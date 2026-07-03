@@ -39,11 +39,13 @@ class _AddTodoTile extends StatelessWidget {
 class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
     Key? key,
+    required this.index,
     this.value,
     required this.onChanged,
     required this.onRemoved,
   }) : super(key: key);
 
+  final int index;
   final String? value;
   final Function(String value) onChanged;
   final VoidCallback onRemoved;
@@ -83,13 +85,29 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
         maxLines: 4,
         minLines: 1,
       ),
-      trailing: IconButton(
-        iconSize: 18,
-        icon: const Icon(
-          Icons.delete_outline,
-          color: Colors.black87,
-        ),
-        onPressed: widget.onRemoved,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            iconSize: 18,
+            icon: const Icon(
+              Icons.delete_outline,
+              color: Colors.black87,
+            ),
+            onPressed: widget.onRemoved,
+          ),
+          ReorderableDragStartListener(
+            index: widget.index,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4.0),
+              child: Icon(
+                Icons.drag_handle,
+                size: 18,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -116,15 +134,22 @@ class _BuildTodoListField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListView.builder(
+        ReorderableListView.builder(
           shrinkWrap: true,
-          itemCount: state.todos.length,
+          buildDefaultDragHandles: false,
           physics: const NeverScrollableScrollPhysics(),
+          itemCount: state.todos.length,
+          onReorder: (oldIndex, newIndex) {
+            context.read<AddUpdateFormBloc>().add(
+                  AddUpdateFormEvent.reorderTodo(oldIndex: oldIndex, newIndex: newIndex),
+                );
+          },
           itemBuilder: (_, index) {
             final Todo todo = state.todos[index];
 
             return _TodoFieldTile(
               key: ValueKey(todo.id),
+              index: index,
               value: todo.title,
               onChanged: (value) {
                 context.read<AddUpdateFormBloc>().add(

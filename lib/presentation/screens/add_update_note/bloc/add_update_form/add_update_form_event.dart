@@ -25,4 +25,9 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     required String value,
     required String id,
   }) = _TodoValueChanged;
+
+  const factory AddUpdateFormEvent.reorderTodo({
+    required int oldIndex,
+    required int newIndex,
+  }) = _ReorderTodo;
 }

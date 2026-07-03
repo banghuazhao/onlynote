@@ -28,6 +28,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -42,6 +43,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -56,6 +58,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -69,6 +72,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -81,6 +85,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -93,6 +98,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -226,6 +232,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return initialize(title, description, color, todos);
   }
@@ -243,6 +250,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return initialize?.call(title, description, color, todos);
   }
@@ -260,6 +268,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (initialize != null) {
@@ -279,6 +288,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return initialize(this);
   }
@@ -294,6 +304,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return initialize?.call(this);
   }
@@ -309,6 +320,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (initialize != null) {
@@ -408,6 +420,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return titleChanged(value);
   }
@@ -425,6 +438,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return titleChanged?.call(value);
   }
@@ -442,6 +456,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -461,6 +476,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return titleChanged(this);
   }
@@ -476,6 +492,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return titleChanged?.call(this);
   }
@@ -491,6 +508,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -584,6 +602,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return descriptionChanged(value);
   }
@@ -601,6 +620,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return descriptionChanged?.call(value);
   }
@@ -618,6 +638,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -637,6 +658,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return descriptionChanged(this);
   }
@@ -652,6 +674,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return descriptionChanged?.call(this);
   }
@@ -667,6 +690,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -760,6 +784,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return colorChanged(value);
   }
@@ -777,6 +802,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return colorChanged?.call(value);
   }
@@ -794,6 +820,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -813,6 +840,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return colorChanged(this);
   }
@@ -828,6 +856,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return colorChanged?.call(this);
   }
@@ -843,6 +872,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -936,6 +966,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return addOrUpdateNote(id);
   }
@@ -953,6 +984,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return addOrUpdateNote?.call(id);
   }
@@ -970,6 +1002,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
@@ -989,6 +1022,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return addOrUpdateNote(this);
   }
@@ -1004,6 +1038,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return addOrUpdateNote?.call(this);
   }
@@ -1019,6 +1054,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
@@ -1085,6 +1121,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return addEmptyTodo();
   }
@@ -1102,6 +1139,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return addEmptyTodo?.call();
   }
@@ -1119,6 +1157,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -1138,6 +1177,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return addEmptyTodo(this);
   }
@@ -1153,6 +1193,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return addEmptyTodo?.call(this);
   }
@@ -1168,6 +1209,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -1255,6 +1297,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return deleteTodo(id);
   }
@@ -1272,6 +1315,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return deleteTodo?.call(id);
   }
@@ -1289,6 +1333,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -1308,6 +1353,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return deleteTodo(this);
   }
@@ -1323,6 +1369,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return deleteTodo?.call(this);
   }
@@ -1338,6 +1385,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -1439,6 +1487,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
   }) {
     return todoValueChanged(value, id);
   }
@@ -1456,6 +1505,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
   }) {
     return todoValueChanged?.call(value, id);
   }
@@ -1473,6 +1523,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -1492,6 +1543,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
   }) {
     return todoValueChanged(this);
   }
@@ -1507,6 +1559,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
   }) {
     return todoValueChanged?.call(this);
   }
@@ -1522,6 +1575,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -1540,6 +1594,200 @@ abstract class _TodoValueChanged implements AddUpdateFormEvent {
   String get id;
   @JsonKey(ignore: true)
   _$$TodoValueChangedImplCopyWith<_$TodoValueChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ReorderTodoImplCopyWith<$Res> {
+  factory _$$ReorderTodoImplCopyWith(
+          _$ReorderTodoImpl value, $Res Function(_$ReorderTodoImpl) then) =
+      __$$ReorderTodoImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({int oldIndex, int newIndex});
+}
+
+/// @nodoc
+class __$$ReorderTodoImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$ReorderTodoImpl>
+    implements _$$ReorderTodoImplCopyWith<$Res> {
+  __$$ReorderTodoImplCopyWithImpl(
+      _$ReorderTodoImpl _value, $Res Function(_$ReorderTodoImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? oldIndex = null,
+    Object? newIndex = null,
+  }) {
+    return _then(_$ReorderTodoImpl(
+      oldIndex: null == oldIndex
+          ? _value.oldIndex
+          : oldIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      newIndex: null == newIndex
+          ? _value.newIndex
+          : newIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ReorderTodoImpl implements _ReorderTodo {
+  const _$ReorderTodoImpl({required this.oldIndex, required this.newIndex});
+
+  @override
+  final int oldIndex;
+  @override
+  final int newIndex;
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.reorderTodo(oldIndex: $oldIndex, newIndex: $newIndex)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ReorderTodoImpl &&
+            (identical(other.oldIndex, oldIndex) ||
+                other.oldIndex == oldIndex) &&
+            (identical(other.newIndex, newIndex) ||
+                other.newIndex == newIndex));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, oldIndex, newIndex);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ReorderTodoImplCopyWith<_$ReorderTodoImpl> get copyWith =>
+      __$$ReorderTodoImplCopyWithImpl<_$ReorderTodoImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String? title, String? description, Color? color, List<Todo>? todos)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function() addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+  }) {
+    return reorderTodo(oldIndex, newIndex);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String? title, String? description, Color? color,
+            List<Todo>? todos)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+  }) {
+    return reorderTodo?.call(oldIndex, newIndex);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String? title, String? description, Color? color,
+            List<Todo>? todos)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function()? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    required TResult orElse(),
+  }) {
+    if (reorderTodo != null) {
+      return reorderTodo(oldIndex, newIndex);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+  }) {
+    return reorderTodo(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+  }) {
+    return reorderTodo?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    required TResult orElse(),
+  }) {
+    if (reorderTodo != null) {
+      return reorderTodo(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ReorderTodo implements AddUpdateFormEvent {
+  const factory _ReorderTodo(
+      {required final int oldIndex,
+      required final int newIndex}) = _$ReorderTodoImpl;
+
+  int get oldIndex;
+  int get newIndex;
+  @JsonKey(ignore: true)
+  _$$ReorderTodoImplCopyWith<_$ReorderTodoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

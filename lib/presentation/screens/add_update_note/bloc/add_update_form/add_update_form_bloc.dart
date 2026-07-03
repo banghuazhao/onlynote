@@ -93,6 +93,19 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
 
       emit(state.copyWith(todos: updatedTodoList));
     });
+
+    //* Reorder todo item
+    on<_ReorderTodo>((event, emit) {
+      final todos = List<Todo>.from(state.todos);
+      var newIndex = event.newIndex;
+      if (newIndex > event.oldIndex) {
+        newIndex -= 1;
+      }
+      final todo = todos.removeAt(event.oldIndex);
+      todos.insert(newIndex, todo);
+
+      emit(state.copyWith(todos: todos));
+    });
   }
 
   final AddUpdateBloc _addUpdateBloc;
