@@ -1,0 +1,5 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"
+
+// Real, production AdMob App ID (gitignored, see Secrets.xcconfig.sample).
+#include? "Secrets.xcconfig"

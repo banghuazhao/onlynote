@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Lulin Y on 2022/2/18.
+  
+*/
+
+"CFBundleDisplayName" = "極簡備忘錄";
+"NSUserTrackingUsageDescription" = "該標識符將用於向您投放個性化廣告";
