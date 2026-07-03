@@ -68,6 +68,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
         "Reminder": MessageLookupByLibrary.simpleMessage("提醒設置"),
         "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
+        "Share": MessageLookupByLibrary.simpleMessage("分享"),
+        "Share_Note_Failed":
+            MessageLookupByLibrary.simpleMessage("分享備忘錄失敗, 請重試"),
         "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
         "Simple_Calculator": MessageLookupByLibrary.simpleMessage("極簡計算器"),
         "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("數獨迷"),

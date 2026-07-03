@@ -6,6 +6,7 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
+import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/random.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -14,6 +15,7 @@ import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:screenshot/screenshot.dart';
 
 import 'bloc/action/note_action_bloc.dart';
 import 'bloc/detail/note_detail_bloc.dart';
@@ -28,6 +30,9 @@ class NoteDetailScreen extends StatefulWidget {
 }
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
+  final ScreenshotController _screenshotController = ScreenshotController();
+  final GlobalKey _shareButtonKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +47,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.deactivate();
   }
 
+  Future<void> _shareNoteAsImage(Note note) async {
+    try {
+      await ShareHelper.shareWidgetAsImage(
+        _screenshotController,
+        fileName: '${note.title?.isNotEmpty == true ? note.title : 'note'}.png',
+        sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NoteDetailBloc, NoteDetailState>(
@@ -53,6 +74,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           appBar: NoteAppBar(
             actions: state.whenOrNull(
               success: (note) => [
+                AppButton(
+                  key: _shareButtonKey,
+                  child: const Icon(Icons.share_outlined),
+                  onPressed: () => _shareNoteAsImage(note),
+                ),
                 AppButton(
                   child: const Icon(Icons.edit_outlined),
                   onPressed: () {
@@ -75,7 +101,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ),
           body: state.maybeMap(
             error: (error) => ErrorText(error.message ?? ''),
-            success: (data) => LoadedView(note: data.note),
+            success: (data) =>
+                LoadedView(note: data.note, screenshotController: _screenshotController),
             orElse: () => const SizedBox.shrink(),
           ),
         );
@@ -88,9 +115,11 @@ class LoadedView extends StatefulWidget {
   const LoadedView({
     Key? key,
     required this.note,
+    required this.screenshotController,
   }) : super(key: key);
 
   final Note note;
+  final ScreenshotController screenshotController;
 
   @override
   _LoadedViewState createState() => _LoadedViewState();
@@ -107,30 +136,44 @@ class _LoadedViewState extends State<LoadedView> {
         vertical: AppSpacings.xl,
       ),
       children: [
-        //* Show Note Title
-        SelectableText(
-          widget.note.title ?? '',
-          style: AppTypography.headline3,
-        ),
-        const SizedBox(height: AppSpacings.l),
+        //* Everything inside here is captured when sharing the note as an image.
+        Screenshot(
+          controller: widget.screenshotController,
+          child: Container(
+            color: widget.note.color ?? Colors.white,
+            padding: const EdgeInsets.all(AppSpacings.l),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                //* Show Note Title
+                SelectableText(
+                  widget.note.title ?? '',
+                  style: AppTypography.headline3,
+                ),
+                const SizedBox(height: AppSpacings.l),
 
-        //* Show Note Update/Add time
-        SelectableText(
-          widget.note.dateWithTime,
-          style: AppTypography.description.copyWith(color: Colors.black87),
-        ),
-        const SizedBox(height: AppSpacings.xxl),
+                //* Show Note Update/Add time
+                SelectableText(
+                  widget.note.dateWithTime,
+                  style: AppTypography.description.copyWith(color: Colors.black87),
+                ),
+                const SizedBox(height: AppSpacings.xxl),
 
-        //* Show todo's list if any
-        if (widget.note.hasTodo) ...{
-          _BuildTodoList(todoList: widget.note.todo),
-          const SizedBox(height: AppSpacings.xxl),
-        },
+                //* Show todo's list if any
+                if (widget.note.hasTodo) ...{
+                  _BuildTodoList(todoList: widget.note.todo),
+                  const SizedBox(height: AppSpacings.xxl),
+                },
 
-        //* Note Description
-        SelectableText(
-          widget.note.description ?? '',
-          style: AppTypography.headline6,
+                //* Note Description
+                SelectableText(
+                  widget.note.description ?? '',
+                  style: AppTypography.headline6,
+                ),
+              ],
+            ),
+          ),
         ),
 
         const SizedBox(height: AppSpacings.xxl),

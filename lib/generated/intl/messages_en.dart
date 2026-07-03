@@ -79,6 +79,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "Relaxing_Up": MessageLookupByLibrary.simpleMessage("Relaxing Up"),
         "Reminder": MessageLookupByLibrary.simpleMessage("Reminder"),
         "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
+        "Share": MessageLookupByLibrary.simpleMessage("Share"),
+        "Share_Note_Failed": MessageLookupByLibrary.simpleMessage(
+            "Failed to share note, please try again."),
         "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
         "Simple_Calculator":
             MessageLookupByLibrary.simpleMessage("Simple Calculator"),

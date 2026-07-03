@@ -23,6 +23,8 @@
  "Failed_to_Update_note_please_try_again" : "Failed to Update note, please try again.",
  "Failed_to_delete_notes" : "Failed to delete notes",
 
+ "Share": "Share",
+ "Share_Note_Failed": "Failed to share note, please try again.",
  "Cancel": "Cancel",
  "OK": "OK",
  "Allow_Notification" : "Allow Notification",

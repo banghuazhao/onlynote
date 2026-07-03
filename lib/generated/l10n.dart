@@ -280,6 +280,26 @@ class S {
     );
   }
 
+  /// `Share`
+  String get Share {
+    return Intl.message(
+      'Share',
+      name: 'Share',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to share note, please try again.`
+  String get Share_Note_Failed {
+    return Intl.message(
+      'Failed to share note, please try again.',
+      name: 'Share_Note_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cancel`
   String get Cancel {
     return Intl.message(

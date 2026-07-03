@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
+import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:screenshot/screenshot.dart';
 
-class NoteCard extends StatelessWidget {
+class NoteCard extends StatefulWidget {
   const NoteCard({
     Key? key,
     required this.note,
@@ -22,8 +25,33 @@ class NoteCard extends StatelessWidget {
   final Function()? onTap;
 
   @override
+  State<NoteCard> createState() => _NoteCardState();
+}
+
+class _NoteCardState extends State<NoteCard> {
+  final ScreenshotController _screenshotController = ScreenshotController();
+  final GlobalKey _shareButtonKey = GlobalKey();
+
+  Future<void> _shareNoteAsImage() async {
+    try {
+      await ShareHelper.shareWidgetAsImage(
+        _screenshotController,
+        fileName: '${widget.note.title?.isNotEmpty == true ? widget.note.title : 'note'}.png',
+        sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
+    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(widget.note);
+    final Note note = widget.note;
 
     return Material(
       type: MaterialType.card,
@@ -34,8 +62,8 @@ class NoteCard extends StatelessWidget {
       elevation: 4,
       child: InkWell(
         splashColor: Colors.black12,
-        onLongPress: onSelect,
-        onTap: onTap,
+        onLongPress: widget.onSelect,
+        onTap: widget.onTap,
         child: Container(
           constraints: const BoxConstraints(
             // maxHeight: 300,
@@ -47,39 +75,45 @@ class NoteCard extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    note.title ?? '',
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 30,
-                      color: AppColors.title,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 4,
+              Screenshot(
+                controller: _screenshotController,
+                child: Container(
+                  color: note.color ?? Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        note.title ?? '',
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 30,
+                          color: AppColors.title,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 4,
+                      ),
+                      const SizedBox(height: AppSpacings.m),
+                      Text(
+                        note.date,
+                        style: AppTypography.description.copyWith(color: Colors.black87),
+                      ),
+                      if (currentReminder != null) const SizedBox(height: AppSpacings.m),
+                      if (currentReminder != null)
+                        Text(
+                          "⏰ " + currentReminder.timeString,
+                          style: AppTypography.description.copyWith(color: Colors.black87),
+                        ),
+                      const SizedBox(height: AppSpacings.m),
+                      if (note.hasTodo) ...{
+                        _BuildTodoList(todoList: note.todo.take(2).toList()),
+                      },
+                    ],
                   ),
-                  const SizedBox(height: AppSpacings.m),
-                  Text(
-                    note.date,
-                    style: AppTypography.description.copyWith(color: Colors.black87),
-                  ),
-                  if (currentReminder != null) const SizedBox(height: AppSpacings.m),
-                  if (currentReminder != null)
-                    Text(
-                      "⏰ " + currentReminder.timeString,
-                      style: AppTypography.description.copyWith(color: Colors.black87),
-                    ),
-                  const SizedBox(height: AppSpacings.m),
-                  if (note.hasTodo) ...{
-                    _BuildTodoList(todoList: note.todo.take(2).toList()),
-                  },
-                ],
+                ),
               ),
-              if (selected)
+              if (widget.selected)
                 Align(
                   alignment: Alignment.topRight,
                   heightFactor: 2,
@@ -101,6 +135,27 @@ class NoteCard extends StatelessWidget {
                         Icons.check,
                         color: note.color,
                         size: 20,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Material(
+                    key: _shareButtonKey,
+                    color: Colors.black.withOpacity(0.08),
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: _shareNoteAsImage,
+                      child: const Padding(
+                        padding: EdgeInsets.all(6.0),
+                        child: Icon(
+                          Icons.share_outlined,
+                          size: 18,
+                          color: Colors.black54,
+                        ),
                       ),
                     ),
                   ),
