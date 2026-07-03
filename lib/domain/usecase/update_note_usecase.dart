@@ -17,8 +17,9 @@ class UpdateNoteUsecase {
 
   Future<Either<NoteError, Unit>> call(Note note) async {
     try {
-      note.todo.removeWhere((todo) => todo.title.isEmptyString);
-      final noteDto = NoteDto.fromNote(note);
+      final todo = List<Todo>.from(note.todo)
+        ..removeWhere((todo) => todo.title.isEmptyString);
+      final noteDto = NoteDto.fromNote(note.copyWith(todo: todo));
 
       if (!noteDto.validNote) {
         return left(

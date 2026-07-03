@@ -195,12 +195,12 @@ class MoreAppItem {
 }
 
 class MoreAppsRow extends StatelessWidget {
-  Image? appIcon;
-  IconData? trailingIcon;
-  String? title;
-  void Function()? onTap;
+  final Image? appIcon;
+  final IconData? trailingIcon;
+  final String? title;
+  final void Function()? onTap;
 
-  MoreAppsRow(
+  const MoreAppsRow(
       {Key? key,
       this.trailingIcon = Icons.chevron_right_rounded,
       required this.appIcon,
@@ -208,11 +208,13 @@ class MoreAppsRow extends StatelessWidget {
       required this.onTap})
       : super(key: key);
 
-  MoreAppsRow.factory(MoreAppItem moreAppItem) {
-    appIcon = moreAppItem.appIcon;
-    trailingIcon = Icons.chevron_right_rounded;
-    title = moreAppItem.title;
-    onTap = moreAppItem.onTap;
+  factory MoreAppsRow.factory(MoreAppItem moreAppItem) {
+    return MoreAppsRow(
+      appIcon: moreAppItem.appIcon,
+      trailingIcon: Icons.chevron_right_rounded,
+      title: moreAppItem.title,
+      onTap: moreAppItem.onTap,
+    );
   }
 
   @override

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/domain/model/note.dart';
-import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
