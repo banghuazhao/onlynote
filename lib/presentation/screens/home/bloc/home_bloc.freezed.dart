@@ -19,32 +19,38 @@ mixin _$HomeEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -106,6 +112,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
   }) {
     return getAllNotes();
   }
@@ -114,6 +121,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
   }) {
     return getAllNotes?.call();
   }
@@ -122,6 +130,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -134,6 +143,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
   }) {
     return getAllNotes(this);
   }
@@ -142,6 +152,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
   }) {
     return getAllNotes?.call(this);
   }
@@ -150,6 +161,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -161,6 +173,149 @@ class _$GetAllNotesImpl implements _GetAllNotes {
 
 abstract class _GetAllNotes implements HomeEvent {
   const factory _GetAllNotes() = _$GetAllNotesImpl;
+}
+
+/// @nodoc
+abstract class _$$DuplicateNoteImplCopyWith<$Res> {
+  factory _$$DuplicateNoteImplCopyWith(
+          _$DuplicateNoteImpl value, $Res Function(_$DuplicateNoteImpl) then) =
+      __$$DuplicateNoteImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({Note note});
+
+  $NoteCopyWith<$Res> get note;
+}
+
+/// @nodoc
+class __$$DuplicateNoteImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$DuplicateNoteImpl>
+    implements _$$DuplicateNoteImplCopyWith<$Res> {
+  __$$DuplicateNoteImplCopyWithImpl(
+      _$DuplicateNoteImpl _value, $Res Function(_$DuplicateNoteImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? note = null,
+  }) {
+    return _then(_$DuplicateNoteImpl(
+      null == note
+          ? _value.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as Note,
+    ));
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $NoteCopyWith<$Res> get note {
+    return $NoteCopyWith<$Res>(_value.note, (value) {
+      return _then(_value.copyWith(note: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _$DuplicateNoteImpl implements _DuplicateNote {
+  const _$DuplicateNoteImpl(this.note);
+
+  @override
+  final Note note;
+
+  @override
+  String toString() {
+    return 'HomeEvent.duplicateNote(note: $note)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DuplicateNoteImpl &&
+            (identical(other.note, note) || other.note == note));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, note);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DuplicateNoteImplCopyWith<_$DuplicateNoteImpl> get copyWith =>
+      __$$DuplicateNoteImplCopyWithImpl<_$DuplicateNoteImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+  }) {
+    return duplicateNote(note);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+  }) {
+    return duplicateNote?.call(note);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    required TResult orElse(),
+  }) {
+    if (duplicateNote != null) {
+      return duplicateNote(note);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+  }) {
+    return duplicateNote(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+  }) {
+    return duplicateNote?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    required TResult orElse(),
+  }) {
+    if (duplicateNote != null) {
+      return duplicateNote(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _DuplicateNote implements HomeEvent {
+  const factory _DuplicateNote(final Note note) = _$DuplicateNoteImpl;
+
+  Note get note;
+  @JsonKey(ignore: true)
+  _$$DuplicateNoteImplCopyWith<_$DuplicateNoteImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc

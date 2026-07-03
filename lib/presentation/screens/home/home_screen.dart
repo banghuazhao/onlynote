@@ -1,3 +1,4 @@
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:focus_detector/focus_detector.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
+import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -18,6 +20,7 @@ import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bl
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:screenshot/screenshot.dart';
 
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
@@ -195,6 +198,14 @@ class _BuildNotesList extends StatefulWidget {
 }
 
 class __BuildNotesListState extends State<_BuildNotesList> {
+  final Map<String, ScreenshotController> _screenshotControllers = {};
+  final Map<String, GlobalKey> _cardKeys = {};
+
+  ScreenshotController _screenshotControllerFor(String noteId) =>
+      _screenshotControllers.putIfAbsent(noteId, () => ScreenshotController());
+
+  GlobalKey _cardKeyFor(String noteId) => _cardKeys.putIfAbsent(noteId, () => GlobalKey());
+
   void viewWillAppear() {
     print("onResume / viewWillAppear / onFocusGained");
     if (mounted) {
@@ -204,6 +215,85 @@ class __BuildNotesListState extends State<_BuildNotesList> {
 
   void viewWillDisappear() {
     print("onPause / viewWillDisappear / onFocusLost");
+  }
+
+  Future<void> _shareNote(
+    BuildContext context,
+    Note note,
+    ScreenshotController controller,
+    GlobalKey cardKey,
+  ) async {
+    try {
+      await ShareHelper.shareWidgetAsImage(
+        controller,
+        fileName: '${note.title?.isNotEmpty == true ? note.title : 'note'}.png',
+        sharePositionOrigin: ShareHelper.shareOriginFromKey(cardKey),
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
+        );
+      }
+    }
+  }
+
+  void _showNoteContextMenu(
+    BuildContext context,
+    Note note,
+    MultipleDeleteBloc multipleDeleteBloc,
+    String noteId,
+  ) {
+    final screenshotController = _screenshotControllerFor(noteId);
+    final cardKey = _cardKeyFor(noteId);
+
+    showAdaptiveActionSheet(
+      context: context,
+      androidBorderRadius: 30,
+      actions: <BottomSheetAction>[
+        BottomSheetAction(
+          leading: const Icon(Icons.share_outlined),
+          title: Text(S.of(context).Share),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _shareNote(context, note, screenshotController, cardKey);
+          },
+        ),
+        BottomSheetAction(
+          leading: const Icon(Icons.copy_outlined),
+          title: Text(S.of(context).Duplicate),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            context.read<HomeBloc>().add(HomeEvent.duplicateNote(note));
+          },
+        ),
+        BottomSheetAction(
+          leading: const Icon(Icons.check_circle_outline),
+          title: Text(S.of(context).Select),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+          },
+        ),
+        BottomSheetAction(
+          leading: const Icon(Icons.delete_outline, color: Colors.red),
+          title: Text(S.of(context).Delete, style: const TextStyle(color: Colors.red)),
+          onPressed: (sheetContext) async {
+            Navigator.pop(sheetContext);
+            final confirmed = await showConfirmDialog(
+              context,
+              title: S.of(context).Delete_Note_Confirm_Title,
+              message: S.of(context).Delete_Note_Confirm_Message,
+            );
+            if (confirmed) {
+              multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+              multipleDeleteBloc.add(const MultipleDeleteEvent.delete());
+            }
+          },
+        ),
+      ],
+      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
+    );
   }
 
   @override
@@ -223,28 +313,35 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         crossAxisCount: width > 600 ? 3 : 2,
         itemCount: widget.notes.length,
         itemBuilder: (BuildContext context, int index) {
-          final noteId = widget.notes[index].id!;
+          final note = widget.notes[index];
+          final noteId = note.id!;
           return FadeInUp(
             duration: Duration(milliseconds: 100 * index),
-            child: NoteCard(
-              note: widget.notes[index],
-              selected: multipleDeleteBloc.isSelected(noteId),
-              onTap: () {
-                multipleDeleteBloc.state.maybeMap(
-                  orElse: () {
-                    // var route = NoteDetailRoute(noteId: noteId);
-                    // context.router.push(route);
-                    // context.router.pop(route);
-                    context.router.push(NoteDetailRoute(noteId: noteId));
-                  },
-                  selected: (_) {
-                    multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
-                  },
-                );
-              },
-              onSelect: () {
-                multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
-              },
+            child: KeyedSubtree(
+              key: _cardKeyFor(noteId),
+              child: NoteCard(
+                note: note,
+                selected: multipleDeleteBloc.isSelected(noteId),
+                screenshotController: _screenshotControllerFor(noteId),
+                onTap: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () {
+                      context.router.push(NoteDetailRoute(noteId: noteId));
+                    },
+                    selected: (_) {
+                      multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
+                onLongPress: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () => _showNoteContextMenu(context, note, multipleDeleteBloc, noteId),
+                    selected: (_) {
+                      multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
+              ),
             ),
           );
         },

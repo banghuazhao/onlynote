@@ -340,6 +340,46 @@ class S {
     );
   }
 
+  /// `Duplicate`
+  String get Duplicate {
+    return Intl.message(
+      'Duplicate',
+      name: 'Duplicate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note Duplicated Successfully`
+  String get Note_Duplicated_Successfully {
+    return Intl.message(
+      'Note Duplicated Successfully',
+      name: 'Note_Duplicated_Successfully',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `(Copy)`
+  String get Copy_Suffix {
+    return Intl.message(
+      '(Copy)',
+      name: 'Copy_Suffix',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select`
+  String get Select {
+    return Intl.message(
+      'Select',
+      name: 'Select',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cancel`
   String get Cancel {
     return Intl.message(

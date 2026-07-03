@@ -29,6 +29,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "Classical_Music_Box":
             MessageLookupByLibrary.simpleMessage("Classical Music Box"),
+        "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(Copy)"),
         "Delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "Delete_Note_Confirm_Message": MessageLookupByLibrary.simpleMessage(
             "This note will be permanently deleted. This can\'t be undone."),
@@ -38,6 +39,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "This checklist item will be removed. This can\'t be undone."),
         "Delete_Todo_Confirm_Title":
             MessageLookupByLibrary.simpleMessage("Delete this item?"),
+        "Duplicate": MessageLookupByLibrary.simpleMessage("Duplicate"),
         "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
         "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
         "Failed_to_Update_note_please_try_again":
@@ -77,6 +79,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Note_Added_Successfully":
             MessageLookupByLibrary.simpleMessage("Note Added Successfully"),
         "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
+        "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
+            "Note Duplicated Successfully"),
         "Note_Updated_Successfully":
             MessageLookupByLibrary.simpleMessage("Note Updated Successfully"),
         "Notes_Deleted_Successfully":
@@ -87,6 +91,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Relaxing_Up": MessageLookupByLibrary.simpleMessage("Relaxing Up"),
         "Reminder": MessageLookupByLibrary.simpleMessage("Reminder"),
         "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
+        "Select": MessageLookupByLibrary.simpleMessage("Select"),
         "Share": MessageLookupByLibrary.simpleMessage("Share"),
         "Share_Note_Failed": MessageLookupByLibrary.simpleMessage(
             "Failed to share note, please try again."),

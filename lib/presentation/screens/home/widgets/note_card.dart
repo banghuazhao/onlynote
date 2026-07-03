@@ -15,21 +15,28 @@ class NoteCard extends StatefulWidget {
     Key? key,
     required this.note,
     this.selected = false,
-    this.onSelect,
+    this.onLongPress,
     this.onTap,
+    this.screenshotController,
   }) : super(key: key);
 
   final Note note;
   final bool selected;
-  final Function()? onSelect;
+  final Function()? onLongPress;
   final Function()? onTap;
+
+  /// Lets a parent capture the same rendered content for its own actions
+  /// (e.g. a long-press context menu's "Share" item). Falls back to an
+  /// internally-owned controller when not provided.
+  final ScreenshotController? screenshotController;
 
   @override
   State<NoteCard> createState() => _NoteCardState();
 }
 
 class _NoteCardState extends State<NoteCard> {
-  final ScreenshotController _screenshotController = ScreenshotController();
+  late final ScreenshotController _screenshotController =
+      widget.screenshotController ?? ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
 
   Future<void> _shareNoteAsImage() async {
@@ -62,7 +69,7 @@ class _NoteCardState extends State<NoteCard> {
       elevation: 4,
       child: InkWell(
         splashColor: Colors.black12,
-        onLongPress: widget.onSelect,
+        onLongPress: widget.onLongPress,
         onTap: widget.onTap,
         child: Container(
           constraints: const BoxConstraints(

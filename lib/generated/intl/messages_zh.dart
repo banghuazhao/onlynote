@@ -27,6 +27,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Allow_Notification": MessageLookupByLibrary.simpleMessage("允许推送"),
         "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
         "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音乐盒"),
+        "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(副本)"),
         "Delete": MessageLookupByLibrary.simpleMessage("删除"),
         "Delete_Note_Confirm_Message":
             MessageLookupByLibrary.simpleMessage("此备忘录将被永久删除，且无法恢复。"),
@@ -36,6 +37,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("此待办事项将被删除，且无法恢复。"),
         "Delete_Todo_Confirm_Title":
             MessageLookupByLibrary.simpleMessage("删除此项？"),
+        "Duplicate": MessageLookupByLibrary.simpleMessage("复制"),
         "Edit": MessageLookupByLibrary.simpleMessage("编辑"),
         "Express_Scan": MessageLookupByLibrary.simpleMessage("飞速扫描"),
         "Failed_to_Update_note_please_try_again":
@@ -66,6 +68,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Note_Added_Successfully":
             MessageLookupByLibrary.simpleMessage("已成功添加备忘录"),
         "Note_Deleted": MessageLookupByLibrary.simpleMessage("已删除备忘录"),
+        "Note_Duplicated_Successfully":
+            MessageLookupByLibrary.simpleMessage("已成功复制备忘录"),
         "Note_Updated_Successfully":
             MessageLookupByLibrary.simpleMessage("已成功更新备忘录"),
         "Notes_Deleted_Successfully":
@@ -76,6 +80,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
         "Reminder": MessageLookupByLibrary.simpleMessage("提醒设置"),
         "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
+        "Select": MessageLookupByLibrary.simpleMessage("选择"),
         "Share": MessageLookupByLibrary.simpleMessage("分享"),
         "Share_Note_Failed":
             MessageLookupByLibrary.simpleMessage("分享备忘录失败, 请重试"),

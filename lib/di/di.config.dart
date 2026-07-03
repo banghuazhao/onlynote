@@ -72,8 +72,10 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i731.AddNoteUsecase>(),
           gh<_i731.UpdateNoteUsecase>(),
         ));
-    gh.factory<_i256.HomeBloc>(
-        () => _i256.HomeBloc(gh<_i731.ShowAllNotesUsecase>()));
+    gh.factory<_i256.HomeBloc>(() => _i256.HomeBloc(
+          gh<_i731.ShowAllNotesUsecase>(),
+          gh<_i731.AddNoteUsecase>(),
+        ));
     gh.factory<_i367.MultipleDeleteBloc>(
         () => _i367.MultipleDeleteBloc(gh<_i731.DeleteMultipleNotesUsecase>()));
     gh.factory<_i346.AddUpdateFormBloc>(
