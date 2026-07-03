@@ -25,6 +25,10 @@
 
  "Share": "Share",
  "Share_Note_Failed": "Failed to share note, please try again.",
+ "Delete_Todo_Confirm_Title": "Delete this item?",
+ "Delete_Todo_Confirm_Message": "This checklist item will be removed. This can't be undone.",
+ "Delete_Note_Confirm_Title": "Delete this note?",
+ "Delete_Note_Confirm_Message": "This note will be permanently deleted. This can't be undone.",
  "Cancel": "Cancel",
  "OK": "OK",
  "Allow_Notification" : "Allow Notification",

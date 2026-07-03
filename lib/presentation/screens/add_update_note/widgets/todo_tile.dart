@@ -124,6 +124,7 @@ class _BuildTodoListField extends StatelessWidget {
             final Todo todo = state.todos[index];
 
             return _TodoFieldTile(
+              key: ValueKey(todo.id),
               value: todo.title,
               onChanged: (value) {
                 context.read<AddUpdateFormBloc>().add(
@@ -133,8 +134,15 @@ class _BuildTodoListField extends StatelessWidget {
                       ),
                     );
               },
-              onRemoved: () {
-                context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.deleteTodo(todo.id!));
+              onRemoved: () async {
+                final confirmed = await showConfirmDialog(
+                  context,
+                  title: S.of(context).Delete_Todo_Confirm_Title,
+                  message: S.of(context).Delete_Todo_Confirm_Message,
+                );
+                if (confirmed) {
+                  context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.deleteTodo(todo.id!));
+                }
               },
             );
           },

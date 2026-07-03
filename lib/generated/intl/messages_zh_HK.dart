@@ -28,6 +28,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
         "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音樂盒"),
         "Delete": MessageLookupByLibrary.simpleMessage("刪除"),
+        "Delete_Note_Confirm_Message":
+            MessageLookupByLibrary.simpleMessage("此備忘錄將被永久刪除，且無法恢復。"),
+        "Delete_Note_Confirm_Title":
+            MessageLookupByLibrary.simpleMessage("刪除此備忘錄？"),
+        "Delete_Todo_Confirm_Message":
+            MessageLookupByLibrary.simpleMessage("此待辦事項將被刪除，且無法恢復。"),
+        "Delete_Todo_Confirm_Title":
+            MessageLookupByLibrary.simpleMessage("刪除此項？"),
         "Edit": MessageLookupByLibrary.simpleMessage("編輯"),
         "Express_Scan": MessageLookupByLibrary.simpleMessage("飛速掃描"),
         "Failed_to_Update_note_please_try_again":

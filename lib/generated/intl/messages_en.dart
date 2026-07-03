@@ -30,6 +30,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "Classical_Music_Box":
             MessageLookupByLibrary.simpleMessage("Classical Music Box"),
         "Delete": MessageLookupByLibrary.simpleMessage("Delete"),
+        "Delete_Note_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+            "This note will be permanently deleted. This can\'t be undone."),
+        "Delete_Note_Confirm_Title":
+            MessageLookupByLibrary.simpleMessage("Delete this note?"),
+        "Delete_Todo_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+            "This checklist item will be removed. This can\'t be undone."),
+        "Delete_Todo_Confirm_Title":
+            MessageLookupByLibrary.simpleMessage("Delete this item?"),
         "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
         "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
         "Failed_to_Update_note_please_try_again":

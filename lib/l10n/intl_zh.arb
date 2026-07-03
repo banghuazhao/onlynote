@@ -25,6 +25,10 @@
 
   "Share": "分享",
   "Share_Note_Failed": "分享备忘录失败, 请重试",
+  "Delete_Todo_Confirm_Title": "删除此项？",
+  "Delete_Todo_Confirm_Message": "此待办事项将被删除，且无法恢复。",
+  "Delete_Note_Confirm_Title": "删除此备忘录？",
+  "Delete_Note_Confirm_Message": "此备忘录将被永久删除，且无法恢复。",
   "Cancel": "取消",
   "OK": "好的",
   "Allow_Notification" : "允许推送",

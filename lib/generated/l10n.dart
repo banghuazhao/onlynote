@@ -300,6 +300,46 @@ class S {
     );
   }
 
+  /// `Delete this item?`
+  String get Delete_Todo_Confirm_Title {
+    return Intl.message(
+      'Delete this item?',
+      name: 'Delete_Todo_Confirm_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This checklist item will be removed. This can't be undone.`
+  String get Delete_Todo_Confirm_Message {
+    return Intl.message(
+      'This checklist item will be removed. This can\'t be undone.',
+      name: 'Delete_Todo_Confirm_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete this note?`
+  String get Delete_Note_Confirm_Title {
+    return Intl.message(
+      'Delete this note?',
+      name: 'Delete_Note_Confirm_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note will be permanently deleted. This can't be undone.`
+  String get Delete_Note_Confirm_Message {
+    return Intl.message(
+      'This note will be permanently deleted. This can\'t be undone.',
+      name: 'Delete_Note_Confirm_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cancel`
   String get Cancel {
     return Intl.message(

@@ -87,7 +87,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 ),
                 AppButton(
                   child: const Icon(Icons.delete_outline),
-                  onPressed: () {
+                  onPressed: () async {
+                    final confirmed = await showConfirmDialog(
+                      context,
+                      title: S.of(context).Delete_Note_Confirm_Title,
+                      message: S.of(context).Delete_Note_Confirm_Message,
+                    );
+                    if (!confirmed) return;
+
                     Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
                     if (currentReminder != null) {
                       ReminderData.shared.deleteReminder(currentReminder);
