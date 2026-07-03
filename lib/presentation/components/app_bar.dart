@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/map_index.dart';
 import 'package:onlynote/presentation/components/components.dart';
@@ -10,7 +9,7 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 
-class NoteAppBar extends StatelessWidget with PreferredSizeWidget {
+class NoteAppBar extends StatelessWidget implements PreferredSizeWidget {
   const NoteAppBar({
     Key? key,
     this.autoImplementLeading = true,
@@ -44,9 +43,9 @@ class NoteAppBar extends StatelessWidget with PreferredSizeWidget {
                 children: [
                   if (autoImplementLeading)
                     AppButton(
-                      child: const Icon(FeatherIcons.chevronLeft),
+                      child: const Icon(Icons.chevron_left),
                       onPressed: () {
-                        context.router.pop("back");
+                        context.router.maybePop("back");
                       },
                     ),
                   (title != null)

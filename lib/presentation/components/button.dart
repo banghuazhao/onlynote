@@ -5,8 +5,6 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 
-export 'package:flutter_feather_icons/flutter_feather_icons.dart';
-
 class AppButton extends StatelessWidget {
   const AppButton({
     Key? key,

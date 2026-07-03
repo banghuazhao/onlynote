@@ -1,6 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'note_detail_bloc.dart';
 
@@ -11,27 +12,7 @@ part of 'note_detail_bloc.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$NoteDetailEventTearOff {
-  const _$NoteDetailEventTearOff();
-
-  _ShowNote showNote(String noteId) {
-    return _ShowNote(
-      noteId,
-    );
-  }
-
-  _ToggleTodoCheckbox toggleTodoCheckbox(String todoId) {
-    return _ToggleTodoCheckbox(
-      todoId,
-    );
-  }
-}
-
-/// @nodoc
-const $NoteDetailEvent = _$NoteDetailEventTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$NoteDetailEvent {
@@ -43,8 +24,8 @@ mixin _$NoteDetailEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String noteId)? showNote,
-    TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId)? showNote,
+    TResult? Function(String todoId)? toggleTodoCheckbox,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -62,8 +43,8 @@ mixin _$NoteDetailEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_ShowNote value)? showNote,
-    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ShowNote value)? showNote,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -79,41 +60,44 @@ mixin _$NoteDetailEvent {
 abstract class $NoteDetailEventCopyWith<$Res> {
   factory $NoteDetailEventCopyWith(
           NoteDetailEvent value, $Res Function(NoteDetailEvent) then) =
-      _$NoteDetailEventCopyWithImpl<$Res>;
+      _$NoteDetailEventCopyWithImpl<$Res, NoteDetailEvent>;
 }
 
 /// @nodoc
-class _$NoteDetailEventCopyWithImpl<$Res>
+class _$NoteDetailEventCopyWithImpl<$Res, $Val extends NoteDetailEvent>
     implements $NoteDetailEventCopyWith<$Res> {
   _$NoteDetailEventCopyWithImpl(this._value, this._then);
 
-  final NoteDetailEvent _value;
   // ignore: unused_field
-  final $Res Function(NoteDetailEvent) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
-abstract class _$ShowNoteCopyWith<$Res> {
-  factory _$ShowNoteCopyWith(_ShowNote value, $Res Function(_ShowNote) then) =
-      __$ShowNoteCopyWithImpl<$Res>;
+abstract class _$$ShowNoteImplCopyWith<$Res> {
+  factory _$$ShowNoteImplCopyWith(
+          _$ShowNoteImpl value, $Res Function(_$ShowNoteImpl) then) =
+      __$$ShowNoteImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String noteId});
 }
 
 /// @nodoc
-class __$ShowNoteCopyWithImpl<$Res> extends _$NoteDetailEventCopyWithImpl<$Res>
-    implements _$ShowNoteCopyWith<$Res> {
-  __$ShowNoteCopyWithImpl(_ShowNote _value, $Res Function(_ShowNote) _then)
-      : super(_value, (v) => _then(v as _ShowNote));
+class __$$ShowNoteImplCopyWithImpl<$Res>
+    extends _$NoteDetailEventCopyWithImpl<$Res, _$ShowNoteImpl>
+    implements _$$ShowNoteImplCopyWith<$Res> {
+  __$$ShowNoteImplCopyWithImpl(
+      _$ShowNoteImpl _value, $Res Function(_$ShowNoteImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ShowNote get _value => super._value as _ShowNote;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? noteId = freezed,
+    Object? noteId = null,
   }) {
-    return _then(_ShowNote(
-      noteId == freezed
+    return _then(_$ShowNoteImpl(
+      null == noteId
           ? _value.noteId
           : noteId // ignore: cast_nullable_to_non_nullable
               as String,
@@ -123,8 +107,8 @@ class __$ShowNoteCopyWithImpl<$Res> extends _$NoteDetailEventCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ShowNote implements _ShowNote {
-  const _$_ShowNote(this.noteId);
+class _$ShowNoteImpl implements _ShowNote {
+  const _$ShowNoteImpl(this.noteId);
 
   @override
   final String noteId;
@@ -135,21 +119,21 @@ class _$_ShowNote implements _ShowNote {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _ShowNote &&
-            (identical(other.noteId, noteId) ||
-                const DeepCollectionEquality().equals(other.noteId, noteId)));
+        (other.runtimeType == runtimeType &&
+            other is _$ShowNoteImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(noteId);
+  int get hashCode => Object.hash(runtimeType, noteId);
 
   @JsonKey(ignore: true)
   @override
-  _$ShowNoteCopyWith<_ShowNote> get copyWith =>
-      __$ShowNoteCopyWithImpl<_ShowNote>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ShowNoteImplCopyWith<_$ShowNoteImpl> get copyWith =>
+      __$$ShowNoteImplCopyWithImpl<_$ShowNoteImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -163,8 +147,8 @@ class _$_ShowNote implements _ShowNote {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String noteId)? showNote,
-    TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId)? showNote,
+    TResult? Function(String todoId)? toggleTodoCheckbox,
   }) {
     return showNote?.call(noteId);
   }
@@ -194,8 +178,8 @@ class _$_ShowNote implements _ShowNote {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_ShowNote value)? showNote,
-    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ShowNote value)? showNote,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
   }) {
     return showNote?.call(this);
   }
@@ -215,39 +199,38 @@ class _$_ShowNote implements _ShowNote {
 }
 
 abstract class _ShowNote implements NoteDetailEvent {
-  const factory _ShowNote(String noteId) = _$_ShowNote;
+  const factory _ShowNote(final String noteId) = _$ShowNoteImpl;
 
-  String get noteId => throw _privateConstructorUsedError;
+  String get noteId;
   @JsonKey(ignore: true)
-  _$ShowNoteCopyWith<_ShowNote> get copyWith =>
+  _$$ShowNoteImplCopyWith<_$ShowNoteImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$ToggleTodoCheckboxCopyWith<$Res> {
-  factory _$ToggleTodoCheckboxCopyWith(
-          _ToggleTodoCheckbox value, $Res Function(_ToggleTodoCheckbox) then) =
-      __$ToggleTodoCheckboxCopyWithImpl<$Res>;
+abstract class _$$ToggleTodoCheckboxImplCopyWith<$Res> {
+  factory _$$ToggleTodoCheckboxImplCopyWith(_$ToggleTodoCheckboxImpl value,
+          $Res Function(_$ToggleTodoCheckboxImpl) then) =
+      __$$ToggleTodoCheckboxImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String todoId});
 }
 
 /// @nodoc
-class __$ToggleTodoCheckboxCopyWithImpl<$Res>
-    extends _$NoteDetailEventCopyWithImpl<$Res>
-    implements _$ToggleTodoCheckboxCopyWith<$Res> {
-  __$ToggleTodoCheckboxCopyWithImpl(
-      _ToggleTodoCheckbox _value, $Res Function(_ToggleTodoCheckbox) _then)
-      : super(_value, (v) => _then(v as _ToggleTodoCheckbox));
+class __$$ToggleTodoCheckboxImplCopyWithImpl<$Res>
+    extends _$NoteDetailEventCopyWithImpl<$Res, _$ToggleTodoCheckboxImpl>
+    implements _$$ToggleTodoCheckboxImplCopyWith<$Res> {
+  __$$ToggleTodoCheckboxImplCopyWithImpl(_$ToggleTodoCheckboxImpl _value,
+      $Res Function(_$ToggleTodoCheckboxImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ToggleTodoCheckbox get _value => super._value as _ToggleTodoCheckbox;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? todoId = freezed,
+    Object? todoId = null,
   }) {
-    return _then(_ToggleTodoCheckbox(
-      todoId == freezed
+    return _then(_$ToggleTodoCheckboxImpl(
+      null == todoId
           ? _value.todoId
           : todoId // ignore: cast_nullable_to_non_nullable
               as String,
@@ -257,8 +240,8 @@ class __$ToggleTodoCheckboxCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ToggleTodoCheckbox implements _ToggleTodoCheckbox {
-  const _$_ToggleTodoCheckbox(this.todoId);
+class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
+  const _$ToggleTodoCheckboxImpl(this.todoId);
 
   @override
   final String todoId;
@@ -269,21 +252,22 @@ class _$_ToggleTodoCheckbox implements _ToggleTodoCheckbox {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _ToggleTodoCheckbox &&
-            (identical(other.todoId, todoId) ||
-                const DeepCollectionEquality().equals(other.todoId, todoId)));
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTodoCheckboxImpl &&
+            (identical(other.todoId, todoId) || other.todoId == todoId));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(todoId);
+  int get hashCode => Object.hash(runtimeType, todoId);
 
   @JsonKey(ignore: true)
   @override
-  _$ToggleTodoCheckboxCopyWith<_ToggleTodoCheckbox> get copyWith =>
-      __$ToggleTodoCheckboxCopyWithImpl<_ToggleTodoCheckbox>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ToggleTodoCheckboxImplCopyWith<_$ToggleTodoCheckboxImpl> get copyWith =>
+      __$$ToggleTodoCheckboxImplCopyWithImpl<_$ToggleTodoCheckboxImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -297,8 +281,8 @@ class _$_ToggleTodoCheckbox implements _ToggleTodoCheckbox {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String noteId)? showNote,
-    TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId)? showNote,
+    TResult? Function(String todoId)? toggleTodoCheckbox,
   }) {
     return toggleTodoCheckbox?.call(todoId);
   }
@@ -328,8 +312,8 @@ class _$_ToggleTodoCheckbox implements _ToggleTodoCheckbox {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_ShowNote value)? showNote,
-    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ShowNote value)? showNote,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
   }) {
     return toggleTodoCheckbox?.call(this);
   }
@@ -349,41 +333,14 @@ class _$_ToggleTodoCheckbox implements _ToggleTodoCheckbox {
 }
 
 abstract class _ToggleTodoCheckbox implements NoteDetailEvent {
-  const factory _ToggleTodoCheckbox(String todoId) = _$_ToggleTodoCheckbox;
+  const factory _ToggleTodoCheckbox(final String todoId) =
+      _$ToggleTodoCheckboxImpl;
 
-  String get todoId => throw _privateConstructorUsedError;
+  String get todoId;
   @JsonKey(ignore: true)
-  _$ToggleTodoCheckboxCopyWith<_ToggleTodoCheckbox> get copyWith =>
+  _$$ToggleTodoCheckboxImplCopyWith<_$ToggleTodoCheckboxImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
-
-/// @nodoc
-class _$NoteDetailStateTearOff {
-  const _$NoteDetailStateTearOff();
-
-  _Initial initial() {
-    return const _Initial();
-  }
-
-  _Loading loading() {
-    return const _Loading();
-  }
-
-  _Loaded success(Note note) {
-    return _Loaded(
-      note,
-    );
-  }
-
-  _Error error({String? message}) {
-    return _Error(
-      message: message,
-    );
-  }
-}
-
-/// @nodoc
-const $NoteDetailState = _$NoteDetailStateTearOff();
 
 /// @nodoc
 mixin _$NoteDetailState {
@@ -397,10 +354,10 @@ mixin _$NoteDetailState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(Note note)? success,
-    TResult Function(String? message)? error,
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(Note note)? success,
+    TResult? Function(String? message)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -422,10 +379,10 @@ mixin _$NoteDetailState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? success,
-    TResult Function(_Error value)? error,
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? success,
+    TResult? Function(_Error value)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -443,39 +400,40 @@ mixin _$NoteDetailState {
 abstract class $NoteDetailStateCopyWith<$Res> {
   factory $NoteDetailStateCopyWith(
           NoteDetailState value, $Res Function(NoteDetailState) then) =
-      _$NoteDetailStateCopyWithImpl<$Res>;
+      _$NoteDetailStateCopyWithImpl<$Res, NoteDetailState>;
 }
 
 /// @nodoc
-class _$NoteDetailStateCopyWithImpl<$Res>
+class _$NoteDetailStateCopyWithImpl<$Res, $Val extends NoteDetailState>
     implements $NoteDetailStateCopyWith<$Res> {
   _$NoteDetailStateCopyWithImpl(this._value, this._then);
 
-  final NoteDetailState _value;
   // ignore: unused_field
-  final $Res Function(NoteDetailState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
-abstract class _$InitialCopyWith<$Res> {
-  factory _$InitialCopyWith(_Initial value, $Res Function(_Initial) then) =
-      __$InitialCopyWithImpl<$Res>;
+abstract class _$$InitialImplCopyWith<$Res> {
+  factory _$$InitialImplCopyWith(
+          _$InitialImpl value, $Res Function(_$InitialImpl) then) =
+      __$$InitialImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$InitialCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
-    implements _$InitialCopyWith<$Res> {
-  __$InitialCopyWithImpl(_Initial _value, $Res Function(_Initial) _then)
-      : super(_value, (v) => _then(v as _Initial));
-
-  @override
-  _Initial get _value => super._value as _Initial;
+class __$$InitialImplCopyWithImpl<$Res>
+    extends _$NoteDetailStateCopyWithImpl<$Res, _$InitialImpl>
+    implements _$$InitialImplCopyWith<$Res> {
+  __$$InitialImplCopyWithImpl(
+      _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$_Initial implements _Initial {
-  const _$_Initial();
+class _$InitialImpl implements _Initial {
+  const _$InitialImpl();
 
   @override
   String toString() {
@@ -483,8 +441,9 @@ class _$_Initial implements _Initial {
   }
 
   @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) || (other is _Initial);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$InitialImpl);
   }
 
   @override
@@ -504,10 +463,10 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(Note note)? success,
-    TResult Function(String? message)? error,
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(Note note)? success,
+    TResult? Function(String? message)? error,
   }) {
     return initial?.call();
   }
@@ -541,10 +500,10 @@ class _$_Initial implements _Initial {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? success,
-    TResult Function(_Error value)? error,
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? success,
+    TResult? Function(_Error value)? error,
   }) {
     return initial?.call(this);
   }
@@ -566,29 +525,29 @@ class _$_Initial implements _Initial {
 }
 
 abstract class _Initial implements NoteDetailState {
-  const factory _Initial() = _$_Initial;
+  const factory _Initial() = _$InitialImpl;
 }
 
 /// @nodoc
-abstract class _$LoadingCopyWith<$Res> {
-  factory _$LoadingCopyWith(_Loading value, $Res Function(_Loading) then) =
-      __$LoadingCopyWithImpl<$Res>;
+abstract class _$$LoadingImplCopyWith<$Res> {
+  factory _$$LoadingImplCopyWith(
+          _$LoadingImpl value, $Res Function(_$LoadingImpl) then) =
+      __$$LoadingImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$LoadingCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
-    implements _$LoadingCopyWith<$Res> {
-  __$LoadingCopyWithImpl(_Loading _value, $Res Function(_Loading) _then)
-      : super(_value, (v) => _then(v as _Loading));
-
-  @override
-  _Loading get _value => super._value as _Loading;
+class __$$LoadingImplCopyWithImpl<$Res>
+    extends _$NoteDetailStateCopyWithImpl<$Res, _$LoadingImpl>
+    implements _$$LoadingImplCopyWith<$Res> {
+  __$$LoadingImplCopyWithImpl(
+      _$LoadingImpl _value, $Res Function(_$LoadingImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$_Loading implements _Loading {
-  const _$_Loading();
+class _$LoadingImpl implements _Loading {
+  const _$LoadingImpl();
 
   @override
   String toString() {
@@ -596,8 +555,9 @@ class _$_Loading implements _Loading {
   }
 
   @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) || (other is _Loading);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$LoadingImpl);
   }
 
   @override
@@ -617,10 +577,10 @@ class _$_Loading implements _Loading {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(Note note)? success,
-    TResult Function(String? message)? error,
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(Note note)? success,
+    TResult? Function(String? message)? error,
   }) {
     return loading?.call();
   }
@@ -654,10 +614,10 @@ class _$_Loading implements _Loading {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? success,
-    TResult Function(_Error value)? error,
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? success,
+    TResult? Function(_Error value)? error,
   }) {
     return loading?.call(this);
   }
@@ -679,33 +639,35 @@ class _$_Loading implements _Loading {
 }
 
 abstract class _Loading implements NoteDetailState {
-  const factory _Loading() = _$_Loading;
+  const factory _Loading() = _$LoadingImpl;
 }
 
 /// @nodoc
-abstract class _$LoadedCopyWith<$Res> {
-  factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) then) =
-      __$LoadedCopyWithImpl<$Res>;
+abstract class _$$LoadedImplCopyWith<$Res> {
+  factory _$$LoadedImplCopyWith(
+          _$LoadedImpl value, $Res Function(_$LoadedImpl) then) =
+      __$$LoadedImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({Note note});
 
   $NoteCopyWith<$Res> get note;
 }
 
 /// @nodoc
-class __$LoadedCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
-    implements _$LoadedCopyWith<$Res> {
-  __$LoadedCopyWithImpl(_Loaded _value, $Res Function(_Loaded) _then)
-      : super(_value, (v) => _then(v as _Loaded));
+class __$$LoadedImplCopyWithImpl<$Res>
+    extends _$NoteDetailStateCopyWithImpl<$Res, _$LoadedImpl>
+    implements _$$LoadedImplCopyWith<$Res> {
+  __$$LoadedImplCopyWithImpl(
+      _$LoadedImpl _value, $Res Function(_$LoadedImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _Loaded get _value => super._value as _Loaded;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? note = freezed,
+    Object? note = null,
   }) {
-    return _then(_Loaded(
-      note == freezed
+    return _then(_$LoadedImpl(
+      null == note
           ? _value.note
           : note // ignore: cast_nullable_to_non_nullable
               as Note,
@@ -713,6 +675,7 @@ class __$LoadedCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
   }
 
   @override
+  @pragma('vm:prefer-inline')
   $NoteCopyWith<$Res> get note {
     return $NoteCopyWith<$Res>(_value.note, (value) {
       return _then(_value.copyWith(note: value));
@@ -722,8 +685,8 @@ class __$LoadedCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Loaded implements _Loaded {
-  const _$_Loaded(this.note);
+class _$LoadedImpl implements _Loaded {
+  const _$LoadedImpl(this.note);
 
   @override
   final Note note;
@@ -734,21 +697,21 @@ class _$_Loaded implements _Loaded {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _Loaded &&
-            (identical(other.note, note) ||
-                const DeepCollectionEquality().equals(other.note, note)));
+        (other.runtimeType == runtimeType &&
+            other is _$LoadedImpl &&
+            (identical(other.note, note) || other.note == note));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(note);
+  int get hashCode => Object.hash(runtimeType, note);
 
   @JsonKey(ignore: true)
   @override
-  _$LoadedCopyWith<_Loaded> get copyWith =>
-      __$LoadedCopyWithImpl<_Loaded>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$LoadedImplCopyWith<_$LoadedImpl> get copyWith =>
+      __$$LoadedImplCopyWithImpl<_$LoadedImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -764,10 +727,10 @@ class _$_Loaded implements _Loaded {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(Note note)? success,
-    TResult Function(String? message)? error,
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(Note note)? success,
+    TResult? Function(String? message)? error,
   }) {
     return success?.call(note);
   }
@@ -801,10 +764,10 @@ class _$_Loaded implements _Loaded {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? success,
-    TResult Function(_Error value)? error,
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? success,
+    TResult? Function(_Error value)? error,
   }) {
     return success?.call(this);
   }
@@ -826,35 +789,38 @@ class _$_Loaded implements _Loaded {
 }
 
 abstract class _Loaded implements NoteDetailState {
-  const factory _Loaded(Note note) = _$_Loaded;
+  const factory _Loaded(final Note note) = _$LoadedImpl;
 
-  Note get note => throw _privateConstructorUsedError;
+  Note get note;
   @JsonKey(ignore: true)
-  _$LoadedCopyWith<_Loaded> get copyWith => throw _privateConstructorUsedError;
+  _$$LoadedImplCopyWith<_$LoadedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$ErrorCopyWith<$Res> {
-  factory _$ErrorCopyWith(_Error value, $Res Function(_Error) then) =
-      __$ErrorCopyWithImpl<$Res>;
+abstract class _$$ErrorImplCopyWith<$Res> {
+  factory _$$ErrorImplCopyWith(
+          _$ErrorImpl value, $Res Function(_$ErrorImpl) then) =
+      __$$ErrorImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String? message});
 }
 
 /// @nodoc
-class __$ErrorCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
-    implements _$ErrorCopyWith<$Res> {
-  __$ErrorCopyWithImpl(_Error _value, $Res Function(_Error) _then)
-      : super(_value, (v) => _then(v as _Error));
+class __$$ErrorImplCopyWithImpl<$Res>
+    extends _$NoteDetailStateCopyWithImpl<$Res, _$ErrorImpl>
+    implements _$$ErrorImplCopyWith<$Res> {
+  __$$ErrorImplCopyWithImpl(
+      _$ErrorImpl _value, $Res Function(_$ErrorImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _Error get _value => super._value as _Error;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? message = freezed,
   }) {
-    return _then(_Error(
-      message: message == freezed
+    return _then(_$ErrorImpl(
+      message: freezed == message
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -864,8 +830,8 @@ class __$ErrorCopyWithImpl<$Res> extends _$NoteDetailStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Error implements _Error {
-  const _$_Error({this.message});
+class _$ErrorImpl implements _Error {
+  const _$ErrorImpl({this.message});
 
   @override
   final String? message;
@@ -876,21 +842,21 @@ class _$_Error implements _Error {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _Error &&
-            (identical(other.message, message) ||
-                const DeepCollectionEquality().equals(other.message, message)));
+        (other.runtimeType == runtimeType &&
+            other is _$ErrorImpl &&
+            (identical(other.message, message) || other.message == message));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(message);
+  int get hashCode => Object.hash(runtimeType, message);
 
   @JsonKey(ignore: true)
   @override
-  _$ErrorCopyWith<_Error> get copyWith =>
-      __$ErrorCopyWithImpl<_Error>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ErrorImplCopyWith<_$ErrorImpl> get copyWith =>
+      __$$ErrorImplCopyWithImpl<_$ErrorImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -906,10 +872,10 @@ class _$_Error implements _Error {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function()? loading,
-    TResult Function(Note note)? success,
-    TResult Function(String? message)? error,
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(Note note)? success,
+    TResult? Function(String? message)? error,
   }) {
     return error?.call(message);
   }
@@ -943,10 +909,10 @@ class _$_Error implements _Error {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Loading value)? loading,
-    TResult Function(_Loaded value)? success,
-    TResult Function(_Error value)? error,
+    TResult? Function(_Initial value)? initial,
+    TResult? Function(_Loading value)? loading,
+    TResult? Function(_Loaded value)? success,
+    TResult? Function(_Error value)? error,
   }) {
     return error?.call(this);
   }
@@ -968,9 +934,10 @@ class _$_Error implements _Error {
 }
 
 abstract class _Error implements NoteDetailState {
-  const factory _Error({String? message}) = _$_Error;
+  const factory _Error({final String? message}) = _$ErrorImpl;
 
-  String? get message => throw _privateConstructorUsedError;
+  String? get message;
   @JsonKey(ignore: true)
-  _$ErrorCopyWith<_Error> get copyWith => throw _privateConstructorUsedError;
+  _$$ErrorImplCopyWith<_$ErrorImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }

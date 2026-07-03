@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +24,7 @@ import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'more_apps_page.dart';
 import 'widgets/note_card.dart';
 
+@RoutePage(name: 'HomeRoute')
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -71,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: context.watch<MultipleDeleteBloc>().state.mapOrNull(
               initial: (selectedNotes) => [
                 AppButton(
-                  child: const Icon(FeatherIcons.moreHorizontal),
+                  child: const Icon(Icons.more_horiz),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -82,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 AppButton(
-                  child: const Icon(FeatherIcons.plus),
+                  child: const Icon(Icons.add),
                   onPressed: () {
                     context.router.push(AddUpdateNoteRoute());
                   },
@@ -97,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: AppTypography.headline6.copyWith(color: AppColors.white),
                       ),
                       const SizedBox(width: AppSpacings.xl),
-                      const Icon(FeatherIcons.trash2),
+                      const Icon(Icons.delete_outline),
                     ],
                   ),
                   onPressed: () {
@@ -105,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
                 AppButton(
-                  child: const Icon(FeatherIcons.x),
+                  child: const Icon(Icons.close),
                   onPressed: () {
                     context.read<MultipleDeleteBloc>().add(const MultipleDeleteEvent.clearAll());
                   },
@@ -113,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
               success: (selectedNotes) => [
                 AppButton(
-                  child: const Icon(FeatherIcons.plus),
+                  child: const Icon(Icons.add),
                   onPressed: () {
                     context.router.push(AddUpdateNoteRoute());
                   },
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
               failed: (selectedNotes) => [
                 AppButton(
-                  child: const Icon(FeatherIcons.plus),
+                  child: const Icon(Icons.add),
                   onPressed: () {
                     context.router.push(AddUpdateNoteRoute());
                   },
@@ -213,7 +215,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     return FocusDetector(
       onFocusGained: viewWillAppear,
       onFocusLost: viewWillDisappear,
-      child: StaggeredGridView.countBuilder(
+      child: MasonryGridView.count(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacings.xl,
           vertical: AppSpacings.xl,
@@ -246,7 +248,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             ),
           );
         },
-        staggeredTileBuilder: (int index) => const StaggeredTile.fit(1),
         mainAxisSpacing: AppSpacings.xl,
         crossAxisSpacing: AppSpacings.l,
       ),

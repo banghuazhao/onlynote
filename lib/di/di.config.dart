@@ -4,68 +4,84 @@
 // InjectableConfigGenerator
 // **************************************************************************
 
-import 'package:get_it/get_it.dart' as _i1;
-import 'package:injectable/injectable.dart' as _i2;
+// ignore_for_file: type=lint
+// coverage:ignore-file
 
-import '../data/local/database.dart' as _i8;
-import '../data/repository/note_repository.dart' as _i14;
-import '../domain/database/database.dart' as _i7;
-import '../domain/repository/note_repository.dart' as _i13;
-import '../domain/usecase/add_note_usecase.dart' as _i17;
-import '../domain/usecase/delete_multiple_notes.dart' as _i18;
-import '../domain/usecase/delete_note_usecase.dart' as _i19;
-import '../domain/usecase/get_note_usecase.dart' as _i20;
-import '../domain/usecase/show_notes_usecase.dart' as _i15;
-import '../domain/usecase/update_note_usecase.dart' as _i16;
-import '../domain/usecase/usecase.dart' as _i4;
-import '../presentation/routes/routes.dart' as _i6;
-import '../presentation/screens/add_update_note/bloc/add_update_bloc.dart'
-    as _i3;
-import '../presentation/screens/add_update_note/bloc/add_update_form/add_update_form_bloc.dart'
-    as _i5;
-import '../presentation/screens/home/bloc/home_bloc.dart' as _i9;
-import '../presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart'
-    as _i10;
-import '../presentation/screens/note_detail/bloc/action/note_action_bloc.dart'
-    as _i11;
-import '../presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart'
-    as _i12;
-import 'module.dart' as _i21; // ignore_for_file: unnecessary_lambdas
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:get_it/get_it.dart' as _i174;
+import 'package:injectable/injectable.dart' as _i526;
+import 'package:onlynote/data/local/database.dart' as _i1044;
+import 'package:onlynote/data/repository/note_repository.dart' as _i277;
+import 'package:onlynote/di/module.dart' as _i504;
+import 'package:onlynote/domain/database/database.dart' as _i491;
+import 'package:onlynote/domain/repository/note_repository.dart' as _i234;
+import 'package:onlynote/domain/usecase/add_note_usecase.dart' as _i153;
+import 'package:onlynote/domain/usecase/delete_multiple_notes.dart' as _i805;
+import 'package:onlynote/domain/usecase/delete_note_usecase.dart' as _i845;
+import 'package:onlynote/domain/usecase/get_note_usecase.dart' as _i513;
+import 'package:onlynote/domain/usecase/show_notes_usecase.dart' as _i61;
+import 'package:onlynote/domain/usecase/update_note_usecase.dart' as _i211;
+import 'package:onlynote/domain/usecase/usecase.dart' as _i731;
+import 'package:onlynote/presentation/routes/routes.dart' as _i288;
+import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
+    as _i460;
+import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_form/add_update_form_bloc.dart'
+    as _i346;
+import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart'
+    as _i256;
+import 'package:onlynote/presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart'
+    as _i367;
+import 'package:onlynote/presentation/screens/note_detail/bloc/action/note_action_bloc.dart'
+    as _i524;
+import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart'
+    as _i273;
 
-// ignore_for_file: lines_longer_than_80_chars
-/// initializes the registration of provided dependencies inside of [GetIt]
-_i1.GetIt $initGetIt(_i1.GetIt get,
-    {String? environment, _i2.EnvironmentFilter? environmentFilter}) {
-  final gh = _i2.GetItHelper(get, environment, environmentFilter);
-  final registerCoreDependencies = _$RegisterCoreDependencies();
-  gh.factory<_i3.AddUpdateBloc>(() => _i3.AddUpdateBloc(
-      get<_i4.AddNoteUsecase>(), get<_i4.UpdateNoteUsecase>()));
-  gh.factory<_i5.AddUpdateFormBloc>(
-      () => _i5.AddUpdateFormBloc(get<_i3.AddUpdateBloc>()));
-  gh.factory<_i6.AppRouter>(() => registerCoreDependencies.appRouter);
-  gh.lazySingleton<_i7.Database>(() => _i8.DatabaseImplementing());
-  gh.factory<_i9.HomeBloc>(() => _i9.HomeBloc(get<_i4.ShowAllNotesUsecase>()));
-  gh.factory<_i10.MultipleDeleteBloc>(
-      () => _i10.MultipleDeleteBloc(get<_i4.DeleteMultipleNotesUsecase>()));
-  gh.factory<_i11.NoteActionBloc>(
-      () => _i11.NoteActionBloc(get<_i4.DeleteNoteUsecase>()));
-  gh.factory<_i12.NoteDetailBloc>(() => _i12.NoteDetailBloc(
-      get<_i4.GetNoteUsecase>(), get<_i4.UpdateNoteUsecase>()));
-  gh.lazySingleton<_i13.NoteRepository>(
-      () => _i14.NoteRepositoryImplementation(get<_i7.Database>()));
-  gh.factory<_i15.ShowAllNotesUsecase>(
-      () => _i15.ShowAllNotesUsecase(get<_i13.NoteRepository>()));
-  gh.factory<_i16.UpdateNoteUsecase>(
-      () => _i16.UpdateNoteUsecase(get<_i13.NoteRepository>()));
-  gh.factory<_i17.AddNoteUsecase>(
-      () => _i17.AddNoteUsecase(get<_i13.NoteRepository>()));
-  gh.factory<_i18.DeleteMultipleNotesUsecase>(
-      () => _i18.DeleteMultipleNotesUsecase(get<_i13.NoteRepository>()));
-  gh.factory<_i19.DeleteNoteUsecase>(
-      () => _i19.DeleteNoteUsecase(get<_i13.NoteRepository>()));
-  gh.factory<_i20.GetNoteUsecase>(
-      () => _i20.GetNoteUsecase(get<_i13.NoteRepository>()));
-  return get;
+extension GetItInjectableX on _i174.GetIt {
+// initializes the registration of main-scope dependencies inside of GetIt
+  _i174.GetIt init({
+    String? environment,
+    _i526.EnvironmentFilter? environmentFilter,
+  }) {
+    final gh = _i526.GetItHelper(
+      this,
+      environment,
+      environmentFilter,
+    );
+    final registerCoreDependencies = _$RegisterCoreDependencies();
+    gh.factory<_i288.AppRouter>(() => registerCoreDependencies.appRouter);
+    gh.lazySingleton<_i491.Database>(() => _i1044.DatabaseImplementing());
+    gh.lazySingleton<_i234.NoteRepository>(
+        () => _i277.NoteRepositoryImplementation(gh<_i491.Database>()));
+    gh.factory<_i805.DeleteMultipleNotesUsecase>(
+        () => _i805.DeleteMultipleNotesUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i845.DeleteNoteUsecase>(
+        () => _i845.DeleteNoteUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i211.UpdateNoteUsecase>(
+        () => _i211.UpdateNoteUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i61.ShowAllNotesUsecase>(
+        () => _i61.ShowAllNotesUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i153.AddNoteUsecase>(
+        () => _i153.AddNoteUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i513.GetNoteUsecase>(
+        () => _i513.GetNoteUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i273.NoteDetailBloc>(() => _i273.NoteDetailBloc(
+          gh<_i731.GetNoteUsecase>(),
+          gh<_i731.UpdateNoteUsecase>(),
+        ));
+    gh.factory<_i460.AddUpdateBloc>(() => _i460.AddUpdateBloc(
+          gh<_i731.AddNoteUsecase>(),
+          gh<_i731.UpdateNoteUsecase>(),
+        ));
+    gh.factory<_i256.HomeBloc>(
+        () => _i256.HomeBloc(gh<_i731.ShowAllNotesUsecase>()));
+    gh.factory<_i367.MultipleDeleteBloc>(
+        () => _i367.MultipleDeleteBloc(gh<_i731.DeleteMultipleNotesUsecase>()));
+    gh.factory<_i346.AddUpdateFormBloc>(
+        () => _i346.AddUpdateFormBloc(gh<_i460.AddUpdateBloc>()));
+    gh.factory<_i524.NoteActionBloc>(
+        () => _i524.NoteActionBloc(gh<_i731.DeleteNoteUsecase>()));
+    return this;
+  }
 }
 
-class _$RegisterCoreDependencies extends _i21.RegisterCoreDependencies {}
+class _$RegisterCoreDependencies extends _i504.RegisterCoreDependencies {}

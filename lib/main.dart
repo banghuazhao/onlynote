@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/observer.dart';
@@ -59,13 +62,11 @@ Future main() async {
 
   await NotificationService().init();
 
-  await localStorage.ready;
+  await initLocalStorage();
   List items = [];
-  if (localStorage != null) {
-    var result = await localStorage.getItem('reminders');
-    if (result != null) {
-      items = result;
-    }
+  final result = localStorage.getItem('reminders');
+  if (result != null) {
+    items = jsonDecode(result) as List;
   }
 
   ReminderData.shared.init(items);

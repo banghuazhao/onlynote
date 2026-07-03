@@ -18,7 +18,7 @@ class _AddTodoTile extends StatelessWidget {
         title: Row(
           children: [
             const Icon(
-              FeatherIcons.plusCircle,
+              Icons.add_circle_outline,
               size: 18,
               color: AppColors.title,
             ),
@@ -86,7 +86,7 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
       trailing: IconButton(
         iconSize: 18,
         icon: const Icon(
-          FeatherIcons.trash2,
+          Icons.delete_outline,
           color: Colors.black87,
         ),
         onPressed: widget.onRemoved,

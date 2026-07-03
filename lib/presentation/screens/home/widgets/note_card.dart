@@ -99,7 +99,7 @@ class NoteCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Icon(
-                        FeatherIcons.check,
+                        Icons.check,
                         color: note.color,
                         size: 20,
                       ),

@@ -1,6 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'add_update_form_bloc.dart';
 
@@ -11,67 +12,7 @@ part of 'add_update_form_bloc.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$AddUpdateFormEventTearOff {
-  const _$AddUpdateFormEventTearOff();
-
-  _Initialize initialize(
-      {String? title, String? description, Color? color, List<Todo>? todos}) {
-    return _Initialize(
-      title: title,
-      description: description,
-      color: color,
-      todos: todos,
-    );
-  }
-
-  _TitleChanged titleChanged(String value) {
-    return _TitleChanged(
-      value,
-    );
-  }
-
-  _DescriptionChanged descriptionChanged(String value) {
-    return _DescriptionChanged(
-      value,
-    );
-  }
-
-  _ColorChanged colorChanged(Color value) {
-    return _ColorChanged(
-      value,
-    );
-  }
-
-  _AddOrUpdateNote addOrUpdateNote({String? id}) {
-    return _AddOrUpdateNote(
-      id: id,
-    );
-  }
-
-  _AddEmptyTodo addEmptyTodo() {
-    return const _AddEmptyTodo();
-  }
-
-  _DeleteTodo deleteTodo(String id) {
-    return _DeleteTodo(
-      id,
-    );
-  }
-
-  _TodoValueChanged todoValueChanged(
-      {required String value, required String id}) {
-    return _TodoValueChanged(
-      value: value,
-      id: id,
-    );
-  }
-}
-
-/// @nodoc
-const $AddUpdateFormEvent = _$AddUpdateFormEventTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$AddUpdateFormEvent {
@@ -91,16 +32,16 @@ mixin _$AddUpdateFormEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -132,14 +73,14 @@ mixin _$AddUpdateFormEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -161,39 +102,39 @@ mixin _$AddUpdateFormEvent {
 abstract class $AddUpdateFormEventCopyWith<$Res> {
   factory $AddUpdateFormEventCopyWith(
           AddUpdateFormEvent value, $Res Function(AddUpdateFormEvent) then) =
-      _$AddUpdateFormEventCopyWithImpl<$Res>;
+      _$AddUpdateFormEventCopyWithImpl<$Res, AddUpdateFormEvent>;
 }
 
 /// @nodoc
-class _$AddUpdateFormEventCopyWithImpl<$Res>
+class _$AddUpdateFormEventCopyWithImpl<$Res, $Val extends AddUpdateFormEvent>
     implements $AddUpdateFormEventCopyWith<$Res> {
   _$AddUpdateFormEventCopyWithImpl(this._value, this._then);
 
-  final AddUpdateFormEvent _value;
   // ignore: unused_field
-  final $Res Function(AddUpdateFormEvent) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 }
 
 /// @nodoc
-abstract class _$InitializeCopyWith<$Res> {
-  factory _$InitializeCopyWith(
-          _Initialize value, $Res Function(_Initialize) then) =
-      __$InitializeCopyWithImpl<$Res>;
+abstract class _$$InitializeImplCopyWith<$Res> {
+  factory _$$InitializeImplCopyWith(
+          _$InitializeImpl value, $Res Function(_$InitializeImpl) then) =
+      __$$InitializeImplCopyWithImpl<$Res>;
+  @useResult
   $Res call(
       {String? title, String? description, Color? color, List<Todo>? todos});
 }
 
 /// @nodoc
-class __$InitializeCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$InitializeCopyWith<$Res> {
-  __$InitializeCopyWithImpl(
-      _Initialize _value, $Res Function(_Initialize) _then)
-      : super(_value, (v) => _then(v as _Initialize));
+class __$$InitializeImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$InitializeImpl>
+    implements _$$InitializeImplCopyWith<$Res> {
+  __$$InitializeImplCopyWithImpl(
+      _$InitializeImpl _value, $Res Function(_$InitializeImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _Initialize get _value => super._value as _Initialize;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = freezed,
@@ -201,21 +142,21 @@ class __$InitializeCopyWithImpl<$Res>
     Object? color = freezed,
     Object? todos = freezed,
   }) {
-    return _then(_Initialize(
-      title: title == freezed
+    return _then(_$InitializeImpl(
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      color: color == freezed
+      color: freezed == color
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
               as Color?,
-      todos: todos == freezed
-          ? _value.todos
+      todos: freezed == todos
+          ? _value._todos
           : todos // ignore: cast_nullable_to_non_nullable
               as List<Todo>?,
     ));
@@ -224,8 +165,10 @@ class __$InitializeCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Initialize implements _Initialize {
-  const _$_Initialize({this.title, this.description, this.color, this.todos});
+class _$InitializeImpl implements _Initialize {
+  const _$InitializeImpl(
+      {this.title, this.description, this.color, final List<Todo>? todos})
+      : _todos = todos;
 
   @override
   final String? title;
@@ -233,8 +176,15 @@ class _$_Initialize implements _Initialize {
   final String? description;
   @override
   final Color? color;
+  final List<Todo>? _todos;
   @override
-  final List<Todo>? todos;
+  List<Todo>? get todos {
+    final value = _todos;
+    if (value == null) return null;
+    if (_todos is EqualUnmodifiableListView) return _todos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
@@ -242,32 +192,26 @@ class _$_Initialize implements _Initialize {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _Initialize &&
-            (identical(other.title, title) ||
-                const DeepCollectionEquality().equals(other.title, title)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$InitializeImpl &&
+            (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
-                const DeepCollectionEquality()
-                    .equals(other.description, description)) &&
-            (identical(other.color, color) ||
-                const DeepCollectionEquality().equals(other.color, color)) &&
-            (identical(other.todos, todos) ||
-                const DeepCollectionEquality().equals(other.todos, todos)));
+                other.description == description) &&
+            (identical(other.color, color) || other.color == color) &&
+            const DeepCollectionEquality().equals(other._todos, _todos));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(title) ^
-      const DeepCollectionEquality().hash(description) ^
-      const DeepCollectionEquality().hash(color) ^
-      const DeepCollectionEquality().hash(todos);
+  int get hashCode => Object.hash(runtimeType, title, description, color,
+      const DeepCollectionEquality().hash(_todos));
 
   @JsonKey(ignore: true)
   @override
-  _$InitializeCopyWith<_Initialize> get copyWith =>
-      __$InitializeCopyWithImpl<_Initialize>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$InitializeImplCopyWith<_$InitializeImpl> get copyWith =>
+      __$$InitializeImplCopyWithImpl<_$InitializeImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -289,16 +233,16 @@ class _$_Initialize implements _Initialize {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return initialize?.call(title, description, color, todos);
   }
@@ -342,14 +286,14 @@ class _$_Initialize implements _Initialize {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return initialize?.call(this);
   }
@@ -376,45 +320,44 @@ class _$_Initialize implements _Initialize {
 
 abstract class _Initialize implements AddUpdateFormEvent {
   const factory _Initialize(
-      {String? title,
-      String? description,
-      Color? color,
-      List<Todo>? todos}) = _$_Initialize;
+      {final String? title,
+      final String? description,
+      final Color? color,
+      final List<Todo>? todos}) = _$InitializeImpl;
 
-  String? get title => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  Color? get color => throw _privateConstructorUsedError;
-  List<Todo>? get todos => throw _privateConstructorUsedError;
+  String? get title;
+  String? get description;
+  Color? get color;
+  List<Todo>? get todos;
   @JsonKey(ignore: true)
-  _$InitializeCopyWith<_Initialize> get copyWith =>
+  _$$InitializeImplCopyWith<_$InitializeImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$TitleChangedCopyWith<$Res> {
-  factory _$TitleChangedCopyWith(
-          _TitleChanged value, $Res Function(_TitleChanged) then) =
-      __$TitleChangedCopyWithImpl<$Res>;
+abstract class _$$TitleChangedImplCopyWith<$Res> {
+  factory _$$TitleChangedImplCopyWith(
+          _$TitleChangedImpl value, $Res Function(_$TitleChangedImpl) then) =
+      __$$TitleChangedImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String value});
 }
 
 /// @nodoc
-class __$TitleChangedCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$TitleChangedCopyWith<$Res> {
-  __$TitleChangedCopyWithImpl(
-      _TitleChanged _value, $Res Function(_TitleChanged) _then)
-      : super(_value, (v) => _then(v as _TitleChanged));
+class __$$TitleChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$TitleChangedImpl>
+    implements _$$TitleChangedImplCopyWith<$Res> {
+  __$$TitleChangedImplCopyWithImpl(
+      _$TitleChangedImpl _value, $Res Function(_$TitleChangedImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _TitleChanged get _value => super._value as _TitleChanged;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? value = freezed,
+    Object? value = null,
   }) {
-    return _then(_TitleChanged(
-      value == freezed
+    return _then(_$TitleChangedImpl(
+      null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as String,
@@ -424,8 +367,8 @@ class __$TitleChangedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_TitleChanged implements _TitleChanged {
-  const _$_TitleChanged(this.value);
+class _$TitleChangedImpl implements _TitleChanged {
+  const _$TitleChangedImpl(this.value);
 
   @override
   final String value;
@@ -436,21 +379,21 @@ class _$_TitleChanged implements _TitleChanged {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _TitleChanged &&
-            (identical(other.value, value) ||
-                const DeepCollectionEquality().equals(other.value, value)));
+        (other.runtimeType == runtimeType &&
+            other is _$TitleChangedImpl &&
+            (identical(other.value, value) || other.value == value));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(value);
+  int get hashCode => Object.hash(runtimeType, value);
 
   @JsonKey(ignore: true)
   @override
-  _$TitleChangedCopyWith<_TitleChanged> get copyWith =>
-      __$TitleChangedCopyWithImpl<_TitleChanged>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$TitleChangedImplCopyWith<_$TitleChangedImpl> get copyWith =>
+      __$$TitleChangedImplCopyWithImpl<_$TitleChangedImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -472,16 +415,16 @@ class _$_TitleChanged implements _TitleChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return titleChanged?.call(value);
   }
@@ -525,14 +468,14 @@ class _$_TitleChanged implements _TitleChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return titleChanged?.call(this);
   }
@@ -558,39 +501,38 @@ class _$_TitleChanged implements _TitleChanged {
 }
 
 abstract class _TitleChanged implements AddUpdateFormEvent {
-  const factory _TitleChanged(String value) = _$_TitleChanged;
+  const factory _TitleChanged(final String value) = _$TitleChangedImpl;
 
-  String get value => throw _privateConstructorUsedError;
+  String get value;
   @JsonKey(ignore: true)
-  _$TitleChangedCopyWith<_TitleChanged> get copyWith =>
+  _$$TitleChangedImplCopyWith<_$TitleChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$DescriptionChangedCopyWith<$Res> {
-  factory _$DescriptionChangedCopyWith(
-          _DescriptionChanged value, $Res Function(_DescriptionChanged) then) =
-      __$DescriptionChangedCopyWithImpl<$Res>;
+abstract class _$$DescriptionChangedImplCopyWith<$Res> {
+  factory _$$DescriptionChangedImplCopyWith(_$DescriptionChangedImpl value,
+          $Res Function(_$DescriptionChangedImpl) then) =
+      __$$DescriptionChangedImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String value});
 }
 
 /// @nodoc
-class __$DescriptionChangedCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$DescriptionChangedCopyWith<$Res> {
-  __$DescriptionChangedCopyWithImpl(
-      _DescriptionChanged _value, $Res Function(_DescriptionChanged) _then)
-      : super(_value, (v) => _then(v as _DescriptionChanged));
+class __$$DescriptionChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$DescriptionChangedImpl>
+    implements _$$DescriptionChangedImplCopyWith<$Res> {
+  __$$DescriptionChangedImplCopyWithImpl(_$DescriptionChangedImpl _value,
+      $Res Function(_$DescriptionChangedImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _DescriptionChanged get _value => super._value as _DescriptionChanged;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? value = freezed,
+    Object? value = null,
   }) {
-    return _then(_DescriptionChanged(
-      value == freezed
+    return _then(_$DescriptionChangedImpl(
+      null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as String,
@@ -600,8 +542,8 @@ class __$DescriptionChangedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_DescriptionChanged implements _DescriptionChanged {
-  const _$_DescriptionChanged(this.value);
+class _$DescriptionChangedImpl implements _DescriptionChanged {
+  const _$DescriptionChangedImpl(this.value);
 
   @override
   final String value;
@@ -612,21 +554,22 @@ class _$_DescriptionChanged implements _DescriptionChanged {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _DescriptionChanged &&
-            (identical(other.value, value) ||
-                const DeepCollectionEquality().equals(other.value, value)));
+        (other.runtimeType == runtimeType &&
+            other is _$DescriptionChangedImpl &&
+            (identical(other.value, value) || other.value == value));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(value);
+  int get hashCode => Object.hash(runtimeType, value);
 
   @JsonKey(ignore: true)
   @override
-  _$DescriptionChangedCopyWith<_DescriptionChanged> get copyWith =>
-      __$DescriptionChangedCopyWithImpl<_DescriptionChanged>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$DescriptionChangedImplCopyWith<_$DescriptionChangedImpl> get copyWith =>
+      __$$DescriptionChangedImplCopyWithImpl<_$DescriptionChangedImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -648,16 +591,16 @@ class _$_DescriptionChanged implements _DescriptionChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return descriptionChanged?.call(value);
   }
@@ -701,14 +644,14 @@ class _$_DescriptionChanged implements _DescriptionChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return descriptionChanged?.call(this);
   }
@@ -734,39 +677,39 @@ class _$_DescriptionChanged implements _DescriptionChanged {
 }
 
 abstract class _DescriptionChanged implements AddUpdateFormEvent {
-  const factory _DescriptionChanged(String value) = _$_DescriptionChanged;
+  const factory _DescriptionChanged(final String value) =
+      _$DescriptionChangedImpl;
 
-  String get value => throw _privateConstructorUsedError;
+  String get value;
   @JsonKey(ignore: true)
-  _$DescriptionChangedCopyWith<_DescriptionChanged> get copyWith =>
+  _$$DescriptionChangedImplCopyWith<_$DescriptionChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$ColorChangedCopyWith<$Res> {
-  factory _$ColorChangedCopyWith(
-          _ColorChanged value, $Res Function(_ColorChanged) then) =
-      __$ColorChangedCopyWithImpl<$Res>;
+abstract class _$$ColorChangedImplCopyWith<$Res> {
+  factory _$$ColorChangedImplCopyWith(
+          _$ColorChangedImpl value, $Res Function(_$ColorChangedImpl) then) =
+      __$$ColorChangedImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({Color value});
 }
 
 /// @nodoc
-class __$ColorChangedCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$ColorChangedCopyWith<$Res> {
-  __$ColorChangedCopyWithImpl(
-      _ColorChanged _value, $Res Function(_ColorChanged) _then)
-      : super(_value, (v) => _then(v as _ColorChanged));
+class __$$ColorChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$ColorChangedImpl>
+    implements _$$ColorChangedImplCopyWith<$Res> {
+  __$$ColorChangedImplCopyWithImpl(
+      _$ColorChangedImpl _value, $Res Function(_$ColorChangedImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _ColorChanged get _value => super._value as _ColorChanged;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? value = freezed,
+    Object? value = null,
   }) {
-    return _then(_ColorChanged(
-      value == freezed
+    return _then(_$ColorChangedImpl(
+      null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as Color,
@@ -776,8 +719,8 @@ class __$ColorChangedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ColorChanged implements _ColorChanged {
-  const _$_ColorChanged(this.value);
+class _$ColorChangedImpl implements _ColorChanged {
+  const _$ColorChangedImpl(this.value);
 
   @override
   final Color value;
@@ -788,21 +731,21 @@ class _$_ColorChanged implements _ColorChanged {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _ColorChanged &&
-            (identical(other.value, value) ||
-                const DeepCollectionEquality().equals(other.value, value)));
+        (other.runtimeType == runtimeType &&
+            other is _$ColorChangedImpl &&
+            (identical(other.value, value) || other.value == value));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(value);
+  int get hashCode => Object.hash(runtimeType, value);
 
   @JsonKey(ignore: true)
   @override
-  _$ColorChangedCopyWith<_ColorChanged> get copyWith =>
-      __$ColorChangedCopyWithImpl<_ColorChanged>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$ColorChangedImplCopyWith<_$ColorChangedImpl> get copyWith =>
+      __$$ColorChangedImplCopyWithImpl<_$ColorChangedImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -824,16 +767,16 @@ class _$_ColorChanged implements _ColorChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return colorChanged?.call(value);
   }
@@ -877,14 +820,14 @@ class _$_ColorChanged implements _ColorChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return colorChanged?.call(this);
   }
@@ -910,39 +853,38 @@ class _$_ColorChanged implements _ColorChanged {
 }
 
 abstract class _ColorChanged implements AddUpdateFormEvent {
-  const factory _ColorChanged(Color value) = _$_ColorChanged;
+  const factory _ColorChanged(final Color value) = _$ColorChangedImpl;
 
-  Color get value => throw _privateConstructorUsedError;
+  Color get value;
   @JsonKey(ignore: true)
-  _$ColorChangedCopyWith<_ColorChanged> get copyWith =>
+  _$$ColorChangedImplCopyWith<_$ColorChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$AddOrUpdateNoteCopyWith<$Res> {
-  factory _$AddOrUpdateNoteCopyWith(
-          _AddOrUpdateNote value, $Res Function(_AddOrUpdateNote) then) =
-      __$AddOrUpdateNoteCopyWithImpl<$Res>;
+abstract class _$$AddOrUpdateNoteImplCopyWith<$Res> {
+  factory _$$AddOrUpdateNoteImplCopyWith(_$AddOrUpdateNoteImpl value,
+          $Res Function(_$AddOrUpdateNoteImpl) then) =
+      __$$AddOrUpdateNoteImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String? id});
 }
 
 /// @nodoc
-class __$AddOrUpdateNoteCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$AddOrUpdateNoteCopyWith<$Res> {
-  __$AddOrUpdateNoteCopyWithImpl(
-      _AddOrUpdateNote _value, $Res Function(_AddOrUpdateNote) _then)
-      : super(_value, (v) => _then(v as _AddOrUpdateNote));
+class __$$AddOrUpdateNoteImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$AddOrUpdateNoteImpl>
+    implements _$$AddOrUpdateNoteImplCopyWith<$Res> {
+  __$$AddOrUpdateNoteImplCopyWithImpl(
+      _$AddOrUpdateNoteImpl _value, $Res Function(_$AddOrUpdateNoteImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _AddOrUpdateNote get _value => super._value as _AddOrUpdateNote;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? id = freezed,
   }) {
-    return _then(_AddOrUpdateNote(
-      id: id == freezed
+    return _then(_$AddOrUpdateNoteImpl(
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
@@ -952,8 +894,8 @@ class __$AddOrUpdateNoteCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_AddOrUpdateNote implements _AddOrUpdateNote {
-  const _$_AddOrUpdateNote({this.id});
+class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
+  const _$AddOrUpdateNoteImpl({this.id});
 
   @override
   final String? id;
@@ -964,21 +906,22 @@ class _$_AddOrUpdateNote implements _AddOrUpdateNote {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _AddOrUpdateNote &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)));
+        (other.runtimeType == runtimeType &&
+            other is _$AddOrUpdateNoteImpl &&
+            (identical(other.id, id) || other.id == id));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(id);
+  int get hashCode => Object.hash(runtimeType, id);
 
   @JsonKey(ignore: true)
   @override
-  _$AddOrUpdateNoteCopyWith<_AddOrUpdateNote> get copyWith =>
-      __$AddOrUpdateNoteCopyWithImpl<_AddOrUpdateNote>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$AddOrUpdateNoteImplCopyWith<_$AddOrUpdateNoteImpl> get copyWith =>
+      __$$AddOrUpdateNoteImplCopyWithImpl<_$AddOrUpdateNoteImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1000,16 +943,16 @@ class _$_AddOrUpdateNote implements _AddOrUpdateNote {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return addOrUpdateNote?.call(id);
   }
@@ -1053,14 +996,14 @@ class _$_AddOrUpdateNote implements _AddOrUpdateNote {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return addOrUpdateNote?.call(this);
   }
@@ -1086,37 +1029,34 @@ class _$_AddOrUpdateNote implements _AddOrUpdateNote {
 }
 
 abstract class _AddOrUpdateNote implements AddUpdateFormEvent {
-  const factory _AddOrUpdateNote({String? id}) = _$_AddOrUpdateNote;
+  const factory _AddOrUpdateNote({final String? id}) = _$AddOrUpdateNoteImpl;
 
-  String? get id => throw _privateConstructorUsedError;
+  String? get id;
   @JsonKey(ignore: true)
-  _$AddOrUpdateNoteCopyWith<_AddOrUpdateNote> get copyWith =>
+  _$$AddOrUpdateNoteImplCopyWith<_$AddOrUpdateNoteImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$AddEmptyTodoCopyWith<$Res> {
-  factory _$AddEmptyTodoCopyWith(
-          _AddEmptyTodo value, $Res Function(_AddEmptyTodo) then) =
-      __$AddEmptyTodoCopyWithImpl<$Res>;
+abstract class _$$AddEmptyTodoImplCopyWith<$Res> {
+  factory _$$AddEmptyTodoImplCopyWith(
+          _$AddEmptyTodoImpl value, $Res Function(_$AddEmptyTodoImpl) then) =
+      __$$AddEmptyTodoImplCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$AddEmptyTodoCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$AddEmptyTodoCopyWith<$Res> {
-  __$AddEmptyTodoCopyWithImpl(
-      _AddEmptyTodo _value, $Res Function(_AddEmptyTodo) _then)
-      : super(_value, (v) => _then(v as _AddEmptyTodo));
-
-  @override
-  _AddEmptyTodo get _value => super._value as _AddEmptyTodo;
+class __$$AddEmptyTodoImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$AddEmptyTodoImpl>
+    implements _$$AddEmptyTodoImplCopyWith<$Res> {
+  __$$AddEmptyTodoImplCopyWithImpl(
+      _$AddEmptyTodoImpl _value, $Res Function(_$AddEmptyTodoImpl) _then)
+      : super(_value, _then);
 }
 
 /// @nodoc
 
-class _$_AddEmptyTodo implements _AddEmptyTodo {
-  const _$_AddEmptyTodo();
+class _$AddEmptyTodoImpl implements _AddEmptyTodo {
+  const _$AddEmptyTodoImpl();
 
   @override
   String toString() {
@@ -1124,8 +1064,9 @@ class _$_AddEmptyTodo implements _AddEmptyTodo {
   }
 
   @override
-  bool operator ==(dynamic other) {
-    return identical(this, other) || (other is _AddEmptyTodo);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$AddEmptyTodoImpl);
   }
 
   @override
@@ -1151,16 +1092,16 @@ class _$_AddEmptyTodo implements _AddEmptyTodo {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return addEmptyTodo?.call();
   }
@@ -1204,14 +1145,14 @@ class _$_AddEmptyTodo implements _AddEmptyTodo {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return addEmptyTodo?.call(this);
   }
@@ -1237,34 +1178,33 @@ class _$_AddEmptyTodo implements _AddEmptyTodo {
 }
 
 abstract class _AddEmptyTodo implements AddUpdateFormEvent {
-  const factory _AddEmptyTodo() = _$_AddEmptyTodo;
+  const factory _AddEmptyTodo() = _$AddEmptyTodoImpl;
 }
 
 /// @nodoc
-abstract class _$DeleteTodoCopyWith<$Res> {
-  factory _$DeleteTodoCopyWith(
-          _DeleteTodo value, $Res Function(_DeleteTodo) then) =
-      __$DeleteTodoCopyWithImpl<$Res>;
+abstract class _$$DeleteTodoImplCopyWith<$Res> {
+  factory _$$DeleteTodoImplCopyWith(
+          _$DeleteTodoImpl value, $Res Function(_$DeleteTodoImpl) then) =
+      __$$DeleteTodoImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String id});
 }
 
 /// @nodoc
-class __$DeleteTodoCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$DeleteTodoCopyWith<$Res> {
-  __$DeleteTodoCopyWithImpl(
-      _DeleteTodo _value, $Res Function(_DeleteTodo) _then)
-      : super(_value, (v) => _then(v as _DeleteTodo));
+class __$$DeleteTodoImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$DeleteTodoImpl>
+    implements _$$DeleteTodoImplCopyWith<$Res> {
+  __$$DeleteTodoImplCopyWithImpl(
+      _$DeleteTodoImpl _value, $Res Function(_$DeleteTodoImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _DeleteTodo get _value => super._value as _DeleteTodo;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = freezed,
+    Object? id = null,
   }) {
-    return _then(_DeleteTodo(
-      id == freezed
+    return _then(_$DeleteTodoImpl(
+      null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
@@ -1274,8 +1214,8 @@ class __$DeleteTodoCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_DeleteTodo implements _DeleteTodo {
-  const _$_DeleteTodo(this.id);
+class _$DeleteTodoImpl implements _DeleteTodo {
+  const _$DeleteTodoImpl(this.id);
 
   @override
   final String id;
@@ -1286,21 +1226,21 @@ class _$_DeleteTodo implements _DeleteTodo {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _DeleteTodo &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)));
+        (other.runtimeType == runtimeType &&
+            other is _$DeleteTodoImpl &&
+            (identical(other.id, id) || other.id == id));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(id);
+  int get hashCode => Object.hash(runtimeType, id);
 
   @JsonKey(ignore: true)
   @override
-  _$DeleteTodoCopyWith<_DeleteTodo> get copyWith =>
-      __$DeleteTodoCopyWithImpl<_DeleteTodo>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$DeleteTodoImplCopyWith<_$DeleteTodoImpl> get copyWith =>
+      __$$DeleteTodoImplCopyWithImpl<_$DeleteTodoImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1322,16 +1262,16 @@ class _$_DeleteTodo implements _DeleteTodo {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return deleteTodo?.call(id);
   }
@@ -1375,14 +1315,14 @@ class _$_DeleteTodo implements _DeleteTodo {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return deleteTodo?.call(this);
   }
@@ -1408,44 +1348,43 @@ class _$_DeleteTodo implements _DeleteTodo {
 }
 
 abstract class _DeleteTodo implements AddUpdateFormEvent {
-  const factory _DeleteTodo(String id) = _$_DeleteTodo;
+  const factory _DeleteTodo(final String id) = _$DeleteTodoImpl;
 
-  String get id => throw _privateConstructorUsedError;
+  String get id;
   @JsonKey(ignore: true)
-  _$DeleteTodoCopyWith<_DeleteTodo> get copyWith =>
+  _$$DeleteTodoImplCopyWith<_$DeleteTodoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$TodoValueChangedCopyWith<$Res> {
-  factory _$TodoValueChangedCopyWith(
-          _TodoValueChanged value, $Res Function(_TodoValueChanged) then) =
-      __$TodoValueChangedCopyWithImpl<$Res>;
+abstract class _$$TodoValueChangedImplCopyWith<$Res> {
+  factory _$$TodoValueChangedImplCopyWith(_$TodoValueChangedImpl value,
+          $Res Function(_$TodoValueChangedImpl) then) =
+      __$$TodoValueChangedImplCopyWithImpl<$Res>;
+  @useResult
   $Res call({String value, String id});
 }
 
 /// @nodoc
-class __$TodoValueChangedCopyWithImpl<$Res>
-    extends _$AddUpdateFormEventCopyWithImpl<$Res>
-    implements _$TodoValueChangedCopyWith<$Res> {
-  __$TodoValueChangedCopyWithImpl(
-      _TodoValueChanged _value, $Res Function(_TodoValueChanged) _then)
-      : super(_value, (v) => _then(v as _TodoValueChanged));
+class __$$TodoValueChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$TodoValueChangedImpl>
+    implements _$$TodoValueChangedImplCopyWith<$Res> {
+  __$$TodoValueChangedImplCopyWithImpl(_$TodoValueChangedImpl _value,
+      $Res Function(_$TodoValueChangedImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _TodoValueChanged get _value => super._value as _TodoValueChanged;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? value = freezed,
-    Object? id = freezed,
+    Object? value = null,
+    Object? id = null,
   }) {
-    return _then(_TodoValueChanged(
-      value: value == freezed
+    return _then(_$TodoValueChangedImpl(
+      value: null == value
           ? _value.value
           : value // ignore: cast_nullable_to_non_nullable
               as String,
-      id: id == freezed
+      id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
@@ -1455,8 +1394,8 @@ class __$TodoValueChangedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_TodoValueChanged implements _TodoValueChanged {
-  const _$_TodoValueChanged({required this.value, required this.id});
+class _$TodoValueChangedImpl implements _TodoValueChanged {
+  const _$TodoValueChangedImpl({required this.value, required this.id});
 
   @override
   final String value;
@@ -1469,25 +1408,23 @@ class _$_TodoValueChanged implements _TodoValueChanged {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _TodoValueChanged &&
-            (identical(other.value, value) ||
-                const DeepCollectionEquality().equals(other.value, value)) &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)));
+        (other.runtimeType == runtimeType &&
+            other is _$TodoValueChangedImpl &&
+            (identical(other.value, value) || other.value == value) &&
+            (identical(other.id, id) || other.id == id));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(value) ^
-      const DeepCollectionEquality().hash(id);
+  int get hashCode => Object.hash(runtimeType, value, id);
 
   @JsonKey(ignore: true)
   @override
-  _$TodoValueChangedCopyWith<_TodoValueChanged> get copyWith =>
-      __$TodoValueChangedCopyWithImpl<_TodoValueChanged>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$TodoValueChangedImplCopyWith<_$TodoValueChangedImpl> get copyWith =>
+      __$$TodoValueChangedImplCopyWithImpl<_$TodoValueChangedImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1509,16 +1446,16 @@ class _$_TodoValueChanged implements _TodoValueChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult Function(String? title, String? description, Color? color,
+    TResult? Function(String? title, String? description, Color? color,
             List<Todo>? todos)?
         initialize,
-    TResult Function(String value)? titleChanged,
-    TResult Function(String value)? descriptionChanged,
-    TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
-    TResult Function(String id)? deleteTodo,
-    TResult Function(String value, String id)? todoValueChanged,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function()? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
   }) {
     return todoValueChanged?.call(value, id);
   }
@@ -1562,14 +1499,14 @@ class _$_TodoValueChanged implements _TodoValueChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult Function(_Initialize value)? initialize,
-    TResult Function(_TitleChanged value)? titleChanged,
-    TResult Function(_DescriptionChanged value)? descriptionChanged,
-    TResult Function(_ColorChanged value)? colorChanged,
-    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
-    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
-    TResult Function(_DeleteTodo value)? deleteTodo,
-    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
   }) {
     return todoValueChanged?.call(this);
   }
@@ -1595,40 +1532,16 @@ class _$_TodoValueChanged implements _TodoValueChanged {
 }
 
 abstract class _TodoValueChanged implements AddUpdateFormEvent {
-  const factory _TodoValueChanged({required String value, required String id}) =
-      _$_TodoValueChanged;
+  const factory _TodoValueChanged(
+      {required final String value,
+      required final String id}) = _$TodoValueChangedImpl;
 
-  String get value => throw _privateConstructorUsedError;
-  String get id => throw _privateConstructorUsedError;
+  String get value;
+  String get id;
   @JsonKey(ignore: true)
-  _$TodoValueChangedCopyWith<_TodoValueChanged> get copyWith =>
+  _$$TodoValueChangedImplCopyWith<_$TodoValueChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
-
-/// @nodoc
-class _$AddUpdateFormStateTearOff {
-  const _$AddUpdateFormStateTearOff();
-
-  _AddUpdateFormState call(
-      {String? title,
-      String? description,
-      Color? selectedColor,
-      List<Todo> todos = const [],
-      DateTime? reminderDate,
-      int? reminderId}) {
-    return _AddUpdateFormState(
-      title: title,
-      description: description,
-      selectedColor: selectedColor,
-      todos: todos,
-      reminderDate: reminderDate,
-      reminderId: reminderId,
-    );
-  }
-}
-
-/// @nodoc
-const $AddUpdateFormState = _$AddUpdateFormStateTearOff();
 
 /// @nodoc
 mixin _$AddUpdateFormState {
@@ -1648,7 +1561,8 @@ mixin _$AddUpdateFormState {
 abstract class $AddUpdateFormStateCopyWith<$Res> {
   factory $AddUpdateFormStateCopyWith(
           AddUpdateFormState value, $Res Function(AddUpdateFormState) then) =
-      _$AddUpdateFormStateCopyWithImpl<$Res>;
+      _$AddUpdateFormStateCopyWithImpl<$Res, AddUpdateFormState>;
+  @useResult
   $Res call(
       {String? title,
       String? description,
@@ -1659,59 +1573,62 @@ abstract class $AddUpdateFormStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$AddUpdateFormStateCopyWithImpl<$Res>
+class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
     implements $AddUpdateFormStateCopyWith<$Res> {
   _$AddUpdateFormStateCopyWithImpl(this._value, this._then);
 
-  final AddUpdateFormState _value;
   // ignore: unused_field
-  final $Res Function(AddUpdateFormState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = freezed,
     Object? description = freezed,
     Object? selectedColor = freezed,
-    Object? todos = freezed,
+    Object? todos = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
     return _then(_value.copyWith(
-      title: title == freezed
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      selectedColor: selectedColor == freezed
+      selectedColor: freezed == selectedColor
           ? _value.selectedColor
           : selectedColor // ignore: cast_nullable_to_non_nullable
               as Color?,
-      todos: todos == freezed
+      todos: null == todos
           ? _value.todos
           : todos // ignore: cast_nullable_to_non_nullable
               as List<Todo>,
-      reminderDate: reminderDate == freezed
+      reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      reminderId: reminderId == freezed
+      reminderId: freezed == reminderId
           ? _value.reminderId
           : reminderId // ignore: cast_nullable_to_non_nullable
               as int?,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$AddUpdateFormStateCopyWith<$Res>
+abstract class _$$AddUpdateFormStateImplCopyWith<$Res>
     implements $AddUpdateFormStateCopyWith<$Res> {
-  factory _$AddUpdateFormStateCopyWith(
-          _AddUpdateFormState value, $Res Function(_AddUpdateFormState) then) =
-      __$AddUpdateFormStateCopyWithImpl<$Res>;
+  factory _$$AddUpdateFormStateImplCopyWith(_$AddUpdateFormStateImpl value,
+          $Res Function(_$AddUpdateFormStateImpl) then) =
+      __$$AddUpdateFormStateImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String? title,
       String? description,
@@ -1722,47 +1639,45 @@ abstract class _$AddUpdateFormStateCopyWith<$Res>
 }
 
 /// @nodoc
-class __$AddUpdateFormStateCopyWithImpl<$Res>
-    extends _$AddUpdateFormStateCopyWithImpl<$Res>
-    implements _$AddUpdateFormStateCopyWith<$Res> {
-  __$AddUpdateFormStateCopyWithImpl(
-      _AddUpdateFormState _value, $Res Function(_AddUpdateFormState) _then)
-      : super(_value, (v) => _then(v as _AddUpdateFormState));
+class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormStateCopyWithImpl<$Res, _$AddUpdateFormStateImpl>
+    implements _$$AddUpdateFormStateImplCopyWith<$Res> {
+  __$$AddUpdateFormStateImplCopyWithImpl(_$AddUpdateFormStateImpl _value,
+      $Res Function(_$AddUpdateFormStateImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _AddUpdateFormState get _value => super._value as _AddUpdateFormState;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? title = freezed,
     Object? description = freezed,
     Object? selectedColor = freezed,
-    Object? todos = freezed,
+    Object? todos = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
-    return _then(_AddUpdateFormState(
-      title: title == freezed
+    return _then(_$AddUpdateFormStateImpl(
+      title: freezed == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: description == freezed
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      selectedColor: selectedColor == freezed
+      selectedColor: freezed == selectedColor
           ? _value.selectedColor
           : selectedColor // ignore: cast_nullable_to_non_nullable
               as Color?,
-      todos: todos == freezed
-          ? _value.todos
+      todos: null == todos
+          ? _value._todos
           : todos // ignore: cast_nullable_to_non_nullable
               as List<Todo>,
-      reminderDate: reminderDate == freezed
+      reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      reminderId: reminderId == freezed
+      reminderId: freezed == reminderId
           ? _value.reminderId
           : reminderId // ignore: cast_nullable_to_non_nullable
               as int?,
@@ -1772,15 +1687,16 @@ class __$AddUpdateFormStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_AddUpdateFormState extends _AddUpdateFormState {
-  _$_AddUpdateFormState(
+class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
+  _$AddUpdateFormStateImpl(
       {this.title,
       this.description,
       this.selectedColor,
-      this.todos = const [],
+      final List<Todo> todos = const [],
       this.reminderDate,
       this.reminderId})
-      : super._();
+      : _todos = todos,
+        super._();
 
   @override
   final String? title;
@@ -1788,9 +1704,15 @@ class _$_AddUpdateFormState extends _AddUpdateFormState {
   final String? description;
   @override
   final Color? selectedColor;
-  @JsonKey(defaultValue: const [])
+  final List<Todo> _todos;
   @override
-  final List<Todo> todos;
+  @JsonKey()
+  List<Todo> get todos {
+    if (_todos is EqualUnmodifiableListView) return _todos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_todos);
+  }
+
   @override
   final DateTime? reminderDate;
   @override
@@ -1802,67 +1724,64 @@ class _$_AddUpdateFormState extends _AddUpdateFormState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is _AddUpdateFormState &&
-            (identical(other.title, title) ||
-                const DeepCollectionEquality().equals(other.title, title)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$AddUpdateFormStateImpl &&
+            (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
-                const DeepCollectionEquality()
-                    .equals(other.description, description)) &&
+                other.description == description) &&
             (identical(other.selectedColor, selectedColor) ||
-                const DeepCollectionEquality()
-                    .equals(other.selectedColor, selectedColor)) &&
-            (identical(other.todos, todos) ||
-                const DeepCollectionEquality().equals(other.todos, todos)) &&
+                other.selectedColor == selectedColor) &&
+            const DeepCollectionEquality().equals(other._todos, _todos) &&
             (identical(other.reminderDate, reminderDate) ||
-                const DeepCollectionEquality()
-                    .equals(other.reminderDate, reminderDate)) &&
+                other.reminderDate == reminderDate) &&
             (identical(other.reminderId, reminderId) ||
-                const DeepCollectionEquality()
-                    .equals(other.reminderId, reminderId)));
+                other.reminderId == reminderId));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(title) ^
-      const DeepCollectionEquality().hash(description) ^
-      const DeepCollectionEquality().hash(selectedColor) ^
-      const DeepCollectionEquality().hash(todos) ^
-      const DeepCollectionEquality().hash(reminderDate) ^
-      const DeepCollectionEquality().hash(reminderId);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      description,
+      selectedColor,
+      const DeepCollectionEquality().hash(_todos),
+      reminderDate,
+      reminderId);
 
   @JsonKey(ignore: true)
   @override
-  _$AddUpdateFormStateCopyWith<_AddUpdateFormState> get copyWith =>
-      __$AddUpdateFormStateCopyWithImpl<_AddUpdateFormState>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$AddUpdateFormStateImplCopyWith<_$AddUpdateFormStateImpl> get copyWith =>
+      __$$AddUpdateFormStateImplCopyWithImpl<_$AddUpdateFormStateImpl>(
+          this, _$identity);
 }
 
 abstract class _AddUpdateFormState extends AddUpdateFormState {
   factory _AddUpdateFormState(
-      {String? title,
-      String? description,
-      Color? selectedColor,
-      List<Todo> todos,
-      DateTime? reminderDate,
-      int? reminderId}) = _$_AddUpdateFormState;
+      {final String? title,
+      final String? description,
+      final Color? selectedColor,
+      final List<Todo> todos,
+      final DateTime? reminderDate,
+      final int? reminderId}) = _$AddUpdateFormStateImpl;
   _AddUpdateFormState._() : super._();
 
   @override
-  String? get title => throw _privateConstructorUsedError;
+  String? get title;
   @override
-  String? get description => throw _privateConstructorUsedError;
+  String? get description;
   @override
-  Color? get selectedColor => throw _privateConstructorUsedError;
+  Color? get selectedColor;
   @override
-  List<Todo> get todos => throw _privateConstructorUsedError;
+  List<Todo> get todos;
   @override
-  DateTime? get reminderDate => throw _privateConstructorUsedError;
+  DateTime? get reminderDate;
   @override
-  int? get reminderId => throw _privateConstructorUsedError;
+  int? get reminderId;
   @override
   @JsonKey(ignore: true)
-  _$AddUpdateFormStateCopyWith<_AddUpdateFormState> get copyWith =>
+  _$$AddUpdateFormStateImplCopyWith<_$AddUpdateFormStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

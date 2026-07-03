@@ -44,6 +44,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/.cxx/
 
 # AdMob release credentials (real production ad unit / app IDs)
 lib/Tools/ad_ids_release.dart

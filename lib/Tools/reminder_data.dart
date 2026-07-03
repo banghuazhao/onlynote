@@ -1,11 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
-
-final LocalStorage localStorage = LocalStorage(
-  'reminderList.json',
-);
 
 class ReminderData extends ChangeNotifier {
   List<Reminder> reminders = [];
@@ -15,7 +13,7 @@ class ReminderData extends ChangeNotifier {
   static final ReminderData shared = ReminderData._privateConstructor();
 
   Future<void> _saveToStorage() async {
-    await localStorage.setItem('reminders', reminders.map((e) => e.toJson()).toList());
+    localStorage.setItem('reminders', jsonEncode(reminders.map((e) => e.toJson()).toList()));
   }
 
   Future<void> addReminder(Reminder reminder) async {

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/random.dart';
@@ -18,6 +19,7 @@ part 'widgets/colors_bar.dart';
 part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
+@RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
   const AddUpdateNoteScreen({Key? key, this.note}) : super(key: key);
   final Note? note;

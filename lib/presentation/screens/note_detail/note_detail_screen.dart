@@ -1,7 +1,8 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
@@ -17,8 +18,9 @@ import 'package:onlynote/presentation/theme/typography.dart';
 import 'bloc/action/note_action_bloc.dart';
 import 'bloc/detail/note_detail_bloc.dart';
 
+@RoutePage(name: 'NoteDetailRoute')
 class NoteDetailScreen extends StatefulWidget {
-  const NoteDetailScreen({Key? key, required this.noteId}) : super(key: key);
+  const NoteDetailScreen({Key? key, @PathParam('noteId') required this.noteId}) : super(key: key);
   final String noteId;
 
   @override
@@ -52,13 +54,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             actions: state.whenOrNull(
               success: (note) => [
                 AppButton(
-                  child: const Icon(FeatherIcons.edit),
+                  child: const Icon(Icons.edit_outlined),
                   onPressed: () {
                     context.router.push(AddUpdateNoteRoute(note: note));
                   },
                 ),
                 AppButton(
-                  child: const Icon(FeatherIcons.trash2),
+                  child: const Icon(Icons.delete_outline),
                   onPressed: () {
                     Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
                     if (currentReminder != null) {
@@ -164,7 +166,7 @@ class _LoadedViewState extends State<LoadedView> {
                   actions: <BottomSheetAction>[
                     BottomSheetAction(
                         title: Text(S.of(context).Edit),
-                        onPressed: () async {
+                        onPressed: (BuildContext context) async {
                           bool? permissionResult =
                               await NotificationService().checkAndAskForPermission(context);
                           if (permissionResult != null && permissionResult == true) {
@@ -191,7 +193,7 @@ class _LoadedViewState extends State<LoadedView> {
                           S.of(context).Delete,
                           style: TextStyle(color: Colors.red),
                         ),
-                        onPressed: () {
+                        onPressed: (BuildContext context) {
                           ReminderData.shared.deleteReminder(currentReminder);
                           NotificationService().removeNotification(currentReminder);
                           setState(() {});

@@ -20,7 +20,7 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     //Initialization Settings for iOS
-    const IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings(
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
@@ -32,11 +32,13 @@ class NotificationService {
 
     tz.initializeTimeZones();
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+    );
   }
 
-  onSelectNotification(String? payload) async {
+  void onDidReceiveNotificationResponse(NotificationResponse response) {
     //Navigate to wherever you want
   }
 
@@ -59,8 +61,13 @@ class NotificationService {
         ticker: 'ticker');
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(id, title, body, platformChannelSpecifics,
-        payload: payload);
+    await flutterLocalNotificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
+    );
   }
 
   Future<void> askForPermissionAndSchedule(
@@ -105,7 +112,7 @@ class NotificationService {
   }
 
   Future<void> removeNotification(Reminder reminder) async {
-    await flutterLocalNotificationsPlugin.cancel(reminder.reminderId);
+    await flutterLocalNotificationsPlugin.cancel(id: reminder.reminderId);
   }
 
   Future<bool?> checkAndAskForPermission(BuildContext context) async {
@@ -155,7 +162,7 @@ class NotificationService {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                AppSettings.openNotificationSettings();
+                AppSettings.openAppSettings(type: AppSettingsType.notification);
               },
             ),
             TextButton(
@@ -185,16 +192,15 @@ class NotificationService {
   Future<void> scheduleNotifications({id, title, body, time}) async {
     try {
       await flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tz.TZDateTime.from(time, tz.local),
-          const NotificationDetails(
-              android: AndroidNotificationDetails('your channel id', 'your channel name',
-                  channelDescription: 'your channel description')),
-          androidAllowWhileIdle: true,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime);
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(time, tz.local),
+        notificationDetails: const NotificationDetails(
+            android: AndroidNotificationDetails('your channel id', 'your channel name',
+                channelDescription: 'your channel description')),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
     } catch (e) {
       print(e);
     }
