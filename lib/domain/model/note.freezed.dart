@@ -22,6 +22,7 @@ mixin _$Note {
   Color? get color => throw _privateConstructorUsedError;
   DateTime? get dateTime => throw _privateConstructorUsedError;
   List<Todo> get todo => throw _privateConstructorUsedError;
+  List<String> get imagePaths => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -38,7 +39,8 @@ abstract class $NoteCopyWith<$Res> {
       String? description,
       Color? color,
       DateTime? dateTime,
-      List<Todo> todo});
+      List<Todo> todo,
+      List<String> imagePaths});
 }
 
 /// @nodoc
@@ -60,6 +62,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? color = freezed,
     Object? dateTime = freezed,
     Object? todo = null,
+    Object? imagePaths = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -86,6 +89,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.todo
           : todo // ignore: cast_nullable_to_non_nullable
               as List<Todo>,
+      imagePaths: null == imagePaths
+          ? _value.imagePaths
+          : imagePaths // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -103,7 +110,8 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       String? description,
       Color? color,
       DateTime? dateTime,
-      List<Todo> todo});
+      List<Todo> todo,
+      List<String> imagePaths});
 }
 
 /// @nodoc
@@ -122,6 +130,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? color = freezed,
     Object? dateTime = freezed,
     Object? todo = null,
+    Object? imagePaths = null,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -148,6 +157,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value._todo
           : todo // ignore: cast_nullable_to_non_nullable
               as List<Todo>,
+      imagePaths: null == imagePaths
+          ? _value._imagePaths
+          : imagePaths // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -161,8 +174,10 @@ class _$NoteImpl extends _Note {
       this.description,
       this.color,
       this.dateTime,
-      final List<Todo> todo = const []})
+      final List<Todo> todo = const [],
+      final List<String> imagePaths = const []})
       : _todo = todo,
+        _imagePaths = imagePaths,
         super._();
 
   @override
@@ -184,9 +199,18 @@ class _$NoteImpl extends _Note {
     return EqualUnmodifiableListView(_todo);
   }
 
+  final List<String> _imagePaths;
+  @override
+  @JsonKey()
+  List<String> get imagePaths {
+    if (_imagePaths is EqualUnmodifiableListView) return _imagePaths;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_imagePaths);
+  }
+
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths)';
   }
 
   @override
@@ -201,12 +225,21 @@ class _$NoteImpl extends _Note {
             (identical(other.color, color) || other.color == color) &&
             (identical(other.dateTime, dateTime) ||
                 other.dateTime == dateTime) &&
-            const DeepCollectionEquality().equals(other._todo, _todo));
+            const DeepCollectionEquality().equals(other._todo, _todo) &&
+            const DeepCollectionEquality()
+                .equals(other._imagePaths, _imagePaths));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, color,
-      dateTime, const DeepCollectionEquality().hash(_todo));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      title,
+      description,
+      color,
+      dateTime,
+      const DeepCollectionEquality().hash(_todo),
+      const DeepCollectionEquality().hash(_imagePaths));
 
   @JsonKey(ignore: true)
   @override
@@ -222,7 +255,8 @@ abstract class _Note extends Note {
       final String? description,
       final Color? color,
       final DateTime? dateTime,
-      final List<Todo> todo}) = _$NoteImpl;
+      final List<Todo> todo,
+      final List<String> imagePaths}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -237,6 +271,8 @@ abstract class _Note extends Note {
   DateTime? get dateTime;
   @override
   List<Todo> get todo;
+  @override
+  List<String> get imagePaths;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>

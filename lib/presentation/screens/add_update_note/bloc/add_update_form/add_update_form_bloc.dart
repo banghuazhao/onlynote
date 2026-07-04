@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
@@ -21,6 +22,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           description: event.description,
           selectedColor: event.color,
           todos: event.todos ?? [],
+          imagePaths: event.imagePaths ?? [],
         ),
       );
     });
@@ -48,15 +50,20 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           title: state.title,
           description: state.description,
           dateTime: DateTime.now(),
+          todo: state.todos,
+          imagePaths: state.imagePaths,
         );
         _addUpdateBloc.add(AddUpdateEvent.addNote(note));
       } else {
         final note = Note(
-            id: event.id,
-            color: state.selectedColor,
-            title: state.title,
-            description: state.description,
-            dateTime: DateTime.now());
+          id: event.id,
+          color: state.selectedColor,
+          title: state.title,
+          description: state.description,
+          dateTime: DateTime.now(),
+          todo: state.todos,
+          imagePaths: state.imagePaths,
+        );
         _addUpdateBloc.add(AddUpdateEvent.updateNote(note, event.id!));
       }
     });
@@ -105,6 +112,18 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       todos.insert(newIndex, todo);
 
       emit(state.copyWith(todos: todos));
+    });
+
+    //* Images
+    on<_AddImage>((event, emit) {
+      final imagePaths = List<String>.from(state.imagePaths)..add(event.path);
+      emit(state.copyWith(imagePaths: imagePaths));
+    });
+
+    on<_RemoveImage>((event, emit) async {
+      final imagePaths = List<String>.from(state.imagePaths)..remove(event.path);
+      emit(state.copyWith(imagePaths: imagePaths));
+      await ImageStorage.deleteImages([event.path]);
     });
   }
 

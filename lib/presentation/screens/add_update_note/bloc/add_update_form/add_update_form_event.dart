@@ -7,6 +7,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     String? description,
     Color? color,
     List<Todo>? todos,
+    List<String>? imagePaths,
   }) = _Initialize;
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;
@@ -30,4 +31,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     required int oldIndex,
     required int newIndex,
   }) = _ReorderTodo;
+
+  const factory AddUpdateFormEvent.addImage(String path) = _AddImage;
+
+  const factory AddUpdateFormEvent.removeImage(String path) = _RemoveImage;
 }

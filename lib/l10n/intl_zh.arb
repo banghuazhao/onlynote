@@ -33,6 +33,8 @@
   "Note_Duplicated_Successfully": "已成功复制备忘录",
   "Copy_Suffix": "(副本)",
   "Select": "选择",
+  "Choose_From_Gallery": "从相册选择",
+  "Take_Photo": "拍照",
   "Cancel": "取消",
   "OK": "好的",
   "Allow_Notification" : "允许推送",

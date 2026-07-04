@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:onlynote/Tools/reminder.dart';
@@ -115,6 +117,18 @@ class _NoteCardState extends State<NoteCard> {
                       const SizedBox(height: AppSpacings.m),
                       if (note.hasTodo) ...{
                         _BuildTodoList(todoList: note.todo.take(2).toList()),
+                      },
+                      if (note.hasImages) ...{
+                        const SizedBox(height: AppSpacings.m),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppSpacings.m),
+                          child: Image.file(
+                            File(note.imagePaths.first),
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       },
                     ],
                   ),

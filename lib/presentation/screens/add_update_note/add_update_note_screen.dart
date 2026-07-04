@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/random.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -16,6 +20,7 @@ import 'bloc/add_update_bloc.dart';
 import 'bloc/add_update_form/add_update_form_bloc.dart';
 
 part 'widgets/colors_bar.dart';
+part 'widgets/image_section.dart';
 part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
@@ -45,6 +50,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
             description: widget.note?.description,
             color: widget.note?.color ?? colors.randomElement,
             todos: widget.note?.todo,
+            imagePaths: widget.note?.imagePaths,
           ),
         );
   }
@@ -137,6 +143,10 @@ class _BuildForm extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacings.xl),
 
+          //* Attach / remove photos.
+          _BuildImageSection(state: state),
+          const SizedBox(height: AppSpacings.xl),
+
           //* Add/Update note description.
           _BuildDescriptionField(
             state: state,
@@ -157,6 +167,7 @@ class _BuildForm extends StatelessWidget {
                 color: state.selectedColor,
                 dateTime: DateTime.now(),
                 todo: state.todos,
+                imagePaths: state.imagePaths,
               ),
             ),
           );
@@ -170,6 +181,7 @@ class _BuildForm extends StatelessWidget {
                 color: state.selectedColor,
                 dateTime: DateTime.now(),
                 todo: state.todos,
+                imagePaths: state.imagePaths,
               ),
               widget.note!.id!,
             ),

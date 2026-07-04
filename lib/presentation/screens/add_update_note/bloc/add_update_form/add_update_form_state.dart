@@ -8,6 +8,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
       String? description,
       Color? selectedColor,
       @Default([]) List<Todo> todos,
+      @Default([]) List<String> imagePaths,
       DateTime? reminderDate,
       int? reminderId}) = _AddUpdateFormState;
 
@@ -16,4 +17,6 @@ class AddUpdateFormState with _$AddUpdateFormState {
   bool get showDescriptionHint => description.isEmptyString;
 
   bool get hasTodo => todos.isNotEmpty;
+
+  bool get hasImages => imagePaths.isNotEmpty;
 }

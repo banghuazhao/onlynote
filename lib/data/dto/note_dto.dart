@@ -48,6 +48,7 @@ class NoteDto implements Comparable {
     this.colorValue,
     this.dateTime,
     this.todoList = const [],
+    this.imagePaths = const [],
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -58,6 +59,7 @@ class NoteDto implements Comparable {
       dateTime: note.dateTime?.toIso8601String(),
       colorValue: note.color?.value,
       todoList: note.todo.map((todo) => TodoDto.fromDomain(todo)).toList(),
+      imagePaths: note.imagePaths,
     );
   }
 
@@ -69,6 +71,7 @@ class NoteDto implements Comparable {
       dateTime: DateTime.tryParse(dateTime!),
       color: Color(colorValue!),
       todo: todoList?.map((todo) => todo.toDomain()).toList() ?? [],
+      imagePaths: imagePaths ?? [],
     );
   }
 
@@ -81,6 +84,7 @@ class NoteDto implements Comparable {
     int? colorValue,
     String? dateTime,
     List<TodoDto>? todoList,
+    List<String>? imagePaths,
   }) {
     return NoteDto(
       id: id ?? this.id,
@@ -89,6 +93,7 @@ class NoteDto implements Comparable {
       colorValue: colorValue ?? this.colorValue,
       dateTime: dateTime ?? this.dateTime,
       todoList: todoList ?? this.todoList,
+      imagePaths: imagePaths ?? this.imagePaths,
     );
   }
 
@@ -104,6 +109,8 @@ class NoteDto implements Comparable {
   final String? dateTime;
   @HiveField(5)
   final List<TodoDto>? todoList;
+  @HiveField(6)
+  final List<String>? imagePaths;
 
   @override
   int compareTo(other) {

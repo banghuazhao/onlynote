@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -178,6 +180,12 @@ class _LoadedViewState extends State<LoadedView> {
                   widget.note.description ?? '',
                   style: AppTypography.headline6,
                 ),
+
+                //* Attached photos, if any
+                if (widget.note.hasImages) ...{
+                  const SizedBox(height: AppSpacings.xxl),
+                  _BuildImageGallery(imagePaths: widget.note.imagePaths),
+                },
               ],
             ),
           ),
@@ -314,6 +322,82 @@ class _BuildTodoList extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _BuildImageGallery extends StatelessWidget {
+  const _BuildImageGallery({Key? key, required this.imagePaths}) : super(key: key);
+  final List<String> imagePaths;
+
+  void _openFullScreen(BuildContext context, int initialIndex) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => _FullScreenImageViewer(
+          imagePaths: imagePaths,
+          initialIndex: initialIndex,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: imagePaths.length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacings.m),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () => _openFullScreen(context, index),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacings.m),
+              child: Image.file(
+                File(imagePaths[index]),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FullScreenImageViewer extends StatelessWidget {
+  const _FullScreenImageViewer({
+    Key? key,
+    required this.imagePaths,
+    required this.initialIndex,
+  }) : super(key: key);
+
+  final List<String> imagePaths;
+  final int initialIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: PageView.builder(
+        controller: PageController(initialPage: initialIndex),
+        itemCount: imagePaths.length,
+        itemBuilder: (context, index) {
+          return InteractiveViewer(
+            child: Center(
+              child: Image.file(File(imagePaths[index])),
+            ),
+          );
+        },
+      ),
     );
   }
 }

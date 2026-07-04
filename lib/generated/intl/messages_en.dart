@@ -27,6 +27,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Allow_Notification":
             MessageLookupByLibrary.simpleMessage("Allow Notification"),
         "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "Choose_From_Gallery":
+            MessageLookupByLibrary.simpleMessage("Choose From Gallery"),
         "Classical_Music_Box":
             MessageLookupByLibrary.simpleMessage("Classical Music Box"),
         "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(Copy)"),
@@ -99,6 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Simple_Calculator":
             MessageLookupByLibrary.simpleMessage("Simple Calculator"),
         "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
+        "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
         "Title": MessageLookupByLibrary.simpleMessage("Title"),
         "To_get_notification": MessageLookupByLibrary.simpleMessage(
             "To get a reminder, please go to settings to open notification."),

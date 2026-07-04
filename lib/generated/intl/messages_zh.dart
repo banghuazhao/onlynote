@@ -26,6 +26,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Add_todo": MessageLookupByLibrary.simpleMessage("添加待办"),
         "Allow_Notification": MessageLookupByLibrary.simpleMessage("允许推送"),
         "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
+        "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage("从相册选择"),
         "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音乐盒"),
         "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(副本)"),
         "Delete": MessageLookupByLibrary.simpleMessage("删除"),
@@ -87,6 +88,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
         "Simple_Calculator": MessageLookupByLibrary.simpleMessage("极简计算器"),
         "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("数独迷"),
+        "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
         "Title": MessageLookupByLibrary.simpleMessage("标题"),
         "To_get_notification":
             MessageLookupByLibrary.simpleMessage("想要设置日程安排提醒，请前往设置打开通知"),

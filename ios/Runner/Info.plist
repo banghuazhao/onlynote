@@ -38,6 +38,10 @@
 		</dict>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>This identifier will be used to deliver personalized ads to you</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Onlynote needs access to your photo library so you can attach photos to your notes.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Onlynote needs access to your camera so you can take a photo to attach to a note.</string>
 		<key>SKAdNetworkItems</key>
 		<array>
 			<dict>

@@ -16,7 +16,8 @@ class Note with _$Note {
       String? description,
       Color? color,
       DateTime? dateTime,
-      @Default([]) List<Todo> todo}) = _Note;
+      @Default([]) List<Todo> todo,
+      @Default([]) List<String> imagePaths}) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');
   String get date => dateTime != null ? _formatter.format(dateTime!) : '';
@@ -25,6 +26,8 @@ class Note with _$Note {
   String get dateWithTime => dateTime != null ? _formatter1.format(dateTime!) : '';
 
   bool get hasTodo => todo.isNotEmpty;
+
+  bool get hasImages => imagePaths.isNotEmpty;
 }
 
 @freezed

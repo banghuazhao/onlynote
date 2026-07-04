@@ -380,6 +380,26 @@ class S {
     );
   }
 
+  /// `Choose From Gallery`
+  String get Choose_From_Gallery {
+    return Intl.message(
+      'Choose From Gallery',
+      name: 'Choose_From_Gallery',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Take Photo`
+  String get Take_Photo {
+    return Intl.message(
+      'Take Photo',
+      name: 'Take_Photo',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cancel`
   String get Cancel {
     return Intl.message(
