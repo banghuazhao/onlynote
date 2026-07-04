@@ -430,6 +430,16 @@ class S {
     );
   }
 
+  /// `Card Size`
+  String get Card_Size {
+    return Intl.message(
+      'Card Size',
+      name: 'Card_Size',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Small`
   String get Small {
     return Intl.message(

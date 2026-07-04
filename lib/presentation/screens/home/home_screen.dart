@@ -9,6 +9,7 @@ import 'package:focus_detector/focus_detector.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
+import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/database/database.dart';
@@ -313,6 +314,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     final multipleDeleteBloc = context.read<MultipleDeleteBloc>();
 
     double width = MediaQuery.of(context).size.width;
+    final baseColumns = AppLayoutSettings.instance.cardSize.columns;
+    final crossAxisCount = width > 600 ? baseColumns + 1 : baseColumns;
 
     return FocusDetector(
       onFocusGained: viewWillAppear,
@@ -322,7 +325,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           horizontal: AppSpacings.xl,
           vertical: AppSpacings.xl,
         ),
-        crossAxisCount: width > 600 ? 3 : 2,
+        crossAxisCount: crossAxisCount,
         itemCount: widget.notes.length,
         itemBuilder: (BuildContext context, int index) {
           final note = widget.notes[index];

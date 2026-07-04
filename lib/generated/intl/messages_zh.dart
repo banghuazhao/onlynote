@@ -51,6 +51,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("删除备忘录失败, 请重试"),
         "Failed_to_delete_notes":
             MessageLookupByLibrary.simpleMessage("删除备忘录失败"),
+        "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
         "Font_Size": MessageLookupByLibrary.simpleMessage("字体大小"),
         "Font_Style": MessageLookupByLibrary.simpleMessage("字体样式"),
         "Large": MessageLookupByLibrary.simpleMessage("大"),

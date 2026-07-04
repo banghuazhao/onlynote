@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -14,10 +15,14 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Rebuilds the whole app when the font family/size preference changes,
-    // so AppTypography's getters are re-evaluated everywhere they're used.
+    // Rebuilds the whole app when the font/layout preferences change, so
+    // AppTypography's getters and the home grid's column count are
+    // re-evaluated everywhere they're used.
     return ListenableBuilder(
-      listenable: AppTypographySettings.instance,
+      listenable: Listenable.merge([
+        AppTypographySettings.instance,
+        AppLayoutSettings.instance,
+      ]),
       builder: (context, _) => _buildMaterialApp(),
     );
   }

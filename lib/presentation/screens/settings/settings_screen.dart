@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
@@ -19,14 +20,26 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  String _cardSizeLabel(BuildContext context, NoteCardSize cardSize) {
+    switch (cardSize) {
+      case NoteCardSize.small:
+        return S.of(context).Small;
+      case NoteCardSize.medium:
+        return S.of(context).Medium;
+      case NoteCardSize.large:
+        return S.of(context).Large;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final settings = AppTypographySettings.instance;
+    final typographySettings = AppTypographySettings.instance;
+    final layoutSettings = AppLayoutSettings.instance;
 
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).Settings)),
       body: ListenableBuilder(
-        listenable: settings,
+        listenable: Listenable.merge([typographySettings, layoutSettings]),
         builder: (context, _) {
           return ListView(
             padding: const EdgeInsets.all(AppSpacings.xl),
@@ -36,13 +49,13 @@ class SettingsScreen extends StatelessWidget {
               for (final fontFamily in kAppFontFamilies.keys)
                 RadioListTile<String>(
                   value: fontFamily,
-                  groupValue: settings.fontFamily,
+                  groupValue: typographySettings.fontFamily,
                   title: Text(
                     fontFamily,
                     style: kAppFontFamilies[fontFamily]!(fontSize: 16, color: AppColors.title),
                   ),
                   onChanged: (value) {
-                    if (value != null) settings.setFontFamily(value);
+                    if (value != null) typographySettings.setFontFamily(value);
                   },
                 ),
               const SizedBox(height: AppSpacings.xl),
@@ -51,13 +64,25 @@ class SettingsScreen extends StatelessWidget {
               for (final fontSize in AppFontSize.values)
                 RadioListTile<AppFontSize>(
                   value: fontSize,
-                  groupValue: settings.fontSize,
+                  groupValue: typographySettings.fontSize,
                   title: Text(
                     _fontSizeLabel(context, fontSize),
                     style: TextStyle(fontSize: 14 * fontSize.scale, color: AppColors.title),
                   ),
                   onChanged: (value) {
-                    if (value != null) settings.setFontSize(value);
+                    if (value != null) typographySettings.setFontSize(value);
+                  },
+                ),
+              const SizedBox(height: AppSpacings.xl),
+              Text(S.of(context).Card_Size, style: AppTypography.headline6),
+              const SizedBox(height: AppSpacings.m),
+              for (final cardSize in NoteCardSize.values)
+                RadioListTile<NoteCardSize>(
+                  value: cardSize,
+                  groupValue: layoutSettings.cardSize,
+                  title: Text(_cardSizeLabel(context, cardSize)),
+                  onChanged: (value) {
+                    if (value != null) layoutSettings.setCardSize(value);
                   },
                 ),
             ],

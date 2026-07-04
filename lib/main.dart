@@ -15,6 +15,7 @@ import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bl
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 
 import 'Tools/ads_manager.dart';
+import 'Tools/app_layout_settings.dart';
 import 'Tools/app_typography_settings.dart';
 import 'Tools/in_app_reviewer_helper.dart';
 import 'Tools/locator.dart';
@@ -52,6 +53,7 @@ Future main() async {
   setupLocator();
 
   await AppTypographySettings.instance.load();
+  await AppLayoutSettings.instance.load();
 
   Future.delayed(const Duration(seconds: 1), () {
     AppTrackingTransparency.requestTrackingAuthorization();
