@@ -1,7 +1,8 @@
 part of '../add_update_note_screen.dart';
 
 class ColorsBar extends StatelessWidget {
-  const ColorsBar({Key? key, this.selectedColor, required this.onChanged}) : super(key: key);
+  const ColorsBar({Key? key, this.selectedColor, required this.onChanged})
+      : super(key: key);
   final Color? selectedColor;
   final Function(Color color) onChanged;
 
@@ -24,7 +25,10 @@ class ColorsBar extends StatelessWidget {
                         (color) => _ColorBox(
                           color: color,
                           isSelected: selectedColor == color,
-                          onTap: () => onChanged(color),
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            onChanged(color);
+                          },
                         ),
                       )
                       .toList(),
@@ -56,24 +60,36 @@ class _ColorBox extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacings.s),
       child: GestureDetector(
         onTap: onTap,
-        child: Material(
-          shape: const CircleBorder(),
-          elevation: isSelected ? 2 : 0.2,
-          child: Container(
-            height: 40,
-            width: 40,
-            margin: const EdgeInsets.all(AppSpacings.s),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
+        child: AnimatedScale(
+          scale: isSelected ? 1.12 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutBack,
+          child: Material(
+            shape: const CircleBorder(),
+            elevation: isSelected ? 3 : 0.2,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 40,
+              width: 40,
+              margin: const EdgeInsets.all(AppSpacings.s),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color,
+                border: isSelected
+                    ? Border.all(color: AppColors.white, width: 2)
+                    : null,
+              ),
+              child: AnimatedScale(
+                scale: isSelected ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutBack,
+                child: const Icon(
+                  Icons.check,
+                  color: AppColors.white,
+                  size: 30,
+                ),
+              ),
             ),
-            child: isSelected
-                ? const Icon(
-                    Icons.check,
-                    color: AppColors.white,
-                    size: 36,
-                  )
-                : null,
           ),
         ),
       ),

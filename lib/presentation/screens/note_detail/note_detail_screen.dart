@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:onlynote/Tools/notification_service.dart';
@@ -24,7 +25,8 @@ import 'bloc/detail/note_detail_bloc.dart';
 
 @RoutePage(name: 'NoteDetailRoute')
 class NoteDetailScreen extends StatefulWidget {
-  const NoteDetailScreen({Key? key, @PathParam('noteId') required this.noteId}) : super(key: key);
+  const NoteDetailScreen({Key? key, @PathParam('noteId') required this.noteId})
+      : super(key: key);
   final String noteId;
 
   @override
@@ -40,7 +42,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.initState();
 
     if (mounted) {
-      BlocProvider.of<NoteDetailBloc>(context).add(NoteDetailEvent.showNote(widget.noteId));
+      BlocProvider.of<NoteDetailBloc>(context)
+          .add(NoteDetailEvent.showNote(widget.noteId));
     }
   }
 
@@ -69,18 +72,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final currentReminder = ReminderData.shared.getCurrentReminder(note);
 
     if (currentReminder == null) {
-      bool? permissionResult = await NotificationService().checkAndAskForPermission(context);
+      bool? permissionResult =
+          await NotificationService().checkAndAskForPermission(context);
       if (permissionResult != null && permissionResult == true) {
         if (!context.mounted) return;
-        DatePicker.showDateTimePicker(context, minTime: DateTime.now(), onConfirm: (date) {
+        DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
+            onConfirm: (date) {
           Reminder reminder = Reminder(
-              reminderId: DateTime.now().difference(DateTime(2020, 1, 1)).inSeconds,
-              reminderDate: DateTime(date.year, date.month, date.day, date.hour, date.minute),
+              reminderId:
+                  DateTime.now().difference(DateTime(2020, 1, 1)).inSeconds,
+              reminderDate: DateTime(
+                  date.year, date.month, date.day, date.hour, date.minute),
               noteId: note.id!);
 
           ReminderData.shared.addReminder(reminder);
 
-          NotificationService().askForPermissionAndSchedule(context, note, reminder);
+          NotificationService()
+              .askForPermissionAndSchedule(context, note, reminder);
 
           if (mounted) setState(() {});
         });
@@ -93,21 +101,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           BottomSheetAction(
               title: Text(S.of(context).Edit),
               onPressed: (BuildContext context) async {
-                bool? permissionResult =
-                    await NotificationService().checkAndAskForPermission(context);
+                bool? permissionResult = await NotificationService()
+                    .checkAndAskForPermission(context);
                 if (permissionResult != null && permissionResult == true) {
                   if (!context.mounted) return;
-                  DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
-                      onConfirm: (date) {
+                  DatePicker.showDateTimePicker(context,
+                      minTime: DateTime.now(), onConfirm: (date) {
                     Reminder newReminder = Reminder(
                         reminderId: currentReminder.reminderId,
-                        reminderDate:
-                            DateTime(date.year, date.month, date.day, date.hour, date.minute),
+                        reminderDate: DateTime(date.year, date.month, date.day,
+                            date.hour, date.minute),
                         noteId: note.id!);
 
-                    ReminderData.shared.modifyReminder(currentReminder, newReminder);
+                    ReminderData.shared
+                        .modifyReminder(currentReminder, newReminder);
 
-                    NotificationService().askForPermissionAndSchedule(context, note, newReminder);
+                    NotificationService().askForPermissionAndSchedule(
+                        context, note, newReminder);
 
                     if (mounted) setState(() {});
                     Navigator.pop(context);
@@ -145,10 +155,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           appBar: NoteAppBar(
             actions: state.whenOrNull(
               success: (note) {
-                final hasReminder = ReminderData.shared.getCurrentReminder(note) != null;
+                final hasReminder =
+                    ReminderData.shared.getCurrentReminder(note) != null;
                 return [
                   AppButton(
-                    child: Icon(hasReminder ? Icons.alarm_on_outlined : Icons.alarm_add_outlined),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) =>
+                          ScaleTransition(scale: animation, child: child),
+                      child: Icon(
+                        hasReminder
+                            ? Icons.alarm_on_outlined
+                            : Icons.alarm_add_outlined,
+                        key: ValueKey(hasReminder),
+                      ),
+                    ),
                     onPressed: () => _showReminderPicker(context, note),
                   ),
                   AppButton(
@@ -172,12 +193,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       );
                       if (!confirmed) return;
 
-                      Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
+                      Reminder? currentReminder =
+                          ReminderData.shared.getCurrentReminder(note);
                       if (currentReminder != null) {
                         ReminderData.shared.deleteReminder(currentReminder);
-                        NotificationService().removeNotification(currentReminder);
+                        NotificationService()
+                            .removeNotification(currentReminder);
                       }
-                      context.read<NoteActionBloc>().add(NoteActionEvent.deleteNote(note.id!));
+                      context
+                          .read<NoteActionBloc>()
+                          .add(NoteActionEvent.deleteNote(note.id!));
                     },
                   ),
                 ];
@@ -241,7 +266,8 @@ class LoadedView extends StatelessWidget {
                 //* Show Note Update/Add time
                 SelectableText(
                   note.dateWithTime,
-                  style: AppTypography.description.copyWith(color: Colors.black87),
+                  style:
+                      AppTypography.description.copyWith(color: Colors.black87),
                 ),
 
                 //* Show reminder time, only if one is actually set.
@@ -252,11 +278,13 @@ class LoadedView extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.alarm, size: 16, color: Colors.black87),
+                        const Icon(Icons.alarm,
+                            size: 16, color: Colors.black87),
                         const SizedBox(width: AppSpacings.s),
                         Text(
                           currentReminder.timeString,
-                          style: AppTypography.description.copyWith(color: Colors.black87),
+                          style: AppTypography.description
+                              .copyWith(color: Colors.black87),
                         ),
                       ],
                     ),
@@ -301,7 +329,8 @@ class _BuildTodoList extends StatelessWidget {
       children: [
         Text(
           S.of(context).Todo_list,
-          style: AppTypography.headline6.copyWith(decoration: TextDecoration.underline),
+          style: AppTypography.headline6
+              .copyWith(decoration: TextDecoration.underline),
         ),
         ListView.builder(
           key: const PageStorageKey('note-todos'),
@@ -311,21 +340,31 @@ class _BuildTodoList extends StatelessWidget {
           itemBuilder: (_, index) {
             final Todo todo = todoList[index];
 
-            return CheckboxListTile(
-              controlAffinity: ListTileControlAffinity.leading,
-              dense: true,
-              value: todo.completed,
-              contentPadding: EdgeInsets.zero,
-              enableFeedback: true,
-              title: Text(
-                todo.title ?? '',
-                style: AppTypography.title.copyWith(
-                  decoration: todo.completed ? TextDecoration.lineThrough : null,
+            return AnimatedOpacity(
+              key: ValueKey(todo.id),
+              opacity: todo.completed ? 0.6 : 1.0,
+              duration: const Duration(milliseconds: 250),
+              child: CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.leading,
+                dense: true,
+                value: todo.completed,
+                contentPadding: EdgeInsets.zero,
+                enableFeedback: true,
+                title: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 250),
+                  style: AppTypography.title.copyWith(
+                    decoration:
+                        todo.completed ? TextDecoration.lineThrough : null,
+                  ),
+                  child: Text(todo.title ?? ''),
                 ),
+                onChanged: (bool? value) {
+                  HapticFeedback.lightImpact();
+                  context
+                      .read<NoteDetailBloc>()
+                      .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
+                },
               ),
-              onChanged: (bool? value) {
-                context.read<NoteDetailBloc>().add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-              },
             );
           },
         ),
@@ -335,7 +374,8 @@ class _BuildTodoList extends StatelessWidget {
 }
 
 class _BuildImageGallery extends StatelessWidget {
-  const _BuildImageGallery({Key? key, required this.imagePaths}) : super(key: key);
+  const _BuildImageGallery({Key? key, required this.imagePaths})
+      : super(key: key);
   final List<String> imagePaths;
 
   void _openFullScreen(BuildContext context, int initialIndex) {

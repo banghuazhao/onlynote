@@ -4,6 +4,7 @@ import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/constants.dart';
@@ -41,7 +42,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
     super.initState();
 
     _titleController = TextEditingController(text: widget.note?.title);
-    _descriptionController = TextEditingController(text: widget.note?.description);
+    _descriptionController =
+        TextEditingController(text: widget.note?.description);
 
     context.read<AddUpdateFormBloc>().add(
           AddUpdateFormEvent.initialize(
@@ -106,7 +108,9 @@ class _BuildForm extends StatelessWidget {
       bottomNavigationBar: ColorsBar(
         selectedColor: state.selectedColor,
         onChanged: (Color color) {
-          context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.colorChanged(color));
+          context
+              .read<AddUpdateFormBloc>()
+              .add(AddUpdateFormEvent.colorChanged(color));
         },
       ),
       appBar: NoteAppBar(

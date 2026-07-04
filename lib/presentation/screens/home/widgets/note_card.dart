@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -39,12 +40,18 @@ class _NoteCardState extends State<NoteCard> {
   late final ScreenshotController _screenshotController =
       widget.screenshotController ?? ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
 
   Future<void> _shareNoteAsImage() async {
     try {
       await ShareHelper.shareWidgetAsImage(
         _screenshotController,
-        fileName: '${widget.note.title?.isNotEmpty == true ? widget.note.title : 'note'}.png',
+        fileName:
+            '${widget.note.title?.isNotEmpty == true ? widget.note.title : 'note'}.png',
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
       );
     } catch (_) {
@@ -58,129 +65,150 @@ class _NoteCardState extends State<NoteCard> {
 
   @override
   Widget build(BuildContext context) {
-    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(widget.note);
+    Reminder? currentReminder =
+        ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
     // Title is optional — fall back to the description so the card still
     // shows something meaningful for title-less notes.
     final String headlineText =
         note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
 
-    return Material(
-      type: MaterialType.card,
-      clipBehavior: Clip.antiAlias,
-      borderRadius: BorderRadius.circular(AppSpacings.xl),
-      color: note.color,
-      shadowColor: Colors.black,
-      elevation: 4,
-      child: InkWell(
-        splashColor: Colors.black12,
-        onLongPress: widget.onLongPress,
-        onTap: widget.onTap,
-        child: Container(
-          constraints: const BoxConstraints(
-            // maxHeight: 300,
-            minHeight: 100,
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacings.l,
-            vertical: AppSpacings.l,
-          ),
-          child: Stack(
-            children: [
-              Screenshot(
-                controller: _screenshotController,
-                child: Container(
-                  color: note.color ?? Colors.white,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        headlineText,
-                        style: AppTypography.cardTitle,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 4,
-                      ),
-                      const SizedBox(height: AppSpacings.m),
-                      Text(
-                        note.date,
-                        style: AppTypography.description.copyWith(color: Colors.black87),
-                      ),
-                      if (currentReminder != null) const SizedBox(height: AppSpacings.m),
-                      if (currentReminder != null)
-                        Text(
-                          "⏰ " + currentReminder.timeString,
-                          style: AppTypography.description.copyWith(color: Colors.black87),
-                        ),
-                      const SizedBox(height: AppSpacings.m),
-                      if (note.hasTodo) ...{
-                        _BuildTodoList(todoList: note.todo.take(2).toList()),
-                      },
-                      if (note.hasImages) ...{
-                        const SizedBox(height: AppSpacings.m),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacings.m),
-                          child: Image.file(
-                            File(note.imagePaths.first),
-                            width: 64,
-                            height: 64,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      },
-                    ],
-                  ),
-                ),
-              ),
-              if (widget.selected)
-                Align(
-                  alignment: Alignment.topRight,
-                  heightFactor: 2,
+    return AnimatedScale(
+      scale: _pressed ? 0.97 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOut,
+      child: Material(
+        type: MaterialType.card,
+        clipBehavior: Clip.antiAlias,
+        borderRadius: BorderRadius.circular(AppSpacings.xl),
+        color: note.color,
+        shadowColor: Colors.black,
+        elevation: 4,
+        child: InkWell(
+          splashColor: Colors.black12,
+          onTapDown: (_) => _setPressed(true),
+          onTapCancel: () => _setPressed(false),
+          onLongPress: widget.onLongPress == null
+              ? null
+              : () {
+                  HapticFeedback.mediumImpact();
+                  widget.onLongPress!();
+                },
+          onTap: widget.onTap == null
+              ? null
+              : () {
+                  _setPressed(false);
+                  widget.onTap!();
+                },
+          child: Container(
+            constraints: const BoxConstraints(
+              // maxHeight: 300,
+              minHeight: 100,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacings.l,
+              vertical: AppSpacings.l,
+            ),
+            child: Stack(
+              children: [
+                Screenshot(
+                  controller: _screenshotController,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 10,
-                          spreadRadius: 20,
-                          color: note.color ?? AppColors.primary,
+                    color: note.color ?? Colors.white,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          headlineText,
+                          style: AppTypography.cardTitle,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 4,
                         ),
+                        const SizedBox(height: AppSpacings.m),
+                        Text(
+                          note.date,
+                          style: AppTypography.description
+                              .copyWith(color: Colors.black87),
+                        ),
+                        if (currentReminder != null)
+                          const SizedBox(height: AppSpacings.m),
+                        if (currentReminder != null)
+                          Text(
+                            "⏰ " + currentReminder.timeString,
+                            style: AppTypography.description
+                                .copyWith(color: Colors.black87),
+                          ),
+                        const SizedBox(height: AppSpacings.m),
+                        if (note.hasTodo) ...{
+                          _BuildTodoList(todoList: note.todo.take(2).toList()),
+                        },
+                        if (note.hasImages) ...{
+                          const SizedBox(height: AppSpacings.m),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(AppSpacings.m),
+                            child: Image.file(
+                              File(note.imagePaths.first),
+                              width: 64,
+                              height: 64,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        },
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.check,
-                        color: note.color,
-                        size: 20,
+                  ),
+                ),
+                if (widget.selected)
+                  Align(
+                    alignment: Alignment.topRight,
+                    heightFactor: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10,
+                            spreadRadius: 20,
+                            color: note.color ?? AppColors.primary,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.check,
+                          color: note.color,
+                          size: 20,
+                        ),
                       ),
                     ),
-                  ),
-                )
-              else
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Material(
-                    key: _shareButtonKey,
-                    color: Colors.black.withOpacity(0.08),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: _shareNoteAsImage,
-                      child: const Padding(
-                        padding: EdgeInsets.all(6.0),
-                        child: Icon(
-                          Icons.share_outlined,
-                          size: 18,
-                          color: Colors.black54,
+                  )
+                else
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Material(
+                      key: _shareButtonKey,
+                      color: Colors.black.withOpacity(0.08),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: _shareNoteAsImage,
+                        child: const Padding(
+                          padding: EdgeInsets.all(6.0),
+                          child: Icon(
+                            Icons.share_outlined,
+                            size: 18,
+                            color: Colors.black54,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
