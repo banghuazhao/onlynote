@@ -159,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: BlocBuilder<HomeBloc, HomeState>(
               builder: (_, state) {
                 return state.maybeMap(
-                  orElse: () => const ErrorText('Loading..'),
+                  orElse: () => const _LoadingSkeleton(),
                   error: (error) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -462,6 +462,41 @@ class _ReorderableNoteTile extends StatelessWidget {
               style: AppTypography.description.copyWith(color: Colors.black87),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A shimmering placeholder grid shown while the first page of notes loads,
+/// so the app never flashes a bare "Loading.." label.
+class _LoadingSkeleton extends StatelessWidget {
+  const _LoadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColumns = AppLayoutSettings.instance.cardSize.columns;
+    final crossAxisCount =
+        MediaQuery.of(context).size.width > 600 ? baseColumns + 1 : baseColumns;
+
+    return ShimmerWrapper(
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacings.xl,
+          vertical: AppSpacings.xl,
+        ),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: AppSpacings.xl,
+          crossAxisSpacing: AppSpacings.l,
+          childAspectRatio: 1.1,
+        ),
+        itemCount: crossAxisCount * 3,
+        itemBuilder: (context, index) => Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(AppSpacings.xl),
+          ),
         ),
       ),
     );
