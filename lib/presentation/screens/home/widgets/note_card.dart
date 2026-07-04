@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -61,6 +60,10 @@ class _NoteCardState extends State<NoteCard> {
   Widget build(BuildContext context) {
     Reminder? currentReminder = ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
+    // Title is optional — fall back to the description so the card still
+    // shows something meaningful for title-less notes.
+    final String headlineText =
+        note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
 
     return Material(
       type: MaterialType.card,
@@ -94,12 +97,8 @@ class _NoteCardState extends State<NoteCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        note.title ?? '',
-                        style: GoogleFonts.montserrat(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 30,
-                          color: AppColors.title,
-                        ),
+                        headlineText,
+                        style: AppTypography.cardTitle,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 4,
                       ),

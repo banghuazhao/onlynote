@@ -43,8 +43,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Express_Scan": MessageLookupByLibrary.simpleMessage("飛速掃描"),
         "Failed_to_Update_note_please_try_again":
             MessageLookupByLibrary.simpleMessage("更新備忘錄失敗, 請重試"),
-        "Failed_to_add_note_Title_should_not_empty":
-            MessageLookupByLibrary.simpleMessage("添加備忘錄失敗, 標題不能為空"),
+        "Failed_to_add_note_Title_should_not_empty": MessageLookupByLibrary
+            .simpleMessage("備忘錄內容不能為空，請添加標題、內容、待辦事項或照片"),
         "Failed_to_add_note_please_try_again":
             MessageLookupByLibrary.simpleMessage("添加備忘錄失敗, 請重試"),
         "Failed_to_delete_note_please_try_again":
@@ -61,8 +61,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("加載備忘錄失敗, 請重試"),
         "Failed_to_load_notes_please_try_again":
             MessageLookupByLibrary.simpleMessage("加載備忘錄失敗, 請重試"),
-        "Failed_to_update_note_Title_should_not_empty":
-            MessageLookupByLibrary.simpleMessage("更新備忘錄失敗, 標題不能為空"),
+        "Failed_to_update_note_Title_should_not_empty": MessageLookupByLibrary
+            .simpleMessage("備忘錄內容不能為空，請添加標題、內容、待辦事項或照片"),
         "Image_Guru": MessageLookupByLibrary.simpleMessage("咕嚕濾鏡"),
         "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
         "Metronome_Go": MessageLookupByLibrary.simpleMessage("打拍節拍器"),

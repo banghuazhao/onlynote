@@ -9,6 +9,12 @@ class AppTypography {
   static GoogleFontBuilder get _font => AppTypographySettings.instance.fontBuilder;
   static double get _scale => AppTypographySettings.instance.scale;
 
+  static TextStyle get cardTitle => _font(
+        fontWeight: FontWeight.w600,
+        fontSize: 30 * _scale,
+        color: AppColors.title,
+      );
+
   static TextStyle get headline1 => _font(
         fontWeight: FontWeight.bold,
         fontSize: 34 * _scale,

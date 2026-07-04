@@ -75,7 +75,12 @@ class NoteDto implements Comparable {
     );
   }
 
-  bool get validNote => title?.isNotEmpty == true;
+  // Title is optional — a note only needs *some* content to be worth saving.
+  bool get validNote =>
+      (title?.isNotEmpty ?? false) ||
+      (description?.isNotEmpty ?? false) ||
+      (todoList?.isNotEmpty ?? false) ||
+      (imagePaths?.isNotEmpty ?? false);
 
   NoteDto copyWith({
     String? id,

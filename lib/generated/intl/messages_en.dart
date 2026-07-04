@@ -49,7 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Failed to Update note, please try again."),
         "Failed_to_add_note_Title_should_not_empty":
             MessageLookupByLibrary.simpleMessage(
-                "Failed to add note, Title should not empty."),
+                "Can\'t save an empty note. Add a title, description, checklist item, or photo."),
         "Failed_to_add_note_please_try_again":
             MessageLookupByLibrary.simpleMessage(
                 "Failed to add note, please try again."),
@@ -72,7 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Failed to load notes, please try again."),
         "Failed_to_update_note_Title_should_not_empty":
             MessageLookupByLibrary.simpleMessage(
-                "Failed to update note, Title should not empty."),
+                "Can\'t save an empty note. Add a title, description, checklist item, or photo."),
         "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
         "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
         "Metronome_Go": MessageLookupByLibrary.simpleMessage("Metronome Go"),

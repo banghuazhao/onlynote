@@ -200,20 +200,20 @@ class S {
     );
   }
 
-  /// `Failed to add note, Title should not empty.`
+  /// `Can't save an empty note. Add a title, description, checklist item, or photo.`
   String get Failed_to_add_note_Title_should_not_empty {
     return Intl.message(
-      'Failed to add note, Title should not empty.',
+      'Can\'t save an empty note. Add a title, description, checklist item, or photo.',
       name: 'Failed_to_add_note_Title_should_not_empty',
       desc: '',
       args: [],
     );
   }
 
-  /// `Failed to update note, Title should not empty.`
+  /// `Can't save an empty note. Add a title, description, checklist item, or photo.`
   String get Failed_to_update_note_Title_should_not_empty {
     return Intl.message(
-      'Failed to update note, Title should not empty.',
+      'Can\'t save an empty note. Add a title, description, checklist item, or photo.',
       name: 'Failed_to_update_note_Title_should_not_empty',
       desc: '',
       args: [],
