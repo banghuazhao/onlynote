@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/screens/home/more_apps_page.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -85,6 +86,20 @@ class SettingsScreen extends StatelessWidget {
                     if (value != null) layoutSettings.setCardSize(value);
                   },
                 ),
+              const SizedBox(height: AppSpacings.xl),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(S.of(context).More_Apps, style: AppTypography.headline6),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => MoreAppsPage(),
+                    ),
+                  );
+                },
+              ),
             ],
           );
         },

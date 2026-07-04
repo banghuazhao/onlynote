@@ -26,7 +26,6 @@ import 'package:screenshot/screenshot.dart';
 import '../settings/settings_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
-import 'more_apps_page.dart';
 import 'widgets/note_card.dart';
 
 @RoutePage(name: 'HomeRoute')
@@ -84,17 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (BuildContext context) => const SettingsScreen(),
-                      ),
-                    );
-                  },
-                ),
-                AppButton(
-                  child: const Icon(Icons.more_horiz),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => MoreAppsPage(),
                       ),
                     );
                   },

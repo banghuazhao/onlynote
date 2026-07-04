@@ -38,12 +38,11 @@ class _AddTodoTile extends StatelessWidget {
 //* Todo list tile
 class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
-    Key? key,
     required this.index,
     this.value,
     required this.onChanged,
     required this.onRemoved,
-  }) : super(key: key);
+  });
 
   final int index;
   final String? value;
@@ -147,28 +146,41 @@ class _BuildTodoListField extends StatelessWidget {
           itemBuilder: (_, index) {
             final Todo todo = state.todos[index];
 
-            return _TodoFieldTile(
+            Future<bool> confirmAndDelete() async {
+              final confirmed = await showConfirmDialog(
+                context,
+                title: S.of(context).Delete_Todo_Confirm_Title,
+                message: S.of(context).Delete_Todo_Confirm_Message,
+              );
+              if (confirmed) {
+                context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.deleteTodo(todo.id!));
+              }
+              return confirmed;
+            }
+
+            return Dismissible(
               key: ValueKey(todo.id),
-              index: index,
-              value: todo.title,
-              onChanged: (value) {
-                context.read<AddUpdateFormBloc>().add(
-                      AddUpdateFormEvent.todoValueChanged(
-                        value: value,
-                        id: todo.id!,
-                      ),
-                    );
-              },
-              onRemoved: () async {
-                final confirmed = await showConfirmDialog(
-                  context,
-                  title: S.of(context).Delete_Todo_Confirm_Title,
-                  message: S.of(context).Delete_Todo_Confirm_Message,
-                );
-                if (confirmed) {
-                  context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.deleteTodo(todo.id!));
-                }
-              },
+              direction: DismissDirection.endToStart,
+              confirmDismiss: (_) => confirmAndDelete(),
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacings.l),
+                color: AppColors.error,
+                child: const Icon(Icons.delete_outline, color: Colors.white),
+              ),
+              child: _TodoFieldTile(
+                index: index,
+                value: todo.title,
+                onChanged: (value) {
+                  context.read<AddUpdateFormBloc>().add(
+                        AddUpdateFormEvent.todoValueChanged(
+                          value: value,
+                          id: todo.id!,
+                        ),
+                      );
+                },
+                onRemoved: confirmAndDelete,
+              ),
             );
           },
         ),
