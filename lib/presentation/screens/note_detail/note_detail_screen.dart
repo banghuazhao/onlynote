@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
@@ -404,7 +405,7 @@ class _BuildImageGallery extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacings.m),
               child: Image.file(
-                File(imagePaths[index]),
+                File(ImageStorage.resolvePath(imagePaths[index])),
                 width: 100,
                 height: 100,
                 fit: BoxFit.cover,
@@ -441,7 +442,7 @@ class _FullScreenImageViewer extends StatelessWidget {
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(
-              child: Image.file(File(imagePaths[index])),
+              child: Image.file(File(ImageStorage.resolvePath(imagePaths[index]))),
             ),
           );
         },

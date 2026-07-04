@@ -17,6 +17,7 @@ import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'Tools/ads_manager.dart';
 import 'Tools/app_layout_settings.dart';
 import 'Tools/app_typography_settings.dart';
+import 'Tools/image_storage.dart';
 import 'Tools/in_app_reviewer_helper.dart';
 import 'Tools/locator.dart';
 import 'Tools/notification_service.dart';
@@ -54,6 +55,7 @@ Future main() async {
 
   await AppTypographySettings.instance.load();
   await AppLayoutSettings.instance.load();
+  await ImageStorage.init();
 
   Future.delayed(const Duration(seconds: 1), () {
     AppTrackingTransparency.requestTrackingAuthorization();

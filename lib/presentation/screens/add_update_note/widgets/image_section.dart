@@ -88,7 +88,7 @@ class _ImageThumbnail extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacings.m),
           child: Image.file(
-            File(path),
+            File(ImageStorage.resolvePath(path)),
             width: 80,
             height: 80,
             fit: BoxFit.cover,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -149,7 +150,7 @@ class _NoteCardState extends State<NoteCard> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(AppSpacings.m),
                             child: Image.file(
-                              File(note.imagePaths.first),
+                              File(ImageStorage.resolvePath(note.imagePaths.first)),
                               width: 64,
                               height: 64,
                               fit: BoxFit.cover,
