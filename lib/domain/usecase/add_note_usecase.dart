@@ -21,7 +21,11 @@ class AddNoteUsecase {
     try {
       final todo = List<Todo>.from(note.todo)
         ..removeWhere((todo) => todo.title.isEmptyString);
-      final noteDto = NoteDto.fromNote(note.copyWith(todo: todo));
+      // New notes sort to the top: more negative than any existing sortOrder
+      // and than any note added later (since -now() keeps decreasing).
+      final noteDto = NoteDto.fromNote(
+        note.copyWith(todo: todo, sortOrder: -DateTime.now().millisecondsSinceEpoch),
+      );
 
       if (!noteDto.validNote) {
         return left(

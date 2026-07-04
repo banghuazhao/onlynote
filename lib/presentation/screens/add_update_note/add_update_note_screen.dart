@@ -182,6 +182,7 @@ class _BuildForm extends StatelessWidget {
                 dateTime: DateTime.now(),
                 todo: state.todos,
                 imagePaths: state.imagePaths,
+                sortOrder: widget.note!.sortOrder,
               ),
               widget.note!.id!,
             ),

@@ -380,6 +380,26 @@ class S {
     );
   }
 
+  /// `Reorder`
+  String get Reorder {
+    return Intl.message(
+      'Reorder',
+      name: 'Reorder',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Done`
+  String get Done {
+    return Intl.message(
+      'Done',
+      name: 'Done',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Choose From Gallery`
   String get Choose_From_Gallery {
     return Intl.message(

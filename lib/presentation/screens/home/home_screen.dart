@@ -21,6 +21,7 @@ import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bl
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
 
 import '../settings/settings_screen.dart';
@@ -40,6 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
   BannerAd? _ad;
 
   bool _isAdLoaded = false;
+  bool _isReorderMode = false;
+
+  void _setReorderMode(bool value) => setState(() => _isReorderMode = value);
 
   @override
   initState() {
@@ -74,7 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
         systemUiOverlayStyle: SystemUiOverlayStyle.dark,
         autoImplementLeading: false,
         title: S.of(context).notes,
-        actions: context.watch<MultipleDeleteBloc>().state.mapOrNull(
+        actions: _isReorderMode
+            ? [
+                AppButton(
+                  child: Text(S.of(context).Done),
+                  onPressed: () => _setReorderMode(false),
+                ),
+              ]
+            : context.watch<MultipleDeleteBloc>().state.mapOrNull(
               initial: (selectedNotes) => [
                 AppButton(
                   child: const Icon(Icons.settings_outlined),
@@ -166,7 +177,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     );
                   },
-                  loaded: (data) => _BuildNotesList(notes: data.notes),
+                  loaded: (data) => _BuildNotesList(
+                    notes: data.notes,
+                    isReorderMode: _isReorderMode,
+                    onEnterReorderMode: () => _setReorderMode(true),
+                  ),
                 );
               },
             ),
@@ -190,9 +205,13 @@ class _BuildNotesList extends StatefulWidget {
   const _BuildNotesList({
     Key? key,
     required this.notes,
+    required this.isReorderMode,
+    required this.onEnterReorderMode,
   }) : super(key: key);
 
   final List<Note> notes;
+  final bool isReorderMode;
+  final VoidCallback onEnterReorderMode;
 
   @override
   __BuildNotesListState createState() => __BuildNotesListState();
@@ -277,6 +296,14 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           },
         ),
         BottomSheetAction(
+          leading: const Icon(Icons.swap_vert),
+          title: Text(S.of(context).Reorder),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            widget.onEnterReorderMode();
+          },
+        ),
+        BottomSheetAction(
           leading: const Icon(Icons.delete_outline, color: Colors.red),
           title: Text(S.of(context).Delete, style: const TextStyle(color: Colors.red)),
           onPressed: (sheetContext) async {
@@ -308,48 +335,134 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     return FocusDetector(
       onFocusGained: viewWillAppear,
       onFocusLost: viewWillDisappear,
-      child: MasonryGridView.count(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacings.xl,
-          vertical: AppSpacings.xl,
-        ),
-        crossAxisCount: crossAxisCount,
-        itemCount: widget.notes.length,
-        itemBuilder: (BuildContext context, int index) {
-          final note = widget.notes[index];
-          final noteId = note.id!;
-          return FadeInUp(
-            duration: Duration(milliseconds: 100 * index),
-            child: KeyedSubtree(
-              key: _cardKeyFor(noteId),
-              child: NoteCard(
-                note: note,
-                selected: multipleDeleteBloc.isSelected(noteId),
-                screenshotController: _screenshotControllerFor(noteId),
-                onTap: () {
-                  multipleDeleteBloc.state.maybeMap(
-                    orElse: () {
-                      context.router.push(NoteDetailRoute(noteId: noteId));
-                    },
-                    selected: (_) {
-                      multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
-                    },
-                  );
-                },
-                onLongPress: () {
-                  multipleDeleteBloc.state.maybeMap(
-                    orElse: () => _showNoteContextMenu(context, note, multipleDeleteBloc, noteId),
-                    selected: (_) {
-                      multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
-                    },
-                  );
-                },
-              ),
+      child: widget.isReorderMode
+          ? _buildReorderableGrid(context, crossAxisCount)
+          : _buildMasonryGrid(context, multipleDeleteBloc, crossAxisCount),
+    );
+  }
+
+  Widget _buildMasonryGrid(
+    BuildContext context,
+    MultipleDeleteBloc multipleDeleteBloc,
+    int crossAxisCount,
+  ) {
+    return MasonryGridView.count(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacings.xl,
+        vertical: AppSpacings.xl,
+      ),
+      crossAxisCount: crossAxisCount,
+      itemCount: widget.notes.length,
+      itemBuilder: (BuildContext context, int index) {
+        final note = widget.notes[index];
+        final noteId = note.id!;
+        return FadeInUp(
+          duration: Duration(milliseconds: 100 * index),
+          child: KeyedSubtree(
+            key: _cardKeyFor(noteId),
+            child: NoteCard(
+              note: note,
+              selected: multipleDeleteBloc.isSelected(noteId),
+              screenshotController: _screenshotControllerFor(noteId),
+              onTap: () {
+                multipleDeleteBloc.state.maybeMap(
+                  orElse: () {
+                    context.router.push(NoteDetailRoute(noteId: noteId));
+                  },
+                  selected: (_) {
+                    multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                  },
+                );
+              },
+              onLongPress: () {
+                multipleDeleteBloc.state.maybeMap(
+                  orElse: () => _showNoteContextMenu(context, note, multipleDeleteBloc, noteId),
+                  selected: (_) {
+                    multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                  },
+                );
+              },
             ),
-          );
-        },
-        mainAxisSpacing: AppSpacings.xl,
-        crossAxisSpacing: AppSpacings.l,
+          ),
+        );
+      },
+      mainAxisSpacing: AppSpacings.xl,
+      crossAxisSpacing: AppSpacings.l,
+    );
+  }
+
+  Widget _buildReorderableGrid(BuildContext context, int crossAxisCount) {
+    final notes = List<Note>.from(widget.notes);
+
+    return ReorderableGridView.count(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacings.xl,
+        vertical: AppSpacings.xl,
+      ),
+      crossAxisCount: crossAxisCount,
+      childAspectRatio: 1.3,
+      mainAxisSpacing: AppSpacings.xl,
+      crossAxisSpacing: AppSpacings.l,
+      onReorder: (oldIndex, newIndex) {
+        final reordered = List<Note>.from(notes);
+        final moved = reordered.removeAt(oldIndex);
+        reordered.insert(newIndex, moved);
+        context.read<HomeBloc>().add(HomeEvent.reorderNotes(reordered));
+      },
+      children: [
+        for (final note in notes)
+          _ReorderableNoteTile(key: ValueKey(note.id), note: note),
+      ],
+    );
+  }
+}
+
+/// A stripped-down note preview used only while dragging to reorder.
+///
+/// Unlike [NoteCard], this has a small, fixed amount of content (title/
+/// description headline + date) so it can safely sit in a uniform-height
+/// grid cell without risking a RenderFlex overflow — full note content
+/// (todos, images, reminders) can vary a lot in height, which is exactly
+/// what the normal masonry layout is built to absorb.
+class _ReorderableNoteTile extends StatelessWidget {
+  const _ReorderableNoteTile({Key? key, required this.note}) : super(key: key);
+  final Note note;
+
+  @override
+  Widget build(BuildContext context) {
+    final headlineText =
+        note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
+
+    return Material(
+      type: MaterialType.card,
+      clipBehavior: Clip.antiAlias,
+      borderRadius: BorderRadius.circular(AppSpacings.xl),
+      color: note.color,
+      shadowColor: Colors.black,
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacings.l,
+          vertical: AppSpacings.l,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              headlineText,
+              style: AppTypography.cardTitle,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppSpacings.m),
+            Text(
+              note.date,
+              style: AppTypography.description.copyWith(color: Colors.black87),
+            ),
+          ],
+        ),
       ),
     );
   }

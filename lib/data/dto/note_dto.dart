@@ -49,6 +49,7 @@ class NoteDto implements Comparable {
     this.dateTime,
     this.todoList = const [],
     this.imagePaths = const [],
+    this.sortOrder,
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -60,6 +61,7 @@ class NoteDto implements Comparable {
       colorValue: note.color?.value,
       todoList: note.todo.map((todo) => TodoDto.fromDomain(todo)).toList(),
       imagePaths: note.imagePaths,
+      sortOrder: note.sortOrder,
     );
   }
 
@@ -72,6 +74,7 @@ class NoteDto implements Comparable {
       color: Color(colorValue!),
       todo: todoList?.map((todo) => todo.toDomain()).toList() ?? [],
       imagePaths: imagePaths ?? [],
+      sortOrder: sortOrder,
     );
   }
 
@@ -90,6 +93,7 @@ class NoteDto implements Comparable {
     String? dateTime,
     List<TodoDto>? todoList,
     List<String>? imagePaths,
+    int? sortOrder,
   }) {
     return NoteDto(
       id: id ?? this.id,
@@ -99,6 +103,7 @@ class NoteDto implements Comparable {
       dateTime: dateTime ?? this.dateTime,
       todoList: todoList ?? this.todoList,
       imagePaths: imagePaths ?? this.imagePaths,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -116,14 +121,22 @@ class NoteDto implements Comparable {
   final List<TodoDto>? todoList;
   @HiveField(6)
   final List<String>? imagePaths;
+  @HiveField(7)
+  final int? sortOrder;
 
   @override
   int compareTo(other) {
+    // Notes with an explicit sortOrder (user-dragged, or newly created) sort
+    // by that; older notes created before this field existed fall back to
+    // date-based ordering.
+    if (sortOrder != null && other.sortOrder != null) {
+      return sortOrder!.compareTo(other.sortOrder!);
+    }
     try {
-      final _isAfter = DateTime.parse(other.dateTime).isAfter(
+      final isAfter = DateTime.parse(other.dateTime).isAfter(
         DateTime.parse(dateTime!),
       );
-      return _isAfter ? 1 : -1;
+      return isAfter ? 1 : -1;
     } catch (_) {
       return 1;
     }

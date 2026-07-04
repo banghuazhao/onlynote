@@ -9,11 +9,11 @@ part 'routes.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
 class AppRouter extends RootStackRouter {
+  // Adaptive gives each platform its native transition — Cupertino on
+  // iOS/macOS (which includes the edge-swipe-to-go-back gesture), Material
+  // elsewhere. A custom transition would bypass that gesture entirely.
   @override
-  RouteType get defaultRouteType => const RouteType.custom(
-        transitionsBuilder: TransitionsBuilders.slideRightWithFade,
-        durationInMilliseconds: 200,
-      );
+  RouteType get defaultRouteType => const RouteType.adaptive();
 
   @override
   List<AutoRoute> get routes => [

@@ -64,13 +64,14 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       dateTime: fields[4] as String?,
       todoList: (fields[5] as List?)?.cast<TodoDto>(),
       imagePaths: (fields[6] as List?)?.cast<String>(),
+      sortOrder: fields[7] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NoteDto obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -84,7 +85,9 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       ..writeByte(5)
       ..write(obj.todoList)
       ..writeByte(6)
-      ..write(obj.imagePaths);
+      ..write(obj.imagePaths)
+      ..writeByte(7)
+      ..write(obj.sortOrder);
   }
 
   @override

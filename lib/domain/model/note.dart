@@ -17,7 +17,8 @@ class Note with _$Note {
       Color? color,
       DateTime? dateTime,
       @Default([]) List<Todo> todo,
-      @Default([]) List<String> imagePaths}) = _Note;
+      @Default([]) List<String> imagePaths,
+      int? sortOrder}) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');
   String get date => dateTime != null ? _formatter.format(dateTime!) : '';

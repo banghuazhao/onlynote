@@ -52,6 +52,7 @@ dependencies:
   cross_file: ^0.3.5+4
   image_picker: ^1.2.3
   path_provider: ^2.1.6
+  reorderable_grid_view: ^2.2.8
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -19,6 +19,7 @@ import 'package:onlynote/domain/usecase/add_note_usecase.dart' as _i153;
 import 'package:onlynote/domain/usecase/delete_multiple_notes.dart' as _i805;
 import 'package:onlynote/domain/usecase/delete_note_usecase.dart' as _i845;
 import 'package:onlynote/domain/usecase/get_note_usecase.dart' as _i513;
+import 'package:onlynote/domain/usecase/reorder_notes_usecase.dart' as _i660;
 import 'package:onlynote/domain/usecase/show_notes_usecase.dart' as _i61;
 import 'package:onlynote/domain/usecase/update_note_usecase.dart' as _i211;
 import 'package:onlynote/domain/usecase/usecase.dart' as _i731;
@@ -54,6 +55,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i277.NoteRepositoryImplementation(gh<_i491.Database>()));
     gh.factory<_i805.DeleteMultipleNotesUsecase>(
         () => _i805.DeleteMultipleNotesUsecase(gh<_i234.NoteRepository>()));
+    gh.factory<_i660.ReorderNotesUsecase>(
+        () => _i660.ReorderNotesUsecase(gh<_i234.NoteRepository>()));
     gh.factory<_i845.DeleteNoteUsecase>(
         () => _i845.DeleteNoteUsecase(gh<_i234.NoteRepository>()));
     gh.factory<_i211.UpdateNoteUsecase>(
@@ -75,6 +78,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i256.HomeBloc>(() => _i256.HomeBloc(
           gh<_i731.ShowAllNotesUsecase>(),
           gh<_i731.AddNoteUsecase>(),
+          gh<_i731.ReorderNotesUsecase>(),
         ));
     gh.factory<_i367.MultipleDeleteBloc>(
         () => _i367.MultipleDeleteBloc(gh<_i731.DeleteMultipleNotesUsecase>()));

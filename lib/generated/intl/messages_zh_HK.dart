@@ -88,6 +88,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
         "Reminder": MessageLookupByLibrary.simpleMessage("提醒設置"),
         "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
+        "Done": MessageLookupByLibrary.simpleMessage("完成"),
+        "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
         "Select": MessageLookupByLibrary.simpleMessage("選擇"),
         "Share": MessageLookupByLibrary.simpleMessage("分享"),
         "Share_Note_Failed":

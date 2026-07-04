@@ -17,7 +17,8 @@ final S _i10n = locator<S>();
 @injectable
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Get all notes
-  HomeBloc(this._usecase, this._addNoteUsecase) : super(const HomeState.initial()) {
+  HomeBloc(this._usecase, this._addNoteUsecase, this._reorderNotesUsecase)
+      : super(const HomeState.initial()) {
     on<_GetAllNotes>(
       (event, emit) async {
         emit(const HomeState.loading());
@@ -47,8 +48,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (_) => getIt<AppRouter>().context.showToast(_i10n.Note_Duplicated_Successfully),
       );
     });
+
+    on<_ReorderNotes>((event, emit) async {
+      // Optimistic update — Hive's box listener will re-fetch and confirm
+      // this same order once the write below completes.
+      emit(HomeState.loaded(event.notes));
+
+      final failureOrSuccess = await _reorderNotesUsecase(event.notes);
+
+      failureOrSuccess.fold(
+        (error) => getIt<AppRouter>().context.showToast('${error.message}', isError: true),
+        (_) => null,
+      );
+    });
   }
 
   final ShowAllNotesUsecase _usecase;
   final AddNoteUsecase _addNoteUsecase;
+  final ReorderNotesUsecase _reorderNotesUsecase;
 }

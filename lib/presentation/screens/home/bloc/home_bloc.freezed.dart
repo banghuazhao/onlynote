@@ -20,18 +20,21 @@ mixin _$HomeEvent {
   TResult when<TResult extends Object?>({
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -39,18 +42,21 @@ mixin _$HomeEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -113,6 +119,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult when<TResult extends Object?>({
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
   }) {
     return getAllNotes();
   }
@@ -122,6 +129,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
   }) {
     return getAllNotes?.call();
   }
@@ -131,6 +139,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -144,6 +153,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult map<TResult extends Object?>({
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
   }) {
     return getAllNotes(this);
   }
@@ -153,6 +163,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
   }) {
     return getAllNotes?.call(this);
   }
@@ -162,6 +173,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -251,6 +263,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult when<TResult extends Object?>({
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
   }) {
     return duplicateNote(note);
   }
@@ -260,6 +273,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
   }) {
     return duplicateNote?.call(note);
   }
@@ -269,6 +283,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
     required TResult orElse(),
   }) {
     if (duplicateNote != null) {
@@ -282,6 +297,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult map<TResult extends Object?>({
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
   }) {
     return duplicateNote(this);
   }
@@ -291,6 +307,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
   }) {
     return duplicateNote?.call(this);
   }
@@ -300,6 +317,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
     required TResult orElse(),
   }) {
     if (duplicateNote != null) {
@@ -315,6 +333,151 @@ abstract class _DuplicateNote implements HomeEvent {
   Note get note;
   @JsonKey(ignore: true)
   _$$DuplicateNoteImplCopyWith<_$DuplicateNoteImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ReorderNotesImplCopyWith<$Res> {
+  factory _$$ReorderNotesImplCopyWith(
+          _$ReorderNotesImpl value, $Res Function(_$ReorderNotesImpl) then) =
+      __$$ReorderNotesImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<Note> notes});
+}
+
+/// @nodoc
+class __$$ReorderNotesImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$ReorderNotesImpl>
+    implements _$$ReorderNotesImplCopyWith<$Res> {
+  __$$ReorderNotesImplCopyWithImpl(
+      _$ReorderNotesImpl _value, $Res Function(_$ReorderNotesImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? notes = null,
+  }) {
+    return _then(_$ReorderNotesImpl(
+      null == notes
+          ? _value._notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as List<Note>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ReorderNotesImpl implements _ReorderNotes {
+  const _$ReorderNotesImpl(final List<Note> notes) : _notes = notes;
+
+  final List<Note> _notes;
+  @override
+  List<Note> get notes {
+    if (_notes is EqualUnmodifiableListView) return _notes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_notes);
+  }
+
+  @override
+  String toString() {
+    return 'HomeEvent.reorderNotes(notes: $notes)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ReorderNotesImpl &&
+            const DeepCollectionEquality().equals(other._notes, _notes));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_notes));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ReorderNotesImplCopyWith<_$ReorderNotesImpl> get copyWith =>
+      __$$ReorderNotesImplCopyWithImpl<_$ReorderNotesImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+  }) {
+    return reorderNotes(notes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+  }) {
+    return reorderNotes?.call(notes);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    required TResult orElse(),
+  }) {
+    if (reorderNotes != null) {
+      return reorderNotes(notes);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+  }) {
+    return reorderNotes(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+  }) {
+    return reorderNotes?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    required TResult orElse(),
+  }) {
+    if (reorderNotes != null) {
+      return reorderNotes(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ReorderNotes implements HomeEvent {
+  const factory _ReorderNotes(final List<Note> notes) = _$ReorderNotesImpl;
+
+  List<Note> get notes;
+  @JsonKey(ignore: true)
+  _$$ReorderNotesImplCopyWith<_$ReorderNotesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

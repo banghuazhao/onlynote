@@ -23,6 +23,7 @@ mixin _$Note {
   DateTime? get dateTime => throw _privateConstructorUsedError;
   List<Todo> get todo => throw _privateConstructorUsedError;
   List<String> get imagePaths => throw _privateConstructorUsedError;
+  int? get sortOrder => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -40,7 +41,8 @@ abstract class $NoteCopyWith<$Res> {
       Color? color,
       DateTime? dateTime,
       List<Todo> todo,
-      List<String> imagePaths});
+      List<String> imagePaths,
+      int? sortOrder});
 }
 
 /// @nodoc
@@ -63,6 +65,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? dateTime = freezed,
     Object? todo = null,
     Object? imagePaths = null,
+    Object? sortOrder = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -93,6 +96,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.imagePaths
           : imagePaths // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sortOrder: freezed == sortOrder
+          ? _value.sortOrder
+          : sortOrder // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -111,7 +118,8 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       Color? color,
       DateTime? dateTime,
       List<Todo> todo,
-      List<String> imagePaths});
+      List<String> imagePaths,
+      int? sortOrder});
 }
 
 /// @nodoc
@@ -131,6 +139,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? dateTime = freezed,
     Object? todo = null,
     Object? imagePaths = null,
+    Object? sortOrder = freezed,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -161,6 +170,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value._imagePaths
           : imagePaths // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sortOrder: freezed == sortOrder
+          ? _value.sortOrder
+          : sortOrder // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -175,7 +188,8 @@ class _$NoteImpl extends _Note {
       this.color,
       this.dateTime,
       final List<Todo> todo = const [],
-      final List<String> imagePaths = const []})
+      final List<String> imagePaths = const [],
+      this.sortOrder})
       : _todo = todo,
         _imagePaths = imagePaths,
         super._();
@@ -209,8 +223,11 @@ class _$NoteImpl extends _Note {
   }
 
   @override
+  final int? sortOrder;
+
+  @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, sortOrder: $sortOrder)';
   }
 
   @override
@@ -227,7 +244,9 @@ class _$NoteImpl extends _Note {
                 other.dateTime == dateTime) &&
             const DeepCollectionEquality().equals(other._todo, _todo) &&
             const DeepCollectionEquality()
-                .equals(other._imagePaths, _imagePaths));
+                .equals(other._imagePaths, _imagePaths) &&
+            (identical(other.sortOrder, sortOrder) ||
+                other.sortOrder == sortOrder));
   }
 
   @override
@@ -239,7 +258,8 @@ class _$NoteImpl extends _Note {
       color,
       dateTime,
       const DeepCollectionEquality().hash(_todo),
-      const DeepCollectionEquality().hash(_imagePaths));
+      const DeepCollectionEquality().hash(_imagePaths),
+      sortOrder);
 
   @JsonKey(ignore: true)
   @override
@@ -256,7 +276,8 @@ abstract class _Note extends Note {
       final Color? color,
       final DateTime? dateTime,
       final List<Todo> todo,
-      final List<String> imagePaths}) = _$NoteImpl;
+      final List<String> imagePaths,
+      final int? sortOrder}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -273,6 +294,8 @@ abstract class _Note extends Note {
   List<Todo> get todo;
   @override
   List<String> get imagePaths;
+  @override
+  int? get sortOrder;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>
