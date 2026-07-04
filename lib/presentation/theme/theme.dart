@@ -28,7 +28,17 @@ class AppTheme {
       selectionColor: Colors.black26,
     ),
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.all(const Color(0xff252525)),
+      // Unchecked = an empty (transparent-fill, outlined) circle; checked =
+      // filled. Using .all() here previously kept the fill color constant
+      // regardless of state, so unchecked boxes looked identical to checked
+      // ones (both a solid dark circle).
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const Color(0xff252525);
+        }
+        return Colors.transparent;
+      }),
+      side: const BorderSide(color: Color(0xff252525), width: 1.5),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(40)),
       ),
