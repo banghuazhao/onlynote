@@ -1,6 +1,7 @@
 import 'dart:ui' show Color;
 
 const List<Color> colors = [
+  // Original neutral/warm palette.
   Color(0xffE3CBB1),
   Color(0xffD5B9AC),
   Color(0xffC1CDDB),
@@ -12,19 +13,18 @@ const List<Color> colors = [
   Color(0xffD2D1CF),
   Color(0xffBFAFA7),
   Color(0xffDFDDB3),
+  // Additional pastel hues for more variety.
+  Color(0xffF6C6C6), // pink
+  Color(0xffF7D9A0), // yellow
+  Color(0xffB8E0D2), // mint
+  Color(0xffA7C6E0), // blue
+  Color(0xffCBB8E0), // lavender
+  Color(0xffF3B6A0), // terracotta
+  Color(0xffA8D8C9), // sage
+  Color(0xffE0B8CE), // rose
+  Color(0xffB9D6E0), // sky
+  Color(0xffE3D5B8), // sand
 ];
-
-// const List<Color> colors = [
-//   Color(0xffe6ee9b),
-//   Color(0xff80deea),
-//   Color(0xffcf93d9),
-//   Color(0xffffab91),
-//   Color(0xffffcc80),
-//   Color(0xffC4BBF0),
-//   Color(0xffFFD717),
-//   Color(0xffFFC7C7),
-//   Color(0xffCCF6C8),
-// ];
 
 const Duration animationDuration = Duration(milliseconds: 400);
 const Duration apiCallInterval = Duration(seconds: 5);
