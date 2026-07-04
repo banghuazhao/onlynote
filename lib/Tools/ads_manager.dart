@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'ad_ids_release.dart';
 
 class AdsManager {
-  static bool disableAllAdsForScreenshot = true;
+  static bool disableAllAdsForScreenshot = false;
 
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
