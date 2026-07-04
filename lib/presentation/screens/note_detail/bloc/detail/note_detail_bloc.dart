@@ -29,23 +29,22 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
       if (state is _Loaded) {
         final state = this.state as _Loaded;
 
-        final updatedNote = state.note.copyWith(
-          todo: state.note.todo.map((todo) {
-            if (todo.id == event.todoId) {
-              return todo.copyWith(completed: !todo.completed);
-            }
-            return todo;
-          }).toList(),
-        );
-
-/* sort by value
-        updatedNote.todo.sort((a, b) {
-          if (b.completed) {
-            return -1;
+        final toggledTodo = state.note.todo.map((todo) {
+          if (todo.id == event.todoId) {
+            return todo.copyWith(completed: !todo.completed);
           }
-          return 1;
-        });
-*/
+          return todo;
+        }).toList();
+
+        // Move checked items to the bottom, keeping the relative order
+        // within the unchecked and checked groups.
+        final sortedTodo = [
+          ...toggledTodo.where((todo) => !todo.completed),
+          ...toggledTodo.where((todo) => todo.completed),
+        ];
+
+        final updatedNote = state.note.copyWith(todo: sortedTodo);
+
         final failureOrSuccess = await _updateUsecase(updatedNote);
         failureOrSuccess.fold(
           (error) {
