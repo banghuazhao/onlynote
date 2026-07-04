@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
@@ -137,10 +136,7 @@ class _BuildForm extends StatelessWidget {
           const SizedBox(height: AppSpacings.xl),
 
           //* Add/Update todo list.
-          _BuildTodoListField(
-            state: state,
-            note: widget.note,
-          ),
+          _BuildTodoListField(state: state),
           const SizedBox(height: AppSpacings.xl),
 
           //* Attach / remove photos.

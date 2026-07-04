@@ -113,23 +113,11 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 }
 
 class _BuildTodoListField extends StatelessWidget {
-  const _BuildTodoListField({Key? key, required this.state, required this.note}) : super(key: key);
+  const _BuildTodoListField({Key? key, required this.state}) : super(key: key);
   final AddUpdateFormState state;
-  final Note? note;
 
   @override
   Widget build(BuildContext context) {
-    if (note != null) {
-      var len = min(note!.todo.length, state.todos.length);
-      if (len > 0) {
-        for (int i = 0; i < len; i++) {
-          if (state.todos[i].id != note!.todo[i].id) {
-            state.todos[i] = note!.todo[i];
-          }
-        }
-      }
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
