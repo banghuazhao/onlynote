@@ -65,6 +65,75 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
+  Future<void> _showReminderPicker(BuildContext context, Note note) async {
+    final currentReminder = ReminderData.shared.getCurrentReminder(note);
+
+    if (currentReminder == null) {
+      bool? permissionResult = await NotificationService().checkAndAskForPermission(context);
+      if (permissionResult != null && permissionResult == true) {
+        if (!context.mounted) return;
+        DatePicker.showDateTimePicker(context, minTime: DateTime.now(), onConfirm: (date) {
+          Reminder reminder = Reminder(
+              reminderId: DateTime.now().difference(DateTime(2020, 1, 1)).inSeconds,
+              reminderDate: DateTime(date.year, date.month, date.day, date.hour, date.minute),
+              noteId: note.id!);
+
+          ReminderData.shared.addReminder(reminder);
+
+          NotificationService().askForPermissionAndSchedule(context, note, reminder);
+
+          if (mounted) setState(() {});
+        });
+      }
+    } else {
+      showAdaptiveActionSheet(
+        context: context,
+        androidBorderRadius: 30,
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+              title: Text(S.of(context).Edit),
+              onPressed: (BuildContext context) async {
+                bool? permissionResult =
+                    await NotificationService().checkAndAskForPermission(context);
+                if (permissionResult != null && permissionResult == true) {
+                  if (!context.mounted) return;
+                  DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
+                      onConfirm: (date) {
+                    Reminder newReminder = Reminder(
+                        reminderId: currentReminder.reminderId,
+                        reminderDate:
+                            DateTime(date.year, date.month, date.day, date.hour, date.minute),
+                        noteId: note.id!);
+
+                    ReminderData.shared.modifyReminder(currentReminder, newReminder);
+
+                    NotificationService().askForPermissionAndSchedule(context, note, newReminder);
+
+                    if (mounted) setState(() {});
+                    Navigator.pop(context);
+                  });
+                }
+              }),
+          BottomSheetAction(
+              title: Text(
+                S.of(context).Delete,
+                style: const TextStyle(color: Colors.red),
+              ),
+              onPressed: (BuildContext context) {
+                ReminderData.shared.deleteReminder(currentReminder);
+                NotificationService().removeNotification(currentReminder);
+                if (mounted) setState(() {});
+                Navigator.pop(context);
+              }),
+        ],
+        cancelAction: CancelAction(
+            title: Text(S
+                .of(context)
+                .Cancel)), // onPressed parameter is optional by default will dismiss the ActionSheet
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NoteDetailBloc, NoteDetailState>(
@@ -75,43 +144,53 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ),
           appBar: NoteAppBar(
             actions: state.whenOrNull(
-              success: (note) => [
-                AppButton(
-                  key: _shareButtonKey,
-                  child: const Icon(Icons.share_outlined),
-                  onPressed: () => _shareNoteAsImage(note),
-                ),
-                AppButton(
-                  child: const Icon(Icons.edit_outlined),
-                  onPressed: () {
-                    context.router.push(AddUpdateNoteRoute(note: note));
-                  },
-                ),
-                AppButton(
-                  child: const Icon(Icons.delete_outline),
-                  onPressed: () async {
-                    final confirmed = await showConfirmDialog(
-                      context,
-                      title: S.of(context).Delete_Note_Confirm_Title,
-                      message: S.of(context).Delete_Note_Confirm_Message,
-                    );
-                    if (!confirmed) return;
+              success: (note) {
+                final hasReminder = ReminderData.shared.getCurrentReminder(note) != null;
+                return [
+                  AppButton(
+                    child: Icon(hasReminder ? Icons.alarm_on_outlined : Icons.alarm_add_outlined),
+                    onPressed: () => _showReminderPicker(context, note),
+                  ),
+                  AppButton(
+                    key: _shareButtonKey,
+                    child: const Icon(Icons.share_outlined),
+                    onPressed: () => _shareNoteAsImage(note),
+                  ),
+                  AppButton(
+                    child: const Icon(Icons.edit_outlined),
+                    onPressed: () {
+                      context.router.push(AddUpdateNoteRoute(note: note));
+                    },
+                  ),
+                  AppButton(
+                    child: const Icon(Icons.delete_outline),
+                    onPressed: () async {
+                      final confirmed = await showConfirmDialog(
+                        context,
+                        title: S.of(context).Delete_Note_Confirm_Title,
+                        message: S.of(context).Delete_Note_Confirm_Message,
+                      );
+                      if (!confirmed) return;
 
-                    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
-                    if (currentReminder != null) {
-                      ReminderData.shared.deleteReminder(currentReminder);
-                      NotificationService().removeNotification(currentReminder);
-                    }
-                    context.read<NoteActionBloc>().add(NoteActionEvent.deleteNote(note.id!));
-                  },
-                ),
-              ],
+                      Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
+                      if (currentReminder != null) {
+                        ReminderData.shared.deleteReminder(currentReminder);
+                        NotificationService().removeNotification(currentReminder);
+                      }
+                      context.read<NoteActionBloc>().add(NoteActionEvent.deleteNote(note.id!));
+                    },
+                  ),
+                ];
+              },
             ),
           ),
           body: state.maybeMap(
             error: (error) => ErrorText(error.message ?? ''),
-            success: (data) =>
-                LoadedView(note: data.note, screenshotController: _screenshotController),
+            success: (data) => LoadedView(
+              note: data.note,
+              screenshotController: _screenshotController,
+              onReminderTap: () => _showReminderPicker(context, data.note),
+            ),
             orElse: () => const SizedBox.shrink(),
           ),
         );
@@ -120,24 +199,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 }
 
-class LoadedView extends StatefulWidget {
+class LoadedView extends StatelessWidget {
   const LoadedView({
     Key? key,
     required this.note,
     required this.screenshotController,
+    required this.onReminderTap,
   }) : super(key: key);
 
   final Note note;
   final ScreenshotController screenshotController;
+  final VoidCallback onReminderTap;
 
-  @override
-  _LoadedViewState createState() => _LoadedViewState();
-}
-
-class _LoadedViewState extends State<LoadedView> {
   @override
   Widget build(BuildContext context) {
-    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(widget.note);
+    Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
 
     return ListView(
       padding: const EdgeInsets.symmetric(
@@ -147,9 +223,9 @@ class _LoadedViewState extends State<LoadedView> {
       children: [
         //* Everything inside here is captured when sharing the note as an image.
         Screenshot(
-          controller: widget.screenshotController,
+          controller: screenshotController,
           child: Container(
-            color: widget.note.color ?? Colors.white,
+            color: note.color ?? Colors.white,
             padding: const EdgeInsets.all(AppSpacings.l),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,128 +233,60 @@ class _LoadedViewState extends State<LoadedView> {
               children: [
                 //* Show Note Title
                 SelectableText(
-                  widget.note.title ?? '',
+                  note.title ?? '',
                   style: AppTypography.headline3,
                 ),
                 const SizedBox(height: AppSpacings.l),
 
                 //* Show Note Update/Add time
                 SelectableText(
-                  widget.note.dateWithTime,
+                  note.dateWithTime,
                   style: AppTypography.description.copyWith(color: Colors.black87),
                 ),
+
+                //* Show reminder time, only if one is actually set.
+                if (currentReminder != null) ...{
+                  const SizedBox(height: AppSpacings.m),
+                  GestureDetector(
+                    onTap: onReminderTap,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.alarm, size: 16, color: Colors.black87),
+                        const SizedBox(width: AppSpacings.s),
+                        Text(
+                          currentReminder.timeString,
+                          style: AppTypography.description.copyWith(color: Colors.black87),
+                        ),
+                      ],
+                    ),
+                  ),
+                },
                 const SizedBox(height: AppSpacings.xxl),
 
                 //* Show todo's list if any
-                if (widget.note.hasTodo) ...{
-                  _BuildTodoList(todoList: widget.note.todo),
+                if (note.hasTodo) ...{
+                  _BuildTodoList(todoList: note.todo),
                   const SizedBox(height: AppSpacings.xxl),
                 },
 
                 //* Note Description
                 SelectableText(
-                  widget.note.description ?? '',
+                  note.description ?? '',
                   style: AppTypography.headline6,
                 ),
 
                 //* Attached photos, if any
-                if (widget.note.hasImages) ...{
+                if (note.hasImages) ...{
                   const SizedBox(height: AppSpacings.xxl),
-                  _BuildImageGallery(imagePaths: widget.note.imagePaths),
+                  _BuildImageGallery(imagePaths: note.imagePaths),
                 },
               ],
             ),
           ),
         ),
-
-        const SizedBox(height: AppSpacings.xxl),
-
-        ElevatedButton.icon(
-            onPressed: () async {
-              if (currentReminder == null) {
-                bool? permissionResult =
-                    await NotificationService().checkAndAskForPermission(context);
-                if (permissionResult != null && permissionResult == true) {
-                  DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
-                      onConfirm: (date) {
-                    print('confirm $date');
-
-                    Reminder reminder = Reminder(
-                        reminderId: DateTime.now().difference(DateTime(2020, 1, 1)).inSeconds,
-                        reminderDate:
-                            DateTime(date.year, date.month, date.day, date.hour, date.minute),
-                        noteId: widget.note.id!);
-
-                    ReminderData.shared.addReminder(reminder);
-
-                    NotificationService()
-                        .askForPermissionAndSchedule(context, widget.note, reminder);
-
-                    setState(() {});
-                  });
-                }
-              } else {
-                showAdaptiveActionSheet(
-                  context: context,
-                  androidBorderRadius: 30,
-                  actions: <BottomSheetAction>[
-                    BottomSheetAction(
-                        title: Text(S.of(context).Edit),
-                        onPressed: (BuildContext context) async {
-                          bool? permissionResult =
-                              await NotificationService().checkAndAskForPermission(context);
-                          if (permissionResult != null && permissionResult == true) {
-                            DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
-                                onConfirm: (date) {
-                              Reminder newReminder = Reminder(
-                                  reminderId: currentReminder.reminderId,
-                                  reminderDate: DateTime(
-                                      date.year, date.month, date.day, date.hour, date.minute),
-                                  noteId: widget.note.id!);
-
-                              ReminderData.shared.modifyReminder(currentReminder, newReminder);
-
-                              NotificationService()
-                                  .askForPermissionAndSchedule(context, widget.note, newReminder);
-
-                              setState(() {});
-                              Navigator.pop(context);
-                            });
-                          }
-                        }),
-                    BottomSheetAction(
-                        title: Text(
-                          S.of(context).Delete,
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        onPressed: (BuildContext context) {
-                          ReminderData.shared.deleteReminder(currentReminder);
-                          NotificationService().removeNotification(currentReminder);
-                          setState(() {});
-                          Navigator.pop(context);
-                        }),
-                  ],
-                  cancelAction: CancelAction(
-                      title: Text(S
-                          .of(context)
-                          .Cancel)), // onPressed parameter is optional by default will dismiss the ActionSheet
-                );
-              }
-            },
-            icon: const Icon(
-              Icons.alarm_rounded,
-            ),
-            label: buildText(context, currentReminder))
       ],
     );
-  }
-
-  Text buildText(BuildContext context, Reminder? currentReminder) {
-    if (currentReminder == null) {
-      return Text(S.of(context).Add_Reminder);
-    } else {
-      return Text(currentReminder.timeString);
-    }
   }
 }
 
