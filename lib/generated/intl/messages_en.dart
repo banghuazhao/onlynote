@@ -58,6 +58,12 @@ class MessageLookup extends MessageLookupByLibrary {
                 "Failed to delete note, please try again."),
         "Failed_to_delete_notes":
             MessageLookupByLibrary.simpleMessage("Failed to delete notes"),
+        "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
+        "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
+        "Large": MessageLookupByLibrary.simpleMessage("Large"),
+        "Medium": MessageLookupByLibrary.simpleMessage("Medium"),
+        "Settings": MessageLookupByLibrary.simpleMessage("Settings"),
+        "Small": MessageLookupByLibrary.simpleMessage("Small"),
         "Failed_to_load_note_please_try_again":
             MessageLookupByLibrary.simpleMessage(
                 "Failed to load note, please try again."),

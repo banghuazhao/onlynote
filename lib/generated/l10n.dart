@@ -400,6 +400,66 @@ class S {
     );
   }
 
+  /// `Settings`
+  String get Settings {
+    return Intl.message(
+      'Settings',
+      name: 'Settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Font Style`
+  String get Font_Style {
+    return Intl.message(
+      'Font Style',
+      name: 'Font_Style',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Font Size`
+  String get Font_Size {
+    return Intl.message(
+      'Font Size',
+      name: 'Font_Size',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Small`
+  String get Small {
+    return Intl.message(
+      'Small',
+      name: 'Small',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Medium`
+  String get Medium {
+    return Intl.message(
+      'Medium',
+      name: 'Medium',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Large`
+  String get Large {
+    return Intl.message(
+      'Large',
+      name: 'Large',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Cancel`
   String get Cancel {
     return Intl.message(

@@ -22,6 +22,7 @@ import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:screenshot/screenshot.dart';
 
+import '../settings/settings_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'more_apps_page.dart';
@@ -75,6 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
         title: S.of(context).notes,
         actions: context.watch<MultipleDeleteBloc>().state.mapOrNull(
               initial: (selectedNotes) => [
+                AppButton(
+                  child: const Icon(Icons.settings_outlined),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
                 AppButton(
                   child: const Icon(Icons.more_horiz),
                   onPressed: () {
