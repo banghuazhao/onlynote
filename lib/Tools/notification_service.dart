@@ -52,6 +52,21 @@ class NotificationService {
         );
   }
 
+  // Android 13+ (API 33) requires this runtime permission before any
+  // notification can be shown; older Android versions grant it implicitly.
+  Future<bool?>? requestAndroidPermissions() {
+    return flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+  }
+
+  Future<bool?> _requestPlatformPermissions() {
+    if (Platform.isIOS) {
+      return requestIOSPermissions() ?? Future.value(true);
+    }
+    return requestAndroidPermissions() ?? Future.value(true);
+  }
+
   Future<void> showNotifications({id, title, body, payload}) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name',
@@ -72,11 +87,7 @@ class NotificationService {
 
   Future<void> askForPermissionAndSchedule(
       BuildContext context, Note note, Reminder reminder) async {
-    var result = await requestIOSPermissions();
-
-    if (!Platform.isIOS) {
-      result = true;
-    }
+    var result = await _requestPlatformPermissions();
 
     print("Notification permission result: $result");
 
@@ -116,11 +127,7 @@ class NotificationService {
   }
 
   Future<bool?> checkAndAskForPermission(BuildContext context) async {
-    var result = await requestIOSPermissions();
-
-    if (!Platform.isIOS) {
-      result = true;
-    }
+    var result = await _requestPlatformPermissions();
 
     print("Notification permission result: $result");
 
@@ -199,7 +206,10 @@ class NotificationService {
         notificationDetails: const NotificationDetails(
             android: AndroidNotificationDetails('your channel id', 'your channel name',
                 channelDescription: 'your channel description')),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        // Inexact avoids needing the restricted SCHEDULE_EXACT_ALARM /
+        // USE_EXACT_ALARM permission on Android 12+ — fine for a note
+        // reminder, which doesn't need to-the-second precision.
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     } catch (e) {
       print(e);
