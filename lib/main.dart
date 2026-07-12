@@ -28,6 +28,7 @@ import 'presentation/screens/add_update_note/bloc/add_update_form/add_update_for
 import 'presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'presentation/screens/note_detail/bloc/action/note_action_bloc.dart';
 import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
+import 'services/purchase_service.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,13 +58,16 @@ Future main() async {
   await AppLayoutSettings.instance.load();
   await ImageStorage.init();
 
+  await PurchaseService.instance.init();
+
   Future.delayed(const Duration(seconds: 1), () {
     AppTrackingTransparency.requestTrackingAuthorization();
   });
 
-  MobileAds.instance.initialize();
-
-  AdsManager.debugPrintID();
+  if (!PurchaseService.instance.isAdsRemoved) {
+    MobileAds.instance.initialize();
+    AdsManager.debugPrintID();
+  }
 
   InAppReviewHelper.checkAndAskForReview();
 

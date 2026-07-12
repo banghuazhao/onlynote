@@ -739,6 +739,47 @@ class S {
       args: [],
     );
   }
+
+  String get Purchases => Intl.message('Purchases', name: 'Purchases');
+  String get Remove_Ads => Intl.message('Remove Ads', name: 'Remove_Ads');
+  String get Ads_Removed => Intl.message('Ads Removed', name: 'Ads_Removed');
+  String get Ads_Removed_Description => Intl.message(
+        'Ads are permanently removed on this device.',
+        name: 'Ads_Removed_Description',
+      );
+  String get Restore_Purchases =>
+      Intl.message('Restore Purchases', name: 'Restore_Purchases');
+  String Remove_Ads_Price(Object price) => Intl.message(
+        'Remove ads permanently for $price.',
+        name: 'Remove_Ads_Price',
+        args: [price],
+      );
+  String get Purchase_Loading =>
+      Intl.message('Contacting the App Store…', name: 'Purchase_Loading');
+  String get Purchase_Unavailable => Intl.message(
+        'Remove Ads is currently unavailable.',
+        name: 'Purchase_Unavailable',
+      );
+  String get Purchase_Pending => Intl.message(
+        'Your purchase is pending approval.',
+        name: 'Purchase_Pending',
+      );
+  String get Purchase_Cancelled =>
+      Intl.message('Purchase cancelled.', name: 'Purchase_Cancelled');
+  String get Purchase_Failed => Intl.message(
+        'The purchase could not be completed. Please try again.',
+        name: 'Purchase_Failed',
+      );
+  String get Purchase_Success =>
+      Intl.message('Ads have been removed.', name: 'Purchase_Success');
+  String get Restore_Success => Intl.message(
+        'Your Remove Ads purchase was restored.',
+        name: 'Restore_Success',
+      );
+  String get Restore_Nothing => Intl.message(
+        'No previous Remove Ads purchase was found.',
+        name: 'Restore_Nothing',
+      );
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

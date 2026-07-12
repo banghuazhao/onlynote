@@ -70,5 +70,19 @@
  "Express_Scan" : "Express Scan",
  "Shows" : "Shows",
  "Minesweeper_Go" : "Minesweeper Go",
- "Water_Tracker" : "Water Tracker"
+ "Water_Tracker" : "Water Tracker",
+ "Purchases": "Purchases",
+ "Remove_Ads": "Remove Ads",
+ "Ads_Removed": "Ads Removed",
+ "Ads_Removed_Description": "Ads are permanently removed on this device.",
+ "Restore_Purchases": "Restore Purchases",
+ "Remove_Ads_Price": "Remove ads permanently for {price}.",
+ "Purchase_Loading": "Contacting the App Store…",
+ "Purchase_Unavailable": "Remove Ads is currently unavailable.",
+ "Purchase_Pending": "Your purchase is pending approval.",
+ "Purchase_Cancelled": "Purchase cancelled.",
+ "Purchase_Failed": "The purchase could not be completed. Please try again.",
+ "Purchase_Success": "Ads have been removed.",
+ "Restore_Success": "Your Remove Ads purchase was restored.",
+ "Restore_Nothing": "No previous Remove Ads purchase was found."
 }

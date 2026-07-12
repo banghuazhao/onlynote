@@ -70,5 +70,19 @@
   "Relaxing_Up" : "冥想Up",
   "Minesweeper_Go" : "經典掃雷",
   "Shows" : "Shows",
-  "Water_Tracker" : "喝水吧"
+  "Water_Tracker" : "喝水吧",
+  "Purchases": "購買項目",
+  "Remove_Ads": "移除廣告",
+  "Ads_Removed": "廣告已移除",
+  "Ads_Removed_Description": "此裝置上的廣告已永久移除。",
+  "Restore_Purchases": "恢復購買",
+  "Remove_Ads_Price": "支付 {price} 永久移除廣告。",
+  "Purchase_Loading": "正在連接 App Store…",
+  "Purchase_Unavailable": "移除廣告目前無法使用。",
+  "Purchase_Pending": "購買正在等待批准。",
+  "Purchase_Cancelled": "購買已取消。",
+  "Purchase_Failed": "無法完成購買，請重試。",
+  "Purchase_Success": "廣告已移除。",
+  "Restore_Success": "已恢復您的移除廣告購買。",
+  "Restore_Nothing": "未找到以前的移除廣告購買。"
 }

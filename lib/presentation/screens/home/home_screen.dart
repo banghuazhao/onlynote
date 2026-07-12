@@ -21,6 +21,7 @@ import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bl
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/services/purchase_service.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
 
@@ -49,15 +50,22 @@ class _HomeScreenState extends State<HomeScreen> {
   initState() {
     super.initState();
 
+    PurchaseService.instance.addListener(_entitlementChanged);
+    if (!PurchaseService.instance.isAdsRemoved) _loadAd();
+  }
+
+  void _loadAd() {
     _ad = BannerAd(
       adUnitId: AdsManager.bannerAdUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
-          setState(() {
-            _isAdLoaded = true;
-          });
+          if (mounted && !PurchaseService.instance.isAdsRemoved) {
+            setState(() => _isAdLoaded = true);
+          } else {
+            _disposeAd();
+          }
         },
         onAdFailedToLoad: (ad, error) {
           // Releases an ad resource when it fails to load
@@ -69,6 +77,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     _ad?.load();
+  }
+
+  void _entitlementChanged() {
+    if (PurchaseService.instance.isAdsRemoved) _disposeAd();
+  }
+
+  void _disposeAd() {
+    _ad?.dispose();
+    _ad = null;
+    if (mounted && _isAdLoaded) setState(() => _isAdLoaded = false);
+  }
+
+  @override
+  void dispose() {
+    PurchaseService.instance.removeListener(_entitlementChanged);
+    _ad?.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,65 +111,72 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ]
             : context.watch<MultipleDeleteBloc>().state.mapOrNull(
-              initial: (selectedNotes) => [
-                AppButton(
-                  child: const Icon(Icons.settings_outlined),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => const SettingsScreen(),
+                  initial: (selectedNotes) => [
+                    AppButton(
+                      child: const Icon(Icons.settings_outlined),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const SettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    AppButton(
+                      child: const Icon(Icons.add),
+                      onPressed: () {
+                        context.router.push(AddUpdateNoteRoute());
+                      },
+                    ),
+                  ],
+                  selected: (selectedNotes) => [
+                    AppButton(
+                      child: Row(
+                        children: [
+                          Text(
+                            S.of(context).Delete +
+                                ' - ${selectedNotes.selectedIds.length}',
+                            style: AppTypography.headline6
+                                .copyWith(color: AppColors.white),
+                          ),
+                          const SizedBox(width: AppSpacings.xl),
+                          const Icon(Icons.delete_outline),
+                        ],
                       ),
-                    );
-                  },
+                      onPressed: () {
+                        context
+                            .read<MultipleDeleteBloc>()
+                            .add(const MultipleDeleteEvent.delete());
+                      },
+                    ),
+                    AppButton(
+                      child: const Icon(Icons.close),
+                      onPressed: () {
+                        context
+                            .read<MultipleDeleteBloc>()
+                            .add(const MultipleDeleteEvent.clearAll());
+                      },
+                    ),
+                  ],
+                  success: (selectedNotes) => [
+                    AppButton(
+                      child: const Icon(Icons.add),
+                      onPressed: () {
+                        context.router.push(AddUpdateNoteRoute());
+                      },
+                    ),
+                  ],
+                  failed: (selectedNotes) => [
+                    AppButton(
+                      child: const Icon(Icons.add),
+                      onPressed: () {
+                        context.router.push(AddUpdateNoteRoute());
+                      },
+                    ),
+                  ],
                 ),
-                AppButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () {
-                    context.router.push(AddUpdateNoteRoute());
-                  },
-                ),
-              ],
-              selected: (selectedNotes) => [
-                AppButton(
-                  child: Row(
-                    children: [
-                      Text(
-                        S.of(context).Delete + ' - ${selectedNotes.selectedIds.length}',
-                        style: AppTypography.headline6.copyWith(color: AppColors.white),
-                      ),
-                      const SizedBox(width: AppSpacings.xl),
-                      const Icon(Icons.delete_outline),
-                    ],
-                  ),
-                  onPressed: () {
-                    context.read<MultipleDeleteBloc>().add(const MultipleDeleteEvent.delete());
-                  },
-                ),
-                AppButton(
-                  child: const Icon(Icons.close),
-                  onPressed: () {
-                    context.read<MultipleDeleteBloc>().add(const MultipleDeleteEvent.clearAll());
-                  },
-                ),
-              ],
-              success: (selectedNotes) => [
-                AppButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () {
-                    context.router.push(AddUpdateNoteRoute());
-                  },
-                ),
-              ],
-              failed: (selectedNotes) => [
-                AppButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () {
-                    context.router.push(AddUpdateNoteRoute());
-                  },
-                ),
-              ],
-            ),
       ),
 
       //* Show available notes list
@@ -186,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-          if (_isAdLoaded)
+          if (_isAdLoaded && !PurchaseService.instance.isAdsRemoved)
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -224,7 +256,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   ScreenshotController _screenshotControllerFor(String noteId) =>
       _screenshotControllers.putIfAbsent(noteId, () => ScreenshotController());
 
-  GlobalKey _cardKeyFor(String noteId) => _cardKeys.putIfAbsent(noteId, () => GlobalKey());
+  GlobalKey _cardKeyFor(String noteId) =>
+      _cardKeys.putIfAbsent(noteId, () => GlobalKey());
 
   void viewWillAppear() {
     print("onResume / viewWillAppear / onFocusGained");
@@ -305,7 +338,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         ),
         BottomSheetAction(
           leading: const Icon(Icons.delete_outline, color: Colors.red),
-          title: Text(S.of(context).Delete, style: const TextStyle(color: Colors.red)),
+          title: Text(S.of(context).Delete,
+              style: const TextStyle(color: Colors.red)),
           onPressed: (sheetContext) async {
             Navigator.pop(sheetContext);
             final confirmed = await showConfirmDialog(
@@ -370,15 +404,18 @@ class __BuildNotesListState extends State<_BuildNotesList> {
                     context.router.push(NoteDetailRoute(noteId: noteId));
                   },
                   selected: (_) {
-                    multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                    multipleDeleteBloc
+                        .add(MultipleDeleteEvent.toggleSelect(noteId));
                   },
                 );
               },
               onLongPress: () {
                 multipleDeleteBloc.state.maybeMap(
-                  orElse: () => _showNoteContextMenu(context, note, multipleDeleteBloc, noteId),
+                  orElse: () => _showNoteContextMenu(
+                      context, note, multipleDeleteBloc, noteId),
                   selected: (_) {
-                    multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
+                    multipleDeleteBloc
+                        .add(MultipleDeleteEvent.toggleSelect(noteId));
                   },
                 );
               },

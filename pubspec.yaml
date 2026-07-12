@@ -45,6 +45,7 @@ dependencies:
   shared_preferences: ^2.0.13
   app_tracking_transparency: ^2.0.2+1
   in_app_review: ^2.0.3
+  in_app_purchase: ^3.2.3
   google_mobile_ads: ^9.0.0
   open_store: ^0.5.0
   screenshot: ^3.0.0

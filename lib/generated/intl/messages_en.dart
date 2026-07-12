@@ -20,8 +20,34 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(price) => "Remove ads permanently for ${price}.";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Ads_Removed": MessageLookupByLibrary.simpleMessage("Ads Removed"),
+        "Ads_Removed_Description": MessageLookupByLibrary.simpleMessage(
+            "Ads are permanently removed on this device."),
+        "Purchase_Cancelled":
+            MessageLookupByLibrary.simpleMessage("Purchase cancelled."),
+        "Purchase_Failed": MessageLookupByLibrary.simpleMessage(
+            "The purchase could not be completed. Please try again."),
+        "Purchase_Loading":
+            MessageLookupByLibrary.simpleMessage("Contacting the App Store…"),
+        "Purchase_Pending": MessageLookupByLibrary.simpleMessage(
+            "Your purchase is pending approval."),
+        "Purchase_Success":
+            MessageLookupByLibrary.simpleMessage("Ads have been removed."),
+        "Purchase_Unavailable": MessageLookupByLibrary.simpleMessage(
+            "Remove Ads is currently unavailable."),
+        "Purchases": MessageLookupByLibrary.simpleMessage("Purchases"),
+        "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
+        "Remove_Ads_Price": m0,
+        "Restore_Nothing": MessageLookupByLibrary.simpleMessage(
+            "No previous Remove Ads purchase was found."),
+        "Restore_Purchases":
+            MessageLookupByLibrary.simpleMessage("Restore Purchases"),
+        "Restore_Success": MessageLookupByLibrary.simpleMessage(
+            "Your Remove Ads purchase was restored."),
         "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
         "Add_todo": MessageLookupByLibrary.simpleMessage("Add todo"),
         "Allow_Notification":

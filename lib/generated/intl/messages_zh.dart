@@ -20,8 +20,28 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
+  static String m0(price) => "支付 ${price} 永久移除广告。";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Ads_Removed": MessageLookupByLibrary.simpleMessage("广告已移除"),
+        "Ads_Removed_Description":
+            MessageLookupByLibrary.simpleMessage("此设备上的广告已永久移除。"),
+        "Purchase_Cancelled": MessageLookupByLibrary.simpleMessage("购买已取消。"),
+        "Purchase_Failed": MessageLookupByLibrary.simpleMessage("无法完成购买，请重试。"),
+        "Purchase_Loading":
+            MessageLookupByLibrary.simpleMessage("正在连接 App Store…"),
+        "Purchase_Pending": MessageLookupByLibrary.simpleMessage("购买正在等待批准。"),
+        "Purchase_Success": MessageLookupByLibrary.simpleMessage("广告已移除。"),
+        "Purchase_Unavailable":
+            MessageLookupByLibrary.simpleMessage("移除广告目前不可用。"),
+        "Purchases": MessageLookupByLibrary.simpleMessage("购买项目"),
+        "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
+        "Remove_Ads_Price": m0,
+        "Restore_Nothing":
+            MessageLookupByLibrary.simpleMessage("未找到以前的移除广告购买。"),
+        "Restore_Purchases": MessageLookupByLibrary.simpleMessage("恢复购买"),
+        "Restore_Success": MessageLookupByLibrary.simpleMessage("已恢复您的移除广告购买。"),
         "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),
         "Add_todo": MessageLookupByLibrary.simpleMessage("添加待办"),
         "Allow_Notification": MessageLookupByLibrary.simpleMessage("允许推送"),
@@ -43,8 +63,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "Express_Scan": MessageLookupByLibrary.simpleMessage("飞速扫描"),
         "Failed_to_Update_note_please_try_again":
             MessageLookupByLibrary.simpleMessage("更新备忘录失败, 请重试"),
-        "Failed_to_add_note_Title_should_not_empty": MessageLookupByLibrary
-            .simpleMessage("备忘录内容不能为空，请添加标题、内容、待办事项或照片"),
+        "Failed_to_add_note_Title_should_not_empty":
+            MessageLookupByLibrary.simpleMessage("备忘录内容不能为空，请添加标题、内容、待办事项或照片"),
         "Failed_to_add_note_please_try_again":
             MessageLookupByLibrary.simpleMessage("添加备忘录失败, 请重试"),
         "Failed_to_delete_note_please_try_again":
@@ -62,8 +82,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("加载备忘录失败, 请重试"),
         "Failed_to_load_notes_please_try_again":
             MessageLookupByLibrary.simpleMessage("加载备忘录失败, 请重试"),
-        "Failed_to_update_note_Title_should_not_empty": MessageLookupByLibrary
-            .simpleMessage("备忘录内容不能为空，请添加标题、内容、待办事项或照片"),
+        "Failed_to_update_note_Title_should_not_empty":
+            MessageLookupByLibrary.simpleMessage("备忘录内容不能为空，请添加标题、内容、待办事项或照片"),
         "Image_Guru": MessageLookupByLibrary.simpleMessage("咕噜滤镜"),
         "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
         "Metronome_Go": MessageLookupByLibrary.simpleMessage("打拍节拍器"),
