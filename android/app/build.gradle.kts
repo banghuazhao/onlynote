@@ -8,8 +8,8 @@ if (keystorePropertiesFile.exists()) {
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
+    // Keep KGP until Android plugins finish their AGP 9 built-in Kotlin migration.
     id("dev.flutter.flutter-gradle-plugin")
 }
 

@@ -1,249 +1,105 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:open_store/open_store.dart';
 
-import '../../../generated/l10n.dart';
-
 class MoreAppsPage extends StatelessWidget {
-  const MoreAppsPage({Key? key}) : super(key: key);
+  const MoreAppsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    List<MoreAppItem> _items = [];
-
-    var Image_Guru =
-        MoreAppItem(Image.asset("assets/app_icons/image_guru.png"), S.of(context).Image_Guru, () {
-      OpenStore.instance.open(appStoreId: "1625021625", androidAppBundleId: "");
-    });
-
-    var Mint_Translate = MoreAppItem(
-        Image.asset("assets/app_icons/mint_translate.png"), S.of(context).Mint_Translate, () {
-      OpenStore.instance
-          .open(appStoreId: "1638456603", androidAppBundleId: "com.appsbay.mint_translate");
-    });
-
-    var Yes_Habit =
-        MoreAppItem(Image.asset("assets/app_icons/yes_habit.png"), S.of(context).Yes_Habit, () {
-      OpenStore.instance.open(appStoreId: "1637643734", androidAppBundleId: "");
-    });
-
-    var We_Play_Piano = MoreAppItem(
-        Image.asset("assets/app_icons/we_play_piano.png"), S.of(context).We_Play_Piano, () {
-      OpenStore.instance
-          .open(appStoreId: "1625018611", androidAppBundleId: "com.appsbay.we_play_piano");
-    });
-
-    var Metronome_Go = MoreAppItem(
-        Image.asset("assets/app_icons/metronome_go.png"), S.of(context).Metronome_Go, () {
-      OpenStore.instance
-          .open(appStoreId: "1635462172", androidAppBundleId: "com.appsbay.metronome_go");
-    });
-
-    var Instant_Face = MoreAppItem(
-        Image.asset("assets/app_icons/instant_face.png"), S.of(context).Instant_Face, () {
-      OpenStore.instance
-          .open(appStoreId: "1638563222", androidAppBundleId: "com.appsbay.instant_face");
-    });
-
-    var World_Weather_Live = MoreAppItem(
-        Image.asset("assets/app_icons/world_weather_live.png"), S.of(context).World_Weather_Live,
-        () {
-      OpenStore.instance
-          .open(appStoreId: "1612773646", androidAppBundleId: "com.appsbay.world_weather_live");
-    });
-
-    var Shows = MoreAppItem(Image.asset("assets/app_icons/shows.png"), S.of(context).Shows, () {
-      OpenStore.instance.open(appStoreId: "1624910011", androidAppBundleId: "com.appsbay.shows");
-    });
-
-    var Classical_Music_Box = MoreAppItem(
-        Image.asset("assets/app_icons/classical_music_box.png"), S.of(context).Classical_Music_Box,
-        () {
-      OpenStore.instance
-          .open(appStoreId: "1613096431", androidAppBundleId: "com.appsbay.classical_music_box");
-    });
-
-    var Money_Tracker = MoreAppItem(
-        Image.asset("assets/app_icons/money_tracker.png"), S.of(context).Money_Tracker, () {
-      OpenStore.instance.open(appStoreId: "1534244892", androidAppBundleId: "");
-    });
-
-    var Sudoku_Lover = MoreAppItem(
-        Image.asset("assets/app_icons/sudoku_lover.png"), S.of(context).Sudoku_Lover, () {
-      OpenStore.instance
-          .open(appStoreId: "1620749798", androidAppBundleId: "com.appsbay.sudoku_lovers");
-    });
-
-    var Express_Scan = MoreAppItem(
-        Image.asset("assets/app_icons/express_scan.png"), S.of(context).Express_Scan, () {
-      OpenStore.instance
-          .open(appStoreId: "1625121991", androidAppBundleId: "com.appsbay.express_scan");
-    });
-
-    var Water_Tracker = MoreAppItem(
-        Image.asset("assets/app_icons/water_tracker.png"), S.of(context).Water_Tracker, () {
-      OpenStore.instance.open(appStoreId: "1534891702", androidAppBundleId: "");
-    });
-
-    var Novels_Hub =
-        MoreAppItem(Image.asset("assets/app_icons/novels_hub.png"), S.of(context).Novels_Hub, () {
-      OpenStore.instance
-          .open(appStoreId: "1528820845", androidAppBundleId: "com.appsbay.novelshub");
-    });
-
-    var Relaxing_Up =
-        MoreAppItem(Image.asset("assets/app_icons/relaxing_up.png"), S.of(context).Relaxing_Up, () {
-      OpenStore.instance
-          .open(appStoreId: "1618712178", androidAppBundleId: "com.appsbay.relaxing_up");
-    });
-
-    var Minesweeper_Go = MoreAppItem(
-        Image.asset("assets/app_icons/minesweeper_go.png"), S.of(context).Minesweeper_Go, () {
-      OpenStore.instance
-          .open(appStoreId: "1621899572", androidAppBundleId: "com.appsbay.classic_minesweeper");
-    });
-
-    var Simple_Calculator = MoreAppItem(
-        Image.asset("assets/app_icons/simple_calculator.png"), S.of(context).Simple_Calculator, () {
-      OpenStore.instance
-          .open(appStoreId: "1610829871", androidAppBundleId: "com.appsbay.simple_calculator");
-    });
-
-    if (Platform.isIOS) {
-      _items = [
-        Relaxing_Up,
-        Image_Guru,
-        Mint_Translate,
-        Yes_Habit,
-        We_Play_Piano,
-        Minesweeper_Go,
-        Metronome_Go,
-        Instant_Face,
-        World_Weather_Live,
-        Shows,
-        Classical_Music_Box,
-        Money_Tracker,
-        Sudoku_Lover,
-        Express_Scan,
-        Water_Tracker,
-        Novels_Hub,
-        Simple_Calculator
-      ];
-    } else {
-      _items = [
-        Relaxing_Up,
-        We_Play_Piano,
-        Mint_Translate,
-        Metronome_Go,
-        Minesweeper_Go,
-        Instant_Face,
-        World_Weather_Live,
-        Shows,
-        Classical_Music_Box,
-        Sudoku_Lover,
-        Express_Scan,
-        Novels_Hub,
-        Simple_Calculator
-      ];
-    }
-
+    final items = _items(context)
+        .where((item) => Platform.isIOS || item.androidId.isNotEmpty)
+        .toList();
+    final tokens = context.tokens;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            S.of(context).More_Apps,
-            style: TextStyle(color: Colors.black),
+      appBar: AppBar(title: Text(S.of(context).More_Apps)),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: tokens.contentMaxWidth),
+          child: ListView.separated(
+            padding: EdgeInsets.fromLTRB(
+                tokens.space4, tokens.space2, tokens.space4, tokens.space6),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => SizedBox(height: tokens.space2),
+            itemBuilder: (context, index) => _MoreAppsRow(item: items[index]),
           ),
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          // elevation: 0,
-          backgroundColor: Color(0xFFD5B9AC),
         ),
-        backgroundColor: Color(0xFFE5D6D9),
-        body: ListView(
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _items.length,
-              itemBuilder: (context, index) {
-                return MoreAppsRow.factory(_items[index]);
-              },
-            ),
-            SizedBox(
-              height: 50,
-            )
-          ],
-        ));
-  }
-}
-
-class MoreAppItem {
-  Image appIcon;
-  String title;
-  void Function() onTap;
-
-  MoreAppItem(this.appIcon, this.title, this.onTap);
-}
-
-class MoreAppsRow extends StatelessWidget {
-  final Image? appIcon;
-  final IconData? trailingIcon;
-  final String? title;
-  final void Function()? onTap;
-
-  const MoreAppsRow(
-      {Key? key,
-      this.trailingIcon = Icons.chevron_right_rounded,
-      required this.appIcon,
-      required this.title,
-      required this.onTap})
-      : super(key: key);
-
-  factory MoreAppsRow.factory(MoreAppItem moreAppItem) {
-    return MoreAppsRow(
-      appIcon: moreAppItem.appIcon,
-      trailingIcon: Icons.chevron_right_rounded,
-      title: moreAppItem.title,
-      onTap: moreAppItem.onTap,
+      ),
     );
   }
 
+  List<_MoreAppItem> _items(BuildContext context) => [
+        _MoreAppItem('relaxing_up', S.of(context).Relaxing_Up, '1618712178',
+            'com.appsbay.relaxing_up'),
+        _MoreAppItem('image_guru', S.of(context).Image_Guru, '1625021625', ''),
+        _MoreAppItem('mint_translate', S.of(context).Mint_Translate,
+            '1638456603', 'com.appsbay.mint_translate'),
+        _MoreAppItem('yes_habit', S.of(context).Yes_Habit, '1637643734', ''),
+        _MoreAppItem('we_play_piano', S.of(context).We_Play_Piano, '1625018611',
+            'com.appsbay.we_play_piano'),
+        _MoreAppItem('minesweeper_go', S.of(context).Minesweeper_Go,
+            '1621899572', 'com.appsbay.classic_minesweeper'),
+        _MoreAppItem('metronome_go', S.of(context).Metronome_Go, '1635462172',
+            'com.appsbay.metronome_go'),
+        _MoreAppItem('instant_face', S.of(context).Instant_Face, '1638563222',
+            'com.appsbay.instant_face'),
+        _MoreAppItem('world_weather_live', S.of(context).World_Weather_Live,
+            '1612773646', 'com.appsbay.world_weather_live'),
+        _MoreAppItem(
+            'shows', S.of(context).Shows, '1624910011', 'com.appsbay.shows'),
+        _MoreAppItem('classical_music_box', S.of(context).Classical_Music_Box,
+            '1613096431', 'com.appsbay.classical_music_box'),
+        _MoreAppItem(
+            'money_tracker', S.of(context).Money_Tracker, '1534244892', ''),
+        _MoreAppItem('sudoku_lover', S.of(context).Sudoku_Lover, '1620749798',
+            'com.appsbay.sudoku_lovers'),
+        _MoreAppItem('express_scan', S.of(context).Express_Scan, '1625121991',
+            'com.appsbay.express_scan'),
+        _MoreAppItem(
+            'water_tracker', S.of(context).Water_Tracker, '1534891702', ''),
+        _MoreAppItem('novels_hub', S.of(context).Novels_Hub, '1528820845',
+            'com.appsbay.novelshub'),
+        _MoreAppItem('simple_calculator', S.of(context).Simple_Calculator,
+            '1610829871', 'com.appsbay.simple_calculator'),
+      ];
+}
+
+class _MoreAppItem {
+  const _MoreAppItem(
+      this.assetName, this.title, this.appStoreId, this.androidId);
+  final String assetName;
+  final String title;
+  final String appStoreId;
+  final String androidId;
+}
+
+class _MoreAppsRow extends StatelessWidget {
+  const _MoreAppsRow({required this.item});
+  final _MoreAppItem item;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.fromLTRB(20, 16, 20, 0),
-      decoration: const BoxDecoration(
-        color: Colors.white60,
-        borderRadius: BorderRadius.all(Radius.circular(24)),
-      ),
-      child: InkWell(
-        customBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+    return Card(
+      child: ListTile(
+        contentPadding: EdgeInsets.all(context.tokens.space2),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+          child: Image.asset(
+            'assets/app_icons/${item.assetName}.png',
+            width: 52,
+            height: 52,
+            fit: BoxFit.cover,
+            semanticLabel: item.title,
+          ),
         ),
-        onTap: onTap,
-        child: ListTile(
-          visualDensity: VisualDensity(vertical: 4), // to compact
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              height: 50,
-              width: 50,
-              child: appIcon,
-            ),
-          ),
-          trailing: Icon(trailingIcon),
-          title: Text(
-            title!,
-          ),
+        title: Text(item.title),
+        trailing: const Icon(Icons.open_in_new_rounded),
+        onTap: () => OpenStore.instance.open(
+          appStoreId: item.appStoreId,
+          androidAppBundleId: item.androidId,
         ),
       ),
     );

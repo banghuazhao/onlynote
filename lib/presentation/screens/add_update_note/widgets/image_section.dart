@@ -5,12 +5,15 @@ class _BuildImageSection extends StatelessWidget {
   final AddUpdateFormState state;
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
-    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+    final picked =
+        await ImagePicker().pickImage(source: source, imageQuality: 85);
     if (picked == null) return;
 
     final savedPath = await ImageStorage.saveImage(File(picked.path));
     if (context.mounted) {
-      context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.addImage(savedPath));
+      context
+          .read<AddUpdateFormBloc>()
+          .add(AddUpdateFormEvent.addImage(savedPath));
     }
   }
 
@@ -53,20 +56,23 @@ class _BuildImageSection extends StatelessWidget {
               child: _ImageThumbnail(
                 path: path,
                 onRemove: () {
-                  context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.removeImage(path));
+                  context
+                      .read<AddUpdateFormBloc>()
+                      .add(AddUpdateFormEvent.removeImage(path));
                 },
               ),
             ),
-          GestureDetector(
-            onTap: () => _showImageSourceSheet(context),
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacings.m),
-                color: Colors.black.withOpacity(0.06),
+          Material(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+              onTap: () => _showImageSourceSheet(context),
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: const Icon(Icons.add_photo_alternate_outlined),
               ),
-              child: const Icon(Icons.add_photo_alternate_outlined, color: AppColors.title),
             ),
           ),
         ],
@@ -97,16 +103,12 @@ class _ImageThumbnail extends StatelessWidget {
         Positioned(
           top: 2,
           right: 2,
-          child: GestureDetector(
-            onTap: onRemove,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.black54,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(2),
-              child: const Icon(Icons.close, size: 14, color: Colors.white),
-            ),
+          child: IconButton.filled(
+            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+            onPressed: onRemove,
+            constraints: const BoxConstraints.tightFor(width: 36, height: 36),
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.close_rounded, size: 18),
           ),
         ),
       ],

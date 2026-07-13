@@ -1,76 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/generated/l10n.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
-import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
 
-class AppButton extends StatefulWidget {
+/// Compact app-bar/action button with Material feedback and a 48dp target.
+class AppButton extends StatelessWidget {
   const AppButton({
-    Key? key,
+    super.key,
     required this.child,
     required this.onPressed,
     this.isLoading = false,
-  }) : super(key: key);
+    this.tooltip,
+  });
 
-  final Widget? child;
+  final Widget child;
   final VoidCallback? onPressed;
   final bool isLoading;
-
-  @override
-  State<AppButton> createState() => _AppButtonState();
-}
-
-class _AppButtonState extends State<AppButton> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed != value) setState(() => _pressed = value);
-  }
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: AppTypography.buttonLink.copyWith(color: AppColors.white),
-      child: GestureDetector(
-        onTapDown: widget.onPressed == null ? null : (_) => _setPressed(true),
-        onTapUp: widget.onPressed == null ? null : (_) => _setPressed(false),
-        onTapCancel: widget.onPressed == null ? null : () => _setPressed(false),
-        onTap: widget.onPressed == null
-            ? null
-            : () {
-                HapticFeedback.selectionClick();
-                widget.onPressed!();
-              },
-        child: AnimatedScale(
-          scale: _pressed ? 0.92 : 1.0,
-          duration: const Duration(milliseconds: 100),
-          curve: Curves.easeOut,
-          child: AnimatedSwitcher(
-            duration: animationDuration,
-            transitionBuilder: (child, animation) => ScaleTransition(
-              scale: animation,
-              child: child,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacings.m),
-              height: 40,
-              constraints: const BoxConstraints(minWidth: 40),
-              decoration: BoxDecoration(
-                color: const Color(0xff444444),
-                borderRadius: BorderRadius.circular(AppSpacings.l),
-              ),
-              child: Center(
-                key: ValueKey(widget.isLoading),
-                child: widget.isLoading
-                    ? Text(' ' + S.of(context).Saving + '.. ')
-                    : widget.child,
-              ),
-            ),
-          ),
-        ),
+    final button = FilledButton.tonal(
+      onPressed: isLoading || onPressed == null
+          ? null
+          : () {
+              HapticFeedback.selectionClick();
+              onPressed!();
+            },
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+      ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        child: isLoading
+            ? Row(
+                key: const ValueKey('loading'),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(S.of(context).Saving),
+                ],
+              )
+            : KeyedSubtree(key: const ValueKey('content'), child: child),
       ),
     );
+    return tooltip == null ? button : Tooltip(message: tooltip, child: button);
   }
 }

@@ -17,15 +17,15 @@ class _AddTodoTile extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
         title: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.add_circle_outline,
               size: 18,
-              color: AppColors.title,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 12),
             Text(
               S.of(context).Add_todo,
-              style: AppTypography.headline6,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
         ),
@@ -63,50 +63,57 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
   }
 
   @override
+  void dispose() {
+    todoController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListTile(
-      dense: true,
-      contentPadding: EdgeInsets.zero,
-      title: TextField(
-        controller: todoController,
-        style: AppTypography.headline6,
-        decoration: InputDecoration(
-          isDense: true,
-          border: InputBorder.none,
-          hintText: S.of(context).Todo,
-          hintStyle: AppTypography.headline6.copyWith(
-            color: AppColors.title.withOpacity(0.6),
+    return Card(
+      margin: EdgeInsets.only(bottom: context.tokens.space2),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerLow
+          .withValues(alpha: 0.72),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: context.tokens.space2),
+        title: TextField(
+          controller: todoController,
+          style: Theme.of(context).textTheme.bodyLarge,
+          decoration: InputDecoration(
+            isDense: true,
+            filled: false,
+            border: InputBorder.none,
+            hintText: S.of(context).Todo,
+            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+            counterText: '',
           ),
-          counterText: '',
+          onChanged: widget.onChanged,
+          maxLength: todoMaxCharCount,
+          maxLines: 4,
+          minLines: 1,
         ),
-        onChanged: widget.onChanged,
-        maxLength: todoMaxCharCount,
-        maxLines: 4,
-        minLines: 1,
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            iconSize: 18,
-            icon: const Icon(
-              Icons.delete_outline,
-              color: Colors.black87,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+              iconSize: 18,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: widget.onRemoved,
             ),
-            onPressed: widget.onRemoved,
-          ),
-          ReorderableDragStartListener(
-            index: widget.index,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.0),
-              child: Icon(
-                Icons.drag_handle,
-                size: 18,
-                color: Colors.black54,
+            ReorderableDragStartListener(
+              index: widget.index,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(Icons.drag_handle, size: 18),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -126,9 +133,10 @@ class _BuildTodoListField extends StatelessWidget {
           buildDefaultDragHandles: false,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: state.todos.length,
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             context.read<AddUpdateFormBloc>().add(
-                  AddUpdateFormEvent.reorderTodo(oldIndex: oldIndex, newIndex: newIndex),
+                  AddUpdateFormEvent.reorderTodo(
+                      oldIndex: oldIndex, newIndex: newIndex),
                 );
           },
           itemBuilder: (_, index) {
@@ -141,7 +149,9 @@ class _BuildTodoListField extends StatelessWidget {
                 message: S.of(context).Delete_Todo_Confirm_Message,
               );
               if (confirmed) {
-                context.read<AddUpdateFormBloc>().add(AddUpdateFormEvent.deleteTodo(todo.id!));
+                context
+                    .read<AddUpdateFormBloc>()
+                    .add(AddUpdateFormEvent.deleteTodo(todo.id!));
               }
               return confirmed;
             }
@@ -174,7 +184,9 @@ class _BuildTodoListField extends StatelessWidget {
         ),
         _AddTodoTile(
           onAdd: () {
-            context.read<AddUpdateFormBloc>().add(const AddUpdateFormEvent.addEmptyTodo());
+            context
+                .read<AddUpdateFormBloc>()
+                .add(const AddUpdateFormEvent.addEmptyTodo());
           },
         ),
       ],

@@ -1,82 +1,55 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:onlynote/common/constants.dart';
-import 'package:onlynote/common/extension/map_index.dart';
-import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
-import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
 
 class NoteAppBar extends StatelessWidget implements PreferredSizeWidget {
   const NoteAppBar({
-    Key? key,
+    super.key,
     this.autoImplementLeading = true,
     this.title,
     this.actions,
-    this.systemUiOverlayStyle = SystemUiOverlayStyle.dark,
-  }) : super(key: key);
+    this.leading,
+    this.systemUiOverlayStyle,
+  });
 
   final bool autoImplementLeading;
   final String? title;
   final List<Widget>? actions;
-  final SystemUiOverlayStyle systemUiOverlayStyle;
+  final Widget? leading;
+  final SystemUiOverlayStyle? systemUiOverlayStyle;
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: systemUiOverlayStyle,
-      child: FadeInDown(
-        duration: animationDuration,
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            iconTheme: const IconThemeData(color: AppColors.white),
-            brightness: Brightness.light,
-          ),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: AppSpacings.xl),
-            padding: const EdgeInsets.symmetric(vertical: AppSpacings.xl),
-            child: SafeArea(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (autoImplementLeading)
-                    AppButton(
-                      child: const Icon(Icons.chevron_left),
-                      onPressed: () {
-                        context.router.maybePop("back");
-                      },
-                    ),
-                  (title != null)
-                      ? Expanded(
-                          child: Text(
-                            title!,
-                            style: AppTypography.headline1.copyWith(color: AppColors.title),
-                          ),
-                        )
-                      : const Spacer(),
-                  if (actions != null) ...{
-                    ...actions!
-                        .mapIndexed(
-                          (action, i) => Padding(
-                            padding: (i == actions!.length - 1)
-                                ? EdgeInsets.zero
-                                : const EdgeInsets.only(right: AppSpacings.l),
-                            child: action,
-                          ),
-                        )
-                        .toList(),
-                  },
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+    return AppBar(
+      automaticallyImplyLeading: false,
+      systemOverlayStyle: systemUiOverlayStyle ??
+          (Theme.of(context).brightness == Brightness.dark
+                  ? SystemUiOverlayStyle.light
+                  : SystemUiOverlayStyle.dark)
+              .copyWith(statusBarColor: Colors.transparent),
+      leading: leading ??
+          (autoImplementLeading
+              ? IconButton(
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                  onPressed: context.router.maybePop,
+                  icon: const Icon(Icons.arrow_back_rounded),
+                )
+              : null),
+      title: title == null ? null : Text(title!),
+      actionsPadding: const EdgeInsets.only(right: 16),
+      actions: actions == null
+          ? null
+          : [
+              for (var index = 0; index < actions!.length; index++)
+                Padding(
+                  padding: EdgeInsets.only(
+                      right: index == actions!.length - 1 ? 0 : 8),
+                  child: actions![index],
+                ),
+            ],
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(100);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

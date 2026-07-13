@@ -14,7 +14,6 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
 
 import 'bloc/add_update_bloc.dart';
 import 'bloc/add_update_form/add_update_form_bloc.dart';
@@ -57,6 +56,13 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
   }
 
   @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
       builder: (ctx, state) {
@@ -74,7 +80,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
                   orElse: () => Container(),
                   saving: (_) => FadeIn(
                     child: Container(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .scrim
+                          .withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -116,43 +125,46 @@ class _BuildForm extends StatelessWidget {
       appBar: NoteAppBar(
         actions: [
           AppButton(
+            tooltip: S.of(context).save,
             isLoading: context.watch<AddUpdateBloc>().state.maybeMap(
                   orElse: () => false,
                   saving: (_) => true,
                 ),
-            child: Text('  ' + S.of(context).save + '  '),
+            child: Text(S.of(context).save),
             onPressed: () => _addOrUpdateNote(context),
           ),
         ],
       ),
-      body: ListView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacings.xl,
-          vertical: AppSpacings.xl,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
+          child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.all(context.tokens.space4),
+            children: [
+              //* Add/Update Note title
+              _BuildTitleField(
+                state: state,
+                titleController: _titleController,
+              ),
+              const SizedBox(height: AppSpacings.xl),
+
+              //* Add/Update todo list.
+              _BuildTodoListField(state: state),
+              const SizedBox(height: AppSpacings.xl),
+
+              //* Attach / remove photos.
+              _BuildImageSection(state: state),
+              const SizedBox(height: AppSpacings.xl),
+
+              //* Add/Update note description.
+              _BuildDescriptionField(
+                state: state,
+                descriptionController: _descriptionController,
+              ),
+            ],
+          ),
         ),
-        children: [
-          //* Add/Update Note title
-          _BuildTitleField(
-            state: state,
-            titleController: _titleController,
-          ),
-          const SizedBox(height: AppSpacings.xl),
-
-          //* Add/Update todo list.
-          _BuildTodoListField(state: state),
-          const SizedBox(height: AppSpacings.xl),
-
-          //* Attach / remove photos.
-          _BuildImageSection(state: state),
-          const SizedBox(height: AppSpacings.xl),
-
-          //* Add/Update note description.
-          _BuildDescriptionField(
-            state: state,
-            descriptionController: _descriptionController,
-          ),
-        ],
       ),
     );
   }

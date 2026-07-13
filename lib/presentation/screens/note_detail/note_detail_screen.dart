@@ -128,7 +128,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           BottomSheetAction(
               title: Text(
                 S.of(context).Delete,
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
               onPressed: (BuildContext context) {
                 ReminderData.shared.deleteReminder(currentReminder);
@@ -160,6 +160,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     ReminderData.shared.getCurrentReminder(note) != null;
                 return [
                   AppButton(
+                    tooltip: S.of(context).Reminder,
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       transitionBuilder: (child, animation) =>
@@ -175,16 +176,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   ),
                   AppButton(
                     key: _shareButtonKey,
+                    tooltip: S.of(context).Share,
                     child: const Icon(Icons.share_outlined),
                     onPressed: () => _shareNoteAsImage(note),
                   ),
                   AppButton(
+                    tooltip: S.of(context).Edit,
                     child: const Icon(Icons.edit_outlined),
                     onPressed: () {
                       context.router.push(AddUpdateNoteRoute(note: note));
                     },
                   ),
                   AppButton(
+                    tooltip: S.of(context).Delete,
                     child: const Icon(Icons.delete_outline),
                     onPressed: () async {
                       final confirmed = await showConfirmDialog(
@@ -217,7 +221,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               screenshotController: _screenshotController,
               onReminderTap: () => _showReminderPicker(context, data.note),
             ),
-            orElse: () => const SizedBox.shrink(),
+            orElse: () => const _DetailSkeleton(),
           ),
         );
       },
@@ -241,80 +245,88 @@ class LoadedView extends StatelessWidget {
   Widget build(BuildContext context) {
     Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacings.xl,
-        vertical: AppSpacings.xl,
-      ),
-      children: [
-        //* Everything inside here is captured when sharing the note as an image.
-        Screenshot(
-          controller: screenshotController,
-          child: Container(
-            color: note.color ?? Colors.white,
-            padding: const EdgeInsets.all(AppSpacings.l),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                //* Show Note Title
-                SelectableText(
-                  note.title ?? '',
-                  style: AppTypography.headline3,
-                ),
-                const SizedBox(height: AppSpacings.l),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
+        child: ListView(
+          padding: EdgeInsets.all(context.tokens.space4),
+          children: [
+            //* Everything inside here is captured when sharing the note as an image.
+            Screenshot(
+              controller: screenshotController,
+              child: Container(
+                color: note.color ?? Colors.white,
+                padding: const EdgeInsets.all(AppSpacings.l),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    //* Show Note Title
+                    if (note.title?.isNotEmpty == true) ...[
+                      SelectableText(note.title!,
+                          style: AppTypography.headline3),
+                      const SizedBox(height: AppSpacings.l),
+                    ],
 
-                //* Show Note Update/Add time
-                SelectableText(
-                  note.dateWithTime,
-                  style:
-                      AppTypography.description.copyWith(color: Colors.black87),
-                ),
-
-                //* Show reminder time, only if one is actually set.
-                if (currentReminder != null) ...{
-                  const SizedBox(height: AppSpacings.m),
-                  GestureDetector(
-                    onTap: onReminderTap,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.alarm,
-                            size: 16, color: Colors.black87),
-                        const SizedBox(width: AppSpacings.s),
-                        Text(
-                          currentReminder.timeString,
-                          style: AppTypography.description
-                              .copyWith(color: Colors.black87),
-                        ),
-                      ],
+                    //* Show Note Update/Add time
+                    SelectableText(
+                      note.dateWithTime,
+                      style: AppTypography.description
+                          .copyWith(color: Colors.black87),
                     ),
-                  ),
-                },
-                const SizedBox(height: AppSpacings.xxl),
 
-                //* Show todo's list if any
-                if (note.hasTodo) ...{
-                  _BuildTodoList(todoList: note.todo),
-                  const SizedBox(height: AppSpacings.xxl),
-                },
+                    //* Show reminder time, only if one is actually set.
+                    if (currentReminder != null) ...{
+                      const SizedBox(height: AppSpacings.m),
+                      InkWell(
+                        borderRadius:
+                            BorderRadius.circular(context.tokens.radiusSmall),
+                        onTap: onReminderTap,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: context.tokens.space2),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.alarm,
+                                  size: 16, color: Colors.black87),
+                              const SizedBox(width: AppSpacings.s),
+                              Text(
+                                currentReminder.timeString,
+                                style: AppTypography.description
+                                    .copyWith(color: Colors.black87),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    },
+                    const SizedBox(height: AppSpacings.xxl),
 
-                //* Note Description
-                SelectableText(
-                  note.description ?? '',
-                  style: AppTypography.headline6,
+                    //* Show todo's list if any
+                    if (note.hasTodo) ...{
+                      _BuildTodoList(todoList: note.todo),
+                      const SizedBox(height: AppSpacings.xxl),
+                    },
+
+                    //* Note Description
+                    SelectableText(
+                      note.description ?? '',
+                      style: AppTypography.headline6,
+                    ),
+
+                    //* Attached photos, if any
+                    if (note.hasImages) ...{
+                      const SizedBox(height: AppSpacings.xxl),
+                      _BuildImageGallery(imagePaths: note.imagePaths),
+                    },
+                  ],
                 ),
-
-                //* Attached photos, if any
-                if (note.hasImages) ...{
-                  const SizedBox(height: AppSpacings.xxl),
-                  _BuildImageGallery(imagePaths: note.imagePaths),
-                },
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -325,6 +337,10 @@ class _BuildTodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sortedTodos = [...todoList]..sort((left, right) {
+        if (left.completed == right.completed) return 0;
+        return left.completed ? 1 : -1;
+      });
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -333,41 +349,53 @@ class _BuildTodoList extends StatelessWidget {
           style: AppTypography.headline6
               .copyWith(decoration: TextDecoration.underline),
         ),
-        ListView.builder(
-          key: const PageStorageKey('note-todos'),
-          shrinkWrap: true,
-          itemCount: todoList.length,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (_, index) {
-            final Todo todo = todoList[index];
-
-            return AnimatedOpacity(
-              key: ValueKey(todo.id),
-              opacity: todo.completed ? 0.6 : 1.0,
-              duration: const Duration(milliseconds: 250),
-              child: CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                dense: true,
-                value: todo.completed,
-                contentPadding: EdgeInsets.zero,
-                enableFeedback: true,
-                title: AnimatedDefaultTextStyle(
+        AnimatedSwitcher(
+          duration: context.tokens.motionStandard,
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, -0.06),
+                end: Offset.zero,
+              ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut)),
+              child: child,
+            ),
+          ),
+          child: Column(
+            key: ValueKey(sortedTodos
+                .map((todo) => '${todo.id}:${todo.completed}')
+                .join('|')),
+            children: [
+              for (final todo in sortedTodos)
+                AnimatedOpacity(
+                  key: ValueKey(todo.id),
+                  opacity: todo.completed ? 0.6 : 1.0,
                   duration: const Duration(milliseconds: 250),
-                  style: AppTypography.title.copyWith(
-                    decoration:
-                        todo.completed ? TextDecoration.lineThrough : null,
+                  child: CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    dense: true,
+                    value: todo.completed,
+                    contentPadding: EdgeInsets.zero,
+                    enableFeedback: true,
+                    title: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 250),
+                      style: AppTypography.title.copyWith(
+                        decoration:
+                            todo.completed ? TextDecoration.lineThrough : null,
+                      ),
+                      child: Text(todo.title ?? ''),
+                    ),
+                    onChanged: (bool? value) {
+                      HapticFeedback.lightImpact();
+                      context
+                          .read<NoteDetailBloc>()
+                          .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
+                    },
                   ),
-                  child: Text(todo.title ?? ''),
                 ),
-                onChanged: (bool? value) {
-                  HapticFeedback.lightImpact();
-                  context
-                      .read<NoteDetailBloc>()
-                      .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-                },
-              ),
-            );
-          },
+            ],
+          ),
         ),
       ],
     );
@@ -400,15 +428,20 @@ class _BuildImageGallery extends StatelessWidget {
         itemCount: imagePaths.length,
         separatorBuilder: (_, __) => const SizedBox(width: AppSpacings.m),
         itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () => _openFullScreen(context, index),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacings.m),
-              child: Image.file(
-                File(ImageStorage.resolvePath(imagePaths[index])),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
+          return Material(
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+            child: InkWell(
+              onTap: () => _openFullScreen(context, index),
+              child: Hero(
+                tag: 'note-image-${imagePaths[index]}',
+                child: Image.file(
+                  File(ImageStorage.resolvePath(imagePaths[index])),
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  semanticLabel: S.of(context).Choose_From_Gallery,
+                ),
               ),
             ),
           );
@@ -416,6 +449,31 @@ class _BuildImageGallery extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DetailSkeleton extends StatelessWidget {
+  const _DetailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ShimmerWrapper(
+      child: ListView(
+        padding: EdgeInsets.all(context.tokens.space4),
+        children: [
+          Container(height: 42, decoration: _decoration(context)),
+          SizedBox(height: context.tokens.space3),
+          Container(height: 16, width: 160, decoration: _decoration(context)),
+          SizedBox(height: context.tokens.space5),
+          Container(height: 180, decoration: _decoration(context)),
+        ],
+      ),
+    );
+  }
+
+  BoxDecoration _decoration(BuildContext context) => BoxDecoration(
+        color: context.colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(context.tokens.radiusMedium),
+      );
 }
 
 class _FullScreenImageViewer extends StatelessWidget {
@@ -442,7 +500,8 @@ class _FullScreenImageViewer extends StatelessWidget {
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(
-              child: Image.file(File(ImageStorage.resolvePath(imagePaths[index]))),
+              child:
+                  Image.file(File(ImageStorage.resolvePath(imagePaths[index]))),
             ),
           );
         },

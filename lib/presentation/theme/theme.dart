@@ -1,47 +1,167 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
 
-class AppTheme {
-  AppTheme._();
+import 'colors.dart';
+import 'spacing.dart';
 
-  static ThemeData light = ThemeData(
-    scaffoldBackgroundColor: const Color(0xffFEF7EE),
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.white,
-      centerTitle: false,
-      elevation: 0,
-      titleTextStyle: GoogleFonts.montserrat(
-        fontSize: 17,
-        fontWeight: FontWeight.bold,
-        color: AppColors.title,
+abstract final class AppTheme {
+  static ThemeData get light => _build(Brightness.light);
+  static ThemeData get dark => _build(Brightness.dark);
+
+  static ThemeData _build(Brightness brightness) {
+    final dark = brightness == Brightness.dark;
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppColors.amber,
+      brightness: brightness,
+      primary: dark ? const Color(0xFFFFD275) : AppColors.ink,
+      secondary: dark ? const Color(0xFFF2C66D) : const Color(0xFF805600),
+      surface: dark ? AppColors.nightSurface : AppColors.parchment,
+      error: dark ? const Color(0xFFFFB4AB) : AppColors.error,
+    );
+    final baseText =
+        dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
+    final textTheme = baseText
+        .copyWith(
+          displaySmall:
+              baseText.displaySmall?.copyWith(fontWeight: FontWeight.w800),
+          headlineMedium:
+              baseText.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+          headlineSmall:
+              baseText.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          titleLarge:
+              baseText.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          titleMedium:
+              baseText.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          bodyLarge: baseText.bodyLarge?.copyWith(height: 1.45),
+          bodyMedium: baseText.bodyMedium?.copyWith(height: 1.4),
+          labelLarge:
+              baseText.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        )
+        .apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
+    const tokens = AppTokens();
+    final mediumRadius = BorderRadius.circular(tokens.radiusMedium);
+    final mediumShape = RoundedRectangleBorder(borderRadius: mediumRadius);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: dark ? AppColors.night : AppColors.parchment,
+      textTheme: textTheme,
+      extensions: const [tokens],
+      visualDensity: VisualDensity.standard,
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        foregroundColor: scheme.onSurface,
+        titleTextStyle: textTheme.titleLarge,
       ),
-      iconTheme: const IconThemeData(color: AppColors.title),
-    ),
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      secondary: const Color(0xff333333),
-      primary: const Color(0xff333333),
-    ),
-    textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: Color(0xff252525),
-      selectionHandleColor: Color(0xff252525),
-      selectionColor: Colors.black26,
-    ),
-    checkboxTheme: CheckboxThemeData(
-      // Unchecked = an empty (transparent-fill, outlined) circle; checked =
-      // filled. Using .all() here previously kept the fill color constant
-      // regardless of state, so unchecked boxes looked identical to checked
-      // ones (both a solid dark circle).
-      fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return const Color(0xff252525);
-        }
-        return Colors.transparent;
-      }),
-      side: const BorderSide(color: Color(0xff252525), width: 1.5),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(40)),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        color: scheme.surfaceContainerLow,
+        shape: mediumShape,
       ),
-    ),
-  );
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          shape: mediumShape,
+          textStyle: textTheme.labelLarge,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          shape: mediumShape,
+          textStyle: textTheme.labelLarge,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          shape: mediumShape,
+          textStyle: textTheme.labelLarge,
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.surfaceContainerLow,
+        border: OutlineInputBorder(
+            borderRadius: mediumRadius, borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: mediumRadius, borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: mediumRadius, borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      listTileTheme: ListTileThemeData(
+        minTileHeight: 56,
+        shape: mediumShape,
+        iconColor: scheme.onSurfaceVariant,
+        titleTextStyle: textTheme.titleMedium,
+        subtitleTextStyle:
+            textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: scheme.surfaceContainerHigh,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(tokens.radiusLarge),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        showDragHandle: true,
+        backgroundColor: scheme.surfaceContainerLow,
+        modalBackgroundColor: scheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(tokens.radiusLarge)),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: scheme.inverseSurface,
+        contentTextStyle:
+            textTheme.bodyMedium?.copyWith(color: scheme.onInverseSurface),
+        shape: mediumShape,
+      ),
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(tokens.radiusSmall),
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(scheme.surfaceContainerHigh),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.radiusMedium)),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: scheme.surfaceContainerHighest,
+          border: OutlineInputBorder(
+              borderRadius: mediumRadius, borderSide: BorderSide.none),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: mediumRadius, borderSide: BorderSide.none),
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+        },
+      ),
+    );
+  }
 }

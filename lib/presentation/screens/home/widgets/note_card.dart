@@ -83,8 +83,9 @@ class _NoteCardState extends State<NoteCard> {
         clipBehavior: Clip.antiAlias,
         borderRadius: BorderRadius.circular(AppSpacings.xl),
         color: note.color,
-        shadowColor: Colors.black,
-        elevation: 4,
+        shadowColor:
+            Theme.of(context).colorScheme.shadow.withValues(alpha: 0.18),
+        elevation: 1,
         child: InkWell(
           splashColor: Colors.black12,
           onTapDown: (_) => _setPressed(true),
@@ -106,28 +107,28 @@ class _NoteCardState extends State<NoteCard> {
               // maxHeight: 300,
               minHeight: 100,
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacings.l,
-              vertical: AppSpacings.l,
-            ),
+            padding: EdgeInsets.zero,
             child: Stack(
               children: [
                 Screenshot(
                   controller: _screenshotController,
                   child: Container(
-                    color: note.color ?? Colors.white,
+                    color: note.color ?? Theme.of(context).colorScheme.surface,
+                    padding: const EdgeInsets.all(AppSpacings.l),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          headlineText,
-                          style: AppTypography.cardTitle,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 4,
-                        ),
-                        const SizedBox(height: AppSpacings.m),
+                        if (headlineText.isNotEmpty) ...[
+                          Text(
+                            headlineText,
+                            style: AppTypography.cardTitle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 4,
+                          ),
+                          const SizedBox(height: AppSpacings.m),
+                        ],
                         Text(
                           note.date,
                           style: AppTypography.description
@@ -150,7 +151,8 @@ class _NoteCardState extends State<NoteCard> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(AppSpacings.m),
                             child: Image.file(
-                              File(ImageStorage.resolvePath(note.imagePaths.first)),
+                              File(ImageStorage.resolvePath(
+                                  note.imagePaths.first)),
                               width: 64,
                               height: 64,
                               fit: BoxFit.cover,
@@ -192,17 +194,19 @@ class _NoteCardState extends State<NoteCard> {
                     alignment: Alignment.bottomRight,
                     child: Material(
                       key: _shareButtonKey,
-                      color: Colors.black.withOpacity(0.08),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .scrim
+                          .withValues(alpha: 0.08),
                       shape: const CircleBorder(),
                       child: InkWell(
                         customBorder: const CircleBorder(),
                         onTap: _shareNoteAsImage,
-                        child: const Padding(
-                          padding: EdgeInsets.all(6.0),
+                        child: const SizedBox.square(
+                          dimension: 48,
                           child: Icon(
                             Icons.share_outlined,
-                            size: 18,
-                            color: Colors.black54,
+                            size: 20,
                           ),
                         ),
                       ),

@@ -1,7 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
 
 class ErrorText extends StatelessWidget {
   const ErrorText(this.message, {Key? key}) : super(key: key);
@@ -13,9 +11,9 @@ class ErrorText extends StatelessWidget {
       child: Center(
         child: Text(
           message,
-          style: AppTypography.title.copyWith(
-            color: AppColors.description,
-          ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
           textAlign: TextAlign.center,
         ),
       ),

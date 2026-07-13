@@ -22,10 +22,9 @@ Future<bool> showConfirmDialog(
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              S.of(context).Delete,
-              style: const TextStyle(color: Colors.red),
-            ),
+            style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error),
+            child: Text(S.of(context).Delete),
           ),
         ],
       );

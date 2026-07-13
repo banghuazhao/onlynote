@@ -18,7 +18,6 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -40,6 +39,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   BannerAd? _ad;
+  AdSize? _adSize;
+  bool _adLoadStarted = false;
 
   bool _isAdLoaded = false;
   bool _isReorderMode = false;
@@ -51,13 +52,27 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     PurchaseService.instance.addListener(_entitlementChanged);
-    if (!PurchaseService.instance.isAdsRemoved) _loadAd();
   }
 
-  void _loadAd() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_adLoadStarted && !PurchaseService.instance.isAdsRemoved) {
+      _adLoadStarted = true;
+      _loadAd();
+    }
+  }
+
+  Future<void> _loadAd() async {
+    final width = MediaQuery.sizeOf(context).width.truncate();
+    final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
+    if (!mounted || size == null || PurchaseService.instance.isAdsRemoved) {
+      return;
+    }
+    _adSize = size;
     _ad = BannerAd(
       adUnitId: AdsManager.bannerAdUnitId,
-      size: AdSize.banner,
+      size: size,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
@@ -70,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onAdFailedToLoad: (ad, error) {
           // Releases an ad resource when it fails to load
           ad.dispose();
+          if (mounted) setState(() => _adSize = null);
 
           print('Ad load failed (code=${error.code} message=${error.message})');
         },
@@ -100,12 +116,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: NoteAppBar(
-        systemUiOverlayStyle: SystemUiOverlayStyle.dark,
         autoImplementLeading: false,
+        leading: IconButton(
+          tooltip: S.of(context).Settings,
+          icon: const Icon(Icons.settings_outlined),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+          ),
+        ),
         title: S.of(context).notes,
         actions: _isReorderMode
             ? [
                 AppButton(
+                  tooltip: S.of(context).Done,
                   child: Text(S.of(context).Done),
                   onPressed: () => _setReorderMode(false),
                 ),
@@ -113,18 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : context.watch<MultipleDeleteBloc>().state.mapOrNull(
                   initial: (selectedNotes) => [
                     AppButton(
-                      child: const Icon(Icons.settings_outlined),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                const SettingsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    AppButton(
+                      tooltip: S.of(context).notes,
                       child: const Icon(Icons.add),
                       onPressed: () {
                         context.router.push(AddUpdateNoteRoute());
@@ -133,13 +146,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                   selected: (selectedNotes) => [
                     AppButton(
+                      tooltip: S.of(context).Delete,
                       child: Row(
                         children: [
                           Text(
                             S.of(context).Delete +
                                 ' - ${selectedNotes.selectedIds.length}',
-                            style: AppTypography.headline6
-                                .copyWith(color: AppColors.white),
+                            style: Theme.of(context).textTheme.labelLarge,
                           ),
                           const SizedBox(width: AppSpacings.xl),
                           const Icon(Icons.delete_outline),
@@ -152,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     AppButton(
+                      tooltip: S.of(context).Cancel,
                       child: const Icon(Icons.close),
                       onPressed: () {
                         context
@@ -162,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                   success: (selectedNotes) => [
                     AppButton(
+                      tooltip: S.of(context).notes,
                       child: const Icon(Icons.add),
                       onPressed: () {
                         context.router.push(AddUpdateNoteRoute());
@@ -170,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                   failed: (selectedNotes) => [
                     AppButton(
+                      tooltip: S.of(context).notes,
                       child: const Icon(Icons.add),
                       onPressed: () {
                         context.router.push(AddUpdateNoteRoute());
@@ -181,8 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       //* Show available notes list
       body: SafeArea(
-        child: Stack(children: [
-          ValueListenableBuilder(
+        child: Column(children: [
+          Expanded(
+              child: ValueListenableBuilder(
             valueListenable: getIt<Database>().box.listenable(),
             builder: (context, _, child) {
               context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
@@ -192,42 +209,95 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (_, state) {
                 return state.maybeMap(
                   orElse: () => const _LoadingSkeleton(),
-                  error: (error) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FadeInDown(
-                          child: Image.asset("assets/empty.png"),
+                  error: (error) => _HomeError(message: error.message ?? ''),
+                  loaded: (data) => data.notes.isEmpty
+                      ? _EmptyNotes(
+                          onAdd: () =>
+                              context.router.push(AddUpdateNoteRoute()))
+                      : _BuildNotesList(
+                          notes: data.notes,
+                          isReorderMode: _isReorderMode,
+                          onEnterReorderMode: () => _setReorderMode(true),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        ErrorText(error.message ?? ''),
-                        const SizedBox(
-                          height: 80,
-                        ),
-                      ],
-                    );
-                  },
-                  loaded: (data) => _BuildNotesList(
-                    notes: data.notes,
-                    isReorderMode: _isReorderMode,
-                    onEnterReorderMode: () => _setReorderMode(true),
-                  ),
                 );
               },
             ),
-          ),
-          if (_isAdLoaded && !PurchaseService.instance.isAdsRemoved)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: AdWidget(ad: _ad!),
-                height: 50.0,
+          )),
+          if (_adSize != null && !PurchaseService.instance.isAdsRemoved)
+            Semantics(
+              label: 'Advertisement',
+              container: true,
+              child: Padding(
+                padding: EdgeInsets.only(top: context.tokens.space2),
+                child: SizedBox(
+                  width: _adSize!.width.toDouble(),
+                  height: _adSize!.height.toDouble(),
+                  child: _isAdLoaded
+                      ? AdWidget(ad: _ad!)
+                      : const SizedBox.shrink(),
+                ),
               ),
             ),
         ]),
+      ),
+    );
+  }
+}
+
+class _EmptyNotes extends StatelessWidget {
+  const _EmptyNotes({required this.onAdd});
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(context.tokens.space5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/empty_notes.png',
+              width: 190,
+              height: 190,
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
+            SizedBox(height: context.tokens.space4),
+            Text(S.of(context).No_notes_found,
+                textAlign: TextAlign.center,
+                style: context.textStyles.titleLarge),
+            SizedBox(height: context.tokens.space4),
+            FilledButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add_rounded),
+              label: Text(S.of(context).notes),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeError extends StatelessWidget {
+  const _HomeError({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(context.tokens.space5),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.note_alt_outlined,
+                size: 64, color: context.colors.error),
+            SizedBox(height: context.tokens.space4),
+            ErrorText(message),
+          ],
+        ),
       ),
     );
   }
@@ -362,16 +432,40 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   Widget build(BuildContext context) {
     final multipleDeleteBloc = context.read<MultipleDeleteBloc>();
 
-    double width = MediaQuery.of(context).size.width;
-    final baseColumns = AppLayoutSettings.instance.cardSize.columns;
-    final crossAxisCount = width > 600 ? baseColumns + 1 : baseColumns;
-
-    return FocusDetector(
-      onFocusGained: viewWillAppear,
-      onFocusLost: viewWillDisappear,
-      child: widget.isReorderMode
-          ? _buildReorderableGrid(context, crossAxisCount)
-          : _buildMasonryGrid(context, multipleDeleteBloc, crossAxisCount),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final baseColumns = AppLayoutSettings.instance.cardSize.columns;
+        final crossAxisCount =
+            constraints.maxWidth >= 600 ? baseColumns + 1 : baseColumns;
+        return FocusDetector(
+          onFocusGained: viewWillAppear,
+          onFocusLost: viewWillDisappear,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 280),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.98, end: 1).animate(animation),
+                child: child,
+              ),
+            ),
+            child: KeyedSubtree(
+              key: ValueKey(
+                '${widget.isReorderMode}:${widget.notes.map((note) => note.id).join(',')}',
+              ),
+              child: widget.isReorderMode
+                  ? _buildReorderableGrid(context, crossAxisCount)
+                  : _buildMasonryGrid(
+                      context,
+                      multipleDeleteBloc,
+                      crossAxisCount,
+                    ),
+            ),
+          ),
+        );
+      },
     );
   }
 

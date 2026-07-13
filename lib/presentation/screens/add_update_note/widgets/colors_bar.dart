@@ -58,35 +58,43 @@ class _ColorBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacings.s),
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedScale(
-          scale: isSelected ? 1.12 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutBack,
-          child: Material(
-            shape: const CircleBorder(),
-            elevation: isSelected ? 3 : 0.2,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: 40,
-              width: 40,
-              margin: const EdgeInsets.all(AppSpacings.s),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color,
-                border: isSelected
-                    ? Border.all(color: AppColors.white, width: 2)
-                    : null,
-              ),
-              child: AnimatedScale(
-                scale: isSelected ? 1.0 : 0.0,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: 'Note color',
+        child: InkResponse(
+          radius: 28,
+          onTap: onTap,
+          child: AnimatedScale(
+            scale: isSelected ? 1.12 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutBack,
+            child: Material(
+              shape: const CircleBorder(),
+              elevation: isSelected ? 3 : 0.2,
+              child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutBack,
-                child: const Icon(
-                  Icons.check,
-                  color: AppColors.white,
-                  size: 30,
+                height: 40,
+                width: 40,
+                margin: const EdgeInsets.all(AppSpacings.s),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color,
+                  border: isSelected
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          width: 2)
+                      : null,
+                ),
+                child: AnimatedScale(
+                  scale: isSelected ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    size: 30,
+                  ),
                 ),
               ),
             ),

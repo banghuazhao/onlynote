@@ -7,9 +7,10 @@ class ShimmerWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Shimmer.fromColors(
-      highlightColor: Colors.grey[300]!,
-      baseColor: Colors.grey[100]!,
+      highlightColor: colors.surfaceContainerHighest,
+      baseColor: colors.surfaceContainerLow,
       child: child,
     );
   }

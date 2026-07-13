@@ -33,7 +33,9 @@ class AddUpdateBloc extends Bloc<AddUpdateEvent, AddUpdateState> {
 
       failureOrSuccess.fold((failure) {
         emit(AddUpdateState.failed(message: failure.message));
-        getIt<AppRouter>().context.showToast('${failure.message}', isError: true);
+        getIt<AppRouter>()
+            .context
+            .showToast('${failure.message}', isError: true);
       }, (_) {
         emit(const AddUpdateState.saved());
         getIt<AppRouter>().navigate(const HomeRoute());
@@ -50,10 +52,12 @@ class AddUpdateBloc extends Bloc<AddUpdateEvent, AddUpdateState> {
 
       failureOrSuccess.fold((failure) {
         emit(AddUpdateState.failed(message: failure.message));
-        getIt<AppRouter>().context.showToast('${failure.message}', isError: true);
+        getIt<AppRouter>()
+            .context
+            .showToast('${failure.message}', isError: true);
       }, (_) {
         emit(const AddUpdateState.saved());
-        getIt<AppRouter>().navigate(const HomeRoute());
+        getIt<AppRouter>().maybePop();
         getIt<AppRouter>().context.showToast(_i10n.Note_Updated_Successfully);
       });
     });

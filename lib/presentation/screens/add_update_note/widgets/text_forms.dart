@@ -20,14 +20,17 @@ class _BuildTitleField extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               S.of(context).Title,
-              style: AppTypography.headline1,
+              style: Theme.of(context).textTheme.titleLarge,
               softWrap: true,
             ),
           ),
         TextField(
           controller: _titleController,
-          style: AppTypography.headline1,
+          style: Theme.of(context).textTheme.titleLarge,
+          textInputAction: TextInputAction.next,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
           decoration: const InputDecoration(
+            filled: false,
             border: InputBorder.none,
             contentPadding: EdgeInsets.zero,
             counterText: '',
@@ -66,14 +69,18 @@ class _BuildDescriptionField extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               S.of(context).Type_something,
-              style: AppTypography.headline6,
+              style: Theme.of(context).textTheme.bodyLarge,
               softWrap: true,
             ),
           ),
         TextField(
           controller: _descriptionController,
-          style: AppTypography.headline6,
+          style: Theme.of(context).textTheme.bodyLarge,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
           decoration: const InputDecoration(
+            filled: false,
             border: InputBorder.none,
             contentPadding: EdgeInsets.zero,
           ),
