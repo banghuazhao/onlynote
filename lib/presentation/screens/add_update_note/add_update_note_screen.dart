@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/constants.dart';
@@ -25,11 +25,11 @@ part 'widgets/todo_tile.dart';
 
 @RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
-  const AddUpdateNoteScreen({Key? key, this.note}) : super(key: key);
+  const AddUpdateNoteScreen({super.key, this.note});
   final Note? note;
 
   @override
-  _AddUpdateNoteScreenState createState() => _AddUpdateNoteScreenState();
+  State<AddUpdateNoteScreen> createState() => _AddUpdateNoteScreenState();
 }
 
 class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
@@ -96,14 +96,12 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen> {
 
 class _BuildForm extends StatelessWidget {
   const _BuildForm({
-    Key? key,
     required this.widget,
     required TextEditingController titleController,
     required TextEditingController descriptionController,
     required this.state,
   })  : _titleController = titleController,
-        _descriptionController = descriptionController,
-        super(key: key);
+        _descriptionController = descriptionController;
 
   final AddUpdateNoteScreen widget;
   final TextEditingController _titleController;

@@ -20,15 +20,18 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     //Initialization Settings for iOS
-    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
     );
 
     //Initializing settings for both platforms (Android & iOS)
-    const InitializationSettings initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsIOS);
 
     tz.initializeTimeZones();
 
@@ -44,7 +47,8 @@ class NotificationService {
 
   Future<bool?>? requestIOSPermissions() {
     return flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -56,7 +60,8 @@ class NotificationService {
   // notification can be shown; older Android versions grant it implicitly.
   Future<bool?>? requestAndroidPermissions() {
     return flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
   }
 
@@ -67,13 +72,18 @@ class NotificationService {
     return requestAndroidPermissions() ?? Future.value(true);
   }
 
-  Future<void> showNotifications({id, title, body, payload}) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name',
-        channelDescription: 'your channel description',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ticker');
+  Future<void> showNotifications({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
@@ -87,9 +97,10 @@ class NotificationService {
 
   Future<void> askForPermissionAndSchedule(
       BuildContext context, Note note, Reminder reminder) async {
-    var result = await _requestPlatformPermissions();
+    final result = await _requestPlatformPermissions();
 
-    print("Notification permission result: $result");
+    debugPrint("Notification permission result: $result");
+    if (!context.mounted) return;
 
     if (result != null) {
       if (result == false) {
@@ -101,24 +112,25 @@ class NotificationService {
 
     scheduleNotification(context, note, reminder);
 
-    var pendingNotificationRequests =
+    final pendingNotificationRequests =
         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
-    print("pendingNotificationRequests count: ${pendingNotificationRequests.length}");
+    debugPrint(
+        "pendingNotificationRequests count: ${pendingNotificationRequests.length}");
     for (PendingNotificationRequest request in pendingNotificationRequests) {
-      print("${request.id}: ${request.title}");
+      debugPrint("${request.id}: ${request.title}");
     }
   }
 
   Future<void> clearAll() async {
     await flutterLocalNotificationsPlugin.cancelAll();
-    var pendingNotificationRequests =
+    final pendingNotificationRequests =
         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
-    print(
+    debugPrint(
         "after clear all: pendingNotificationRequests count: ${pendingNotificationRequests.length}");
     for (PendingNotificationRequest request in pendingNotificationRequests) {
-      print("${request.id}: ${request.title}");
+      debugPrint("${request.id}: ${request.title}");
     }
   }
 
@@ -127,9 +139,10 @@ class NotificationService {
   }
 
   Future<bool?> checkAndAskForPermission(BuildContext context) async {
-    var result = await _requestPlatformPermissions();
+    final result = await _requestPlatformPermissions();
 
-    print("Notification permission result: $result");
+    debugPrint("Notification permission result: $result");
+    if (!context.mounted) return result;
 
     if (result != null) {
       if (result == false) {
@@ -187,16 +200,22 @@ class NotificationService {
     );
   }
 
-  void scheduleNotification(BuildContext context, Note note, Reminder reminder) {
-    print(reminder);
-    NotificationService().scheduleNotifications(
+  void scheduleNotification(
+      BuildContext context, Note note, Reminder reminder) {
+    debugPrint('$reminder');
+    scheduleNotifications(
         id: reminder.reminderId,
         title: S.of(context).Onlynote,
-        body: S.of(context).Reminder + ": " + (note.title ?? ""),
+        body: '${S.of(context).Reminder}: ${note.title ?? ""}',
         time: reminder.reminderDate);
   }
 
-  Future<void> scheduleNotifications({id, title, body, time}) async {
+  Future<void> scheduleNotifications({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime time,
+  }) async {
     try {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
@@ -204,7 +223,8 @@ class NotificationService {
         body: body,
         scheduledDate: tz.TZDateTime.from(time, tz.local),
         notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails('your channel id', 'your channel name',
+            android: AndroidNotificationDetails(
+                'your channel id', 'your channel name',
                 channelDescription: 'your channel description')),
         // Inexact avoids needing the restricted SCHEDULE_EXACT_ALARM /
         // USE_EXACT_ALARM permission on Android 12+ — fine for a note
@@ -212,12 +232,12 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     } catch (e) {
-      print(e);
+      debugPrint('$e');
     }
   }
 
   Future<bool> isNotificationOpen() async {
-    var pendingNotificationRequests =
+    final pendingNotificationRequests =
         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
     return pendingNotificationRequests.isNotEmpty;
   }

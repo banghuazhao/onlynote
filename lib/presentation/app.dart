@@ -9,7 +9,7 @@ import 'routes/routes.dart';
 import 'theme/theme.dart';
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   AppRouter get _router => getIt<AppRouter>();
 
@@ -41,7 +41,6 @@ class App extends StatelessWidget {
       supportedLocales: S.delegate.supportedLocales,
       // 插件目前不完善手动处理简繁体
       localeResolutionCallback: (locale, supportLocales) {
-        print(locale);
         // 中文 简繁体处理
         if (locale?.languageCode == 'zh') {
           if (locale?.scriptCode == 'Hant') {

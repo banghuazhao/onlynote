@@ -1,16 +1,12 @@
-import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/common/constants.dart';
-import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/toast.dart';
-import 'package:onlynote/presentation/routes/routes.dart';
-
-export 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'add_update_bloc.freezed.dart';
 part 'add_update_event.dart';

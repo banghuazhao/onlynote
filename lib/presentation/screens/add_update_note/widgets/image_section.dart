@@ -1,7 +1,7 @@
 part of '../add_update_note_screen.dart';
 
 class _BuildImageSection extends StatelessWidget {
-  const _BuildImageSection({Key? key, required this.state}) : super(key: key);
+  const _BuildImageSection({required this.state});
   final AddUpdateFormState state;
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
@@ -82,8 +82,7 @@ class _BuildImageSection extends StatelessWidget {
 }
 
 class _ImageThumbnail extends StatelessWidget {
-  const _ImageThumbnail({Key? key, required this.path, required this.onRemove})
-      : super(key: key);
+  const _ImageThumbnail({required this.path, required this.onRemove});
   final String path;
   final VoidCallback onRemove;
 

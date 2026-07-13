@@ -23,7 +23,8 @@ class UpdateNoteUsecase {
 
       if (!noteDto.validNote) {
         return left(
-          NoteError(message: _i10n.Failed_to_update_note_Title_should_not_empty),
+          NoteError(
+              message: _i10n.Failed_to_update_note_Title_should_not_empty),
         );
       }
 
@@ -32,7 +33,7 @@ class UpdateNoteUsecase {
     } catch (e) {
       return left(
         NoteError(
-          message: _i10n.Failed_to_Update_note_please_try_again + '\nError: $e',
+          message: '${_i10n.Failed_to_Update_note_please_try_again}\nError: $e',
         ),
       );
     }

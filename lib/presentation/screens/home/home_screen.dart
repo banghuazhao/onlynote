@@ -1,8 +1,6 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:focus_detector/focus_detector.dart';
@@ -11,13 +9,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/share_helper.dart';
-import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
-import 'package:onlynote/presentation/routes/routes.dart';
-import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -31,10 +26,10 @@ import 'widgets/note_card.dart';
 
 @RoutePage(name: 'HomeRoute')
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -48,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _setReorderMode(bool value) => setState(() => _isReorderMode = value);
 
   @override
-  initState() {
+  void initState() {
     super.initState();
 
     PurchaseService.instance.addListener(_entitlementChanged);
@@ -57,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_adLoadStarted && !PurchaseService.instance.isAdsRemoved) {
+    if (!_adLoadStarted && PurchaseService.instance.shouldShowAds) {
       _adLoadStarted = true;
       _loadAd();
     }
@@ -66,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadAd() async {
     final width = MediaQuery.sizeOf(context).width.truncate();
     final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
-    if (!mounted || size == null || PurchaseService.instance.isAdsRemoved) {
+    if (!mounted || size == null || !PurchaseService.instance.shouldShowAds) {
       return;
     }
     _adSize = size;
@@ -76,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (_) {
-          if (mounted && !PurchaseService.instance.isAdsRemoved) {
+          if (mounted && PurchaseService.instance.shouldShowAds) {
             setState(() => _isAdLoaded = true);
           } else {
             _disposeAd();
@@ -87,7 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ad.dispose();
           if (mounted) setState(() => _adSize = null);
 
-          print('Ad load failed (code=${error.code} message=${error.message})');
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
         },
       ),
     );
@@ -96,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _entitlementChanged() {
-    if (PurchaseService.instance.isAdsRemoved) _disposeAd();
+    if (!PurchaseService.instance.shouldShowAds) _disposeAd();
   }
 
   void _disposeAd() {
@@ -150,8 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         children: [
                           Text(
-                            S.of(context).Delete +
-                                ' - ${selectedNotes.selectedIds.length}',
+                            '${S.of(context).Delete} - ${selectedNotes.selectedIds.length}',
                             style: Theme.of(context).textTheme.labelLarge,
                           ),
                           const SizedBox(width: AppSpacings.xl),
@@ -223,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           )),
-          if (_adSize != null && !PurchaseService.instance.isAdsRemoved)
+          if (_adSize != null && PurchaseService.instance.shouldShowAds)
             Semantics(
               label: 'Advertisement',
               container: true,
@@ -292,8 +287,13 @@ class _HomeError extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.note_alt_outlined,
-                size: 64, color: context.colors.error),
+            Image.asset(
+              'assets/empty_notes.png',
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
+            ),
             SizedBox(height: context.tokens.space4),
             ErrorText(message),
           ],
@@ -305,18 +305,17 @@ class _HomeError extends StatelessWidget {
 
 class _BuildNotesList extends StatefulWidget {
   const _BuildNotesList({
-    Key? key,
     required this.notes,
     required this.isReorderMode,
     required this.onEnterReorderMode,
-  }) : super(key: key);
+  });
 
   final List<Note> notes;
   final bool isReorderMode;
   final VoidCallback onEnterReorderMode;
 
   @override
-  __BuildNotesListState createState() => __BuildNotesListState();
+  State<_BuildNotesList> createState() => __BuildNotesListState();
 }
 
 class __BuildNotesListState extends State<_BuildNotesList> {
@@ -330,14 +329,14 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       _cardKeys.putIfAbsent(noteId, () => GlobalKey());
 
   void viewWillAppear() {
-    print("onResume / viewWillAppear / onFocusGained");
+    debugPrint("onResume / viewWillAppear / onFocusGained");
     if (mounted) {
       setState(() {});
     }
   }
 
   void viewWillDisappear() {
-    print("onPause / viewWillDisappear / onFocusLost");
+    debugPrint("onPause / viewWillDisappear / onFocusLost");
   }
 
   Future<void> _shareNote(
@@ -474,6 +473,11 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     MultipleDeleteBloc multipleDeleteBloc,
     int crossAxisCount,
   ) {
+    final isSelectionMode = multipleDeleteBloc.state.maybeMap(
+      selected: (_) => true,
+      orElse: () => false,
+    );
+
     return MasonryGridView.count(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacings.xl,
@@ -491,6 +495,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             child: NoteCard(
               note: note,
               selected: multipleDeleteBloc.isSelected(noteId),
+              selectionMode: isSelectionMode,
               screenshotController: _screenshotControllerFor(noteId),
               onTap: () {
                 multipleDeleteBloc.state.maybeMap(
@@ -556,7 +561,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
 /// (todos, images, reminders) can vary a lot in height, which is exactly
 /// what the normal masonry layout is built to absorb.
 class _ReorderableNoteTile extends StatelessWidget {
-  const _ReorderableNoteTile({Key? key, required this.note}) : super(key: key);
+  const _ReorderableNoteTile({super.key, required this.note});
   final Note note;
 
   @override

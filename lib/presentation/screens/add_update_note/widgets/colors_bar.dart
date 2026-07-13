@@ -1,8 +1,7 @@
 part of '../add_update_note_screen.dart';
 
 class ColorsBar extends StatelessWidget {
-  const ColorsBar({Key? key, this.selectedColor, required this.onChanged})
-      : super(key: key);
+  const ColorsBar({super.key, this.selectedColor, required this.onChanged});
   final Color? selectedColor;
   final Function(Color color) onChanged;
 
@@ -44,11 +43,10 @@ class ColorsBar extends StatelessWidget {
 
 class _ColorBox extends StatelessWidget {
   const _ColorBox({
-    Key? key,
     this.isSelected = false,
     this.onTap,
     required this.color,
-  }) : super(key: key);
+  });
 
   final bool isSelected;
   final Color color;

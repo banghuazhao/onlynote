@@ -1,12 +1,10 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
-import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/toast.dart';
-import 'package:onlynote/presentation/routes/routes.dart';
 
 part 'note_action_bloc.freezed.dart';
 part 'note_action_event.dart';
@@ -25,7 +23,9 @@ class NoteActionBloc extends Bloc<NoteActionEvent, NoteActionState> {
       failureOrSuccess.fold(
         (failure) {
           emit(NoteActionState.deleteFailure(message: failure.message));
-          getIt<AppRouter>().context.showToast('${failure.message}', isError: true);
+          getIt<AppRouter>()
+              .context
+              .showToast('${failure.message}', isError: true);
         },
         (success) {
           emit(const NoteActionState.deleteSuccess());
@@ -35,5 +35,6 @@ class NoteActionBloc extends Bloc<NoteActionEvent, NoteActionState> {
       );
     });
   }
+
   final DeleteNoteUsecase _usecase;
 }

@@ -97,6 +97,7 @@ class PurchaseService extends ChangeNotifier {
   PurchaseState _state = PurchaseState.idle;
 
   bool get isAdsRemoved => _isAdsRemoved;
+  bool get shouldShowAds => !_isAdsRemoved;
   ProductDetails? get removeAdsProduct => _removeAdsProduct;
   String? get localizedPrice => _removeAdsProduct?.price;
   PurchaseState get state => _state;

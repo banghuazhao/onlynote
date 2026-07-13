@@ -24,7 +24,8 @@ class Note with _$Note {
   String get date => dateTime != null ? _formatter.format(dateTime!) : '';
 
   final DateFormat _formatter1 = DateFormat('MMMM dd, yyyy  h:m a');
-  String get dateWithTime => dateTime != null ? _formatter1.format(dateTime!) : '';
+  String get dateWithTime =>
+      dateTime != null ? _formatter1.format(dateTime!) : '';
 
   bool get hasTodo => todo.isNotEmpty;
 
@@ -42,10 +43,10 @@ class Todo with _$Todo {
   }) = _Todo;
 
   factory Todo.empty() {
-    const _uuid = Uuid();
+    const uuid = Uuid();
 
     return Todo(
-      id: _uuid.v4(),
+      id: uuid.v4(),
       title: '',
       completed: false,
     );

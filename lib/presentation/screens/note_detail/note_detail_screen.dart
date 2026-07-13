@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +15,6 @@ import 'package:onlynote/common/extension/random.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
-import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:screenshot/screenshot.dart';
@@ -26,8 +24,8 @@ import 'bloc/detail/note_detail_bloc.dart';
 
 @RoutePage(name: 'NoteDetailRoute')
 class NoteDetailScreen extends StatefulWidget {
-  const NoteDetailScreen({Key? key, @PathParam('noteId') required this.noteId})
-      : super(key: key);
+  const NoteDetailScreen(
+      {super.key, @PathParam('noteId') required this.noteId});
   final String noteId;
 
   @override
@@ -196,6 +194,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         title: S.of(context).Delete_Note_Confirm_Title,
                         message: S.of(context).Delete_Note_Confirm_Message,
                       );
+                      if (!context.mounted) return;
                       if (!confirmed) return;
 
                       Reminder? currentReminder =
@@ -231,11 +230,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
 class LoadedView extends StatelessWidget {
   const LoadedView({
-    Key? key,
+    super.key,
     required this.note,
     required this.screenshotController,
     required this.onReminderTap,
-  }) : super(key: key);
+  });
 
   final Note note;
   final ScreenshotController screenshotController;
@@ -254,73 +253,75 @@ class LoadedView extends StatelessWidget {
             //* Everything inside here is captured when sharing the note as an image.
             Screenshot(
               controller: screenshotController,
-              child: Container(
+              child: Material(
                 color: note.color ?? Colors.white,
-                padding: const EdgeInsets.all(AppSpacings.l),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    //* Show Note Title
-                    if (note.title?.isNotEmpty == true) ...[
-                      SelectableText(note.title!,
-                          style: AppTypography.headline3),
-                      const SizedBox(height: AppSpacings.l),
-                    ],
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacings.l),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      //* Show Note Title
+                      if (note.title?.isNotEmpty == true) ...[
+                        SelectableText(note.title!,
+                            style: AppTypography.headline3),
+                        const SizedBox(height: AppSpacings.l),
+                      ],
 
-                    //* Show Note Update/Add time
-                    SelectableText(
-                      note.dateWithTime,
-                      style: AppTypography.description
-                          .copyWith(color: Colors.black87),
-                    ),
+                      //* Show Note Update/Add time
+                      SelectableText(
+                        note.dateWithTime,
+                        style: AppTypography.description
+                            .copyWith(color: Colors.black87),
+                      ),
 
-                    //* Show reminder time, only if one is actually set.
-                    if (currentReminder != null) ...{
-                      const SizedBox(height: AppSpacings.m),
-                      InkWell(
-                        borderRadius:
-                            BorderRadius.circular(context.tokens.radiusSmall),
-                        onTap: onReminderTap,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: context.tokens.space2),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.alarm,
-                                  size: 16, color: Colors.black87),
-                              const SizedBox(width: AppSpacings.s),
-                              Text(
-                                currentReminder.timeString,
-                                style: AppTypography.description
-                                    .copyWith(color: Colors.black87),
-                              ),
-                            ],
+                      //* Show reminder time, only if one is actually set.
+                      if (currentReminder != null) ...{
+                        const SizedBox(height: AppSpacings.m),
+                        InkWell(
+                          borderRadius:
+                              BorderRadius.circular(context.tokens.radiusSmall),
+                          onTap: onReminderTap,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: context.tokens.space2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.alarm,
+                                    size: 16, color: Colors.black87),
+                                const SizedBox(width: AppSpacings.s),
+                                Text(
+                                  currentReminder.timeString,
+                                  style: AppTypography.description
+                                      .copyWith(color: Colors.black87),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                      },
+                      const SizedBox(height: AppSpacings.xxl),
+
+                      //* Show todo's list if any
+                      if (note.hasTodo) ...{
+                        _BuildTodoList(todoList: note.todo),
+                        const SizedBox(height: AppSpacings.xxl),
+                      },
+
+                      //* Note Description
+                      SelectableText(
+                        note.description ?? '',
+                        style: AppTypography.headline6,
                       ),
-                    },
-                    const SizedBox(height: AppSpacings.xxl),
 
-                    //* Show todo's list if any
-                    if (note.hasTodo) ...{
-                      _BuildTodoList(todoList: note.todo),
-                      const SizedBox(height: AppSpacings.xxl),
-                    },
-
-                    //* Note Description
-                    SelectableText(
-                      note.description ?? '',
-                      style: AppTypography.headline6,
-                    ),
-
-                    //* Attached photos, if any
-                    if (note.hasImages) ...{
-                      const SizedBox(height: AppSpacings.xxl),
-                      _BuildImageGallery(imagePaths: note.imagePaths),
-                    },
-                  ],
+                      //* Attached photos, if any
+                      if (note.hasImages) ...{
+                        const SizedBox(height: AppSpacings.xxl),
+                        _BuildImageGallery(imagePaths: note.imagePaths),
+                      },
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -332,7 +333,7 @@ class LoadedView extends StatelessWidget {
 }
 
 class _BuildTodoList extends StatelessWidget {
-  const _BuildTodoList({Key? key, required this.todoList}) : super(key: key);
+  const _BuildTodoList({required this.todoList});
   final List<Todo> todoList;
 
   @override
@@ -403,8 +404,7 @@ class _BuildTodoList extends StatelessWidget {
 }
 
 class _BuildImageGallery extends StatelessWidget {
-  const _BuildImageGallery({Key? key, required this.imagePaths})
-      : super(key: key);
+  const _BuildImageGallery({required this.imagePaths});
   final List<String> imagePaths;
 
   void _openFullScreen(BuildContext context, int initialIndex) {
@@ -478,10 +478,9 @@ class _DetailSkeleton extends StatelessWidget {
 
 class _FullScreenImageViewer extends StatelessWidget {
   const _FullScreenImageViewer({
-    Key? key,
     required this.imagePaths,
     required this.initialIndex,
-  }) : super(key: key);
+  });
 
   final List<String> imagePaths;
   final int initialIndex;

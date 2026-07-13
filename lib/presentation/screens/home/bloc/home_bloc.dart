@@ -1,8 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
-import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -44,8 +43,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final failureOrSuccess = await _addNoteUsecase(duplicated);
 
       failureOrSuccess.fold(
-        (error) => getIt<AppRouter>().context.showToast('${error.message}', isError: true),
-        (_) => getIt<AppRouter>().context.showToast(_i10n.Note_Duplicated_Successfully),
+        (error) => getIt<AppRouter>()
+            .context
+            .showToast('${error.message}', isError: true),
+        (_) => getIt<AppRouter>()
+            .context
+            .showToast(_i10n.Note_Duplicated_Successfully),
       );
     });
 
@@ -57,7 +60,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final failureOrSuccess = await _reorderNotesUsecase(event.notes);
 
       failureOrSuccess.fold(
-        (error) => getIt<AppRouter>().context.showToast('${error.message}', isError: true),
+        (error) => getIt<AppRouter>()
+            .context
+            .showToast('${error.message}', isError: true),
         (_) => null,
       );
     });

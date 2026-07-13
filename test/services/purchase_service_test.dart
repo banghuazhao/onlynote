@@ -32,6 +32,7 @@ void main() {
     await service.init();
 
     expect(service.isSupported, isFalse);
+    expect(service.shouldShowAds, isTrue);
     expect(store.availabilityChecks, 0);
     expect(store.restoreCalls, 0);
     service.dispose();
@@ -48,6 +49,7 @@ void main() {
 
     expect(service.state, PurchaseState.purchased);
     expect(service.isAdsRemoved, isTrue);
+    expect(service.shouldShowAds, isFalse);
     expect(storage.value, isTrue);
     expect(store.completedPurchases, 1);
     service.dispose();
@@ -78,6 +80,72 @@ void main() {
     expect(service.isAdsRemoved, isTrue);
     service.dispose();
   });
+
+  test('unavailable store leaves ads enabled', () async {
+    store.available = false;
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: true);
+
+    await service.init();
+
+    expect(service.state, PurchaseState.unavailable);
+    expect(service.shouldShowAds, isTrue);
+    service.dispose();
+  });
+
+  test('missing product reports unavailable without changing entitlement',
+      () async {
+    store.productAvailable = false;
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: true);
+
+    await service.init();
+
+    expect(service.state, PurchaseState.unavailable);
+    expect(service.isAdsRemoved, isFalse);
+    service.dispose();
+  });
+
+  test('pending purchase leaves entitlement and ad gate unchanged', () async {
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: true);
+    await service.init();
+
+    store.emit(_purchase(PurchaseStatus.pending));
+    await pumpEventQueue();
+
+    expect(service.state, PurchaseState.pending);
+    expect(service.isAdsRemoved, isFalse);
+    expect(service.shouldShowAds, isTrue);
+    service.dispose();
+  });
+
+  test('purchase failure leaves entitlement and ad gate unchanged', () async {
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: true);
+    await service.init();
+
+    store.emit(_purchase(PurchaseStatus.error));
+    await pumpEventQueue();
+
+    expect(service.state, PurchaseState.failed);
+    expect(service.isAdsRemoved, isFalse);
+    expect(service.shouldShowAds, isTrue);
+    service.dispose();
+  });
+
+  test('restore with no transaction reports nothing to restore', () async {
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: true);
+    await service.init();
+
+    await service.restorePurchases();
+
+    expect(service.state, PurchaseState.nothingToRestore);
+    expect(service.isAdsRemoved, isFalse);
+    expect(store.restoreCalls, 2);
+    service.dispose();
+  });
 }
 
 PurchaseDetails _purchase(PurchaseStatus status) => PurchaseDetails(
@@ -105,6 +173,7 @@ class MemoryEntitlementStorage implements EntitlementStorage {
 class FakePurchaseStore implements PurchaseStore {
   final _controller = StreamController<List<PurchaseDetails>>.broadcast();
   bool available = true;
+  bool productAvailable = true;
   int availabilityChecks = 0;
   int restoreCalls = 0;
   int completedPurchases = 0;
@@ -132,7 +201,10 @@ class FakePurchaseStore implements PurchaseStore {
   @override
   Future<ProductDetailsResponse> queryProductDetails(
           Set<String> identifiers) async =>
-      ProductDetailsResponse(productDetails: [product], notFoundIDs: const []);
+      ProductDetailsResponse(
+        productDetails: productAvailable ? [product] : const [],
+        notFoundIDs: productAvailable ? const [] : [removeAdsProductId],
+      );
 
   @override
   Future<bool> buyNonConsumable(PurchaseParam purchaseParam) async => true;

@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -11,7 +11,8 @@ part 'note_detail_state.dart';
 
 @injectable
 class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
-  NoteDetailBloc(this._usecase, this._updateUsecase) : super(const NoteDetailState.initial()) {
+  NoteDetailBloc(this._usecase, this._updateUsecase)
+      : super(const NoteDetailState.initial()) {
     //* show note detail
     on<_ShowNote>((event, emit) async {
       emit(const NoteDetailState.loading());
@@ -48,7 +49,9 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
         final failureOrSuccess = await _updateUsecase(updatedNote);
         failureOrSuccess.fold(
           (error) {
-            getIt<AppRouter>().context.showToast('${error.message}', isError: true);
+            getIt<AppRouter>()
+                .context
+                .showToast('${error.message}', isError: true);
           },
           (_) => emit(state.copyWith(note: updatedNote)),
         );

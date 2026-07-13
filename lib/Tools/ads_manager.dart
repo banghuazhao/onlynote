@@ -31,7 +31,7 @@ class AdsManager {
         return AdIdsRelease.bannerAdUnitIdIOS;
       }
     } else {
-      throw new UnsupportedError("Unsupported platform");
+      throw UnsupportedError("Unsupported platform");
     }
   }
 
@@ -64,7 +64,9 @@ class AdsManager {
   // }
 
   static void debugPrintID() {
-    print("bannerAdUnitId: ${AdsManager.bannerAdUnitId}");
+    if (kDebugMode) {
+      debugPrint("bannerAdUnitId: ${AdsManager.bannerAdUnitId}");
+    }
     // print("openAdUnitID: ${AdsManager.openAdUnitID}");
   }
 }

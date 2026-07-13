@@ -1,11 +1,12 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
-import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
+import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
+    show AddUpdateBloc, AddUpdateEvent;
 
 part 'add_update_form_bloc.freezed.dart';
 part 'add_update_form_event.dart';
@@ -121,7 +122,8 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
     });
 
     on<_RemoveImage>((event, emit) async {
-      final imagePaths = List<String>.from(state.imagePaths)..remove(event.path);
+      final imagePaths = List<String>.from(state.imagePaths)
+        ..remove(event.path);
       emit(state.copyWith(imagePaths: imagePaths));
       await ImageStorage.deleteImages([event.path]);
     });

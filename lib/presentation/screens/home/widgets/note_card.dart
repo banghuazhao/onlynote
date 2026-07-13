@@ -15,16 +15,18 @@ import 'package:screenshot/screenshot.dart';
 
 class NoteCard extends StatefulWidget {
   const NoteCard({
-    Key? key,
+    super.key,
     required this.note,
     this.selected = false,
+    this.selectionMode = false,
     this.onLongPress,
     this.onTap,
     this.screenshotController,
-  }) : super(key: key);
+  });
 
   final Note note;
   final bool selected;
+  final bool selectionMode;
   final Function()? onLongPress;
   final Function()? onTap;
 
@@ -112,106 +114,92 @@ class _NoteCardState extends State<NoteCard> {
               children: [
                 Screenshot(
                   controller: _screenshotController,
-                  child: Container(
+                  child: Material(
                     color: note.color ?? Theme.of(context).colorScheme.surface,
-                    padding: const EdgeInsets.all(AppSpacings.l),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (headlineText.isNotEmpty) ...[
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacings.l),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (headlineText.isNotEmpty) ...[
+                            Text(
+                              headlineText,
+                              style: AppTypography.cardTitle,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 4,
+                            ),
+                            const SizedBox(height: AppSpacings.m),
+                          ],
                           Text(
-                            headlineText,
-                            style: AppTypography.cardTitle,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 4,
-                          ),
-                          const SizedBox(height: AppSpacings.m),
-                        ],
-                        Text(
-                          note.date,
-                          style: AppTypography.description
-                              .copyWith(color: Colors.black87),
-                        ),
-                        if (currentReminder != null)
-                          const SizedBox(height: AppSpacings.m),
-                        if (currentReminder != null)
-                          Text(
-                            "⏰ " + currentReminder.timeString,
+                            note.date,
                             style: AppTypography.description
                                 .copyWith(color: Colors.black87),
                           ),
-                        const SizedBox(height: AppSpacings.m),
-                        if (note.hasTodo) ...{
-                          _BuildTodoList(todoList: note.todo.take(2).toList()),
-                        },
-                        if (note.hasImages) ...{
-                          const SizedBox(height: AppSpacings.m),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(AppSpacings.m),
-                            child: Image.file(
-                              File(ImageStorage.resolvePath(
-                                  note.imagePaths.first)),
-                              width: 64,
-                              height: 64,
-                              fit: BoxFit.cover,
+                          if (currentReminder != null)
+                            const SizedBox(height: AppSpacings.m),
+                          if (currentReminder != null)
+                            Text(
+                              '⏰ ${currentReminder.timeString}',
+                              style: AppTypography.description
+                                  .copyWith(color: Colors.black87),
                             ),
-                          ),
-                        },
-                      ],
+                          const SizedBox(height: AppSpacings.m),
+                          if (note.hasTodo) ...{
+                            _BuildTodoList(
+                                todoList: note.todo.take(2).toList()),
+                          },
+                          if (note.hasImages) ...{
+                            const SizedBox(height: AppSpacings.m),
+                            ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(AppSpacings.m),
+                              child: Image.file(
+                                File(ImageStorage.resolvePath(
+                                    note.imagePaths.first)),
+                                width: 64,
+                                height: 64,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          },
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                if (widget.selected)
-                  Align(
-                    alignment: Alignment.topRight,
-                    heightFactor: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 10,
-                            spreadRadius: 20,
-                            color: note.color ?? AppColors.primary,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Material(
+                    key: widget.selectionMode ? null : _shareButtonKey,
+                    color: widget.selected
+                        ? AppColors.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .scrim
+                            .withValues(alpha: 0.08),
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: widget.selectionMode
+                          ? widget.onTap
+                          : _shareNoteAsImage,
+                      child: SizedBox.square(
+                        dimension: 36,
                         child: Icon(
-                          Icons.check,
-                          color: note.color,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Material(
-                      key: _shareButtonKey,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .scrim
-                          .withValues(alpha: 0.08),
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: _shareNoteAsImage,
-                        child: const SizedBox.square(
-                          dimension: 48,
-                          child: Icon(
-                            Icons.share_outlined,
-                            size: 20,
-                          ),
+                          widget.selectionMode
+                              ? widget.selected
+                                  ? Icons.check_rounded
+                                  : Icons.check_circle_outline_rounded
+                              : Icons.share_outlined,
+                          size: 18,
+                          color: widget.selected ? Colors.white : null,
                         ),
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
@@ -222,7 +210,7 @@ class _NoteCardState extends State<NoteCard> {
 }
 
 class _BuildTodoList extends StatelessWidget {
-  const _BuildTodoList({Key? key, required this.todoList}) : super(key: key);
+  const _BuildTodoList({required this.todoList});
   final List<Todo> todoList;
 
   @override

@@ -35,8 +35,6 @@ class MoreAppsPage extends StatelessWidget {
         _MoreAppItem('relaxing_up', S.of(context).Relaxing_Up, '1618712178',
             'com.appsbay.relaxing_up'),
         _MoreAppItem('image_guru', S.of(context).Image_Guru, '1625021625', ''),
-        _MoreAppItem('mint_translate', S.of(context).Mint_Translate,
-            '1638456603', 'com.appsbay.mint_translate'),
         _MoreAppItem('yes_habit', S.of(context).Yes_Habit, '1637643734', ''),
         _MoreAppItem('we_play_piano', S.of(context).We_Play_Piano, '1625018611',
             'com.appsbay.we_play_piano'),
@@ -44,8 +42,6 @@ class MoreAppsPage extends StatelessWidget {
             '1621899572', 'com.appsbay.classic_minesweeper'),
         _MoreAppItem('metronome_go', S.of(context).Metronome_Go, '1635462172',
             'com.appsbay.metronome_go'),
-        _MoreAppItem('instant_face', S.of(context).Instant_Face, '1638563222',
-            'com.appsbay.instant_face'),
         _MoreAppItem('world_weather_live', S.of(context).World_Weather_Live,
             '1612773646', 'com.appsbay.world_weather_live'),
         _MoreAppItem(

@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
 class ErrorText extends StatelessWidget {
-  const ErrorText(this.message, {Key? key}) : super(key: key);
+  const ErrorText(this.message, {super.key});
   final String message;
 
   @override

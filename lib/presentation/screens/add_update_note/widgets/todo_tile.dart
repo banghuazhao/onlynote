@@ -2,9 +2,8 @@ part of '../add_update_note_screen.dart';
 
 class _AddTodoTile extends StatelessWidget {
   const _AddTodoTile({
-    Key? key,
     required this.onAdd,
-  }) : super(key: key);
+  });
 
   final VoidCallback? onAdd;
 
@@ -40,12 +39,14 @@ class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
     required this.index,
     this.value,
+    required this.focusNode,
     required this.onChanged,
     required this.onRemoved,
   });
 
   final int index;
   final String? value;
+  final FocusNode focusNode;
   final Function(String value) onChanged;
   final VoidCallback onRemoved;
 
@@ -80,6 +81,7 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
         contentPadding: EdgeInsets.symmetric(horizontal: context.tokens.space2),
         title: TextField(
           controller: todoController,
+          focusNode: widget.focusNode,
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: InputDecoration(
             isDense: true,
@@ -119,9 +121,59 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
   }
 }
 
-class _BuildTodoListField extends StatelessWidget {
-  const _BuildTodoListField({Key? key, required this.state}) : super(key: key);
+class _BuildTodoListField extends StatefulWidget {
+  const _BuildTodoListField({required this.state});
   final AddUpdateFormState state;
+
+  @override
+  State<_BuildTodoListField> createState() => _BuildTodoListFieldState();
+}
+
+class _BuildTodoListFieldState extends State<_BuildTodoListField> {
+  final Map<String, FocusNode> _focusNodes = {};
+  bool _focusNextTodo = false;
+
+  FocusNode _focusNodeFor(String todoId) =>
+      _focusNodes.putIfAbsent(todoId, FocusNode.new);
+
+  @override
+  void didUpdateWidget(covariant _BuildTodoListField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final currentIds = widget.state.todos.map((todo) => todo.id).toSet();
+    final removedIds = _focusNodes.keys
+        .where((todoId) => !currentIds.contains(todoId))
+        .toList();
+    for (final todoId in removedIds) {
+      _focusNodes.remove(todoId)?.dispose();
+    }
+
+    if (!_focusNextTodo ||
+        widget.state.todos.length <= oldWidget.state.todos.length) {
+      return;
+    }
+
+    final oldIds = oldWidget.state.todos.map((todo) => todo.id).toSet();
+    for (final todo in widget.state.todos.reversed) {
+      if (!oldIds.contains(todo.id)) {
+        final newTodoId = todo.id!;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _focusNodes[newTodoId]?.requestFocus();
+        });
+        break;
+      }
+    }
+    _focusNextTodo = false;
+  }
+
+  @override
+  void dispose() {
+    for (final focusNode in _focusNodes.values) {
+      focusNode.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +184,7 @@ class _BuildTodoListField extends StatelessWidget {
           shrinkWrap: true,
           buildDefaultDragHandles: false,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: state.todos.length,
+          itemCount: widget.state.todos.length,
           onReorderItem: (oldIndex, newIndex) {
             context.read<AddUpdateFormBloc>().add(
                   AddUpdateFormEvent.reorderTodo(
@@ -140,7 +192,7 @@ class _BuildTodoListField extends StatelessWidget {
                 );
           },
           itemBuilder: (_, index) {
-            final Todo todo = state.todos[index];
+            final Todo todo = widget.state.todos[index];
 
             Future<bool> confirmAndDelete() async {
               final confirmed = await showConfirmDialog(
@@ -148,6 +200,7 @@ class _BuildTodoListField extends StatelessWidget {
                 title: S.of(context).Delete_Todo_Confirm_Title,
                 message: S.of(context).Delete_Todo_Confirm_Message,
               );
+              if (!context.mounted) return false;
               if (confirmed) {
                 context
                     .read<AddUpdateFormBloc>()
@@ -169,6 +222,7 @@ class _BuildTodoListField extends StatelessWidget {
               child: _TodoFieldTile(
                 index: index,
                 value: todo.title,
+                focusNode: _focusNodeFor(todo.id!),
                 onChanged: (value) {
                   context.read<AddUpdateFormBloc>().add(
                         AddUpdateFormEvent.todoValueChanged(
@@ -184,6 +238,7 @@ class _BuildTodoListField extends StatelessWidget {
         ),
         _AddTodoTile(
           onAdd: () {
+            _focusNextTodo = true;
             context
                 .read<AddUpdateFormBloc>()
                 .add(const AddUpdateFormEvent.addEmptyTodo());

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/Tools/reminder.dart';
@@ -13,7 +14,8 @@ class ReminderData extends ChangeNotifier {
   static final ReminderData shared = ReminderData._privateConstructor();
 
   Future<void> _saveToStorage() async {
-    localStorage.setItem('reminders', jsonEncode(reminders.map((e) => e.toJson()).toList()));
+    localStorage.setItem(
+        'reminders', jsonEncode(reminders.map((e) => e.toJson()).toList()));
   }
 
   Future<void> addReminder(Reminder reminder) async {
@@ -31,7 +33,7 @@ class ReminderData extends ChangeNotifier {
   Future<void> modifyReminder(Reminder original, Reminder newReminder) async {
     for (int i = 0; i < reminders.length; i++) {
       if (reminders[i].reminderId == original.reminderId) {
-        print('Reminder found at $i');
+        debugPrint('Reminder found at $i');
         reminders[i] = newReminder;
         break;
       }
@@ -54,15 +56,16 @@ class ReminderData extends ChangeNotifier {
     return null;
   }
 
-  void init(item) {
-    print(item);
-    if (item != null && item.length > 0) {
+  void init(List<dynamic>? items) {
+    debugPrint('$items');
+    if (items != null && items.isNotEmpty) {
       reminders.clear();
-      for (Map e in item) {
+      for (final dynamic e in items) {
+        final reminderMap = e as Map<dynamic, dynamic>;
         reminders.add(Reminder(
-            reminderDate: DateTime.parse(e['reminderDate']),
-            reminderId: e['reminderId'],
-            noteId: e['noteId']));
+            reminderDate: DateTime.parse(reminderMap['reminderDate'] as String),
+            reminderId: reminderMap['reminderId'] as int,
+            noteId: reminderMap['noteId'] as String));
       }
     }
   }

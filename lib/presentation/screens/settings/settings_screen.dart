@@ -16,6 +16,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   PurchaseState? _shownState;
+  bool _purchaseActionStarted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +62,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 typography.setFontFamily(value);
                               }
                             },
+                          ),
+                          SizedBox(height: tokens.space3),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(tokens.space3),
+                            decoration: BoxDecoration(
+                              color: context.colors.surfaceContainerLowest,
+                              borderRadius:
+                                  BorderRadius.circular(tokens.radiusMedium),
+                            ),
+                            child: Text(
+                              'Aa  The quick brown fox jumps over the lazy dog.',
+                              style: typography.fontBuilder(
+                                textStyle: context.textStyles.bodyLarge,
+                                fontSize: 16 * typography.scale,
+                              ),
+                            ),
                           ),
                           SizedBox(height: tokens.space4),
                           Text(S.of(context).Font_Size,
@@ -117,9 +135,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         SizedBox(height: tokens.space4),
                         SectionCard(
                           title: S.of(context).Purchases,
-                          subtitle: purchase.isAdsRemoved
-                              ? S.of(context).Ads_Removed_Description
-                              : _purchaseSubtitle(context),
                           icon: Icons.workspace_premium_outlined,
                           children: [
                             ListTile(
@@ -142,7 +157,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               enabled: !purchase.isAdsRemoved &&
                                   purchase.removeAdsProduct != null &&
                                   purchase.state != PurchaseState.loading,
-                              onTap: purchase.buyRemoveAds,
+                              onTap: () =>
+                                  _runPurchaseAction(purchase.buyRemoveAds),
                             ),
                             const Divider(),
                             ListTile(
@@ -157,7 +173,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     )
                                   : const Icon(Icons.chevron_right_rounded),
                               enabled: purchase.state != PurchaseState.loading,
-                              onTap: purchase.restorePurchases,
+                              onTap: () =>
+                                  _runPurchaseAction(purchase.restorePurchases),
                             ),
                           ],
                         ),
@@ -203,6 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showPurchaseFeedback(BuildContext context) {
+    if (!_purchaseActionStarted) return;
     final state = PurchaseService.instance.state;
     if (state == _shownState ||
         state == PurchaseState.idle ||
@@ -220,6 +238,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       PurchaseState.nothingToRestore => S.of(context).Restore_Nothing,
       _ => null,
     };
+    if (state != PurchaseState.pending) {
+      _purchaseActionStarted = false;
+    }
     if (message != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -228,5 +249,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ..showSnackBar(SnackBar(content: Text(message)));
       });
     }
+  }
+
+  Future<void> _runPurchaseAction(Future<void> Function() action) async {
+    _purchaseActionStarted = true;
+    _shownState = PurchaseService.instance.state;
+    await action();
   }
 }

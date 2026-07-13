@@ -30,7 +30,7 @@ import 'presentation/screens/note_detail/bloc/action/note_action_bloc.dart';
 import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
 
-Future main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //* observe bloc logs
   Bloc.observer = MyBlocObserver();
@@ -60,11 +60,10 @@ Future main() async {
 
   await PurchaseService.instance.init();
 
-  Future.delayed(const Duration(seconds: 1), () {
-    AppTrackingTransparency.requestTrackingAuthorization();
-  });
-
-  if (!PurchaseService.instance.isAdsRemoved) {
+  if (PurchaseService.instance.shouldShowAds) {
+    Future.delayed(const Duration(seconds: 1), () {
+      AppTrackingTransparency.requestTrackingAuthorization();
+    });
     MobileAds.instance.initialize();
     AdsManager.debugPrintID();
   }

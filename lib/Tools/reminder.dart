@@ -1,7 +1,10 @@
 import 'package:intl/intl.dart';
 
 class Reminder {
-  Reminder({required this.reminderDate, required this.reminderId, required this.noteId});
+  Reminder(
+      {required this.reminderDate,
+      required this.reminderId,
+      required this.noteId});
 
   DateTime reminderDate;
   int reminderId;
@@ -13,16 +16,13 @@ class Reminder {
     return string;
   }
 
-  Map toJson() =>
-      {"reminderDate": reminderDate.toString(), "reminderId": reminderId, "noteId": noteId};
+  Map<String, Object> toJson() => {
+        "reminderDate": reminderDate.toString(),
+        "reminderId": reminderId,
+        "noteId": noteId
+      };
 
   @override
-  toString() {
-    return "name: " +
-        reminderDate.toString() +
-        ", reminderId: " +
-        reminderId.toString() +
-        ", noteId: " +
-        noteId.toString();
-  }
+  String toString() =>
+      'name: $reminderDate, reminderId: $reminderId, noteId: $noteId';
 }

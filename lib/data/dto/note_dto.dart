@@ -58,7 +58,7 @@ class NoteDto implements Comparable {
       title: note.title.clipToMaxLength(maxTitleCharCount),
       description: note.description,
       dateTime: note.dateTime?.toIso8601String(),
-      colorValue: note.color?.value,
+      colorValue: note.color?.toARGB32(),
       todoList: note.todo.map((todo) => TodoDto.fromDomain(todo)).toList(),
       imagePaths: note.imagePaths,
       sortOrder: note.sortOrder,

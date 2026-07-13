@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'colors.dart';
 import 'spacing.dart';
@@ -57,6 +58,13 @@ abstract final class AppTheme {
         backgroundColor: Colors.transparent,
         foregroundColor: scheme.onSurface,
         titleTextStyle: textTheme.titleLarge,
+        systemOverlayStyle:
+            (dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
+                .copyWith(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+          statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,

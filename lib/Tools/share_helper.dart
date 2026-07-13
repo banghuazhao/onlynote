@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -17,10 +16,12 @@ class ShareHelper {
       throw Exception('Failed to capture note image');
     }
 
-    await Share.shareXFiles(
-      [XFile.fromData(bytes, mimeType: 'image/png', name: fileName)],
-      text: text,
-      sharePositionOrigin: sharePositionOrigin,
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes, mimeType: 'image/png', name: fileName)],
+        text: text,
+        sharePositionOrigin: sharePositionOrigin,
+      ),
     );
   }
 
