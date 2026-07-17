@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:onlynote/common/exception.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -39,8 +40,11 @@ class NoteRepositoryImplementation implements NoteRepository {
   @override
   List<NoteDto> getAllNotes() {
     try {
-      final notesDto = _database.getAll().map((note) => note as NoteDto).toList();
+      final notesDto =
+          _database.getAll().map((note) => note as NoteDto).toList();
       return notesDto;
+    } on NoRecordsException {
+      return [];
     } catch (_) {
       rethrow;
     }

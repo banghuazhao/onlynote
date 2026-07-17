@@ -50,6 +50,9 @@ class NoteDto implements Comparable {
     this.todoList = const [],
     this.imagePaths = const [],
     this.sortOrder,
+    this.isPinned = false,
+    this.deletedAt,
+    this.folderId,
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -62,6 +65,9 @@ class NoteDto implements Comparable {
       todoList: note.todo.map((todo) => TodoDto.fromDomain(todo)).toList(),
       imagePaths: note.imagePaths,
       sortOrder: note.sortOrder,
+      isPinned: note.isPinned,
+      deletedAt: note.deletedAt?.toIso8601String(),
+      folderId: note.folderId,
     );
   }
 
@@ -70,11 +76,14 @@ class NoteDto implements Comparable {
       id: id,
       title: title,
       description: description,
-      dateTime: DateTime.tryParse(dateTime!),
-      color: Color(colorValue!),
+      dateTime: dateTime != null ? DateTime.tryParse(dateTime!) : null,
+      color: colorValue != null ? Color(colorValue!) : null,
       todo: todoList?.map((todo) => todo.toDomain()).toList() ?? [],
       imagePaths: imagePaths ?? [],
       sortOrder: sortOrder,
+      isPinned: isPinned ?? false,
+      deletedAt: deletedAt != null ? DateTime.tryParse(deletedAt!) : null,
+      folderId: folderId,
     );
   }
 
@@ -85,6 +94,8 @@ class NoteDto implements Comparable {
       (todoList?.isNotEmpty ?? false) ||
       (imagePaths?.isNotEmpty ?? false);
 
+  bool get isDeleted => deletedAt != null && deletedAt!.isNotEmpty;
+
   NoteDto copyWith({
     String? id,
     String? title,
@@ -94,6 +105,11 @@ class NoteDto implements Comparable {
     List<TodoDto>? todoList,
     List<String>? imagePaths,
     int? sortOrder,
+    bool? isPinned,
+    String? deletedAt,
+    String? folderId,
+    bool clearDeletedAt = false,
+    bool clearFolderId = false,
   }) {
     return NoteDto(
       id: id ?? this.id,
@@ -104,6 +120,9 @@ class NoteDto implements Comparable {
       todoList: todoList ?? this.todoList,
       imagePaths: imagePaths ?? this.imagePaths,
       sortOrder: sortOrder ?? this.sortOrder,
+      isPinned: isPinned ?? this.isPinned,
+      deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
+      folderId: clearFolderId ? null : (folderId ?? this.folderId),
     );
   }
 
@@ -123,17 +142,32 @@ class NoteDto implements Comparable {
   final List<String>? imagePaths;
   @HiveField(7)
   final int? sortOrder;
+  @HiveField(8)
+  final bool? isPinned;
+  @HiveField(9)
+  final String? deletedAt;
+  @HiveField(10)
+  final String? folderId;
 
   @override
   int compareTo(other) {
+    final NoteDto otherNote = other as NoteDto;
+
+    // Pinned notes float to the top (among non-trashed notes).
+    final pinned = isPinned ?? false;
+    final otherPinned = otherNote.isPinned ?? false;
+    if (pinned != otherPinned) {
+      return pinned ? -1 : 1;
+    }
+
     // Notes with an explicit sortOrder (user-dragged, or newly created) sort
     // by that; older notes created before this field existed fall back to
     // date-based ordering.
-    if (sortOrder != null && other.sortOrder != null) {
-      return sortOrder!.compareTo(other.sortOrder!);
+    if (sortOrder != null && otherNote.sortOrder != null) {
+      return sortOrder!.compareTo(otherNote.sortOrder!);
     }
     try {
-      final isAfter = DateTime.parse(other.dateTime).isAfter(
+      final isAfter = DateTime.parse(otherNote.dateTime!).isAfter(
         DateTime.parse(dateTime!),
       );
       return isAfter ? 1 : -1;

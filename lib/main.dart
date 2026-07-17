@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/common/constants.dart';
+import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/observer.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
@@ -21,6 +22,7 @@ import 'Tools/image_storage.dart';
 import 'Tools/in_app_reviewer_helper.dart';
 import 'Tools/locator.dart';
 import 'Tools/notification_service.dart';
+import 'Tools/onboarding_settings.dart';
 import 'Tools/reminder_data.dart';
 import 'di/di.dart';
 import 'presentation/app.dart';
@@ -42,7 +44,9 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(NoteDtoAdapter());
   Hive.registerAdapter(TodoDtoAdapter());
+  Hive.registerAdapter(FolderDtoAdapter());
   await Hive.openBox(databaseBox);
+  await Hive.openBox(folderDatabaseBox);
 
   //* Update statusbar theme
   SystemChrome.setSystemUIOverlayStyle(
@@ -56,6 +60,7 @@ Future<void> main() async {
 
   await AppTypographySettings.instance.load();
   await AppLayoutSettings.instance.load();
+  await OnboardingSettings.instance.load();
   await ImageStorage.init();
 
   await PurchaseService.instance.init();

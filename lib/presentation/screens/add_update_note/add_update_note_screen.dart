@@ -25,8 +25,9 @@ part 'widgets/todo_tile.dart';
 
 @RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
-  const AddUpdateNoteScreen({super.key, this.note});
+  const AddUpdateNoteScreen({super.key, this.note, this.folderId});
   final Note? note;
+  final String? folderId;
 
   @override
   State<AddUpdateNoteScreen> createState() => _AddUpdateNoteScreenState();
@@ -178,6 +179,7 @@ class _BuildForm extends StatelessWidget {
                 dateTime: DateTime.now(),
                 todo: state.todos,
                 imagePaths: state.imagePaths,
+                folderId: widget.folderId,
               ),
             ),
           );
@@ -193,6 +195,9 @@ class _BuildForm extends StatelessWidget {
                 todo: state.todos,
                 imagePaths: state.imagePaths,
                 sortOrder: widget.note!.sortOrder,
+                isPinned: widget.note!.isPinned,
+                folderId: widget.note!.folderId,
+                deletedAt: widget.note!.deletedAt,
               ),
               widget.note!.id!,
             ),

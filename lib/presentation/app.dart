@@ -2,16 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/onboarding_settings.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 import 'routes/routes.dart';
 import 'theme/theme.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
 
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
   AppRouter get _router => getIt<AppRouter>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!OnboardingSettings.instance.completed) {
+        _router.replaceAll([const OnboardingRoute()]);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

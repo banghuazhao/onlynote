@@ -24,6 +24,9 @@ mixin _$Note {
   List<Todo> get todo => throw _privateConstructorUsedError;
   List<String> get imagePaths => throw _privateConstructorUsedError;
   int? get sortOrder => throw _privateConstructorUsedError;
+  bool get isPinned => throw _privateConstructorUsedError;
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
+  String? get folderId => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -42,7 +45,10 @@ abstract class $NoteCopyWith<$Res> {
       DateTime? dateTime,
       List<Todo> todo,
       List<String> imagePaths,
-      int? sortOrder});
+      int? sortOrder,
+      bool isPinned,
+      DateTime? deletedAt,
+      String? folderId});
 }
 
 /// @nodoc
@@ -66,6 +72,9 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? todo = null,
     Object? imagePaths = null,
     Object? sortOrder = freezed,
+    Object? isPinned = null,
+    Object? deletedAt = freezed,
+    Object? folderId = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -100,6 +109,18 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.sortOrder
           : sortOrder // ignore: cast_nullable_to_non_nullable
               as int?,
+      isPinned: null == isPinned
+          ? _value.isPinned
+          : isPinned // ignore: cast_nullable_to_non_nullable
+              as bool,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      folderId: freezed == folderId
+          ? _value.folderId
+          : folderId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -119,7 +140,10 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       DateTime? dateTime,
       List<Todo> todo,
       List<String> imagePaths,
-      int? sortOrder});
+      int? sortOrder,
+      bool isPinned,
+      DateTime? deletedAt,
+      String? folderId});
 }
 
 /// @nodoc
@@ -140,6 +164,9 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? todo = null,
     Object? imagePaths = null,
     Object? sortOrder = freezed,
+    Object? isPinned = null,
+    Object? deletedAt = freezed,
+    Object? folderId = freezed,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -174,6 +201,18 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value.sortOrder
           : sortOrder // ignore: cast_nullable_to_non_nullable
               as int?,
+      isPinned: null == isPinned
+          ? _value.isPinned
+          : isPinned // ignore: cast_nullable_to_non_nullable
+              as bool,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      folderId: freezed == folderId
+          ? _value.folderId
+          : folderId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -189,7 +228,10 @@ class _$NoteImpl extends _Note {
       this.dateTime,
       final List<Todo> todo = const [],
       final List<String> imagePaths = const [],
-      this.sortOrder})
+      this.sortOrder,
+      this.isPinned = false,
+      this.deletedAt,
+      this.folderId})
       : _todo = todo,
         _imagePaths = imagePaths,
         super._();
@@ -224,10 +266,17 @@ class _$NoteImpl extends _Note {
 
   @override
   final int? sortOrder;
+  @override
+  @JsonKey()
+  final bool isPinned;
+  @override
+  final DateTime? deletedAt;
+  @override
+  final String? folderId;
 
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, sortOrder: $sortOrder)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId)';
   }
 
   @override
@@ -246,7 +295,13 @@ class _$NoteImpl extends _Note {
             const DeepCollectionEquality()
                 .equals(other._imagePaths, _imagePaths) &&
             (identical(other.sortOrder, sortOrder) ||
-                other.sortOrder == sortOrder));
+                other.sortOrder == sortOrder) &&
+            (identical(other.isPinned, isPinned) ||
+                other.isPinned == isPinned) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.folderId, folderId) ||
+                other.folderId == folderId));
   }
 
   @override
@@ -259,7 +314,10 @@ class _$NoteImpl extends _Note {
       dateTime,
       const DeepCollectionEquality().hash(_todo),
       const DeepCollectionEquality().hash(_imagePaths),
-      sortOrder);
+      sortOrder,
+      isPinned,
+      deletedAt,
+      folderId);
 
   @JsonKey(ignore: true)
   @override
@@ -277,7 +335,10 @@ abstract class _Note extends Note {
       final DateTime? dateTime,
       final List<Todo> todo,
       final List<String> imagePaths,
-      final int? sortOrder}) = _$NoteImpl;
+      final int? sortOrder,
+      final bool isPinned,
+      final DateTime? deletedAt,
+      final String? folderId}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -296,6 +357,12 @@ abstract class _Note extends Note {
   List<String> get imagePaths;
   @override
   int? get sortOrder;
+  @override
+  bool get isPinned;
+  @override
+  DateTime? get deletedAt;
+  @override
+  String? get folderId;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>

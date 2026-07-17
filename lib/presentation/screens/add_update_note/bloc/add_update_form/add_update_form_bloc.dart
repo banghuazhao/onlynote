@@ -53,6 +53,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          folderId: event.folderId,
+          isPinned: event.isPinned,
+          sortOrder: event.sortOrder,
         );
         _addUpdateBloc.add(AddUpdateEvent.addNote(note));
       } else {
@@ -64,6 +67,10 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          folderId: event.folderId,
+          isPinned: event.isPinned,
+          sortOrder: event.sortOrder,
+          deletedAt: event.deletedAt,
         );
         _addUpdateBloc.add(AddUpdateEvent.updateNote(note, event.id!));
       }

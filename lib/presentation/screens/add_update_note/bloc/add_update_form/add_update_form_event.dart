@@ -16,7 +16,13 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
 
   const factory AddUpdateFormEvent.colorChanged(Color value) = _ColorChanged;
 
-  const factory AddUpdateFormEvent.addOrUpdateNote({String? id}) = _AddOrUpdateNote;
+  const factory AddUpdateFormEvent.addOrUpdateNote({
+    String? id,
+    String? folderId,
+    @Default(false) bool isPinned,
+    int? sortOrder,
+    DateTime? deletedAt,
+  }) = _AddOrUpdateNote;
 
   const factory AddUpdateFormEvent.addEmptyTodo() = _AddEmptyTodo;
 

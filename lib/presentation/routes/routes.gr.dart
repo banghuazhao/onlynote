@@ -15,12 +15,14 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
   AddUpdateNoteRoute({
     Key? key,
     Note? note,
+    String? folderId,
     List<PageRouteInfo>? children,
   }) : super(
           AddUpdateNoteRoute.name,
           args: AddUpdateNoteRouteArgs(
             key: key,
             note: note,
+            folderId: folderId,
           ),
           initialChildren: children,
         );
@@ -35,6 +37,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
       return AddUpdateNoteScreen(
         key: args.key,
         note: args.note,
+        folderId: args.folderId,
       );
     },
   );
@@ -44,15 +47,18 @@ class AddUpdateNoteRouteArgs {
   const AddUpdateNoteRouteArgs({
     this.key,
     this.note,
+    this.folderId,
   });
 
   final Key? key;
 
   final Note? note;
 
+  final String? folderId;
+
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId}';
   }
 }
 
@@ -123,4 +129,23 @@ class NoteDetailRouteArgs {
   String toString() {
     return 'NoteDetailRouteArgs{key: $key, noteId: $noteId}';
   }
+}
+
+/// generated route for
+/// [OnboardingScreen]
+class OnboardingRoute extends PageRouteInfo<void> {
+  const OnboardingRoute({List<PageRouteInfo>? children})
+      : super(
+          OnboardingRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'OnboardingRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const OnboardingScreen();
+    },
+  );
 }

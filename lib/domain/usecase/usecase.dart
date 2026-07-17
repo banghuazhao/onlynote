@@ -1,7 +1,12 @@
 export 'add_note_usecase.dart';
 export 'delete_multiple_notes.dart';
 export 'delete_note_usecase.dart';
+export 'folder_usecases.dart';
 export 'get_note_usecase.dart';
+export 'move_note_to_folder_usecase.dart';
+export 'permanent_delete_notes_usecase.dart';
 export 'reorder_notes_usecase.dart';
+export 'restore_notes_usecase.dart';
 export 'show_notes_usecase.dart';
+export 'toggle_pin_usecase.dart';
 export 'update_note_usecase.dart';

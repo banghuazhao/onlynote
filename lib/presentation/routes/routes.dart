@@ -17,6 +17,7 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
+        AutoRoute(page: OnboardingRoute.page),
         AutoRoute(page: HomeRoute.page, initial: true),
         AutoRoute(path: '/notes/:noteId', page: NoteDetailRoute.page),
         AutoRoute(path: '/add-update-note', page: AddUpdateNoteRoute.page),

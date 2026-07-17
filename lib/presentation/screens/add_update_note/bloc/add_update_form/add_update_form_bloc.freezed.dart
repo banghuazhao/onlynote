@@ -24,7 +24,9 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -41,7 +43,9 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -58,7 +62,9 @@ mixin _$AddUpdateFormEvent {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -271,7 +277,9 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -291,7 +299,9 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -311,7 +321,9 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -473,7 +485,9 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -493,7 +507,9 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -513,7 +529,9 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -667,7 +685,9 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -687,7 +707,9 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -707,7 +729,9 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -861,7 +885,9 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -881,7 +907,9 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -901,7 +929,9 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -990,7 +1020,12 @@ abstract class _$$AddOrUpdateNoteImplCopyWith<$Res> {
           $Res Function(_$AddOrUpdateNoteImpl) then) =
       __$$AddOrUpdateNoteImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String? id});
+  $Res call(
+      {String? id,
+      String? folderId,
+      bool isPinned,
+      int? sortOrder,
+      DateTime? deletedAt});
 }
 
 /// @nodoc
@@ -1005,12 +1040,32 @@ class __$$AddOrUpdateNoteImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? folderId = freezed,
+    Object? isPinned = null,
+    Object? sortOrder = freezed,
+    Object? deletedAt = freezed,
   }) {
     return _then(_$AddOrUpdateNoteImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String?,
+      folderId: freezed == folderId
+          ? _value.folderId
+          : folderId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isPinned: null == isPinned
+          ? _value.isPinned
+          : isPinned // ignore: cast_nullable_to_non_nullable
+              as bool,
+      sortOrder: freezed == sortOrder
+          ? _value.sortOrder
+          : sortOrder // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -1018,14 +1073,28 @@ class __$$AddOrUpdateNoteImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
-  const _$AddOrUpdateNoteImpl({this.id});
+  const _$AddOrUpdateNoteImpl(
+      {this.id,
+      this.folderId,
+      this.isPinned = false,
+      this.sortOrder,
+      this.deletedAt});
 
   @override
   final String? id;
+  @override
+  final String? folderId;
+  @override
+  @JsonKey()
+  final bool isPinned;
+  @override
+  final int? sortOrder;
+  @override
+  final DateTime? deletedAt;
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.addOrUpdateNote(id: $id)';
+    return 'AddUpdateFormEvent.addOrUpdateNote(id: $id, folderId: $folderId, isPinned: $isPinned, sortOrder: $sortOrder, deletedAt: $deletedAt)';
   }
 
   @override
@@ -1033,11 +1102,20 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AddOrUpdateNoteImpl &&
-            (identical(other.id, id) || other.id == id));
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.folderId, folderId) ||
+                other.folderId == folderId) &&
+            (identical(other.isPinned, isPinned) ||
+                other.isPinned == isPinned) &&
+            (identical(other.sortOrder, sortOrder) ||
+                other.sortOrder == sortOrder) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id);
+  int get hashCode =>
+      Object.hash(runtimeType, id, folderId, isPinned, sortOrder, deletedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -1055,7 +1133,9 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -1063,7 +1143,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
   }) {
-    return addOrUpdateNote(id);
+    return addOrUpdateNote(id, folderId, isPinned, sortOrder, deletedAt);
   }
 
   @override
@@ -1075,7 +1155,9 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -1083,7 +1165,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
   }) {
-    return addOrUpdateNote?.call(id);
+    return addOrUpdateNote?.call(id, folderId, isPinned, sortOrder, deletedAt);
   }
 
   @override
@@ -1095,7 +1177,9 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -1105,7 +1189,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
-      return addOrUpdateNote(id);
+      return addOrUpdateNote(id, folderId, isPinned, sortOrder, deletedAt);
     }
     return orElse();
   }
@@ -1170,9 +1254,18 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
 }
 
 abstract class _AddOrUpdateNote implements AddUpdateFormEvent {
-  const factory _AddOrUpdateNote({final String? id}) = _$AddOrUpdateNoteImpl;
+  const factory _AddOrUpdateNote(
+      {final String? id,
+      final String? folderId,
+      final bool isPinned,
+      final int? sortOrder,
+      final DateTime? deletedAt}) = _$AddOrUpdateNoteImpl;
 
   String? get id;
+  String? get folderId;
+  bool get isPinned;
+  int? get sortOrder;
+  DateTime? get deletedAt;
   @JsonKey(ignore: true)
   _$$AddOrUpdateNoteImplCopyWith<_$AddOrUpdateNoteImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1222,7 +1315,9 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -1242,7 +1337,9 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -1262,7 +1359,9 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -1410,7 +1509,9 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -1430,7 +1531,9 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -1450,7 +1553,9 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -1612,7 +1717,9 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -1632,7 +1739,9 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -1652,7 +1761,9 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -1818,7 +1929,9 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -1838,7 +1951,9 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -1858,7 +1973,9 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -2014,7 +2131,9 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -2034,7 +2153,9 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -2054,7 +2175,9 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
@@ -2207,7 +2330,9 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
-    required TResult Function(String? id) addOrUpdateNote,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
     required TResult Function() addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
@@ -2227,7 +2352,9 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
-    TResult? Function(String? id)? addOrUpdateNote,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult? Function()? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
@@ -2247,7 +2374,9 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
-    TResult Function(String? id)? addOrUpdateNote,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
     TResult Function()? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,

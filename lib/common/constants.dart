@@ -35,3 +35,4 @@ const int maxTitleLinesCount = 8;
 const int todoMaxCharCount = 100;
 
 const String databaseBox = 'note_database_box';
+const String folderDatabaseBox = 'folder_database_box';

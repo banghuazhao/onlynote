@@ -9,7 +9,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/share_helper.dart';
+import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/domain/database/database.dart';
+import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
@@ -39,13 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isAdLoaded = false;
   bool _isReorderMode = false;
+  bool _isSearchVisible = false;
+  final _searchController = TextEditingController();
 
   void _setReorderMode(bool value) => setState(() => _isReorderMode = value);
 
   @override
   void initState() {
     super.initState();
-
     PurchaseService.instance.addListener(_entitlementChanged);
   }
 
@@ -78,10 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         onAdFailedToLoad: (ad, error) {
-          // Releases an ad resource when it fails to load
           ad.dispose();
           if (mounted) setState(() => _adSize = null);
-
           debugPrint(
               'Ad load failed (code=${error.code} message=${error.message})');
         },
@@ -101,150 +102,532 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted && _isAdLoaded) setState(() => _isAdLoaded = false);
   }
 
+  void _showMovedToTrashSnackBar(List<String> ids) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(S.of(context).Notes_Moved_To_Trash),
+        action: SnackBarAction(
+          label: S.of(context).Undo,
+          onPressed: () {
+            context.read<HomeBloc>().add(HomeEvent.restoreNotes(ids));
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _promptFolderName({
+    required String title,
+    String? initial,
+    required ValueChanged<String> onSubmit,
+  }) async {
+    final controller = TextEditingController(text: initial ?? '');
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(hintText: S.of(context).Folder_Name),
+            textInputAction: TextInputAction.done,
+            onSubmitted: (value) => Navigator.pop(dialogContext, value),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(S.of(context).Cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, controller.text),
+              child: Text(S.of(context).OK),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+    if (name != null && name.trim().isNotEmpty) {
+      onSubmit(name.trim());
+    }
+  }
+
   @override
   void dispose() {
     PurchaseService.instance.removeListener(_entitlementChanged);
+    _searchController.dispose();
     _ad?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: NoteAppBar(
-        autoImplementLeading: false,
-        leading: IconButton(
-          tooltip: S.of(context).Settings,
-          icon: const Icon(Icons.settings_outlined),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
-          ),
-        ),
-        title: S.of(context).notes,
-        actions: _isReorderMode
-            ? [
-                AppButton(
-                  tooltip: S.of(context).Done,
-                  child: Text(S.of(context).Done),
-                  onPressed: () => _setReorderMode(false),
-                ),
-              ]
-            : context.watch<MultipleDeleteBloc>().state.mapOrNull(
-                  initial: (selectedNotes) => [
-                    AppButton(
-                      tooltip: S.of(context).notes,
-                      child: const Icon(Icons.add),
-                      onPressed: () {
-                        context.router.push(AddUpdateNoteRoute());
-                      },
-                    ),
-                  ],
-                  selected: (selectedNotes) => [
-                    AppButton(
-                      tooltip: S.of(context).Delete,
-                      child: Row(
-                        children: [
-                          Text(
-                            '${S.of(context).Delete} - ${selectedNotes.selectedIds.length}',
-                            style: Theme.of(context).textTheme.labelLarge,
-                          ),
-                          const SizedBox(width: AppSpacings.xl),
-                          const Icon(Icons.delete_outline),
-                        ],
-                      ),
-                      onPressed: () {
-                        context
-                            .read<MultipleDeleteBloc>()
-                            .add(const MultipleDeleteEvent.delete());
-                      },
-                    ),
-                    AppButton(
-                      tooltip: S.of(context).Cancel,
-                      child: const Icon(Icons.close),
-                      onPressed: () {
-                        context
-                            .read<MultipleDeleteBloc>()
-                            .add(const MultipleDeleteEvent.clearAll());
-                      },
-                    ),
-                  ],
-                  success: (selectedNotes) => [
-                    AppButton(
-                      tooltip: S.of(context).notes,
-                      child: const Icon(Icons.add),
-                      onPressed: () {
-                        context.router.push(AddUpdateNoteRoute());
-                      },
-                    ),
-                  ],
-                  failed: (selectedNotes) => [
-                    AppButton(
-                      tooltip: S.of(context).notes,
-                      child: const Icon(Icons.add),
-                      onPressed: () {
-                        context.router.push(AddUpdateNoteRoute());
-                      },
-                    ),
-                  ],
-                ),
-      ),
-
-      //* Show available notes list
-      body: SafeArea(
-        child: Column(children: [
-          Expanded(
-              child: ValueListenableBuilder(
-            valueListenable: getIt<Database>().box.listenable(),
-            builder: (context, _, child) {
-              context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
-              return child!;
-            },
-            child: BlocBuilder<HomeBloc, HomeState>(
-              builder: (_, state) {
-                return state.maybeMap(
-                  orElse: () => const _LoadingSkeleton(),
-                  error: (error) => _HomeError(message: error.message ?? ''),
-                  loaded: (data) => data.notes.isEmpty
-                      ? _EmptyNotes(
-                          onAdd: () =>
-                              context.router.push(AddUpdateNoteRoute()))
-                      : _BuildNotesList(
-                          notes: data.notes,
-                          isReorderMode: _isReorderMode,
-                          onEnterReorderMode: () => _setReorderMode(true),
-                        ),
-                );
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MultipleDeleteBloc, MultipleDeleteState>(
+          listener: (context, state) {
+            state.mapOrNull(
+              success: (success) {
+                _showMovedToTrashSnackBar(success.deletedIds);
+                context
+                    .read<MultipleDeleteBloc>()
+                    .add(const MultipleDeleteEvent.clearAll());
               },
+            );
+          },
+        ),
+      ],
+      child: Scaffold(
+        appBar: NoteAppBar(
+          autoImplementLeading: false,
+          leading: IconButton(
+            tooltip: S.of(context).Settings,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
             ),
-          )),
-          if (_adSize != null && PurchaseService.instance.shouldShowAds)
-            Semantics(
-              label: 'Advertisement',
-              container: true,
-              child: Padding(
-                padding: EdgeInsets.only(top: context.tokens.space2),
-                child: SizedBox(
-                  width: _adSize!.width.toDouble(),
-                  height: _adSize!.height.toDouble(),
-                  child: _isAdLoaded
-                      ? AdWidget(ad: _ad!)
-                      : const SizedBox.shrink(),
+          ),
+          title: S.of(context).notes,
+          actions: _buildAppBarActions(context),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              if (_isSearchVisible) _buildSearchField(context),
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: getIt<Database>().box.listenable(),
+                  builder: (context, _, child) {
+                    context
+                        .read<HomeBloc>()
+                        .add(const HomeEvent.getAllNotes());
+                    return child!;
+                  },
+                  child: ValueListenableBuilder(
+                    valueListenable:
+                        Hive.box(folderDatabaseBox).listenable(),
+                    builder: (context, _, child) {
+                      context
+                          .read<HomeBloc>()
+                          .add(const HomeEvent.getAllNotes());
+                      return child!;
+                    },
+                    child: BlocBuilder<HomeBloc, HomeState>(
+                      builder: (_, state) {
+                        return state.maybeMap(
+                          orElse: () => const _LoadingSkeleton(),
+                          error: (error) =>
+                              _HomeError(message: error.message ?? ''),
+                          loaded: (data) => Column(
+                            children: [
+                              _FolderFilterBar(
+                                folders: data.folders,
+                                selectedFolderId: data.selectedFolderId,
+                                showTrash: data.showTrash,
+                                trashCount: data.trashCount,
+                                onSelectAll: () => context
+                                    .read<HomeBloc>()
+                                    .add(const HomeEvent.selectFolder(null)),
+                                onSelectFolder: (id) => context
+                                    .read<HomeBloc>()
+                                    .add(HomeEvent.selectFolder(id)),
+                                onShowTrash: () => context
+                                    .read<HomeBloc>()
+                                    .add(const HomeEvent.showTrash(true)),
+                                onCreateFolder: () => _promptFolderName(
+                                  title: S.of(context).New_Folder,
+                                  onSubmit: (name) => context
+                                      .read<HomeBloc>()
+                                      .add(HomeEvent.createFolder(name)),
+                                ),
+                                onRenameFolder: (folder) => _promptFolderName(
+                                  title: S.of(context).Rename_Folder,
+                                  initial: folder.name,
+                                  onSubmit: (name) =>
+                                      context.read<HomeBloc>().add(
+                                            HomeEvent.renameFolder(
+                                              folder.id,
+                                              name,
+                                            ),
+                                          ),
+                                ),
+                                onDeleteFolder: (folder) async {
+                                  final confirmed = await showConfirmDialog(
+                                    context,
+                                    title: S.of(context).Delete_Folder,
+                                    message: S
+                                        .of(context)
+                                        .Delete_Folder_Confirm_Message,
+                                  );
+                                  if (confirmed && context.mounted) {
+                                    context.read<HomeBloc>().add(
+                                          HomeEvent.deleteFolder(folder.id),
+                                        );
+                                  }
+                                },
+                              ),
+                              Expanded(
+                                child: data.notes.isEmpty
+                                    ? _EmptyNotes(
+                                        showTrash: data.showTrash,
+                                        hasSearch:
+                                            data.searchQuery.trim().isNotEmpty,
+                                        hasFolder:
+                                            data.selectedFolderId != null,
+                                        onAdd: () {
+                                          context.router.push(
+                                            AddUpdateNoteRoute(
+                                              folderId: data.selectedFolderId,
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : _BuildNotesList(
+                                        notes: data.notes,
+                                        folders: data.folders,
+                                        showTrash: data.showTrash,
+                                        isReorderMode: _isReorderMode,
+                                        onEnterReorderMode: () =>
+                                            _setReorderMode(true),
+                                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
+              if (_adSize != null && PurchaseService.instance.shouldShowAds)
+                Semantics(
+                  label: 'Advertisement',
+                  container: true,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: context.tokens.space2),
+                    child: SizedBox(
+                      width: _adSize!.width.toDouble(),
+                      height: _adSize!.height.toDouble(),
+                      child: _isAdLoaded
+                          ? AdWidget(ad: _ad!)
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget>? _buildAppBarActions(BuildContext context) {
+    if (_isReorderMode) {
+      return [
+        AppButton(
+          tooltip: S.of(context).Done,
+          child: Text(S.of(context).Done),
+          onPressed: () => _setReorderMode(false),
+        ),
+      ];
+    }
+
+    return context.watch<MultipleDeleteBloc>().state.mapOrNull(
+          initial: (_) => [
+            AppButton(
+              tooltip: S.of(context).Search_Notes,
+              child: Icon(
+                _isSearchVisible ? Icons.search_off : Icons.search,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isSearchVisible = !_isSearchVisible;
+                  if (!_isSearchVisible) {
+                    _searchController.clear();
+                    context
+                        .read<HomeBloc>()
+                        .add(const HomeEvent.searchChanged(''));
+                  }
+                });
+              },
             ),
-        ]),
+            AppButton(
+              tooltip: S.of(context).Add_Note,
+              child: const Icon(Icons.add),
+              onPressed: () {
+                final folderId = context.read<HomeBloc>().state.mapOrNull(
+                      loaded: (s) => s.showTrash ? null : s.selectedFolderId,
+                    );
+                context.router.push(AddUpdateNoteRoute(folderId: folderId));
+              },
+            ),
+          ],
+          selected: (selectedNotes) {
+            final showTrash = context.read<HomeBloc>().state.mapOrNull(
+                  loaded: (s) => s.showTrash,
+                ) ??
+                false;
+            return [
+              AppButton(
+                tooltip: showTrash
+                    ? S.of(context).Delete_Forever
+                    : S.of(context).Delete,
+                child: Row(
+                  children: [
+                    Text(
+                      '${showTrash ? S.of(context).Delete_Forever : S.of(context).Delete} - ${selectedNotes.selectedIds.length}',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    const SizedBox(width: AppSpacings.xl),
+                    Icon(
+                      showTrash
+                          ? Icons.delete_forever_outlined
+                          : Icons.delete_outline,
+                    ),
+                  ],
+                ),
+                onPressed: () async {
+                  if (showTrash) {
+                    final confirmed = await showConfirmDialog(
+                      context,
+                      title: S.of(context).Permanent_Delete_Confirm_Title,
+                      message: S.of(context).Permanent_Delete_Confirm_Message,
+                    );
+                    if (!confirmed || !context.mounted) return;
+                    context.read<HomeBloc>().add(
+                          HomeEvent.permanentDelete(selectedNotes.selectedIds),
+                        );
+                    context
+                        .read<MultipleDeleteBloc>()
+                        .add(const MultipleDeleteEvent.clearAll());
+                  } else {
+                    context
+                        .read<MultipleDeleteBloc>()
+                        .add(const MultipleDeleteEvent.delete());
+                  }
+                },
+              ),
+              if (showTrash)
+                AppButton(
+                  tooltip: S.of(context).Restore,
+                  child: const Icon(Icons.restore_outlined),
+                  onPressed: () {
+                    context.read<HomeBloc>().add(
+                          HomeEvent.restoreNotes(selectedNotes.selectedIds),
+                        );
+                    context
+                        .read<MultipleDeleteBloc>()
+                        .add(const MultipleDeleteEvent.clearAll());
+                  },
+                ),
+              AppButton(
+                tooltip: S.of(context).Cancel,
+                child: const Icon(Icons.close),
+                onPressed: () {
+                  context
+                      .read<MultipleDeleteBloc>()
+                      .add(const MultipleDeleteEvent.clearAll());
+                },
+              ),
+            ];
+          },
+          success: (_) => [
+            AppButton(
+              tooltip: S.of(context).Add_Note,
+              child: const Icon(Icons.add),
+              onPressed: () {
+                context.router.push(AddUpdateNoteRoute());
+              },
+            ),
+          ],
+          failed: (_) => [
+            AppButton(
+              tooltip: S.of(context).Add_Note,
+              child: const Icon(Icons.add),
+              onPressed: () {
+                context.router.push(AddUpdateNoteRoute());
+              },
+            ),
+          ],
+        );
+  }
+
+  Widget _buildSearchField(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacings.xl,
+        AppSpacings.s,
+        AppSpacings.xl,
+        AppSpacings.s,
+      ),
+      child: TextField(
+        controller: _searchController,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: S.of(context).Search_Notes,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _searchController.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    context
+                        .read<HomeBloc>()
+                        .add(const HomeEvent.searchChanged(''));
+                    setState(() {});
+                  },
+                ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSpacings.l),
+          ),
+          isDense: true,
+        ),
+        onChanged: (value) {
+          context.read<HomeBloc>().add(HomeEvent.searchChanged(value));
+          setState(() {});
+        },
       ),
     );
   }
 }
 
-class _EmptyNotes extends StatelessWidget {
-  const _EmptyNotes({required this.onAdd});
-  final VoidCallback onAdd;
+class _FolderFilterBar extends StatelessWidget {
+  const _FolderFilterBar({
+    required this.folders,
+    required this.selectedFolderId,
+    required this.showTrash,
+    required this.trashCount,
+    required this.onSelectAll,
+    required this.onSelectFolder,
+    required this.onShowTrash,
+    required this.onCreateFolder,
+    required this.onRenameFolder,
+    required this.onDeleteFolder,
+  });
+
+  final List<Folder> folders;
+  final String? selectedFolderId;
+  final bool showTrash;
+  final int trashCount;
+  final VoidCallback onSelectAll;
+  final ValueChanged<String> onSelectFolder;
+  final VoidCallback onShowTrash;
+  final VoidCallback onCreateFolder;
+  final ValueChanged<Folder> onRenameFolder;
+  final ValueChanged<Folder> onDeleteFolder;
 
   @override
   Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacings.xl),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacings.s),
+            child: FilterChip(
+              label: Text(S.of(context).All_Notes),
+              selected: !showTrash && selectedFolderId == null,
+              onSelected: (_) => onSelectAll(),
+            ),
+          ),
+          ...folders.map(
+            (folder) => Padding(
+              padding: const EdgeInsets.only(right: AppSpacings.s),
+              child: GestureDetector(
+                onLongPress: () => _showFolderMenu(context, folder),
+                child: FilterChip(
+                  avatar: const Icon(Icons.folder_outlined, size: 18),
+                  label: Text(folder.name),
+                  selected: !showTrash && selectedFolderId == folder.id,
+                  onSelected: (_) => onSelectFolder(folder.id),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacings.s),
+            child: ActionChip(
+              avatar: const Icon(Icons.create_new_folder_outlined, size: 18),
+              label: Text(S.of(context).New_Folder),
+              onPressed: onCreateFolder,
+            ),
+          ),
+          FilterChip(
+            avatar: const Icon(Icons.delete_outline, size: 18),
+            label: Text(
+              trashCount > 0
+                  ? '${S.of(context).Trash} ($trashCount)'
+                  : S.of(context).Trash,
+            ),
+            selected: showTrash,
+            onSelected: (_) => onShowTrash(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFolderMenu(BuildContext context, Folder folder) {
+    showAdaptiveActionSheet(
+      context: context,
+      androidBorderRadius: 30,
+      actions: <BottomSheetAction>[
+        BottomSheetAction(
+          leading: const Icon(Icons.drive_file_rename_outline),
+          title: Text(S.of(context).Rename_Folder),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            onRenameFolder(folder);
+          },
+        ),
+        BottomSheetAction(
+          leading: const Icon(Icons.delete_outline, color: Colors.red),
+          title: Text(
+            S.of(context).Delete_Folder,
+            style: const TextStyle(color: Colors.red),
+          ),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            onDeleteFolder(folder);
+          },
+        ),
+      ],
+      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
+    );
+  }
+}
+
+class _EmptyNotes extends StatelessWidget {
+  const _EmptyNotes({
+    required this.onAdd,
+    required this.showTrash,
+    required this.hasSearch,
+    required this.hasFolder,
+  });
+
+  final VoidCallback onAdd;
+  final bool showTrash;
+  final bool hasSearch;
+  final bool hasFolder;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    final message = hasSearch
+        ? l10n.No_Search_Results
+        : showTrash
+            ? l10n.Trash_Empty
+            : hasFolder
+                ? l10n.No_Notes_In_Folder
+                : l10n.No_notes_found;
+
     return Center(
       child: SingleChildScrollView(
         padding: EdgeInsets.all(context.tokens.space5),
@@ -259,15 +642,19 @@ class _EmptyNotes extends StatelessWidget {
               excludeFromSemantics: true,
             ),
             SizedBox(height: context.tokens.space4),
-            Text(S.of(context).No_notes_found,
-                textAlign: TextAlign.center,
-                style: context.textStyles.titleLarge),
-            SizedBox(height: context.tokens.space4),
-            FilledButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(S.of(context).notes),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: context.textStyles.titleLarge,
             ),
+            if (!showTrash && !hasSearch) ...[
+              SizedBox(height: context.tokens.space4),
+              FilledButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded),
+                label: Text(l10n.Add_Note),
+              ),
+            ],
           ],
         ),
       ),
@@ -306,11 +693,15 @@ class _HomeError extends StatelessWidget {
 class _BuildNotesList extends StatefulWidget {
   const _BuildNotesList({
     required this.notes,
+    required this.folders,
+    required this.showTrash,
     required this.isReorderMode,
     required this.onEnterReorderMode,
   });
 
   final List<Note> notes;
+  final List<Folder> folders;
+  final bool showTrash;
   final bool isReorderMode;
   final VoidCallback onEnterReorderMode;
 
@@ -327,17 +718,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
 
   GlobalKey _cardKeyFor(String noteId) =>
       _cardKeys.putIfAbsent(noteId, () => GlobalKey());
-
-  void viewWillAppear() {
-    debugPrint("onResume / viewWillAppear / onFocusGained");
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  void viewWillDisappear() {
-    debugPrint("onPause / viewWillDisappear / onFocusLost");
-  }
 
   Future<void> _shareNote(
     BuildContext context,
@@ -360,6 +740,41 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     }
   }
 
+  void _showMoveToFolderSheet(BuildContext context, Note note) {
+    showAdaptiveActionSheet(
+      context: context,
+      androidBorderRadius: 30,
+      actions: <BottomSheetAction>[
+        BottomSheetAction(
+          leading: const Icon(Icons.notes_outlined),
+          title: Text(S.of(context).No_Folder),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            context.read<HomeBloc>().add(
+                  HomeEvent.moveNoteToFolder(noteId: note.id!, folderId: null),
+                );
+          },
+        ),
+        ...widget.folders.map(
+          (folder) => BottomSheetAction(
+            leading: const Icon(Icons.folder_outlined),
+            title: Text(folder.name),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              context.read<HomeBloc>().add(
+                    HomeEvent.moveNoteToFolder(
+                      noteId: note.id!,
+                      folderId: folder.id,
+                    ),
+                  );
+            },
+          ),
+        ),
+      ],
+      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
+    );
+  }
+
   void _showNoteContextMenu(
     BuildContext context,
     Note note,
@@ -369,10 +784,69 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     final screenshotController = _screenshotControllerFor(noteId);
     final cardKey = _cardKeyFor(noteId);
 
+    if (widget.showTrash) {
+      showAdaptiveActionSheet(
+        context: context,
+        androidBorderRadius: 30,
+        actions: <BottomSheetAction>[
+          BottomSheetAction(
+            leading: const Icon(Icons.restore_outlined),
+            title: Text(S.of(context).Restore),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              context
+                  .read<HomeBloc>()
+                  .add(HomeEvent.restoreNotes([noteId]));
+            },
+          ),
+          BottomSheetAction(
+            leading: const Icon(Icons.delete_forever_outlined, color: Colors.red),
+            title: Text(
+              S.of(context).Delete_Forever,
+              style: const TextStyle(color: Colors.red),
+            ),
+            onPressed: (sheetContext) async {
+              Navigator.pop(sheetContext);
+              final confirmed = await showConfirmDialog(
+                context,
+                title: S.of(context).Permanent_Delete_Confirm_Title,
+                message: S.of(context).Permanent_Delete_Confirm_Message,
+              );
+              if (confirmed && context.mounted) {
+                context
+                    .read<HomeBloc>()
+                    .add(HomeEvent.permanentDelete([noteId]));
+              }
+            },
+          ),
+        ],
+        cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
+      );
+      return;
+    }
+
     showAdaptiveActionSheet(
       context: context,
       androidBorderRadius: 30,
       actions: <BottomSheetAction>[
+        BottomSheetAction(
+          leading: Icon(
+            note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+          ),
+          title: Text(note.isPinned ? S.of(context).Unpin : S.of(context).Pin),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            context.read<HomeBloc>().add(HomeEvent.togglePin(noteId));
+          },
+        ),
+        BottomSheetAction(
+          leading: const Icon(Icons.drive_file_move_outline),
+          title: Text(S.of(context).Move_To_Folder),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _showMoveToFolderSheet(context, note);
+          },
+        ),
         BottomSheetAction(
           leading: const Icon(Icons.share_outlined),
           title: Text(S.of(context).Share),
@@ -437,8 +911,9 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         final crossAxisCount =
             constraints.maxWidth >= 600 ? baseColumns + 1 : baseColumns;
         return FocusDetector(
-          onFocusGained: viewWillAppear,
-          onFocusLost: viewWillDisappear,
+          onFocusGained: () {
+            if (mounted) setState(() {});
+          },
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 280),
             switchInCurve: Curves.easeOutCubic,
@@ -452,9 +927,9 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             ),
             child: KeyedSubtree(
               key: ValueKey(
-                '${widget.isReorderMode}:${widget.notes.map((note) => note.id).join(',')}',
+                '${widget.isReorderMode}:${widget.showTrash}:${widget.notes.map((note) => '${note.id}:${note.isPinned}').join(',')}',
               ),
-              child: widget.isReorderMode
+              child: widget.isReorderMode && !widget.showTrash
                   ? _buildReorderableGrid(context, crossAxisCount)
                   : _buildMasonryGrid(
                       context,
@@ -553,13 +1028,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   }
 }
 
-/// A stripped-down note preview used only while dragging to reorder.
-///
-/// Unlike [NoteCard], this has a small, fixed amount of content (title/
-/// description headline + date) so it can safely sit in a uniform-height
-/// grid cell without risking a RenderFlex overflow — full note content
-/// (todos, images, reminders) can vary a lot in height, which is exactly
-/// what the normal masonry layout is built to absorb.
 class _ReorderableNoteTile extends StatelessWidget {
   const _ReorderableNoteTile({super.key, required this.note});
   final Note note;
@@ -586,6 +1054,11 @@ class _ReorderableNoteTile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (note.isPinned)
+              const Padding(
+                padding: EdgeInsets.only(bottom: AppSpacings.s),
+                child: Icon(Icons.push_pin, size: 16),
+              ),
             Text(
               headlineText,
               style: AppTypography.cardTitle,
@@ -604,8 +1077,6 @@ class _ReorderableNoteTile extends StatelessWidget {
   }
 }
 
-/// A shimmering placeholder grid shown while the first page of notes loads,
-/// so the app never flashes a bare "Loading.." label.
 class _LoadingSkeleton extends StatelessWidget {
   const _LoadingSkeleton();
 

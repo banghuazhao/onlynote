@@ -10,15 +10,19 @@ part 'note.freezed.dart';
 class Note with _$Note {
   Note._();
 
-  factory Note(
-      {String? id,
-      String? title,
-      String? description,
-      Color? color,
-      DateTime? dateTime,
-      @Default([]) List<Todo> todo,
-      @Default([]) List<String> imagePaths,
-      int? sortOrder}) = _Note;
+  factory Note({
+    String? id,
+    String? title,
+    String? description,
+    Color? color,
+    DateTime? dateTime,
+    @Default([]) List<Todo> todo,
+    @Default([]) List<String> imagePaths,
+    int? sortOrder,
+    @Default(false) bool isPinned,
+    DateTime? deletedAt,
+    String? folderId,
+  }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');
   String get date => dateTime != null ? _formatter.format(dateTime!) : '';
@@ -30,6 +34,8 @@ class Note with _$Note {
   bool get hasTodo => todo.isNotEmpty;
 
   bool get hasImages => imagePaths.isNotEmpty;
+
+  bool get isDeleted => deletedAt != null;
 }
 
 @freezed

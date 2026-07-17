@@ -30,7 +30,7 @@ class NoteActionBloc extends Bloc<NoteActionEvent, NoteActionState> {
         (success) {
           emit(const NoteActionState.deleteSuccess());
           getIt<AppRouter>().navigate(const HomeRoute());
-          getIt<AppRouter>().context.showToast(_i10n.Note_Deleted);
+          getIt<AppRouter>().context.showToast(_i10n.Notes_Moved_To_Trash);
         },
       );
     });

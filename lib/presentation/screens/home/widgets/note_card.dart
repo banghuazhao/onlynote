@@ -123,6 +123,10 @@ class _NoteCardState extends State<NoteCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          if (note.isPinned) ...[
+                            const Icon(Icons.push_pin, size: 16),
+                            const SizedBox(height: AppSpacings.s),
+                          ],
                           if (headlineText.isNotEmpty) ...[
                             Text(
                               headlineText,

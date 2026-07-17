@@ -442,7 +442,7 @@ mixin _$MultipleDeleteState {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) =>
       throw _privateConstructorUsedError;
@@ -451,7 +451,7 @@ mixin _$MultipleDeleteState {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) =>
       throw _privateConstructorUsedError;
@@ -460,7 +460,7 @@ mixin _$MultipleDeleteState {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) =>
@@ -554,7 +554,7 @@ class _$InitialImpl implements _Initial {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) {
     return initial();
@@ -566,7 +566,7 @@ class _$InitialImpl implements _Initial {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) {
     return initial?.call();
@@ -578,7 +578,7 @@ class _$InitialImpl implements _Initial {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
@@ -708,7 +708,7 @@ class _$SelectedImpl implements _Selected {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) {
     return selected(selectedIds);
@@ -720,7 +720,7 @@ class _$SelectedImpl implements _Selected {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) {
     return selected?.call(selectedIds);
@@ -732,7 +732,7 @@ class _$SelectedImpl implements _Selected {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
@@ -833,7 +833,7 @@ class _$DeletingImpl implements _Deleting {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) {
     return deleting();
@@ -845,7 +845,7 @@ class _$DeletingImpl implements _Deleting {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) {
     return deleting?.call();
@@ -857,7 +857,7 @@ class _$DeletingImpl implements _Deleting {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
@@ -917,6 +917,8 @@ abstract class _$$DeleteSuccessImplCopyWith<$Res> {
   factory _$$DeleteSuccessImplCopyWith(
           _$DeleteSuccessImpl value, $Res Function(_$DeleteSuccessImpl) then) =
       __$$DeleteSuccessImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<String> deletedIds});
 }
 
 /// @nodoc
@@ -926,26 +928,58 @@ class __$$DeleteSuccessImplCopyWithImpl<$Res>
   __$$DeleteSuccessImplCopyWithImpl(
       _$DeleteSuccessImpl _value, $Res Function(_$DeleteSuccessImpl) _then)
       : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? deletedIds = null,
+  }) {
+    return _then(_$DeleteSuccessImpl(
+      null == deletedIds
+          ? _value._deletedIds
+          : deletedIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$DeleteSuccessImpl implements _DeleteSuccess {
-  const _$DeleteSuccessImpl();
+  const _$DeleteSuccessImpl(final List<String> deletedIds)
+      : _deletedIds = deletedIds;
+
+  final List<String> _deletedIds;
+  @override
+  List<String> get deletedIds {
+    if (_deletedIds is EqualUnmodifiableListView) return _deletedIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_deletedIds);
+  }
 
   @override
   String toString() {
-    return 'MultipleDeleteState.success()';
+    return 'MultipleDeleteState.success(deletedIds: $deletedIds)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$DeleteSuccessImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$DeleteSuccessImpl &&
+            const DeepCollectionEquality()
+                .equals(other._deletedIds, _deletedIds));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_deletedIds));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DeleteSuccessImplCopyWith<_$DeleteSuccessImpl> get copyWith =>
+      __$$DeleteSuccessImplCopyWithImpl<_$DeleteSuccessImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -953,10 +987,10 @@ class _$DeleteSuccessImpl implements _DeleteSuccess {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) {
-    return success();
+    return success(deletedIds);
   }
 
   @override
@@ -965,10 +999,10 @@ class _$DeleteSuccessImpl implements _DeleteSuccess {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) {
-    return success?.call();
+    return success?.call(deletedIds);
   }
 
   @override
@@ -977,12 +1011,12 @@ class _$DeleteSuccessImpl implements _DeleteSuccess {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
     if (success != null) {
-      return success();
+      return success(deletedIds);
     }
     return orElse();
   }
@@ -1029,7 +1063,13 @@ class _$DeleteSuccessImpl implements _DeleteSuccess {
 }
 
 abstract class _DeleteSuccess implements MultipleDeleteState {
-  const factory _DeleteSuccess() = _$DeleteSuccessImpl;
+  const factory _DeleteSuccess(final List<String> deletedIds) =
+      _$DeleteSuccessImpl;
+
+  List<String> get deletedIds;
+  @JsonKey(ignore: true)
+  _$$DeleteSuccessImplCopyWith<_$DeleteSuccessImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -1073,7 +1113,7 @@ class _$DeleteFailureImpl implements _DeleteFailure {
     required TResult Function() initial,
     required TResult Function(List<String> selectedIds) selected,
     required TResult Function() deleting,
-    required TResult Function() success,
+    required TResult Function(List<String> deletedIds) success,
     required TResult Function() failed,
   }) {
     return failed();
@@ -1085,7 +1125,7 @@ class _$DeleteFailureImpl implements _DeleteFailure {
     TResult? Function()? initial,
     TResult? Function(List<String> selectedIds)? selected,
     TResult? Function()? deleting,
-    TResult? Function()? success,
+    TResult? Function(List<String> deletedIds)? success,
     TResult? Function()? failed,
   }) {
     return failed?.call();
@@ -1097,7 +1137,7 @@ class _$DeleteFailureImpl implements _DeleteFailure {
     TResult Function()? initial,
     TResult Function(List<String> selectedIds)? selected,
     TResult Function()? deleting,
-    TResult Function()? success,
+    TResult Function(List<String> deletedIds)? success,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
