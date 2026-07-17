@@ -22,6 +22,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(price) => "Remove ads permanently for ${price}.";
 
+  static String m1(count) => "${count} notes";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
@@ -112,12 +114,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
+    "Folder_Notes_Count": m1,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
     "Large": MessageLookupByLibrary.simpleMessage("Large"),
+    "Manage_Folders": MessageLookupByLibrary.simpleMessage("Manage Folders"),
     "Medium": MessageLookupByLibrary.simpleMessage("Medium"),
     "Metronome_Go": MessageLookupByLibrary.simpleMessage("Metronome Go"),
     "Minesweeper_Go": MessageLookupByLibrary.simpleMessage("Minesweeper Go"),
@@ -127,6 +131,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("Move to Folder"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("New Folder"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("No Folder"),
+    "No_Folders": MessageLookupByLibrary.simpleMessage(
+      "No folders yet. Create one to organize your notes.",
+    ),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
       "No notes in this folder yet.\nTap + to add one.",
     ),

@@ -7,6 +7,8 @@ import 'package:onlynote/presentation/screens/home/more_apps_page.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/purchase_service.dart';
 
+import 'manage_folders_screen.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -131,6 +133,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(height: tokens.space4),
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.folder_outlined),
+                          title: Text(S.of(context).Manage_Folders),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) => const ManageFoldersScreen(),
+                            ),
+                          ),
+                        ),
+                      ),
                       if (purchase.isSupported) ...[
                         SizedBox(height: tokens.space4),
                         SectionCard(
@@ -180,21 +196,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ],
                       SizedBox(height: tokens.space4),
-                      SectionCard(
-                        title: S.of(context).More_Apps,
-                        icon: Icons.apps_rounded,
-                        children: [
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(S.of(context).More_Apps),
-                            trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                  builder: (_) => const MoreAppsPage()),
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.apps_rounded),
+                          title: Text(S.of(context).More_Apps),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) => const MoreAppsPage(),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

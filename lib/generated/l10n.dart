@@ -405,6 +405,36 @@ class S {
     return Intl.message('Folders', name: 'Folders', desc: '', args: []);
   }
 
+  /// `Manage Folders`
+  String get Manage_Folders {
+    return Intl.message(
+      'Manage Folders',
+      name: 'Manage_Folders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No folders yet. Create one to organize your notes.`
+  String get No_Folders {
+    return Intl.message(
+      'No folders yet. Create one to organize your notes.',
+      name: 'No_Folders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} notes`
+  String Folder_Notes_Count(Object count) {
+    return Intl.message(
+      '$count notes',
+      name: 'Folder_Notes_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `New Folder`
   String get New_Folder {
     return Intl.message('New Folder', name: 'New_Folder', desc: '', args: []);

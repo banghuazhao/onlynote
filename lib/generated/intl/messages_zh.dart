@@ -22,6 +22,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m0(price) => "支付 ${price} 永久移除广告。";
 
+  static String m1(count) => "${count} 条备忘录";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Note": MessageLookupByLibrary.simpleMessage("添加备忘录"),
@@ -88,12 +90,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已删除文件夹"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("请输入文件夹名称。"),
+    "Folder_Notes_Count": m1,
     "Folders": MessageLookupByLibrary.simpleMessage("文件夹"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字体大小"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("字体样式"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("咕噜滤镜"),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
     "Large": MessageLookupByLibrary.simpleMessage("大"),
+    "Manage_Folders": MessageLookupByLibrary.simpleMessage("管理文件夹"),
     "Medium": MessageLookupByLibrary.simpleMessage("中"),
     "Metronome_Go": MessageLookupByLibrary.simpleMessage("打拍节拍器"),
     "Minesweeper_Go": MessageLookupByLibrary.simpleMessage("经典扫雷"),
@@ -103,6 +107,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("移至文件夹"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("新建文件夹"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("无文件夹"),
+    "No_Folders": MessageLookupByLibrary.simpleMessage(
+      "暂无文件夹。创建文件夹来整理备忘录。",
+    ),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
       "此文件夹暂无备忘录。\n点击 + 添加。",
     ),

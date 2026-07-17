@@ -123,33 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
     String? initial,
     required ValueChanged<String> onSubmit,
   }) async {
-    final controller = TextEditingController(text: initial ?? '');
     final name = await showDialog<String>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(title),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(hintText: S.of(context).Folder_Name),
-            textInputAction: TextInputAction.done,
-            onSubmitted: (value) => Navigator.pop(dialogContext, value),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(S.of(context).Cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, controller.text),
-              child: Text(S.of(context).OK),
-            ),
-          ],
-        );
-      },
+      builder: (_) => _FolderNameDialog(title: title, initial: initial),
     );
-    controller.dispose();
     if (name != null && name.trim().isNotEmpty) {
       onSubmit(name.trim());
     }
@@ -492,6 +469,56 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {});
         },
       ),
+    );
+  }
+}
+
+class _FolderNameDialog extends StatefulWidget {
+  const _FolderNameDialog({required this.title, this.initial});
+
+  final String title;
+  final String? initial;
+
+  @override
+  State<_FolderNameDialog> createState() => _FolderNameDialogState();
+}
+
+class _FolderNameDialogState extends State<_FolderNameDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initial ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        decoration: InputDecoration(hintText: S.of(context).Folder_Name),
+        textInputAction: TextInputAction.done,
+        onSubmitted: (value) => Navigator.pop(context, value),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(S.of(context).Cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: Text(S.of(context).OK),
+        ),
+      ],
     );
   }
 }
