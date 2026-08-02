@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/consent_gate.dart';
+import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/screens/home/more_apps_page.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/purchase_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'manage_folders_screen.dart';
 import 'widget_guide_screen.dart';
@@ -31,7 +34,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).Settings)),
       body: ListenableBuilder(
-        listenable: Listenable.merge([typography, layout, purchase]),
+        listenable: Listenable.merge(
+            [typography, layout, purchase, ConsentGate.instance]),
         builder: (context, _) {
           _showPurchaseFeedback(context);
           return ListView(
@@ -212,6 +216,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ],
                       SizedBox(height: tokens.space4),
+                      SectionCard(
+                        title: S.of(context).Privacy,
+                        icon: Icons.privacy_tip_outlined,
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.description_outlined),
+                            title: Text(S.of(context).Privacy_Policy),
+                            trailing: const Icon(Icons.open_in_new_rounded),
+                            onTap: _openPrivacyPolicy,
+                          ),
+                          // Only offered where Google reports a withdrawal path
+                          // is owed; elsewhere the form has nothing to show.
+                          if (ConsentGate.instance.isPrivacyOptionsRequired) ...[
+                            const Divider(),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(Icons.tune_rounded),
+                              title: Text(S.of(context).Privacy_Settings),
+                              subtitle: Text(
+                                  S.of(context).Privacy_Settings_Description),
+                              trailing:
+                                  const Icon(Icons.chevron_right_rounded),
+                              onTap: ConsentGate.instance.showPrivacyOptionsForm,
+                            ),
+                          ],
+                        ],
+                      ),
+                      SizedBox(height: tokens.space4),
                       Card(
                         child: ListTile(
                           leading: const Icon(Icons.apps_rounded),
@@ -234,6 +267,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _openPrivacyPolicy() async {
+    final opened = await launchUrl(
+      Uri.parse(kPrivacyPolicyUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+            SnackBar(content: Text(S.of(context).Privacy_Policy_Failed)));
+    }
   }
 
   String _purchaseSubtitle(BuildContext context) {

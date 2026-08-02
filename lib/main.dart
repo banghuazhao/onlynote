@@ -1,10 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:injectable/injectable.dart';
 import 'package:localstorage/localstorage.dart';
@@ -18,6 +17,7 @@ import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'Tools/ads_manager.dart';
 import 'Tools/app_layout_settings.dart';
 import 'Tools/app_typography_settings.dart';
+import 'Tools/consent_gate.dart';
 import 'Tools/image_storage.dart';
 import 'Tools/in_app_reviewer_helper.dart';
 import 'Tools/locator.dart';
@@ -68,10 +68,10 @@ Future<void> main() async {
   await PurchaseService.instance.init();
 
   if (PurchaseService.instance.shouldShowAds) {
-    Future.delayed(const Duration(seconds: 1), () {
-      AppTrackingTransparency.requestTrackingAuthorization();
-    });
-    MobileAds.instance.initialize();
+    // Not awaited: the gate shows a consent form, so awaiting it here would
+    // hold back the first frame. Ad code waits on ConsentGate.isResolved
+    // instead, which is what actually has to happen before a request goes out.
+    unawaited(ConsentGate.instance.resolve());
     AdsManager.debugPrintID();
   }
 

@@ -8,6 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
+import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/domain/database/database.dart';
@@ -73,12 +74,18 @@ class _HomeScreenState extends State<HomeScreen> {
     const size = AdSize.banner;
     assert(size.height == _bannerHeight);
 
+    // No request may go out before consent has an answer — on every launch,
+    // not just the one where the form was shown.
+    final gate = ConsentGate.instance;
+    await gate.resolve();
+    if (!mounted || !gate.canRequestAds) return;
+
     if (!PurchaseService.instance.shouldShowAds) return;
     _adSize = size;
     _ad = BannerAd(
       adUnitId: AdsManager.bannerAdUnitId,
       size: size,
-      request: const AdRequest(),
+      request: AdRequest(nonPersonalizedAds: gate.nonPersonalizedAds),
       listener: BannerAdListener(
         onAdLoaded: (_) {
           if (mounted && PurchaseService.instance.shouldShowAds) {

@@ -36,3 +36,8 @@ const int todoMaxCharCount = 100;
 
 const String databaseBox = 'note_database_box';
 const String folderDatabaseBox = 'folder_database_box';
+
+/// Reachable from Settings > Privacy. Both stores also point at this URL, so
+/// the in-app link and the listing stay one document.
+const String kPrivacyPolicyUrl =
+    'https://apps-bay.github.io/Apps-Bay-Website/privacy/';

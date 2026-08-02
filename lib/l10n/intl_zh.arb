@@ -147,5 +147,10 @@
   "Widget_Step_Android_2": "点按“小部件”。",
   "Widget_Step_Android_3": "在列表中找到“极简备忘录”。",
   "Widget_Step_Android_4": "把小部件拖到想要的位置。",
-  "Widget_Tip": "点按小组件里的备忘录即可打开；点按“新建”直接开始记录。"
+  "Widget_Tip": "点按小组件里的备忘录即可打开；点按“新建”直接开始记录。",
+  "Privacy": "隐私",
+  "Privacy_Policy": "隐私政策",
+  "Privacy_Policy_Failed": "无法打开隐私政策，请重试。",
+  "Privacy_Settings": "广告隐私设置",
+  "Privacy_Settings_Description": "更改或撤回你对个性化广告的选择。"
 }

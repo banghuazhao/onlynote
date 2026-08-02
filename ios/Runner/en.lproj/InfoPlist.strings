@@ -7,4 +7,4 @@
 */
 
 "CFBundleDisplayName" = "Onlynote";
-"NSUserTrackingUsageDescription" = "This identifier will be used to deliver personalized ads to you";
+"NSUserTrackingUsageDescription" = "Onlynote uses your device's advertising identifier to choose which ads appear in the banner at the bottom of your notes list — for example, showing stationery or productivity app ads instead of unrelated ones. What you write in your notes is never used for this and never leaves your device.";

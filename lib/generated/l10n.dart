@@ -1239,6 +1239,51 @@ class S {
       args: [],
     );
   }
+
+  /// `Privacy`
+  String get Privacy {
+    return Intl.message('Privacy', name: 'Privacy', desc: '', args: []);
+  }
+
+  /// `Privacy Policy`
+  String get Privacy_Policy {
+    return Intl.message(
+      'Privacy Policy',
+      name: 'Privacy_Policy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Couldn't open the privacy policy. Please try again.`
+  String get Privacy_Policy_Failed {
+    return Intl.message(
+      'Couldn\'t open the privacy policy. Please try again.',
+      name: 'Privacy_Policy_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ad Privacy Settings`
+  String get Privacy_Settings {
+    return Intl.message(
+      'Ad Privacy Settings',
+      name: 'Privacy_Settings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change or withdraw your choices about personalized ads.`
+  String get Privacy_Settings_Description {
+    return Intl.message(
+      'Change or withdraw your choices about personalized ads.',
+      name: 'Privacy_Settings_Description',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

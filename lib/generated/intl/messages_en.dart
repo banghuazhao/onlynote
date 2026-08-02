@@ -203,6 +203,17 @@ class MessageLookup extends MessageLookupByLibrary {
       "Delete forever?",
     ),
     "Pin": MessageLookupByLibrary.simpleMessage("Pin"),
+    "Privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
+    "Privacy_Policy": MessageLookupByLibrary.simpleMessage("Privacy Policy"),
+    "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t open the privacy policy. Please try again.",
+    ),
+    "Privacy_Settings": MessageLookupByLibrary.simpleMessage(
+      "Ad Privacy Settings",
+    ),
+    "Privacy_Settings_Description": MessageLookupByLibrary.simpleMessage(
+      "Change or withdraw your choices about personalized ads.",
+    ),
     "Purchase_Cancelled": MessageLookupByLibrary.simpleMessage(
       "Purchase cancelled.",
     ),

@@ -7,4 +7,4 @@
 */
 
 "CFBundleDisplayName" = "極簡備忘錄";
-"NSUserTrackingUsageDescription" = "該標識符將用於向您投放個性化廣告";
+"NSUserTrackingUsageDescription" = "極簡備忘錄會使用你裝置的廣告識別碼來決定備忘錄清單底部橫幅裡顯示哪些廣告——例如顯示文具或效率類 App 的廣告，而不是無關內容。你寫的備忘錄內容不會用於此用途，也不會離開你的裝置。";

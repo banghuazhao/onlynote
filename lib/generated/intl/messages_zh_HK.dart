@@ -159,6 +159,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "永久刪除？",
     ),
     "Pin": MessageLookupByLibrary.simpleMessage("置頂"),
+    "Privacy": MessageLookupByLibrary.simpleMessage("私隱"),
+    "Privacy_Policy": MessageLookupByLibrary.simpleMessage("私隱政策"),
+    "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法開啟私隱政策，請再試一次。",
+    ),
+    "Privacy_Settings": MessageLookupByLibrary.simpleMessage("廣告私隱設定"),
+    "Privacy_Settings_Description": MessageLookupByLibrary.simpleMessage(
+      "更改或撤回你對個人化廣告的選擇。",
+    ),
     "Purchase_Cancelled": MessageLookupByLibrary.simpleMessage("購買已取消。"),
     "Purchase_Failed": MessageLookupByLibrary.simpleMessage("無法完成購買，請重試。"),
     "Purchase_Loading": MessageLookupByLibrary.simpleMessage("正在連接 App Store…"),

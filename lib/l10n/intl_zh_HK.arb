@@ -147,5 +147,10 @@
   "Widget_Step_Android_2": "點按「小工具」。",
   "Widget_Step_Android_3": "在清單中找到「極簡備忘錄」。",
   "Widget_Step_Android_4": "把小工具拖到想要的位置。",
-  "Widget_Tip": "點按小工具裡的備忘錄即可開啟；點按「新增」直接開始記錄。"
+  "Widget_Tip": "點按小工具裡的備忘錄即可開啟；點按「新增」直接開始記錄。",
+  "Privacy": "私隱",
+  "Privacy_Policy": "私隱政策",
+  "Privacy_Policy_Failed": "無法開啟私隱政策，請再試一次。",
+  "Privacy_Settings": "廣告私隱設定",
+  "Privacy_Settings_Description": "更改或撤回你對個人化廣告的選擇。"
 }

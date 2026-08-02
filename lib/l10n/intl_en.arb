@@ -147,5 +147,10 @@
  "Widget_Step_Android_2": "Tap Widgets.",
  "Widget_Step_Android_3": "Find “Onlynote” in the list.",
  "Widget_Step_Android_4": "Drag the widget where you want it.",
- "Widget_Tip": "Tap a note in the widget to open it, or tap New to start writing."
+ "Widget_Tip": "Tap a note in the widget to open it, or tap New to start writing.",
+ "Privacy": "Privacy",
+ "Privacy_Policy": "Privacy Policy",
+ "Privacy_Policy_Failed": "Couldn't open the privacy policy. Please try again.",
+ "Privacy_Settings": "Ad Privacy Settings",
+ "Privacy_Settings_Description": "Change or withdraw your choices about personalized ads."
 }
