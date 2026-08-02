@@ -21,6 +21,7 @@ import 'package:onlynote/services/purchase_service.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
 
+import '../settings/manage_folders_screen.dart';
 import '../settings/settings_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
@@ -35,6 +36,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  /// Height of the home screen banner, in logical pixels.
+  static const _bannerHeight = 50;
+
   BannerAd? _ad;
   AdSize? _adSize;
   bool _adLoadStarted = false;
@@ -62,11 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadAd() async {
-    final width = MediaQuery.sizeOf(context).width.truncate();
-    final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
-    if (!mounted || size == null || !PurchaseService.instance.shouldShowAds) {
-      return;
-    }
+    // The standard 320x50 banner. The adaptive helper used before returned up
+    // to 100 high and ate a note row's worth of the grid; a custom
+    // screen-width x 50 slot fixes the height but letterboxes standard
+    // creatives in black, since nothing is served at that exact size.
+    const size = AdSize.banner;
+    assert(size.height == _bannerHeight);
+
+    if (!PurchaseService.instance.shouldShowAds) return;
     _adSize = size;
     _ad = BannerAd(
       adUnitId: AdsManager.bannerAdUnitId,
@@ -132,6 +139,63 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// What the app bar title reads: the scope the note list is currently
+  /// showing.
+  String _scopeLabel(BuildContext context, _FolderScope scope) {
+    if (scope.showTrash) return S.of(context).Trash;
+    return scope.selectedFolder?.name ?? S.of(context).All_Notes;
+  }
+
+  IconData _scopeIcon(_FolderScope scope) {
+    if (scope.showTrash) return Icons.delete_outline_rounded;
+    if (scope.selectedFolderId != null) return Icons.folder_rounded;
+    return Icons.notes_rounded;
+  }
+
+  Future<void> _openFolderPicker(_FolderScope scope) async {
+    final bloc = context.read<HomeBloc>();
+
+    final result = await showModalBottomSheet<_FolderPickerResult>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _FolderPickerSheet(scope: scope),
+    );
+    if (result == null || !mounted) return;
+
+    switch (result) {
+      case _SelectAll():
+        bloc.add(const HomeEvent.selectFolder(null));
+      case _SelectFolder(:final id):
+        bloc.add(HomeEvent.selectFolder(id));
+      case _SelectTrash():
+        bloc.add(const HomeEvent.showTrash(true));
+      case _CreateFolder():
+        await _promptFolderName(
+          title: S.of(context).New_Folder,
+          onSubmit: (name) => bloc.add(HomeEvent.createFolder(name)),
+        );
+      case _RenameFolder(:final folder):
+        await _promptFolderName(
+          title: S.of(context).Rename_Folder,
+          initial: folder.name,
+          onSubmit: (name) => bloc.add(HomeEvent.renameFolder(folder.id, name)),
+        );
+      case _DeleteFolder(:final folder):
+        final confirmed = await showConfirmDialog(
+          context,
+          title: S.of(context).Delete_Folder,
+          message: S.of(context).Delete_Folder_Confirm_Message,
+        );
+        if (confirmed) bloc.add(HomeEvent.deleteFolder(folder.id));
+      case _ManageFolders():
+        await Navigator.push(
+          context,
+          MaterialPageRoute<void>(builder: (_) => const ManageFoldersScreen()),
+        );
+    }
+  }
+
   @override
   void dispose() {
     PurchaseService.instance.removeListener(_entitlementChanged);
@@ -168,7 +232,26 @@ class _HomeScreenState extends State<HomeScreen> {
               MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
             ),
           ),
-          title: S.of(context).notes,
+          titleWidget: BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) => state.maybeMap(
+              orElse: () => Text(S.of(context).notes),
+              loaded: (data) {
+                final scope = _FolderScope(
+                  folders: data.folders,
+                  selectedFolderId: data.selectedFolderId,
+                  showTrash: data.showTrash,
+                  trashCount: data.trashCount,
+                  folderCounts: data.folderCounts,
+                  allNotesCount: data.allNotesCount,
+                );
+                return _FolderPickerTitle(
+                  label: _scopeLabel(context, scope),
+                  icon: _scopeIcon(scope),
+                  onTap: () => _openFolderPicker(scope),
+                );
+              },
+            ),
+          ),
           actions: _buildAppBarActions(context),
         ),
         body: SafeArea(
@@ -201,52 +284,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               _HomeError(message: error.message ?? ''),
                           loaded: (data) => Column(
                             children: [
-                              _FolderFilterBar(
-                                folders: data.folders,
-                                selectedFolderId: data.selectedFolderId,
-                                showTrash: data.showTrash,
-                                trashCount: data.trashCount,
-                                onSelectAll: () => context
-                                    .read<HomeBloc>()
-                                    .add(const HomeEvent.selectFolder(null)),
-                                onSelectFolder: (id) => context
-                                    .read<HomeBloc>()
-                                    .add(HomeEvent.selectFolder(id)),
-                                onShowTrash: () => context
-                                    .read<HomeBloc>()
-                                    .add(const HomeEvent.showTrash(true)),
-                                onCreateFolder: () => _promptFolderName(
-                                  title: S.of(context).New_Folder,
-                                  onSubmit: (name) => context
-                                      .read<HomeBloc>()
-                                      .add(HomeEvent.createFolder(name)),
-                                ),
-                                onRenameFolder: (folder) => _promptFolderName(
-                                  title: S.of(context).Rename_Folder,
-                                  initial: folder.name,
-                                  onSubmit: (name) =>
-                                      context.read<HomeBloc>().add(
-                                            HomeEvent.renameFolder(
-                                              folder.id,
-                                              name,
-                                            ),
-                                          ),
-                                ),
-                                onDeleteFolder: (folder) async {
-                                  final confirmed = await showConfirmDialog(
-                                    context,
-                                    title: S.of(context).Delete_Folder,
-                                    message: S
-                                        .of(context)
-                                        .Delete_Folder_Confirm_Message,
-                                  );
-                                  if (confirmed && context.mounted) {
-                                    context.read<HomeBloc>().add(
-                                          HomeEvent.deleteFolder(folder.id),
-                                        );
-                                  }
-                                },
-                              ),
                               Expanded(
                                 child: data.notes.isEmpty
                                     ? _EmptyNotes(
@@ -519,114 +556,6 @@ class _FolderNameDialogState extends State<_FolderNameDialog> {
           child: Text(S.of(context).OK),
         ),
       ],
-    );
-  }
-}
-
-class _FolderFilterBar extends StatelessWidget {
-  const _FolderFilterBar({
-    required this.folders,
-    required this.selectedFolderId,
-    required this.showTrash,
-    required this.trashCount,
-    required this.onSelectAll,
-    required this.onSelectFolder,
-    required this.onShowTrash,
-    required this.onCreateFolder,
-    required this.onRenameFolder,
-    required this.onDeleteFolder,
-  });
-
-  final List<Folder> folders;
-  final String? selectedFolderId;
-  final bool showTrash;
-  final int trashCount;
-  final VoidCallback onSelectAll;
-  final ValueChanged<String> onSelectFolder;
-  final VoidCallback onShowTrash;
-  final VoidCallback onCreateFolder;
-  final ValueChanged<Folder> onRenameFolder;
-  final ValueChanged<Folder> onDeleteFolder;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacings.xl),
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacings.s),
-            child: FilterChip(
-              label: Text(S.of(context).All_Notes),
-              selected: !showTrash && selectedFolderId == null,
-              onSelected: (_) => onSelectAll(),
-            ),
-          ),
-          ...folders.map(
-            (folder) => Padding(
-              padding: const EdgeInsets.only(right: AppSpacings.s),
-              child: GestureDetector(
-                onLongPress: () => _showFolderMenu(context, folder),
-                child: FilterChip(
-                  avatar: const Icon(Icons.folder_outlined, size: 18),
-                  label: Text(folder.name),
-                  selected: !showTrash && selectedFolderId == folder.id,
-                  onSelected: (_) => onSelectFolder(folder.id),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacings.s),
-            child: ActionChip(
-              avatar: const Icon(Icons.create_new_folder_outlined, size: 18),
-              label: Text(S.of(context).New_Folder),
-              onPressed: onCreateFolder,
-            ),
-          ),
-          FilterChip(
-            avatar: const Icon(Icons.delete_outline, size: 18),
-            label: Text(
-              trashCount > 0
-                  ? '${S.of(context).Trash} ($trashCount)'
-                  : S.of(context).Trash,
-            ),
-            selected: showTrash,
-            onSelected: (_) => onShowTrash(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showFolderMenu(BuildContext context, Folder folder) {
-    showAdaptiveActionSheet(
-      context: context,
-      androidBorderRadius: 30,
-      actions: <BottomSheetAction>[
-        BottomSheetAction(
-          leading: const Icon(Icons.drive_file_rename_outline),
-          title: Text(S.of(context).Rename_Folder),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            onRenameFolder(folder);
-          },
-        ),
-        BottomSheetAction(
-          leading: const Icon(Icons.delete_outline, color: Colors.red),
-          title: Text(
-            S.of(context).Delete_Folder,
-            style: const TextStyle(color: Colors.red),
-          ),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            onDeleteFolder(folder);
-          },
-        ),
-      ],
-      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
     );
   }
 }
@@ -1136,3 +1065,327 @@ class _LoadingSkeleton extends StatelessWidget {
     );
   }
 }
+
+/// The slice of [HomeState] the folder picker needs.
+///
+/// Freezed generates the loaded state as a library-private class, so it can't
+/// be named outside the bloc's own file — this is the view-model that crosses
+/// that boundary.
+class _FolderScope {
+  const _FolderScope({
+    required this.folders,
+    required this.selectedFolderId,
+    required this.showTrash,
+    required this.trashCount,
+    required this.folderCounts,
+    required this.allNotesCount,
+  });
+
+  final List<Folder> folders;
+  final String? selectedFolderId;
+  final bool showTrash;
+  final int trashCount;
+  final Map<String, int> folderCounts;
+  final int allNotesCount;
+
+  Folder? get selectedFolder {
+    for (final folder in folders) {
+      if (folder.id == selectedFolderId) return folder;
+    }
+    return null;
+  }
+}
+
+/// The app bar title on the home screen: a button that reads as the current
+/// scope and opens the folder picker. Replaces the horizontal chip bar that
+/// used to sit under the app bar and cost a row of vertical space on every
+/// screen, whether or not the user had folders.
+class _FolderPickerTitle extends StatelessWidget {
+  const _FolderPickerTitle({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Semantics(
+        button: true,
+        // The label alone reads as a heading; the hint is what tells a screen
+        // reader user this is also how you switch folders.
+        hint: S.of(context).Folders,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(tokens.radiusLarge),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.space2,
+              vertical: tokens.space1,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
+                SizedBox(width: tokens.space2),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.titleLarge,
+                  ),
+                ),
+                Icon(
+                  Icons.expand_more_rounded,
+                  size: 20,
+                  color: context.colors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// What the picker sheet hands back. The sheet itself stays presentational —
+/// it pops a result and lets the screen own the dialogs and bloc events, so a
+/// confirmation dialog is never parented to a sheet that's closing.
+sealed class _FolderPickerResult {
+  const _FolderPickerResult();
+}
+
+class _SelectAll extends _FolderPickerResult {
+  const _SelectAll();
+}
+
+class _SelectFolder extends _FolderPickerResult {
+  const _SelectFolder(this.id);
+  final String id;
+}
+
+class _SelectTrash extends _FolderPickerResult {
+  const _SelectTrash();
+}
+
+class _CreateFolder extends _FolderPickerResult {
+  const _CreateFolder();
+}
+
+class _RenameFolder extends _FolderPickerResult {
+  const _RenameFolder(this.folder);
+  final Folder folder;
+}
+
+class _DeleteFolder extends _FolderPickerResult {
+  const _DeleteFolder(this.folder);
+  final Folder folder;
+}
+
+class _ManageFolders extends _FolderPickerResult {
+  const _ManageFolders();
+}
+
+class _FolderPickerSheet extends StatelessWidget {
+  const _FolderPickerSheet({required this.scope});
+
+  final _FolderScope scope;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = S.of(context);
+    final tokens = context.tokens;
+
+    return SafeArea(
+      child: ConstrainedBox(
+        // Never let a long folder list swallow the whole screen.
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.7,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                tokens.space5,
+                0,
+                tokens.space5,
+                tokens.space3,
+              ),
+              child: Text(
+                l10n.Folders,
+                style: context.textStyles.titleLarge,
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: EdgeInsets.only(bottom: tokens.space2),
+                children: [
+                  _PickerTile(
+                    icon: Icons.notes_rounded,
+                    label: l10n.All_Notes,
+                    count: scope.allNotesCount,
+                    selected: !scope.showTrash && scope.selectedFolderId == null,
+                    onTap: () => Navigator.pop(context, const _SelectAll()),
+                  ),
+                  for (final folder in scope.folders)
+                    _PickerTile(
+                      icon: Icons.folder_rounded,
+                      label: folder.name,
+                      count: scope.folderCounts[folder.id] ?? 0,
+                      selected: !scope.showTrash &&
+                          scope.selectedFolderId == folder.id,
+                      onTap: () =>
+                          Navigator.pop(context, _SelectFolder(folder.id)),
+                      onRename: () =>
+                          Navigator.pop(context, _RenameFolder(folder)),
+                      onDelete: () =>
+                          Navigator.pop(context, _DeleteFolder(folder)),
+                    ),
+                  _PickerTile(
+                    icon: Icons.delete_outline_rounded,
+                    label: l10n.Trash,
+                    count: scope.trashCount,
+                    selected: scope.showTrash,
+                    onTap: () => Navigator.pop(context, const _SelectTrash()),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: Icon(
+                Icons.create_new_folder_outlined,
+                color: context.colors.primary,
+              ),
+              title: Text(
+                l10n.New_Folder,
+                style: context.textStyles.bodyLarge?.copyWith(
+                  color: context.colors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () => Navigator.pop(context, const _CreateFolder()),
+            ),
+            if (scope.folders.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.tune_rounded),
+                title: Text(l10n.Manage_Folders),
+                onTap: () => Navigator.pop(context, const _ManageFolders()),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PickerTile extends StatelessWidget {
+  const _PickerTile({
+    required this.icon,
+    required this.label,
+    required this.count,
+    required this.selected,
+    required this.onTap,
+    this.onRename,
+    this.onDelete,
+  });
+
+  final IconData icon;
+  final String label;
+  final int count;
+  final bool selected;
+  final VoidCallback onTap;
+  final VoidCallback? onRename;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final isFolder = onRename != null;
+
+    return ListTile(
+      selected: selected,
+      selectedTileColor: context.colors.primaryContainer.withValues(alpha: 0.4),
+      leading: Icon(
+        icon,
+        color: selected ? context.colors.primary : null,
+      ),
+      title: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: context.textStyles.bodyLarge?.copyWith(
+          fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$count',
+            style: context.textStyles.labelLarge?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
+          if (isFolder)
+            // Rename/delete used to be long-press only, which nobody
+            // discovers. An explicit overflow button is the trade for a
+            // slightly busier row.
+            PopupMenuButton<_FolderRowAction>(
+              tooltip: S.of(context).Edit,
+              icon: Icon(
+                Icons.more_vert_rounded,
+                size: 20,
+                color: context.colors.onSurfaceVariant,
+              ),
+              onSelected: (action) => switch (action) {
+                _FolderRowAction.rename => onRename!(),
+                _FolderRowAction.delete => onDelete!(),
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _FolderRowAction.rename,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.drive_file_rename_outline),
+                    title: Text(S.of(context).Rename_Folder),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _FolderRowAction.delete,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      Icons.delete_outline,
+                      color: context.colors.error,
+                    ),
+                    title: Text(
+                      S.of(context).Delete_Folder,
+                      style: TextStyle(color: context.colors.error),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            SizedBox(width: tokens.space4),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+enum _FolderRowAction { rename, delete }

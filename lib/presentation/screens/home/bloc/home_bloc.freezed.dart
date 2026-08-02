@@ -2761,7 +2761,9 @@ mixin _$HomeState {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) =>
@@ -2776,7 +2778,9 @@ mixin _$HomeState {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)?
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) =>
@@ -2785,8 +2789,15 @@ mixin _$HomeState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Note> notes, List<Folder> folders, String searchQuery,
-            String? selectedFolderId, bool showTrash, int trashCount)?
+    TResult Function(
+            List<Note> notes,
+            List<Folder> folders,
+            String searchQuery,
+            String? selectedFolderId,
+            bool showTrash,
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult Function(String? message)? error,
     required TResult orElse(),
@@ -2882,7 +2893,9 @@ class _$InitialImpl implements _Initial {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) {
@@ -2900,7 +2913,9 @@ class _$InitialImpl implements _Initial {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)?
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) {
@@ -2912,8 +2927,15 @@ class _$InitialImpl implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Note> notes, List<Folder> folders, String searchQuery,
-            String? selectedFolderId, bool showTrash, int trashCount)?
+    TResult Function(
+            List<Note> notes,
+            List<Folder> folders,
+            String searchQuery,
+            String? selectedFolderId,
+            bool showTrash,
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult Function(String? message)? error,
     required TResult orElse(),
@@ -3012,7 +3034,9 @@ class _$LoadingImpl implements _Loading {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) {
@@ -3030,7 +3054,9 @@ class _$LoadingImpl implements _Loading {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)?
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) {
@@ -3042,8 +3068,15 @@ class _$LoadingImpl implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Note> notes, List<Folder> folders, String searchQuery,
-            String? selectedFolderId, bool showTrash, int trashCount)?
+    TResult Function(
+            List<Note> notes,
+            List<Folder> folders,
+            String searchQuery,
+            String? selectedFolderId,
+            bool showTrash,
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult Function(String? message)? error,
     required TResult orElse(),
@@ -3108,7 +3141,9 @@ abstract class _$$LoadedImplCopyWith<$Res> {
       String searchQuery,
       String? selectedFolderId,
       bool showTrash,
-      int trashCount});
+      int trashCount,
+      Map<String, int> folderCounts,
+      int allNotesCount});
 }
 
 /// @nodoc
@@ -3128,6 +3163,8 @@ class __$$LoadedImplCopyWithImpl<$Res>
     Object? selectedFolderId = freezed,
     Object? showTrash = null,
     Object? trashCount = null,
+    Object? folderCounts = null,
+    Object? allNotesCount = null,
   }) {
     return _then(_$LoadedImpl(
       notes: null == notes
@@ -3154,6 +3191,14 @@ class __$$LoadedImplCopyWithImpl<$Res>
           ? _value.trashCount
           : trashCount // ignore: cast_nullable_to_non_nullable
               as int,
+      folderCounts: null == folderCounts
+          ? _value._folderCounts
+          : folderCounts // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
+      allNotesCount: null == allNotesCount
+          ? _value.allNotesCount
+          : allNotesCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -3167,9 +3212,12 @@ class _$LoadedImpl implements _Loaded {
       this.searchQuery = '',
       this.selectedFolderId,
       this.showTrash = false,
-      this.trashCount = 0})
+      this.trashCount = 0,
+      final Map<String, int> folderCounts = const <String, int>{},
+      this.allNotesCount = 0})
       : _notes = notes,
-        _folders = folders;
+        _folders = folders,
+        _folderCounts = folderCounts;
 
   final List<Note> _notes;
   @override
@@ -3199,9 +3247,29 @@ class _$LoadedImpl implements _Loaded {
   @JsonKey()
   final int trashCount;
 
+  /// Active notes per folder id, for the folder picker. Counts ignore the
+  /// current search so the picker always shows what each folder holds, not
+  /// what happens to match right now.
+  final Map<String, int> _folderCounts;
+
+  /// Active notes per folder id, for the folder picker. Counts ignore the
+  /// current search so the picker always shows what each folder holds, not
+  /// what happens to match right now.
+  @override
+  @JsonKey()
+  Map<String, int> get folderCounts {
+    if (_folderCounts is EqualUnmodifiableMapView) return _folderCounts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_folderCounts);
+  }
+
+  @override
+  @JsonKey()
+  final int allNotesCount;
+
   @override
   String toString() {
-    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, selectedFolderId: $selectedFolderId, showTrash: $showTrash, trashCount: $trashCount)';
+    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, selectedFolderId: $selectedFolderId, showTrash: $showTrash, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
   }
 
   @override
@@ -3218,7 +3286,11 @@ class _$LoadedImpl implements _Loaded {
             (identical(other.showTrash, showTrash) ||
                 other.showTrash == showTrash) &&
             (identical(other.trashCount, trashCount) ||
-                other.trashCount == trashCount));
+                other.trashCount == trashCount) &&
+            const DeepCollectionEquality()
+                .equals(other._folderCounts, _folderCounts) &&
+            (identical(other.allNotesCount, allNotesCount) ||
+                other.allNotesCount == allNotesCount));
   }
 
   @override
@@ -3229,7 +3301,9 @@ class _$LoadedImpl implements _Loaded {
       searchQuery,
       selectedFolderId,
       showTrash,
-      trashCount);
+      trashCount,
+      const DeepCollectionEquality().hash(_folderCounts),
+      allNotesCount);
 
   @JsonKey(ignore: true)
   @override
@@ -3248,12 +3322,14 @@ class _$LoadedImpl implements _Loaded {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) {
-    return loaded(
-        notes, folders, searchQuery, selectedFolderId, showTrash, trashCount);
+    return loaded(notes, folders, searchQuery, selectedFolderId, showTrash,
+        trashCount, folderCounts, allNotesCount);
   }
 
   @override
@@ -3267,12 +3343,14 @@ class _$LoadedImpl implements _Loaded {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)?
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) {
-    return loaded?.call(
-        notes, folders, searchQuery, selectedFolderId, showTrash, trashCount);
+    return loaded?.call(notes, folders, searchQuery, selectedFolderId,
+        showTrash, trashCount, folderCounts, allNotesCount);
   }
 
   @override
@@ -3280,15 +3358,22 @@ class _$LoadedImpl implements _Loaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Note> notes, List<Folder> folders, String searchQuery,
-            String? selectedFolderId, bool showTrash, int trashCount)?
+    TResult Function(
+            List<Note> notes,
+            List<Folder> folders,
+            String searchQuery,
+            String? selectedFolderId,
+            bool showTrash,
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult Function(String? message)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(
-          notes, folders, searchQuery, selectedFolderId, showTrash, trashCount);
+      return loaded(notes, folders, searchQuery, selectedFolderId, showTrash,
+          trashCount, folderCounts, allNotesCount);
     }
     return orElse();
   }
@@ -3338,7 +3423,9 @@ abstract class _Loaded implements HomeState {
       final String searchQuery,
       final String? selectedFolderId,
       final bool showTrash,
-      final int trashCount}) = _$LoadedImpl;
+      final int trashCount,
+      final Map<String, int> folderCounts,
+      final int allNotesCount}) = _$LoadedImpl;
 
   List<Note> get notes;
   List<Folder> get folders;
@@ -3346,6 +3433,12 @@ abstract class _Loaded implements HomeState {
   String? get selectedFolderId;
   bool get showTrash;
   int get trashCount;
+
+  /// Active notes per folder id, for the folder picker. Counts ignore the
+  /// current search so the picker always shows what each folder holds, not
+  /// what happens to match right now.
+  Map<String, int> get folderCounts;
+  int get allNotesCount;
   @JsonKey(ignore: true)
   _$$LoadedImplCopyWith<_$LoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -3423,7 +3516,9 @@ class _$ErrorImpl implements _Error {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) {
@@ -3441,7 +3536,9 @@ class _$ErrorImpl implements _Error {
             String searchQuery,
             String? selectedFolderId,
             bool showTrash,
-            int trashCount)?
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) {
@@ -3453,8 +3550,15 @@ class _$ErrorImpl implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Note> notes, List<Folder> folders, String searchQuery,
-            String? selectedFolderId, bool showTrash, int trashCount)?
+    TResult Function(
+            List<Note> notes,
+            List<Folder> folders,
+            String searchQuery,
+            String? selectedFolderId,
+            bool showTrash,
+            int trashCount,
+            Map<String, int> folderCounts,
+            int allNotesCount)?
         loaded,
     TResult Function(String? message)? error,
     required TResult orElse(),

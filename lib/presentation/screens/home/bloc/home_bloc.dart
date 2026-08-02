@@ -259,7 +259,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       selectedFolderId: _selectedFolderId,
       showTrash: _showTrash,
       trashCount: _trashedNotes.length,
+      folderCounts: _folderCounts(),
+      allNotesCount: _activeNotes.length,
     );
+  }
+
+  Map<String, int> _folderCounts() {
+    final counts = <String, int>{};
+    for (final note in _activeNotes) {
+      final folderId = note.folderId;
+      if (folderId == null) continue;
+      counts[folderId] = (counts[folderId] ?? 0) + 1;
+    }
+    return Map.unmodifiable(counts);
   }
 
   List<Note> _visibleNotes() {
