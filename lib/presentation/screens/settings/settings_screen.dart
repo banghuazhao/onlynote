@@ -8,6 +8,7 @@ import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/purchase_service.dart';
 
 import 'manage_folders_screen.dart';
+import 'widget_guide_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -132,6 +133,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(height: tokens.space4),
+                      Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.widgets_outlined),
+                          title: Text(S.of(context).Widget),
+                          subtitle: Text(S.of(context).Widget_Description),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) => const WidgetGuideScreen(),
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(height: tokens.space4),
                       Card(

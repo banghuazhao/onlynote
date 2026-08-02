@@ -1079,6 +1079,166 @@ class S {
       args: [],
     );
   }
+
+  /// `Notes on your Home Screen`
+  String get Onboarding_Title_4 {
+    return Intl.message(
+      'Notes on your Home Screen',
+      name: 'Onboarding_Title_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add the Onlynote widget to read your notes and start writing without opening the app.`
+  String get Onboarding_Body_4 {
+    return Intl.message(
+      'Add the Onlynote widget to read your notes and start writing without opening the app.',
+      name: 'Onboarding_Body_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Home Screen Widget`
+  String get Widget {
+    return Intl.message(
+      'Home Screen Widget',
+      name: 'Widget',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `See your notes at a glance, without opening the app.`
+  String get Widget_Description {
+    return Intl.message(
+      'See your notes at a glance, without opening the app.',
+      name: 'Widget_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to Home Screen`
+  String get Widget_Add_To_Home {
+    return Intl.message(
+      'Add to Home Screen',
+      name: 'Widget_Add_To_Home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your launcher can't add it automatically — follow the steps below instead.`
+  String get Widget_Add_Unsupported {
+    return Intl.message(
+      'Your launcher can\'t add it automatically — follow the steps below instead.',
+      name: 'Widget_Add_Unsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `How to add it`
+  String get Widget_Steps_Title {
+    return Intl.message(
+      'How to add it',
+      name: 'Widget_Steps_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Touch and hold an empty area of your Home Screen until the icons jiggle.`
+  String get Widget_Step_iOS_1 {
+    return Intl.message(
+      'Touch and hold an empty area of your Home Screen until the icons jiggle.',
+      name: 'Widget_Step_iOS_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap the + button in the top corner.`
+  String get Widget_Step_iOS_2 {
+    return Intl.message(
+      'Tap the + button in the top corner.',
+      name: 'Widget_Step_iOS_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search for “Onlynote”, then select it.`
+  String get Widget_Step_iOS_3 {
+    return Intl.message(
+      'Search for “Onlynote”, then select it.',
+      name: 'Widget_Step_iOS_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a size and tap Add Widget.`
+  String get Widget_Step_iOS_4 {
+    return Intl.message(
+      'Choose a size and tap Add Widget.',
+      name: 'Widget_Step_iOS_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Touch and hold an empty area of your Home Screen.`
+  String get Widget_Step_Android_1 {
+    return Intl.message(
+      'Touch and hold an empty area of your Home Screen.',
+      name: 'Widget_Step_Android_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap Widgets.`
+  String get Widget_Step_Android_2 {
+    return Intl.message(
+      'Tap Widgets.',
+      name: 'Widget_Step_Android_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Find “Onlynote” in the list.`
+  String get Widget_Step_Android_3 {
+    return Intl.message(
+      'Find “Onlynote” in the list.',
+      name: 'Widget_Step_Android_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag the widget where you want it.`
+  String get Widget_Step_Android_4 {
+    return Intl.message(
+      'Drag the widget where you want it.',
+      name: 'Widget_Step_Android_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap a note in the widget to open it, or tap New to start writing.`
+  String get Widget_Tip {
+    return Intl.message(
+      'Tap a note in the widget to open it, or tap New to start writing.',
+      name: 'Widget_Tip',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

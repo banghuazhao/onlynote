@@ -24,6 +24,7 @@ import 'Tools/locator.dart';
 import 'Tools/notification_service.dart';
 import 'Tools/onboarding_settings.dart';
 import 'Tools/reminder_data.dart';
+import 'Tools/widget_sync.dart';
 import 'di/di.dart';
 import 'presentation/app.dart';
 import 'presentation/screens/add_update_note/bloc/add_update_form/add_update_form_bloc.dart';
@@ -62,6 +63,7 @@ Future<void> main() async {
   await AppLayoutSettings.instance.load();
   await OnboardingSettings.instance.load();
   await ImageStorage.init();
+  await WidgetSync.instance.init();
 
   await PurchaseService.instance.init();
 

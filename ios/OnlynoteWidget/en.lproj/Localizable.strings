@@ -1,0 +1,23 @@
+"widget.app_name" = "Onlynote";
+"widget.display_name" = "Notes";
+"widget.description" = "Your pinned and recent notes, plus a shortcut to write a new one.";
+
+"widget.new_note" = "New";
+"widget.untitled" = "Untitled";
+"widget.all_done" = "All done";
+"widget.more" = "+%d more";
+
+"widget.empty.title" = "No notes yet";
+"widget.empty.action" = "Tap to write your first one";
+
+"widget.sample.1.title" = "Weekend plan";
+"widget.sample.1.body" = "Book train tickets, pack the camera";
+"widget.sample.2.title" = "Groceries";
+"widget.sample.2.todo.1" = "Milk";
+"widget.sample.2.todo.2" = "Coffee beans";
+"widget.sample.2.todo.3" = "Olive oil";
+"widget.sample.3.title" = "Book notes";
+"widget.sample.3.body" = "Chapter 4 — on deliberate practice";
+"widget.sample.4.title" = "Trip photos";
+"widget.sample.5.title" = "Ideas";
+"widget.sample.5.body" = "Onboarding could be shorter";

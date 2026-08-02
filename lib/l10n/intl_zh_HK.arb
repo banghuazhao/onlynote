@@ -129,5 +129,23 @@
   "Purchase_Failed": "無法完成購買，請重試。",
   "Purchase_Success": "廣告已移除。",
   "Restore_Success": "已恢復您的移除廣告購買。",
-  "Restore_Nothing": "未找到以前的移除廣告購買。"
+  "Restore_Nothing": "未找到以前的移除廣告購買。",
+
+  "Onboarding_Title_4": "備忘錄放上主畫面",
+  "Onboarding_Body_4": "加入極簡備忘錄小工具，不用開啟 App 也能查看備忘錄、隨手記錄。",
+
+  "Widget": "主畫面小工具",
+  "Widget_Description": "不用開啟 App，一眼看到你的備忘錄。",
+  "Widget_Add_To_Home": "加入主畫面",
+  "Widget_Add_Unsupported": "目前的桌面不支援自動加入，請依照下面的步驟操作。",
+  "Widget_Steps_Title": "加入方法",
+  "Widget_Step_iOS_1": "長按主畫面空白處，直到圖示開始晃動。",
+  "Widget_Step_iOS_2": "點按左上角的 + 按鈕。",
+  "Widget_Step_iOS_3": "搜尋「極簡備忘錄」，然後選擇它。",
+  "Widget_Step_iOS_4": "選擇尺寸，然後點按「加入小工具」。",
+  "Widget_Step_Android_1": "長按主畫面空白處。",
+  "Widget_Step_Android_2": "點按「小工具」。",
+  "Widget_Step_Android_3": "在清單中找到「極簡備忘錄」。",
+  "Widget_Step_Android_4": "把小工具拖到想要的位置。",
+  "Widget_Tip": "點按小工具裡的備忘錄即可開啟；點按「新增」直接開始記錄。"
 }

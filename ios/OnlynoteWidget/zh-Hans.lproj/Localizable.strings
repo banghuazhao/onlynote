@@ -1,0 +1,23 @@
+"widget.app_name" = "极简备忘录";
+"widget.display_name" = "备忘录";
+"widget.description" = "查看置顶和最近的备忘录，并快速新建一条。";
+
+"widget.new_note" = "新建";
+"widget.untitled" = "无标题";
+"widget.all_done" = "全部完成";
+"widget.more" = "还有 %d 条";
+
+"widget.empty.title" = "还没有备忘录";
+"widget.empty.action" = "点按写下第一条";
+
+"widget.sample.1.title" = "周末计划";
+"widget.sample.1.body" = "订火车票，带上相机";
+"widget.sample.2.title" = "购物清单";
+"widget.sample.2.todo.1" = "牛奶";
+"widget.sample.2.todo.2" = "咖啡豆";
+"widget.sample.2.todo.3" = "橄榄油";
+"widget.sample.3.title" = "读书笔记";
+"widget.sample.3.body" = "第四章 · 关于刻意练习";
+"widget.sample.4.title" = "旅行照片";
+"widget.sample.5.title" = "灵感";
+"widget.sample.5.body" = "新手引导可以再短一些";

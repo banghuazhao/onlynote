@@ -129,5 +129,23 @@
  "Purchase_Failed": "The purchase could not be completed. Please try again.",
  "Purchase_Success": "Ads have been removed.",
  "Restore_Success": "Your Remove Ads purchase was restored.",
- "Restore_Nothing": "No previous Remove Ads purchase was found."
+ "Restore_Nothing": "No previous Remove Ads purchase was found.",
+
+ "Onboarding_Title_4": "Notes on your Home Screen",
+ "Onboarding_Body_4": "Add the Onlynote widget to read your notes and start writing without opening the app.",
+
+ "Widget": "Home Screen Widget",
+ "Widget_Description": "See your notes at a glance, without opening the app.",
+ "Widget_Add_To_Home": "Add to Home Screen",
+ "Widget_Add_Unsupported": "Your launcher can't add it automatically — follow the steps below instead.",
+ "Widget_Steps_Title": "How to add it",
+ "Widget_Step_iOS_1": "Touch and hold an empty area of your Home Screen until the icons jiggle.",
+ "Widget_Step_iOS_2": "Tap the + button in the top corner.",
+ "Widget_Step_iOS_3": "Search for “Onlynote”, then select it.",
+ "Widget_Step_iOS_4": "Choose a size and tap Add Widget.",
+ "Widget_Step_Android_1": "Touch and hold an empty area of your Home Screen.",
+ "Widget_Step_Android_2": "Tap Widgets.",
+ "Widget_Step_Android_3": "Find “Onlynote” in the list.",
+ "Widget_Step_Android_4": "Drag the widget where you want it.",
+ "Widget_Tip": "Tap a note in the widget to open it, or tap New to start writing."
 }

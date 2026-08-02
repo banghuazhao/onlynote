@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Onlynote</string>
+
+    <string name="widget_description">Your pinned and recent notes, plus a shortcut to write a new one.</string>
+    <string name="widget_new_note">New</string>
+    <string name="widget_untitled">Untitled</string>
+    <string name="widget_all_done">All done</string>
+    <string name="widget_more">+%1$d more</string>
+    <string name="widget_empty_action">No notes yet — tap to write your first one</string>
+
+    <string name="widget_sample_1_title">Weekend plan</string>
+    <string name="widget_sample_1_body">Book train tickets, pack the camera</string>
+    <string name="widget_sample_2_title">Groceries</string>
+    <string name="widget_sample_2_todo">Coffee beans</string>
 </resources>

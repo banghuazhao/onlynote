@@ -129,5 +129,23 @@
   "Purchase_Failed": "无法完成购买，请重试。",
   "Purchase_Success": "广告已移除。",
   "Restore_Success": "已恢复您的移除广告购买。",
-  "Restore_Nothing": "未找到以前的移除广告购买。"
+  "Restore_Nothing": "未找到以前的移除广告购买。",
+
+  "Onboarding_Title_4": "备忘录放上主屏幕",
+  "Onboarding_Body_4": "添加极简备忘录小组件，不用打开 App 也能查看备忘录、随手记录。",
+
+  "Widget": "主屏幕小组件",
+  "Widget_Description": "不用打开 App，一眼看到你的备忘录。",
+  "Widget_Add_To_Home": "添加到主屏幕",
+  "Widget_Add_Unsupported": "当前桌面不支持自动添加，请按下面的步骤操作。",
+  "Widget_Steps_Title": "添加方法",
+  "Widget_Step_iOS_1": "长按主屏幕空白处，直到图标开始抖动。",
+  "Widget_Step_iOS_2": "点按左上角的 + 按钮。",
+  "Widget_Step_iOS_3": "搜索“极简备忘录”，然后选择它。",
+  "Widget_Step_iOS_4": "选择尺寸，然后点按“添加小组件”。",
+  "Widget_Step_Android_1": "长按主屏幕空白处。",
+  "Widget_Step_Android_2": "点按“小部件”。",
+  "Widget_Step_Android_3": "在列表中找到“极简备忘录”。",
+  "Widget_Step_Android_4": "把小部件拖到想要的位置。",
+  "Widget_Tip": "点按小组件里的备忘录即可打开；点按“新建”直接开始记录。"
 }

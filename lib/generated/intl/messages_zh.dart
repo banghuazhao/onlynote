@@ -20,9 +20,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static String m0(price) => "支付 ${price} 永久移除广告。";
+  static String m0(count) => "${count} 条备忘录";
 
-  static String m1(count) => "${count} 条备忘录";
+  static String m1(price) => "支付 ${price} 永久移除广告。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -90,7 +90,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已删除文件夹"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("请输入文件夹名称。"),
-    "Folder_Notes_Count": m1,
+    "Folder_Notes_Count": m0,
     "Folders": MessageLookupByLibrary.simpleMessage("文件夹"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字体大小"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("字体样式"),
@@ -107,9 +107,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("移至文件夹"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("新建文件夹"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("无文件夹"),
-    "No_Folders": MessageLookupByLibrary.simpleMessage(
-      "暂无文件夹。创建文件夹来整理备忘录。",
-    ),
+    "No_Folders": MessageLookupByLibrary.simpleMessage("暂无文件夹。创建文件夹来整理备忘录。"),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
       "此文件夹暂无备忘录。\n点击 + 添加。",
     ),
@@ -143,12 +141,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Body_3": MessageLookupByLibrary.simpleMessage(
       "设置提醒，删除的备忘录可从回收站恢复。",
     ),
+    "Onboarding_Body_4": MessageLookupByLibrary.simpleMessage(
+      "添加极简备忘录小组件，不用打开 App 也能查看备忘录、随手记录。",
+    ),
     "Onboarding_Get_Started": MessageLookupByLibrary.simpleMessage("开始使用"),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("下一步"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("跳过"),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage("随时记录"),
     "Onboarding_Title_2": MessageLookupByLibrary.simpleMessage("轻松整理"),
     "Onboarding_Title_3": MessageLookupByLibrary.simpleMessage("不再遗忘"),
+    "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage("备忘录放上主屏幕"),
     "Onlynote": MessageLookupByLibrary.simpleMessage("极简备忘录"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "这些备忘录及其照片、提醒将被永久删除，且无法恢复。",
@@ -167,7 +169,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("提醒设置"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m0,
+    "Remove_Ads_Price": m1,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("恢复"),
@@ -198,6 +200,36 @@ class MessageLookup extends MessageLookupByLibrary {
     "Unpin": MessageLookupByLibrary.simpleMessage("取消置顶"),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("喝水吧"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("弹钢琴"),
+    "Widget": MessageLookupByLibrary.simpleMessage("主屏幕小组件"),
+    "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage("添加到主屏幕"),
+    "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "当前桌面不支持自动添加，请按下面的步骤操作。",
+    ),
+    "Widget_Description": MessageLookupByLibrary.simpleMessage(
+      "不用打开 App，一眼看到你的备忘录。",
+    ),
+    "Widget_Step_Android_1": MessageLookupByLibrary.simpleMessage("长按主屏幕空白处。"),
+    "Widget_Step_Android_2": MessageLookupByLibrary.simpleMessage("点按“小部件”。"),
+    "Widget_Step_Android_3": MessageLookupByLibrary.simpleMessage(
+      "在列表中找到“极简备忘录”。",
+    ),
+    "Widget_Step_Android_4": MessageLookupByLibrary.simpleMessage(
+      "把小部件拖到想要的位置。",
+    ),
+    "Widget_Step_iOS_1": MessageLookupByLibrary.simpleMessage(
+      "长按主屏幕空白处，直到图标开始抖动。",
+    ),
+    "Widget_Step_iOS_2": MessageLookupByLibrary.simpleMessage("点按左上角的 + 按钮。"),
+    "Widget_Step_iOS_3": MessageLookupByLibrary.simpleMessage(
+      "搜索“极简备忘录”，然后选择它。",
+    ),
+    "Widget_Step_iOS_4": MessageLookupByLibrary.simpleMessage(
+      "选择尺寸，然后点按“添加小组件”。",
+    ),
+    "Widget_Steps_Title": MessageLookupByLibrary.simpleMessage("添加方法"),
+    "Widget_Tip": MessageLookupByLibrary.simpleMessage(
+      "点按小组件里的备忘录即可打开；点按“新建”直接开始记录。",
+    ),
     "World_Weather_Live": MessageLookupByLibrary.simpleMessage("极简天气"),
     "Yes_Habit": MessageLookupByLibrary.simpleMessage("签签习惯"),
     "notes": MessageLookupByLibrary.simpleMessage("备忘录"),

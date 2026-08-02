@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mirrors lib/presentation/theme/colors.dart -->
+    <color name="widget_background">#FFFFF9F0</color>
+    <color name="widget_text_primary">#FF292722</color>
+    <color name="widget_text_muted">#FF69645B</color>
+    <color name="widget_divider">#22292722</color>
+    <color name="widget_accent">#FFF4B942</color>
+    <color name="widget_pill_text">#FF292722</color>
+    <color name="widget_stripe_default">#FFD2D1CF</color>
+</resources>

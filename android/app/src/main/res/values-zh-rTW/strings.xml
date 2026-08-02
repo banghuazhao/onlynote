@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">極簡備忘錄</string>
+
+    <string name="widget_description">查看置頂和最近的備忘錄，並快速新增一則。</string>
+    <string name="widget_new_note">新增</string>
+    <string name="widget_untitled">無標題</string>
+    <string name="widget_all_done">全部完成</string>
+    <string name="widget_more">還有 %1$d 則</string>
+    <string name="widget_empty_action">還沒有備忘錄，點按寫下第一則</string>
+
+    <string name="widget_sample_1_title">週末計畫</string>
+    <string name="widget_sample_1_body">訂火車票，帶上相機</string>
+    <string name="widget_sample_2_title">購物清單</string>
+    <string name="widget_sample_2_todo">咖啡豆</string>
 </resources>

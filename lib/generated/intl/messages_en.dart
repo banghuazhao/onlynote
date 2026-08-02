@@ -20,9 +20,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(price) => "Remove ads permanently for ${price}.";
+  static String m0(count) => "${count} notes";
 
-  static String m1(count) => "${count} notes";
+  static String m1(price) => "Remove ads permanently for ${price}.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -114,7 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m1,
+    "Folder_Notes_Count": m0,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
@@ -175,6 +175,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Body_3": MessageLookupByLibrary.simpleMessage(
       "Set reminders and recover deleted notes from Trash anytime.",
     ),
+    "Onboarding_Body_4": MessageLookupByLibrary.simpleMessage(
+      "Add the Onlynote widget to read your notes and start writing without opening the app.",
+    ),
     "Onboarding_Get_Started": MessageLookupByLibrary.simpleMessage(
       "Get Started",
     ),
@@ -188,6 +191,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Onboarding_Title_3": MessageLookupByLibrary.simpleMessage(
       "Never lose a thought",
+    ),
+    "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage(
+      "Notes on your Home Screen",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
@@ -219,7 +225,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("Relaxing Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("Reminder"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m0,
+    "Remove_Ads_Price": m1,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
@@ -260,6 +266,44 @@ class MessageLookup extends MessageLookupByLibrary {
     "Unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("Water Tracker"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("We Play Piano"),
+    "Widget": MessageLookupByLibrary.simpleMessage("Home Screen Widget"),
+    "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage(
+      "Add to Home Screen",
+    ),
+    "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "Your launcher can\'t add it automatically — follow the steps below instead.",
+    ),
+    "Widget_Description": MessageLookupByLibrary.simpleMessage(
+      "See your notes at a glance, without opening the app.",
+    ),
+    "Widget_Step_Android_1": MessageLookupByLibrary.simpleMessage(
+      "Touch and hold an empty area of your Home Screen.",
+    ),
+    "Widget_Step_Android_2": MessageLookupByLibrary.simpleMessage(
+      "Tap Widgets.",
+    ),
+    "Widget_Step_Android_3": MessageLookupByLibrary.simpleMessage(
+      "Find “Onlynote” in the list.",
+    ),
+    "Widget_Step_Android_4": MessageLookupByLibrary.simpleMessage(
+      "Drag the widget where you want it.",
+    ),
+    "Widget_Step_iOS_1": MessageLookupByLibrary.simpleMessage(
+      "Touch and hold an empty area of your Home Screen until the icons jiggle.",
+    ),
+    "Widget_Step_iOS_2": MessageLookupByLibrary.simpleMessage(
+      "Tap the + button in the top corner.",
+    ),
+    "Widget_Step_iOS_3": MessageLookupByLibrary.simpleMessage(
+      "Search for “Onlynote”, then select it.",
+    ),
+    "Widget_Step_iOS_4": MessageLookupByLibrary.simpleMessage(
+      "Choose a size and tap Add Widget.",
+    ),
+    "Widget_Steps_Title": MessageLookupByLibrary.simpleMessage("How to add it"),
+    "Widget_Tip": MessageLookupByLibrary.simpleMessage(
+      "Tap a note in the widget to open it, or tap New to start writing.",
+    ),
     "World_Weather_Live": MessageLookupByLibrary.simpleMessage(
       "World Weather Live",
     ),

@@ -20,9 +20,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh_HK';
 
-  static String m0(price) => "支付 ${price} 永久移除廣告。";
+  static String m0(count) => "${count} 則備忘錄";
 
-  static String m1(count) => "${count} 則備忘錄";
+  static String m1(price) => "支付 ${price} 永久移除廣告。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -90,7 +90,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已刪除資料夾"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("請輸入資料夾名稱。"),
-    "Folder_Notes_Count": m1,
+    "Folder_Notes_Count": m0,
     "Folders": MessageLookupByLibrary.simpleMessage("資料夾"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字體大小"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("字體樣式"),
@@ -107,9 +107,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("移至資料夾"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("新增資料夾"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("無資料夾"),
-    "No_Folders": MessageLookupByLibrary.simpleMessage(
-      "暫無資料夾。建立資料夾來整理備忘錄。",
-    ),
+    "No_Folders": MessageLookupByLibrary.simpleMessage("暫無資料夾。建立資料夾來整理備忘錄。"),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
       "此資料夾暫無備忘錄。\n點擊 + 新增。",
     ),
@@ -143,12 +141,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Body_3": MessageLookupByLibrary.simpleMessage(
       "設定提醒，刪除的備忘錄可從回收站還原。",
     ),
+    "Onboarding_Body_4": MessageLookupByLibrary.simpleMessage(
+      "加入極簡備忘錄小工具，不用開啟 App 也能查看備忘錄、隨手記錄。",
+    ),
     "Onboarding_Get_Started": MessageLookupByLibrary.simpleMessage("開始使用"),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("下一步"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("略過"),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage("隨時記錄"),
     "Onboarding_Title_2": MessageLookupByLibrary.simpleMessage("輕鬆整理"),
     "Onboarding_Title_3": MessageLookupByLibrary.simpleMessage("不再遺忘"),
+    "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage("備忘錄放上主畫面"),
     "Onlynote": MessageLookupByLibrary.simpleMessage("極簡備忘錄"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "這些備忘錄及其照片、提醒將被永久刪除，且無法復原。",
@@ -167,7 +169,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("提醒設置"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m0,
+    "Remove_Ads_Price": m1,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("還原"),
@@ -198,6 +200,36 @@ class MessageLookup extends MessageLookupByLibrary {
     "Unpin": MessageLookupByLibrary.simpleMessage("取消置頂"),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("喝水吧"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("彈鋼琴"),
+    "Widget": MessageLookupByLibrary.simpleMessage("主畫面小工具"),
+    "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage("加入主畫面"),
+    "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "目前的桌面不支援自動加入，請依照下面的步驟操作。",
+    ),
+    "Widget_Description": MessageLookupByLibrary.simpleMessage(
+      "不用開啟 App，一眼看到你的備忘錄。",
+    ),
+    "Widget_Step_Android_1": MessageLookupByLibrary.simpleMessage("長按主畫面空白處。"),
+    "Widget_Step_Android_2": MessageLookupByLibrary.simpleMessage("點按「小工具」。"),
+    "Widget_Step_Android_3": MessageLookupByLibrary.simpleMessage(
+      "在清單中找到「極簡備忘錄」。",
+    ),
+    "Widget_Step_Android_4": MessageLookupByLibrary.simpleMessage(
+      "把小工具拖到想要的位置。",
+    ),
+    "Widget_Step_iOS_1": MessageLookupByLibrary.simpleMessage(
+      "長按主畫面空白處，直到圖示開始晃動。",
+    ),
+    "Widget_Step_iOS_2": MessageLookupByLibrary.simpleMessage("點按左上角的 + 按鈕。"),
+    "Widget_Step_iOS_3": MessageLookupByLibrary.simpleMessage(
+      "搜尋「極簡備忘錄」，然後選擇它。",
+    ),
+    "Widget_Step_iOS_4": MessageLookupByLibrary.simpleMessage(
+      "選擇尺寸，然後點按「加入小工具」。",
+    ),
+    "Widget_Steps_Title": MessageLookupByLibrary.simpleMessage("加入方法"),
+    "Widget_Tip": MessageLookupByLibrary.simpleMessage(
+      "點按小工具裡的備忘錄即可開啟；點按「新增」直接開始記錄。",
+    ),
     "World_Weather_Live": MessageLookupByLibrary.simpleMessage("極簡天氣"),
     "Yes_Habit": MessageLookupByLibrary.simpleMessage("簽簽習慣"),
     "notes": MessageLookupByLibrary.simpleMessage("備忘錄"),

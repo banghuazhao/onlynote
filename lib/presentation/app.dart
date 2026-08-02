@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/onboarding_settings.dart';
+import 'package:onlynote/Tools/widget_launch.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/generated/l10n.dart';
 
@@ -26,6 +27,12 @@ class _AppState extends State<App> {
       if (!OnboardingSettings.instance.completed) {
         _router.replaceAll([const OnboardingRoute()]);
       }
+      // Subscribed unconditionally, and only once the router is live: a widget
+      // tap can arrive at any point in this process's life, and finishing
+      // onboarding doesn't restart the process. Skipping it here would leave
+      // taps dead for the whole first session. Taps that land *during*
+      // onboarding are dropped inside the handler instead.
+      WidgetLaunch.instance.init();
     });
   }
 

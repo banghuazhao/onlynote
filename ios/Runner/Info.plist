@@ -24,6 +24,19 @@
 		<string>$(CURRENT_PROJECT_VERSION)</string>
 		<key>GADApplicationIdentifier</key>
 		<string>$(GAD_APPLICATION_IDENTIFIER)</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>com.appsbay.onlynote.widget</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>onlynote</string>
+				</array>
+			</dict>
+		</array>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<string>https</string>

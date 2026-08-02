@@ -32,6 +32,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       titleKey: 2,
       bodyKey: 2,
     ),
+    (
+      icon: Icons.widgets_outlined,
+      titleKey: 3,
+      bodyKey: 3,
+    ),
   ];
 
   Future<void> _finish() async {
@@ -53,11 +58,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       l10n.Onboarding_Title_1,
       l10n.Onboarding_Title_2,
       l10n.Onboarding_Title_3,
+      l10n.Onboarding_Title_4,
     ];
     final bodies = [
       l10n.Onboarding_Body_1,
       l10n.Onboarding_Body_2,
       l10n.Onboarding_Body_3,
+      l10n.Onboarding_Body_4,
     ];
     final isLast = _index == _pages.length - 1;
     final colorScheme = Theme.of(context).colorScheme;

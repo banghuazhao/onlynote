@@ -1,0 +1,23 @@
+"widget.app_name" = "極簡備忘錄";
+"widget.display_name" = "備忘錄";
+"widget.description" = "查看置頂和最近的備忘錄，並快速新增一則。";
+
+"widget.new_note" = "新增";
+"widget.untitled" = "無標題";
+"widget.all_done" = "全部完成";
+"widget.more" = "還有 %d 則";
+
+"widget.empty.title" = "還沒有備忘錄";
+"widget.empty.action" = "點按寫下第一則";
+
+"widget.sample.1.title" = "週末計畫";
+"widget.sample.1.body" = "訂火車票，帶上相機";
+"widget.sample.2.title" = "購物清單";
+"widget.sample.2.todo.1" = "牛奶";
+"widget.sample.2.todo.2" = "咖啡豆";
+"widget.sample.2.todo.3" = "橄欖油";
+"widget.sample.3.title" = "讀書筆記";
+"widget.sample.3.body" = "第四章 · 關於刻意練習";
+"widget.sample.4.title" = "旅行照片";
+"widget.sample.5.title" = "靈感";
+"widget.sample.5.body" = "新手引導可以再短一些";
