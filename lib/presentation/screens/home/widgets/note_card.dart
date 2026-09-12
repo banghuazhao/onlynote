@@ -1,3 +1,5 @@
+import 'package:onlynote/presentation/components/search_highlight.dart';
+import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
@@ -8,7 +10,6 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_image.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
-import 'package:onlynote/presentation/components/toast.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -19,6 +20,7 @@ class NoteCard extends StatefulWidget {
     super.key,
     required this.note,
     this.selected = false,
+    this.searchQuery = '',
     this.selectionMode = false,
     this.onLongPress,
     this.onTap,
@@ -26,6 +28,7 @@ class NoteCard extends StatefulWidget {
   });
 
   final Note note;
+  final String searchQuery;
   final bool selected;
   final bool selectionMode;
   final Function()? onLongPress;
@@ -50,22 +53,20 @@ class _NoteCardState extends State<NoteCard> {
     if (_pressed != value) setState(() => _pressed = value);
   }
 
-  Future<void> _shareNoteAsImage() async {
-    try {
-      await ShareHelper.shareWidgetAsImage(
+  Future<void> _shareNoteAsImage() => ShareHelper.shareNote(
+        context,
+        widget.note,
         _screenshotController,
-        fileName:
-            '${widget.note.title?.isNotEmpty == true ? widget.note.title : 'note'}.png',
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
       );
-    } catch (_) {
-      if (mounted) {
-        showTransientSnackBar(
-          context,
-          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
-        );
-      }
-    }
+
+  Iterable<Todo> _visibleTodos(Note note) {
+    final pattern = searchPattern(widget.searchQuery);
+    if (pattern == null) return note.todo.take(3);
+    return [
+      ...note.todo.where((t) => pattern.hasMatch(t.title ?? '')),
+      ...note.todo.where((t) => !pattern.hasMatch(t.title ?? '')),
+    ].take(3);
   }
 
   @override
@@ -122,8 +123,9 @@ class _NoteCardState extends State<NoteCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (hasTitle)
-                          Text(
-                            note.title!,
+                          SearchHighlight(
+                            searchExcerpt(note.title!, widget.searchQuery),
+                            query: widget.searchQuery,
                             style: AppTypography.cardTitle,
                             overflow: TextOverflow.ellipsis,
                             maxLines: hasDescription ? 3 : 5,
@@ -131,8 +133,10 @@ class _NoteCardState extends State<NoteCard> {
                         if (hasTitle && hasDescription)
                           const SizedBox(height: AppSpacings.m),
                         if (hasDescription)
-                          Text(
-                            note.description!,
+                          SearchHighlight(
+                            searchExcerpt(
+                                note.description!, widget.searchQuery),
+                            query: widget.searchQuery,
                             style: hasTitle
                                 ? AppTypography.cardBody
                                 : AppTypography.cardTitle,
@@ -172,12 +176,14 @@ class _NoteCardState extends State<NoteCard> {
                         ],
                         if (note.hasTodo) ...[
                           const SizedBox(height: AppSpacings.l),
-                          for (final todo in note.todo.take(3))
+                          for (final todo in _visibleTodos(note))
                             Padding(
                               padding:
                                   const EdgeInsets.only(bottom: AppSpacings.s),
                               child: PaperChecklistRow(
-                                label: todo.title ?? '',
+                                label: searchExcerpt(
+                                    todo.title ?? '', widget.searchQuery),
+                                searchQuery: widget.searchQuery,
                                 completed: todo.completed,
                                 dense: true,
                                 maxLines: 1,

@@ -36,25 +36,21 @@ class MultipleDeleteBloc
 
     on<_Delete>((event, emit) async {
       if (state is _Selected) {
-        final selectedIds = (state as _Selected).selectedIds;
-
-        emit(const MultipleDeleteState.deleting());
-
-        final failureOrSuccess = await _usecase(selectedIds);
-
-        failureOrSuccess.fold(
-          (error) {
-            emit(MultipleDeleteState.selected(selectedIds));
-            getIt<AppRouter>()
-                .context
-                .showToast('${error.message}', isError: true);
-          },
-          (_) {
-            emit(MultipleDeleteState.success(List.unmodifiable(selectedIds)));
-          },
-        );
+        await _delete((state as _Selected).selectedIds, emit);
       }
     });
+    on<_DeleteIds>((event, emit) => _delete(event.ids, emit));
+  }
+
+  Future<void> _delete(
+      List<String> ids, Emitter<MultipleDeleteState> emit) async {
+    if (state is _Deleting || ids.isEmpty) return;
+    emit(const MultipleDeleteState.deleting());
+    final result = await _usecase(ids);
+    result.fold((error) {
+      emit(MultipleDeleteState.selected(ids));
+      getIt<AppRouter>().context.showToast('${error.message}', isError: true);
+    }, (_) => emit(MultipleDeleteState.success(List.unmodifiable(ids))));
   }
 
   bool isSelected(String? id) =>

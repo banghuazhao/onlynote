@@ -1,3 +1,4 @@
+import 'package:onlynote/services/note_trash.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
@@ -12,13 +13,11 @@ class RestoreNotesUsecase {
   const RestoreNotesUsecase(this._repository);
   final NoteRepository _repository;
 
-  Future<Either<NoteError, Unit>> call(List<String> ids) async {
+  Future<Either<NoteError, bool>> call(List<String> ids) async {
     try {
-      for (final id in ids) {
-        final note = await _repository.getNote(id);
-        await _repository.addUpdateNote(note.copyWith(clearDeletedAt: true));
-      }
-      return right(unit);
+      final remindersRestored =
+          await NoteTrash.device(_repository).setDeleted(ids, deleted: false);
+      return right(remindersRestored);
     } catch (_) {
       return left(
         NoteError(message: _i10n.Failed_to_restore_notes),

@@ -1,3 +1,8 @@
+import 'package:onlynote/presentation/components/appearance_section.dart';
+import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/note_share_sheet.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
+import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -202,4 +207,54 @@ Widget backupSectionPreview() => MaterialApp(
           ),
         ),
       ),
+    );
+
+@Preview(name: 'Search filters and matches', size: Size(390, 300))
+Widget searchFiltersPreview() => const _SearchPreview();
+
+class _SearchPreview extends StatefulWidget {
+  const _SearchPreview();
+  @override
+  State<_SearchPreview> createState() => _SearchPreviewState();
+}
+
+class _SearchPreviewState extends State<_SearchPreview> {
+  Set<NoteSearchFilter> filters = {NoteSearchFilter.checklists};
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        theme: AppTheme.light,
+        localizationsDelegates: const [S.delegate],
+        home: Scaffold(
+            body: DeskSurface(
+                child: Column(children: [
+          NoteSearchFilters(
+              selected: filters,
+              onChanged: (value) => setState(() => filters = value)),
+          const Padding(
+              padding: EdgeInsets.all(24),
+              child: PaperNote(
+                color: AppColors.parchment,
+                tilt: false,
+                child: SearchHighlight('Pick up tea at the market',
+                    query: 'tea',
+                    style: TextStyle(fontSize: 22, color: AppColors.ink)),
+              )),
+        ]))),
+      );
+}
+
+@Preview(name: 'Share formats', size: Size(390, 560))
+Widget shareFormatsPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(body: NoteShareSheet()),
+    );
+
+@Preview(name: 'Appearance controls', size: Size(390, 340))
+Widget appearanceControlsPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(
+          body:
+              Padding(padding: EdgeInsets.all(16), child: AppearanceSection())),
     );

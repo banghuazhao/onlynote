@@ -1,3 +1,4 @@
+import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -68,6 +69,7 @@ Future<void> main() async {
 
   await AppTypographySettings.instance.load();
   await AppLayoutSettings.instance.load();
+  await AppAppearanceSettings.instance.load();
   await OnboardingSettings.instance.load();
   await ImageStorage.init();
   await WidgetSync.instance.init();

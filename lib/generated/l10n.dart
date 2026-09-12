@@ -1559,6 +1559,186 @@ class S {
       args: [],
     );
   }
+
+  /// `Appearance`
+  String get Appearance {
+    return Intl.message('Appearance', name: 'Appearance', desc: '', args: []);
+  }
+
+  /// `System`
+  String get Theme_System {
+    return Intl.message('System', name: 'Theme_System', desc: '', args: []);
+  }
+
+  /// `Light`
+  String get Theme_Light {
+    return Intl.message('Light', name: 'Theme_Light', desc: '', args: []);
+  }
+
+  /// `Dark`
+  String get Theme_Dark {
+    return Intl.message('Dark', name: 'Theme_Dark', desc: '', args: []);
+  }
+
+  /// `Plain paper`
+  String get Plain_Paper {
+    return Intl.message('Plain paper', name: 'Plain_Paper', desc: '', args: []);
+  }
+
+  /// `A calmer look without texture, ruled lines, or tilted cards.`
+  String get Plain_Paper_Description {
+    return Intl.message(
+      'A calmer look without texture, ruled lines, or tilted cards.',
+      name: 'Plain_Paper_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save this setting. Please try again.`
+  String get Settings_Save_Failed {
+    return Intl.message(
+      'Could not save this setting. Please try again.',
+      name: 'Settings_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checklists`
+  String get Filter_Checklists {
+    return Intl.message(
+      'Checklists',
+      name: 'Filter_Checklists',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photos`
+  String get Filter_Photos {
+    return Intl.message('Photos', name: 'Filter_Photos', desc: '', args: []);
+  }
+
+  /// `Reminders`
+  String get Filter_Reminders {
+    return Intl.message(
+      'Reminders',
+      name: 'Filter_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pinned`
+  String get Filter_Pinned {
+    return Intl.message('Pinned', name: 'Filter_Pinned', desc: '', args: []);
+  }
+
+  /// `Clear filters`
+  String get Clear_Filters {
+    return Intl.message(
+      'Clear filters',
+      name: 'Clear_Filters',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Image`
+  String get Share_Image {
+    return Intl.message('Image', name: 'Share_Image', desc: '', args: []);
+  }
+
+  /// `Plain text`
+  String get Share_Plain_Text {
+    return Intl.message(
+      'Plain text',
+      name: 'Share_Plain_Text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Markdown`
+  String get Share_Markdown {
+    return Intl.message('Markdown', name: 'Share_Markdown', desc: '', args: []);
+  }
+
+  /// `PDF document`
+  String get Share_PDF {
+    return Intl.message('PDF document', name: 'Share_PDF', desc: '', args: []);
+  }
+
+  /// `Share the current paper view as a picture.`
+  String get Share_Image_Description {
+    return Intl.message(
+      'Share the current paper view as a picture.',
+      name: 'Share_Image_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title, full text, checklist, and reminder. No photos.`
+  String get Share_Text_Description {
+    return Intl.message(
+      'Title, full text, checklist, and reminder. No photos.',
+      name: 'Share_Text_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A .md file with checklist formatting and photo attachments.`
+  String get Share_Markdown_Description {
+    return Intl.message(
+      'A .md file with checklist formatting and photo attachments.',
+      name: 'Share_Markdown_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full note and photos, laid out across printable pages.`
+  String get Share_PDF_Description {
+    return Intl.message(
+      'Full note and photos, laid out across printable pages.',
+      name: 'Share_PDF_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Preparing your note…`
+  String get Share_Preparing {
+    return Intl.message(
+      'Preparing your note…',
+      name: 'Share_Preparing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note has no text. Choose an image or PDF to include its photos.`
+  String get Share_No_Text {
+    return Intl.message(
+      'This note has no text. Choose an image or PDF to include its photos.',
+      name: 'Share_No_Text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.`
+  String get Restore_Reminder_Warning {
+    return Intl.message(
+      'Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.',
+      name: 'Restore_Reminder_Warning',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

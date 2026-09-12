@@ -1,3 +1,5 @@
+import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     PurchaseService.instance.addListener(_entitlementChanged);
+    ReminderData.shared.addListener(_remindersChanged);
   }
 
   @override
@@ -106,6 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _ad?.load();
   }
 
+  void _remindersChanged() {
+    if (mounted) context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
+  }
+
   void _entitlementChanged() {
     if (!PurchaseService.instance.shouldShowAds) _disposeAd();
   }
@@ -121,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       SnackBar(
         content: Text(S.of(context).Notes_Moved_To_Trash),
+        duration: const Duration(seconds: 6),
         action: SnackBarAction(
           label: S.of(context).Undo,
           onPressed: () {
@@ -203,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     PurchaseService.instance.removeListener(_entitlementChanged);
+    ReminderData.shared.removeListener(_remindersChanged);
     _searchController.dispose();
     _ad?.dispose();
     super.dispose();
@@ -263,7 +272,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SafeArea(
             child: Column(
               children: [
-                if (_isSearchVisible) _buildSearchField(context),
+                if (_isSearchVisible) ...[
+                  _buildSearchField(context),
+                  BlocBuilder<HomeBloc, HomeState>(
+                      builder: (context, state) => NoteSearchFilters(
+                            selected:
+                                state.mapOrNull(loaded: (s) => s.filters) ?? {},
+                            onChanged: (filters) => context
+                                .read<HomeBloc>()
+                                .add(HomeEvent.filtersChanged(filters)),
+                          )),
+                ],
                 Expanded(
                   child: ValueListenableBuilder(
                     valueListenable: getIt<Database>().box.listenable(),
@@ -294,8 +313,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? _EmptyNotes(
                                           showTrash: data.showTrash,
                                           hasSearch: data.searchQuery
-                                              .trim()
-                                              .isNotEmpty,
+                                                  .trim()
+                                                  .isNotEmpty ||
+                                              data.filters.isNotEmpty,
                                           hasFolder:
                                               data.selectedFolderId != null,
                                           onAdd: () {
@@ -308,11 +328,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )
                                       : _BuildNotesList(
                                           notes: data.notes,
+                                          searchQuery: data.searchQuery,
                                           folders: data.folders,
                                           showTrash: data.showTrash,
-                                          isReorderMode: _isReorderMode,
-                                          onEnterReorderMode: () =>
-                                              _setReorderMode(true),
+                                          isReorderMode: _isReorderMode &&
+                                              data.searchQuery.trim().isEmpty &&
+                                              data.filters.isEmpty,
+                                          onEnterReorderMode: () {
+                                            _searchController.clear();
+                                            context.read<HomeBloc>().add(
+                                                const HomeEvent.searchChanged(
+                                                    ''));
+                                            context.read<HomeBloc>().add(
+                                                const HomeEvent.filtersChanged(
+                                                    {}));
+                                            setState(() {
+                                              _isSearchVisible = false;
+                                              _isReorderMode = true;
+                                            });
+                                          },
                                         ),
                                 ),
                               ],
@@ -323,7 +357,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                if (_adSize != null && PurchaseService.instance.shouldShowAds)
+                if (_adSize != null &&
+                    PurchaseService.instance.shouldShowAds &&
+                    MediaQuery.viewInsetsOf(context).bottom == 0)
                   Semantics(
                     label: 'Advertisement',
                     container: true,
@@ -369,6 +405,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   _isSearchVisible = !_isSearchVisible;
                   if (!_isSearchVisible) {
                     _searchController.clear();
+                    context
+                        .read<HomeBloc>()
+                        .add(const HomeEvent.filtersChanged({}));
                     context
                         .read<HomeBloc>()
                         .add(const HomeEvent.searchChanged(''));
@@ -616,6 +655,7 @@ class _HomeError extends StatelessWidget {
 class _BuildNotesList extends StatefulWidget {
   const _BuildNotesList({
     required this.notes,
+    required this.searchQuery,
     required this.folders,
     required this.showTrash,
     required this.isReorderMode,
@@ -623,6 +663,7 @@ class _BuildNotesList extends StatefulWidget {
   });
 
   final List<Note> notes;
+  final String searchQuery;
   final List<Folder> folders;
   final bool showTrash;
   final bool isReorderMode;
@@ -648,20 +689,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     ScreenshotController controller,
     GlobalKey cardKey,
   ) async {
-    try {
-      await ShareHelper.shareWidgetAsImage(
-        controller,
-        fileName: '${note.title?.isNotEmpty == true ? note.title : 'note'}.png',
-        sharePositionOrigin: ShareHelper.shareOriginFromKey(cardKey),
-      );
-    } catch (_) {
-      if (context.mounted) {
-        showTransientSnackBar(
-          context,
-          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
-        );
-      }
-    }
+    await ShareHelper.shareNote(context, note, controller,
+        sharePositionOrigin: ShareHelper.shareOriginFromKey(cardKey));
   }
 
   void _showMoveToFolderSheet(BuildContext context, Note note) {
@@ -811,15 +840,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
               style: TextStyle(color: context.colors.error)),
           onPressed: (sheetContext) async {
             Navigator.pop(sheetContext);
-            final confirmed = await showConfirmDialog(
-              context,
-              title: S.of(context).Delete_Note_Confirm_Title,
-              message: S.of(context).Delete_Note_Confirm_Message,
-            );
-            if (confirmed) {
-              multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
-              multipleDeleteBloc.add(const MultipleDeleteEvent.delete());
-            }
+            multipleDeleteBloc.add(MultipleDeleteEvent.deleteIds([noteId]));
           },
         ),
       ],
@@ -896,6 +917,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             key: _cardKeyFor(noteId),
             child: NoteCard(
               note: note,
+              searchQuery: widget.searchQuery,
               selected: multipleDeleteBloc.isSelected(noteId),
               selectionMode: isSelectionMode,
               screenshotController: _screenshotControllerFor(noteId),

@@ -1,3 +1,5 @@
+import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -33,6 +35,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<_DuplicateNote>(_onDuplicateNote);
     on<_ReorderNotes>(_onReorderNotes);
     on<_SearchChanged>(_onSearchChanged);
+    on<_FiltersChanged>((event, emit) {
+      _filters = Set.of(event.filters);
+      emit(_buildLoaded());
+    });
     on<_SelectFolder>(_onSelectFolder);
     on<_ShowTrash>(_onShowTrash);
     on<_TogglePin>(_onTogglePin);
@@ -59,6 +65,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<Note> _trashedNotes = [];
   List<Folder> _folders = [];
   String _searchQuery = '';
+  Set<NoteSearchFilter> _filters = {};
   String? _selectedFolderId;
   bool _showTrash = false;
 
@@ -169,7 +176,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (error) => getIt<AppRouter>()
           .context
           .showToast('${error.message}', isError: true),
-      (_) => getIt<AppRouter>().context.showToast(_i10n.Notes_Restored),
+      (remindersRestored) => getIt<AppRouter>().context.showToast(
+          remindersRestored
+              ? _i10n.Notes_Restored
+              : _i10n.Restore_Reminder_Warning),
     );
   }
 
@@ -182,9 +192,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (error) => getIt<AppRouter>()
           .context
           .showToast('${error.message}', isError: true),
-      (_) => getIt<AppRouter>()
-          .context
-          .showToast(_i10n.Notes_Permanently_Deleted),
+      (_) =>
+          getIt<AppRouter>().context.showToast(_i10n.Notes_Permanently_Deleted),
     );
   }
 
@@ -260,6 +269,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       notes: overrideVisible ?? _visibleNotes(),
       folders: List.unmodifiable(_folders),
       searchQuery: _searchQuery,
+      filters: _filters,
       selectedFolderId: _selectedFolderId,
       showTrash: _showTrash,
       trashCount: _trashedNotes.length,
@@ -285,20 +295,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       notes = notes.where((n) => n.folderId == _selectedFolderId);
     }
 
-    final query = _searchQuery.trim().toLowerCase();
-    if (query.isNotEmpty) {
-      notes = notes.where((n) => _matchesSearch(n, query));
-    }
-
-    return notes.toList();
-  }
-
-  bool _matchesSearch(Note note, String query) {
-    if ((note.title ?? '').toLowerCase().contains(query)) return true;
-    if ((note.description ?? '').toLowerCase().contains(query)) return true;
-    for (final todo in note.todo) {
-      if ((todo.title ?? '').toLowerCase().contains(query)) return true;
-    }
-    return false;
+    return notes
+        .where((note) => matchesNoteSearch(note, _searchQuery, _filters,
+            hasReminder: ReminderData.shared.getCurrentReminder(note) != null))
+        .toList();
   }
 }

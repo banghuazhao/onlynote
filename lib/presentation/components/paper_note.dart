@@ -1,3 +1,5 @@
+import 'package:onlynote/presentation/components/search_highlight.dart';
+import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -41,7 +43,13 @@ class PaperNote extends StatelessWidget {
   static const _sheetRadius = 3.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppAppearanceSettings.instance,
+        builder: (context, _) => _buildSurface(context),
+      );
+
+  Widget _buildSurface(BuildContext context) {
+    final plain = AppAppearanceSettings.instance.plainPaper;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final isSheet = kind == PaperNoteKind.sheet;
     final radius = isSheet ? _sheetRadius : _scrapRadius;
@@ -49,8 +57,9 @@ class PaperNote extends StatelessWidget {
       borderRadius: BorderRadius.circular(radius),
     );
     final desk = DeskSurface.colorOf(context);
-    final tiltTurns =
-        (!tilt || reduceMotion || isSheet) ? 0.0 : ((seed % 13) - 6) * 0.0008;
+    final tiltTurns = (!tilt || plain || reduceMotion || isSheet)
+        ? 0.0
+        : ((seed % 13) - 6) * 0.0008;
 
     final paper = AnimatedContainer(
       duration:
@@ -85,18 +94,19 @@ class PaperNote extends StatelessWidget {
         shape: shape,
         child: Stack(
           children: [
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _PaperTexturePainter(
-                    color: color,
-                    seed: seed,
-                    kind: kind,
-                    holeColor: desk,
+            if (!plain)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: _PaperTexturePainter(
+                      color: color,
+                      seed: seed,
+                      kind: kind,
+                      holeColor: desk,
+                    ),
                   ),
                 ),
               ),
-            ),
             Padding(
               padding: _resolvePadding(context, isSheet),
               child: child,
@@ -109,7 +119,11 @@ class PaperNote extends StatelessWidget {
                 child: IgnorePointer(
                   child: Semantics(
                     label: S.of(context).Pin,
-                    child: Center(child: _Thumbtack(seed: seed)),
+                    child: Center(
+                        child: plain
+                            ? const Icon(Icons.push_pin,
+                                size: 18, color: AppColors.ink)
+                            : _Thumbtack(seed: seed)),
                   ),
                 ),
               ),
@@ -151,12 +165,19 @@ class DeskSurface extends StatelessWidget {
           : AppColors.desk;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppAppearanceSettings.instance,
+        builder: (context, _) => _buildSurface(context),
+      );
+
+  Widget _buildSurface(BuildContext context) {
     final color = colorOf(context);
     return ColoredBox(
       color: color,
       child: CustomPaint(
-        painter: _DeskGrainPainter(color: color),
+        painter: AppAppearanceSettings.instance.plainPaper
+            ? null
+            : _DeskGrainPainter(color: color),
         isComplex: true,
         willChange: false,
         child: child,
@@ -179,7 +200,13 @@ class RuledWritingArea extends StatelessWidget {
   final double lineHeight;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppAppearanceSettings.instance,
+        builder: (context, _) => _buildSurface(context),
+      );
+
+  Widget _buildSurface(BuildContext context) {
+    if (AppAppearanceSettings.instance.plainPaper) return child;
     final ink = Color.lerp(
       paperColor ?? AppColors.parchment,
       AppColors.ink,
@@ -205,6 +232,7 @@ class PaperChecklistRow extends StatelessWidget {
     this.onChanged,
     this.maxLines = 2,
     this.dense = false,
+    this.searchQuery = '',
   });
 
   final String label;
@@ -212,6 +240,7 @@ class PaperChecklistRow extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
   final int maxLines;
   final bool dense;
+  final String searchQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -234,8 +263,9 @@ class PaperChecklistRow extends StatelessWidget {
               decoration: completed ? TextDecoration.lineThrough : null,
               decorationColor: AppColors.ink.withValues(alpha: 0.45),
             ),
-            child: Text(
+            child: SearchHighlight(
               label,
+              query: searchQuery,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
             ),

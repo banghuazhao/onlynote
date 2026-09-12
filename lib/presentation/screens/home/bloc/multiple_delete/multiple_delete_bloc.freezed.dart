@@ -19,6 +19,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) toggleSelect,
+    required TResult Function(List<String> ids) deleteIds,
     required TResult Function() delete,
     required TResult Function() clearAll,
   }) =>
@@ -26,6 +27,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? toggleSelect,
+    TResult? Function(List<String> ids)? deleteIds,
     TResult? Function()? delete,
     TResult? Function()? clearAll,
   }) =>
@@ -33,6 +35,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? toggleSelect,
+    TResult Function(List<String> ids)? deleteIds,
     TResult Function()? delete,
     TResult Function()? clearAll,
     required TResult orElse(),
@@ -41,6 +44,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_ToggleSelect value) toggleSelect,
+    required TResult Function(_DeleteIds value) deleteIds,
     required TResult Function(_Delete value) delete,
     required TResult Function(_ClearAll value) clearAll,
   }) =>
@@ -48,6 +52,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ToggleSelect value)? toggleSelect,
+    TResult? Function(_DeleteIds value)? deleteIds,
     TResult? Function(_Delete value)? delete,
     TResult? Function(_ClearAll value)? clearAll,
   }) =>
@@ -55,6 +60,7 @@ mixin _$MultipleDeleteEvent {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ToggleSelect value)? toggleSelect,
+    TResult Function(_DeleteIds value)? deleteIds,
     TResult Function(_Delete value)? delete,
     TResult Function(_ClearAll value)? clearAll,
     required TResult orElse(),
@@ -145,6 +151,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) toggleSelect,
+    required TResult Function(List<String> ids) deleteIds,
     required TResult Function() delete,
     required TResult Function() clearAll,
   }) {
@@ -155,6 +162,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? toggleSelect,
+    TResult? Function(List<String> ids)? deleteIds,
     TResult? Function()? delete,
     TResult? Function()? clearAll,
   }) {
@@ -165,6 +173,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? toggleSelect,
+    TResult Function(List<String> ids)? deleteIds,
     TResult Function()? delete,
     TResult Function()? clearAll,
     required TResult orElse(),
@@ -179,6 +188,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_ToggleSelect value) toggleSelect,
+    required TResult Function(_DeleteIds value) deleteIds,
     required TResult Function(_Delete value) delete,
     required TResult Function(_ClearAll value) clearAll,
   }) {
@@ -189,6 +199,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ToggleSelect value)? toggleSelect,
+    TResult? Function(_DeleteIds value)? deleteIds,
     TResult? Function(_Delete value)? delete,
     TResult? Function(_ClearAll value)? clearAll,
   }) {
@@ -199,6 +210,7 @@ class _$ToggleSelectImpl implements _ToggleSelect {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ToggleSelect value)? toggleSelect,
+    TResult Function(_DeleteIds value)? deleteIds,
     TResult Function(_Delete value)? delete,
     TResult Function(_ClearAll value)? clearAll,
     required TResult orElse(),
@@ -216,6 +228,157 @@ abstract class _ToggleSelect implements MultipleDeleteEvent {
   String get id;
   @JsonKey(ignore: true)
   _$$ToggleSelectImplCopyWith<_$ToggleSelectImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$DeleteIdsImplCopyWith<$Res> {
+  factory _$$DeleteIdsImplCopyWith(
+          _$DeleteIdsImpl value, $Res Function(_$DeleteIdsImpl) then) =
+      __$$DeleteIdsImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<String> ids});
+}
+
+/// @nodoc
+class __$$DeleteIdsImplCopyWithImpl<$Res>
+    extends _$MultipleDeleteEventCopyWithImpl<$Res, _$DeleteIdsImpl>
+    implements _$$DeleteIdsImplCopyWith<$Res> {
+  __$$DeleteIdsImplCopyWithImpl(
+      _$DeleteIdsImpl _value, $Res Function(_$DeleteIdsImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? ids = null,
+  }) {
+    return _then(_$DeleteIdsImpl(
+      null == ids
+          ? _value._ids
+          : ids // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$DeleteIdsImpl implements _DeleteIds {
+  const _$DeleteIdsImpl(final List<String> ids) : _ids = ids;
+
+  final List<String> _ids;
+  @override
+  List<String> get ids {
+    if (_ids is EqualUnmodifiableListView) return _ids;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_ids);
+  }
+
+  @override
+  String toString() {
+    return 'MultipleDeleteEvent.deleteIds(ids: $ids)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DeleteIdsImpl &&
+            const DeepCollectionEquality().equals(other._ids, _ids));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_ids));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DeleteIdsImplCopyWith<_$DeleteIdsImpl> get copyWith =>
+      __$$DeleteIdsImplCopyWithImpl<_$DeleteIdsImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id) toggleSelect,
+    required TResult Function(List<String> ids) deleteIds,
+    required TResult Function() delete,
+    required TResult Function() clearAll,
+  }) {
+    return deleteIds(ids);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id)? toggleSelect,
+    TResult? Function(List<String> ids)? deleteIds,
+    TResult? Function()? delete,
+    TResult? Function()? clearAll,
+  }) {
+    return deleteIds?.call(ids);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String id)? toggleSelect,
+    TResult Function(List<String> ids)? deleteIds,
+    TResult Function()? delete,
+    TResult Function()? clearAll,
+    required TResult orElse(),
+  }) {
+    if (deleteIds != null) {
+      return deleteIds(ids);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ToggleSelect value) toggleSelect,
+    required TResult Function(_DeleteIds value) deleteIds,
+    required TResult Function(_Delete value) delete,
+    required TResult Function(_ClearAll value) clearAll,
+  }) {
+    return deleteIds(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ToggleSelect value)? toggleSelect,
+    TResult? Function(_DeleteIds value)? deleteIds,
+    TResult? Function(_Delete value)? delete,
+    TResult? Function(_ClearAll value)? clearAll,
+  }) {
+    return deleteIds?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ToggleSelect value)? toggleSelect,
+    TResult Function(_DeleteIds value)? deleteIds,
+    TResult Function(_Delete value)? delete,
+    TResult Function(_ClearAll value)? clearAll,
+    required TResult orElse(),
+  }) {
+    if (deleteIds != null) {
+      return deleteIds(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _DeleteIds implements MultipleDeleteEvent {
+  const factory _DeleteIds(final List<String> ids) = _$DeleteIdsImpl;
+
+  List<String> get ids;
+  @JsonKey(ignore: true)
+  _$$DeleteIdsImplCopyWith<_$DeleteIdsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -258,6 +421,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) toggleSelect,
+    required TResult Function(List<String> ids) deleteIds,
     required TResult Function() delete,
     required TResult Function() clearAll,
   }) {
@@ -268,6 +432,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? toggleSelect,
+    TResult? Function(List<String> ids)? deleteIds,
     TResult? Function()? delete,
     TResult? Function()? clearAll,
   }) {
@@ -278,6 +443,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? toggleSelect,
+    TResult Function(List<String> ids)? deleteIds,
     TResult Function()? delete,
     TResult Function()? clearAll,
     required TResult orElse(),
@@ -292,6 +458,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_ToggleSelect value) toggleSelect,
+    required TResult Function(_DeleteIds value) deleteIds,
     required TResult Function(_Delete value) delete,
     required TResult Function(_ClearAll value) clearAll,
   }) {
@@ -302,6 +469,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ToggleSelect value)? toggleSelect,
+    TResult? Function(_DeleteIds value)? deleteIds,
     TResult? Function(_Delete value)? delete,
     TResult? Function(_ClearAll value)? clearAll,
   }) {
@@ -312,6 +480,7 @@ class _$DeleteImpl implements _Delete {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ToggleSelect value)? toggleSelect,
+    TResult Function(_DeleteIds value)? deleteIds,
     TResult Function(_Delete value)? delete,
     TResult Function(_ClearAll value)? clearAll,
     required TResult orElse(),
@@ -366,6 +535,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String id) toggleSelect,
+    required TResult Function(List<String> ids) deleteIds,
     required TResult Function() delete,
     required TResult Function() clearAll,
   }) {
@@ -376,6 +546,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String id)? toggleSelect,
+    TResult? Function(List<String> ids)? deleteIds,
     TResult? Function()? delete,
     TResult? Function()? clearAll,
   }) {
@@ -386,6 +557,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id)? toggleSelect,
+    TResult Function(List<String> ids)? deleteIds,
     TResult Function()? delete,
     TResult Function()? clearAll,
     required TResult orElse(),
@@ -400,6 +572,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_ToggleSelect value) toggleSelect,
+    required TResult Function(_DeleteIds value) deleteIds,
     required TResult Function(_Delete value) delete,
     required TResult Function(_ClearAll value) clearAll,
   }) {
@@ -410,6 +583,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ToggleSelect value)? toggleSelect,
+    TResult? Function(_DeleteIds value)? deleteIds,
     TResult? Function(_Delete value)? delete,
     TResult? Function(_ClearAll value)? clearAll,
   }) {
@@ -420,6 +594,7 @@ class _$ClearAllImpl implements _ClearAll {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ToggleSelect value)? toggleSelect,
+    TResult Function(_DeleteIds value)? deleteIds,
     TResult Function(_Delete value)? delete,
     TResult Function(_ClearAll value)? clearAll,
     required TResult orElse(),

@@ -22,6 +22,7 @@ mixin _$HomeEvent {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -39,6 +40,7 @@ mixin _$HomeEvent {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -56,6 +58,7 @@ mixin _$HomeEvent {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -74,6 +77,7 @@ mixin _$HomeEvent {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -91,6 +95,7 @@ mixin _$HomeEvent {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -108,6 +113,7 @@ mixin _$HomeEvent {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -181,6 +187,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -201,6 +208,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -221,6 +229,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -245,6 +254,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -265,6 +275,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -285,6 +296,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -385,6 +397,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -405,6 +418,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -425,6 +439,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -449,6 +464,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -469,6 +485,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -489,6 +506,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -590,6 +608,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -610,6 +629,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -630,6 +650,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -654,6 +675,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -674,6 +696,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -694,6 +717,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -789,6 +813,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -809,6 +834,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -829,6 +855,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -853,6 +880,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -873,6 +901,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -893,6 +922,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -917,6 +947,220 @@ abstract class _SearchChanged implements HomeEvent {
   String get query;
   @JsonKey(ignore: true)
   _$$SearchChangedImplCopyWith<_$SearchChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$FiltersChangedImplCopyWith<$Res> {
+  factory _$$FiltersChangedImplCopyWith(_$FiltersChangedImpl value,
+          $Res Function(_$FiltersChangedImpl) then) =
+      __$$FiltersChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({Set<NoteSearchFilter> filters});
+}
+
+/// @nodoc
+class __$$FiltersChangedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$FiltersChangedImpl>
+    implements _$$FiltersChangedImplCopyWith<$Res> {
+  __$$FiltersChangedImplCopyWithImpl(
+      _$FiltersChangedImpl _value, $Res Function(_$FiltersChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? filters = null,
+  }) {
+    return _then(_$FiltersChangedImpl(
+      null == filters
+          ? _value._filters
+          : filters // ignore: cast_nullable_to_non_nullable
+              as Set<NoteSearchFilter>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$FiltersChangedImpl implements _FiltersChanged {
+  const _$FiltersChangedImpl(final Set<NoteSearchFilter> filters)
+      : _filters = filters;
+
+  final Set<NoteSearchFilter> _filters;
+  @override
+  Set<NoteSearchFilter> get filters {
+    if (_filters is EqualUnmodifiableSetView) return _filters;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_filters);
+  }
+
+  @override
+  String toString() {
+    return 'HomeEvent.filtersChanged(filters: $filters)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$FiltersChangedImpl &&
+            const DeepCollectionEquality().equals(other._filters, _filters));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_filters));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$FiltersChangedImplCopyWith<_$FiltersChangedImpl> get copyWith =>
+      __$$FiltersChangedImplCopyWithImpl<_$FiltersChangedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return filtersChanged(filters);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return filtersChanged?.call(filters);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (filtersChanged != null) {
+      return filtersChanged(filters);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return filtersChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return filtersChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (filtersChanged != null) {
+      return filtersChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _FiltersChanged implements HomeEvent {
+  const factory _FiltersChanged(final Set<NoteSearchFilter> filters) =
+      _$FiltersChangedImpl;
+
+  Set<NoteSearchFilter> get filters;
+  @JsonKey(ignore: true)
+  _$$FiltersChangedImplCopyWith<_$FiltersChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -989,6 +1233,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -1009,6 +1254,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -1029,6 +1275,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -1053,6 +1300,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -1073,6 +1321,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -1093,6 +1342,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -1188,6 +1438,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -1208,6 +1459,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -1228,6 +1480,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -1252,6 +1505,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -1272,6 +1526,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -1292,6 +1547,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -1387,6 +1643,7 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -1407,6 +1664,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -1427,6 +1685,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -1451,6 +1710,7 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -1471,6 +1731,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -1491,6 +1752,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -1592,6 +1854,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -1612,6 +1875,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -1632,6 +1896,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -1656,6 +1921,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -1676,6 +1942,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -1696,6 +1963,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -1798,6 +2066,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -1818,6 +2087,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -1838,6 +2108,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -1862,6 +2133,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -1882,6 +2154,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -1902,6 +2175,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -1998,6 +2272,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -2018,6 +2293,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -2038,6 +2314,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -2062,6 +2339,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -2082,6 +2360,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -2102,6 +2381,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -2205,6 +2485,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -2225,6 +2506,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -2245,6 +2527,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -2269,6 +2552,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -2289,6 +2573,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -2309,6 +2594,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -2406,6 +2692,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -2426,6 +2713,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -2446,6 +2734,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -2470,6 +2759,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -2490,6 +2780,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -2510,6 +2801,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -2615,6 +2907,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
     required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(String noteId) togglePin,
@@ -2635,6 +2928,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
     TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(String noteId)? togglePin,
@@ -2655,6 +2949,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
     TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(String noteId)? togglePin,
@@ -2679,6 +2974,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
     required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
     required TResult Function(_TogglePin value) togglePin,
@@ -2699,6 +2995,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
     TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
     TResult? Function(_TogglePin value)? togglePin,
@@ -2719,6 +3016,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
     TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
     TResult Function(_TogglePin value)? togglePin,
@@ -2759,6 +3057,7 @@ mixin _$HomeState {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -2776,6 +3075,7 @@ mixin _$HomeState {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -2793,6 +3093,7 @@ mixin _$HomeState {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -2891,6 +3192,7 @@ class _$InitialImpl implements _Initial {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -2911,6 +3213,7 @@ class _$InitialImpl implements _Initial {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -2931,6 +3234,7 @@ class _$InitialImpl implements _Initial {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3032,6 +3336,7 @@ class _$LoadingImpl implements _Loading {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3052,6 +3357,7 @@ class _$LoadingImpl implements _Loading {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3072,6 +3378,7 @@ class _$LoadingImpl implements _Loading {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3139,6 +3446,7 @@ abstract class _$$LoadedImplCopyWith<$Res> {
       {List<Note> notes,
       List<Folder> folders,
       String searchQuery,
+      Set<NoteSearchFilter> filters,
       String? selectedFolderId,
       bool showTrash,
       int trashCount,
@@ -3160,6 +3468,7 @@ class __$$LoadedImplCopyWithImpl<$Res>
     Object? notes = null,
     Object? folders = null,
     Object? searchQuery = null,
+    Object? filters = null,
     Object? selectedFolderId = freezed,
     Object? showTrash = null,
     Object? trashCount = null,
@@ -3179,6 +3488,10 @@ class __$$LoadedImplCopyWithImpl<$Res>
           ? _value.searchQuery
           : searchQuery // ignore: cast_nullable_to_non_nullable
               as String,
+      filters: null == filters
+          ? _value._filters
+          : filters // ignore: cast_nullable_to_non_nullable
+              as Set<NoteSearchFilter>,
       selectedFolderId: freezed == selectedFolderId
           ? _value.selectedFolderId
           : selectedFolderId // ignore: cast_nullable_to_non_nullable
@@ -3210,6 +3523,7 @@ class _$LoadedImpl implements _Loaded {
       {required final List<Note> notes,
       required final List<Folder> folders,
       this.searchQuery = '',
+      final Set<NoteSearchFilter> filters = const <NoteSearchFilter>{},
       this.selectedFolderId,
       this.showTrash = false,
       this.trashCount = 0,
@@ -3217,6 +3531,7 @@ class _$LoadedImpl implements _Loaded {
       this.allNotesCount = 0})
       : _notes = notes,
         _folders = folders,
+        _filters = filters,
         _folderCounts = folderCounts;
 
   final List<Note> _notes;
@@ -3238,6 +3553,15 @@ class _$LoadedImpl implements _Loaded {
   @override
   @JsonKey()
   final String searchQuery;
+  final Set<NoteSearchFilter> _filters;
+  @override
+  @JsonKey()
+  Set<NoteSearchFilter> get filters {
+    if (_filters is EqualUnmodifiableSetView) return _filters;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_filters);
+  }
+
   @override
   final String? selectedFolderId;
   @override
@@ -3269,7 +3593,7 @@ class _$LoadedImpl implements _Loaded {
 
   @override
   String toString() {
-    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, selectedFolderId: $selectedFolderId, showTrash: $showTrash, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
+    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, filters: $filters, selectedFolderId: $selectedFolderId, showTrash: $showTrash, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
   }
 
   @override
@@ -3281,6 +3605,7 @@ class _$LoadedImpl implements _Loaded {
             const DeepCollectionEquality().equals(other._folders, _folders) &&
             (identical(other.searchQuery, searchQuery) ||
                 other.searchQuery == searchQuery) &&
+            const DeepCollectionEquality().equals(other._filters, _filters) &&
             (identical(other.selectedFolderId, selectedFolderId) ||
                 other.selectedFolderId == selectedFolderId) &&
             (identical(other.showTrash, showTrash) ||
@@ -3299,6 +3624,7 @@ class _$LoadedImpl implements _Loaded {
       const DeepCollectionEquality().hash(_notes),
       const DeepCollectionEquality().hash(_folders),
       searchQuery,
+      const DeepCollectionEquality().hash(_filters),
       selectedFolderId,
       showTrash,
       trashCount,
@@ -3320,6 +3646,7 @@ class _$LoadedImpl implements _Loaded {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3328,8 +3655,8 @@ class _$LoadedImpl implements _Loaded {
         loaded,
     required TResult Function(String? message) error,
   }) {
-    return loaded(notes, folders, searchQuery, selectedFolderId, showTrash,
-        trashCount, folderCounts, allNotesCount);
+    return loaded(notes, folders, searchQuery, filters, selectedFolderId,
+        showTrash, trashCount, folderCounts, allNotesCount);
   }
 
   @override
@@ -3341,6 +3668,7 @@ class _$LoadedImpl implements _Loaded {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3349,7 +3677,7 @@ class _$LoadedImpl implements _Loaded {
         loaded,
     TResult? Function(String? message)? error,
   }) {
-    return loaded?.call(notes, folders, searchQuery, selectedFolderId,
+    return loaded?.call(notes, folders, searchQuery, filters, selectedFolderId,
         showTrash, trashCount, folderCounts, allNotesCount);
   }
 
@@ -3362,6 +3690,7 @@ class _$LoadedImpl implements _Loaded {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3372,8 +3701,8 @@ class _$LoadedImpl implements _Loaded {
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(notes, folders, searchQuery, selectedFolderId, showTrash,
-          trashCount, folderCounts, allNotesCount);
+      return loaded(notes, folders, searchQuery, filters, selectedFolderId,
+          showTrash, trashCount, folderCounts, allNotesCount);
     }
     return orElse();
   }
@@ -3421,6 +3750,7 @@ abstract class _Loaded implements HomeState {
       {required final List<Note> notes,
       required final List<Folder> folders,
       final String searchQuery,
+      final Set<NoteSearchFilter> filters,
       final String? selectedFolderId,
       final bool showTrash,
       final int trashCount,
@@ -3430,6 +3760,7 @@ abstract class _Loaded implements HomeState {
   List<Note> get notes;
   List<Folder> get folders;
   String get searchQuery;
+  Set<NoteSearchFilter> get filters;
   String? get selectedFolderId;
   bool get showTrash;
   int get trashCount;
@@ -3514,6 +3845,7 @@ class _$ErrorImpl implements _Error {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3534,6 +3866,7 @@ class _$ErrorImpl implements _Error {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,
@@ -3554,6 +3887,7 @@ class _$ErrorImpl implements _Error {
             List<Note> notes,
             List<Folder> folders,
             String searchQuery,
+            Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
             int trashCount,

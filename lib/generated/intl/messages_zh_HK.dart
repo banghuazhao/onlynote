@@ -39,6 +39,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "All_Notes": MessageLookupByLibrary.simpleMessage("全部備忘錄"),
     "Allow_Notification": MessageLookupByLibrary.simpleMessage("允許推送"),
+    "Appearance": MessageLookupByLibrary.simpleMessage("外觀"),
     "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存變更。請保持筆記開啟，點按「完成」重試。",
     ),
@@ -79,6 +80,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage("從相冊選擇"),
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音樂盒"),
+    "Clear_Filters": MessageLookupByLibrary.simpleMessage("清除篩選"),
     "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(副本)"),
     "Delete": MessageLookupByLibrary.simpleMessage("刪除"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("刪除資料夾"),
@@ -126,6 +128,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Failed_to_update_note_Title_should_not_empty":
         MessageLookupByLibrary.simpleMessage("備忘錄內容不能為空，請添加標題、內容、待辦事項或照片"),
+    "Filter_Checklists": MessageLookupByLibrary.simpleMessage("清單"),
+    "Filter_Photos": MessageLookupByLibrary.simpleMessage("相片"),
+    "Filter_Pinned": MessageLookupByLibrary.simpleMessage("置頂"),
+    "Filter_Reminders": MessageLookupByLibrary.simpleMessage("提醒"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已建立資料夾"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已刪除資料夾"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
@@ -200,6 +206,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "永久刪除？",
     ),
     "Pin": MessageLookupByLibrary.simpleMessage("置頂"),
+    "Plain_Paper": MessageLookupByLibrary.simpleMessage("純色紙張"),
+    "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
+      "移除紋理、橫線和卡片傾斜，讓介面更簡潔。",
+    ),
     "Privacy": MessageLookupByLibrary.simpleMessage("私隱"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("私隱政策"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
@@ -234,18 +244,45 @@ class MessageLookup extends MessageLookupByLibrary {
     "Restore": MessageLookupByLibrary.simpleMessage("還原"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage("未找到以前的移除廣告購買。"),
     "Restore_Purchases": MessageLookupByLibrary.simpleMessage("恢復購買"),
+    "Restore_Reminder_Warning": MessageLookupByLibrary.simpleMessage(
+      "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。",
+    ),
     "Restore_Success": MessageLookupByLibrary.simpleMessage("已恢復您的移除廣告購買。"),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
     "Settings": MessageLookupByLibrary.simpleMessage("設置"),
+    "Settings_Save_Failed": MessageLookupByLibrary.simpleMessage("無法儲存設定，請重試。"),
     "Share": MessageLookupByLibrary.simpleMessage("分享"),
+    "Share_Image": MessageLookupByLibrary.simpleMessage("圖片"),
+    "Share_Image_Description": MessageLookupByLibrary.simpleMessage(
+      "將目前紙張畫面分享為圖片。",
+    ),
+    "Share_Markdown": MessageLookupByLibrary.simpleMessage("Markdown"),
+    "Share_Markdown_Description": MessageLookupByLibrary.simpleMessage(
+      "包含清單格式和相片附件的 .md 檔案。",
+    ),
+    "Share_No_Text": MessageLookupByLibrary.simpleMessage(
+      "此筆記沒有文字，請選擇圖片或 PDF 來分享相片。",
+    ),
     "Share_Note_Failed": MessageLookupByLibrary.simpleMessage("分享備忘錄失敗, 請重試"),
+    "Share_PDF": MessageLookupByLibrary.simpleMessage("PDF 文件"),
+    "Share_PDF_Description": MessageLookupByLibrary.simpleMessage(
+      "包含完整筆記和相片，自動分頁，方便列印。",
+    ),
+    "Share_Plain_Text": MessageLookupByLibrary.simpleMessage("純文字"),
+    "Share_Preparing": MessageLookupByLibrary.simpleMessage("正在準備筆記…"),
+    "Share_Text_Description": MessageLookupByLibrary.simpleMessage(
+      "標題、全文、清單和提醒，不包含相片。",
+    ),
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage("極簡計算器"),
     "Small": MessageLookupByLibrary.simpleMessage("小"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("數獨迷"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
+    "Theme_Dark": MessageLookupByLibrary.simpleMessage("深色"),
+    "Theme_Light": MessageLookupByLibrary.simpleMessage("淺色"),
+    "Theme_System": MessageLookupByLibrary.simpleMessage("跟隨系統"),
     "Title": MessageLookupByLibrary.simpleMessage("標題"),
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "想要設置日程安排提醒，請前往設置打開通知",

@@ -1,3 +1,4 @@
+import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,22 +48,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.deactivate();
   }
 
-  Future<void> _shareNoteAsImage(Note note) async {
-    try {
-      await ShareHelper.shareWidgetAsImage(
+  Future<void> _shareNoteAsImage(Note note) => ShareHelper.shareNote(
+        context,
+        note,
         _screenshotController,
-        fileName: '${note.title?.isNotEmpty == true ? note.title : 'note'}.png',
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
       );
-    } catch (_) {
-      if (mounted) {
-        showTransientSnackBar(
-          context,
-          SnackBar(content: Text(S.of(context).Share_Note_Failed)),
-        );
-      }
-    }
-  }
 
   Future<void> _showReminderPicker(BuildContext context, Note note) async {
     final current = ReminderData.shared.getCurrentReminder(note);
@@ -212,6 +203,48 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
+  List<Widget> _trashActions(Note note) => [
+        AppButton(
+            key: _shareButtonKey,
+            tooltip: S.of(context).Share,
+            child: const Icon(Icons.share_outlined),
+            onPressed: () => _shareNoteAsImage(note)),
+        AppButton(
+            tooltip: S.of(context).Restore,
+            child: const Icon(Icons.restore_outlined),
+            onPressed: () async {
+              final result = await getIt<RestoreNotesUsecase>()([note.id!]);
+              if (!mounted) return;
+              result.fold(
+                  (error) =>
+                      context.showToast('${error.message}', isError: true),
+                  (remindersRestored) {
+                context
+                    .read<NoteDetailBloc>()
+                    .add(NoteDetailEvent.showNote(note.id!));
+                context.showToast(remindersRestored
+                    ? S.of(context).Notes_Restored
+                    : S.of(context).Restore_Reminder_Warning);
+              });
+            }),
+        AppButton(
+            tooltip: S.of(context).Delete_Forever,
+            child: const Icon(Icons.delete_forever_outlined),
+            onPressed: () async {
+              final confirmed = await showConfirmDialog(context,
+                  title: S.of(context).Permanent_Delete_Confirm_Title,
+                  message: S.of(context).Permanent_Delete_Confirm_Message);
+              if (!confirmed || !mounted) return;
+              final result =
+                  await getIt<PermanentDeleteNotesUsecase>()([note.id!]);
+              if (!mounted) return;
+              result.fold(
+                  (error) =>
+                      context.showToast('${error.message}', isError: true),
+                  (_) => context.router.popUntilRoot());
+            }),
+      ];
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NoteDetailBloc, NoteDetailState>(
@@ -221,6 +254,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           appBar: NoteAppBar(
             actions: state.whenOrNull(
               success: (note) {
+                if (note.isDeleted) return _trashActions(note);
                 final hasReminder =
                     ReminderData.shared.getCurrentReminder(note) != null;
                 return [
@@ -261,21 +295,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     tooltip: S.of(context).Delete,
                     child: const Icon(Icons.delete_outline),
                     onPressed: () async {
-                      final confirmed = await showConfirmDialog(
-                        context,
-                        title: S.of(context).Delete_Note_Confirm_Title,
-                        message: S.of(context).Delete_Note_Confirm_Message,
-                      );
-                      if (!context.mounted) return;
-                      if (!confirmed) return;
-
-                      Reminder? currentReminder =
-                          ReminderData.shared.getCurrentReminder(note);
-                      if (currentReminder != null) {
-                        ReminderData.shared.deleteReminder(currentReminder);
-                        NotificationService()
-                            .removeNotification(currentReminder);
-                      }
                       context
                           .read<NoteActionBloc>()
                           .add(NoteActionEvent.deleteNote(note.id!));
@@ -291,7 +310,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               success: (data) => LoadedView(
                 note: data.note,
                 screenshotController: _screenshotController,
-                onReminderTap: () => _showReminderPicker(context, data.note),
+                onReminderTap: data.note.isDeleted
+                    ? null
+                    : () => _showReminderPicker(context, data.note),
               ),
               orElse: () => const _DetailSkeleton(),
             ),
@@ -312,7 +333,7 @@ class LoadedView extends StatelessWidget {
 
   final Note note;
   final ScreenshotController screenshotController;
-  final VoidCallback onReminderTap;
+  final VoidCallback? onReminderTap;
 
   @override
   Widget build(BuildContext context) {
@@ -389,7 +410,8 @@ class LoadedView extends StatelessWidget {
                     },
                     const SizedBox(height: AppSpacings.xxl),
                     if (note.hasTodo) ...{
-                      _BuildTodoList(todoList: note.todo),
+                      _BuildTodoList(
+                          todoList: note.todo, readOnly: note.isDeleted),
                       const SizedBox(height: AppSpacings.xxl),
                     },
                     SelectableText(
@@ -415,7 +437,8 @@ class LoadedView extends StatelessWidget {
 }
 
 class _BuildTodoList extends StatelessWidget {
-  const _BuildTodoList({required this.todoList});
+  const _BuildTodoList({required this.todoList, this.readOnly = false});
+  final bool readOnly;
   final List<Todo> todoList;
 
   @override
@@ -458,12 +481,13 @@ class _BuildTodoList extends StatelessWidget {
                   key: ValueKey(todo.id),
                   label: todo.title ?? '',
                   completed: todo.completed,
-                  onChanged: (_) {
-                    HapticFeedback.lightImpact();
-                    context
-                        .read<NoteDetailBloc>()
-                        .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-                  },
+                  onChanged: readOnly
+                      ? null
+                      : (_) {
+                          HapticFeedback.lightImpact();
+                          context.read<NoteDetailBloc>().add(
+                              NoteDetailEvent.toggleTodoCheckbox(todo.id!));
+                        },
                 ),
             ],
           ),

@@ -1,3 +1,4 @@
+import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
@@ -61,6 +62,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               BoxConstraints(maxWidth: tokens.contentMaxWidth),
                           child: Column(
                             children: [
+                              const AppearanceSection(),
+                              SizedBox(height: tokens.space4),
                               SectionCard(
                                 title: S.of(context).Font_Style,
                                 icon: Icons.text_fields_rounded,

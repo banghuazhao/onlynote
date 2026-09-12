@@ -1,3 +1,4 @@
+import 'package:onlynote/services/note_trash.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
@@ -15,11 +16,8 @@ class DeleteMultipleNotesUsecase {
 
   Future<Either<NoteError, Unit>> call(List<String> selectedIds) async {
     try {
-      final now = DateTime.now().toIso8601String();
-      for (final id in selectedIds) {
-        final note = await _repository.getNote(id);
-        await _repository.addUpdateNote(note.copyWith(deletedAt: now));
-      }
+      await NoteTrash.device(_repository)
+          .setDeleted(selectedIds, deleted: true);
       return right(unit);
     } catch (_) {
       return left(NoteError(message: _i10n.Failed_to_delete_notes));

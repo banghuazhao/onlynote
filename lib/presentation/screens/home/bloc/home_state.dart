@@ -8,6 +8,7 @@ class HomeState with _$HomeState {
     required List<Note> notes,
     required List<Folder> folders,
     @Default('') String searchQuery,
+    @Default(<NoteSearchFilter>{}) Set<NoteSearchFilter> filters,
     String? selectedFolderId,
     @Default(false) bool showTrash,
     @Default(0) int trashCount,

@@ -6,6 +6,8 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.duplicateNote(Note note) = _DuplicateNote;
   const factory HomeEvent.reorderNotes(List<Note> notes) = _ReorderNotes;
   const factory HomeEvent.searchChanged(String query) = _SearchChanged;
+  const factory HomeEvent.filtersChanged(Set<NoteSearchFilter> filters) =
+      _FiltersChanged;
   const factory HomeEvent.selectFolder(String? folderId) = _SelectFolder;
   const factory HomeEvent.showTrash(bool show) = _ShowTrash;
   const factory HomeEvent.togglePin(String noteId) = _TogglePin;

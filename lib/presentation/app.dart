@@ -1,3 +1,4 @@
+import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
@@ -45,6 +46,7 @@ class _AppState extends State<App> {
       listenable: Listenable.merge([
         AppTypographySettings.instance,
         AppLayoutSettings.instance,
+        AppAppearanceSettings.instance,
       ]),
       builder: (context, _) => _buildMaterialApp(),
     );
@@ -78,7 +80,7 @@ class _AppState extends State<App> {
       routerDelegate: _router.delegate(),
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: AppAppearanceSettings.instance.themeMode,
     );
   }
 }

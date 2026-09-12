@@ -1,3 +1,4 @@
+import 'package:onlynote/services/note_trash.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
@@ -15,10 +16,7 @@ class DeleteNoteUsecase {
 
   Future<Either<NoteError, Unit>> call(String id) async {
     try {
-      final note = await _repository.getNote(id);
-      await _repository.addUpdateNote(
-        note.copyWith(deletedAt: DateTime.now().toIso8601String()),
-      );
+      await NoteTrash.device(_repository).setDeleted([id], deleted: true);
       return right(unit);
     } catch (_) {
       return left(

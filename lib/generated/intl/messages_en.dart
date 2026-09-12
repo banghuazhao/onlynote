@@ -41,6 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Allow_Notification": MessageLookupByLibrary.simpleMessage(
       "Allow Notification",
     ),
+    "Appearance": MessageLookupByLibrary.simpleMessage("Appearance"),
     "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save your changes. Keep this note open and tap Done to retry.",
     ),
@@ -93,6 +94,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage(
       "Classical Music Box",
     ),
+    "Clear_Filters": MessageLookupByLibrary.simpleMessage("Clear filters"),
     "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(Copy)"),
     "Delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("Delete Folder"),
@@ -156,6 +158,10 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Can\'t save an empty note. Add a title, description, checklist item, or photo.",
         ),
+    "Filter_Checklists": MessageLookupByLibrary.simpleMessage("Checklists"),
+    "Filter_Photos": MessageLookupByLibrary.simpleMessage("Photos"),
+    "Filter_Pinned": MessageLookupByLibrary.simpleMessage("Pinned"),
+    "Filter_Reminders": MessageLookupByLibrary.simpleMessage("Reminders"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
@@ -254,6 +260,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Delete forever?",
     ),
     "Pin": MessageLookupByLibrary.simpleMessage("Pin"),
+    "Plain_Paper": MessageLookupByLibrary.simpleMessage("Plain paper"),
+    "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
+      "A calmer look without texture, ruled lines, or tilted cards.",
+    ),
     "Privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
@@ -312,6 +322,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Restore_Purchases": MessageLookupByLibrary.simpleMessage(
       "Restore Purchases",
     ),
+    "Restore_Reminder_Warning": MessageLookupByLibrary.simpleMessage(
+      "Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.",
+    ),
     "Restore_Success": MessageLookupByLibrary.simpleMessage(
       "Your Remove Ads purchase was restored.",
     ),
@@ -319,9 +332,34 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
     "Settings": MessageLookupByLibrary.simpleMessage("Settings"),
+    "Settings_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save this setting. Please try again.",
+    ),
     "Share": MessageLookupByLibrary.simpleMessage("Share"),
+    "Share_Image": MessageLookupByLibrary.simpleMessage("Image"),
+    "Share_Image_Description": MessageLookupByLibrary.simpleMessage(
+      "Share the current paper view as a picture.",
+    ),
+    "Share_Markdown": MessageLookupByLibrary.simpleMessage("Markdown"),
+    "Share_Markdown_Description": MessageLookupByLibrary.simpleMessage(
+      "A .md file with checklist formatting and photo attachments.",
+    ),
+    "Share_No_Text": MessageLookupByLibrary.simpleMessage(
+      "This note has no text. Choose an image or PDF to include its photos.",
+    ),
     "Share_Note_Failed": MessageLookupByLibrary.simpleMessage(
       "Failed to share note, please try again.",
+    ),
+    "Share_PDF": MessageLookupByLibrary.simpleMessage("PDF document"),
+    "Share_PDF_Description": MessageLookupByLibrary.simpleMessage(
+      "Full note and photos, laid out across printable pages.",
+    ),
+    "Share_Plain_Text": MessageLookupByLibrary.simpleMessage("Plain text"),
+    "Share_Preparing": MessageLookupByLibrary.simpleMessage(
+      "Preparing your note…",
+    ),
+    "Share_Text_Description": MessageLookupByLibrary.simpleMessage(
+      "Title, full text, checklist, and reminder. No photos.",
     ),
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage(
@@ -330,6 +368,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Small": MessageLookupByLibrary.simpleMessage("Small"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
+    "Theme_Dark": MessageLookupByLibrary.simpleMessage("Dark"),
+    "Theme_Light": MessageLookupByLibrary.simpleMessage("Light"),
+    "Theme_System": MessageLookupByLibrary.simpleMessage("System"),
     "Title": MessageLookupByLibrary.simpleMessage("Title"),
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "To get a reminder, please go to settings to open notification.",

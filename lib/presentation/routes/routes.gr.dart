@@ -16,6 +16,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     Key? key,
     Note? note,
     String? folderId,
+    NoteAutosaveStore? autosaveStore,
     List<PageRouteInfo>? children,
   }) : super(
           AddUpdateNoteRoute.name,
@@ -23,6 +24,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             key: key,
             note: note,
             folderId: folderId,
+            autosaveStore: autosaveStore,
           ),
           initialChildren: children,
         );
@@ -38,6 +40,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         key: args.key,
         note: args.note,
         folderId: args.folderId,
+        autosaveStore: args.autosaveStore,
       );
     },
   );
@@ -48,6 +51,7 @@ class AddUpdateNoteRouteArgs {
     this.key,
     this.note,
     this.folderId,
+    this.autosaveStore,
   });
 
   final Key? key;
@@ -56,9 +60,11 @@ class AddUpdateNoteRouteArgs {
 
   final String? folderId;
 
+  final NoteAutosaveStore? autosaveStore;
+
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, autosaveStore: $autosaveStore}';
   }
 }
 
