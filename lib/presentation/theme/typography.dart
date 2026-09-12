@@ -1,4 +1,4 @@
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 
 import 'colors.dart';
@@ -6,14 +6,21 @@ import 'colors.dart';
 class AppTypography {
   AppTypography._();
 
-  static GoogleFontBuilder get _font => AppTypographySettings.instance.fontBuilder;
+  static GoogleFontBuilder get _font =>
+      AppTypographySettings.instance.fontBuilder;
   static double get _scale => AppTypographySettings.instance.scale;
 
   static TextStyle get cardTitle => _font(
         fontWeight: FontWeight.w600,
-        fontSize: 30 * _scale,
+        fontSize: 20 * _scale,
         color: AppColors.title,
-      );
+      ).copyWith(height: 1.28, letterSpacing: -0.2);
+
+  static TextStyle get cardBody => _font(
+        fontWeight: FontWeight.w400,
+        fontSize: 14 * _scale,
+        color: AppColors.ink.withValues(alpha: 0.78),
+      ).copyWith(height: 1.4);
 
   static TextStyle get headline1 => _font(
         fontWeight: FontWeight.bold,
@@ -49,7 +56,7 @@ class AppTypography {
         fontWeight: FontWeight.w600,
         fontSize: 18 * _scale,
         color: AppColors.title,
-      );
+      ).copyWith(height: 1.45);
 
   static TextStyle get title => _font(
         fontWeight: FontWeight.w600,
@@ -85,5 +92,5 @@ class AppTypography {
         fontWeight: FontWeight.w400,
         fontSize: 17 * _scale,
         color: AppColors.title,
-      );
+      ).copyWith(height: 1.55);
 }

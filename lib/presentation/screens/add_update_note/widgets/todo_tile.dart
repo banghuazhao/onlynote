@@ -10,21 +10,24 @@ class _AddTodoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: 0.6,
+      opacity: 0.7,
       child: ListTile(
         dense: true,
         contentPadding: EdgeInsets.zero,
+        minTileHeight: 44,
         title: Row(
           children: [
             Icon(
-              Icons.add_circle_outline,
+              Icons.add_rounded,
               size: 18,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: AppColors.ink.withValues(alpha: 0.55),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Text(
               S.of(context).Add_todo,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: AppTypography.title.copyWith(
+                color: AppColors.ink.withValues(alpha: 0.55),
+              ),
             ),
           ],
         ),
@@ -39,6 +42,7 @@ class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
     required this.index,
     this.value,
+    required this.completed,
     required this.focusNode,
     required this.onChanged,
     required this.onRemoved,
@@ -46,6 +50,7 @@ class _TodoFieldTile extends StatefulWidget {
 
   final int index;
   final String? value;
+  final bool completed;
   final FocusNode focusNode;
   final Function(String value) onChanged;
   final VoidCallback onRemoved;
@@ -71,51 +76,63 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.only(bottom: context.tokens.space2),
-      color: Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow
-          .withValues(alpha: 0.72),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: context.tokens.space2),
-        title: TextField(
-          controller: todoController,
-          focusNode: widget.focusNode,
-          style: Theme.of(context).textTheme.bodyLarge,
-          decoration: InputDecoration(
-            isDense: true,
-            filled: false,
-            border: InputBorder.none,
-            hintText: S.of(context).Todo,
-            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-            counterText: '',
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            // Sits on the first line of the field below.
+            padding: const EdgeInsets.only(top: 13),
+            child: InkCheckbox(checked: widget.completed, size: 18),
           ),
-          onChanged: widget.onChanged,
-          maxLength: todoMaxCharCount,
-          maxLines: 4,
-          minLines: 1,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-              iconSize: 18,
-              icon: const Icon(Icons.delete_outline),
-              onPressed: widget.onRemoved,
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: todoController,
+              focusNode: widget.focusNode,
+              style: AppTypography.formText.copyWith(fontSize: 16),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: false,
+                border: InputBorder.none,
+                // Without this the field inherits the theme's 16px inset and
+                // the todo text hangs away from its checkbox.
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                hintText: S.of(context).Todo,
+                hintStyle: AppTypography.formText.copyWith(
+                  fontSize: 16,
+                  color: AppColors.ink.withValues(alpha: 0.35),
+                ),
+                counterText: '',
+              ),
+              onChanged: widget.onChanged,
+              maxLength: todoMaxCharCount,
+              maxLines: 4,
+              minLines: 1,
             ),
-            ReorderableDragStartListener(
-              index: widget.index,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Icon(Icons.drag_handle, size: 18),
+          ),
+          IconButton(
+            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+            iconSize: 18,
+            icon: Icon(
+              Icons.close_rounded,
+              color: AppColors.ink.withValues(alpha: 0.45),
+            ),
+            onPressed: widget.onRemoved,
+          ),
+          ReorderableDragStartListener(
+            index: widget.index,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+              child: Icon(
+                Icons.drag_handle,
+                size: 18,
+                color: AppColors.ink.withValues(alpha: 0.4),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -213,15 +230,20 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
               key: ValueKey(todo.id),
               direction: DismissDirection.endToStart,
               confirmDismiss: (_) => confirmAndDelete(),
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacings.l),
-                color: AppColors.error,
-                child: const Icon(Icons.delete_outline, color: Colors.white),
+              background: ColoredBox(
+                color: AppColors.error.withValues(alpha: 0.9),
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacings.l),
+                    child: Icon(Icons.delete_outline, color: Colors.white),
+                  ),
+                ),
               ),
               child: _TodoFieldTile(
                 index: index,
                 value: todo.title,
+                completed: todo.completed,
                 focusNode: _focusNodeFor(todo.id!),
                 onChanged: (value) {
                   context.read<AddUpdateFormBloc>().add(

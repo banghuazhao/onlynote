@@ -13,6 +13,9 @@ Future<bool> showConfirmDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
+        scrollable: true,
+        icon: Icon(Icons.delete_outline_rounded,
+            color: Theme.of(context).colorScheme.error),
         title: Text(title),
         content: Text(message),
         actions: [
@@ -20,10 +23,11 @@ Future<bool> showConfirmDialog(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(S.of(context).Cancel),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Theme.of(context).colorScheme.onError),
             child: Text(S.of(context).Delete),
           ),
         ],

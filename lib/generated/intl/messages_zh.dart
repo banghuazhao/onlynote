@@ -20,12 +20,16 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'zh';
 
-  static String m0(count) => "${count} 条备忘录";
+  static String m0(notes, folders, photos) =>
+      "${notes} 条笔记 · ${folders} 个文件夹 · ${photos} 张照片";
 
-  static String m1(price) => "支付 ${price} 永久移除广告。";
+  static String m1(count) => "${count} 条备忘录";
+
+  static String m2(price) => "支付 ${price} 永久移除广告。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Add_Image": MessageLookupByLibrary.simpleMessage("添加照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("添加备忘录"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),
     "Add_todo": MessageLookupByLibrary.simpleMessage("添加待办"),
@@ -35,6 +39,42 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "All_Notes": MessageLookupByLibrary.simpleMessage("全部备忘录"),
     "Allow_Notification": MessageLookupByLibrary.simpleMessage("允许推送"),
+    "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法保存更改。请保持笔记打开，点击“完成”重试。",
+    ),
+    "Autosave_Retry": MessageLookupByLibrary.simpleMessage("尚未保存"),
+    "Autosave_Saved": MessageLookupByLibrary.simpleMessage("已保存"),
+    "Autosave_Saving": MessageLookupByLibrary.simpleMessage("正在保存…"),
+    "Backup_Choose": MessageLookupByLibrary.simpleMessage("选择备份文件"),
+    "Backup_Contents": m0,
+    "Backup_Export": MessageLookupByLibrary.simpleMessage("创建备份"),
+    "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
+      "将笔记、清单、文件夹、照片和提醒日期保存到一个 Onlynote 文件中，包含回收站中的笔记。在分享菜单中选择保存到文件或存储应用。文件大小上限：256 MB。",
+    ),
+    "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法创建备份。请检查可用存储空间，并确认所有笔记照片均可访问。备份不能超过 256 MB。",
+    ),
+    "Backup_Invalid": MessageLookupByLibrary.simpleMessage(
+      "这不是受支持的 Onlynote 备份，或文件已损坏或超过 256 MB。未导入任何内容。",
+    ),
+    "Backup_Preparing": MessageLookupByLibrary.simpleMessage("正在准备备份…"),
+    "Backup_Reading": MessageLookupByLibrary.simpleMessage("正在检查备份文件…"),
+    "Backup_Restore": MessageLookupByLibrary.simpleMessage("恢复备份"),
+    "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
+      "恢复会添加备份中笔记和文件夹的副本，不会更改现有笔记。再次恢复同一文件会添加另一组副本。",
+    ),
+    "Backup_Restore_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法恢复备份。请检查可用存储空间后重试。现有笔记未被覆盖。",
+    ),
+    "Backup_Restored": MessageLookupByLibrary.simpleMessage("备份已恢复。笔记已添加到笔记库。"),
+    "Backup_Restored_No_Notifications": MessageLookupByLibrary.simpleMessage(
+      "笔记已恢复。部分提醒通知未能安排；请打开相应笔记重新设置。",
+    ),
+    "Backup_Restoring": MessageLookupByLibrary.simpleMessage("正在恢复笔记和照片…"),
+    "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
+      "安排未来的提醒通知",
+    ),
+    "Backup_Title": MessageLookupByLibrary.simpleMessage("备份与恢复"),
     "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage("从相册选择"),
@@ -90,8 +130,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已删除文件夹"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("请输入文件夹名称。"),
-    "Folder_Notes_Count": m0,
+    "Folder_Notes_Count": m1,
     "Folders": MessageLookupByLibrary.simpleMessage("文件夹"),
+    "Font_Preview": MessageLookupByLibrary.simpleMessage("留一点空间，记录下一个好想法。"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字体大小"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("字体样式"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("咕噜滤镜"),
@@ -177,8 +218,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "Purchases": MessageLookupByLibrary.simpleMessage("购买项目"),
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("提醒设置"),
+    "Reminder_Custom": MessageLookupByLibrary.simpleMessage("选择日期和时间"),
+    "Reminder_Future_Time": MessageLookupByLibrary.simpleMessage(
+      "请选择将来的时间来设置提醒。",
+    ),
+    "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小时后"),
+    "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一周后"),
+    "Reminder_Save_Failed": MessageLookupByLibrary.simpleMessage("无法更新提醒，请重试。"),
+    "Reminder_Saved": MessageLookupByLibrary.simpleMessage("提醒已设置"),
+    "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m1,
+    "Remove_Ads_Price": m2,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("恢复"),

@@ -18,30 +18,30 @@ class ReminderData extends ChangeNotifier {
         'reminders', jsonEncode(reminders.map((e) => e.toJson()).toList()));
   }
 
-  Future<void> addReminder(Reminder reminder) async {
-    reminders.add(reminder);
-    await _saveToStorage();
-    notifyListeners();
-  }
-
-  Future<void> deleteReminder(Reminder reminder) async {
-    reminders.remove(reminder);
-    await _saveToStorage();
-    notifyListeners();
-  }
-
-  Future<void> modifyReminder(Reminder original, Reminder newReminder) async {
-    for (int i = 0; i < reminders.length; i++) {
-      if (reminders[i].reminderId == original.reminderId) {
-        debugPrint('Reminder found at $i');
-        reminders[i] = newReminder;
-        break;
-      }
+  Future<void> replaceAll(List<Reminder> values) async {
+    final previous = reminders;
+    reminders = List.of(values);
+    try {
+      await _saveToStorage();
+    } catch (_) {
+      reminders = previous;
+      rethrow;
     }
-
-    await _saveToStorage();
     notifyListeners();
   }
+
+  Future<void> addReminder(Reminder reminder) =>
+      replaceAll([...reminders, reminder]);
+
+  Future<void> deleteReminder(Reminder reminder) => replaceAll(
+        reminders.where((r) => r.reminderId != reminder.reminderId).toList(),
+      );
+
+  Future<void> modifyReminder(Reminder original, Reminder newReminder) =>
+      replaceAll([
+        for (final reminder in reminders)
+          reminder.reminderId == original.reminderId ? newReminder : reminder,
+      ]);
 
   int get reminderCount {
     return reminders.length;

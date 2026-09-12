@@ -15,7 +15,11 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
       : super(const NoteDetailState.initial()) {
     //* show note detail
     on<_ShowNote>((event, emit) async {
-      emit(const NoteDetailState.loading());
+      final current = state;
+      //* Keep the current note on screen while refreshing it, so returning
+      //* from the edit screen doesn't flash the loading skeleton.
+      final isRefresh = current is _Loaded && current.note.id == event.noteId;
+      if (!isRefresh) emit(const NoteDetailState.loading());
 
       final failureOrSuccess = await _usecase(event.noteId);
 

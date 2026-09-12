@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/Tools/locator.dart';
+import 'package:onlynote/Tools/note_cleanup.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/error.dart';
@@ -28,7 +29,22 @@ class UpdateNoteUsecase {
         );
       }
 
+      // Images the user dropped from the note are only deleted once the
+      // edit is committed — and only if no other note still points at them.
+      final previousPaths = await _previousImagePaths(noteDto.id);
+      final dropped = previousPaths
+          .where((path) => !(noteDto.imagePaths ?? const []).contains(path))
+          .toList();
+
       await _repository.addUpdateNote(noteDto);
+
+      if (dropped.isNotEmpty) {
+        await NoteCleanup.deleteUnreferencedImages(
+          dropped,
+          repository: _repository,
+          ignoreNoteIds: {if (noteDto.id != null) noteDto.id!},
+        );
+      }
       return right(unit);
     } catch (e) {
       return left(
@@ -36,6 +52,16 @@ class UpdateNoteUsecase {
           message: '${_i10n.Failed_to_Update_note_please_try_again}\nError: $e',
         ),
       );
+    }
+  }
+
+  Future<List<String>> _previousImagePaths(String? id) async {
+    if (id == null) return const [];
+    try {
+      final previous = await _repository.getNote(id);
+      return previous.imagePaths ?? const [];
+    } catch (_) {
+      return const [];
     }
   }
 }

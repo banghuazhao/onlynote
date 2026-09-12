@@ -21,7 +21,7 @@ class PermanentDeleteNotesUsecase {
       for (final id in ids) {
         notes.add(await _repository.getNote(id));
       }
-      await NoteCleanup.cleanupNotes(notes);
+      await NoteCleanup.cleanupNotes(notes, repository: _repository);
       await _repository.deleteMultiNotes(ids);
       return right(unit);
     } catch (_) {

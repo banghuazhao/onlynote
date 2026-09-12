@@ -1,4 +1,3 @@
-import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +15,7 @@ import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -117,9 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showMovedToTrashSnackBar(List<String> ids) {
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
+    showTransientSnackBar(
+      context,
       SnackBar(
         content: Text(S.of(context).Notes_Moved_To_Trash),
         action: SnackBarAction(
@@ -139,9 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }) async {
     final name = await showDialog<String>(
       context: context,
-      builder: (_) => _FolderNameDialog(title: title, initial: initial),
+      builder: (_) => FolderNameDialog(title: title, initial: initial),
     );
-    if (name != null && name.trim().isNotEmpty) {
+    if (mounted && name != null && name.trim().isNotEmpty) {
       onSubmit(name.trim());
     }
   }
@@ -162,10 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openFolderPicker(_FolderScope scope) async {
     final bloc = context.read<HomeBloc>();
 
-    final result = await showModalBottomSheet<_FolderPickerResult>(
+    final result = await showAppSheet<_FolderPickerResult>(
       context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
       builder: (_) => _FolderPickerSheet(scope: scope),
     );
     if (result == null || !mounted) return;
@@ -229,6 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ],
       child: Scaffold(
+        backgroundColor: DeskSurface.colorOf(context),
         appBar: NoteAppBar(
           autoImplementLeading: false,
           leading: IconButton(
@@ -261,85 +259,87 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: _buildAppBarActions(context),
         ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              if (_isSearchVisible) _buildSearchField(context),
-              Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: getIt<Database>().box.listenable(),
-                  builder: (context, _, child) {
-                    context
-                        .read<HomeBloc>()
-                        .add(const HomeEvent.getAllNotes());
-                    return child!;
-                  },
+        body: DeskSurface(
+          child: SafeArea(
+            child: Column(
+              children: [
+                if (_isSearchVisible) _buildSearchField(context),
+                Expanded(
                   child: ValueListenableBuilder(
-                    valueListenable:
-                        Hive.box(folderDatabaseBox).listenable(),
+                    valueListenable: getIt<Database>().box.listenable(),
                     builder: (context, _, child) {
                       context
                           .read<HomeBloc>()
                           .add(const HomeEvent.getAllNotes());
                       return child!;
                     },
-                    child: BlocBuilder<HomeBloc, HomeState>(
-                      builder: (_, state) {
-                        return state.maybeMap(
-                          orElse: () => const _LoadingSkeleton(),
-                          error: (error) =>
-                              _HomeError(message: error.message ?? ''),
-                          loaded: (data) => Column(
-                            children: [
-                              Expanded(
-                                child: data.notes.isEmpty
-                                    ? _EmptyNotes(
-                                        showTrash: data.showTrash,
-                                        hasSearch:
-                                            data.searchQuery.trim().isNotEmpty,
-                                        hasFolder:
-                                            data.selectedFolderId != null,
-                                        onAdd: () {
-                                          context.router.push(
-                                            AddUpdateNoteRoute(
-                                              folderId: data.selectedFolderId,
-                                            ),
-                                          );
-                                        },
-                                      )
-                                    : _BuildNotesList(
-                                        notes: data.notes,
-                                        folders: data.folders,
-                                        showTrash: data.showTrash,
-                                        isReorderMode: _isReorderMode,
-                                        onEnterReorderMode: () =>
-                                            _setReorderMode(true),
-                                      ),
-                              ),
-                            ],
-                          ),
-                        );
+                    child: ValueListenableBuilder(
+                      valueListenable: Hive.box(folderDatabaseBox).listenable(),
+                      builder: (context, _, child) {
+                        context
+                            .read<HomeBloc>()
+                            .add(const HomeEvent.getAllNotes());
+                        return child!;
                       },
+                      child: BlocBuilder<HomeBloc, HomeState>(
+                        builder: (_, state) {
+                          return state.maybeMap(
+                            orElse: () => const _LoadingSkeleton(),
+                            error: (error) =>
+                                _HomeError(message: error.message ?? ''),
+                            loaded: (data) => Column(
+                              children: [
+                                Expanded(
+                                  child: data.notes.isEmpty
+                                      ? _EmptyNotes(
+                                          showTrash: data.showTrash,
+                                          hasSearch: data.searchQuery
+                                              .trim()
+                                              .isNotEmpty,
+                                          hasFolder:
+                                              data.selectedFolderId != null,
+                                          onAdd: () {
+                                            context.router.push(
+                                              AddUpdateNoteRoute(
+                                                folderId: data.selectedFolderId,
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : _BuildNotesList(
+                                          notes: data.notes,
+                                          folders: data.folders,
+                                          showTrash: data.showTrash,
+                                          isReorderMode: _isReorderMode,
+                                          onEnterReorderMode: () =>
+                                              _setReorderMode(true),
+                                        ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (_adSize != null && PurchaseService.instance.shouldShowAds)
-                Semantics(
-                  label: 'Advertisement',
-                  container: true,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: context.tokens.space2),
-                    child: SizedBox(
-                      width: _adSize!.width.toDouble(),
-                      height: _adSize!.height.toDouble(),
-                      child: _isAdLoaded
-                          ? AdWidget(ad: _ad!)
-                          : const SizedBox.shrink(),
+                if (_adSize != null && PurchaseService.instance.shouldShowAds)
+                  Semantics(
+                    label: 'Advertisement',
+                    container: true,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: context.tokens.space2),
+                      child: SizedBox(
+                        width: _adSize!.width.toDouble(),
+                        height: _adSize!.height.toDouble(),
+                        child: _isAdLoaded
+                            ? AdWidget(ad: _ad!)
+                            : const SizedBox.shrink(),
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -389,8 +389,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           selected: (selectedNotes) {
             final showTrash = context.read<HomeBloc>().state.mapOrNull(
-                  loaded: (s) => s.showTrash,
-                ) ??
+                      loaded: (s) => s.showTrash,
+                    ) ??
                 false;
             return [
               AppButton(
@@ -485,84 +485,44 @@ class _HomeScreenState extends State<HomeScreen> {
         AppSpacings.xl,
         AppSpacings.s,
       ),
-      child: TextField(
-        controller: _searchController,
-        autofocus: true,
-        decoration: InputDecoration(
-          hintText: S.of(context).Search_Notes,
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchController.text.isEmpty
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    context
-                        .read<HomeBloc>()
-                        .add(const HomeEvent.searchChanged(''));
-                    setState(() {});
-                  },
-                ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacings.l),
+      child: PaperNote(
+        color: AppColors.parchment,
+        seed: 11,
+        tilt: false,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: TextField(
+          controller: _searchController,
+          autofocus: true,
+          style: AppTypography.formText.copyWith(fontSize: 16),
+          decoration: InputDecoration(
+            hintText: S.of(context).Search_Notes,
+            prefixIcon: const Icon(Icons.search),
+            suffixIcon: _searchController.text.isEmpty
+                ? null
+                : IconButton(
+                    tooltip:
+                        MaterialLocalizations.of(context).deleteButtonTooltip,
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      context
+                          .read<HomeBloc>()
+                          .add(const HomeEvent.searchChanged(''));
+                      setState(() {});
+                    },
+                  ),
+            filled: false,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            isDense: true,
           ),
-          isDense: true,
+          onChanged: (value) {
+            context.read<HomeBloc>().add(HomeEvent.searchChanged(value));
+            setState(() {});
+          },
         ),
-        onChanged: (value) {
-          context.read<HomeBloc>().add(HomeEvent.searchChanged(value));
-          setState(() {});
-        },
       ),
-    );
-  }
-}
-
-class _FolderNameDialog extends StatefulWidget {
-  const _FolderNameDialog({required this.title, this.initial});
-
-  final String title;
-  final String? initial;
-
-  @override
-  State<_FolderNameDialog> createState() => _FolderNameDialogState();
-}
-
-class _FolderNameDialogState extends State<_FolderNameDialog> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initial ?? '');
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        decoration: InputDecoration(hintText: S.of(context).Folder_Name),
-        textInputAction: TextInputAction.done,
-        onSubmitted: (value) => Navigator.pop(context, value),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(S.of(context).Cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: Text(S.of(context).OK),
-        ),
-      ],
     );
   }
 }
@@ -696,7 +656,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       );
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTransientSnackBar(
+          context,
           SnackBar(content: Text(S.of(context).Share_Note_Failed)),
         );
       }
@@ -704,13 +665,14 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   }
 
   void _showMoveToFolderSheet(BuildContext context, Note note) {
-    showAdaptiveActionSheet(
+    showAppActionSheet(
       context: context,
-      androidBorderRadius: 30,
-      actions: <BottomSheetAction>[
-        BottomSheetAction(
+      title: S.of(context).Move_To_Folder,
+      actions: <AppSheetAction>[
+        AppSheetAction(
           leading: const Icon(Icons.notes_outlined),
           title: Text(S.of(context).No_Folder),
+          selected: note.folderId == null,
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
             context.read<HomeBloc>().add(
@@ -719,9 +681,10 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           },
         ),
         ...widget.folders.map(
-          (folder) => BottomSheetAction(
+          (folder) => AppSheetAction(
             leading: const Icon(Icons.folder_outlined),
             title: Text(folder.name),
+            selected: note.folderId == folder.id,
             onPressed: (sheetContext) {
               Navigator.pop(sheetContext);
               context.read<HomeBloc>().add(
@@ -734,7 +697,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           ),
         ),
       ],
-      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
     );
   }
 
@@ -748,25 +710,24 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     final cardKey = _cardKeyFor(noteId);
 
     if (widget.showTrash) {
-      showAdaptiveActionSheet(
+      showAppActionSheet(
         context: context,
-        androidBorderRadius: 30,
-        actions: <BottomSheetAction>[
-          BottomSheetAction(
+        title: S.of(context).Trash,
+        actions: <AppSheetAction>[
+          AppSheetAction(
             leading: const Icon(Icons.restore_outlined),
             title: Text(S.of(context).Restore),
             onPressed: (sheetContext) {
               Navigator.pop(sheetContext);
-              context
-                  .read<HomeBloc>()
-                  .add(HomeEvent.restoreNotes([noteId]));
+              context.read<HomeBloc>().add(HomeEvent.restoreNotes([noteId]));
             },
           ),
-          BottomSheetAction(
-            leading: const Icon(Icons.delete_forever_outlined, color: Colors.red),
+          AppSheetAction(
+            destructive: true,
+            leading: const Icon(Icons.delete_forever_outlined),
             title: Text(
               S.of(context).Delete_Forever,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: context.colors.error),
             ),
             onPressed: (sheetContext) async {
               Navigator.pop(sheetContext);
@@ -783,16 +744,17 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             },
           ),
         ],
-        cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
       );
       return;
     }
 
-    showAdaptiveActionSheet(
+    showAppActionSheet(
       context: context,
-      androidBorderRadius: 30,
-      actions: <BottomSheetAction>[
-        BottomSheetAction(
+      title: note.title?.trim().isNotEmpty == true
+          ? note.title!
+          : S.of(context).Onlynote,
+      actions: <AppSheetAction>[
+        AppSheetAction(
           leading: Icon(
             note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
           ),
@@ -802,7 +764,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             context.read<HomeBloc>().add(HomeEvent.togglePin(noteId));
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.drive_file_move_outline),
           title: Text(S.of(context).Move_To_Folder),
           onPressed: (sheetContext) {
@@ -810,7 +772,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             _showMoveToFolderSheet(context, note);
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.share_outlined),
           title: Text(S.of(context).Share),
           onPressed: (sheetContext) {
@@ -818,7 +780,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             _shareNote(context, note, screenshotController, cardKey);
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.copy_outlined),
           title: Text(S.of(context).Duplicate),
           onPressed: (sheetContext) {
@@ -826,7 +788,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             context.read<HomeBloc>().add(HomeEvent.duplicateNote(note));
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.check_circle_outline),
           title: Text(S.of(context).Select),
           onPressed: (sheetContext) {
@@ -834,7 +796,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.swap_vert),
           title: Text(S.of(context).Reorder),
           onPressed: (sheetContext) {
@@ -842,10 +804,11 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             widget.onEnterReorderMode();
           },
         ),
-        BottomSheetAction(
-          leading: const Icon(Icons.delete_outline, color: Colors.red),
+        AppSheetAction(
+          destructive: true,
+          leading: const Icon(Icons.delete_outline),
           title: Text(S.of(context).Delete,
-              style: const TextStyle(color: Colors.red)),
+              style: TextStyle(color: context.colors.error)),
           onPressed: (sheetContext) async {
             Navigator.pop(sheetContext);
             final confirmed = await showConfirmDialog(
@@ -860,7 +823,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           },
         ),
       ],
-      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
     );
   }
 
@@ -889,9 +851,11 @@ class __BuildNotesListState extends State<_BuildNotesList> {
               ),
             ),
             child: KeyedSubtree(
-              key: ValueKey(
-                '${widget.isReorderMode}:${widget.showTrash}:${widget.notes.map((note) => '${note.id}:${note.isPinned}').join(',')}',
-              ),
+              // Keyed on the *mode* only. Including the notes themselves
+              // swapped in a brand-new grid on every add/pin/delete, which
+              // replayed the entrance animation and threw away the user's
+              // scroll position.
+              key: ValueKey('${widget.isReorderMode}:${widget.showTrash}'),
               child: widget.isReorderMode && !widget.showTrash
                   ? _buildReorderableGrid(context, crossAxisCount)
                   : _buildMasonryGrid(
@@ -927,7 +891,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         final note = widget.notes[index];
         final noteId = note.id!;
         return FadeInUp(
-          duration: Duration(milliseconds: 100 * index),
+          duration: Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
           child: KeyedSubtree(
             key: _cardKeyFor(noteId),
             child: NoteCard(
@@ -1000,41 +964,30 @@ class _ReorderableNoteTile extends StatelessWidget {
     final headlineText =
         note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
 
-    return Material(
-      type: MaterialType.card,
-      clipBehavior: Clip.antiAlias,
-      borderRadius: BorderRadius.circular(AppSpacings.xl),
-      color: note.color,
-      shadowColor: Colors.black,
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacings.l,
-          vertical: AppSpacings.l,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (note.isPinned)
-              const Padding(
-                padding: EdgeInsets.only(bottom: AppSpacings.s),
-                child: Icon(Icons.push_pin, size: 16),
-              ),
-            Text(
-              headlineText,
-              style: AppTypography.cardTitle,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
+    return PaperNote(
+      color: note.color ?? AppColors.parchment,
+      seed: note.id?.hashCode ?? 0,
+      pinned: note.isPinned,
+      tilt: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            headlineText,
+            style: AppTypography.cardTitle,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 3,
+          ),
+          const SizedBox(height: AppSpacings.m),
+          Text(
+            note.date,
+            style: AppTypography.description.copyWith(
+              color: AppColors.ink.withValues(alpha: 0.55),
             ),
-            const SizedBox(height: AppSpacings.m),
-            Text(
-              note.date,
-              style: AppTypography.description.copyWith(color: Colors.black87),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1062,10 +1015,21 @@ class _LoadingSkeleton extends StatelessWidget {
           childAspectRatio: 1.1,
         ),
         itemCount: crossAxisCount * 3,
-        itemBuilder: (context, index) => Container(
+        itemBuilder: (context, index) => DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(AppSpacings.xl),
+            color: Color.lerp(
+              AppColors.parchment,
+              AppColors.ink,
+              0.04 + (index % 3) * 0.02,
+            ),
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 10,
+                offset: const Offset(1, 4),
+              ),
+            ],
           ),
         ),
       ),
@@ -1210,89 +1174,57 @@ class _FolderPickerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final tokens = context.tokens;
-
-    return SafeArea(
-      child: ConstrainedBox(
-        // Never let a long folder list swallow the whole screen.
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * 0.7,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                tokens.space5,
-                0,
-                tokens.space5,
-                tokens.space3,
-              ),
-              child: Text(
-                l10n.Folders,
-                style: context.textStyles.titleLarge,
-              ),
+    return AppSheet(
+      title: l10n.Folders,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _PickerTile(
+            icon: Icons.notes_rounded,
+            label: l10n.All_Notes,
+            count: scope.allNotesCount,
+            selected: !scope.showTrash && scope.selectedFolderId == null,
+            onTap: () => Navigator.pop(context, const _SelectAll()),
+          ),
+          for (final folder in scope.folders)
+            _PickerTile(
+              icon: Icons.folder_rounded,
+              label: folder.name,
+              count: scope.folderCounts[folder.id] ?? 0,
+              selected: !scope.showTrash && scope.selectedFolderId == folder.id,
+              onTap: () => Navigator.pop(context, _SelectFolder(folder.id)),
+              onRename: () => Navigator.pop(context, _RenameFolder(folder)),
+              onDelete: () => Navigator.pop(context, _DeleteFolder(folder)),
             ),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                padding: EdgeInsets.only(bottom: tokens.space2),
-                children: [
-                  _PickerTile(
-                    icon: Icons.notes_rounded,
-                    label: l10n.All_Notes,
-                    count: scope.allNotesCount,
-                    selected: !scope.showTrash && scope.selectedFolderId == null,
-                    onTap: () => Navigator.pop(context, const _SelectAll()),
-                  ),
-                  for (final folder in scope.folders)
-                    _PickerTile(
-                      icon: Icons.folder_rounded,
-                      label: folder.name,
-                      count: scope.folderCounts[folder.id] ?? 0,
-                      selected: !scope.showTrash &&
-                          scope.selectedFolderId == folder.id,
-                      onTap: () =>
-                          Navigator.pop(context, _SelectFolder(folder.id)),
-                      onRename: () =>
-                          Navigator.pop(context, _RenameFolder(folder)),
-                      onDelete: () =>
-                          Navigator.pop(context, _DeleteFolder(folder)),
-                    ),
-                  _PickerTile(
-                    icon: Icons.delete_outline_rounded,
-                    label: l10n.Trash,
-                    count: scope.trashCount,
-                    selected: scope.showTrash,
-                    onTap: () => Navigator.pop(context, const _SelectTrash()),
-                  ),
-                ],
-              ),
+          _PickerTile(
+            icon: Icons.delete_outline_rounded,
+            label: l10n.Trash,
+            count: scope.trashCount,
+            selected: scope.showTrash,
+            onTap: () => Navigator.pop(context, const _SelectTrash()),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: Icon(
+              Icons.create_new_folder_outlined,
+              color: context.colors.primary,
             ),
-            const Divider(height: 1),
-            ListTile(
-              leading: Icon(
-                Icons.create_new_folder_outlined,
+            title: Text(
+              l10n.New_Folder,
+              style: context.textStyles.bodyLarge?.copyWith(
                 color: context.colors.primary,
+                fontWeight: FontWeight.w600,
               ),
-              title: Text(
-                l10n.New_Folder,
-                style: context.textStyles.bodyLarge?.copyWith(
-                  color: context.colors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onTap: () => Navigator.pop(context, const _CreateFolder()),
             ),
-            if (scope.folders.isNotEmpty)
-              ListTile(
-                leading: const Icon(Icons.tune_rounded),
-                title: Text(l10n.Manage_Folders),
-                onTap: () => Navigator.pop(context, const _ManageFolders()),
-              ),
-          ],
-        ),
+            onTap: () => Navigator.pop(context, const _CreateFolder()),
+          ),
+          if (scope.folders.isNotEmpty)
+            ListTile(
+              leading: const Icon(Icons.tune_rounded),
+              title: Text(l10n.Manage_Folders),
+              onTap: () => Navigator.pop(context, const _ManageFolders()),
+            ),
+        ],
       ),
     );
   }
@@ -1324,7 +1256,8 @@ class _PickerTile extends StatelessWidget {
 
     return ListTile(
       selected: selected,
-      selectedTileColor: context.colors.primaryContainer.withValues(alpha: 0.4),
+      selectedTileColor: context.colors.primaryContainer,
+      selectedColor: context.colors.onPrimaryContainer,
       leading: Icon(
         icon,
         color: selected ? context.colors.primary : null,
@@ -1340,6 +1273,10 @@ class _PickerTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (selected) ...[
+            Icon(Icons.check_rounded, size: 20, color: context.colors.primary),
+            const SizedBox(width: 8),
+          ],
           Text(
             '$count',
             style: context.textStyles.labelLarge?.copyWith(

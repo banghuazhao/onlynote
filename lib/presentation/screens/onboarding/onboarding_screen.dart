@@ -89,37 +89,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPageChanged: (value) => setState(() => _index = value),
                   itemBuilder: (context, index) {
                     final page = _pages[index];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            shape: BoxShape.circle,
+                    // Scrollable so a large system text size can't overflow
+                    // the page instead of just making it taller.
+                    return SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              page.icon,
+                              size: 56,
+                              color: colorScheme.onPrimaryContainer,
+                            ),
                           ),
-                          child: Icon(
-                            page.icon,
-                            size: 56,
-                            color: colorScheme.onPrimaryContainer,
+                          SizedBox(height: context.tokens.space5),
+                          Text(
+                            titles[index],
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineMedium,
                           ),
-                        ),
-                        SizedBox(height: context.tokens.space5),
-                        Text(
-                          titles[index],
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        SizedBox(height: context.tokens.space3),
-                        Text(
-                          bodies[index],
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                        ),
-                      ],
+                          SizedBox(height: context.tokens.space3),
+                          Text(
+                            bodies[index],
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),

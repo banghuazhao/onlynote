@@ -1,23 +1,19 @@
-import 'dart:io';
-
-import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
-import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
-import 'package:onlynote/common/constants.dart';
-import 'package:onlynote/common/extension/random.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:uuid/uuid.dart';
+import 'package:onlynote/services/reminder_shortcuts.dart';
 
 import 'bloc/action/note_action_bloc.dart';
 import 'bloc/detail/note_detail_bloc.dart';
@@ -60,7 +56,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       );
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTransientSnackBar(
+          context,
           SnackBar(content: Text(S.of(context).Share_Note_Failed)),
         );
       }
@@ -68,78 +65,150 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _showReminderPicker(BuildContext context, Note note) async {
-    final currentReminder = ReminderData.shared.getCurrentReminder(note);
-
-    if (currentReminder == null) {
-      bool? permissionResult =
-          await NotificationService().checkAndAskForPermission(context);
-      if (permissionResult != null && permissionResult == true) {
-        if (!context.mounted) return;
-        DatePicker.showDateTimePicker(context, minTime: DateTime.now(),
-            onConfirm: (date) {
-          Reminder reminder = Reminder(
-              reminderId:
-                  DateTime.now().difference(DateTime(2020, 1, 1)).inSeconds,
-              reminderDate: DateTime(
-                  date.year, date.month, date.day, date.hour, date.minute),
-              noteId: note.id!);
-
-          ReminderData.shared.addReminder(reminder);
-
-          NotificationService()
-              .askForPermissionAndSchedule(context, note, reminder);
-
-          if (mounted) setState(() {});
-        });
-      }
-    } else {
-      showAdaptiveActionSheet(
-        context: context,
-        androidBorderRadius: 30,
-        actions: <BottomSheetAction>[
-          BottomSheetAction(
-              title: Text(S.of(context).Edit),
-              onPressed: (BuildContext context) async {
-                bool? permissionResult = await NotificationService()
-                    .checkAndAskForPermission(context);
-                if (permissionResult != null && permissionResult == true) {
-                  if (!context.mounted) return;
-                  DatePicker.showDateTimePicker(context,
-                      minTime: DateTime.now(), onConfirm: (date) {
-                    Reminder newReminder = Reminder(
-                        reminderId: currentReminder.reminderId,
-                        reminderDate: DateTime(date.year, date.month, date.day,
-                            date.hour, date.minute),
-                        noteId: note.id!);
-
-                    ReminderData.shared
-                        .modifyReminder(currentReminder, newReminder);
-
-                    NotificationService().askForPermissionAndSchedule(
-                        context, note, newReminder);
-
-                    if (mounted) setState(() {});
-                    Navigator.pop(context);
-                  });
+    final current = ReminderData.shared.getCurrentReminder(note);
+    await showAppActionSheet(
+      context: context,
+      title: S.of(context).Reminder,
+      actions: [
+        for (final shortcut in ReminderShortcut.values)
+          AppSheetAction(
+            leading: Icon(switch (shortcut) {
+              ReminderShortcut.inOneHour => Icons.schedule_outlined,
+              ReminderShortcut.tomorrowMorning => Icons.wb_sunny_outlined,
+              ReminderShortcut.nextWeek => Icons.event_outlined,
+            }),
+            title: Text(switch (shortcut) {
+              ReminderShortcut.inOneHour => S.of(context).Reminder_In_One_Hour,
+              ReminderShortcut.tomorrowMorning =>
+                S.of(context).Reminder_Tomorrow,
+              ReminderShortcut.nextWeek => S.of(context).Reminder_Next_Week,
+            }),
+            subtitle: Text(
+                _formatReminderTime(context, shortcut.resolve(DateTime.now()))),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _saveReminder(note, shortcut.resolve(DateTime.now()),
+                  current: current);
+            },
+          ),
+        AppSheetAction(
+          leading: const Icon(Icons.edit_calendar_outlined),
+          title: Text(S.of(context).Reminder_Custom),
+          subtitle: current == null
+              ? null
+              : Text(_formatReminderTime(context, current.reminderDate)),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _editReminder(note, current: current);
+          },
+        ),
+        if (current != null)
+          AppSheetAction(
+            destructive: true,
+            leading: const Icon(Icons.notifications_off_outlined),
+            title: Text(S.of(context).Delete),
+            onPressed: (sheetContext) async {
+              Navigator.pop(sheetContext);
+              try {
+                await NotificationService().removeNotification(current);
+                await ReminderData.shared.deleteReminder(current);
+                if (context.mounted) setState(() {});
+              } catch (_) {
+                if (context.mounted) {
+                  showTransientSnackBar(
+                      context,
+                      SnackBar(
+                          content: Text(S.of(context).Reminder_Save_Failed)));
                 }
-              }),
-          BottomSheetAction(
-              title: Text(
-                S.of(context).Delete,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-              onPressed: (BuildContext context) {
-                ReminderData.shared.deleteReminder(currentReminder);
-                NotificationService().removeNotification(currentReminder);
-                if (mounted) setState(() {});
-                Navigator.pop(context);
-              }),
-        ],
-        cancelAction: CancelAction(
-            title: Text(S
-                .of(context)
-                .Cancel)), // onPressed parameter is optional by default will dismiss the ActionSheet
+              }
+            },
+          ),
+      ],
+    );
+  }
+
+  String _formatReminderTime(BuildContext context, DateTime date) {
+    final localizations = MaterialLocalizations.of(context);
+    return '${localizations.formatMediumDate(date)} · ${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context))}';
+  }
+
+  Future<void> _editReminder(Note note, {Reminder? current}) async {
+    final now = DateTime.now();
+    final initial = current != null && current.reminderDate.isAfter(now)
+        ? current.reminderDate
+        : now.add(const Duration(hours: 1));
+    final date = await showDatePicker(
+      context: context,
+      helpText: S.of(context).Reminder,
+      initialDate: initial,
+      firstDate: now,
+      lastDate: DateTime(now.year + 100),
+    );
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(
+      context: context,
+      helpText: S.of(context).Reminder,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
+    if (time == null || !mounted) return;
+    final reminderDate =
+        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    if (!reminderDate.isAfter(DateTime.now())) {
+      showTransientSnackBar(
+          context, SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
+      return;
+    }
+    await _saveReminder(note, reminderDate, current: current);
+  }
+
+  Future<void> _saveReminder(Note note, DateTime date,
+      {Reminder? current}) async {
+    try {
+      final service = NotificationService();
+      final allowed = await service.checkAndAskForPermission(context);
+      if (allowed != true || !mounted) return;
+      final usedIds =
+          ReminderData.shared.reminders.map((r) => r.reminderId).toSet();
+      var id = current?.reminderId ?? (const Uuid().v4().hashCode & 0x7fffffff);
+      if (current == null) {
+        while (usedIds.contains(id)) {
+          id = (id + 1) & 0x7fffffff;
+        }
+      }
+      final reminder =
+          Reminder(reminderId: id, reminderDate: date, noteId: note.id!);
+      if (!date.isAfter(DateTime.now())) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
+        return;
+      }
+      final scheduled = await service.scheduleNotifications(
+        id: id,
+        title: S.of(context).Onlynote,
+        body: '${S.of(context).Reminder}: ${note.title ?? ''}',
+        time: date,
       );
+      if (!scheduled) throw StateError('Scheduling failed');
+      try {
+        if (current == null) {
+          await ReminderData.shared.addReminder(reminder);
+        } else {
+          await ReminderData.shared.modifyReminder(current, reminder);
+        }
+      } catch (_) {
+        await service.removeNotification(reminder);
+        rethrow;
+      }
+      if (mounted) {
+        setState(() {});
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Reminder_Saved)));
+      }
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Reminder_Save_Failed)));
+      }
     }
   }
 
@@ -148,9 +217,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     return BlocBuilder<NoteDetailBloc, NoteDetailState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: state.whenOrNull(
-            success: (note) => note.color ?? colors.randomElement,
-          ),
+          backgroundColor: DeskSurface.colorOf(context),
           appBar: NoteAppBar(
             actions: state.whenOrNull(
               success: (note) {
@@ -181,8 +248,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   AppButton(
                     tooltip: S.of(context).Edit,
                     child: const Icon(Icons.edit_outlined),
-                    onPressed: () {
-                      context.router.push(AddUpdateNoteRoute(note: note));
+                    onPressed: () async {
+                      await context.router.push(AddUpdateNoteRoute(note: note));
+                      if (!context.mounted) return;
+                      //* Reload the note so edits made on the form screen show up.
+                      context
+                          .read<NoteDetailBloc>()
+                          .add(NoteDetailEvent.showNote(widget.noteId));
                     },
                   ),
                   AppButton(
@@ -213,14 +285,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               },
             ),
           ),
-          body: state.maybeMap(
-            error: (error) => ErrorText(error.message ?? ''),
-            success: (data) => LoadedView(
-              note: data.note,
-              screenshotController: _screenshotController,
-              onReminderTap: () => _showReminderPicker(context, data.note),
+          body: DeskSurface(
+            child: state.maybeMap(
+              error: (error) => ErrorText(error.message ?? ''),
+              success: (data) => LoadedView(
+                note: data.note,
+                screenshotController: _screenshotController,
+                onReminderTap: () => _showReminderPicker(context, data.note),
+              ),
+              orElse: () => const _DetailSkeleton(),
             ),
-            orElse: () => const _DetailSkeleton(),
           ),
         );
       },
@@ -248,80 +322,88 @@ class LoadedView extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
         child: ListView(
-          padding: EdgeInsets.all(context.tokens.space4),
+          padding: EdgeInsets.fromLTRB(
+            context.tokens.space4,
+            context.tokens.space3,
+            context.tokens.space4,
+            context.tokens.space6,
+          ),
           children: [
             //* Everything inside here is captured when sharing the note as an image.
             Screenshot(
               controller: screenshotController,
-              child: Material(
-                color: note.color ?? Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacings.l),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      //* Show Note Title
-                      if (note.title?.isNotEmpty == true) ...[
-                        SelectableText(note.title!,
-                            style: AppTypography.headline3),
-                        const SizedBox(height: AppSpacings.l),
-                      ],
-
-                      //* Show Note Update/Add time
+              child: PaperNote(
+                color: note.color ?? AppColors.parchment,
+                kind: PaperNoteKind.sheet,
+                seed: note.id?.hashCode ?? 0,
+                pinned: note.isPinned,
+                tilt: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (note.title?.isNotEmpty == true) ...[
                       SelectableText(
-                        note.dateWithTime,
-                        style: AppTypography.description
-                            .copyWith(color: Colors.black87),
+                        note.title!,
+                        style: AppTypography.headline3.copyWith(height: 1.25),
                       ),
-
-                      //* Show reminder time, only if one is actually set.
-                      if (currentReminder != null) ...{
-                        const SizedBox(height: AppSpacings.m),
-                        InkWell(
-                          borderRadius:
-                              BorderRadius.circular(context.tokens.radiusSmall),
-                          onTap: onReminderTap,
+                      const SizedBox(height: AppSpacings.l),
+                    ],
+                    SelectableText(
+                      note.dateWithTime,
+                      style: AppTypography.description.copyWith(
+                        color: AppColors.ink.withValues(alpha: 0.55),
+                      ),
+                    ),
+                    if (currentReminder != null) ...{
+                      const SizedBox(height: AppSpacings.m),
+                      InkWell(
+                        borderRadius:
+                            BorderRadius.circular(context.tokens.radiusSmall),
+                        onTap: onReminderTap,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 44),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                                 vertical: context.tokens.space2),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.alarm,
-                                    size: 16, color: Colors.black87),
+                                Icon(
+                                  Icons.alarm_rounded,
+                                  size: 16,
+                                  color: AppColors.ink.withValues(alpha: 0.7),
+                                ),
                                 const SizedBox(width: AppSpacings.s),
                                 Text(
                                   currentReminder.timeString,
-                                  style: AppTypography.description
-                                      .copyWith(color: Colors.black87),
+                                  style: AppTypography.description.copyWith(
+                                    color: AppColors.ink.withValues(alpha: 0.7),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      },
-                      const SizedBox(height: AppSpacings.xxl),
-
-                      //* Show todo's list if any
-                      if (note.hasTodo) ...{
-                        _BuildTodoList(todoList: note.todo),
-                        const SizedBox(height: AppSpacings.xxl),
-                      },
-
-                      //* Note Description
-                      SelectableText(
-                        note.description ?? '',
-                        style: AppTypography.headline6,
                       ),
-
-                      //* Attached photos, if any
-                      if (note.hasImages) ...{
-                        const SizedBox(height: AppSpacings.xxl),
-                        _BuildImageGallery(imagePaths: note.imagePaths),
-                      },
-                    ],
-                  ),
+                    },
+                    const SizedBox(height: AppSpacings.xxl),
+                    if (note.hasTodo) ...{
+                      _BuildTodoList(todoList: note.todo),
+                      const SizedBox(height: AppSpacings.xxl),
+                    },
+                    SelectableText(
+                      note.description ?? '',
+                      style: AppTypography.headline6.copyWith(
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.ink.withValues(alpha: 0.88),
+                      ),
+                    ),
+                    if (note.hasImages) ...{
+                      const SizedBox(height: AppSpacings.xxl),
+                      _BuildImageGallery(imagePaths: note.imagePaths),
+                    },
+                  ],
                 ),
               ),
             ),
@@ -347,9 +429,12 @@ class _BuildTodoList extends StatelessWidget {
       children: [
         Text(
           S.of(context).Todo_list,
-          style: AppTypography.headline6
-              .copyWith(decoration: TextDecoration.underline),
+          style: AppTypography.headline6.copyWith(
+            decoration: TextDecoration.underline,
+            decorationColor: AppColors.ink.withValues(alpha: 0.35),
+          ),
         ),
+        const SizedBox(height: AppSpacings.m),
         AnimatedSwitcher(
           duration: context.tokens.motionStandard,
           transitionBuilder: (child, animation) => FadeTransition(
@@ -369,31 +454,16 @@ class _BuildTodoList extends StatelessWidget {
                 .join('|')),
             children: [
               for (final todo in sortedTodos)
-                AnimatedOpacity(
+                PaperChecklistRow(
                   key: ValueKey(todo.id),
-                  opacity: todo.completed ? 0.6 : 1.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: CheckboxListTile(
-                    controlAffinity: ListTileControlAffinity.leading,
-                    dense: true,
-                    value: todo.completed,
-                    contentPadding: EdgeInsets.zero,
-                    enableFeedback: true,
-                    title: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 250),
-                      style: AppTypography.title.copyWith(
-                        decoration:
-                            todo.completed ? TextDecoration.lineThrough : null,
-                      ),
-                      child: Text(todo.title ?? ''),
-                    ),
-                    onChanged: (bool? value) {
-                      HapticFeedback.lightImpact();
-                      context
-                          .read<NoteDetailBloc>()
-                          .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-                    },
-                  ),
+                  label: todo.title ?? '',
+                  completed: todo.completed,
+                  onChanged: (_) {
+                    HapticFeedback.lightImpact();
+                    context
+                        .read<NoteDetailBloc>()
+                        .add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
+                  },
                 ),
             ],
           ),
@@ -422,25 +492,28 @@ class _BuildImageGallery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100,
+      height: 118,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: imagePaths.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacings.m),
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacings.l),
         itemBuilder: (context, index) {
           return Material(
-            clipBehavior: Clip.antiAlias,
-            borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+            color: Colors.white.withValues(alpha: 0.86),
+            elevation: 1,
+            shadowColor: Colors.black26,
             child: InkWell(
               onTap: () => _openFullScreen(context, index),
-              child: Hero(
-                tag: 'note-image-${imagePaths[index]}',
-                child: Image.file(
-                  File(ImageStorage.resolvePath(imagePaths[index])),
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                  semanticLabel: S.of(context).Choose_From_Gallery,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(6, 6, 6, 14),
+                child: Hero(
+                  tag: 'note-image-${imagePaths[index]}',
+                  child: NoteImage(
+                    path: imagePaths[index],
+                    width: 100,
+                    height: 88,
+                    semanticLabel: S.of(context).Choose_From_Gallery,
+                  ),
                 ),
               ),
             ),
@@ -476,7 +549,7 @@ class _DetailSkeleton extends StatelessWidget {
       );
 }
 
-class _FullScreenImageViewer extends StatelessWidget {
+class _FullScreenImageViewer extends StatefulWidget {
   const _FullScreenImageViewer({
     required this.imagePaths,
     required this.initialIndex,
@@ -486,21 +559,48 @@ class _FullScreenImageViewer extends StatelessWidget {
   final int initialIndex;
 
   @override
+  State<_FullScreenImageViewer> createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
+  late final PageController _controller =
+      PageController(initialPage: widget.initialIndex);
+  late int _index = widget.initialIndex;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hasMultiple = widget.imagePaths.length > 1;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
+        title: hasMultiple
+            ? Text('${_index + 1} / ${widget.imagePaths.length}')
+            : null,
       ),
       body: PageView.builder(
-        controller: PageController(initialPage: initialIndex),
-        itemCount: imagePaths.length,
+        controller: _controller,
+        itemCount: widget.imagePaths.length,
+        onPageChanged: (index) => setState(() => _index = index),
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(
-              child:
-                  Image.file(File(ImageStorage.resolvePath(imagePaths[index]))),
+              child: Hero(
+                tag: 'note-image-${widget.imagePaths[index]}',
+                child: NoteImage(
+                  path: widget.imagePaths[index],
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
           );
         },

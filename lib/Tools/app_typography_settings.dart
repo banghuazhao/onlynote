@@ -19,6 +19,9 @@ final Map<String, GoogleFontBuilder> kAppFontFamilies = {
   'Poppins': GoogleFonts.poppins,
   'Nunito': GoogleFonts.nunito,
   'Merriweather': GoogleFonts.merriweather,
+  'Caveat': GoogleFonts.caveat,
+  'Kalam': GoogleFonts.kalam,
+  'Patrick Hand': GoogleFonts.patrickHand,
 };
 
 enum AppFontSize {
@@ -45,7 +48,8 @@ class AppTypographySettings extends ChangeNotifier {
   String get fontFamily => _fontFamily;
   AppFontSize get fontSize => _fontSize;
 
-  GoogleFontBuilder get fontBuilder => kAppFontFamilies[_fontFamily] ?? GoogleFonts.montserrat;
+  GoogleFontBuilder get fontBuilder =>
+      kAppFontFamilies[_fontFamily] ?? GoogleFonts.montserrat;
   double get scale => _fontSize.scale;
 
   Future<void> load() async {

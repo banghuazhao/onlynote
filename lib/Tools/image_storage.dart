@@ -65,6 +65,47 @@ class ImageStorage {
     return 'note_images/$fileName';
   }
 
+  /// Copies [paths] to fresh files so the copy owns its own images — used
+  /// when a note is duplicated, otherwise both notes point at the same file
+  /// and deleting either one breaks the other.
+  static Future<List<String>> copyImages(List<String> paths) async {
+    final copies = <String>[];
+    for (final path in paths) {
+      try {
+        final source = File(resolvePath(path));
+        if (!await source.exists()) continue;
+        copies.add(await saveImage(source));
+      } catch (_) {
+        // Best-effort: a failed copy just means the duplicate has one
+        // image fewer, which beats failing the whole duplication.
+      }
+    }
+    return copies;
+  }
+
+  /// Deletes image files no note points at any more — drafts abandoned
+  /// without saving, or files orphaned by an interrupted delete. [keep] holds
+  /// the absolute paths (see [resolvePath]) that are still referenced.
+  static Future<void> pruneOrphans(Set<String> keep) async {
+    try {
+      final documentsPath = await _documentsPathAsync();
+      final imagesDir = Directory('$documentsPath/note_images');
+      if (!await imagesDir.exists()) return;
+
+      await for (final entity in imagesDir.list()) {
+        if (entity is! File) continue;
+        if (keep.contains(entity.path)) continue;
+        try {
+          await entity.delete();
+        } catch (_) {
+          // Locked or already gone — nothing to do.
+        }
+      }
+    } catch (_) {
+      // Housekeeping only; never let it break startup.
+    }
+  }
+
   static Future<void> deleteImages(List<String> paths) async {
     for (final path in paths) {
       try {

@@ -47,11 +47,10 @@ class _WidgetGuideScreenState extends State<WidgetGuideScreen> {
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text(S.of(context).Widget_Add_Unsupported)),
-        );
+      showTransientSnackBar(
+        context,
+        SnackBar(content: Text(S.of(context).Widget_Add_Unsupported)),
+      );
     }
   }
 
@@ -61,75 +60,82 @@ class _WidgetGuideScreenState extends State<WidgetGuideScreen> {
     final tokens = context.tokens;
 
     return Scaffold(
+      backgroundColor: DeskSurface.colorOf(context),
       appBar: AppBar(title: Text(l10n.Widget)),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          tokens.space4,
-          tokens.space2,
-          tokens.space4,
-          tokens.space6,
-        ),
-        children: [
-          Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: tokens.contentMaxWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: DeskSurface(
+          child: SafeArea(
+              top: false,
+              child: ListView(
+                padding: EdgeInsets.fromLTRB(
+                  tokens.space4,
+                  tokens.space2,
+                  tokens.space4,
+                  tokens.space6,
+                ),
                 children: [
-                  const _WidgetPreview(),
-                  SizedBox(height: tokens.space4),
-                  Text(
-                    l10n.Widget_Description,
-                    textAlign: TextAlign.center,
-                    style: context.textStyles.bodyLarge?.copyWith(
-                      color: context.colors.onSurfaceVariant,
-                    ),
-                  ),
-                  SizedBox(height: tokens.space5),
-                  if (_canPin) ...[
-                    FilledButton.icon(
-                      onPressed: _pin,
-                      icon: const Icon(Icons.add_to_home_screen_rounded),
-                      label: Text(l10n.Widget_Add_To_Home),
-                    ),
-                    SizedBox(height: tokens.space4),
-                  ],
-                  SectionCard(
-                    title: l10n.Widget_Steps_Title,
-                    icon: Icons.widgets_outlined,
-                    children: [
-                      for (final (index, step) in _steps(l10n).indexed) ...[
-                        if (index > 0) SizedBox(height: tokens.space3),
-                        _Step(number: index + 1, text: step),
-                      ],
-                    ],
-                  ),
-                  SizedBox(height: tokens.space4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.lightbulb_outline_rounded,
-                        size: 18,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                      SizedBox(width: tokens.space2),
-                      Expanded(
-                        child: Text(
-                          l10n.Widget_Tip,
-                          style: context.textStyles.bodySmall?.copyWith(
-                            color: context.colors.onSurfaceVariant,
+                  Center(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(maxWidth: tokens.contentMaxWidth),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const _WidgetPreview(),
+                          SizedBox(height: tokens.space4),
+                          Text(
+                            l10n.Widget_Description,
+                            textAlign: TextAlign.center,
+                            style: context.textStyles.bodyLarge?.copyWith(
+                              color: context.colors.onSurfaceVariant,
+                            ),
                           ),
-                        ),
+                          SizedBox(height: tokens.space5),
+                          if (_canPin) ...[
+                            FilledButton.icon(
+                              onPressed: _pin,
+                              icon:
+                                  const Icon(Icons.add_to_home_screen_rounded),
+                              label: Text(l10n.Widget_Add_To_Home),
+                            ),
+                            SizedBox(height: tokens.space4),
+                          ],
+                          SectionCard(
+                            title: l10n.Widget_Steps_Title,
+                            icon: Icons.widgets_outlined,
+                            children: [
+                              for (final (index, step)
+                                  in _steps(l10n).indexed) ...[
+                                if (index > 0) SizedBox(height: tokens.space3),
+                                _Step(number: index + 1, text: step),
+                              ],
+                            ],
+                          ),
+                          SizedBox(height: tokens.space4),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.lightbulb_outline_rounded,
+                                size: 18,
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                              SizedBox(width: tokens.space2),
+                              Expanded(
+                                child: Text(
+                                  l10n.Widget_Tip,
+                                  style: context.textStyles.bodySmall?.copyWith(
+                                    color: context.colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ),
+              ))),
     );
   }
 

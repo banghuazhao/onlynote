@@ -1,13 +1,14 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:onlynote/Tools/image_storage.dart';
+import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/note_image.dart';
+import 'package:onlynote/presentation/components/paper_note.dart';
+import 'package:onlynote/presentation/components/toast.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -59,7 +60,8 @@ class _NoteCardState extends State<NoteCard> {
       );
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTransientSnackBar(
+          context,
           SnackBar(content: Text(S.of(context).Share_Note_Failed)),
         );
       }
@@ -68,29 +70,27 @@ class _NoteCardState extends State<NoteCard> {
 
   @override
   Widget build(BuildContext context) {
-    Reminder? currentReminder =
+    final Reminder? currentReminder =
         ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
-    // Title is optional — fall back to the description so the card still
-    // shows something meaningful for title-less notes.
-    final String headlineText =
-        note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
+    final hasTitle = note.title?.isNotEmpty == true;
+    final hasDescription = note.description?.isNotEmpty == true;
+    // Always a light paper: everything drawn on it is ink-coloured.
+    final paperColor = note.color ?? AppColors.parchment;
+    final seed = note.id?.hashCode ?? note.date.hashCode;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    return AnimatedScale(
-      scale: _pressed ? 0.97 : 1.0,
-      duration: const Duration(milliseconds: 120),
-      curve: Curves.easeOut,
-      child: Material(
-        type: MaterialType.card,
-        clipBehavior: Clip.antiAlias,
-        borderRadius: BorderRadius.circular(AppSpacings.xl),
-        color: note.color,
-        shadowColor:
-            Theme.of(context).colorScheme.shadow.withValues(alpha: 0.18),
-        elevation: 1,
-        child: InkWell(
-          splashColor: Colors.black12,
+    return Semantics(
+      button: true,
+      selected: widget.selected,
+      child: AnimatedScale(
+        scale: _pressed ? 0.985 : 1.0,
+        duration:
+            reduceMotion ? Duration.zero : const Duration(milliseconds: 160),
+        curve: Curves.easeOut,
+        child: GestureDetector(
           onTapDown: (_) => _setPressed(true),
+          onTapUp: (_) => _setPressed(false),
           onTapCancel: () => _setPressed(false),
           onLongPress: widget.onLongPress == null
               ? null
@@ -104,108 +104,131 @@ class _NoteCardState extends State<NoteCard> {
                   _setPressed(false);
                   widget.onTap!();
                 },
-          child: Container(
-            constraints: const BoxConstraints(
-              // maxHeight: 300,
-              minHeight: 100,
-            ),
-            padding: EdgeInsets.zero,
-            child: Stack(
-              children: [
-                Screenshot(
-                  controller: _screenshotController,
-                  child: Material(
-                    color: note.color ?? Theme.of(context).colorScheme.surface,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacings.l),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (note.isPinned) ...[
-                            const Icon(Icons.push_pin, size: 16),
-                            const SizedBox(height: AppSpacings.s),
-                          ],
-                          if (headlineText.isNotEmpty) ...[
-                            Text(
-                              headlineText,
-                              style: AppTypography.cardTitle,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 4,
-                            ),
-                            const SizedBox(height: AppSpacings.m),
-                          ],
+          child: Stack(
+            children: [
+              Screenshot(
+                controller: _screenshotController,
+                child: PaperNote(
+                  color: paperColor,
+                  seed: seed,
+                  pinned: note.isPinned,
+                  selected: widget.selected,
+                  pressed: _pressed,
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 48),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 88),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (hasTitle)
                           Text(
-                            note.date,
-                            style: AppTypography.description
-                                .copyWith(color: Colors.black87),
+                            note.title!,
+                            style: AppTypography.cardTitle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: hasDescription ? 3 : 5,
                           ),
-                          if (currentReminder != null)
-                            const SizedBox(height: AppSpacings.m),
-                          if (currentReminder != null)
-                            Text(
-                              '⏰ ${currentReminder.timeString}',
-                              style: AppTypography.description
-                                  .copyWith(color: Colors.black87),
-                            ),
+                        if (hasTitle && hasDescription)
                           const SizedBox(height: AppSpacings.m),
-                          if (note.hasTodo) ...{
-                            _BuildTodoList(
-                                todoList: note.todo.take(2).toList()),
-                          },
-                          if (note.hasImages) ...{
-                            const SizedBox(height: AppSpacings.m),
-                            ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(AppSpacings.m),
-                              child: Image.file(
-                                File(ImageStorage.resolvePath(
-                                    note.imagePaths.first)),
-                                width: 64,
-                                height: 64,
-                                fit: BoxFit.cover,
+                        if (hasDescription)
+                          Text(
+                            note.description!,
+                            style: hasTitle
+                                ? AppTypography.cardBody
+                                : AppTypography.cardTitle,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: hasTitle ? 4 : 6,
+                          ),
+                        const SizedBox(height: AppSpacings.l),
+                        Text(
+                          note.date,
+                          style: AppTypography.description.copyWith(
+                            color: AppColors.ink.withValues(alpha: 0.55),
+                            fontSize: 12 * AppTypographySettings.instance.scale,
+                          ),
+                        ),
+                        if (currentReminder != null) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.alarm_rounded,
+                                size: 14,
+                                color: AppColors.ink.withValues(alpha: 0.62),
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  currentReminder.timeString,
+                                  style: AppTypography.description.copyWith(
+                                    color:
+                                        AppColors.ink.withValues(alpha: 0.62),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (note.hasTodo) ...[
+                          const SizedBox(height: AppSpacings.l),
+                          for (final todo in note.todo.take(3))
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: AppSpacings.s),
+                              child: PaperChecklistRow(
+                                label: todo.title ?? '',
+                                completed: todo.completed,
+                                dense: true,
+                                maxLines: 1,
                               ),
                             ),
-                          },
                         ],
-                      ),
+                        if (note.hasImages) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          _PolaroidThumb(
+                            path: note.imagePaths.first,
+                            extraCount: note.imagePaths.length - 1,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Material(
+              ),
+              Positioned(
+                right: 2,
+                bottom: 2,
+                child: Tooltip(
+                  message: widget.selectionMode
+                      ? S.of(context).Select
+                      : S.of(context).Share,
+                  child: IconButton(
                     key: widget.selectionMode ? null : _shareButtonKey,
-                    color: widget.selected
-                        ? AppColors.primary
-                        : Theme.of(context)
-                            .colorScheme
-                            .scrim
-                            .withValues(alpha: 0.08),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: widget.selectionMode
-                          ? widget.onTap
-                          : _shareNoteAsImage,
-                      child: SizedBox.square(
-                        dimension: 36,
-                        child: Icon(
-                          widget.selectionMode
-                              ? widget.selected
-                                  ? Icons.check_rounded
-                                  : Icons.check_circle_outline_rounded
-                              : Icons.share_outlined,
-                          size: 18,
-                          color: widget.selected ? Colors.white : null,
-                        ),
-                      ),
+                    style: IconButton.styleFrom(
+                      backgroundColor: widget.selected
+                          ? AppColors.primary
+                          : AppColors.ink.withValues(alpha: 0.08),
+                      foregroundColor: widget.selected
+                          ? Colors.white
+                          : AppColors.ink.withValues(alpha: 0.7),
+                      minimumSize: const Size(44, 44),
+                      tapTargetSize: MaterialTapTargetSize.padded,
+                    ),
+                    onPressed:
+                        widget.selectionMode ? widget.onTap : _shareNoteAsImage,
+                    icon: Icon(
+                      widget.selectionMode
+                          ? widget.selected
+                              ? Icons.check_rounded
+                              : Icons.check_circle_outline_rounded
+                          : Icons.ios_share_rounded,
+                      size: 18,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -213,41 +236,59 @@ class _NoteCardState extends State<NoteCard> {
   }
 }
 
-class _BuildTodoList extends StatelessWidget {
-  const _BuildTodoList({required this.todoList});
-  final List<Todo> todoList;
+class _PolaroidThumb extends StatelessWidget {
+  const _PolaroidThumb({required this.path, required this.extraCount});
+
+  final String path;
+  final int extraCount;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      itemCount: todoList.length,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (_, index) {
-        final Todo todo = todoList[index];
-
-        return AbsorbPointer(
-          absorbing: true,
-          child: CheckboxListTile(
-            controlAffinity: ListTileControlAffinity.leading,
-            dense: true,
-            value: todo.completed,
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              todo.title ?? '',
-              style: AppTypography.title.copyWith(
-                decoration: todo.completed ? TextDecoration.lineThrough : null,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+    return Semantics(
+      image: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.82),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 3,
+              offset: const Offset(0.5, 1),
             ),
-            onChanged: (bool? value) {
-              // context.read<NoteDetailBloc>().add(NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-            },
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+          child: Stack(
+            children: [
+              NoteImage(path: path, width: 64, height: 52),
+              if (extraCount > 0)
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.ink.withValues(alpha: 0.62),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 1),
+                      child: Text(
+                        '+$extraCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

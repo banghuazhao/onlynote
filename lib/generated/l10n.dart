@@ -1284,6 +1284,281 @@ class S {
       args: [],
     );
   }
+
+  /// `Add Photo`
+  String get Add_Image {
+    return Intl.message('Add Photo', name: 'Add_Image', desc: '', args: []);
+  }
+
+  /// `A little space for your next big idea.`
+  String get Font_Preview {
+    return Intl.message(
+      'A little space for your next big idea.',
+      name: 'Font_Preview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a time in the future for your reminder.`
+  String get Reminder_Future_Time {
+    return Intl.message(
+      'Choose a time in the future for your reminder.',
+      name: 'Reminder_Future_Time',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved`
+  String get Autosave_Saved {
+    return Intl.message('Saved', name: 'Autosave_Saved', desc: '', args: []);
+  }
+
+  /// `Saving…`
+  String get Autosave_Saving {
+    return Intl.message('Saving…', name: 'Autosave_Saving', desc: '', args: []);
+  }
+
+  /// `Not saved`
+  String get Autosave_Retry {
+    return Intl.message(
+      'Not saved',
+      name: 'Autosave_Retry',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save your changes. Keep this note open and tap Done to retry.`
+  String get Autosave_Failed {
+    return Intl.message(
+      'Could not save your changes. Keep this note open and tap Done to retry.',
+      name: 'Autosave_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup & Restore`
+  String get Backup_Title {
+    return Intl.message(
+      'Backup & Restore',
+      name: 'Backup_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create backup`
+  String get Backup_Export {
+    return Intl.message(
+      'Create backup',
+      name: 'Backup_Export',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.`
+  String get Backup_Export_Description {
+    return Intl.message(
+      'Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.',
+      name: 'Backup_Export_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore backup`
+  String get Backup_Restore {
+    return Intl.message(
+      'Restore backup',
+      name: 'Backup_Restore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.`
+  String get Backup_Restore_Description {
+    return Intl.message(
+      'Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.',
+      name: 'Backup_Restore_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose backup file`
+  String get Backup_Choose {
+    return Intl.message(
+      'Choose backup file',
+      name: 'Backup_Choose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Preparing your backup…`
+  String get Backup_Preparing {
+    return Intl.message(
+      'Preparing your backup…',
+      name: 'Backup_Preparing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checking the backup file…`
+  String get Backup_Reading {
+    return Intl.message(
+      'Checking the backup file…',
+      name: 'Backup_Reading',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restoring your notes and photos…`
+  String get Backup_Restoring {
+    return Intl.message(
+      'Restoring your notes and photos…',
+      name: 'Backup_Restoring',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.`
+  String get Backup_Export_Failed {
+    return Intl.message(
+      'Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.',
+      name: 'Backup_Export_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This is not a supported Onlynote backup, or the file is damaged or larger than 256 MB. Nothing was imported.`
+  String get Backup_Invalid {
+    return Intl.message(
+      'This is not a supported Onlynote backup, or the file is damaged or larger than 256 MB. Nothing was imported.',
+      name: 'Backup_Invalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not restore the backup. Check available storage and try again. Your existing notes have not been overwritten.`
+  String get Backup_Restore_Failed {
+    return Intl.message(
+      'Could not restore the backup. Check available storage and try again. Your existing notes have not been overwritten.',
+      name: 'Backup_Restore_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup restored. Your notes are ready in the library.`
+  String get Backup_Restored {
+    return Intl.message(
+      'Backup restored. Your notes are ready in the library.',
+      name: 'Backup_Restored',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes restored. Some reminder notifications could not be scheduled; open those notes to set them again.`
+  String get Backup_Restored_No_Notifications {
+    return Intl.message(
+      'Notes restored. Some reminder notifications could not be scheduled; open those notes to set them again.',
+      name: 'Backup_Restored_No_Notifications',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Schedule future reminder notifications`
+  String get Backup_Schedule_Reminders {
+    return Intl.message(
+      'Schedule future reminder notifications',
+      name: 'Backup_Schedule_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{notes} notes · {folders} folders · {photos} photos`
+  String Backup_Contents(Object notes, Object folders, Object photos) {
+    return Intl.message(
+      '$notes notes · $folders folders · $photos photos',
+      name: 'Backup_Contents',
+      desc: '',
+      args: [notes, folders, photos],
+    );
+  }
+
+  /// `In 1 hour`
+  String get Reminder_In_One_Hour {
+    return Intl.message(
+      'In 1 hour',
+      name: 'Reminder_In_One_Hour',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tomorrow morning`
+  String get Reminder_Tomorrow {
+    return Intl.message(
+      'Tomorrow morning',
+      name: 'Reminder_Tomorrow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `In a week`
+  String get Reminder_Next_Week {
+    return Intl.message(
+      'In a week',
+      name: 'Reminder_Next_Week',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose date & time`
+  String get Reminder_Custom {
+    return Intl.message(
+      'Choose date & time',
+      name: 'Reminder_Custom',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reminder set`
+  String get Reminder_Saved {
+    return Intl.message(
+      'Reminder set',
+      name: 'Reminder_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not update the reminder. Please try again.`
+  String get Reminder_Save_Failed {
+    return Intl.message(
+      'Could not update the reminder. Please try again.',
+      name: 'Reminder_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -15,6 +15,22 @@ abstract final class AppTheme {
       seedColor: AppColors.amber,
       brightness: brightness,
       primary: dark ? const Color(0xFFFFD275) : AppColors.ink,
+      onPrimary: dark ? AppColors.ink : AppColors.parchment,
+      primaryContainer:
+          dark ? const Color(0xFF514126) : const Color(0xFFF6E4B9),
+      onPrimaryContainer: dark ? const Color(0xFFFFE3AA) : AppColors.ink,
+      onSurface: dark ? const Color(0xFFF1E8DA) : AppColors.ink,
+      onSurfaceVariant:
+          dark ? const Color(0xFFCCC1B1) : const Color(0xFF625C51),
+      surfaceContainerLowest: dark ? AppColors.night : const Color(0xFFFFFCF7),
+      surfaceContainerLow: dark ? AppColors.nightSurface : AppColors.parchment,
+      surfaceContainer:
+          dark ? const Color(0xFF2B2822) : const Color(0xFFF7EEDD),
+      surfaceContainerHigh:
+          dark ? const Color(0xFF332F28) : const Color(0xFFF1E6D4),
+      surfaceContainerHighest:
+          dark ? const Color(0xFF3D382F) : const Color(0xFFE9DDC8),
+      outlineVariant: dark ? const Color(0xFF514B40) : const Color(0xFFD6C8B2),
       secondary: dark ? const Color(0xFFF2C66D) : const Color(0xFF805600),
       surface: dark ? AppColors.nightSurface : AppColors.parchment,
       error: dark ? const Color(0xFFFFB4AB) : AppColors.error,
@@ -70,7 +86,11 @@ abstract final class AppTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         color: scheme.surfaceContainerLow,
-        shape: mediumShape,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: .7)),
+        ),
+        clipBehavior: Clip.antiAlias,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -104,7 +124,8 @@ abstract final class AppTheme {
         enabledBorder: OutlineInputBorder(
             borderRadius: mediumRadius, borderSide: BorderSide.none),
         focusedBorder: OutlineInputBorder(
-            borderRadius: mediumRadius, borderSide: BorderSide.none),
+            borderRadius: mediumRadius,
+            borderSide: BorderSide(color: scheme.primary, width: 1.5)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
@@ -117,13 +138,25 @@ abstract final class AppTheme {
             textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: scheme.surfaceContainerHigh,
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        iconColor: scheme.secondary,
+        titleTextStyle: textTheme.titleLarge,
+        contentTextStyle:
+            textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(tokens.radiusLarge),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: scheme.outlineVariant),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         showDragHandle: true,
+        dragHandleColor: scheme.outlineVariant,
+        dragHandleSize: const Size(36, 4),
+        surfaceTintColor: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        constraints: const BoxConstraints(maxWidth: 640),
         backgroundColor: scheme.surfaceContainerLow,
         modalBackgroundColor: scheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
@@ -131,6 +164,27 @@ abstract final class AppTheme {
               BorderRadius.vertical(top: Radius.circular(tokens.radiusLarge)),
         ),
       ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: scheme.outlineVariant),
+        ),
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: scheme.primaryContainer,
+        headerForegroundColor: scheme.onPrimaryContainer,
+      ),
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: scheme.surface,
+        dialBackgroundColor: scheme.surfaceContainer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      dividerTheme:
+          DividerThemeData(color: scheme.outlineVariant, thickness: 1),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.inverseSurface,

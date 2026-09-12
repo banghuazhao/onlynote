@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -95,6 +96,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       title: '${event.note.title ?? ''} ${_i10n.Copy_Suffix}',
       dateTime: DateTime.now(),
       todo: event.note.todo.map((todo) => todo.copyWith()).toList(),
+      // Its own copies of the images: sharing the files would mean deleting
+      // either note takes the other note's pictures with it.
+      imagePaths: await ImageStorage.copyImages(event.note.imagePaths),
       isPinned: false,
       deletedAt: null,
     );

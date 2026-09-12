@@ -19,92 +19,105 @@ class ManageFoldersScreen extends StatelessWidget {
     final notesListenable = Hive.box(databaseBox).listenable();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).Manage_Folders),
-        actions: [
-          IconButton(
-            tooltip: S.of(context).New_Folder,
-            icon: const Icon(Icons.create_new_folder_outlined),
-            onPressed: () => _showFolderNameDialog(context),
-          ),
-        ],
-      ),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([foldersListenable, notesListenable]),
-        builder: (context, _) {
-          final folders = foldersListenable.value.values
-              .whereType<FolderDto>()
-              .map((folder) => folder.toDomain())
-              .toList()
-            ..sort(_compareFolders);
-          final noteCounts = _noteCountsByFolder(notesListenable.value);
+      backgroundColor: DeskSurface.colorOf(context),
+      // "New folder" lives on the FAB alone — it was also in the app bar,
+      // which read as two different actions.
+      appBar: AppBar(title: Text(S.of(context).Manage_Folders)),
+      body: DeskSurface(
+          child: SafeArea(
+              top: false,
+              child: Center(
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: context.tokens.contentMaxWidth),
+                      child: AnimatedBuilder(
+                        animation: Listenable.merge(
+                            [foldersListenable, notesListenable]),
+                        builder: (context, _) {
+                          final folders = foldersListenable.value.values
+                              .whereType<FolderDto>()
+                              .map((folder) => folder.toDomain())
+                              .toList()
+                            ..sort(_compareFolders);
+                          final noteCounts =
+                              _noteCountsByFolder(notesListenable.value);
 
-          if (folders.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(context.tokens.space5),
-                child: Text(
-                  S.of(context).No_Folders,
-                  textAlign: TextAlign.center,
-                  style: context.textStyles.bodyLarge,
-                ),
-              ),
-            );
-          }
+                          if (folders.isEmpty) {
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(context.tokens.space5),
+                                child: Text(
+                                  S.of(context).No_Folders,
+                                  textAlign: TextAlign.center,
+                                  style: context.textStyles.bodyLarge,
+                                ),
+                              ),
+                            );
+                          }
 
-          return ListView.separated(
-            padding: EdgeInsets.fromLTRB(
-              context.tokens.space4,
-              context.tokens.space2,
-              context.tokens.space4,
-              context.tokens.space6,
-            ),
-            itemCount: folders.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final folder = folders[index];
-              final noteCount = noteCounts[folder.id] ?? 0;
-              return ListTile(
-                leading: const Icon(Icons.folder_outlined),
-                title: Text(folder.name),
-                subtitle: Text(S.of(context).Folder_Notes_Count(noteCount)),
-                trailing: PopupMenuButton<_FolderAction>(
-                  onSelected: (action) {
-                    switch (action) {
-                      case _FolderAction.rename:
-                        _showFolderNameDialog(context, folder: folder);
-                      case _FolderAction.delete:
-                        _deleteFolder(context, folder);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: _FolderAction.rename,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.drive_file_rename_outline),
-                        title: Text(S.of(context).Rename_Folder),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: _FolderAction.delete,
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading:
-                            const Icon(Icons.delete_outline, color: Colors.red),
-                        title: Text(
-                          S.of(context).Delete_Folder,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
+                          return ListView.separated(
+                            padding: EdgeInsets.fromLTRB(
+                              context.tokens.space4,
+                              context.tokens.space2,
+                              context.tokens.space4,
+                              // Clears the extended FAB so it can't sit on the last folder.
+                              context.tokens.space6 * 3,
+                            ),
+                            itemCount: folders.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
+                            itemBuilder: (context, index) {
+                              final folder = folders[index];
+                              final noteCount = noteCounts[folder.id] ?? 0;
+                              return Card(
+                                  child: ListTile(
+                                leading: const Icon(Icons.folder_outlined),
+                                title: Text(folder.name),
+                                subtitle: Text(S
+                                    .of(context)
+                                    .Folder_Notes_Count(noteCount)),
+                                trailing: PopupMenuButton<_FolderAction>(
+                                  tooltip: S.of(context).Edit,
+                                  onSelected: (action) {
+                                    switch (action) {
+                                      case _FolderAction.rename:
+                                        _showFolderNameDialog(context,
+                                            folder: folder);
+                                      case _FolderAction.delete:
+                                        _deleteFolder(context, folder);
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: _FolderAction.rename,
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        leading: const Icon(
+                                            Icons.drive_file_rename_outline),
+                                        title:
+                                            Text(S.of(context).Rename_Folder),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: _FolderAction.delete,
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        leading: Icon(Icons.delete_outline,
+                                            color: context.colors.error),
+                                        title: Text(
+                                          S.of(context).Delete_Folder,
+                                          style: TextStyle(
+                                              color: context.colors.error),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ));
+                            },
+                          );
+                        },
+                      ))))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showFolderNameDialog(context),
         icon: const Icon(Icons.create_new_folder_outlined),
@@ -137,7 +150,7 @@ class ManageFoldersScreen extends StatelessWidget {
   }) async {
     final name = await showDialog<String>(
       context: context,
-      builder: (_) => _FolderNameDialog(
+      builder: (_) => FolderNameDialog(
         title: folder == null
             ? S.of(context).New_Folder
             : S.of(context).Rename_Folder,
@@ -171,53 +184,3 @@ class ManageFoldersScreen extends StatelessWidget {
 }
 
 enum _FolderAction { rename, delete }
-
-class _FolderNameDialog extends StatefulWidget {
-  const _FolderNameDialog({required this.title, this.initial});
-
-  final String title;
-  final String? initial;
-
-  @override
-  State<_FolderNameDialog> createState() => _FolderNameDialogState();
-}
-
-class _FolderNameDialogState extends State<_FolderNameDialog> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initial ?? '');
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: TextField(
-        controller: _controller,
-        autofocus: true,
-        decoration: InputDecoration(hintText: S.of(context).Folder_Name),
-        textInputAction: TextInputAction.done,
-        onSubmitted: (value) => Navigator.pop(context, value),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(S.of(context).Cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: Text(S.of(context).OK),
-        ),
-      ],
-    );
-  }
-}

@@ -1,29 +1,29 @@
 import 'dart:ui' show Color;
 
 const List<Color> colors = [
-  // Original neutral/warm palette.
-  Color(0xffE3CBB1),
-  Color(0xffD5B9AC),
-  Color(0xffC1CDDB),
-  Color(0xffB0B1B4),
-  Color(0xffE5E6E2),
-  Color(0xffB9C3B8),
-  Color(0xffE6D5D9),
-  Color(0xffFBE9D8),
-  Color(0xffD2D1CF),
-  Color(0xffBFAFA7),
-  Color(0xffDFDDB3),
-  // Additional pastel hues for more variety.
-  Color(0xffF6C6C6), // pink
-  Color(0xffF7D9A0), // yellow
-  Color(0xffB8E0D2), // mint
-  Color(0xffA7C6E0), // blue
-  Color(0xffCBB8E0), // lavender
-  Color(0xffF3B6A0), // terracotta
-  Color(0xffA8D8C9), // sage
-  Color(0xffE0B8CE), // rose
-  Color(0xffB9D6E0), // sky
-  Color(0xffE3D5B8), // sand
+  // Stationery and sticky-note papers. Existing notes keep whatever Color
+  // was stored; this list only affects new notes and the editor swatches.
+  Color(0xFFFFF4C2), // sticky yellow
+  Color(0xFFFFF6D8), // legal pad
+  Color(0xFFFFE4C4), // manila
+  Color(0xFFF8D5C0), // kraft blush
+  Color(0xFFF7C9C9), // pink sticky
+  Color(0xFFF3D1E0), // rose
+  Color(0xFFE4D4F0), // lilac
+  Color(0xFFD4E3F5), // index card blue
+  Color(0xFFD3EDE4), // mint
+  Color(0xFFE2EDD4), // sage
+  Color(0xFFF0E6D2), // parchment
+  Color(0xFFE8E4D9), // cotton
+  Color(0xFFE6D5C3), // kraft
+  Color(0xFFD9D3C9), // stone
+  Color(0xFFC9D6C8), // olive paper
+  Color(0xFFF7C8A8), // coral
+  Color(0xFFBFD7EA), // sky
+  Color(0xFFE8C4B8), // terracotta paper
+  Color(0xFFD5C6B0), // cardboard
+  Color(0xFFF3E5AB), // butter
+  Color(0xFFE5E6E2), // cold white
 ];
 
 const Duration animationDuration = Duration(milliseconds: 400);

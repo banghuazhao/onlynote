@@ -18,11 +18,11 @@ class _BuildImageSection extends StatelessWidget {
   }
 
   void _showImageSourceSheet(BuildContext context) {
-    showAdaptiveActionSheet(
+    showAppActionSheet(
       context: context,
-      androidBorderRadius: 30,
-      actions: <BottomSheetAction>[
-        BottomSheetAction(
+      title: S.of(context).Add_Image,
+      actions: <AppSheetAction>[
+        AppSheetAction(
           leading: const Icon(Icons.photo_library_outlined),
           title: Text(S.of(context).Choose_From_Gallery),
           onPressed: (sheetContext) {
@@ -30,7 +30,7 @@ class _BuildImageSection extends StatelessWidget {
             _pickImage(context, ImageSource.gallery);
           },
         ),
-        BottomSheetAction(
+        AppSheetAction(
           leading: const Icon(Icons.camera_alt_outlined),
           title: Text(S.of(context).Take_Photo),
           onPressed: (sheetContext) {
@@ -39,14 +39,13 @@ class _BuildImageSection extends StatelessWidget {
           },
         ),
       ],
-      cancelAction: CancelAction(title: Text(S.of(context).Cancel)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 88,
+      height: 96,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -63,15 +62,15 @@ class _BuildImageSection extends StatelessWidget {
               ),
             ),
           Material(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
+            color: Colors.white.withValues(alpha: 0.55),
+            elevation: 1,
+            shadowColor: Colors.black26,
             child: InkWell(
-              borderRadius: BorderRadius.circular(context.tokens.radiusSmall),
               onTap: () => _showImageSourceSheet(context),
-              child: SizedBox(
+              child: const SizedBox(
                 width: 80,
                 height: 80,
-                child: const Icon(Icons.add_photo_alternate_outlined),
+                child: Icon(Icons.add_photo_alternate_outlined),
               ),
             ),
           ),
@@ -90,13 +89,20 @@ class _ImageThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AppSpacings.m),
-          child: Image.file(
-            File(ImageStorage.resolvePath(path)),
-            width: 80,
-            height: 80,
-            fit: BoxFit.cover,
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.86),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 3,
+                offset: const Offset(0.5, 1),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+            child: NoteImage(path: path, width: 80, height: 66),
           ),
         ),
         Positioned(

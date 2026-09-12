@@ -10,6 +10,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/observer.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
@@ -21,6 +22,7 @@ import 'Tools/consent_gate.dart';
 import 'Tools/image_storage.dart';
 import 'Tools/in_app_reviewer_helper.dart';
 import 'Tools/locator.dart';
+import 'Tools/note_cleanup.dart';
 import 'Tools/notification_service.dart';
 import 'Tools/onboarding_settings.dart';
 import 'Tools/reminder_data.dart';
@@ -32,6 +34,9 @@ import 'presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart
 import 'presentation/screens/note_detail/bloc/action/note_action_bloc.dart';
 import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
+import 'services/note_autosave.dart';
+import 'services/backup/backup_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +53,8 @@ Future<void> main() async {
   Hive.registerAdapter(FolderDtoAdapter());
   await Hive.openBox(databaseBox);
   await Hive.openBox(folderDatabaseBox);
+  await Hive.openBox(draftDatabaseBox);
+  await Hive.openBox(backupRecoveryBox);
 
   //* Update statusbar theme
   SystemChrome.setSystemUIOverlayStyle(
@@ -87,6 +94,19 @@ Future<void> main() async {
   }
 
   ReminderData.shared.init(items);
+  await BackupService(
+    notes: Hive.box(databaseBox),
+    folders: Hive.box(folderDatabaseBox),
+    journal: Hive.box(backupRecoveryBox),
+    documents: await getApplicationDocumentsDirectory(),
+    readReminders: () => ReminderData.shared.reminders,
+    writeReminders: ReminderData.shared.replaceAll,
+  ).recoverInterruptedRestore();
+  await HiveNoteAutosaveStore(
+          getIt<NoteRepository>(), Hive.box(draftDatabaseBox))
+      .recover();
+  // Finish recovery before pruning; pending drafts may own photos too.
+  await NoteCleanup.pruneOrphanImages(getIt<NoteRepository>());
 
   runApp(
     MultiBlocProvider(

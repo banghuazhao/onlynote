@@ -18,13 +18,15 @@ class _BuildTitleField extends StatelessWidget {
             opacity: 0.6,
             child: Text(
               S.of(context).Title,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: AppTypography.headline4.copyWith(
+                color: AppColors.ink.withValues(alpha: 0.35),
+              ),
               softWrap: true,
             ),
           ),
         TextField(
           controller: _titleController,
-          style: Theme.of(context).textTheme.titleLarge,
+          style: AppTypography.headline4.copyWith(height: 1.25),
           textInputAction: TextInputAction.next,
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
           decoration: const InputDecoration(
@@ -58,37 +60,46 @@ class _BuildDescriptionField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        if (state.showDescriptionHint)
-          Opacity(
-            opacity: 0.6,
-            child: Text(
-              S.of(context).Type_something,
-              style: Theme.of(context).textTheme.bodyLarge,
-              softWrap: true,
+    final lineHeight = (AppTypography.formText.fontSize ?? 17) *
+        (AppTypography.formText.height ?? 1.55);
+
+    return RuledWritingArea(
+      paperColor: state.selectedColor ?? AppColors.parchment,
+      lineHeight: lineHeight,
+      child: Stack(
+        children: [
+          if (state.showDescriptionHint)
+            Opacity(
+              opacity: 0.55,
+              child: Text(
+                S.of(context).Type_something,
+                style: AppTypography.formText.copyWith(
+                  color: AppColors.ink.withValues(alpha: 0.4),
+                ),
+                softWrap: true,
+              ),
             ),
+          TextField(
+            controller: _descriptionController,
+            style: AppTypography.formText,
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            decoration: const InputDecoration(
+              filled: false,
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            minLines: 6,
+            maxLines: 100,
+            onChanged: (value) {
+              context.read<AddUpdateFormBloc>().add(
+                    AddUpdateFormEvent.descriptionChanged(value),
+                  );
+            },
           ),
-        TextField(
-          controller: _descriptionController,
-          style: Theme.of(context).textTheme.bodyLarge,
-          keyboardType: TextInputType.multiline,
-          textInputAction: TextInputAction.newline,
-          onTapOutside: (_) => FocusScope.of(context).unfocus(),
-          decoration: const InputDecoration(
-            filled: false,
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
-          ),
-          minLines: 2,
-          maxLines: 100,
-          onChanged: (value) {
-            context.read<AddUpdateFormBloc>().add(
-                  AddUpdateFormEvent.descriptionChanged(value),
-                );
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

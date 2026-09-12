@@ -8,30 +8,33 @@ class ColorsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FadeInRight(
-      // delay: const Duration(milliseconds: 600),
-      child: SafeArea(
-        minimum: const EdgeInsets.only(bottom: 12),
-        child: Material(
-          color: selectedColor,
+      child: Material(
+        color: DeskSurface.colorOf(context),
+        elevation: 8,
+        shadowColor: Colors.black26,
+        child: SafeArea(
+          minimum: const EdgeInsets.only(bottom: 8),
           child: SizedBox(
-            height: kToolbarHeight,
+            height: 64,
             child: Center(
-              child: SingleChildScrollView(
+              child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: colors
-                      .map(
-                        (color) => _ColorBox(
-                          color: color,
-                          isSelected: selectedColor == color,
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            onChanged(color);
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: colors.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final color = colors[index];
+                  return Center(
+                    child: _ColorBox(
+                      color: color,
+                      isSelected: selectedColor == color,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        onChanged(color);
+                      },
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -54,46 +57,45 @@ class _ColorBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacings.s),
-      child: Semantics(
-        button: true,
-        selected: isSelected,
-        label: 'Note color',
-        child: InkResponse(
-          radius: 28,
-          onTap: onTap,
-          child: AnimatedScale(
-            scale: isSelected ? 1.12 : 1.0,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: 'Note color',
+      child: InkResponse(
+        radius: 28,
+        onTap: onTap,
+        child: AnimatedScale(
+          scale: isSelected ? 1.08 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutBack,
+          child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,
-            child: Material(
-              shape: const CircleBorder(),
-              elevation: isSelected ? 3 : 0.2,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                height: 40,
-                width: 40,
-                margin: const EdgeInsets.all(AppSpacings.s),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: color,
-                  border: isSelected
-                      ? Border.all(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          width: 2)
-                      : null,
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: isSelected
+                    ? AppColors.ink.withValues(alpha: 0.7)
+                    : AppColors.ink.withValues(alpha: 0.18),
+                width: isSelected ? 2 : 0.8,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isSelected ? 0.2 : 0.1),
+                  blurRadius: isSelected ? 6 : 3,
+                  offset: Offset(0, isSelected ? 3 : 1.5),
                 ),
-                child: AnimatedScale(
-                  scale: isSelected ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutBack,
-                  child: Icon(
-                    Icons.check,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    size: 30,
-                  ),
-                ),
+              ],
+            ),
+            child: AnimatedOpacity(
+              opacity: isSelected ? 1 : 0,
+              duration: const Duration(milliseconds: 180),
+              child: Icon(
+                Icons.check_rounded,
+                color: AppColors.ink.withValues(alpha: 0.75),
+                size: 20,
               ),
             ),
           ),

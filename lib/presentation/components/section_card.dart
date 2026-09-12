@@ -30,11 +30,22 @@ class SectionCard extends StatelessWidget {
               Row(
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, color: context.colors.primary),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: context.colors.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon,
+                          size: 22, color: context.colors.onPrimaryContainer),
+                    ),
                     SizedBox(width: tokens.space2),
                   ],
                   Expanded(
-                      child: Text(title, style: context.textStyles.titleLarge)),
+                      child: Semantics(
+                          header: true,
+                          child: Text(title,
+                              style: context.textStyles.titleMedium))),
                 ],
               ),
               if (subtitle != null) ...[
@@ -44,7 +55,7 @@ class SectionCard extends StatelessWidget {
                       color: context.colors.onSurfaceVariant,
                     )),
               ],
-              SizedBox(height: tokens.space2),
+              SizedBox(height: tokens.space4),
               ...children,
             ],
           ),

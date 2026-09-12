@@ -20,12 +20,16 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(count) => "${count} notes";
+  static String m0(notes, folders, photos) =>
+      "${notes} notes · ${folders} folders · ${photos} photos";
 
-  static String m1(price) => "Remove ads permanently for ${price}.";
+  static String m1(count) => "${count} notes";
+
+  static String m2(price) => "Remove ads permanently for ${price}.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
     "Add_todo": MessageLookupByLibrary.simpleMessage("Add todo"),
@@ -37,6 +41,50 @@ class MessageLookup extends MessageLookupByLibrary {
     "Allow_Notification": MessageLookupByLibrary.simpleMessage(
       "Allow Notification",
     ),
+    "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save your changes. Keep this note open and tap Done to retry.",
+    ),
+    "Autosave_Retry": MessageLookupByLibrary.simpleMessage("Not saved"),
+    "Autosave_Saved": MessageLookupByLibrary.simpleMessage("Saved"),
+    "Autosave_Saving": MessageLookupByLibrary.simpleMessage("Saving…"),
+    "Backup_Choose": MessageLookupByLibrary.simpleMessage("Choose backup file"),
+    "Backup_Contents": m0,
+    "Backup_Export": MessageLookupByLibrary.simpleMessage("Create backup"),
+    "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
+      "Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
+    ),
+    "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.",
+    ),
+    "Backup_Invalid": MessageLookupByLibrary.simpleMessage(
+      "This is not a supported Onlynote backup, or the file is damaged or larger than 256 MB. Nothing was imported.",
+    ),
+    "Backup_Preparing": MessageLookupByLibrary.simpleMessage(
+      "Preparing your backup…",
+    ),
+    "Backup_Reading": MessageLookupByLibrary.simpleMessage(
+      "Checking the backup file…",
+    ),
+    "Backup_Restore": MessageLookupByLibrary.simpleMessage("Restore backup"),
+    "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
+      "Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.",
+    ),
+    "Backup_Restore_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not restore the backup. Check available storage and try again. Your existing notes have not been overwritten.",
+    ),
+    "Backup_Restored": MessageLookupByLibrary.simpleMessage(
+      "Backup restored. Your notes are ready in the library.",
+    ),
+    "Backup_Restored_No_Notifications": MessageLookupByLibrary.simpleMessage(
+      "Notes restored. Some reminder notifications could not be scheduled; open those notes to set them again.",
+    ),
+    "Backup_Restoring": MessageLookupByLibrary.simpleMessage(
+      "Restoring your notes and photos…",
+    ),
+    "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
+      "Schedule future reminder notifications",
+    ),
+    "Backup_Title": MessageLookupByLibrary.simpleMessage("Backup & Restore"),
     "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage(
@@ -114,8 +162,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m0,
+    "Folder_Notes_Count": m1,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
+    "Font_Preview": MessageLookupByLibrary.simpleMessage(
+      "A little space for your next big idea.",
+    ),
     "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
@@ -235,8 +286,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "Purchases": MessageLookupByLibrary.simpleMessage("Purchases"),
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("Relaxing Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("Reminder"),
+    "Reminder_Custom": MessageLookupByLibrary.simpleMessage(
+      "Choose date & time",
+    ),
+    "Reminder_Future_Time": MessageLookupByLibrary.simpleMessage(
+      "Choose a time in the future for your reminder.",
+    ),
+    "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
+    "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
+    "Reminder_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not update the reminder. Please try again.",
+    ),
+    "Reminder_Saved": MessageLookupByLibrary.simpleMessage("Reminder set"),
+    "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage(
+      "Tomorrow morning",
+    ),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m1,
+    "Remove_Ads_Price": m2,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),

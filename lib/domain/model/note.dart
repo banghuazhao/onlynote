@@ -27,7 +27,7 @@ class Note with _$Note {
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');
   String get date => dateTime != null ? _formatter.format(dateTime!) : '';
 
-  final DateFormat _formatter1 = DateFormat('MMMM dd, yyyy  h:m a');
+  final DateFormat _formatter1 = DateFormat('MMMM dd, yyyy  h:mm a');
   String get dateWithTime =>
       dateTime != null ? _formatter1.format(dateTime!) : '';
 

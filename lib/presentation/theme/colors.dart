@@ -6,6 +6,8 @@ abstract final class AppColors {
   static const ink = Color(0xFF292722);
   static const amber = Color(0xFFF4B942);
   static const parchment = Color(0xFFFFF9F0);
+  static const desk = Color(0xFFCDBBA0);
+  static const deskDark = Color(0xFF141310);
   static const night = Color(0xFF171612);
   static const nightSurface = Color(0xFF22201B);
   static const success = Color(0xFF16876B);

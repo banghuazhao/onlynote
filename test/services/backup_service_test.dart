@@ -1,0 +1,204 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:onlynote/Tools/reminder.dart';
+import 'package:onlynote/data/dto/folder_dto.dart';
+import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
+import 'package:onlynote/services/backup/backup_contents.dart';
+import 'package:onlynote/services/backup/backup_service.dart';
+import 'package:onlynote/services/note_autosave.dart';
+
+class BoxRepository implements NoteRepository {
+  BoxRepository(this.box);
+  final Box box;
+  @override
+  List<NoteDto> getAllNotes() => box.values.cast<NoteDto>().toList();
+  @override
+  Future<NoteDto> getNote(String id) async => box.get(id) as NoteDto;
+  @override
+  Future addUpdateNote(NoteDto note) => box.put(note.id, note);
+  @override
+  Future deleteNote(String id) => box.delete(id);
+  @override
+  Future deleteMultiNotes(List<String> ids) => box.deleteAll(ids);
+}
+
+void main() {
+  late Directory directory;
+  late Box notes, folders, journal, drafts;
+  late BackupService service;
+  late List<Reminder> reminders;
+  var failWrite = false;
+
+  setUp(() async {
+    directory = await Directory.systemTemp.createTemp('onlynote-backup-test-');
+    Hive.init(directory.path);
+    if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(TodoDtoAdapter());
+    if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(NoteDtoAdapter());
+    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(FolderDtoAdapter());
+    notes = await Hive.openBox('notes');
+    folders = await Hive.openBox('folders');
+    journal = await Hive.openBox('journal');
+    drafts = await Hive.openBox('drafts');
+    reminders = [];
+    failWrite = false;
+    service = BackupService(
+        notes: notes,
+        folders: folders,
+        journal: journal,
+        documents: directory,
+        readReminders: () => reminders,
+        writeReminders: (values) async {
+          if (failWrite) {
+            failWrite = false;
+            throw const FileSystemException('Disk full');
+          }
+          reminders = values;
+        });
+  });
+  tearDown(() async {
+    await Hive.close();
+    await directory.delete(recursive: true);
+  });
+
+  Future<void> seed() async {
+    await Directory('${directory.path}/note_images').create();
+    await File('${directory.path}/note_images/a.png')
+        .writeAsBytes([1, 2, 3, 4]);
+    await folders.put(
+        'folder', FolderDto(id: 'folder', name: 'Ideas', sortOrder: 5));
+    await notes.put(
+        'original',
+        NoteDto(
+            id: 'original',
+            title: 'Keep me',
+            description: '正文',
+            colorValue: 0xffffcc00,
+            dateTime: '2026-09-13T10:00:00.000',
+            isPinned: true,
+            sortOrder: -4,
+            folderId: 'folder',
+            imagePaths: ['note_images/a.png'],
+            todoList: [TodoDto(id: 'todo', title: 'Read', completed: true)]));
+    await notes.put(
+        'trash',
+        NoteDto(
+            id: 'trash',
+            title: 'In trash',
+            deletedAt: '2026-09-12T09:00:00.000'));
+    reminders = [
+      Reminder(
+          noteId: 'original',
+          reminderId: 1,
+          reminderDate: DateTime(2027, 1, 1, 9))
+    ];
+  }
+
+  test(
+      'roundtrip includes photos, checklists, trash, folders and reminder dates',
+      () async {
+    await seed();
+    final backup = decodeBackup(await service.export());
+    expect(backup.notes, hasLength(2));
+    expect(backup.photos.values.single.bytes, [1, 2, 3, 4]);
+    final restored = await service.restore(backup);
+    expect(notes.length, 4);
+    expect(folders.length, 2);
+    expect((notes.get('original') as NoteDto).title, 'Keep me');
+    final copy = notes.values
+        .cast<NoteDto>()
+        .singleWhere((n) => n.id != 'original' && n.title == 'Keep me');
+    expect(copy.folderId, isNot('folder'));
+    expect(copy.isPinned, isTrue);
+    expect(copy.sortOrder, -4);
+    expect(copy.todoList!.single.completed, isTrue);
+    expect(copy.description, '正文');
+    expect(copy.imagePaths, isNot(['note_images/a.png']));
+    expect(
+        await File('${directory.path}/${copy.imagePaths!.single}')
+            .readAsBytes(),
+        [1, 2, 3, 4]);
+    expect(restored.single.noteId, copy.id);
+    expect(restored.single.reminderDate, DateTime(2027, 1, 1, 9));
+    expect(restored.single.reminderId, isNot(1));
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test('failed restore rolls back only the newly created data', () async {
+    await seed();
+    final backup = decodeBackup(await service.export());
+    failWrite = true;
+    await expectLater(
+        service.restore(backup), throwsA(isA<FileSystemException>()));
+    expect(notes.keys.toSet(), {'original', 'trash'});
+    expect(folders.keys, ['folder']);
+    expect(reminders.single.noteId, 'original');
+    expect(await Directory('${directory.path}/note_images').list().length, 1);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test('startup rolls back an interrupted import from its journal', () async {
+    await seed();
+    await notes.put('partial', NoteDto(id: 'partial', title: 'Partial import'));
+    await folders.put(
+        'partial-folder', FolderDto(id: 'partial-folder', name: 'Partial'));
+    await File('${directory.path}/note_images/partial.png').writeAsBytes([9]);
+    await journal.put('pending', {
+      'notes': ['partial'],
+      'folders': ['partial-folder'],
+      'photos': ['note_images/partial.png']
+    });
+    await service.recoverInterruptedRestore();
+    expect(notes.keys.toSet(), {'original', 'trash'});
+    expect(folders.keys, ['folder']);
+    expect(await File('${directory.path}/note_images/partial.png').exists(),
+        isFalse);
+  });
+
+  test('recovery replays an unfinished edit including its photos', () async {
+    await seed();
+    final pending = Note(
+        id: 'original', title: 'Recovered', imagePaths: ['note_images/a.png']);
+    final store = HiveNoteAutosaveStore(BoxRepository(notes), drafts);
+    await store.writeDraft(pending);
+    await store.recover();
+    expect((notes.get('original') as NoteDto).title, 'Recovered');
+    expect(
+        (notes.get('original') as NoteDto).imagePaths, ['note_images/a.png']);
+    expect(drafts.isEmpty, isTrue);
+  });
+
+  test('missing source photos fail export rather than silently omitting them',
+      () async {
+    await seed();
+    await File('${directory.path}/note_images/a.png').delete();
+    await expectLater(service.export(), throwsA(isA<FileSystemException>()));
+  });
+
+  test(
+      'invalid backup references, versions and paths are rejected before import',
+      () async {
+    await seed();
+    final original = (decodeBackup(await service.export())).toJson();
+    for (final mutation in <void Function(Map<String, dynamic>)>[
+      (m) => m['version'] = 99,
+      (m) => (m['notes'] as List).first['photos'] = ['missing'],
+      (m) => (m['notes'] as List).first['folderId'] = 'missing',
+      (m) => (m['photos'] as Map).values.first['extension'] = '../outside',
+      (m) => (m['notes'] as List).add((m['notes'] as List).first),
+    ]) {
+      final changed = jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+      mutation(changed);
+      expect(
+          () => decodeBackup(
+              Uint8List.fromList(utf8.encode(jsonEncode(changed)))),
+          throwsFormatException);
+    }
+    expect(notes.length, 2);
+  });
+}

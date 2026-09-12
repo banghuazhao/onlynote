@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:open_store/open_store.dart';
 
@@ -15,19 +16,25 @@ class MoreAppsPage extends StatelessWidget {
         .toList();
     final tokens = context.tokens;
     return Scaffold(
+      backgroundColor: DeskSurface.colorOf(context),
       appBar: AppBar(title: Text(S.of(context).More_Apps)),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: tokens.contentMaxWidth),
-          child: ListView.separated(
-            padding: EdgeInsets.fromLTRB(
-                tokens.space4, tokens.space2, tokens.space4, tokens.space6),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => SizedBox(height: tokens.space2),
-            itemBuilder: (context, index) => _MoreAppsRow(item: items[index]),
-          ),
-        ),
-      ),
+      body: DeskSurface(
+          child: SafeArea(
+              top: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: tokens.contentMaxWidth),
+                  child: ListView.separated(
+                    padding: EdgeInsets.fromLTRB(tokens.space4, tokens.space2,
+                        tokens.space4, tokens.space6),
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) =>
+                        SizedBox(height: tokens.space2),
+                    itemBuilder: (context, index) =>
+                        _MoreAppsRow(item: items[index]),
+                  ),
+                ),
+              ))),
     );
   }
 

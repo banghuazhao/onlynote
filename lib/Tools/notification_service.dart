@@ -161,38 +161,21 @@ class NotificationService {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color(0xFFFDF9F5),
-          title: Text(
-            S.of(context).Allow_Notification,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  S.of(context).To_get_notification,
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
+          scrollable: true,
+          icon: const Icon(Icons.notifications_outlined),
+          title: Text(S.of(context).Allow_Notification),
+          content: Text(S.of(context).To_get_notification),
+          actions: [
             TextButton(
-              child: Text(
-                S.of(context).OK,
-                style: TextStyle(color: Color(0xFFAE7056), fontSize: 18),
-              ),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(S.of(context).Cancel),
+            ),
+            FilledButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 AppSettings.openAppSettings(type: AppSettingsType.notification);
               },
-            ),
-            TextButton(
-              child: Text(
-                S.of(context).Cancel,
-                style: TextStyle(color: Color(0xFFAE7056), fontSize: 18),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              child: Text(S.of(context).Settings),
             ),
           ],
         );
@@ -210,7 +193,7 @@ class NotificationService {
         time: reminder.reminderDate);
   }
 
-  Future<void> scheduleNotifications({
+  Future<bool> scheduleNotifications({
     required int id,
     required String title,
     required String body,
@@ -231,8 +214,10 @@ class NotificationService {
         // reminder, which doesn't need to-the-second precision.
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
+      return true;
     } catch (e) {
       debugPrint('$e');
+      return false;
     }
   }
 

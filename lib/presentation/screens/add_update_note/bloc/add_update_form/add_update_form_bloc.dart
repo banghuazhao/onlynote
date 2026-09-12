@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
@@ -14,7 +13,12 @@ part 'add_update_form_state.dart';
 
 @injectable
 class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
-  AddUpdateFormBloc(this._addUpdateBloc) : super(AddUpdateFormState()) {
+  AddUpdateFormBloc(AddUpdateBloc bloc)
+      : this.withState(bloc, AddUpdateFormState());
+
+  AddUpdateFormBloc.withState(
+      this._addUpdateBloc, AddUpdateFormState initialState)
+      : super(initialState) {
     //* initialize form with initial data
     on<_Initialize>((event, emit) {
       emit(
@@ -112,12 +116,10 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
     //* Reorder todo item
     on<_ReorderTodo>((event, emit) {
       final todos = List<Todo>.from(state.todos);
-      var newIndex = event.newIndex;
-      if (newIndex > event.oldIndex) {
-        newIndex -= 1;
-      }
+      // ReorderableListView.onReorderItem already accounts for the item being
+      // removed from oldIndex, so newIndex needs no further adjustment.
       final todo = todos.removeAt(event.oldIndex);
-      todos.insert(newIndex, todo);
+      todos.insert(event.newIndex, todo);
 
       emit(state.copyWith(todos: todos));
     });
@@ -128,11 +130,13 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       emit(state.copyWith(imagePaths: imagePaths));
     });
 
-    on<_RemoveImage>((event, emit) async {
+    //* Only drops the path from the draft. The file itself is deleted when
+    //* the note is saved (see UpdateNoteUsecase) — deleting it here would
+    //* break the saved note if the user backs out without saving.
+    on<_RemoveImage>((event, emit) {
       final imagePaths = List<String>.from(state.imagePaths)
         ..remove(event.path);
       emit(state.copyWith(imagePaths: imagePaths));
-      await ImageStorage.deleteImages([event.path]);
     });
   }
 
