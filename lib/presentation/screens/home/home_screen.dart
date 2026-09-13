@@ -386,6 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_isReorderMode) {
       return [
         AppButton(
+          primary: true,
           tooltip: S.of(context).Done,
           child: Text(S.of(context).Done),
           onPressed: () => _setReorderMode(false),
@@ -416,6 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             AppButton(
+              primary: true,
               tooltip: S.of(context).Add_Note,
               child: const Icon(Icons.add),
               onPressed: () {
@@ -433,16 +435,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 false;
             return [
               AppButton(
+                destructive: true,
                 tooltip: showTrash
                     ? S.of(context).Delete_Forever
                     : S.of(context).Delete,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${showTrash ? S.of(context).Delete_Forever : S.of(context).Delete} - ${selectedNotes.selectedIds.length}',
+                      '${selectedNotes.selectedIds.length}',
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
-                    const SizedBox(width: AppSpacings.xl),
+                    const SizedBox(width: 6),
                     Icon(
                       showTrash
                           ? Icons.delete_forever_outlined
@@ -497,6 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           success: (_) => [
             AppButton(
+              primary: true,
               tooltip: S.of(context).Add_Note,
               child: const Icon(Icons.add),
               onPressed: () {
@@ -506,6 +511,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           failed: (_) => [
             AppButton(
+              primary: true,
               tooltip: S.of(context).Add_Note,
               child: const Icon(Icons.add),
               onPressed: () {
@@ -1115,9 +1121,9 @@ class _FolderPickerTitle extends StatelessWidget {
         // The label alone reads as a heading; the hint is what tells a screen
         // reader user this is also how you switch folders.
         hint: S.of(context).Folders,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(tokens.radiusLarge),
+        child: TextButton(
+          onPressed: onTap,
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: tokens.space2,
@@ -1309,39 +1315,49 @@ class _PickerTile extends StatelessWidget {
             // Rename/delete used to be long-press only, which nobody
             // discovers. An explicit overflow button is the trade for a
             // slightly busier row.
-            PopupMenuButton<_FolderRowAction>(
-              tooltip: S.of(context).Edit,
-              icon: Icon(
-                Icons.more_vert_rounded,
-                size: 20,
-                color: context.colors.onSurfaceVariant,
-              ),
-              onSelected: (action) => switch (action) {
-                _FolderRowAction.rename => onRename!(),
-                _FolderRowAction.delete => onDelete!(),
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: _FolderRowAction.rename,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.drive_file_rename_outline),
-                    title: Text(S.of(context).Rename_Folder),
+            Row(
+              children: [
+                const SizedBox(width: 10),
+                PopupMenuButton<_FolderRowAction>(
+                  tooltip: S.of(context).Edit,
+                  icon: Icon(
+                    Icons.more_vert_rounded,
+                    size: 20,
+                    color: context.colors.onSurfaceVariant,
                   ),
-                ),
-                PopupMenuItem(
-                  value: _FolderRowAction.delete,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.delete_outline,
-                      color: context.colors.error,
-                    ),
-                    title: Text(
-                      S.of(context).Delete_Folder,
-                      style: TextStyle(color: context.colors.error),
-                    ),
+                  iconSize: 20,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
                   ),
+                  onSelected: (action) => switch (action) {
+                    _FolderRowAction.rename => onRename!(),
+                    _FolderRowAction.delete => onDelete!(),
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _FolderRowAction.rename,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.drive_file_rename_outline),
+                        title: Text(S.of(context).Rename_Folder),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: _FolderRowAction.delete,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          Icons.delete_outline,
+                          color: context.colors.error,
+                        ),
+                        title: Text(
+                          S.of(context).Delete_Folder,
+                          style: TextStyle(color: context.colors.error),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             )

@@ -1,3 +1,5 @@
+import 'package:onlynote/presentation/components/button.dart';
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/note_share_sheet.dart';
@@ -258,3 +260,97 @@ Widget appearanceControlsPreview() => MaterialApp(
           body:
               Padding(padding: EdgeInsets.all(16), child: AppearanceSection())),
     );
+
+@Preview(name: 'Buttons — light', size: Size(390, 650))
+Widget buttonsLightPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(body: DeskSurface(child: ButtonExamples())),
+    );
+
+@Preview(
+    name: 'Buttons — dark', size: Size(390, 650), brightness: Brightness.dark)
+Widget buttonsDarkPreview() => MaterialApp(
+      theme: AppTheme.dark,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(body: DeskSurface(child: ButtonExamples())),
+    );
+
+void previewButtonPressed() {}
+
+class ButtonExamples extends StatelessWidget {
+  const ButtonExamples({super.key});
+
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child:
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text('Everyday actions',
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 16),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            FilledButton.icon(
+                onPressed: previewButtonPressed,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Add note')),
+            OutlinedButton(
+                onPressed: previewButtonPressed, child: const Text('Restore')),
+            TextButton(
+                onPressed: previewButtonPressed, child: const Text('Cancel')),
+          ]),
+          const SizedBox(height: 24),
+          Text('Toolbar', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Wrap(spacing: 4, runSpacing: 8, children: [
+            IconButton(
+                tooltip: 'Settings',
+                onPressed: previewButtonPressed,
+                icon: const Icon(Icons.settings_outlined)),
+            const AppButton(
+                tooltip: 'Search',
+                onPressed: previewButtonPressed,
+                child: Icon(Icons.search)),
+            const AppButton(
+                tooltip: 'Delete',
+                destructive: true,
+                onPressed: previewButtonPressed,
+                child: Icon(Icons.delete_outline)),
+            const AppButton(
+                primary: true,
+                onPressed: previewButtonPressed,
+                child: Text('Done')),
+          ]),
+          const SizedBox(height: 24),
+          Text('On paper', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          PaperNote(
+              color: AppColors.parchment,
+              tilt: false,
+              child: Wrap(spacing: 8, runSpacing: 8, children: [
+                IconButton(
+                    tooltip: 'Share',
+                    style: AppButtonStyles.paper(),
+                    onPressed: previewButtonPressed,
+                    icon: const Icon(Icons.ios_share_rounded)),
+                IconButton(
+                    tooltip: 'Selected',
+                    style: AppButtonStyles.paper(selected: true),
+                    isSelected: true,
+                    onPressed: previewButtonPressed,
+                    icon: const Icon(Icons.check_rounded)),
+                IconButton(
+                    tooltip: 'Remove photo',
+                    style: AppButtonStyles.paper(destructive: true),
+                    onPressed: previewButtonPressed,
+                    icon: const Icon(Icons.close_rounded)),
+              ])),
+          const SizedBox(height: 24),
+          const Wrap(spacing: 8, runSpacing: 8, children: [
+            FilledButton(onPressed: null, child: Text('Unavailable')),
+            AppButton(
+                isLoading: true, onPressed: null, child: Text('Save note')),
+          ]),
+        ]),
+      );
+}

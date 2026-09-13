@@ -12,7 +12,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;
 
-  const factory AddUpdateFormEvent.descriptionChanged(String value) = _DescriptionChanged;
+  const factory AddUpdateFormEvent.descriptionChanged(String value) =
+      _DescriptionChanged;
 
   const factory AddUpdateFormEvent.colorChanged(Color value) = _ColorChanged;
 

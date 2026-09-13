@@ -204,5 +204,6 @@
     "Share_PDF_Description": "包含完整筆記和相片，自動分頁，方便列印。",
     "Share_Preparing": "正在準備筆記…",
     "Share_No_Text": "此筆記沒有文字，請選擇圖片或 PDF 來分享相片。",
- "Restore_Reminder_Warning": "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。"
+ "Restore_Reminder_Warning": "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。",
+ "Note_Color": "筆記顏色 {number}"
 }

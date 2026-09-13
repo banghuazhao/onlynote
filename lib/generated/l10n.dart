@@ -1739,6 +1739,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Note color {number}`
+  String Note_Color(Object number) {
+    return Intl.message(
+      'Note color $number',
+      name: 'Note_Color',
+      desc: '',
+      args: [number],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

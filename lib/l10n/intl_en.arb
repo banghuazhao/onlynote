@@ -204,5 +204,6 @@
     "Share_PDF_Description": "Full note and photos, laid out across printable pages.",
     "Share_Preparing": "Preparing your note…",
     "Share_No_Text": "This note has no text. Choose an image or PDF to include its photos.",
- "Restore_Reminder_Warning": "Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again."
+ "Restore_Reminder_Warning": "Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.",
+ "Note_Color": "Note color {number}"
 }

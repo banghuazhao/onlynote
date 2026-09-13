@@ -1,3 +1,4 @@
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
@@ -222,7 +223,11 @@ class _BuildForm extends StatelessWidget {
               ),
         ),
         actions: [
-          TextButton(onPressed: onDone, child: Text(S.of(context).Done))
+          AppButton(
+              primary: true,
+              tooltip: S.of(context).Done,
+              onPressed: onDone,
+              child: Text(S.of(context).Done))
         ],
       ),
       body: DeskSurface(

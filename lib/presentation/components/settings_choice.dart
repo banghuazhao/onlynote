@@ -23,7 +23,6 @@ class SettingsChoice<T> extends StatelessWidget {
               label: Text(label(value)),
               selected: value == selected,
               showCheckmark: true,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               materialTapTargetSize: MaterialTapTargetSize.padded,
               onSelected: (_) => onSelected(value),
             ),

@@ -1,3 +1,4 @@
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +116,7 @@ class _NoteCardState extends State<NoteCard> {
                   pinned: note.isPinned,
                   selected: widget.selected,
                   pressed: _pressed,
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 48),
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 56),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 88),
                     child: Column(
@@ -211,16 +212,7 @@ class _NoteCardState extends State<NoteCard> {
                       : S.of(context).Share,
                   child: IconButton(
                     key: widget.selectionMode ? null : _shareButtonKey,
-                    style: IconButton.styleFrom(
-                      backgroundColor: widget.selected
-                          ? AppColors.primary
-                          : AppColors.ink.withValues(alpha: 0.08),
-                      foregroundColor: widget.selected
-                          ? Colors.white
-                          : AppColors.ink.withValues(alpha: 0.7),
-                      minimumSize: const Size(44, 44),
-                      tapTargetSize: MaterialTapTargetSize.padded,
-                    ),
+                    style: AppButtonStyles.paper(selected: widget.selected),
                     onPressed:
                         widget.selectionMode ? widget.onTap : _shareNoteAsImage,
                     icon: Icon(

@@ -25,7 +25,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m1(count) => "${count} notes";
 
-  static String m2(price) => "Remove ads permanently for ${price}.";
+  static String m2(number) => "Note color ${number}";
+
+  static String m3(price) => "Remove ads permanently for ${price}.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -203,6 +205,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Added Successfully",
     ),
+    "Note_Color": m2,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -312,7 +315,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tomorrow morning",
     ),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m2,
+    "Remove_Ads_Price": m3,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),

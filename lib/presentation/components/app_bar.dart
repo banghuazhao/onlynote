@@ -35,24 +35,28 @@ class NoteAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ? SystemUiOverlayStyle.light
                   : SystemUiOverlayStyle.dark)
               .copyWith(statusBarColor: Colors.transparent),
-      leading: leading ??
-          (autoImplementLeading
-              ? IconButton(
-                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                  onPressed: context.router.maybePop,
-                  icon: const Icon(Icons.arrow_back_rounded),
-                )
-              : null),
+      leadingWidth: 60,
+      leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: leading ??
+              (autoImplementLeading
+                  ? IconButton(
+                      tooltip:
+                          MaterialLocalizations.of(context).backButtonTooltip,
+                      onPressed: context.router.maybePop,
+                      icon: const Icon(Icons.arrow_back_rounded),
+                    )
+                  : const SizedBox.shrink())),
       titleSpacing: titleWidget == null ? null : 0,
       title: titleWidget ?? (title == null ? null : Text(title!)),
-      actionsPadding: const EdgeInsets.only(right: 16),
+      actionsPadding: const EdgeInsets.only(right: 12),
       actions: actions == null
           ? null
           : [
               for (var index = 0; index < actions!.length; index++)
                 Padding(
                   padding: EdgeInsets.only(
-                      right: index == actions!.length - 1 ? 0 : 8),
+                      right: index == actions!.length - 1 ? 0 : 4),
                   child: actions![index],
                 ),
             ],

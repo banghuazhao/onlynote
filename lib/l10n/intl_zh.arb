@@ -204,5 +204,6 @@
     "Share_PDF_Description": "包含完整笔记和照片，自动分页，方便打印。",
     "Share_Preparing": "正在准备笔记…",
     "Share_No_Text": "此笔记没有文本，请选择图片或 PDF 来分享照片。",
- "Restore_Reminder_Warning": "笔记已恢复，但部分提醒未能安排。请打开相关笔记重新设置提醒。"
+ "Restore_Reminder_Warning": "笔记已恢复，但部分提醒未能安排。请打开相关笔记重新设置提醒。",
+ "Note_Color": "笔记颜色 {number}"
 }

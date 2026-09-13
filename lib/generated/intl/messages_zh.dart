@@ -25,7 +25,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m1(count) => "${count} 条备忘录";
 
-  static String m2(price) => "支付 ${price} 永久移除广告。";
+  static String m2(number) => "笔记颜色 ${number}";
+
+  static String m3(price) => "支付 ${price} 永久移除广告。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -163,6 +165,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "目前没有备忘录..\n点击  +  添加",
     ),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加备忘录"),
+    "Note_Color": m2,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("已删除备忘录"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "已成功复制备忘录",
@@ -238,7 +241,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Saved": MessageLookupByLibrary.simpleMessage("提醒已设置"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m2,
+    "Remove_Ads_Price": m3,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("恢复"),

@@ -228,6 +228,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               });
             }),
         AppButton(
+            destructive: true,
             tooltip: S.of(context).Delete_Forever,
             child: const Icon(Icons.delete_forever_outlined),
             onPressed: () async {
@@ -292,6 +293,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     },
                   ),
                   AppButton(
+                    destructive: true,
                     tooltip: S.of(context).Delete,
                     child: const Icon(Icons.delete_outline),
                     onPressed: () async {

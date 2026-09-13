@@ -171,14 +171,14 @@ class DeskSurface extends StatelessWidget {
       );
 
   Widget _buildSurface(BuildContext context) {
+    final plain = AppAppearanceSettings.instance.plainPaper;
     final color = colorOf(context);
     return ColoredBox(
       color: color,
       child: CustomPaint(
-        painter: AppAppearanceSettings.instance.plainPaper
-            ? null
-            : _DeskGrainPainter(color: color),
-        isComplex: true,
+        painter: plain ? null : _DeskGrainPainter(color: color),
+        // A raster-cache hint requires a painter, including during style changes.
+        isComplex: !plain,
         willChange: false,
         child: child,
       ),

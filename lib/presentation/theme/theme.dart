@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'colors.dart';
+import 'button_styles.dart';
 import 'spacing.dart';
 
 abstract final class AppTheme {
@@ -67,6 +68,10 @@ abstract final class AppTheme {
       textTheme: textTheme,
       extensions: const [tokens],
       visualDensity: VisualDensity.standard,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      splashColor: scheme.primary.withValues(alpha: .12),
+      hoverColor: scheme.primary.withValues(alpha: .06),
+      focusColor: scheme.primary.withValues(alpha: .12),
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -93,28 +98,31 @@ abstract final class AppTheme {
         clipBehavior: Clip.antiAlias,
       ),
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          minimumSize: const Size(48, 48),
-          shape: mediumShape,
-          textStyle: textTheme.labelLarge,
-        ),
+        style: AppButtonStyles.base(scheme)
+            .copyWith(textStyle: WidgetStatePropertyAll(textTheme.labelLarge)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: AppButtonStyles.icon(scheme, primary: true)
+            .copyWith(textStyle: WidgetStatePropertyAll(textTheme.labelLarge)),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size(48, 48),
-          shape: mediumShape,
-          textStyle: textTheme.labelLarge,
-        ),
+        style: AppButtonStyles.outlined(scheme)
+            .copyWith(textStyle: WidgetStatePropertyAll(textTheme.labelLarge)),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          minimumSize: const Size(48, 48),
-          shape: mediumShape,
-          textStyle: textTheme.labelLarge,
-        ),
+        style: AppButtonStyles.base(scheme)
+            .copyWith(textStyle: WidgetStatePropertyAll(textTheme.labelLarge)),
       ),
-      iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
+      iconButtonTheme: IconButtonThemeData(style: AppButtonStyles.icon(scheme)),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        elevation: 2,
+        focusElevation: 2,
+        hoverElevation: 3,
+        highlightElevation: 1,
+        shape: AppButtonStyles.shape,
+        extendedTextStyle: textTheme.labelLarge,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -193,9 +201,14 @@ abstract final class AppTheme {
         shape: mediumShape,
       ),
       chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(tokens.radiusSmall),
-        ),
+        shape: AppButtonStyles.shape,
+        backgroundColor: scheme.surfaceContainerLow,
+        selectedColor: scheme.primaryContainer,
+        disabledColor: scheme.onSurface.withValues(alpha: .08),
+        checkmarkColor: scheme.onPrimaryContainer,
+        labelStyle: textTheme.labelLarge?.copyWith(color: scheme.onSurface),
+        side: BorderSide(color: scheme.outlineVariant),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       ),
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(

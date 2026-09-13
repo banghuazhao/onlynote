@@ -9,29 +9,17 @@ class _AddTodoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: 0.7,
-      child: ListTile(
-        dense: true,
-        contentPadding: EdgeInsets.zero,
-        minTileHeight: 44,
-        title: Row(
-          children: [
-            Icon(
-              Icons.add_rounded,
-              size: 18,
-              color: AppColors.ink.withValues(alpha: 0.55),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              S.of(context).Add_todo,
-              style: AppTypography.title.copyWith(
-                color: AppColors.ink.withValues(alpha: 0.55),
-              ),
-            ),
-          ],
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton.icon(
+        style: AppButtonStyles.paper().copyWith(
+          backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+          side: const WidgetStatePropertyAll(
+              BorderSide(color: Colors.transparent)),
         ),
-        onTap: onAdd,
+        onPressed: onAdd,
+        icon: const Icon(Icons.add_rounded, size: 20),
+        label: Text(S.of(context).Add_todo),
       ),
     );
   }
@@ -113,12 +101,10 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
             ),
           ),
           IconButton(
+            style: AppButtonStyles.paper(destructive: true),
             tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
             iconSize: 18,
-            icon: Icon(
-              Icons.close_rounded,
-              color: AppColors.ink.withValues(alpha: 0.45),
-            ),
+            icon: const Icon(Icons.close_rounded),
             onPressed: widget.onRemoved,
           ),
           ReorderableDragStartListener(

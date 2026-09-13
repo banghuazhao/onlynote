@@ -61,17 +61,13 @@ class _BuildImageSection extends StatelessWidget {
                 },
               ),
             ),
-          Material(
-            color: Colors.white.withValues(alpha: 0.55),
-            elevation: 1,
-            shadowColor: Colors.black26,
-            child: InkWell(
-              onTap: () => _showImageSourceSheet(context),
-              child: const SizedBox(
-                width: 80,
-                height: 80,
-                child: Icon(Icons.add_photo_alternate_outlined),
-              ),
+          SizedBox(
+            width: 88,
+            child: IconButton(
+              style: AppButtonStyles.paper(),
+              tooltip: S.of(context).Add_Image,
+              onPressed: () => _showImageSourceSheet(context),
+              icon: const Icon(Icons.add_photo_alternate_outlined, size: 28),
             ),
           ),
         ],
@@ -108,11 +104,10 @@ class _ImageThumbnail extends StatelessWidget {
         Positioned(
           top: 2,
           right: 2,
-          child: IconButton.filled(
+          child: IconButton(
             tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
             onPressed: onRemove,
-            constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-            padding: EdgeInsets.zero,
+            style: AppButtonStyles.paper(destructive: true),
             icon: const Icon(Icons.close_rounded, size: 18),
           ),
         ),

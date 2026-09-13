@@ -175,6 +175,44 @@ void main() {
   });
 
   for (final dark in [false, true]) {
+    testWidgets(
+        'plain paper toggles across the desk and writing surface: $dark',
+        (tester) async {
+      const screen = Scaffold(
+          body: DeskSurface(
+              child: SingleChildScrollView(
+                  child: Column(children: [
+        AppearanceSection(),
+        PaperNote(
+            color: Colors.yellow,
+            child: RuledWritingArea(child: Text('My note'))),
+      ]))));
+      await tester.pumpWidget(app(screen, dark: dark));
+      await tester.pumpAndSettle();
+      for (final plain in [true, false, true]) {
+        await tester.tap(find.byType(SwitchListTile));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(AppAppearanceSettings.instance.plainPaper, plain);
+        expect(find.text('My note'), findsOneWidget);
+        final deskPaint = tester.widget<CustomPaint>(find
+            .descendant(
+                of: find.byType(DeskSurface),
+                matching: find.byType(CustomPaint))
+            .first);
+        expect(deskPaint.painter == null, plain);
+      }
+      // A saved Plain paper preference must also render on a fresh screen.
+      await tester.pumpWidget(const SizedBox());
+      await AppAppearanceSettings.instance.load();
+      await tester.pumpWidget(app(screen, dark: dark));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('My note'), findsOneWidget);
+    });
+  }
+
+  for (final dark in [false, true]) {
     testWidgets('share format picker fits a phone with large text: $dark',
         (tester) async {
       tester.view.physicalSize = const Size(375, 812);

@@ -10,7 +10,7 @@ class ColorsBar extends StatelessWidget {
     return FadeInRight(
       child: Material(
         color: DeskSurface.colorOf(context),
-        elevation: 8,
+        elevation: 0,
         shadowColor: Colors.black26,
         child: SafeArea(
           minimum: const EdgeInsets.only(bottom: 8),
@@ -27,6 +27,7 @@ class ColorsBar extends StatelessWidget {
                   return Center(
                     child: _ColorBox(
                       color: color,
+                      label: S.of(context).Note_Color(index + 1),
                       isSelected: selectedColor == color,
                       onTap: () {
                         HapticFeedback.selectionClick();
@@ -49,58 +50,35 @@ class _ColorBox extends StatelessWidget {
     this.isSelected = false,
     this.onTap,
     required this.color,
+    required this.label,
   });
 
   final bool isSelected;
   final Color color;
+  final String label;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: isSelected,
-      label: 'Note color',
-      child: InkResponse(
-        radius: 28,
-        onTap: onTap,
-        child: AnimatedScale(
-          scale: isSelected ? 1.08 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutBack,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: isSelected
-                    ? AppColors.ink.withValues(alpha: 0.7)
-                    : AppColors.ink.withValues(alpha: 0.18),
-                width: isSelected ? 2 : 0.8,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isSelected ? 0.2 : 0.1),
-                  blurRadius: isSelected ? 6 : 3,
-                  offset: Offset(0, isSelected ? 3 : 1.5),
-                ),
-              ],
-            ),
-            child: AnimatedOpacity(
-              opacity: isSelected ? 1 : 0,
-              duration: const Duration(milliseconds: 180),
-              child: Icon(
-                Icons.check_rounded,
-                color: AppColors.ink.withValues(alpha: 0.75),
-                size: 20,
-              ),
-            ),
-          ),
-        ),
+    return IconButton(
+      tooltip: label,
+      isSelected: isSelected,
+      onPressed: onTap,
+      style: AppButtonStyles.paper().copyWith(
+        backgroundColor: WidgetStatePropertyAll(color),
+        side: WidgetStateProperty.resolveWith((states) => BorderSide(
+              color: AppColors.ink.withValues(
+                  alpha: isSelected || states.contains(WidgetState.focused)
+                      ? .85
+                      : .25),
+              width: isSelected || states.contains(WidgetState.focused) ? 2 : 1,
+            )),
+        animationDuration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 160),
       ),
+      icon: const SizedBox.square(dimension: 20),
+      selectedIcon: const Icon(Icons.check_rounded, size: 20),
     );
   }
 }
