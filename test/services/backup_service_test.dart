@@ -12,6 +12,9 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
+
+import '../support/memory_preferences.dart';
 
 class BoxRepository implements NoteRepository {
   BoxRepository(this.box);
@@ -33,6 +36,7 @@ void main() {
   late Box notes, folders, journal, drafts;
   late BackupService service;
   late List<Reminder> reminders;
+  late CustomNoteTemplateStore templates;
   var failWrite = false;
 
   setUp(() async {
@@ -47,11 +51,16 @@ void main() {
     drafts = await Hive.openBox('drafts');
     reminders = [];
     failWrite = false;
+    templates = CustomNoteTemplateStore(
+      preferences: MemoryPreferences(),
+      documentsPath: directory.path,
+    );
     service = BackupService(
         notes: notes,
         folders: folders,
         journal: journal,
         documents: directory,
+        templateStore: templates,
         readReminders: () => reminders,
         writeReminders: (values) async {
           if (failWrite) {
@@ -62,6 +71,7 @@ void main() {
         });
   });
   tearDown(() async {
+    templates.dispose();
     await Hive.close();
     await directory.delete(recursive: true);
   });
@@ -130,6 +140,88 @@ void main() {
     expect(journal.isEmpty, isTrue);
   });
 
+  test('custom templates and their independent photos survive backup restore',
+      () async {
+    await seed();
+    final original = await templates.saveFromNote(
+      (notes.get('original') as NoteDto).toDomain(),
+      name: 'Weekly list',
+    );
+    final backup = decodeBackup(await service.export());
+    expect(backup.toJson()['version'], 2);
+    expect(backup.templates.single.name, 'Weekly list');
+    expect(backup.templates.single.items, ['Read']);
+    await service.restore(backup);
+    final restored =
+        templates.templates.singleWhere((t) => t.id != original.id);
+    expect(restored.title, original.title);
+    expect(restored.body, original.body);
+    expect(restored.color, original.color);
+    expect(restored.imagePaths, isNot(original.imagePaths));
+    expect(
+        await File('${directory.path}/${restored.imagePaths.single}')
+            .readAsBytes(),
+        [1, 2, 3, 4]);
+    await templates.delete(original.id);
+    final freshNote = await templates.createNote(restored.id);
+    expect(freshNote.todo.single.completed, isFalse);
+    expect(freshNote.imagePaths.single, startsWith('note_images/'));
+    expect(
+        await File('${directory.path}/${freshNote.imagePaths.single}').exists(),
+        isTrue);
+    expect(await File('${directory.path}/note_images/a.png').exists(), isTrue);
+  });
+
+  test('failed restore rolls back imported templates and photos only',
+      () async {
+    await seed();
+    final original = await templates.saveFromNote(
+      (notes.get('original') as NoteDto).toDomain(),
+      name: 'Keep my template',
+    );
+    final backup = decodeBackup(await service.export());
+    failWrite = true;
+    await expectLater(
+        service.restore(backup), throwsA(isA<FileSystemException>()));
+    expect(templates.templates.single.id, original.id);
+    expect(notes.length, 2);
+    expect(folders.length, 1);
+    expect(journal.isEmpty, isTrue);
+    final photos = await Directory('${directory.path}/template_images')
+        .list()
+        .where((file) => file is File)
+        .toList();
+    expect(photos, hasLength(1));
+    expect(
+        photos.single.path, '${directory.path}/${original.imagePaths.single}');
+  });
+
+  test('v1 loads without templates; v2 requires valid template metadata',
+      () async {
+    await seed();
+    final json = decodeBackup(await service.export()).toJson();
+    final legacy = {...json, 'version': 1}..remove('templates');
+    expect(BackupContents.fromJson(legacy).templates, isEmpty);
+    final missing = {...json}..remove('templates');
+    expect(() => BackupContents.fromJson(missing), throwsFormatException);
+    expect(() => BackupContents.fromJson({...json, 'templates': null}),
+        throwsFormatException);
+    final template = await templates.saveFromNote(
+        (notes.get('original') as NoteDto).toDomain(),
+        name: 'Photo template');
+    expect(
+        () => BackupContents.fromJson({
+              ...json,
+              'templates': [
+                {
+                  ...template.toJson(),
+                  'imagePaths': ['missing-photo']
+                }
+              ],
+            }),
+        throwsFormatException);
+  });
+
   test('backup and restore retain daily and weekly past reminder anchors',
       () async {
     await seed();
@@ -172,6 +264,8 @@ void main() {
       () async {
     await seed();
     final json = decodeBackup(await service.export()).toJson();
+    json['version'] = 1;
+    json.remove('templates');
     for (final reminder in json['reminders'] as List) {
       (reminder as Map<String, dynamic>).remove('repeat');
       reminder['date'] = DateTime(2020).toIso8601String();

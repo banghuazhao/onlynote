@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,24 +32,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this._renameFolderUsecase,
     this._deleteFolderUsecase,
     this._moveNoteToFolderUsecase,
+    this._getNoteUsecase,
+    this._updateNoteUsecase,
   ) : super(const HomeState.initial()) {
-    on<_GetAllNotes>(_onGetAllNotes);
-    on<_DuplicateNote>(_onDuplicateNote);
-    on<_ReorderNotes>(_onReorderNotes);
-    on<_SearchChanged>(_onSearchChanged);
-    on<_FiltersChanged>((event, emit) {
-      _filters = Set.of(event.filters);
-      emit(_buildLoaded());
-    });
-    on<_SelectFolder>(_onSelectFolder);
-    on<_ShowTrash>(_onShowTrash);
-    on<_TogglePin>(_onTogglePin);
-    on<_RestoreNotes>(_onRestoreNotes);
-    on<_PermanentDelete>(_onPermanentDelete);
-    on<_CreateFolder>(_onCreateFolder);
-    on<_RenameFolder>(_onRenameFolder);
-    on<_DeleteFolder>(_onDeleteFolder);
-    on<_MoveNoteToFolder>(_onMoveNoteToFolder);
+    // Refreshes and mutations share one queue. A second checklist tap reads
+    // the first saved result; pin/folder changes cannot race that write.
+    on<HomeEvent>(_handleEvent,
+        transformer: (events, mapper) => events.asyncExpand(mapper));
   }
 
   final ShowAllNotesUsecase _showNotesUsecase;
@@ -60,6 +51,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final RenameFolderUsecase _renameFolderUsecase;
   final DeleteFolderUsecase _deleteFolderUsecase;
   final MoveNoteToFolderUsecase _moveNoteToFolderUsecase;
+  final GetNoteUsecase _getNoteUsecase;
+  final UpdateNoteUsecase _updateNoteUsecase;
 
   List<Note> _activeNotes = [];
   List<Note> _trashedNotes = [];
@@ -68,6 +61,128 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Set<NoteSearchFilter> _filters = {};
   String? _selectedFolderId;
   bool _showTrash = false;
+
+  Future<HomeChecklistResult> toggleTodo({
+    required String noteId,
+    required String todoId,
+  }) =>
+      _changeTodo(noteId: noteId, todoId: todoId);
+
+  /// Undo sets the affected item explicitly, leaving all other changes intact.
+  Future<HomeChecklistResult> setTodoCompleted({
+    required String noteId,
+    required String todoId,
+    required bool completed,
+  }) =>
+      _changeTodo(noteId: noteId, todoId: todoId, completed: completed);
+
+  Future<HomeChecklistResult> _changeTodo({
+    required String noteId,
+    required String todoId,
+    bool? completed,
+  }) {
+    if (isClosed) {
+      return Future.value(
+          HomeChecklistResult(error: _i10n.Checklist_Item_Unavailable));
+    }
+    final completion = Completer<HomeChecklistResult>();
+    add(HomeEvent.updateTodo(
+        noteId: noteId,
+        todoId: todoId,
+        completed: completed,
+        completion: completion));
+    return completion.future;
+  }
+
+  Future<void> _handleEvent(HomeEvent event, Emitter<HomeState> emit) async {
+    if (event is _GetAllNotes) {
+      await _onGetAllNotes(event, emit);
+    } else if (event is _DuplicateNote) {
+      await _onDuplicateNote(event, emit);
+    } else if (event is _ReorderNotes) {
+      await _onReorderNotes(event, emit);
+    } else if (event is _SearchChanged) {
+      _onSearchChanged(event, emit);
+    } else if (event is _FiltersChanged) {
+      _filters = Set.of(event.filters);
+      emit(_buildLoaded());
+    } else if (event is _SelectFolder) {
+      _onSelectFolder(event, emit);
+    } else if (event is _ShowTrash) {
+      _onShowTrash(event, emit);
+    } else if (event is _TogglePin) {
+      await _onTogglePin(event, emit);
+    } else if (event is _RestoreNotes) {
+      await _onRestoreNotes(event, emit);
+    } else if (event is _PermanentDelete) {
+      await _onPermanentDelete(event, emit);
+    } else if (event is _CreateFolder) {
+      await _onCreateFolder(event, emit);
+    } else if (event is _RenameFolder) {
+      await _onRenameFolder(event, emit);
+    } else if (event is _DeleteFolder) {
+      await _onDeleteFolder(event, emit);
+    } else if (event is _MoveNoteToFolder) {
+      await _onMoveNoteToFolder(event, emit);
+    } else if (event is _UpdateTodo) {
+      await _onUpdateTodo(event, emit);
+    }
+  }
+
+  Future<void> _onUpdateTodo(_UpdateTodo event, Emitter<HomeState> emit) async {
+    // Cards are excerpts and may have become stale while another screen edits
+    // the note. Start with the latest saved note instead of the card snapshot.
+    final fetched = await _getNoteUsecase(event.noteId);
+    final note = fetched.fold<Note?>((_) => null, (note) => note);
+    if (note == null || note.isDeleted) {
+      event.completion?.complete(HomeChecklistResult(
+          error: fetched.fold((error) => error.message, (_) => null) ??
+              _i10n.Checklist_Item_Unavailable));
+      return;
+    }
+    final index = note.todo.indexWhere((todo) => todo.id == event.todoId);
+    if (index < 0) {
+      event.completion?.complete(
+          HomeChecklistResult(error: _i10n.Checklist_Item_Unavailable));
+      return;
+    }
+    final previous = note.todo[index].completed;
+    final completed = event.completed ?? !previous;
+    if (previous == completed) {
+      event.completion?.complete(const HomeChecklistResult());
+      return;
+    }
+    final todos = List<Todo>.from(note.todo);
+    todos[index] = todos[index].copyWith(completed: completed);
+    final updated = note.copyWith(todo: todos);
+    final saved = await _updateNoteUsecase(updated);
+    final error = saved.fold<String?>(
+        (error) =>
+            error.message ?? _i10n.Failed_to_Update_note_please_try_again,
+        (_) => null);
+    if (error != null) {
+      event.completion?.complete(HomeChecklistResult(error: error));
+      return;
+    }
+    if (!emit.isDone) {
+      _activeNotes = [
+        if (!_activeNotes.any((note) => note.id == updated.id)) updated,
+        for (final active in _activeNotes)
+          if (active.id == updated.id) updated else active,
+      ];
+      emit(_buildLoaded());
+    }
+    event.completion?.complete(HomeChecklistResult(
+        change: HomeChecklistChange(
+      noteId: event.noteId,
+      todoId: event.todoId,
+      previousCompleted: previous,
+      completed: completed,
+      checklistNowComplete: updated.todo
+          .where((todo) => todo.title?.trim().isNotEmpty == true)
+          .every((todo) => todo.completed),
+    )));
+  }
 
   Future<void> _onGetAllNotes(
     _GetAllNotes event,
@@ -126,9 +241,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _ReorderNotes event,
     Emitter<HomeState> emit,
   ) async {
-    emit(_buildLoaded(overrideVisible: event.notes));
+    final latest = <Note>[];
+    for (final snapshot in event.notes) {
+      if (snapshot.id == null) continue;
+      final fetched = await _getNoteUsecase(snapshot.id!);
+      final note = fetched.fold<Note?>((_) => null, (note) => note);
+      if (note == null || note.isDeleted) continue;
+      latest.add(note);
+    }
+    emit(_buildLoaded(overrideVisible: latest));
 
-    final failureOrSuccess = await _reorderNotesUsecase(event.notes);
+    // A drag snapshot can predate a queued checkbox change. Apply ordering to
+    // freshly read notes so the drag never restores an old completion value.
+    final failureOrSuccess = await _reorderNotesUsecase(latest);
 
     failureOrSuccess.fold(
       (error) => getIt<AppRouter>()
@@ -300,4 +425,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             hasReminder: ReminderData.shared.getCurrentReminder(note) != null))
         .toList();
   }
+}
+
+class HomeChecklistChange {
+  const HomeChecklistChange({
+    required this.noteId,
+    required this.todoId,
+    required this.previousCompleted,
+    required this.completed,
+    required this.checklistNowComplete,
+  });
+  final String noteId;
+  final String todoId;
+  final bool previousCompleted;
+  final bool completed;
+  final bool checklistNowComplete;
+  bool get newlyCompleted => !previousCompleted && completed;
+}
+
+class HomeChecklistResult {
+  const HomeChecklistResult({this.change, this.error});
+  final HomeChecklistChange? change;
+  final String? error;
 }

@@ -25,6 +25,7 @@ class PaperNote extends StatelessWidget {
     this.pinned = false,
     this.selected = false,
     this.pressed = false,
+    this.exportMode = false,
     this.tilt = true,
     this.padding,
   });
@@ -36,6 +37,7 @@ class PaperNote extends StatelessWidget {
   final bool pinned;
   final bool selected;
   final bool pressed;
+  final bool exportMode;
   final bool tilt;
   final EdgeInsetsGeometry? padding;
 
@@ -62,8 +64,9 @@ class PaperNote extends StatelessWidget {
         : ((seed % 13) - 6) * 0.0008;
 
     final paper = AnimatedContainer(
-      duration:
-          reduceMotion ? Duration.zero : const Duration(milliseconds: 180),
+      duration: reduceMotion || exportMode
+          ? Duration.zero
+          : const Duration(milliseconds: 180),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
         color: color,
@@ -230,6 +233,7 @@ class PaperChecklistRow extends StatelessWidget {
     required this.label,
     required this.completed,
     this.onChanged,
+    this.exportMode = false,
     this.maxLines = 2,
     this.dense = false,
     this.searchQuery = '',
@@ -238,6 +242,9 @@ class PaperChecklistRow extends StatelessWidget {
   final String label;
   final bool completed;
   final ValueChanged<bool>? onChanged;
+
+  /// Removes interactive ink while keeping the normal row's dimensions.
+  final bool exportMode;
   final int maxLines;
   final bool dense;
   final String searchQuery;
@@ -251,12 +258,20 @@ class PaperChecklistRow extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: dense ? 2 : 4),
-          child: InkCheckbox(checked: completed, size: size),
+          child: AnimatedSwitcher(
+            duration: exportMode || MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 160),
+            child: InkCheckbox(
+                key: ValueKey(completed), checked: completed, size: size),
+          ),
         ),
         SizedBox(width: dense ? 8 : 10),
         Expanded(
           child: AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
+            duration: exportMode || MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 200),
             style: (dense ? AppTypography.cardBody : AppTypography.formText)
                 .copyWith(
               color: AppColors.ink.withValues(alpha: completed ? 0.45 : 0.88),
@@ -276,6 +291,15 @@ class PaperChecklistRow extends StatelessWidget {
 
     if (!interactive) return row;
 
+    final content = ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 44),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: row,
+      ),
+    );
+    if (exportMode) return content;
+
     return Semantics(
       button: true,
       checked: completed,
@@ -283,13 +307,7 @@ class PaperChecklistRow extends StatelessWidget {
       child: InkWell(
         onTap: () => onChanged!(!completed),
         borderRadius: BorderRadius.circular(6),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: row,
-          ),
-        ),
+        child: content,
       ),
     );
   }

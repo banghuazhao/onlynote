@@ -6,10 +6,14 @@ import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
+import 'package:onlynote/Tools/in_app_reviewer_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/components/note_checklist.dart';
+import 'package:onlynote/presentation/components/template_name_dialog.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -23,8 +27,11 @@ import 'bloc/detail/note_detail_bloc.dart';
 @RoutePage(name: 'NoteDetailRoute')
 class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen(
-      {super.key, @PathParam('noteId') required this.noteId});
+      {super.key,
+      @PathParam('noteId') required this.noteId,
+      this.templateStore});
   final String noteId;
+  final CustomNoteTemplateStore? templateStore;
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -35,6 +42,108 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final GlobalKey _shareButtonKey = GlobalKey();
   bool _savingReminder = false;
   bool _exportingImage = false;
+  bool _savingTemplate = false;
+  Note? _lastSavedNote;
+  int _reviewGeneration = 0;
+
+  void _observeSavedChecklist(NoteDetailState state) {
+    final generation = ++_reviewGeneration;
+    final next = state.whenOrNull(success: (note) => note);
+    final previous = _lastSavedNote;
+    _lastSavedNote = next;
+    if (next == null ||
+        previous == null ||
+        !context.read<NoteDetailBloc>().lastSaveWasTodoToggle ||
+        previous.id != next.id ||
+        next.isDeleted ||
+        !previous.todo.any((item) =>
+            item.title?.trim().isNotEmpty == true && !item.completed)) {
+      return;
+    }
+    final items = next.todo
+        .where((item) => item.title?.trim().isNotEmpty == true)
+        .toList();
+    if (items.isEmpty || items.any((item) => !item.completed)) return;
+    _considerChecklistReview(next.id!, generation);
+  }
+
+  Future<void> _considerChecklistReview(String noteId, int generation) async {
+    if (!InAppReviewHelper.instance.promptsEnabled) return;
+    await Future<void>.delayed(const Duration(seconds: 6));
+    if (!mounted ||
+        generation != _reviewGeneration ||
+        !isReviewMomentIdle ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    await InAppReviewHelper.instance.recordChecklistCompleted(noteId: noteId);
+    if (mounted &&
+        generation == _reviewGeneration &&
+        ModalRoute.of(context)?.isCurrent == true &&
+        isReviewMomentIdle) {
+      await InAppReviewHelper.instance
+          .requestReviewIfEligible(afterChecklistCompletion: true);
+    }
+  }
+
+  Future<void> _saveAsTemplate(Note note) async {
+    if (_savingTemplate) return;
+    final strings = S.of(context);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => TemplateNameDialog(
+        title: strings.Save_As_Template,
+        initial: note.title?.trim().isNotEmpty == true
+            ? note.title
+            : strings.Template_Default_Name,
+      ),
+    );
+    if (!mounted || name == null) return;
+    setState(() => _savingTemplate = true);
+    try {
+      await (widget.templateStore ?? CustomNoteTemplateStore.instance)
+          .saveFromNote(note, name: name);
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(strings.Template_Saved)));
+      }
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(strings.Template_Save_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _savingTemplate = false);
+    }
+  }
+
+  void _showMoreOptions(Note note) {
+    showAppActionSheet(
+      context: context,
+      title: S.of(context).More_Options,
+      actions: [
+        AppSheetAction(
+          leading: const Icon(Icons.bookmarks_outlined),
+          title: Text(S.of(context).Save_As_Template),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _saveAsTemplate(note);
+          },
+        ),
+        AppSheetAction(
+          destructive: true,
+          leading: const Icon(Icons.delete_outline),
+          title: Text(S.of(context).Delete),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            context
+                .read<NoteActionBloc>()
+                .add(NoteActionEvent.deleteNote(note.id!));
+          },
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -228,7 +337,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NoteDetailBloc, NoteDetailState>(
+    return BlocConsumer<NoteDetailBloc, NoteDetailState>(
+      listener: (_, state) => _observeSavedChecklist(state),
       builder: (context, state) {
         return Scaffold(
           backgroundColor: DeskSurface.colorOf(context),
@@ -273,14 +383,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     },
                   ),
                   AppButton(
-                    destructive: true,
-                    tooltip: S.of(context).Delete,
-                    child: const Icon(Icons.delete_outline),
-                    onPressed: () async {
-                      context
-                          .read<NoteActionBloc>()
-                          .add(NoteActionEvent.deleteNote(note.id!));
-                    },
+                    tooltip: S.of(context).More_Options,
+                    isLoading: _savingTemplate,
+                    child: const Icon(Icons.more_horiz_rounded),
+                    onPressed: () => _showMoreOptions(note),
                   ),
                 ];
               },
@@ -293,6 +399,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 note: data.note,
                 screenshotController: _screenshotController,
                 exportMode: _exportingImage,
+                onChecklistActionStart: () => _reviewGeneration++,
                 onReminderTap: data.note.isDeleted
                     ? null
                     : () => _showReminderPicker(data.note),
@@ -312,12 +419,14 @@ class LoadedView extends StatelessWidget {
     required this.note,
     required this.screenshotController,
     required this.onReminderTap,
+    this.onChecklistActionStart,
     this.exportMode = false,
   });
 
   final Note note;
   final ScreenshotController screenshotController;
   final VoidCallback? onReminderTap;
+  final VoidCallback? onChecklistActionStart;
   final bool exportMode;
 
   @override
@@ -404,12 +513,14 @@ class LoadedView extends StatelessWidget {
                         readOnly: note.isDeleted,
                         exportMode: exportMode,
                         onToggle: (id) {
+                          onChecklistActionStart?.call();
                           HapticFeedback.selectionClick();
                           context
                               .read<NoteDetailBloc>()
                               .add(NoteDetailEvent.toggleTodoCheckbox(id));
                         },
                         onReset: () async {
+                          onChecklistActionStart?.call();
                           final bloc = context.read<NoteDetailBloc>();
                           final ids = await bloc.resetChecklist(note.id!);
                           if (!context.mounted || ids == null) return;
@@ -420,9 +531,12 @@ class LoadedView extends StatelessWidget {
                                     Text(S.of(context).Checklist_Reset_Done),
                                 action: SnackBarAction(
                                     label: S.of(context).Undo,
-                                    onPressed: () => bloc.add(
-                                        NoteDetailEvent.restoreCompletedTodos(
-                                            noteId: note.id!, todoIds: ids))),
+                                    onPressed: () {
+                                      onChecklistActionStart?.call();
+                                      bloc.add(
+                                          NoteDetailEvent.restoreCompletedTodos(
+                                              noteId: note.id!, todoIds: ids));
+                                    }),
                               ));
                         },
                       ),

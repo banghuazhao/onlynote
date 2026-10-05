@@ -35,6 +35,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m6(price) => "支付 ${price} 永久移除廣告。";
 
+  static String m7(items, photos) => "${items} 項 · ${photos} 張照片";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Image": MessageLookupByLibrary.simpleMessage("加入照片"),
@@ -58,7 +60,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Contents": m0,
     "Backup_Export": MessageLookupByLibrary.simpleMessage("建立備份"),
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
-      "將筆記、清單、資料夾、照片及提醒日期儲存至一個 Onlynote 檔案，包含垃圾桶中的筆記。在分享選單中選擇儲存至檔案或儲存空間應用程式。檔案大小上限：256 MB。",
+      "將筆記、清單、資料夾、照片、範本及提醒日期儲存至一個 Onlynote 檔案，包含垃圾桶中的筆記。在分享選單中選擇儲存至檔案或儲存空間應用程式。檔案大小上限：256 MB。",
     ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "無法建立備份。請檢查可用儲存空間，並確認所有筆記照片均可存取。備份不能超過 256 MB。",
@@ -70,7 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Reading": MessageLookupByLibrary.simpleMessage("正在檢查備份檔案…"),
     "Backup_Restore": MessageLookupByLibrary.simpleMessage("還原備份"),
     "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
-      "還原會加入備份中筆記與資料夾的副本，不會更改現有筆記。再次還原同一檔案會加入另一組副本。",
+      "還原會將備份中筆記、資料夾和範本的副本加入資料庫。再次還原同一檔案會加入另一組副本。",
     ),
     "Backup_Restore_Failed": MessageLookupByLibrary.simpleMessage(
       "無法還原備份。請檢查可用儲存空間後重試。現有筆記未被覆寫。",
@@ -88,6 +90,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("全部完成"),
     "Checklist_Completed": m1,
+    "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage("項目已完成"),
+    "Checklist_Item_Reopened": MessageLookupByLibrary.simpleMessage("項目已重新開啟"),
+    "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此清單項目已無法使用。",
+    ),
     "Checklist_Progress": m2,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("重設清單"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage("清單已重設"),
@@ -107,6 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Delete_Note_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除此備忘錄？",
     ),
+    "Delete_Template": MessageLookupByLibrary.simpleMessage("刪除範本"),
     "Delete_Todo_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "此待辦事項將被刪除，且無法恢復。",
     ),
@@ -145,6 +153,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Photos": MessageLookupByLibrary.simpleMessage("相片"),
     "Filter_Pinned": MessageLookupByLibrary.simpleMessage("置頂"),
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("提醒"),
+    "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("未完成"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已建立資料夾"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已刪除資料夾"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
@@ -164,7 +173,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Mint_Translate": MessageLookupByLibrary.simpleMessage("薄荷翻譯"),
     "Money_Tracker": MessageLookupByLibrary.simpleMessage("極簡記賬"),
     "More_Apps": MessageLookupByLibrary.simpleMessage("更多App"),
+    "More_Options": MessageLookupByLibrary.simpleMessage("更多選項"),
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("移至資料夾"),
+    "My_Templates": MessageLookupByLibrary.simpleMessage("我的範本"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("新增資料夾"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("無資料夾"),
     "No_Folders": MessageLookupByLibrary.simpleMessage("暫無資料夾。建立資料夾來整理備忘錄。"),
@@ -268,6 +279,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
     "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
+    "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("還原"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage("未找到以前的移除廣告購買。"),
@@ -276,6 +288,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。",
     ),
     "Restore_Success": MessageLookupByLibrary.simpleMessage("已恢復您的移除廣告購買。"),
+    "Retry": MessageLookupByLibrary.simpleMessage("重試"),
+    "Save_As_Template": MessageLookupByLibrary.simpleMessage("儲存為範本"),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
@@ -306,8 +320,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage("極簡計算器"),
     "Small": MessageLookupByLibrary.simpleMessage("小"),
+    "Starter_Templates": MessageLookupByLibrary.simpleMessage("入門範本"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("數獨迷"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
+    "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法更新範本，請重試。",
+    ),
+    "Template_Copy_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法從範本建立筆記，請檢查照片後重試。",
+    ),
     "Template_Daily_Plan_Body": MessageLookupByLibrary.simpleMessage(
       "今日重點\n\n筆記\n",
     ),
@@ -318,6 +339,16 @@ class MessageLookup extends MessageLookupByLibrary {
       "確定今日重點，列出幾個明確的優先事項。",
     ),
     "Template_Daily_Plan_Title": MessageLookupByLibrary.simpleMessage("每日計畫"),
+    "Template_Default_Name": MessageLookupByLibrary.simpleMessage("我的範本"),
+    "Template_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+      "將刪除此範本，已用此範本建立的筆記會保留。",
+    ),
+    "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
+      "刪除範本？",
+    ),
+    "Template_Details": m7,
+    "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
+    "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
       "日期：\n與會人員：\n\n議程\n\n記錄\n\n決定\n",
     ),
@@ -328,6 +359,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "記錄議程、決定和後續事項。",
     ),
     "Template_Meeting_Title": MessageLookupByLibrary.simpleMessage("會議記錄"),
+    "Template_Name": MessageLookupByLibrary.simpleMessage("範本名稱"),
     "Template_Packing_Items": MessageLookupByLibrary.simpleMessage(
       "旅行證件\n手機和充電器\n衣物\n盥洗用品\n藥品",
     ),
@@ -335,6 +367,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "出發前整理旅行必需品。",
     ),
     "Template_Packing_Title": MessageLookupByLibrary.simpleMessage("行李清單"),
+    "Template_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法儲存範本。請檢查儲存空間和照片，然後重試。",
+    ),
+    "Template_Saved": MessageLookupByLibrary.simpleMessage("範本已儲存"),
     "Template_Shopping_Items": MessageLookupByLibrary.simpleMessage(
       "水果和蔬菜\n麵包和穀物\n牛奶或乳製品替代品\n日用品",
     ),
@@ -343,6 +379,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Template_Shopping_Title": MessageLookupByLibrary.simpleMessage("購物清單"),
     "Templates": MessageLookupByLibrary.simpleMessage("範本"),
+    "Templates_Create_Hint": MessageLookupByLibrary.simpleMessage(
+      "在筆記選單中將任何筆記儲存為範本。",
+    ),
     "Templates_Description": MessageLookupByLibrary.simpleMessage(
       "從實用的大綱開始，再按需要編輯。",
     ),

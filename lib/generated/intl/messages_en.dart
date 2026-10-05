@@ -35,6 +35,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m6(price) => "Remove ads permanently for ${price}.";
 
+  static String m7(items, photos) =>
+      "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
@@ -60,7 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Contents": m0,
     "Backup_Export": MessageLookupByLibrary.simpleMessage("Create backup"),
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
-      "Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
+      "Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
     ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.",
@@ -76,7 +79,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Restore": MessageLookupByLibrary.simpleMessage("Restore backup"),
     "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
-      "Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.",
+      "Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.",
     ),
     "Backup_Restore_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not restore the backup. Check available storage and try again. Your existing notes have not been overwritten.",
@@ -98,6 +101,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("All done"),
     "Checklist_Completed": m1,
+    "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage(
+      "Item completed",
+    ),
+    "Checklist_Item_Reopened": MessageLookupByLibrary.simpleMessage(
+      "Item reopened",
+    ),
+    "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "This checklist item is no longer available.",
+    ),
     "Checklist_Progress": m2,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("Reset checklist"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage(
@@ -123,6 +135,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Delete_Note_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete this note?",
     ),
+    "Delete_Template": MessageLookupByLibrary.simpleMessage("Delete template"),
     "Delete_Todo_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "This checklist item will be removed. This can\'t be undone.",
     ),
@@ -177,6 +190,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Photos": MessageLookupByLibrary.simpleMessage("Photos"),
     "Filter_Pinned": MessageLookupByLibrary.simpleMessage("Pinned"),
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("Reminders"),
+    "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("Unfinished"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
@@ -200,7 +214,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Mint_Translate": MessageLookupByLibrary.simpleMessage("Mint Translate"),
     "Money_Tracker": MessageLookupByLibrary.simpleMessage("Money Tracker"),
     "More_Apps": MessageLookupByLibrary.simpleMessage("More Apps"),
+    "More_Options": MessageLookupByLibrary.simpleMessage("More options"),
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("Move to Folder"),
+    "My_Templates": MessageLookupByLibrary.simpleMessage("My templates"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("New Folder"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("No Folder"),
     "No_Folders": MessageLookupByLibrary.simpleMessage(
@@ -350,6 +366,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
     "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
+    "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage(
@@ -363,6 +380,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Restore_Success": MessageLookupByLibrary.simpleMessage(
       "Your Remove Ads purchase was restored.",
+    ),
+    "Retry": MessageLookupByLibrary.simpleMessage("Retry"),
+    "Save_As_Template": MessageLookupByLibrary.simpleMessage(
+      "Save as template",
     ),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
@@ -402,8 +423,17 @@ class MessageLookup extends MessageLookupByLibrary {
       "Simple Calculator",
     ),
     "Small": MessageLookupByLibrary.simpleMessage("Small"),
+    "Starter_Templates": MessageLookupByLibrary.simpleMessage(
+      "Starter templates",
+    ),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
+    "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t update the template. Please try again.",
+    ),
+    "Template_Copy_Failed": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t create a note from the template. Check its photos and try again.",
+    ),
     "Template_Daily_Plan_Body": MessageLookupByLibrary.simpleMessage(
       "Today\'s focus\n\nNotes\n",
     ),
@@ -416,6 +446,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Daily_Plan_Title": MessageLookupByLibrary.simpleMessage(
       "Daily plan",
     ),
+    "Template_Default_Name": MessageLookupByLibrary.simpleMessage(
+      "My template",
+    ),
+    "Template_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+      "This removes the saved template. Notes you\'ve created from it stay in your library.",
+    ),
+    "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
+      "Delete template?",
+    ),
+    "Template_Details": m7,
+    "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t load your templates. Please try again.",
+    ),
+    "Template_Manage": MessageLookupByLibrary.simpleMessage("Manage template"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
       "Date:\nAttendees:\n\nAgenda\n\nNotes\n\nDecisions\n",
     ),
@@ -428,6 +472,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Meeting_Title": MessageLookupByLibrary.simpleMessage(
       "Meeting notes",
     ),
+    "Template_Name": MessageLookupByLibrary.simpleMessage("Template name"),
     "Template_Packing_Items": MessageLookupByLibrary.simpleMessage(
       "Travel documents\nPhone & charger\nClothes\nToiletries\nMedication",
     ),
@@ -437,6 +482,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Packing_Title": MessageLookupByLibrary.simpleMessage(
       "Packing list",
     ),
+    "Template_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t save the template. Check available storage and photos, then try again.",
+    ),
+    "Template_Saved": MessageLookupByLibrary.simpleMessage("Template saved"),
     "Template_Shopping_Items": MessageLookupByLibrary.simpleMessage(
       "Fruit & vegetables\nBread & grains\nMilk or dairy alternatives\nHousehold essentials",
     ),
@@ -447,6 +496,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Shopping list",
     ),
     "Templates": MessageLookupByLibrary.simpleMessage("Templates"),
+    "Templates_Create_Hint": MessageLookupByLibrary.simpleMessage(
+      "Save any note as a template from its menu.",
+    ),
     "Templates_Description": MessageLookupByLibrary.simpleMessage(
       "Start with a useful outline, then make it yours.",
     ),

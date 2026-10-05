@@ -1380,10 +1380,10 @@ class S {
     );
   }
 
-  /// `Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.`
+  /// `Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.`
   String get Backup_Export_Description {
     return Intl.message(
-      'Save your notes, checklists, folders, photos, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.',
+      'Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.',
       name: 'Backup_Export_Description',
       desc: '',
       args: [],
@@ -1400,10 +1400,10 @@ class S {
     );
   }
 
-  /// `Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.`
+  /// `Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.`
   String get Backup_Restore_Description {
     return Intl.message(
-      'Restoring adds copies of the backed-up notes and folders. Your existing notes stay unchanged. Restoring the same file again adds another set of copies.',
+      'Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.',
       name: 'Backup_Restore_Description',
       desc: '',
       args: [],
@@ -2088,6 +2088,231 @@ class S {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Unfinished`
+  String get Filter_Unfinished {
+    return Intl.message(
+      'Unfinished',
+      name: 'Filter_Unfinished',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Item completed`
+  String get Checklist_Item_Completed {
+    return Intl.message(
+      'Item completed',
+      name: 'Checklist_Item_Completed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Item reopened`
+  String get Checklist_Item_Reopened {
+    return Intl.message(
+      'Item reopened',
+      name: 'Checklist_Item_Reopened',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This checklist item is no longer available.`
+  String get Checklist_Item_Unavailable {
+    return Intl.message(
+      'This checklist item is no longer available.',
+      name: 'Checklist_Item_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save as template`
+  String get Save_As_Template {
+    return Intl.message(
+      'Save as template',
+      name: 'Save_As_Template',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Template name`
+  String get Template_Name {
+    return Intl.message(
+      'Template name',
+      name: 'Template_Name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My templates`
+  String get My_Templates {
+    return Intl.message(
+      'My templates',
+      name: 'My_Templates',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Starter templates`
+  String get Starter_Templates {
+    return Intl.message(
+      'Starter templates',
+      name: 'Starter_Templates',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save any note as a template from its menu.`
+  String get Templates_Create_Hint {
+    return Intl.message(
+      'Save any note as a template from its menu.',
+      name: 'Templates_Create_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My template`
+  String get Template_Default_Name {
+    return Intl.message(
+      'My template',
+      name: 'Template_Default_Name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Template saved`
+  String get Template_Saved {
+    return Intl.message(
+      'Template saved',
+      name: 'Template_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Couldn't load your templates. Please try again.`
+  String get Template_Load_Failed {
+    return Intl.message(
+      'Couldn\'t load your templates. Please try again.',
+      name: 'Template_Load_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Couldn't save the template. Check available storage and photos, then try again.`
+  String get Template_Save_Failed {
+    return Intl.message(
+      'Couldn\'t save the template. Check available storage and photos, then try again.',
+      name: 'Template_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Couldn't update the template. Please try again.`
+  String get Template_Change_Failed {
+    return Intl.message(
+      'Couldn\'t update the template. Please try again.',
+      name: 'Template_Change_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Couldn't create a note from the template. Check its photos and try again.`
+  String get Template_Copy_Failed {
+    return Intl.message(
+      'Couldn\'t create a note from the template. Check its photos and try again.',
+      name: 'Template_Copy_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rename template`
+  String get Rename_Template {
+    return Intl.message(
+      'Rename template',
+      name: 'Rename_Template',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete template`
+  String get Delete_Template {
+    return Intl.message(
+      'Delete template',
+      name: 'Delete_Template',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete template?`
+  String get Template_Delete_Confirm_Title {
+    return Intl.message(
+      'Delete template?',
+      name: 'Template_Delete_Confirm_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This removes the saved template. Notes you've created from it stay in your library.`
+  String get Template_Delete_Confirm_Message {
+    return Intl.message(
+      'This removes the saved template. Notes you\'ve created from it stay in your library.',
+      name: 'Template_Delete_Confirm_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{items, plural, =0{0 items} one{1 item} other{{items} items}} · {photos, plural, =0{0 photos} one{1 photo} other{{photos} photos}}`
+  String Template_Details(num items, num photos) {
+    return Intl.message(
+      '${Intl.plural(items, zero: '0 items', one: '1 item', other: '$items items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '$photos photos')}',
+      name: 'Template_Details',
+      desc: '',
+      args: [items, photos],
+    );
+  }
+
+  /// `Manage template`
+  String get Template_Manage {
+    return Intl.message(
+      'Manage template',
+      name: 'Template_Manage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `More options`
+  String get More_Options {
+    return Intl.message(
+      'More options',
+      name: 'More_Options',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Retry`
+  String get Retry {
+    return Intl.message('Retry', name: 'Retry', desc: '', args: []);
   }
 }
 

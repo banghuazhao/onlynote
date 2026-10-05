@@ -43,6 +43,34 @@ void main() {
             hasReminder: true),
         isFalse);
   });
+  test('Unfinished requires a nonempty unchecked item and composes with search',
+      () {
+    expect(
+        matchesNoteSearch(note, '茶', {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isTrue);
+    expect(
+        matchesNoteSearch(
+            note.copyWith(todo: [Todo(title: 'Buy 茶', completed: true)]),
+            '',
+            {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isFalse);
+    expect(
+        matchesNoteSearch(note.copyWith(todo: [Todo(title: '  ')]), '',
+            {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isFalse);
+    expect(
+        matchesNoteSearch(
+            note.copyWith(todo: []), '', {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isFalse);
+    expect(
+        matchesNoteSearch(note, 'missing', {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isFalse);
+  });
   test(
       'excerpt reveals a match deep in a note without breaking surrogate pairs',
       () {

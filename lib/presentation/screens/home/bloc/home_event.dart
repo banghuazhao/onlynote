@@ -2,6 +2,12 @@ part of 'home_bloc.dart';
 
 @freezed
 class HomeEvent with _$HomeEvent {
+  const factory HomeEvent.updateTodo({
+    required String noteId,
+    required String todoId,
+    bool? completed,
+    Completer<HomeChecklistResult>? completion,
+  }) = _UpdateTodo;
   const factory HomeEvent.getAllNotes() = _GetAllNotes;
   const factory HomeEvent.duplicateNote(Note note) = _DuplicateNote;
   const factory HomeEvent.reorderNotes(List<Note> notes) = _ReorderNotes;

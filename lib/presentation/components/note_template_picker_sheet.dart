@@ -1,16 +1,130 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/confirm_dialog.dart';
+import 'package:onlynote/presentation/components/template_name_dialog.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_templates.dart';
 
-Future<NoteTemplate?> showNoteTemplatePickerSheet(BuildContext context) =>
-    showAppSheet<NoteTemplate>(
+Future<NoteTemplateSelection?> showNoteTemplatePickerSheet(BuildContext context,
+        {CustomNoteTemplateStore? store}) =>
+    showAppSheet<NoteTemplateSelection>(
       context: context,
-      builder: (_) => const NoteTemplatePickerSheet(),
+      builder: (_) => NoteTemplatePickerSheet(store: store),
     );
 
-class NoteTemplatePickerSheet extends StatelessWidget {
-  const NoteTemplatePickerSheet({super.key});
+class NoteTemplatePickerSheet extends StatefulWidget {
+  const NoteTemplatePickerSheet({super.key, this.store});
+  final CustomNoteTemplateStore? store;
+
+  @override
+  State<NoteTemplatePickerSheet> createState() =>
+      _NoteTemplatePickerSheetState();
+}
+
+class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
+  late final _store = widget.store ?? CustomNoteTemplateStore.instance;
+  bool _loading = true;
+  bool _loadFailed = false;
+  bool _busy = false;
+  bool _changeFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _store.addListener(_refresh);
+    unawaited(_load());
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _loadFailed = false;
+    });
+    try {
+      await _store.load();
+    } catch (_) {
+      if (mounted) setState(() => _loadFailed = true);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _change(Future<void> Function() action) async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _changeFailed = false;
+    });
+    try {
+      await action();
+    } catch (_) {
+      if (mounted) setState(() => _changeFailed = true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _rename(CustomNoteTemplate template) async {
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => TemplateNameDialog(
+        title: S.of(context).Rename_Template,
+        initial: template.name,
+      ),
+    );
+    if (!mounted || name == null) return;
+    await _change(() => _store.rename(template.id, name));
+  }
+
+  Future<void> _delete(CustomNoteTemplate template) async {
+    final confirmed = await showConfirmDialog(
+      context,
+      title: S.of(context).Template_Delete_Confirm_Title,
+      message: S.of(context).Template_Delete_Confirm_Message,
+    );
+    if (!mounted || !confirmed) return;
+    await _change(() => _store.delete(template.id));
+  }
+
+  void _manage(CustomNoteTemplate template) {
+    showAppActionSheet(
+      context: context,
+      title: template.name,
+      actions: [
+        AppSheetAction(
+          leading: const Icon(Icons.edit_outlined),
+          title: Text(S.of(context).Rename_Template),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _rename(template);
+          },
+        ),
+        AppSheetAction(
+          destructive: true,
+          leading: const Icon(Icons.delete_outline),
+          title: Text(S.of(context).Delete_Template),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _delete(template);
+          },
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _store.removeListener(_refresh);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,49 +137,124 @@ class NoteTemplatePickerSheet extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-            child: Text(
-              strings.Templates_Description,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
+            child: Text(strings.Templates_Description,
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ),
-          for (final template in NoteTemplate.values)
+          _heading(strings.My_Templates),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(12),
+              child: LinearProgressIndicator(),
+            )
+          else if (_loadFailed)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Card(
-                clipBehavior: Clip.antiAlias,
-                margin: EdgeInsets.zero,
-                child: ListTile(
-                  key: ValueKey('template-${template.name}'),
-                  minVerticalPadding: 16,
-                  leading: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Icon(
-                        switch (template) {
-                          NoteTemplate.shopping =>
-                            Icons.shopping_basket_outlined,
-                          NoteTemplate.packing => Icons.luggage_outlined,
-                          NoteTemplate.dailyPlan => Icons.today_outlined,
-                          NoteTemplate.meeting => Icons.groups_outlined,
-                        },
-                        color: theme.colorScheme.onPrimaryContainer,
-                        size: 22,
-                      ),
-                    ),
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(strings.Template_Load_Failed,
+                      style: TextStyle(color: theme.colorScheme.error)),
+                  TextButton.icon(
+                    onPressed: _load,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(strings.Retry),
                   ),
-                  title: Text(template.content(strings).title),
-                  subtitle: Text(template.content(strings).summary),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.pop(context, template),
+                ],
+              ),
+            )
+          else if (_store.templates.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+              child: Text(strings.Templates_Create_Hint,
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            )
+          else ...[
+            for (final template in _store.templates)
+              _card(
+                ListTile(
+                  key: ValueKey('custom-template-${template.id}'),
+                  minVerticalPadding: 16,
+                  leading: _icon(Icons.notes_outlined),
+                  title: Text(template.name),
+                  subtitle: Text(strings.Template_Details(
+                      template.items.length, template.imagePaths.length)),
+                  trailing: IconButton(
+                    key: ValueKey('manage-template-${template.id}'),
+                    tooltip: strings.Template_Manage,
+                    onPressed: _busy ? null : () => _manage(template),
+                    icon: const Icon(Icons.more_horiz_rounded),
+                  ),
+                  onTap: _busy
+                      ? null
+                      : () => Navigator.pop(
+                          context, NoteTemplateSelection.custom(template)),
                 ),
+              ),
+          ],
+          if (_busy)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: LinearProgressIndicator(),
+            ),
+          if (_changeFailed)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(strings.Template_Change_Failed,
+                  style: TextStyle(color: theme.colorScheme.error)),
+            ),
+          _heading(strings.Starter_Templates),
+          for (final template in NoteTemplate.values)
+            _card(
+              ListTile(
+                key: ValueKey('template-${template.name}'),
+                minVerticalPadding: 16,
+                leading: _icon(switch (template) {
+                  NoteTemplate.shopping => Icons.shopping_basket_outlined,
+                  NoteTemplate.packing => Icons.luggage_outlined,
+                  NoteTemplate.dailyPlan => Icons.today_outlined,
+                  NoteTemplate.meeting => Icons.groups_outlined,
+                }),
+                title: Text(template.content(strings).title),
+                subtitle: Text(template.content(strings).summary),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.pop(
+                    context, NoteTemplateSelection.builtIn(template)),
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _heading(String title) => Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+        child: Semantics(
+          header: true,
+          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+        ),
+      );
+
+  Widget _card(Widget child) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          margin: EdgeInsets.zero,
+          child: child,
+        ),
+      );
+
+  Widget _icon(IconData icon) {
+    final colors = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.primaryContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Icon(icon, color: colors.onPrimaryContainer, size: 22),
       ),
     );
   }

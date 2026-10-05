@@ -36,6 +36,7 @@ import 'presentation/screens/note_detail/bloc/action/note_action_bloc.dart';
 import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
 import 'services/note_autosave.dart';
+import 'services/custom_note_template_store.dart';
 import 'services/backup/backup_service.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -84,7 +85,9 @@ Future<void> main() async {
     AdsManager.debugPrintID();
   }
 
-  InAppReviewHelper.checkAndAskForReview();
+  // Track use without interrupting launch; completed actions decide when to
+  // consider a review request.
+  unawaited(InAppReviewHelper.instance.recordAppOpen());
 
   final notifications = NotificationService();
   await notifications.init();
@@ -104,6 +107,7 @@ Future<void> main() async {
     documents: await getApplicationDocumentsDirectory(),
     readReminders: () => ReminderData.shared.reminders,
     writeReminders: ReminderData.shared.replaceAll,
+    templateStore: CustomNoteTemplateStore.instance,
   ).recoverInterruptedRestore();
   await HiveNoteAutosaveStore(
           getIt<NoteRepository>(), Hive.box(draftDatabaseBox))

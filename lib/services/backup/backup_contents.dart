@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/custom_note_template.dart';
 
 const maxBackupBytes = 256 * 1024 * 1024;
 
@@ -29,16 +30,18 @@ class BackupContents {
       required this.notes,
       required this.folders,
       required this.photos,
-      required this.reminders});
+      required this.reminders,
+      this.templates = const []});
   final DateTime createdAt;
   final List<NoteDto> notes;
   final List<FolderDto> folders;
   final Map<String, BackupPhoto> photos;
   final List<BackupReminder> reminders;
+  final List<CustomNoteTemplate> templates;
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 1,
+        'version': 2,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -86,10 +89,12 @@ class BackupContents {
               'repeat': reminder.repeat.name,
             }
         ],
+        'templates': [for (final template in templates) template.toJson()],
       };
 
   factory BackupContents.fromJson(Map<String, dynamic> json) {
-    if (json['format'] != 'onlynote-backup' || json['version'] != 1) {
+    if (json['format'] != 'onlynote-backup' ||
+        (json['version'] != 1 && json['version'] != 2)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -175,12 +180,32 @@ class BackupContents {
       reminders.add(BackupReminder(id, DateTime.parse(map['date'] as String),
           repeat: repeat.single));
     }
+    final templates = <CustomNoteTemplate>[];
+    final templateIds = <String>{};
+    if (json['version'] == 2 && json['templates'] is! List) {
+      throw const FormatException('Missing templates');
+    }
+    for (final raw in (json['templates'] as List? ?? const [])) {
+      final map = raw as Map<String, dynamic>;
+      final paths = (map['imagePaths'] as List).cast<String>();
+      if (paths.any((path) => !photos.containsKey(path))) {
+        throw const FormatException('Missing template photo');
+      }
+      // Photo references in a backup are archive keys, not device paths.
+      final template = CustomNoteTemplate.fromJson({...map, 'imagePaths': []})
+          .copyWith(imagePaths: paths);
+      if (!templateIds.add(template.id)) {
+        throw const FormatException('Duplicate template');
+      }
+      templates.add(template);
+    }
     return BackupContents(
         createdAt: createdAt,
         notes: notes,
         folders: folders,
         photos: photos,
-        reminders: reminders);
+        reminders: reminders,
+        templates: templates);
   }
 
   static String _id(dynamic value) {

@@ -41,8 +41,9 @@ class _MemoryStore implements NoteAutosaveStore {
 }
 
 class _TemplateRouter extends RootStackRouter {
-  _TemplateRouter(this.store);
+  _TemplateRouter(this.store, {this.customNote});
   final _MemoryStore store;
+  final Note? customNote;
 
   @override
   List<AutoRoute> get routes => [
@@ -54,7 +55,8 @@ class _TemplateRouter extends RootStackRouter {
               body: Builder(
                 builder: (context) => TextButton(
                   onPressed: () => context.router.push(AddUpdateNoteRoute(
-                    template: NoteTemplate.packing,
+                    template: customNote == null ? NoteTemplate.packing : null,
+                    customTemplateNote: customNote,
                     folderId: 'travel',
                   )),
                   child: const Text('Open packing template'),
@@ -70,6 +72,7 @@ class _TemplateRouter extends RootStackRouter {
               final args = data.argsAs<AddUpdateNoteRouteArgs>();
               return AddUpdateNoteScreen(
                 template: args.template,
+                customTemplateNote: args.customTemplateNote,
                 folderId: args.folderId,
                 autosaveStore: store,
               );
@@ -151,4 +154,49 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+      'custom template seed is saved as a new independent note without edits',
+      (tester) async {
+    final store = _MemoryStore();
+    final repository = _MemoryNotes();
+    final bloc = AddUpdateBloc(
+        AddNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final initial = Note(
+        id: 'custom-new-note',
+        title: 'Trip',
+        description: 'Travel notes',
+        folderId: 'travel',
+        color: const Color(0xffd3ede4),
+        todo: [Todo(id: 'new-passport', title: 'Passport')]);
+    final router = _TemplateRouter(store, customNote: initial);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+      await bloc.close();
+    });
+    await tester.pumpWidget(BlocProvider.value(
+        value: bloc,
+        child: MaterialApp.router(
+          routerConfig: router.config(),
+          theme: AppTheme.light,
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+        )));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open packing template'));
+    await tester.pumpAndSettle();
+    expect(find.text('Trip'), findsOneWidget);
+    expect(find.text('Passport'), findsOneWidget);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(store.saved.values.single, initial);
+    expect(store.drafts, isEmpty);
+    expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+    expect(tester.takeException(), isNull);
+  });
 }

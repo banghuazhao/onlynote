@@ -6,6 +6,7 @@ import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:uuid/uuid.dart';
 
 import 'backup_contents.dart';
@@ -20,7 +21,8 @@ class BackupService {
       required this.journal,
       required this.documents,
       required this.readReminders,
-      required this.writeReminders});
+      required this.writeReminders,
+      this.templateStore});
   final Box notes;
   final Box? drafts;
   final Box folders;
@@ -28,9 +30,12 @@ class BackupService {
   final Directory documents;
   final List<Reminder> Function() readReminders;
   final Future<void> Function(List<Reminder>) writeReminders;
+  final CustomNoteTemplateStore? templateStore;
   static const _uuid = Uuid();
 
   Future<Uint8List> export() async {
+    await templateStore?.load();
+    final templates = templateStore?.templates.toList() ?? const [];
     final byId = {for (final n in notes.values.whereType<NoteDto>()) n.id: n};
     for (final draft in drafts?.values.whereType<NoteDto>() ?? <NoteDto>[]) {
       if (draft.validNote || byId.containsKey(draft.id)) byId[draft.id] = draft;
@@ -46,8 +51,11 @@ class BackupService {
     final photos = <String, BackupPhoto>{};
     final photoKeys = <String, String>{};
     var totalBytes = 0;
-    for (final note in snapshot) {
-      for (final path in note.imagePaths ?? <String>[]) {
+    for (final imagePaths in [
+      for (final note in snapshot) note.imagePaths ?? <String>[],
+      for (final template in templates) template.imagePaths,
+    ]) {
+      for (final path in imagePaths) {
         if (photoKeys.containsKey(path)) continue;
         final resolved = path.startsWith('/')
             ? ImageStorage.resolvePath(path)
@@ -72,6 +80,12 @@ class BackupService {
       folders: folderSnapshot,
       photos: photos,
       reminders: reminders,
+      templates: [
+        for (final template in templates)
+          template.copyWith(imagePaths: [
+            for (final path in template.imagePaths) photoKeys[path]!,
+          ]),
+      ],
       notes: [
         for (final note in snapshot)
           note.copyWith(
@@ -88,24 +102,50 @@ class BackupService {
   /// Restore only creates new IDs. The journal rolls back a partial import on
   /// I/O failure or on next launch, without ever deleting pre-existing data.
   Future<List<Reminder>> restore(BackupContents backup) async {
+    if (backup.templates.isNotEmpty && templateStore == null) {
+      throw StateError('Template storage is unavailable');
+    }
+    await templateStore?.load();
     if (journal.containsKey('pending')) await recoverInterruptedRestore();
     final noteIds = {for (final n in backup.notes) n.id!: _newId(notes)};
     final folderIds = {for (final f in backup.folders) f.id!: _newId(folders)};
+    final templateIds = {
+      for (final template in backup.templates) template.id: _uuid.v4(),
+    };
+    final notePhotoKeys = {
+      for (final note in backup.notes) ...note.imagePaths ?? <String>[],
+    };
+    final templatePhotoKeys = {
+      for (final template in backup.templates) ...template.imagePaths,
+    };
     final paths = {
-      for (final entry in backup.photos.entries)
-        entry.key: 'note_images/${_uuid.v4()}.${entry.value.extension}'
+      for (final key in notePhotoKeys)
+        key: 'note_images/${_uuid.v4()}.${backup.photos[key]!.extension}',
+    };
+    final templatePaths = {
+      for (final key in templatePhotoKeys)
+        key: 'template_images/${_uuid.v4()}.${backup.photos[key]!.extension}',
     };
     await journal.put('pending', {
       'notes': noteIds.values.toList(),
       'folders': folderIds.values.toList(),
-      'photos': paths.values.toList(),
+      'templates': templateIds.values.toList(),
+      'photos': [...paths.values, ...templatePaths.values],
     });
     await journal.flush();
     try {
       await Directory('${documents.path}/note_images').create(recursive: true);
-      for (final entry in backup.photos.entries) {
-        await File('${documents.path}/${paths[entry.key]}')
-            .writeAsBytes(entry.value.bytes, flush: true);
+      if (templatePaths.isNotEmpty) {
+        await Directory('${documents.path}/template_images')
+            .create(recursive: true);
+      }
+      for (final entry in paths.entries) {
+        await File('${documents.path}/${entry.value}')
+            .writeAsBytes(backup.photos[entry.key]!.bytes, flush: true);
+      }
+      for (final entry in templatePaths.entries) {
+        await File('${documents.path}/${entry.value}')
+            .writeAsBytes(backup.photos[entry.key]!.bytes, flush: true);
       }
       await folders.putAll({
         for (final f in backup.folders)
@@ -122,6 +162,17 @@ class BackupService {
             ],
           )
       });
+      if (backup.templates.isNotEmpty) {
+        await templateStore!.importTemplates([
+          for (final template in backup.templates)
+            template.copyWith(
+              id: templateIds[template.id],
+              imagePaths: [
+                for (final key in template.imagePaths) templatePaths[key]!,
+              ],
+            ),
+        ]);
+      }
       final existing = List<Reminder>.of(readReminders());
       final usedIds = existing.map((r) => r.reminderId).toSet();
       final restored = <Reminder>[];
@@ -159,6 +210,14 @@ class BackupService {
   Future<void> recoverInterruptedRestore() async {
     final pending = journal.get('pending');
     if (pending == null) return;
+    final templateIds =
+        (pending['templates'] as List? ?? const []).cast<String>().toSet();
+    if (templateIds.isNotEmpty) {
+      if (templateStore == null) {
+        throw StateError('Template recovery storage is unavailable');
+      }
+      await templateStore!.deleteTemplates(templateIds);
+    }
     final ids = (pending['notes'] as List).cast<String>();
     await writeReminders(
         readReminders().where((r) => !ids.contains(r.noteId)).toList());
@@ -166,7 +225,8 @@ class BackupService {
     await folders.deleteAll((pending['folders'] as List).cast<String>());
     for (final path in (pending['photos'] as List).cast<String>()) {
       // Recovery paths must remain inside the managed image directory.
-      if (!RegExp(r'^note_images/[a-zA-Z0-9-]+\.[a-zA-Z0-9]+$')
+      if (!RegExp(
+              r'^(note_images|template_images)/[a-zA-Z0-9-]+\.[a-zA-Z0-9]+$')
           .hasMatch(path)) {
         continue;
       }
@@ -174,5 +234,6 @@ class BackupService {
       if (await file.exists()) await file.delete();
     }
     await journal.delete('pending');
+    await journal.flush();
   }
 }

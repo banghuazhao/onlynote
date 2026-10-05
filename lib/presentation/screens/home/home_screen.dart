@@ -12,16 +12,23 @@ import 'package:onlynote/Tools/ads_manager.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/Tools/share_helper.dart';
+import 'package:onlynote/Tools/image_storage.dart';
+import 'package:onlynote/Tools/in_app_reviewer_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/presentation/theme/note_grid_layout.dart';
 import 'package:onlynote/services/purchase_service.dart';
+import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
 
@@ -41,6 +48,82 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _checklistReviewGeneration = 0;
+  void _cancelChecklistReview() => _checklistReviewGeneration++;
+
+  void _handleChecklistResult(HomeChecklistResult result) {
+    if (!mounted) return;
+    if (result.error != null) {
+      _cancelChecklistReview();
+      context.showToast(result.error!, isError: true);
+      return;
+    }
+    final change = result.change;
+    if (change == null) return;
+    _considerChecklistReview(change);
+    final bloc = context.read<HomeBloc>();
+    showTransientSnackBar(
+        context,
+        SnackBar(
+          duration: const Duration(seconds: 5),
+          content: Text(change.completed
+              ? S.of(context).Checklist_Item_Completed
+              : S.of(context).Checklist_Item_Reopened),
+          action: SnackBarAction(
+              label: S.of(context).Undo,
+              onPressed: () async {
+                _cancelChecklistReview();
+                final undone = await bloc.setTodoCompleted(
+                    noteId: change.noteId,
+                    todoId: change.todoId,
+                    completed: change.previousCompleted);
+                if (mounted && undone.error != null) {
+                  context.showToast(undone.error!, isError: true);
+                }
+              }),
+        ));
+  }
+
+  Future<void> _considerChecklistReview(HomeChecklistChange change) async {
+    final generation = ++_checklistReviewGeneration;
+    if (!InAppReviewHelper.instance.promptsEnabled) return;
+    if (!change.newlyCompleted || !change.checklistNowComplete) return;
+    // Wait for Undo to expire. Any subsequent checkbox action cancels this.
+    await Future<void>.delayed(const Duration(seconds: 6));
+    if (!mounted ||
+        generation != _checklistReviewGeneration ||
+        !isReviewMomentIdle ||
+        _isSearchVisible ||
+        ModalRoute.of(context)?.isCurrent != true ||
+        !getIt.isRegistered<NoteRepository>()) {
+      return;
+    }
+    try {
+      final note =
+          (await getIt<NoteRepository>().getNote(change.noteId)).toDomain();
+      final items = note.todo
+          .where((todo) => todo.title?.trim().isNotEmpty == true)
+          .toList();
+      if (note.isDeleted ||
+          items.isEmpty ||
+          items.any((todo) => !todo.completed)) {
+        return;
+      }
+      await InAppReviewHelper.instance
+          .recordChecklistCompleted(noteId: change.noteId);
+      if (mounted &&
+          generation == _checklistReviewGeneration &&
+          ModalRoute.of(context)?.isCurrent == true &&
+          isReviewMomentIdle &&
+          !_isSearchVisible) {
+        await InAppReviewHelper.instance
+            .requestReviewIfEligible(afterChecklistCompletion: true);
+      }
+    } catch (_) {
+      // Review opportunities never interfere with a saved checklist.
+    }
+  }
+
   /// Height of the home screen banner, in logical pixels.
   static const _bannerHeight = 50;
 
@@ -156,11 +239,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openTemplates({String? folderId}) async {
-    final template = await showNoteTemplatePickerSheet(context);
-    if (!mounted || template == null) return;
-    context.router.push(
-      AddUpdateNoteRoute(folderId: folderId, template: template),
-    );
+    final selection = await showNoteTemplatePickerSheet(context);
+    if (!mounted || selection == null) return;
+    if (selection.builtIn != null) {
+      context.router.push(
+        AddUpdateNoteRoute(folderId: folderId, template: selection.builtIn),
+      );
+      return;
+    }
+    try {
+      final note = await CustomNoteTemplateStore.instance
+          .createNote(selection.custom!.id, folderId: folderId);
+      if (!mounted) {
+        await ImageStorage.deleteImages(note.imagePaths);
+        return;
+      }
+      context.router.push(AddUpdateNoteRoute(customTemplateNote: note));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Template_Copy_Failed)));
+      }
+    }
   }
 
   /// What the app bar title reads: the scope the note list is currently
@@ -293,6 +393,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .add(HomeEvent.filtersChanged(filters)),
                           )),
                 ],
+                if (!_isSearchVisible && !_isReorderMode)
+                  BlocBuilder<MultipleDeleteBloc, MultipleDeleteState>(
+                    builder: (context, selection) => selection.maybeMap(
+                      selected: (_) => const SizedBox.shrink(),
+                      orElse: () => BlocBuilder<HomeBloc, HomeState>(
+                        builder: (context, state) => state.maybeMap(
+                          loaded: (data) => data.showTrash
+                              ? const SizedBox.shrink()
+                              : UnfinishedNotesFilter(
+                                  selected: data.filters
+                                      .contains(NoteSearchFilter.unfinished),
+                                  onChanged: (selected) {
+                                    final filters =
+                                        Set<NoteSearchFilter>.of(data.filters);
+                                    if (selected) {
+                                      filters.add(NoteSearchFilter.unfinished);
+                                    } else {
+                                      filters
+                                          .remove(NoteSearchFilter.unfinished);
+                                    }
+                                    context
+                                        .read<HomeBloc>()
+                                        .add(HomeEvent.filtersChanged(filters));
+                                  },
+                                ),
+                          orElse: () => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                  ),
                 Expanded(
                   child: ValueListenableBuilder(
                     valueListenable: getIt<Database>().box.listenable(),
@@ -340,8 +470,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         )
                                       : _BuildNotesList(
+                                          onChecklistActionStart:
+                                              _cancelChecklistReview,
+                                          onChecklistResult:
+                                              _handleChecklistResult,
                                           notes: data.notes,
                                           searchQuery: data.searchQuery,
+                                          unfinishedOnly: data.filters.contains(
+                                              NoteSearchFilter.unfinished),
                                           folders: data.folders,
                                           showTrash: data.showTrash,
                                           showWidgetDiscovery:
@@ -429,9 +565,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   _isSearchVisible = !_isSearchVisible;
                   if (!_isSearchVisible) {
                     _searchController.clear();
-                    context
-                        .read<HomeBloc>()
-                        .add(const HomeEvent.filtersChanged({}));
+                    final filters = context.read<HomeBloc>().state.mapOrNull(
+                              loaded: (data) => data.filters,
+                            ) ??
+                        <NoteSearchFilter>{};
+                    context.read<HomeBloc>().add(HomeEvent.filtersChanged({
+                          if (filters.contains(NoteSearchFilter.unfinished))
+                            NoteSearchFilter.unfinished,
+                        }));
                     context
                         .read<HomeBloc>()
                         .add(const HomeEvent.searchChanged(''));
@@ -703,19 +844,25 @@ class _BuildNotesList extends StatefulWidget {
   const _BuildNotesList({
     required this.notes,
     required this.searchQuery,
+    required this.unfinishedOnly,
     required this.folders,
     required this.showTrash,
     required this.showWidgetDiscovery,
     required this.isReorderMode,
     required this.onEnterReorderMode,
+    required this.onChecklistActionStart,
+    required this.onChecklistResult,
   });
 
   final List<Note> notes;
   final String searchQuery;
+  final bool unfinishedOnly;
   final List<Folder> folders;
   final bool showTrash;
   final bool showWidgetDiscovery;
   final bool isReorderMode;
+  final VoidCallback onChecklistActionStart;
+  final ValueChanged<HomeChecklistResult> onChecklistResult;
   final VoidCallback onEnterReorderMode;
 
   @override
@@ -724,22 +871,32 @@ class _BuildNotesList extends StatefulWidget {
 
 class __BuildNotesListState extends State<_BuildNotesList> {
   final Map<String, ScreenshotController> _screenshotControllers = {};
-  final Map<String, GlobalKey> _cardKeys = {};
+  final Map<String, GlobalKey<NoteCardState>> _cardKeys = {};
 
   ScreenshotController _screenshotControllerFor(String noteId) =>
       _screenshotControllers.putIfAbsent(noteId, () => ScreenshotController());
 
-  GlobalKey _cardKeyFor(String noteId) =>
-      _cardKeys.putIfAbsent(noteId, () => GlobalKey());
+  GlobalKey<NoteCardState> _cardKeyFor(String noteId) =>
+      _cardKeys.putIfAbsent(noteId, () => GlobalKey<NoteCardState>());
 
   Future<void> _shareNote(
     BuildContext context,
     Note note,
     ScreenshotController controller,
-    GlobalKey cardKey,
+    GlobalKey<NoteCardState> cardKey,
   ) async {
     await ShareHelper.shareNote(context, note, controller,
-        sharePositionOrigin: ShareHelper.shareOriginFromKey(cardKey));
+        sharePositionOrigin: ShareHelper.shareOriginFromKey(cardKey),
+        captureImage: () async => cardKey.currentState?.captureImage());
+  }
+
+  Future<void> _toggleTodo(String noteId, String todoId) async {
+    widget.onChecklistActionStart();
+    final bloc = context.read<HomeBloc>();
+    final onResult = widget.onChecklistResult;
+    final result = await bloc.toggleTodo(noteId: noteId, todoId: todoId);
+    // The Home screen owns feedback, even if Unfinished removes this list.
+    onResult(result);
   }
 
   void _showMoveToFolderSheet(BuildContext context, Note note) {
@@ -902,9 +1059,11 @@ class __BuildNotesListState extends State<_BuildNotesList> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final baseColumns = AppLayoutSettings.instance.cardSize.columns;
-        final crossAxisCount =
-            constraints.maxWidth >= 600 ? baseColumns + 1 : baseColumns;
+        final crossAxisCount = noteGridColumns(
+          width: constraints.maxWidth,
+          textScaler: MediaQuery.textScalerOf(context),
+          preferredColumns: AppLayoutSettings.instance.cardSize.columns,
+        );
         return FocusDetector(
           onFocusGained: () {
             if (mounted) setState(() {});
@@ -971,36 +1130,38 @@ class __BuildNotesListState extends State<_BuildNotesList> {
               final noteId = note.id!;
               return FadeInUp(
                 duration: Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
-                child: KeyedSubtree(
+                child: NoteCard(
                   key: _cardKeyFor(noteId),
-                  child: NoteCard(
-                    note: note,
-                    searchQuery: widget.searchQuery,
-                    selected: multipleDeleteBloc.isSelected(noteId),
-                    selectionMode: isSelectionMode,
-                    screenshotController: _screenshotControllerFor(noteId),
-                    onTap: () {
-                      multipleDeleteBloc.state.maybeMap(
-                        orElse: () {
-                          context.router.push(NoteDetailRoute(noteId: noteId));
-                        },
-                        selected: (_) {
-                          multipleDeleteBloc
-                              .add(MultipleDeleteEvent.toggleSelect(noteId));
-                        },
-                      );
-                    },
-                    onLongPress: () {
-                      multipleDeleteBloc.state.maybeMap(
-                        orElse: () => _showNoteContextMenu(
-                            context, note, multipleDeleteBloc, noteId),
-                        selected: (_) {
-                          multipleDeleteBloc
-                              .add(MultipleDeleteEvent.toggleSelect(noteId));
-                        },
-                      );
-                    },
-                  ),
+                  note: note,
+                  searchQuery: widget.searchQuery,
+                  selected: multipleDeleteBloc.isSelected(noteId),
+                  selectionMode: isSelectionMode,
+                  unfinishedOnly: widget.unfinishedOnly,
+                  onTodoToggle: isSelectionMode || widget.showTrash
+                      ? null
+                      : (todoId) => _toggleTodo(noteId, todoId),
+                  screenshotController: _screenshotControllerFor(noteId),
+                  onTap: () {
+                    multipleDeleteBloc.state.maybeMap(
+                      orElse: () {
+                        context.router.push(NoteDetailRoute(noteId: noteId));
+                      },
+                      selected: (_) {
+                        multipleDeleteBloc
+                            .add(MultipleDeleteEvent.toggleSelect(noteId));
+                      },
+                    );
+                  },
+                  onLongPress: () {
+                    multipleDeleteBloc.state.maybeMap(
+                      orElse: () => _showNoteContextMenu(
+                          context, note, multipleDeleteBloc, noteId),
+                      selected: (_) {
+                        multipleDeleteBloc
+                            .add(MultipleDeleteEvent.toggleSelect(noteId));
+                      },
+                    );
+                  },
                 ),
               );
             },

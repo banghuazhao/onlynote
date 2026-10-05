@@ -18,6 +18,9 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$HomeEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -36,6 +39,9 @@ mixin _$HomeEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -54,6 +60,9 @@ mixin _$HomeEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -73,6 +82,7 @@ mixin _$HomeEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -91,6 +101,7 @@ mixin _$HomeEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -109,6 +120,7 @@ mixin _$HomeEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -143,6 +155,265 @@ class _$HomeEventCopyWithImpl<$Res, $Val extends HomeEvent>
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
+}
+
+/// @nodoc
+abstract class _$$UpdateTodoImplCopyWith<$Res> {
+  factory _$$UpdateTodoImplCopyWith(
+          _$UpdateTodoImpl value, $Res Function(_$UpdateTodoImpl) then) =
+      __$$UpdateTodoImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String noteId,
+      String todoId,
+      bool? completed,
+      Completer<HomeChecklistResult>? completion});
+}
+
+/// @nodoc
+class __$$UpdateTodoImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$UpdateTodoImpl>
+    implements _$$UpdateTodoImplCopyWith<$Res> {
+  __$$UpdateTodoImplCopyWithImpl(
+      _$UpdateTodoImpl _value, $Res Function(_$UpdateTodoImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? todoId = null,
+    Object? completed = freezed,
+    Object? completion = freezed,
+  }) {
+    return _then(_$UpdateTodoImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      todoId: null == todoId
+          ? _value.todoId
+          : todoId // ignore: cast_nullable_to_non_nullable
+              as String,
+      completed: freezed == completed
+          ? _value.completed
+          : completed // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<HomeChecklistResult>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$UpdateTodoImpl implements _UpdateTodo {
+  const _$UpdateTodoImpl(
+      {required this.noteId,
+      required this.todoId,
+      this.completed,
+      this.completion});
+
+  @override
+  final String noteId;
+  @override
+  final String todoId;
+  @override
+  final bool? completed;
+  @override
+  final Completer<HomeChecklistResult>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.updateTodo(noteId: $noteId, todoId: $todoId, completed: $completed, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UpdateTodoImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            (identical(other.todoId, todoId) || other.todoId == todoId) &&
+            (identical(other.completed, completed) ||
+                other.completed == completed) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, noteId, todoId, completed, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UpdateTodoImplCopyWith<_$UpdateTodoImpl> get copyWith =>
+      __$$UpdateTodoImplCopyWithImpl<_$UpdateTodoImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return updateTodo(noteId, todoId, completed, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return updateTodo?.call(noteId, todoId, completed, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (updateTodo != null) {
+      return updateTodo(noteId, todoId, completed, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return updateTodo(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return updateTodo?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (updateTodo != null) {
+      return updateTodo(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _UpdateTodo implements HomeEvent {
+  const factory _UpdateTodo(
+      {required final String noteId,
+      required final String todoId,
+      final bool? completed,
+      final Completer<HomeChecklistResult>? completion}) = _$UpdateTodoImpl;
+
+  String get noteId;
+  String get todoId;
+  bool? get completed;
+  Completer<HomeChecklistResult>? get completion;
+  @JsonKey(ignore: true)
+  _$$UpdateTodoImplCopyWith<_$UpdateTodoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -183,6 +454,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -204,6 +478,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -225,6 +502,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -250,6 +530,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -271,6 +552,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -292,6 +574,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -393,6 +676,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -414,6 +700,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -435,6 +724,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -460,6 +752,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -481,6 +774,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -502,6 +796,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -604,6 +899,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -625,6 +923,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -646,6 +947,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -671,6 +975,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -692,6 +997,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -713,6 +1019,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -809,6 +1116,9 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -830,6 +1140,9 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -851,6 +1164,9 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -876,6 +1192,7 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -897,6 +1214,7 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -918,6 +1236,7 @@ class _$SearchChangedImpl implements _SearchChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -1022,6 +1341,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -1043,6 +1365,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -1064,6 +1389,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -1089,6 +1417,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -1110,6 +1439,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -1131,6 +1461,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -1229,6 +1560,9 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -1250,6 +1584,9 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -1271,6 +1608,9 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -1296,6 +1636,7 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -1317,6 +1658,7 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -1338,6 +1680,7 @@ class _$SelectFolderImpl implements _SelectFolder {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -1434,6 +1777,9 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -1455,6 +1801,9 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -1476,6 +1825,9 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -1501,6 +1853,7 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -1522,6 +1875,7 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -1543,6 +1897,7 @@ class _$ShowTrashImpl implements _ShowTrash {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -1639,6 +1994,9 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -1660,6 +2018,9 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -1681,6 +2042,9 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -1706,6 +2070,7 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -1727,6 +2092,7 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -1748,6 +2114,7 @@ class _$TogglePinImpl implements _TogglePin {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -1850,6 +2217,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -1871,6 +2241,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -1892,6 +2265,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -1917,6 +2293,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -1938,6 +2315,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -1959,6 +2337,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -2062,6 +2441,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -2083,6 +2465,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -2104,6 +2489,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -2129,6 +2517,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -2150,6 +2539,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -2171,6 +2561,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -2268,6 +2659,9 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -2289,6 +2683,9 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -2310,6 +2707,9 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -2335,6 +2735,7 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -2356,6 +2757,7 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -2377,6 +2779,7 @@ class _$CreateFolderImpl implements _CreateFolder {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -2481,6 +2884,9 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -2502,6 +2908,9 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -2523,6 +2932,9 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -2548,6 +2960,7 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -2569,6 +2982,7 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -2590,6 +3004,7 @@ class _$RenameFolderImpl implements _RenameFolder {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -2688,6 +3103,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -2709,6 +3127,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -2730,6 +3151,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -2755,6 +3179,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -2776,6 +3201,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -2797,6 +3223,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,
@@ -2903,6 +3330,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
     required TResult Function(List<Note> notes) reorderNotes,
@@ -2924,6 +3354,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
     TResult? Function(List<Note> notes)? reorderNotes,
@@ -2945,6 +3378,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
     TResult Function(List<Note> notes)? reorderNotes,
@@ -2970,6 +3406,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
     required TResult Function(_GetAllNotes value) getAllNotes,
     required TResult Function(_DuplicateNote value) duplicateNote,
     required TResult Function(_ReorderNotes value) reorderNotes,
@@ -2991,6 +3428,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
     TResult? Function(_GetAllNotes value)? getAllNotes,
     TResult? Function(_DuplicateNote value)? duplicateNote,
     TResult? Function(_ReorderNotes value)? reorderNotes,
@@ -3012,6 +3450,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
     TResult Function(_GetAllNotes value)? getAllNotes,
     TResult Function(_DuplicateNote value)? duplicateNote,
     TResult Function(_ReorderNotes value)? reorderNotes,

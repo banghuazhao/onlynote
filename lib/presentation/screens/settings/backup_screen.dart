@@ -11,6 +11,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -34,6 +35,7 @@ class _BackupScreenState extends State<BackupScreen> {
         documents: await getApplicationDocumentsDirectory(),
         readReminders: () => ReminderData.shared.reminders,
         writeReminders: ReminderData.shared.replaceAll,
+        templateStore: CustomNoteTemplateStore.instance,
       );
 
   Future<void> _export() async {
@@ -102,6 +104,9 @@ class _BackupScreenState extends State<BackupScreen> {
                             contents.notes.length,
                             contents.folders.length,
                             contents.photos.length)),
+                        if (contents.templates.isNotEmpty)
+                          Text(
+                              '${S.of(context).My_Templates}: ${contents.templates.length}'),
                         const SizedBox(height: 16),
                         Text(S.of(context).Backup_Restore_Description),
                         if (contents.reminders

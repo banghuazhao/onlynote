@@ -84,6 +84,7 @@ void main() {
 
     expect(_loaded(bloc).todo.map((todo) => todo.id), ['a', 'b', 'c']);
     expect(_loaded(bloc).todo.every((todo) => todo.completed), isTrue);
+    expect(bloc.lastSaveWasTodoToggle, isTrue);
     expect(
         repository.notes['note']!
             .toDomain()
@@ -94,6 +95,7 @@ void main() {
 
   test('reset and Undo preserve unrelated checklist changes', () async {
     final completedIds = await bloc.resetChecklist('note');
+    expect(bloc.lastSaveWasTodoToggle, isFalse);
     expect(completedIds, ['b']);
     expect(_loaded(bloc).todo.every((todo) => !todo.completed), isTrue);
     bloc.add(const NoteDetailEvent.toggleTodoCheckbox('a'));
@@ -104,6 +106,7 @@ void main() {
 
     expect(
         _loaded(bloc).todo.map((todo) => todo.completed), [true, true, false]);
+    expect(bloc.lastSaveWasTodoToggle, isFalse);
     expect(
         repository.notes['note']!.toDomain().todo.map((todo) => todo.completed),
         [true, true, false]);

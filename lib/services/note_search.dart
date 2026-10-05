@@ -1,6 +1,6 @@
 import 'package:onlynote/domain/model/note.dart';
 
-enum NoteSearchFilter { checklists, photos, reminders, pinned }
+enum NoteSearchFilter { checklists, photos, reminders, pinned, unfinished }
 
 bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
     {required bool hasReminder}) {
@@ -14,6 +14,11 @@ bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
     return false;
   }
   if (filters.contains(NoteSearchFilter.pinned) && !note.isPinned) return false;
+  if (filters.contains(NoteSearchFilter.unfinished) &&
+      !note.todo.any(
+          (todo) => !todo.completed && todo.title?.trim().isNotEmpty == true)) {
+    return false;
+  }
   final pattern = searchPattern(query);
   return pattern == null ||
       [

@@ -1,3 +1,4 @@
+
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
@@ -23,6 +24,8 @@ class NoteCard extends StatefulWidget {
     this.selected = false,
     this.searchQuery = '',
     this.selectionMode = false,
+    this.unfinishedOnly = false,
+    this.onTodoToggle,
     this.onLongPress,
     this.onTap,
     this.screenshotController,
@@ -32,6 +35,8 @@ class NoteCard extends StatefulWidget {
   final String searchQuery;
   final bool selected;
   final bool selectionMode;
+  final bool unfinishedOnly;
+  final ValueChanged<String>? onTodoToggle;
   final Function()? onLongPress;
   final Function()? onTap;
 
@@ -41,16 +46,34 @@ class NoteCard extends StatefulWidget {
   final ScreenshotController? screenshotController;
 
   @override
-  State<NoteCard> createState() => _NoteCardState();
+  NoteCardState createState() => NoteCardState();
 }
 
-class _NoteCardState extends State<NoteCard> {
+class NoteCardState extends State<NoteCard> {
   late final ScreenshotController _screenshotController =
       widget.screenshotController ?? ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
   bool _pressed = false;
+  bool _exportingImage = false;
+
+  /// Captures the visible card without tap feedback, preserving its layout.
+  Future<Uint8List?> captureImage() async {
+    if (!mounted || _exportingImage) return null;
+    setState(() {
+      _exportingImage = true;
+      _pressed = false;
+    });
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return null;
+      return await _screenshotController.capture(pixelRatio: 3);
+    } finally {
+      if (mounted) setState(() => _exportingImage = false);
+    }
+  }
 
   void _setPressed(bool value) {
+    if (_exportingImage) return;
     if (_pressed != value) setState(() => _pressed = value);
   }
 
@@ -59,14 +82,19 @@ class _NoteCardState extends State<NoteCard> {
         widget.note,
         _screenshotController,
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
+        captureImage: captureImage,
       );
 
   Iterable<Todo> _visibleTodos(Note note) {
+    final todos = widget.unfinishedOnly
+        ? note.todo.where(
+            (todo) => !todo.completed && todo.title?.trim().isNotEmpty == true)
+        : note.todo;
     final pattern = searchPattern(widget.searchQuery);
-    if (pattern == null) return note.todo.take(3);
+    if (pattern == null) return todos.take(3);
     return [
-      ...note.todo.where((t) => pattern.hasMatch(t.title ?? '')),
-      ...note.todo.where((t) => !pattern.hasMatch(t.title ?? '')),
+      ...todos.where((t) => pattern.hasMatch(t.title ?? '')),
+      ...todos.where((t) => !pattern.hasMatch(t.title ?? '')),
     ].take(3);
   }
 
@@ -87,22 +115,25 @@ class _NoteCardState extends State<NoteCard> {
       selected: widget.selected,
       child: AnimatedScale(
         scale: _pressed ? 0.985 : 1.0,
-        duration:
-            reduceMotion ? Duration.zero : const Duration(milliseconds: 160),
+        duration: reduceMotion || _exportingImage
+            ? Duration.zero
+            : const Duration(milliseconds: 160),
         curve: Curves.easeOut,
         child: GestureDetector(
-          onTapDown: (_) => _setPressed(true),
-          onTapUp: (_) => _setPressed(false),
-          onTapCancel: () => _setPressed(false),
-          onLongPress: widget.onLongPress == null
+          onTapDown: _exportingImage ? null : (_) => _setPressed(true),
+          onTapUp: _exportingImage ? null : (_) => _setPressed(false),
+          onTapCancel: _exportingImage ? null : () => _setPressed(false),
+          onLongPress: _exportingImage || widget.onLongPress == null
               ? null
               : () {
+                  if (_exportingImage) return;
                   HapticFeedback.mediumImpact();
                   widget.onLongPress!();
                 },
-          onTap: widget.onTap == null
+          onTap: _exportingImage || widget.onTap == null
               ? null
               : () {
+                  if (_exportingImage) return;
                   _setPressed(false);
                   widget.onTap!();
                 },
@@ -116,6 +147,7 @@ class _NoteCardState extends State<NoteCard> {
                   pinned: note.isPinned,
                   selected: widget.selected,
                   pressed: _pressed,
+                  exportMode: _exportingImage,
                   padding: const EdgeInsets.fromLTRB(14, 14, 14, 56),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 88),
@@ -182,6 +214,18 @@ class _NoteCardState extends State<NoteCard> {
                               padding:
                                   const EdgeInsets.only(bottom: AppSpacings.s),
                               child: PaperChecklistRow(
+                                key: ValueKey('card-todo-${todo.id}'),
+                                exportMode: _exportingImage,
+                                onChanged: widget.selectionMode ||
+                                        note.isDeleted ||
+                                        widget.onTodoToggle == null ||
+                                        todo.id == null
+                                    ? null
+                                    : (_) {
+                                        if (_exportingImage) return;
+                                        HapticFeedback.selectionClick();
+                                        widget.onTodoToggle!(todo.id!);
+                                      },
                                 label: searchExcerpt(
                                     todo.title ?? '', widget.searchQuery),
                                 searchQuery: widget.searchQuery,
@@ -213,8 +257,11 @@ class _NoteCardState extends State<NoteCard> {
                   child: IconButton(
                     key: widget.selectionMode ? null : _shareButtonKey,
                     style: AppButtonStyles.paper(selected: widget.selected),
-                    onPressed:
-                        widget.selectionMode ? widget.onTap : _shareNoteAsImage,
+                    onPressed: _exportingImage
+                        ? null
+                        : widget.selectionMode
+                            ? widget.onTap
+                            : _shareNoteAsImage,
                     icon: Icon(
                       widget.selectionMode
                           ? widget.selected

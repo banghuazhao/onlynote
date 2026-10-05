@@ -121,6 +121,8 @@ extension GetItInjectableX on _i174.GetIt {
           gh<_i731.RenameFolderUsecase>(),
           gh<_i731.DeleteFolderUsecase>(),
           gh<_i731.MoveNoteToFolderUsecase>(),
+          gh<_i731.GetNoteUsecase>(),
+          gh<_i731.UpdateNoteUsecase>(),
         ));
     return this;
   }

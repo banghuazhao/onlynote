@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
+import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/presentation/components/note_checklist.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/presentation/components/button.dart';
@@ -11,6 +15,9 @@ import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/note_share_sheet.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/custom_template_images.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -399,11 +406,104 @@ class ButtonExamples extends StatelessWidget {
 }
 
 @Preview(name: 'Starter templates', size: Size(390, 640))
-Widget starterTemplatesPreview() => MaterialApp(
+Widget starterTemplatesPreview() => const _TemplatePickerPreview();
+
+@Preview(name: 'Saved and starter templates', size: Size(390, 740))
+Widget customTemplatesPreview() =>
+    const _TemplatePickerPreview(includeCustom: true);
+
+@Preview(name: 'Template name', size: Size(390, 500))
+Widget templateNamePreview() => MaterialApp(
       theme: AppTheme.light,
       localizationsDelegates: const [S.delegate],
-      home: const Scaffold(body: NoteTemplatePickerSheet()),
+      home: const Scaffold(
+        body: Center(
+          child: TemplateNameDialog(
+            title: 'Save as template',
+            initial: 'Weekend packing',
+          ),
+        ),
+      ),
     );
+
+class _TemplatePickerPreview extends StatefulWidget {
+  const _TemplatePickerPreview({this.includeCustom = false});
+  final bool includeCustom;
+
+  @override
+  State<_TemplatePickerPreview> createState() => _TemplatePickerPreviewState();
+}
+
+class _TemplatePickerPreviewState extends State<_TemplatePickerPreview> {
+  late final CustomNoteTemplateStore _store;
+
+  @override
+  void initState() {
+    super.initState();
+    final preferences = _PreviewTemplatePreferences();
+    if (widget.includeCustom) {
+      final template = CustomNoteTemplate(
+        id: 'preview-weekend-packing',
+        name: 'Weekend packing',
+        title: 'Weekend trip',
+        body: 'Destination:\nTravel plans:',
+        items: ['Travel documents', 'Phone and charger', 'Clothes'],
+        color: AppColors.parchment.toARGB32(),
+        createdAt: DateTime(2024, 1, 1),
+      );
+      preferences.values[CustomNoteTemplateStore.storageKey] = jsonEncode({
+        'version': 1,
+        'templates': [template.toJson()],
+      });
+    }
+    _store = CustomNoteTemplateStore(
+      preferences: preferences,
+      images: _PreviewTemplateImages(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _store.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        theme: AppTheme.light,
+        localizationsDelegates: const [S.delegate],
+        home: Scaffold(body: NoteTemplatePickerSheet(store: _store)),
+      );
+}
+
+/// Preview edits stay in memory and never touch the app's saved templates.
+class _PreviewTemplatePreferences implements SharedPreferencesAsync {
+  final values = <String, String>{};
+
+  @override
+  Future<String?> getString(String key) async => values[key];
+
+  @override
+  Future<void> setString(String key, String value) async => values[key] = value;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnsupportedError('Unsupported preview preference operation');
+}
+
+class _PreviewTemplateImages implements CustomTemplateImages {
+  @override
+  Future<List<String>> copyToTemplate(List<String> sources) async => [];
+
+  @override
+  Future<List<String>> copyToNote(List<String> sources) async => [];
+
+  @override
+  Future<void> deleteTemplates(List<String> paths) async {}
+
+  @override
+  Future<void> pruneTemplates(Set<String> keep) async {}
+}
 
 @Preview(name: 'Checklist progress', size: Size(390, 500))
 Widget checklistProgressPreview() => MaterialApp(

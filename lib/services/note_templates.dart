@@ -1,7 +1,20 @@
 import 'package:onlynote/common/constants.dart';
+import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:uuid/uuid.dart';
+
+class NoteTemplateSelection {
+  const NoteTemplateSelection.builtIn(NoteTemplate template)
+      : builtIn = template,
+        custom = null;
+  const NoteTemplateSelection.custom(CustomNoteTemplate template)
+      : custom = template,
+        builtIn = null;
+
+  final NoteTemplate? builtIn;
+  final CustomNoteTemplate? custom;
+}
 
 /// Choosing a template creates an ordinary, fully editable note.
 enum NoteTemplate {

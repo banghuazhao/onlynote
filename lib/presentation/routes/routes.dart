@@ -1,5 +1,6 @@
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';

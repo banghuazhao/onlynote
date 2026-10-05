@@ -14,11 +14,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:onlynote/Tools/image_storage.dart';
+import 'package:onlynote/Tools/in_app_reviewer_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/random.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -41,11 +43,15 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.note,
       this.folderId,
       this.template,
+      this.customTemplateNote,
       this.autosaveStore,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
   final NoteTemplate? template;
+
+  /// A newly instantiated custom template, already owning its photo copies.
+  final Note? customTemplateNote;
   final NoteAutosaveStore? autosaveStore;
   final NoteEditorStart start;
 
@@ -62,6 +68,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final StreamSubscription<AddUpdateFormState> _changes;
   bool _leaving = false;
   bool _allowPop = false;
+  bool _hadUserChange = false;
+  bool _recordedReviewSave = false;
 
   @override
   void initState() {
@@ -74,6 +82,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             : Hive.box(draftDatabaseBox).get(widget.note!.id) as NoteDto?;
     final initial = recovered?.toDomain() ??
         widget.note ??
+        widget.customTemplateNote ??
         widget.template
             ?.createNote(S.current, folderId: widget.folderId, now: now) ??
         Note(
@@ -104,9 +113,13 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           todos: initial.todo,
           imagePaths: initial.imagePaths,
         ));
-    _changes = _form.stream.listen(_capture);
+    _changes = _form.stream.listen((state) {
+      _hadUserChange = true;
+      _capture(state);
+    });
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
-    if (widget.note == null && widget.template != null) {
+    if (widget.note == null &&
+        (widget.template != null || widget.customTemplateNote != null)) {
       _autosave.saveInitial();
     }
   }
@@ -126,6 +139,47 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   void _refreshStatus() {
     if (mounted) setState(() {});
+  }
+
+  Future<void> _recordReviewOnExit() async {
+    if (!InAppReviewHelper.instance.promptsEnabled) return;
+    final seeded = widget.note == null &&
+        (widget.template != null || widget.customTemplateNote != null);
+    if (_recordedReviewSave ||
+        (!_hadUserChange && !seeded) ||
+        _autosave.dirty ||
+        _autosave.status != AutosaveStatus.saved ||
+        !NoteAutosave.hasContent(_autosave.note)) {
+      return;
+    }
+    _recordedReviewSave = true;
+    RouteData? destination;
+    if (getIt.isRegistered<AppRouter>()) {
+      final router = getIt<AppRouter>().topMostRouter();
+      final stack = router.stackData;
+      final exitingRoute = RouteData.of(context);
+      final index = stack.indexWhere((route) => identical(route, exitingRoute));
+      destination = index > 0
+          ? stack[index - 1]
+          : index < 0
+              ? router.current
+              : null;
+    }
+    await InAppReviewHelper.instance.recordSavedNote(_autosave.note);
+    // Let the page transition settle, then confirm the editor stayed closed.
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (destination == null ||
+        !getIt.isRegistered<AppRouter>() ||
+        !isReviewMomentIdle) {
+      return;
+    }
+    final router = getIt<AppRouter>();
+    if (router.hasPagelessTopRoute) return;
+    final route = router.topMostRouter().current;
+    if (identical(route, destination) &&
+        (route.name == HomeRoute.name || route.name == NoteDetailRoute.name)) {
+      await InAppReviewHelper.instance.requestReviewIfEligible();
+    }
   }
 
   @override
@@ -175,7 +229,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         child: PopScope(
           canPop: _allowPop || !_autosave.dirty,
           onPopInvokedWithResult: (didPop, _) {
-            if (!didPop) _finish();
+            if (!didPop) {
+              _finish();
+            } else {
+              unawaited(_recordReviewOnExit());
+            }
           },
           child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
             builder: (context, state) => _BuildForm(

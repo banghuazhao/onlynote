@@ -23,6 +23,8 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
 
   final GetNoteUsecase _usecase;
   final UpdateNoteUsecase _updateUsecase;
+  bool _lastSaveWasTodoToggle = false;
+  bool get lastSaveWasTodoToggle => _lastSaveWasTodoToggle;
 
   /// Returns an undo snapshot only after the reset has been persisted.
   Future<List<String>?> resetChecklist(String noteId) {
@@ -35,6 +37,7 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
   Future<void> _handleEvent(
       NoteDetailEvent event, Emitter<NoteDetailState> emit) async {
     if (event is _ShowNote) {
+      _lastSaveWasTodoToggle = false;
       final current = state;
       // Keep the note visible when returning from the editor.
       final isRefresh = current is _Loaded && current.note.id == event.noteId;
@@ -63,7 +66,7 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
           else
             todo,
       ];
-      await _persist(note.copyWith(todo: todos), emit);
+      await _persist(note.copyWith(todo: todos), emit, isTodoToggle: true);
     } else if (event is _ResetChecklist) {
       if (note.id != event.noteId) {
         event.completion?.complete(null);
@@ -99,7 +102,8 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
     }
   }
 
-  Future<bool> _persist(Note note, Emitter<NoteDetailState> emit) async {
+  Future<bool> _persist(Note note, Emitter<NoteDetailState> emit,
+      {bool isTodoToggle = false}) async {
     final result = await _updateUsecase(note);
     if (emit.isDone) return false;
     return result.fold(
@@ -114,6 +118,7 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
         return false;
       },
       (_) {
+        _lastSaveWasTodoToggle = isTodoToggle;
         emit(NoteDetailState.success(note));
         return true;
       },

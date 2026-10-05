@@ -24,6 +24,7 @@ class NoteSearchFilters extends StatelessWidget {
                   NoteSearchFilter.photos => s.Filter_Photos,
                   NoteSearchFilter.reminders => s.Filter_Reminders,
                   NoteSearchFilter.pinned => s.Filter_Pinned,
+                  NoteSearchFilter.unfinished => s.Filter_Unfinished,
                 }),
                 selected: selected.contains(filter),
                 onSelected: (value) =>
@@ -45,4 +46,27 @@ extension on Set<NoteSearchFilter> {
       remove(filter);
     }
   }
+}
+
+/// A visible shortcut for the common checklist workflow without opening search.
+class UnfinishedNotesFilter extends StatelessWidget {
+  const UnfinishedNotesFilter(
+      {super.key, required this.selected, required this.onChanged});
+  final bool selected;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: FilterChip(
+            key: const ValueKey('unfinished-quick-filter'),
+            avatar: const Icon(Icons.check_box_outlined, size: 18),
+            label: Text(S.of(context).Filter_Unfinished),
+            selected: selected,
+            onSelected: onChanged,
+          ),
+        ),
+      );
 }
