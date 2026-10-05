@@ -4,8 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/onboarding_settings.dart';
+import 'package:onlynote/Tools/reminder_data.dart';
+import 'package:onlynote/Tools/reminder_launch.dart';
 import 'package:onlynote/Tools/widget_launch.dart';
 import 'package:onlynote/di/di.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 import 'routes/routes.dart';
@@ -34,7 +37,18 @@ class _AppState extends State<App> {
       // taps dead for the whole first session. Taps that land *during*
       // onboarding are dropped inside the handler instead.
       WidgetLaunch.instance.init();
+      ReminderLaunch.instance.attach(
+        router: _router,
+        notes: getIt<NoteRepository>(),
+        reminders: () => ReminderData.shared.reminders,
+      );
     });
+  }
+
+  @override
+  void dispose() {
+    ReminderLaunch.instance.detach();
+    super.dispose();
   }
 
   @override

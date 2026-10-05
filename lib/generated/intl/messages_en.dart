@@ -241,6 +241,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Get_Started": MessageLookupByLibrary.simpleMessage(
       "Get Started",
     ),
+    "Onboarding_Make_Checklist": MessageLookupByLibrary.simpleMessage(
+      "Make a checklist",
+    ),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("Next"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("Skip"),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage(
@@ -254,6 +257,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage(
       "Notes on your Home Screen",
+    ),
+    "Onboarding_Write_Note": MessageLookupByLibrary.simpleMessage(
+      "Write a note",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(

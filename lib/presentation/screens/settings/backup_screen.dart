@@ -152,6 +152,7 @@ class _BackupScreenState extends State<BackupScreen> {
                 title: S.of(context).Onlynote,
                 body: '${S.of(context).Reminder}: ${note.title ?? ''}',
                 time: reminder.reminderDate,
+                noteId: reminder.noteId,
               );
               remindersEnabled = scheduled && remindersEnabled;
               if (!mounted) return;

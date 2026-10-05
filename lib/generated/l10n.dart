@@ -610,6 +610,26 @@ class S {
     );
   }
 
+  /// `Write a note`
+  String get Onboarding_Write_Note {
+    return Intl.message(
+      'Write a note',
+      name: 'Onboarding_Write_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Make a checklist`
+  String get Onboarding_Make_Checklist {
+    return Intl.message(
+      'Make a checklist',
+      name: 'Onboarding_Make_Checklist',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Capture anything`
   String get Onboarding_Title_1 {
     return Intl.message(

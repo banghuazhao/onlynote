@@ -4,6 +4,7 @@ import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/reminder.dart';
+import 'package:onlynote/Tools/reminder_launch.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -39,10 +40,19 @@ class NotificationService {
       settings: initializationSettings,
       onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
     );
+
+    // The response callback handles an already running app. A tap that starts
+    // a terminated process is supplied separately, before the router exists.
+    final launch =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (launch?.didNotificationLaunchApp == true &&
+        launch?.notificationResponse != null) {
+      onDidReceiveNotificationResponse(launch!.notificationResponse!);
+    }
   }
 
   void onDidReceiveNotificationResponse(NotificationResponse response) {
-    //Navigate to wherever you want
+    ReminderLaunch.instance.handleNotificationResponse(response);
   }
 
   Future<bool?>? requestIOSPermissions() {
@@ -190,7 +200,8 @@ class NotificationService {
         id: reminder.reminderId,
         title: S.of(context).Onlynote,
         body: '${S.of(context).Reminder}: ${note.title ?? ""}',
-        time: reminder.reminderDate);
+        time: reminder.reminderDate,
+        noteId: reminder.noteId);
   }
 
   Future<bool> scheduleNotifications({
@@ -198,12 +209,14 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime time,
+    required String noteId,
   }) async {
     try {
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
         title: title,
         body: body,
+        payload: noteId,
         scheduledDate: tz.TZDateTime.from(time, tz.local),
         notificationDetails: const NotificationDetails(
             android: AndroidNotificationDetails(

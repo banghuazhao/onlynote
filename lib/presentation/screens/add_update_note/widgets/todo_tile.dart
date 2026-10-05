@@ -32,6 +32,7 @@ class _TodoFieldTile extends StatefulWidget {
     this.value,
     required this.completed,
     required this.focusNode,
+    this.autofocus = false,
     required this.onChanged,
     required this.onRemoved,
   });
@@ -40,6 +41,7 @@ class _TodoFieldTile extends StatefulWidget {
   final String? value;
   final bool completed;
   final FocusNode focusNode;
+  final bool autofocus;
   final Function(String value) onChanged;
   final VoidCallback onRemoved;
 
@@ -79,6 +81,7 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
             child: TextField(
               controller: todoController,
               focusNode: widget.focusNode,
+              autofocus: widget.autofocus,
               style: AppTypography.formText.copyWith(fontSize: 16),
               decoration: InputDecoration(
                 isDense: true,
@@ -125,8 +128,12 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 }
 
 class _BuildTodoListField extends StatefulWidget {
-  const _BuildTodoListField({required this.state});
+  const _BuildTodoListField({
+    required this.state,
+    this.autofocusFirstTodo = false,
+  });
   final AddUpdateFormState state;
+  final bool autofocusFirstTodo;
 
   @override
   State<_BuildTodoListField> createState() => _BuildTodoListFieldState();
@@ -231,6 +238,7 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
                 value: todo.title,
                 completed: todo.completed,
                 focusNode: _focusNodeFor(todo.id!),
+                autofocus: widget.autofocusFirstTodo && index == 0,
                 onChanged: (value) {
                   context.read<AddUpdateFormBloc>().add(
                         AddUpdateFormEvent.todoValueChanged(

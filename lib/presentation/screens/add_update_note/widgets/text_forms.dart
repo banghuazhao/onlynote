@@ -53,10 +53,12 @@ class _BuildDescriptionField extends StatelessWidget {
   const _BuildDescriptionField({
     required this.state,
     required TextEditingController descriptionController,
+    this.autofocus = false,
   }) : _descriptionController = descriptionController;
 
   final AddUpdateFormState state;
   final TextEditingController _descriptionController;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,7 @@ class _BuildDescriptionField extends StatelessWidget {
             ),
           TextField(
             controller: _descriptionController,
+            autofocus: autofocus,
             style: AppTypography.formText,
             keyboardType: TextInputType.multiline,
             textInputAction: TextInputAction.newline,

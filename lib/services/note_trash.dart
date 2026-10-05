@@ -19,6 +19,7 @@ class NoteTrash {
           title: S.current.Onlynote,
           body: '${S.current.Reminder}: ${note.title ?? ''}',
           time: r.reminderDate,
+          noteId: r.noteId,
         ),
       );
 

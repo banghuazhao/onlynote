@@ -30,13 +30,21 @@ part 'widgets/image_section.dart';
 part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
+/// Determines which field is ready to type when a new note is opened.
+enum NoteEditorStart { standard, quickNote, checklist }
+
 @RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
   const AddUpdateNoteScreen(
-      {super.key, this.note, this.folderId, this.autosaveStore});
+      {super.key,
+      this.note,
+      this.folderId,
+      this.autosaveStore,
+      this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
   final NoteAutosaveStore? autosaveStore;
+  final NoteEditorStart start;
 
   @override
   State<AddUpdateNoteScreen> createState() => _AddUpdateNoteScreenState();
@@ -69,6 +77,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           dateTime: now,
           sortOrder: -now.millisecondsSinceEpoch,
           folderId: widget.folderId,
+          todo: widget.start == NoteEditorStart.checklist
+              ? [Todo.empty()]
+              : const [],
         );
     _titleController = TextEditingController(text: initial.title);
     _descriptionController = TextEditingController(text: initial.description);
@@ -257,13 +268,19 @@ class _BuildForm extends StatelessWidget {
                         titleController: _titleController,
                       ),
                       const SizedBox(height: AppSpacings.xl),
-                      _BuildTodoListField(state: state),
+                      _BuildTodoListField(
+                        state: state,
+                        autofocusFirstTodo: widget.note == null &&
+                            widget.start == NoteEditorStart.checklist,
+                      ),
                       const SizedBox(height: AppSpacings.xl),
                       _BuildImageSection(state: state),
                       const SizedBox(height: AppSpacings.xl),
                       _BuildDescriptionField(
                         state: state,
                         descriptionController: _descriptionController,
+                        autofocus: widget.note == null &&
+                            widget.start == NoteEditorStart.quickNote,
                       ),
                     ],
                   ),

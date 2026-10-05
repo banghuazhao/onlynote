@@ -178,6 +178,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         title: S.of(context).Onlynote,
         body: '${S.of(context).Reminder}: ${note.title ?? ''}',
         time: date,
+        noteId: reminder.noteId,
       );
       if (!scheduled) throw StateError('Scheduling failed');
       try {
