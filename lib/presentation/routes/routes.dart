@@ -1,6 +1,8 @@
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/reminder_agenda_controller.dart';
+import 'package:onlynote/services/note_photo_capture.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -22,6 +24,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes => [
         AutoRoute(page: OnboardingRoute.page),
         AutoRoute(page: HomeRoute.page, initial: true),
+        AutoRoute(path: '/reminders', page: RemindersRoute.page),
         AutoRoute(path: '/notes/:noteId', page: NoteDetailRoute.page),
         AutoRoute(path: '/add-update-note', page: AddUpdateNoteRoute.page),
       ];

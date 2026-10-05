@@ -402,6 +402,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           loaded: (data) => data.showTrash
                               ? const SizedBox.shrink()
                               : UnfinishedNotesFilter(
+                                  onOpenReminders: () {
+                                    _cancelChecklistReview();
+                                    context.router.push(RemindersRoute());
+                                  },
                                   selected: data.filters
                                       .contains(NoteSearchFilter.unfinished),
                                   onChanged: (selected) {

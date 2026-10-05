@@ -17,6 +17,8 @@ import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/custom_template_images.dart';
+import 'package:onlynote/services/reminder_agenda.dart';
+import 'package:onlynote/presentation/screens/reminders/reminders_agenda_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
@@ -28,6 +30,50 @@ import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
+
+@Preview(name: 'Today and upcoming reminders', size: Size(390, 740))
+Widget remindersAgendaPreview() {
+  final now = DateTime(2026, 10, 6, 10);
+  ReminderAgendaEntry entry(String id, String title, DateTime due,
+          {bool snoozed = false,
+          ReminderRepeat repeat = ReminderRepeat.none}) =>
+      ReminderAgendaEntry(
+        note: Note(id: id, title: title),
+        reminder: Reminder(
+            noteId: id,
+            reminderId: id.hashCode & 0x7fffffff,
+            reminderDate: due,
+            repeat: repeat),
+        dueDate: due,
+        snoozed: snoozed,
+      );
+  return MaterialApp(
+    theme: AppTheme.light,
+    localizationsDelegates: const [S.delegate],
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Today & Upcoming')),
+      body: DeskSurface(
+        child: RemindersAgendaList(
+          now: now,
+          entries: [
+            entry('shopping', 'Pick up groceries', DateTime(2026, 10, 5, 17)),
+            entry('dentist', 'Call the dentist', DateTime(2026, 10, 6, 10, 10),
+                snoozed: true),
+            entry('journal', 'Evening journal', DateTime(2026, 10, 6, 20),
+                repeat: ReminderRepeat.daily),
+            entry('packing', 'Weekend packing', DateTime(2026, 10, 9, 18)),
+          ],
+          busyReminderId: null,
+          onOpen: previewAgendaAction,
+          onSnooze: previewAgendaAction,
+          onReschedule: previewAgendaAction,
+        ),
+      ),
+    ),
+  );
+}
+
+void previewAgendaAction(ReminderAgendaEntry _) {}
 
 @Preview(name: 'Widget discovery', size: Size(390, 280))
 Widget widgetDiscoveryPreview() => MaterialApp(

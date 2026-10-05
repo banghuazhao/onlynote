@@ -297,6 +297,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Permanent_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete forever?",
     ),
+    "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not add the photo. Try again or choose one from your library.",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("Pin"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("Plain paper"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -363,6 +366,32 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage(
       "Tomorrow morning",
     ),
+    "Reminders_Changed": MessageLookupByLibrary.simpleMessage(
+      "This reminder changed. Try again.",
+    ),
+    "Reminders_Empty_Message": MessageLookupByLibrary.simpleMessage(
+      "Add a reminder to a note to see it here.",
+    ),
+    "Reminders_Empty_Title": MessageLookupByLibrary.simpleMessage(
+      "Nothing on your schedule",
+    ),
+    "Reminders_Entry": MessageLookupByLibrary.simpleMessage("Today"),
+    "Reminders_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not load reminders. Try again.",
+    ),
+    "Reminders_Note_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "This note is no longer available.",
+    ),
+    "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("Overdue"),
+    "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("Reschedule"),
+    "Reminders_Snooze": MessageLookupByLibrary.simpleMessage("Snooze"),
+    "Reminders_Snooze_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not snooze this reminder. Try again.",
+    ),
+    "Reminders_Snoozed": MessageLookupByLibrary.simpleMessage("Snoozed"),
+    "Reminders_Title": MessageLookupByLibrary.simpleMessage("Today & Upcoming"),
+    "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
+    "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
     "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),

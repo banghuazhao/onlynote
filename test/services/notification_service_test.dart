@@ -64,7 +64,7 @@ void main() {
   late ReminderSnoozeRegistry registry;
   late bool failNextSchedule;
   late Set<int> failCancellationIds;
-  late List<Map<String, Object?>> pendingRequests;
+  late List<Map<String, Object?>>? pendingRequests;
   late Map<int, Map> nativeSchedules;
   void Function()? onNativeSchedule;
 
@@ -87,7 +87,7 @@ void main() {
     registry = ReminderSnoozeRegistry(preferences: MemoryPreferences());
     failNextSchedule = false;
     failCancellationIds = {};
-    pendingRequests = [];
+    pendingRequests = null;
     nativeSchedules = {};
     onNativeSchedule = null;
     messenger.setMockMethodCallHandler(timezoneChannel, (call) async {
@@ -124,7 +124,16 @@ void main() {
           nativeSchedules.clear();
           return null;
         case 'pendingNotificationRequests':
-          return pendingRequests;
+          return pendingRequests ??
+              [
+                for (final entry in nativeSchedules.entries)
+                  {
+                    'id': entry.key,
+                    'title': entry.value['title'],
+                    'body': entry.value['body'],
+                    'payload': entry.value['payload'],
+                  },
+              ];
         default:
           return null;
       }
@@ -472,6 +481,260 @@ void main() {
       expect(await registry.isCurrent(current), isTrue);
       expect(await registry.isCurrent(previous), isFalse);
       expect(current.snoozeId, isNot(previous.snoozeId));
+    });
+
+    test(
+        '${platform.name} agenda snooze preserves repeat and reports actual due',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final reminder = Reminder(
+          noteId: 'daily',
+          reminderId: 42,
+          reminderDate: DateTime(2020, 1, 6, 9),
+          repeat: ReminderRepeat.daily);
+      await service.scheduleNotifications(
+          id: 42,
+          title: 'Onlynote',
+          body: 'Reminder: Daily',
+          time: reminder.reminderDate,
+          noteId: 'daily',
+          repeat: reminder.repeat);
+      final base = Map.of(nativeSchedules[42]!);
+
+      expect(
+          await service.snoozeReminder(reminder,
+              delay: const Duration(minutes: 10),
+              title: 'Onlynote',
+              body: 'Reminder: Daily'),
+          isTrue);
+
+      final due = instant.add(const Duration(minutes: 10));
+      expect(nativeSchedules[42], base);
+      expect(await service.readPendingSnoozeDates([reminder]), {42: due});
+      expect(
+          await service.readPendingSnoozeDates([reminder], now: due), isEmpty);
+      final mismatched = Reminder(
+          noteId: 'another',
+          reminderId: 42,
+          reminderDate: reminder.reminderDate,
+          repeat: reminder.repeat);
+      expect(await service.readPendingSnoozeDates([mismatched]), isEmpty);
+      nativeSchedules.remove(payloadOf(base).snoozeId);
+      expect(await service.readPendingSnoozeDates([reminder]), isEmpty);
+    });
+
+    test(
+        '${platform.name} foreground snooze upgrades legacy repeats and respects removal',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final repeating = Reminder(
+          noteId: 'weekly',
+          reminderId: 42,
+          reminderDate: DateTime(2020, 1, 6, 9),
+          repeat: ReminderRepeat.weekly);
+
+      expect(
+          await service.snoozeReminder(repeating,
+              delay: const Duration(hours: 1),
+              title: 'Onlynote',
+              body: 'Reminder: Weekly'),
+          isTrue);
+      expect(nativeSchedules[42]!['matchDateTimeComponents'],
+          DateTimeComponents.dayOfWeekAndTime.index);
+      expect(await service.readPendingSnoozeDates([repeating]),
+          {42: instant.add(const Duration(hours: 1))});
+      await service.removeNotification(repeating);
+      expect(
+          await service.snoozeReminder(repeating,
+              delay: const Duration(minutes: 10),
+              title: 'Onlynote',
+              body: 'Reminder: Weekly'),
+          isFalse);
+      final once = Reminder(
+          noteId: 'once',
+          reminderId: 43,
+          reminderDate: instant.add(const Duration(hours: 1)));
+      expect(
+          await service.snoozeReminder(once,
+              delay: const Duration(minutes: 10),
+              title: 'Onlynote',
+              body: 'Reminder: Once'),
+          isFalse);
+      expect(nativeSchedules, isEmpty);
+    });
+
+    test(
+        '${platform.name} one-time agenda reschedule replaces base and saves once',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final original = Reminder(
+          noteId: 'once',
+          reminderId: 42,
+          reminderDate: instant.add(const Duration(hours: 1)));
+      await service.scheduleNotifications(
+          id: 42,
+          title: 'Onlynote',
+          body: 'Reminder: Once',
+          time: original.reminderDate,
+          noteId: 'once');
+      final originalPayload = payloadOf(nativeSchedules[42]!);
+      final updated = Reminder(
+          noteId: 'once',
+          reminderId: 42,
+          reminderDate: original.reminderDate.add(const Duration(minutes: 10)));
+      var saves = 0;
+
+      expect(
+          await service.rescheduleReminder(original, updated,
+              title: 'Onlynote', body: 'Reminder: Once', persist: () async {
+            saves++;
+            expect(nativeSchedules[42]!['scheduledDateTime'],
+                '2030-01-02T14:10:00');
+          }),
+          isTrue);
+
+      expect(saves, 1);
+      expect(nativeSchedules.keys, [42]);
+      expect(await registry.isCurrent(originalPayload), isFalse);
+      expect(await registry.isCurrent(payloadOf(nativeSchedules[42]!)), isTrue);
+    });
+
+    test(
+        '${platform.name} metadata failure restores repeat identity and existing snooze',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final original = Reminder(
+          noteId: 'daily',
+          reminderId: 42,
+          reminderDate: DateTime(2020, 1, 6, 9),
+          repeat: ReminderRepeat.daily);
+      await service.scheduleNotifications(
+          id: 42,
+          title: 'Onlynote',
+          body: 'Reminder: Daily',
+          time: original.reminderDate,
+          noteId: 'daily',
+          repeat: original.repeat);
+      final base = Map.of(nativeSchedules[42]!);
+      final originalPayload = payloadOf(base);
+      await service.snoozeReminder(original,
+          delay: const Duration(minutes: 10),
+          title: 'Onlynote',
+          body: 'Reminder: Daily');
+      final snoozed = Map.of(nativeSchedules[originalPayload.snoozeId]!);
+      final updated = Reminder(
+          noteId: 'daily',
+          reminderId: 42,
+          reminderDate: DateTime(2020, 1, 6, 10),
+          repeat: ReminderRepeat.daily);
+
+      expect(
+          await service.rescheduleReminder(original, updated,
+              title: 'Onlynote',
+              body: 'Reminder: Edited daily', persist: () async {
+            throw StateError('Disk full');
+          }),
+          isFalse);
+
+      expect(nativeSchedules[42], base);
+      expect(nativeSchedules[originalPayload.snoozeId], snoozed);
+      expect(nativeSchedules, hasLength(2));
+      expect(await registry.isCurrent(originalPayload), isTrue);
+      expect(await service.readPendingSnoozeDates([original]),
+          {42: instant.add(const Duration(minutes: 10))});
+    });
+
+    test(
+        '${platform.name} failed past one-time edit restores snooze without reviving base',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final original = Reminder(
+          noteId: 'once', reminderId: 42, reminderDate: DateTime(2020));
+      final payload = (await registry.prepare(
+              noteId: 'once',
+              reminderId: 42,
+              title: 'Onlynote',
+              body: 'Reminder: Once'))
+          .payload;
+      await service.handleSnoozeResponse(NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotificationAction,
+          id: 42,
+          payload: payload.encode(),
+          actionId: ReminderSnooze.tenMinutes));
+      final snoozed = Map.of(nativeSchedules[payload.snoozeId]!);
+      final updated = Reminder(
+          noteId: 'once',
+          reminderId: 42,
+          reminderDate: instant.add(const Duration(hours: 1)));
+
+      expect(
+          await service.rescheduleReminder(original, updated,
+              title: 'Onlynote', body: 'Reminder: Once', persist: () async {
+            throw StateError('Disk full');
+          }),
+          isFalse);
+
+      expect(nativeSchedules.keys, [payload.snoozeId]);
+      expect(nativeSchedules[payload.snoozeId], snoozed);
+      expect(await registry.isCurrent(payload), isTrue);
+    });
+
+    test('${platform.name} native reschedule failure leaves metadata untouched',
+        () async {
+      _usePlatform(platform);
+      final instant = DateTime.utc(2030, 1, 2);
+      final service =
+          NotificationService(snoozeRegistry: registry, now: () => instant);
+      await service.init();
+      final original = Reminder(
+          noteId: 'once',
+          reminderId: 42,
+          reminderDate: instant.add(const Duration(hours: 1)));
+      await service.scheduleNotifications(
+          id: 42,
+          title: 'Onlynote',
+          body: 'Reminder: Once',
+          time: original.reminderDate,
+          noteId: 'once');
+      final base = Map.of(nativeSchedules[42]!);
+      final updated = Reminder(
+          noteId: 'once',
+          reminderId: 42,
+          reminderDate: instant.add(const Duration(hours: 2)));
+      failNextSchedule = true;
+      var saves = 0;
+
+      expect(
+          await service.rescheduleReminder(original, updated,
+              title: 'Onlynote', body: 'Reminder: Once', persist: () async {
+            saves++;
+          }),
+          isFalse);
+
+      expect(saves, 0);
+      expect(nativeSchedules[42], base);
+      expect(await registry.isCurrent(payloadOf(base)), isTrue);
     });
 
     test('${platform.name} upgrades only active legacy native requests',

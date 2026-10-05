@@ -1,4 +1,5 @@
 import 'package:onlynote/Tools/app_appearance_settings.dart';
+import 'package:onlynote/Tools/app_shortcut_launch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
@@ -27,10 +28,13 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!OnboardingSettings.instance.completed) {
-        _router.replaceAll([const OnboardingRoute()]);
+        await _router.replaceAll([const OnboardingRoute()]);
       }
+      if (!mounted) return;
+      AppShortcutLaunch.instance.attach(_router);
+      AppShortcutLaunch.instance.init();
       // Subscribed unconditionally, and only once the router is live: a widget
       // tap can arrive at any point in this process's life, and finishing
       // onboarding doesn't restart the process. Skipping it here would leave
@@ -47,6 +51,7 @@ class _AppState extends State<App> {
 
   @override
   void dispose() {
+    AppShortcutLaunch.instance.detach();
     ReminderLaunch.instance.detach();
     super.dispose();
   }

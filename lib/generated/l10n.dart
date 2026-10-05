@@ -2314,6 +2314,141 @@ class S {
   String get Retry {
     return Intl.message('Retry', name: 'Retry', desc: '', args: []);
   }
+
+  /// `Today & Upcoming`
+  String get Reminders_Title {
+    return Intl.message(
+      'Today & Upcoming',
+      name: 'Reminders_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today`
+  String get Reminders_Entry {
+    return Intl.message('Today', name: 'Reminders_Entry', desc: '', args: []);
+  }
+
+  /// `Overdue`
+  String get Reminders_Overdue {
+    return Intl.message(
+      'Overdue',
+      name: 'Reminders_Overdue',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today`
+  String get Reminders_Today {
+    return Intl.message('Today', name: 'Reminders_Today', desc: '', args: []);
+  }
+
+  /// `Upcoming`
+  String get Reminders_Upcoming {
+    return Intl.message(
+      'Upcoming',
+      name: 'Reminders_Upcoming',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nothing on your schedule`
+  String get Reminders_Empty_Title {
+    return Intl.message(
+      'Nothing on your schedule',
+      name: 'Reminders_Empty_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a reminder to a note to see it here.`
+  String get Reminders_Empty_Message {
+    return Intl.message(
+      'Add a reminder to a note to see it here.',
+      name: 'Reminders_Empty_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not load reminders. Try again.`
+  String get Reminders_Load_Failed {
+    return Intl.message(
+      'Could not load reminders. Try again.',
+      name: 'Reminders_Load_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reschedule`
+  String get Reminders_Reschedule {
+    return Intl.message(
+      'Reschedule',
+      name: 'Reminders_Reschedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Snooze`
+  String get Reminders_Snooze {
+    return Intl.message('Snooze', name: 'Reminders_Snooze', desc: '', args: []);
+  }
+
+  /// `Snoozed`
+  String get Reminders_Snoozed {
+    return Intl.message(
+      'Snoozed',
+      name: 'Reminders_Snoozed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not snooze this reminder. Try again.`
+  String get Reminders_Snooze_Failed {
+    return Intl.message(
+      'Could not snooze this reminder. Try again.',
+      name: 'Reminders_Snooze_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note is no longer available.`
+  String get Reminders_Note_Unavailable {
+    return Intl.message(
+      'This note is no longer available.',
+      name: 'Reminders_Note_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not add the photo. Try again or choose one from your library.`
+  String get Photo_Capture_Failed {
+    return Intl.message(
+      'Could not add the photo. Try again or choose one from your library.',
+      name: 'Photo_Capture_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This reminder changed. Try again.`
+  String get Reminders_Changed {
+    return Intl.message(
+      'This reminder changed. Try again.',
+      name: 'Reminders_Changed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

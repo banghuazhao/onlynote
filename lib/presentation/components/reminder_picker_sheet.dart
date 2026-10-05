@@ -5,7 +5,10 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/reminder_shortcuts.dart';
 
 import 'app_sheet.dart';
+import 'reminder_labels.dart';
 import 'toast.dart';
+
+export 'reminder_labels.dart';
 
 class ReminderPickerResult {
   const ReminderPickerResult.schedule(this.date, this.repeat) : delete = false;
@@ -19,23 +22,12 @@ class ReminderPickerResult {
   final bool delete;
 }
 
-String reminderRepeatLabel(BuildContext context, ReminderRepeat repeat) =>
-    switch (repeat) {
-      ReminderRepeat.none => S.of(context).Reminder_Repeat_Never,
-      ReminderRepeat.daily => S.of(context).Reminder_Repeat_Daily,
-      ReminderRepeat.weekly => S.of(context).Reminder_Repeat_Weekly,
-    };
-
-String formatReminderTime(BuildContext context, DateTime date) {
-  final localizations = MaterialLocalizations.of(context);
-  return '${localizations.formatMediumDate(date.toLocal())} · ${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(date.toLocal()), alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context))}';
-}
-
 /// One-time shortcuts remain one tap; recurring schedules choose a wall-clock
 /// time and, for weekly reminders, a weekday rather than a future start date.
 class ReminderPickerSheet extends StatefulWidget {
-  const ReminderPickerSheet({super.key, this.current});
+  const ReminderPickerSheet({super.key, this.current, this.allowDelete = true});
   final Reminder? current;
+  final bool allowDelete;
 
   @override
   State<ReminderPickerSheet> createState() => _ReminderPickerSheetState();
@@ -219,7 +211,7 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
               label: Text(l10n.Reminder_Set),
             ),
           ],
-          if (widget.current != null) ...[
+          if (widget.current != null && widget.allowDelete) ...[
             const Divider(indent: 12, endIndent: 12, height: 24),
             ListTile(
               leading: const Icon(Icons.notifications_off_outlined),

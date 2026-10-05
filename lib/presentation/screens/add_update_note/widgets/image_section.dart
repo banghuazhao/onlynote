@@ -1,21 +1,14 @@
 part of '../add_update_note_screen.dart';
 
 class _BuildImageSection extends StatelessWidget {
-  const _BuildImageSection({required this.state});
+  const _BuildImageSection({
+    required this.state,
+    required this.onAddPhoto,
+    required this.addingPhoto,
+  });
   final AddUpdateFormState state;
-
-  Future<void> _pickImage(BuildContext context, ImageSource source) async {
-    final picked =
-        await ImagePicker().pickImage(source: source, imageQuality: 85);
-    if (picked == null) return;
-
-    final savedPath = await ImageStorage.saveImage(File(picked.path));
-    if (context.mounted) {
-      context
-          .read<AddUpdateFormBloc>()
-          .add(AddUpdateFormEvent.addImage(savedPath));
-    }
-  }
+  final ValueChanged<ImageSource> onAddPhoto;
+  final bool addingPhoto;
 
   void _showImageSourceSheet(BuildContext context) {
     showAppActionSheet(
@@ -27,7 +20,7 @@ class _BuildImageSection extends StatelessWidget {
           title: Text(S.of(context).Choose_From_Gallery),
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
-            _pickImage(context, ImageSource.gallery);
+            onAddPhoto(ImageSource.gallery);
           },
         ),
         AppSheetAction(
@@ -35,7 +28,7 @@ class _BuildImageSection extends StatelessWidget {
           title: Text(S.of(context).Take_Photo),
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
-            _pickImage(context, ImageSource.camera);
+            onAddPhoto(ImageSource.camera);
           },
         ),
       ],
@@ -50,7 +43,7 @@ class _BuildImageSection extends StatelessWidget {
         child: TextButton.icon(
           key: const ValueKey('editor-add-photo'),
           style: AppButtonStyles.paperAction(),
-          onPressed: () => _showImageSourceSheet(context),
+          onPressed: addingPhoto ? null : () => _showImageSourceSheet(context),
           icon: const SizedBox(
               width: 28,
               child: Icon(Icons.add_photo_alternate_outlined, size: 20)),
@@ -82,7 +75,8 @@ class _BuildImageSection extends StatelessWidget {
               key: const ValueKey('editor-add-photo'),
               style: AppButtonStyles.paper(),
               tooltip: S.of(context).Add_Image,
-              onPressed: () => _showImageSourceSheet(context),
+              onPressed:
+                  addingPhoto ? null : () => _showImageSourceSheet(context),
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 28),
             ),
           ),

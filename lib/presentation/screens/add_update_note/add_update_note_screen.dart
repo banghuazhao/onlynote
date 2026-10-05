@@ -1,5 +1,4 @@
 import 'package:onlynote/presentation/theme/button_styles.dart';
-import 'dart:io';
 import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 
@@ -9,6 +8,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_templates.dart';
+import 'package:onlynote/services/note_photo_capture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,7 +34,7 @@ part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
 /// Determines which field is ready to type when a new note is opened.
-enum NoteEditorStart { standard, quickNote, checklist }
+enum NoteEditorStart { standard, quickNote, checklist, photo }
 
 @RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
@@ -45,6 +45,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.template,
       this.customTemplateNote,
       this.autosaveStore,
+      this.photoCapture,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
@@ -53,6 +54,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
   /// A newly instantiated custom template, already owning its photo copies.
   final Note? customTemplateNote;
   final NoteAutosaveStore? autosaveStore;
+  final NotePhotoCapture? photoCapture;
   final NoteEditorStart start;
 
   @override
@@ -66,6 +68,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final AddUpdateFormBloc _form;
   late final NoteAutosave _autosave;
   late final StreamSubscription<AddUpdateFormState> _changes;
+  late final NotePhotoCapture _photoCapture;
+  Animation<double>? _entryAnimation;
+  bool _photoStarted = false;
+  bool _addingPhoto = false;
   bool _leaving = false;
   bool _allowPop = false;
   bool _hadUserChange = false;
@@ -75,6 +81,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _photoCapture = widget.photoCapture ?? NotePhotoCapture();
     final now = DateTime.now();
     final recovered =
         widget.note?.id == null || !Hive.isBoxOpen(draftDatabaseBox)
@@ -121,6 +128,82 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     if (widget.note == null &&
         (widget.template != null || widget.customTemplateNote != null)) {
       _autosave.saveInitial();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.start != NoteEditorStart.photo ||
+        widget.note != null ||
+        _photoStarted) {
+      return;
+    }
+    _photoStarted = true;
+    // UIKit needs the editor's presentation transition to finish before it
+    // can present the camera. Rebuilds and resumes must not launch it twice.
+    _entryAnimation = ModalRoute.of(context)?.animation;
+    if (_entryAnimation != null &&
+        _entryAnimation!.status != AnimationStatus.completed) {
+      _entryAnimation!.addStatusListener(_onPhotoEntryStatus);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_addPhoto(ImageSource.camera));
+      });
+    }
+  }
+
+  void _onPhotoEntryStatus(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
+    _entryAnimation?.removeStatusListener(_onPhotoEntryStatus);
+    if (mounted) unawaited(_addPhoto(ImageSource.camera));
+  }
+
+  Future<void> _addPhoto(ImageSource source, {bool retry = false}) async {
+    if (_addingPhoto) return;
+    setState(() => _addingPhoto = true);
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      if (!await _autosave.flush()) {
+        throw StateError(
+            'Current draft could not be saved before photo capture');
+      }
+      await _photoCapture.prepare(_autosave.note);
+      final path =
+          await (retry ? _photoCapture.retry() : _photoCapture.capture(source));
+      if (path == null) return;
+      if (!mounted) {
+        if (!_photoCapture.isJournaled) {
+          await ImageStorage.deleteImages([path]);
+        }
+        return;
+      }
+      _form.add(AddUpdateFormEvent.addImage(path));
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _capture(_form.state);
+      if (await _autosave.flush()) {
+        await _photoCapture.complete();
+      } else if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+      }
+    } catch (error) {
+      if (!mounted) return;
+      showTransientSnackBar(
+        context,
+        SnackBar(
+          content: Text(S.of(context).Photo_Capture_Failed),
+          action: _photoCapture.canRetry
+              ? SnackBarAction(
+                  label: S.of(context).Retry,
+                  onPressed: () => _addPhoto(source, retry: true),
+                )
+              : null,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _addingPhoto = false);
     }
   }
 
@@ -191,7 +274,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _finish() async {
-    if (_leaving) return;
+    if (_leaving || _addingPhoto) return;
+    if (_photoCapture.canRetry) {
+      await _addPhoto(ImageSource.camera, retry: true);
+      if (!mounted || _photoCapture.canRetry) return;
+    }
     _leaving = true;
     // Allow queued form events to apply before flushing the final snapshot.
     await Future<void>.delayed(Duration.zero);
@@ -205,6 +292,14 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
       return;
     }
+    try {
+      await _photoCapture.complete();
+    } catch (error) {
+      // The photo and note are already saved. Recovery will harmlessly merge
+      // the recorded path again if clearing its metadata must be retried.
+      debugPrint('Photo capture journal cleanup deferred: $error');
+    }
+    if (!mounted) return;
     setState(() => _allowPop = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) context.router.maybePop();
@@ -213,6 +308,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   @override
   void dispose() {
+    _entryAnimation?.removeStatusListener(_onPhotoEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _changes.cancel();
     _form.close();
@@ -227,7 +323,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   Widget build(BuildContext context) => BlocProvider.value(
         value: _form,
         child: PopScope(
-          canPop: _allowPop || !_autosave.dirty,
+          canPop: _allowPop ||
+              (!_autosave.dirty && !_photoCapture.canRetry && !_addingPhoto),
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) {
               _finish();
@@ -243,6 +340,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               descriptionController: _descriptionController,
               status: _autosave.status,
               onDone: _finish,
+              onAddPhoto: _addPhoto,
+              addingPhoto: _addingPhoto,
             ),
           ),
         ),
@@ -257,6 +356,8 @@ class _BuildForm extends StatelessWidget {
     required this.state,
     required this.status,
     required this.onDone,
+    required this.onAddPhoto,
+    required this.addingPhoto,
   })  : _titleController = titleController,
         _descriptionController = descriptionController;
 
@@ -266,6 +367,8 @@ class _BuildForm extends StatelessWidget {
   final AddUpdateFormState state;
   final AutosaveStatus status;
   final VoidCallback onDone;
+  final ValueChanged<ImageSource> onAddPhoto;
+  final bool addingPhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +454,11 @@ class _BuildForm extends StatelessWidget {
                           height: state.imagePaths.isEmpty
                               ? AppSpacings.m
                               : AppSpacings.xl),
-                      _BuildImageSection(state: state),
+                      _BuildImageSection(
+                        state: state,
+                        onAddPhoto: onAddPhoto,
+                        addingPhoto: addingPhoto,
+                      ),
                       const SizedBox(height: AppSpacings.xml),
                       _BuildDescriptionField(
                         state: state,

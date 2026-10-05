@@ -54,6 +54,26 @@ void main() {
     addTearDown(() => kAppFontFamilies.addAll(fonts));
   });
 
+  testWidgets('Today shortcut stays usable with large text and opens reminders',
+      (tester) async {
+    var opened = 0;
+    await tester.pumpWidget(_app(MediaQuery(
+      data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+      child: UnfinishedNotesFilter(
+        selected: false,
+        onChanged: (_) {},
+        onOpenReminders: () => opened++,
+      ),
+    )));
+    await tester.pumpAndSettle();
+    final shortcut = find.byKey(const ValueKey('today-reminders-shortcut'));
+    await tester.ensureVisible(shortcut);
+    await tester.tap(shortcut);
+    await tester.pumpAndSettle();
+    expect(opened, 1);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
       'Home item tap toggles once without opening the note; other content still opens it',
       (tester) async {

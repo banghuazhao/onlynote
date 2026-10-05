@@ -13,4 +13,7 @@
     <string name="widget_sample_1_body">订火车票，带上相机</string>
     <string name="widget_sample_2_title">购物清单</string>
     <string name="widget_sample_2_todo">咖啡豆</string>
+    <string name="shortcut_new_note">新建备忘录</string>
+    <string name="shortcut_new_checklist">新建清单</string>
+    <string name="shortcut_photo_note">拍照备忘录</string>
 </resources>

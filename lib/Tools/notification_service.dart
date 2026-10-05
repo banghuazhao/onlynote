@@ -27,10 +27,13 @@ void reminderNotificationActionBackground(NotificationResponse response) async {
 }
 
 class NotificationService {
-  NotificationService({ReminderSnoozeRegistry? snoozeRegistry})
-      : snoozeRegistry = snoozeRegistry ?? ReminderSnoozeRegistry();
+  NotificationService(
+      {ReminderSnoozeRegistry? snoozeRegistry, DateTime Function()? now})
+      : snoozeRegistry = snoozeRegistry ?? ReminderSnoozeRegistry(),
+        _now = now ?? DateTime.now;
 
   final ReminderSnoozeRegistry snoozeRegistry;
+  final DateTime Function() _now;
   static const _category = 'onlynote_reminder_actions';
   static Future<void> _scheduleQueue = Future.value();
   static Future<void> _actionQueue = Future.value();
@@ -52,9 +55,11 @@ class NotificationService {
         : const Locale('en'));
   }
 
-  Future<bool> handleSnoozeResponse(NotificationResponse response) {
-    final result = _actionQueue.then((_) => ReminderSnooze(
+  Future<bool> _runSnooze(
+      Future<bool> Function(ReminderSnooze snooze) operation) {
+    final result = _actionQueue.then((_) => operation(ReminderSnooze(
           registry: snoozeRegistry,
+          now: _now,
           schedule: (payload, due) => _scheduleNative(
               id: payload.snoozeId,
               title: payload.title,
@@ -63,11 +68,171 @@ class NotificationService {
               payload: payload.encode(),
               repeat: ReminderRepeat.none),
           cancel: (id) => flutterLocalNotificationsPlugin.cancel(id: id),
-        ).handleResponse(response));
+        )));
     _actionQueue =
         result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
     return result;
   }
+
+  Future<bool> handleSnoozeResponse(NotificationResponse response) =>
+      _runSnooze((snooze) => snooze.handleResponse(response));
+
+  /// The agenda reschedules one-time reminders and saves their new date with
+  /// [rescheduleReminder]. Repeats keep their original calendar pattern.
+  Future<bool> snoozeReminder(Reminder reminder,
+          {required Duration delay,
+          required String title,
+          required String body}) =>
+      _serialize(() async {
+        if (!reminder.isRepeating || delay <= Duration.zero) return false;
+        try {
+          var payload = await snoozeRegistry.read(reminder.reminderId);
+          if (payload == null) {
+            // A legacy repeating native request may not have been upgraded
+            // when the user opens the agenda immediately after launch.
+            if (await snoozeRegistry.hasRegistration(reminder.reminderId)) {
+              return false;
+            }
+            if (!await _scheduleRegistered(
+                id: reminder.reminderId,
+                title: title,
+                body: body,
+                time: reminder.reminderDate,
+                noteId: reminder.noteId,
+                repeat: reminder.repeat)) {
+              return false;
+            }
+            payload = await snoozeRegistry.read(reminder.reminderId);
+          }
+          if (payload == null || payload.noteId != reminder.noteId) {
+            return false;
+          }
+          return await _runSnooze(
+              (snooze) => snooze.snooze(payload!, delay: delay));
+        } catch (error) {
+          debugPrint('Could not snooze reminder from agenda: $error');
+          return false;
+        }
+      });
+
+  /// Returns only future snoozes whose native request and action revision are
+  /// still active. Older registrations have no due timestamp and are omitted.
+  Future<Map<int, DateTime>> readPendingSnoozeDates(
+      Iterable<Reminder> reminders,
+      {DateTime? now}) async {
+    final instant = now ?? _now();
+    final result = <int, DateTime>{};
+    final pending =
+        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    final pendingPayloads = {
+      for (final request in pending) request.id: request.payload,
+    };
+    for (final reminder in reminders) {
+      final payload = await snoozeRegistry.read(reminder.reminderId);
+      if (payload == null ||
+          payload.noteId != reminder.noteId ||
+          pendingPayloads[payload.snoozeId] != payload.encode()) {
+        continue;
+      }
+      final due = await snoozeRegistry.readPendingDue(payload, now: instant);
+      if (due != null) result[reminder.reminderId] = due;
+    }
+    return result;
+  }
+
+  /// Replaces a base schedule and commits its metadata together. A failed
+  /// metadata save restores the previous base identity and pending snooze.
+  Future<bool> rescheduleReminder(Reminder original, Reminder updated,
+          {required String title,
+          required String body,
+          required Future<void> Function() persist}) =>
+      _serialize(() async {
+        try {
+          if (original.reminderId != updated.reminderId ||
+              original.noteId != updated.noteId ||
+              !updated.isSchedulable(_now())) {
+            return false;
+          }
+          final previous = await snoozeRegistry.read(original.reminderId);
+          final previouslyRegistered =
+              await snoozeRegistry.hasRegistration(original.reminderId);
+          final previousDue = previous == null
+              ? null
+              : (await readPendingSnoozeDates([original],
+                  now: _now()))[original.reminderId];
+          ReminderNotificationPayload? replacement;
+          if (!await _scheduleRegistered(
+              id: updated.reminderId,
+              title: title,
+              body: body,
+              time: updated.reminderDate,
+              noteId: updated.noteId,
+              repeat: updated.repeat,
+              onRegistered: (registration) =>
+                  replacement = registration.payload)) {
+            return false;
+          }
+          try {
+            await persist();
+            return true;
+          } catch (error) {
+            try {
+              if (replacement != null) {
+                await snoozeRegistry.restore(previous, replacing: replacement!);
+                if (previous == null && previouslyRegistered) {
+                  await snoozeRegistry.invalidate(original.reminderId);
+                }
+                try {
+                  await Future.wait([
+                    flutterLocalNotificationsPlugin.cancel(
+                        id: replacement!.snoozeId),
+                    snoozeRegistry.clearPendingDue(replacement!),
+                  ]);
+                } catch (cleanupError) {
+                  // Cleanup must not stop recovery of the original base.
+                  debugPrint(
+                      'Replacement snooze cleanup deferred: $cleanupError');
+                }
+              }
+              final originalActive = previous == null
+                  ? !previouslyRegistered
+                  : await snoozeRegistry.isCurrent(previous);
+              if (originalActive && original.isSchedulable(_now())) {
+                await _scheduleNative(
+                    id: original.reminderId,
+                    title: previous?.title ?? title,
+                    body: previous?.body ?? body,
+                    time: original.reminderDate,
+                    payload: previous?.encode() ?? original.noteId,
+                    repeat: original.repeat);
+              } else {
+                await flutterLocalNotificationsPlugin.cancel(
+                    id: updated.reminderId);
+              }
+              if (previous != null &&
+                  previousDue != null &&
+                  previousDue.isAfter(_now()) &&
+                  await snoozeRegistry.isCurrent(previous)) {
+                await snoozeRegistry.savePendingDue(previous, previousDue);
+                await _scheduleNative(
+                    id: previous.snoozeId,
+                    title: previous.title,
+                    body: previous.body,
+                    time: previousDue,
+                    payload: previous.encode(),
+                    repeat: ReminderRepeat.none);
+              }
+            } catch (rollbackError) {
+              debugPrint('Could not restore reminder schedule: $rollbackError');
+            }
+            debugPrint('Could not save reminder metadata: $error');
+            return false;
+          }
+        } catch (error) {
+          debugPrint('Could not reschedule reminder: $error');
+          return false;
+        }
+      });
 
   //instance of FlutterLocalNotificationsPlugin
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -343,7 +508,8 @@ class NotificationService {
       required String body,
       required DateTime time,
       required String noteId,
-      required ReminderRepeat repeat}) async {
+      required ReminderRepeat repeat,
+      void Function(ReminderSnoozeRegistration)? onRegistered}) async {
     ReminderSnoozeRegistration? registration;
     try {
       await NotificationTimezone.initialize();
@@ -370,7 +536,14 @@ class NotificationService {
           // Scheduling already succeeded. Keep its action revision active.
           debugPrint('Obsolete snooze cleanup deferred: $error');
         }
+        try {
+          await snoozeRegistry.clearPendingDue(registration.previous!);
+        } catch (error) {
+          // The obsolete revision is already invalid and will not be shown.
+          debugPrint('Obsolete snooze metadata cleanup deferred: $error');
+        }
       }
+      onRegistered?.call(registration);
       return true;
     } catch (error) {
       // Keep the native action payload and registry in agreement on failure.

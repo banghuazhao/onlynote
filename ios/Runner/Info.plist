@@ -44,6 +44,33 @@
 		</array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
+		<key>UIApplicationShortcutItems</key>
+		<array>
+			<dict>
+				<key>UIApplicationShortcutItemType</key>
+				<string>com.appsbay.onlynote.new_note</string>
+				<key>UIApplicationShortcutItemTitle</key>
+				<string>New Note</string>
+				<key>UIApplicationShortcutItemIconSymbolName</key>
+				<string>square.and.pencil</string>
+			</dict>
+			<dict>
+				<key>UIApplicationShortcutItemType</key>
+				<string>com.appsbay.onlynote.new_checklist</string>
+				<key>UIApplicationShortcutItemTitle</key>
+				<string>New Checklist</string>
+				<key>UIApplicationShortcutItemIconSymbolName</key>
+				<string>checklist</string>
+			</dict>
+			<dict>
+				<key>UIApplicationShortcutItemType</key>
+				<string>com.appsbay.onlynote.photo_note</string>
+				<key>UIApplicationShortcutItemTitle</key>
+				<string>Photo Note</string>
+				<key>UIApplicationShortcutItemIconSymbolName</key>
+				<string>camera</string>
+			</dict>
+		</array>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>Onlynote uses your device's advertising identifier to choose which ads appear in the banner at the bottom of your notes list — for example, showing stationery or productivity app ads instead of unrelated ones. What you write in your notes is never used for this and never leaves your device.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
@@ -297,7 +324,7 @@
 						<key>UISceneConfigurationName</key>
 						<string>flutter</string>
 						<key>UISceneDelegateClassName</key>
-						<string>FlutterSceneDelegate</string>
+						<string>$(PRODUCT_MODULE_NAME).OnlynoteSceneDelegate</string>
 						<key>UISceneStoryboardFile</key>
 						<string>Main</string>
 					</dict>

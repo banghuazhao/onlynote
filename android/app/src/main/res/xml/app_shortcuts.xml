@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_note"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_note"
+        android:shortcutShortLabel="@string/shortcut_new_note">
+        <intent
+            android:action="com.appsbay.onlynote.NEW_NOTE"
+            android:targetPackage="com.appsbay.onlynote"
+            android:targetClass="com.appsbay.onlynote.ShortcutActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="new_checklist"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_checklist"
+        android:shortcutShortLabel="@string/shortcut_new_checklist">
+        <intent
+            android:action="com.appsbay.onlynote.NEW_CHECKLIST"
+            android:targetPackage="com.appsbay.onlynote"
+            android:targetClass="com.appsbay.onlynote.ShortcutActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="photo_note"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_photo"
+        android:shortcutShortLabel="@string/shortcut_photo_note">
+        <intent
+            android:action="com.appsbay.onlynote.PHOTO_NOTE"
+            android:targetPackage="com.appsbay.onlynote"
+            android:targetClass="com.appsbay.onlynote.ShortcutActivity" />
+    </shortcut>
+</shortcuts>

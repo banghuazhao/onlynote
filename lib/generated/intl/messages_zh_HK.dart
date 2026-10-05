@@ -232,6 +232,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Permanent_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "永久刪除？",
     ),
+    "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法加入照片，請重試或從相簿中選擇。",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("置頂"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("純色紙張"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -276,6 +279,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
     "Reminder_Time": MessageLookupByLibrary.simpleMessage("時間"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
+    "Reminders_Changed": MessageLookupByLibrary.simpleMessage("此提醒已更改，請重試。"),
+    "Reminders_Empty_Message": MessageLookupByLibrary.simpleMessage(
+      "為筆記加入提醒，即可在這裡查看。",
+    ),
+    "Reminders_Empty_Title": MessageLookupByLibrary.simpleMessage("暫無提醒日程"),
+    "Reminders_Entry": MessageLookupByLibrary.simpleMessage("今天"),
+    "Reminders_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法載入提醒，請重試。",
+    ),
+    "Reminders_Note_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此筆記已不可用。",
+    ),
+    "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已過期"),
+    "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
+    "Reminders_Snooze": MessageLookupByLibrary.simpleMessage("稍後提醒"),
+    "Reminders_Snooze_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法延後此提醒，請重試。",
+    ),
+    "Reminders_Snoozed": MessageLookupByLibrary.simpleMessage("已延後"),
+    "Reminders_Title": MessageLookupByLibrary.simpleMessage("提醒日程"),
+    "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
+    "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
     "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),

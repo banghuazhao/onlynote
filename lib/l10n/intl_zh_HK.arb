@@ -264,5 +264,20 @@
   "Template_Details": "{items} 項 · {photos} 張照片",
   "Template_Manage": "管理範本",
   "More_Options": "更多選項",
-  "Retry": "重試"
+  "Retry": "重試",
+  "Reminders_Title": "提醒日程",
+  "Reminders_Entry": "今天",
+  "Reminders_Overdue": "已過期",
+  "Reminders_Today": "今天",
+  "Reminders_Upcoming": "即將到來",
+  "Reminders_Empty_Title": "暫無提醒日程",
+  "Reminders_Empty_Message": "為筆記加入提醒，即可在這裡查看。",
+  "Reminders_Load_Failed": "無法載入提醒，請重試。",
+  "Reminders_Reschedule": "重新安排",
+  "Reminders_Snooze": "稍後提醒",
+  "Reminders_Snoozed": "已延後",
+  "Reminders_Snooze_Failed": "無法延後此提醒，請重試。",
+  "Reminders_Note_Unavailable": "此筆記已不可用。",
+  "Photo_Capture_Failed": "無法加入照片，請重試或從相簿中選擇。",
+  "Reminders_Changed": "此提醒已更改，請重試。"
 }

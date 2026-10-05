@@ -264,5 +264,20 @@
   "Template_Details": "{items, plural, =0{0 items} one{1 item} other{{items} items}} · {photos, plural, =0{0 photos} one{1 photo} other{{photos} photos}}",
   "Template_Manage": "Manage template",
   "More_Options": "More options",
-  "Retry": "Retry"
+  "Retry": "Retry",
+  "Reminders_Title": "Today & Upcoming",
+  "Reminders_Entry": "Today",
+  "Reminders_Overdue": "Overdue",
+  "Reminders_Today": "Today",
+  "Reminders_Upcoming": "Upcoming",
+  "Reminders_Empty_Title": "Nothing on your schedule",
+  "Reminders_Empty_Message": "Add a reminder to a note to see it here.",
+  "Reminders_Load_Failed": "Could not load reminders. Try again.",
+  "Reminders_Reschedule": "Reschedule",
+  "Reminders_Snooze": "Snooze",
+  "Reminders_Snoozed": "Snoozed",
+  "Reminders_Snooze_Failed": "Could not snooze this reminder. Try again.",
+  "Reminders_Note_Unavailable": "This note is no longer available.",
+  "Photo_Capture_Failed": "Could not add the photo. Try again or choose one from your library.",
+  "Reminders_Changed": "This reminder changed. Try again."
 }

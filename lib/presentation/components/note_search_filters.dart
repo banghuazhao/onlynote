@@ -51,22 +51,40 @@ extension on Set<NoteSearchFilter> {
 /// A visible shortcut for the common checklist workflow without opening search.
 class UnfinishedNotesFilter extends StatelessWidget {
   const UnfinishedNotesFilter(
-      {super.key, required this.selected, required this.onChanged});
+      {super.key,
+      required this.selected,
+      required this.onChanged,
+      this.onOpenReminders});
   final bool selected;
   final ValueChanged<bool> onChanged;
+  final VoidCallback? onOpenReminders;
 
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: FilterChip(
-            key: const ValueKey('unfinished-quick-filter'),
-            avatar: const Icon(Icons.check_box_outlined, size: 18),
-            label: Text(S.of(context).Filter_Unfinished),
-            selected: selected,
-            onSelected: onChanged,
-          ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+            FilterChip(
+              key: const ValueKey('unfinished-quick-filter'),
+              avatar: const Icon(Icons.check_box_outlined, size: 18),
+              label: Text(S.of(context).Filter_Unfinished),
+              selected: selected,
+              onSelected: onChanged,
+            ),
+            if (onOpenReminders != null) ...[
+              const SizedBox(width: 8),
+              Tooltip(
+                message: S.of(context).Reminders_Title,
+                child: ActionChip(
+                  key: const ValueKey('today-reminders-shortcut'),
+                  avatar: const Icon(Icons.today_outlined, size: 18),
+                  label: Text(S.of(context).Reminders_Entry),
+                  onPressed: onOpenReminders,
+                ),
+              ),
+            ],
+          ]),
         ),
       );
 }

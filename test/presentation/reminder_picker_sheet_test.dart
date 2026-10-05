@@ -13,6 +13,7 @@ Future<void> _openPicker(
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),
   double textScale = 1,
+  bool allowDelete = true,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -42,7 +43,8 @@ Future<void> _openPicker(
             onPressed: () async {
               results.add(await showAppSheet<ReminderPickerResult>(
                 context: context,
-                builder: (_) => ReminderPickerSheet(current: current),
+                builder: (_) => ReminderPickerSheet(
+                    current: current, allowDelete: allowDelete),
               ));
             },
             child: const Text('Open picker'),
@@ -75,6 +77,18 @@ DateTime _nextScheduledTime(ReminderPickerResult result) => Reminder(
     ).nextOccurrence(DateTime.now());
 
 void main() {
+  testWidgets('reschedule picker can omit reminder deletion', (tester) async {
+    final results = <ReminderPickerResult?>[];
+    await _openPicker(tester, results,
+        current: Reminder(
+            reminderDate: DateTime.now().add(const Duration(hours: 1)),
+            reminderId: 42,
+            noteId: 'note'),
+        allowDelete: false);
+    expect(find.text('Delete'), findsNothing);
+    await _tapVisible(tester, find.text('Cancel'));
+    expect(results, [null]);
+  });
   testWidgets('one-time shortcut closes the sheet with a future date',
       (tester) async {
     final results = <ReminderPickerResult?>[];

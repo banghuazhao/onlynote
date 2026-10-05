@@ -232,6 +232,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Permanent_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "永久删除？",
     ),
+    "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法添加照片，请重试或从相册中选择。",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("置顶"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("纯色纸张"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -276,6 +279,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("稍后 1 小时提醒"),
     "Reminder_Time": MessageLookupByLibrary.simpleMessage("时间"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
+    "Reminders_Changed": MessageLookupByLibrary.simpleMessage("此提醒已更改，请重试。"),
+    "Reminders_Empty_Message": MessageLookupByLibrary.simpleMessage(
+      "为笔记添加提醒，即可在这里查看。",
+    ),
+    "Reminders_Empty_Title": MessageLookupByLibrary.simpleMessage("暂无提醒日程"),
+    "Reminders_Entry": MessageLookupByLibrary.simpleMessage("今天"),
+    "Reminders_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法加载提醒，请重试。",
+    ),
+    "Reminders_Note_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此笔记已不可用。",
+    ),
+    "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已过期"),
+    "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
+    "Reminders_Snooze": MessageLookupByLibrary.simpleMessage("稍后提醒"),
+    "Reminders_Snooze_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法延后此提醒，请重试。",
+    ),
+    "Reminders_Snoozed": MessageLookupByLibrary.simpleMessage("已延后"),
+    "Reminders_Title": MessageLookupByLibrary.simpleMessage("提醒日程"),
+    "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
+    "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即将到来"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
     "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),

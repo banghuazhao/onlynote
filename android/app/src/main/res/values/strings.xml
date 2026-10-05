@@ -13,4 +13,7 @@
     <string name="widget_sample_1_body">Book train tickets, pack the camera</string>
     <string name="widget_sample_2_title">Groceries</string>
     <string name="widget_sample_2_todo">Coffee beans</string>
+    <string name="shortcut_new_note">New Note</string>
+    <string name="shortcut_new_checklist">New Checklist</string>
+    <string name="shortcut_photo_note">Photo Note</string>
 </resources>

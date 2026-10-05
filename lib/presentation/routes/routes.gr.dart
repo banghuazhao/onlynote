@@ -19,6 +19,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     NoteTemplate? template,
     Note? customTemplateNote,
     NoteAutosaveStore? autosaveStore,
+    NotePhotoCapture? photoCapture,
     NoteEditorStart start = NoteEditorStart.standard,
     List<PageRouteInfo>? children,
   }) : super(
@@ -30,6 +31,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             template: template,
             customTemplateNote: customTemplateNote,
             autosaveStore: autosaveStore,
+            photoCapture: photoCapture,
             start: start,
           ),
           initialChildren: children,
@@ -49,6 +51,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         template: args.template,
         customTemplateNote: args.customTemplateNote,
         autosaveStore: args.autosaveStore,
+        photoCapture: args.photoCapture,
         start: args.start,
       );
     },
@@ -63,6 +66,7 @@ class AddUpdateNoteRouteArgs {
     this.template,
     this.customTemplateNote,
     this.autosaveStore,
+    this.photoCapture,
     this.start = NoteEditorStart.standard,
   });
 
@@ -78,11 +82,13 @@ class AddUpdateNoteRouteArgs {
 
   final NoteAutosaveStore? autosaveStore;
 
+  final NotePhotoCapture? photoCapture;
+
   final NoteEditorStart start;
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, start: $start}';
   }
 }
 
@@ -178,4 +184,51 @@ class OnboardingRoute extends PageRouteInfo<void> {
       return const OnboardingScreen();
     },
   );
+}
+
+/// generated route for
+/// [RemindersScreen]
+class RemindersRoute extends PageRouteInfo<RemindersRouteArgs> {
+  RemindersRoute({
+    Key? key,
+    ReminderAgendaController? controller,
+    List<PageRouteInfo>? children,
+  }) : super(
+          RemindersRoute.name,
+          args: RemindersRouteArgs(
+            key: key,
+            controller: controller,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'RemindersRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<RemindersRouteArgs>(
+          orElse: () => const RemindersRouteArgs());
+      return RemindersScreen(
+        key: args.key,
+        controller: args.controller,
+      );
+    },
+  );
+}
+
+class RemindersRouteArgs {
+  const RemindersRouteArgs({
+    this.key,
+    this.controller,
+  });
+
+  final Key? key;
+
+  final ReminderAgendaController? controller;
+
+  @override
+  String toString() {
+    return 'RemindersRouteArgs{key: $key, controller: $controller}';
+  }
 }

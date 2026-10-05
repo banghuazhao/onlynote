@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/reminder_notification_payload.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,8 @@ class ReminderSnoozeRegistry {
   static const _epochKey = 'onlynote_reminder_epoch';
   static const _counterKey = 'onlynote_snooze_next_id';
   String _key(int id) => 'onlynote_reminder_notification_$id';
+  String _dueKey(ReminderNotificationPayload payload) =>
+      'onlynote_reminder_snooze_due_${payload.revision}';
 
   Future<ReminderNotificationPayload?> read(int reminderId) async =>
       ReminderNotificationPayload.tryDecode(
@@ -67,6 +70,31 @@ class ReminderSnoozeRegistry {
     final current = await read(payload.reminderId);
     return current?.encode() == payload.encode();
   }
+
+  /// Older action registrations have no due entry until snoozed again.
+  /// A separate revision key prevents a background write from reviving an
+  /// edited or removed reminder's action registration.
+  Future<DateTime?> readPendingDue(ReminderNotificationPayload payload,
+      {DateTime? now}) async {
+    if (!await isCurrent(payload)) return null;
+    final encoded = await _preferences.getString(_dueKey(payload));
+    final due = encoded == null ? null : DateTime.tryParse(encoded);
+    if (due == null || !due.isAfter(now ?? DateTime.now())) return null;
+    return await isCurrent(payload) ? due.toUtc() : null;
+  }
+
+  Future<bool> savePendingDue(
+      ReminderNotificationPayload payload, DateTime due) async {
+    if (!await isCurrent(payload)) return false;
+    await _preferences.setString(
+        _dueKey(payload), due.toUtc().toIso8601String());
+    if (await isCurrent(payload)) return true;
+    await clearPendingDue(payload);
+    return false;
+  }
+
+  Future<void> clearPendingDue(ReminderNotificationPayload payload) =>
+      _preferences.remove(_dueKey(payload));
 
   Future<ReminderNotificationPayload?> invalidate(int reminderId) async {
     final previous = await read(reminderId);
@@ -114,6 +142,13 @@ class ReminderSnooze {
     return result;
   }
 
+  Future<bool> snooze(ReminderNotificationPayload payload,
+      {required Duration delay}) {
+    final result = _queue.then((_) => _snooze(payload, delay));
+    _queue = result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return result;
+  }
+
   Future<bool> _handle(NotificationResponse response) async {
     if (response.notificationResponseType !=
             NotificationResponseType.selectedNotificationAction ||
@@ -130,11 +165,47 @@ class ReminderSnooze {
     final delay = response.actionId == tenMinutes
         ? const Duration(minutes: 10)
         : const Duration(hours: 1);
+    return _snooze(payload, delay);
+  }
+
+  Future<bool> _snooze(
+      ReminderNotificationPayload payload, Duration delay) async {
+    if (delay <= Duration.zero || !await registry.isCurrent(payload)) {
+      return false;
+    }
+    final instant = now().toUtc();
+    final previousDue = await registry.readPendingDue(payload, now: instant);
     // Add elapsed time in UTC even during a daylight-saving clock change.
-    final due = now().toUtc().add(delay);
+    final due = instant.add(delay);
     if (!await schedule(payload, due)) return false;
     if (!await registry.isCurrent(payload)) {
       await cancel(payload.snoozeId);
+      return false;
+    }
+    try {
+      if (!await registry.savePendingDue(payload, due)) {
+        await cancel(payload.snoozeId);
+        return false;
+      }
+    } catch (error) {
+      // A failed metadata write must not leave an invisible new snooze. The
+      // previous snooze shares this ID, so restore its native due time too.
+      try {
+        await cancel(payload.snoozeId);
+        if (await registry.isCurrent(payload)) {
+          if (previousDue != null && previousDue.isAfter(now())) {
+            await schedule(payload, previousDue);
+          }
+          if (previousDue == null) {
+            await registry.clearPendingDue(payload);
+          } else {
+            await registry.savePendingDue(payload, previousDue);
+          }
+        }
+      } catch (rollbackError) {
+        debugPrint('Could not restore previous snooze: $rollbackError');
+      }
+      debugPrint('Could not save snooze due time: $error');
       return false;
     }
     return true;

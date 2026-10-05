@@ -8,6 +8,19 @@ import 'package:onlynote/services/reminder_snooze.dart';
 
 import '../support/memory_preferences.dart';
 
+class _DuePreferences extends MemoryPreferences {
+  final dueWriteFailures = <Object>[];
+
+  @override
+  Future<void> setString(String key, String value) async {
+    if (key.startsWith('onlynote_reminder_snooze_due_') &&
+        dueWriteFailures.isNotEmpty) {
+      throw dueWriteFailures.removeAt(0);
+    }
+    await super.setString(key, value);
+  }
+}
+
 NotificationResponse _action(
   ReminderNotificationPayload payload, {
   String actionId = 'onlynote_snooze_10m',
@@ -22,7 +35,7 @@ NotificationResponse _action(
     );
 
 void main() {
-  late MemoryPreferences preferences;
+  late _DuePreferences preferences;
   late ReminderSnoozeRegistry registry;
   late ReminderSnooze snooze;
   late List<(ReminderNotificationPayload, DateTime)> scheduled;
@@ -42,7 +55,7 @@ void main() {
           .payload;
 
   setUp(() {
-    preferences = MemoryPreferences();
+    preferences = _DuePreferences();
     registry = ReminderSnoozeRegistry(preferences: preferences);
     scheduled = [];
     cancelled = [];
@@ -81,6 +94,7 @@ void main() {
       expect(due.isUtc, isTrue);
       // Snooze must leave the base notification's daily/weekly schedule alone.
       expect(cancelled, isNot(contains(42)));
+      expect(await registry.readPendingDue(payload, now: clock), due);
     });
   }
 
@@ -227,6 +241,62 @@ void main() {
     await registry.invalidate(payload.reminderId);
 
     expect(await backgroundRegistry.isCurrent(payload), isFalse);
+  });
+
+  test('legacy registrations have no due and expired snoozes are hidden',
+      () async {
+    final payload = await prepare();
+    expect(await registry.readPendingDue(payload, now: clock), isNull);
+    expect(await snooze.handleResponse(_action(payload)), isTrue);
+    final due = clock.add(const Duration(minutes: 10));
+    expect(await registry.readPendingDue(payload, now: clock), due);
+    expect(await registry.readPendingDue(payload, now: due), isNull);
+  });
+
+  test('future due metadata cannot revive an edited or canceled reminder',
+      () async {
+    final original = await prepare();
+    await registry.savePendingDue(
+        original, clock.add(const Duration(minutes: 10)));
+    final edited = await prepare();
+
+    expect(await registry.readPendingDue(original, now: clock), isNull);
+    expect(await registry.readPendingDue(edited, now: clock), isNull);
+    expect(
+        await registry.savePendingDue(
+            original, clock.add(const Duration(hours: 1))),
+        isFalse);
+    await registry.invalidate(edited.reminderId);
+    expect(await registry.readPendingDue(edited, now: clock), isNull);
+  });
+
+  test('failed first due save cancels the invisible native snooze', () async {
+    final payload = await prepare();
+    preferences.dueWriteFailures.add(StateError('Disk full'));
+
+    expect(await snooze.handleResponse(_action(payload)), isFalse);
+
+    expect(cancelled, [payload.snoozeId]);
+    expect(await registry.readPendingDue(payload, now: clock), isNull);
+    expect(await registry.isCurrent(payload), isTrue);
+  });
+
+  test('failed replacement due save restores the prior native snooze and date',
+      () async {
+    final payload = await prepare();
+    expect(await snooze.handleResponse(_action(payload)), isTrue);
+    final originalDue = clock.add(const Duration(minutes: 10));
+    preferences.dueWriteFailures.add(StateError('Disk full'));
+
+    expect(
+        await snooze
+            .handleResponse(_action(payload, actionId: 'onlynote_snooze_1h')),
+        isFalse);
+
+    expect(scheduled, hasLength(3));
+    expect(scheduled.last.$2, originalDue);
+    expect(cancelled, [payload.snoozeId]);
+    expect(await registry.readPendingDue(payload, now: clock), originalDue);
   });
 
   test('removal during native scheduling cancels the late snooze only',
