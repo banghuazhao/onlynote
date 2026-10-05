@@ -27,9 +27,11 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -46,9 +48,11 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -65,9 +69,11 @@ mixin _$AddUpdateFormEvent {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -84,6 +90,8 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -99,6 +107,8 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -114,6 +124,8 @@ mixin _$AddUpdateFormEvent {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -280,9 +292,11 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -302,9 +316,11 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -324,9 +340,11 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -349,6 +367,8 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -367,6 +387,8 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -385,6 +407,8 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -488,9 +512,11 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -510,9 +536,11 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -532,9 +560,11 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -557,6 +587,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -575,6 +607,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -593,6 +627,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -688,9 +724,11 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -710,9 +748,11 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -732,9 +772,11 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -757,6 +799,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -775,6 +819,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -793,6 +839,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -888,9 +936,11 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -910,9 +960,11 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -932,9 +984,11 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -957,6 +1011,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -975,6 +1031,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -993,6 +1051,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -1136,9 +1196,11 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -1158,9 +1220,11 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -1180,9 +1244,11 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -1205,6 +1271,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -1223,6 +1291,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -1241,6 +1311,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -1276,6 +1348,8 @@ abstract class _$$AddEmptyTodoImplCopyWith<$Res> {
   factory _$$AddEmptyTodoImplCopyWith(
           _$AddEmptyTodoImpl value, $Res Function(_$AddEmptyTodoImpl) then) =
       __$$AddEmptyTodoImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String? afterId});
 }
 
 /// @nodoc
@@ -1285,26 +1359,50 @@ class __$$AddEmptyTodoImplCopyWithImpl<$Res>
   __$$AddEmptyTodoImplCopyWithImpl(
       _$AddEmptyTodoImpl _value, $Res Function(_$AddEmptyTodoImpl) _then)
       : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? afterId = freezed,
+  }) {
+    return _then(_$AddEmptyTodoImpl(
+      afterId: freezed == afterId
+          ? _value.afterId
+          : afterId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$AddEmptyTodoImpl implements _AddEmptyTodo {
-  const _$AddEmptyTodoImpl();
+  const _$AddEmptyTodoImpl({this.afterId});
+
+  @override
+  final String? afterId;
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.addEmptyTodo()';
+    return 'AddUpdateFormEvent.addEmptyTodo(afterId: $afterId)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _$AddEmptyTodoImpl);
+        (other.runtimeType == runtimeType &&
+            other is _$AddEmptyTodoImpl &&
+            (identical(other.afterId, afterId) || other.afterId == afterId));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode => Object.hash(runtimeType, afterId);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AddEmptyTodoImplCopyWith<_$AddEmptyTodoImpl> get copyWith =>
+      __$$AddEmptyTodoImplCopyWithImpl<_$AddEmptyTodoImpl>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1318,14 +1416,16 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
   }) {
-    return addEmptyTodo();
+    return addEmptyTodo(afterId);
   }
 
   @override
@@ -1340,14 +1440,16 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
   }) {
-    return addEmptyTodo?.call();
+    return addEmptyTodo?.call(afterId);
   }
 
   @override
@@ -1362,16 +1464,18 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
-      return addEmptyTodo();
+      return addEmptyTodo(afterId);
     }
     return orElse();
   }
@@ -1387,6 +1491,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -1405,6 +1511,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -1423,6 +1531,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -1436,7 +1546,12 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
 }
 
 abstract class _AddEmptyTodo implements AddUpdateFormEvent {
-  const factory _AddEmptyTodo() = _$AddEmptyTodoImpl;
+  const factory _AddEmptyTodo({final String? afterId}) = _$AddEmptyTodoImpl;
+
+  String? get afterId;
+  @JsonKey(ignore: true)
+  _$$AddEmptyTodoImplCopyWith<_$AddEmptyTodoImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -1512,9 +1627,11 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -1534,9 +1651,11 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -1556,9 +1675,11 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -1581,6 +1702,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -1599,6 +1722,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -1617,6 +1742,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -1720,9 +1847,11 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -1742,9 +1871,11 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -1764,9 +1895,11 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -1789,6 +1922,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -1807,6 +1942,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -1825,6 +1962,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -1846,6 +1985,449 @@ abstract class _TodoValueChanged implements AddUpdateFormEvent {
   String get id;
   @JsonKey(ignore: true)
   _$$TodoValueChangedImplCopyWith<_$TodoValueChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleTodoCheckboxImplCopyWith<$Res> {
+  factory _$$ToggleTodoCheckboxImplCopyWith(_$ToggleTodoCheckboxImpl value,
+          $Res Function(_$ToggleTodoCheckboxImpl) then) =
+      __$$ToggleTodoCheckboxImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id});
+}
+
+/// @nodoc
+class __$$ToggleTodoCheckboxImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$ToggleTodoCheckboxImpl>
+    implements _$$ToggleTodoCheckboxImplCopyWith<$Res> {
+  __$$ToggleTodoCheckboxImplCopyWithImpl(_$ToggleTodoCheckboxImpl _value,
+      $Res Function(_$ToggleTodoCheckboxImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+  }) {
+    return _then(_$ToggleTodoCheckboxImpl(
+      null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
+  const _$ToggleTodoCheckboxImpl(this.id);
+
+  @override
+  final String id;
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.toggleTodoCheckbox(id: $id)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ToggleTodoCheckboxImpl &&
+            (identical(other.id, id) || other.id == id));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ToggleTodoCheckboxImplCopyWith<_$ToggleTodoCheckboxImpl> get copyWith =>
+      __$$ToggleTodoCheckboxImplCopyWithImpl<_$ToggleTodoCheckboxImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path) addImage,
+    required TResult Function(String path) removeImage,
+  }) {
+    return toggleTodoCheckbox(id);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path)? addImage,
+    TResult? Function(String path)? removeImage,
+  }) {
+    return toggleTodoCheckbox?.call(id);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path)? addImage,
+    TResult Function(String path)? removeImage,
+    required TResult orElse(),
+  }) {
+    if (toggleTodoCheckbox != null) {
+      return toggleTodoCheckbox(id);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+  }) {
+    return toggleTodoCheckbox(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+  }) {
+    return toggleTodoCheckbox?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    required TResult orElse(),
+  }) {
+    if (toggleTodoCheckbox != null) {
+      return toggleTodoCheckbox(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ToggleTodoCheckbox implements AddUpdateFormEvent {
+  const factory _ToggleTodoCheckbox(final String id) = _$ToggleTodoCheckboxImpl;
+
+  String get id;
+  @JsonKey(ignore: true)
+  _$$ToggleTodoCheckboxImplCopyWith<_$ToggleTodoCheckboxImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ReplaceTodoLinesImplCopyWith<$Res> {
+  factory _$$ReplaceTodoLinesImplCopyWith(_$ReplaceTodoLinesImpl value,
+          $Res Function(_$ReplaceTodoLinesImpl) then) =
+      __$$ReplaceTodoLinesImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String id, List<String> lines});
+}
+
+/// @nodoc
+class __$$ReplaceTodoLinesImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$ReplaceTodoLinesImpl>
+    implements _$$ReplaceTodoLinesImplCopyWith<$Res> {
+  __$$ReplaceTodoLinesImplCopyWithImpl(_$ReplaceTodoLinesImpl _value,
+      $Res Function(_$ReplaceTodoLinesImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? lines = null,
+  }) {
+    return _then(_$ReplaceTodoLinesImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      lines: null == lines
+          ? _value._lines
+          : lines // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
+  const _$ReplaceTodoLinesImpl(
+      {required this.id, required final List<String> lines})
+      : _lines = lines;
+
+  @override
+  final String id;
+  final List<String> _lines;
+  @override
+  List<String> get lines {
+    if (_lines is EqualUnmodifiableListView) return _lines;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_lines);
+  }
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.replaceTodoLines(id: $id, lines: $lines)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ReplaceTodoLinesImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality().equals(other._lines, _lines));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, const DeepCollectionEquality().hash(_lines));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ReplaceTodoLinesImplCopyWith<_$ReplaceTodoLinesImpl> get copyWith =>
+      __$$ReplaceTodoLinesImplCopyWithImpl<_$ReplaceTodoLinesImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path) addImage,
+    required TResult Function(String path) removeImage,
+  }) {
+    return replaceTodoLines(id, lines);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path)? addImage,
+    TResult? Function(String path)? removeImage,
+  }) {
+    return replaceTodoLines?.call(id, lines);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String? title, String? description, Color? color,
+            List<Todo>? todos, List<String>? imagePaths)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path)? addImage,
+    TResult Function(String path)? removeImage,
+    required TResult orElse(),
+  }) {
+    if (replaceTodoLines != null) {
+      return replaceTodoLines(id, lines);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+  }) {
+    return replaceTodoLines(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+  }) {
+    return replaceTodoLines?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    required TResult orElse(),
+  }) {
+    if (replaceTodoLines != null) {
+      return replaceTodoLines(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ReplaceTodoLines implements AddUpdateFormEvent {
+  const factory _ReplaceTodoLines(
+      {required final String id,
+      required final List<String> lines}) = _$ReplaceTodoLinesImpl;
+
+  String get id;
+  List<String> get lines;
+  @JsonKey(ignore: true)
+  _$$ReplaceTodoLinesImplCopyWith<_$ReplaceTodoLinesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1932,9 +2514,11 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -1954,9 +2538,11 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -1976,9 +2562,11 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -2001,6 +2589,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -2019,6 +2609,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -2037,6 +2629,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -2134,9 +2728,11 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -2156,9 +2752,11 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -2178,9 +2776,11 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -2203,6 +2803,8 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -2221,6 +2823,8 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -2239,6 +2843,8 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
@@ -2333,9 +2939,11 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
-    required TResult Function() addEmptyTodo,
+    required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
     required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
     required TResult Function(int oldIndex, int newIndex) reorderTodo,
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
@@ -2355,9 +2963,11 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult? Function()? addEmptyTodo,
+    TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
     TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
     TResult? Function(int oldIndex, int newIndex)? reorderTodo,
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
@@ -2377,9 +2987,11 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(String? id, String? folderId, bool isPinned,
             int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
-    TResult Function()? addEmptyTodo,
+    TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
     TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
     TResult Function(int oldIndex, int newIndex)? reorderTodo,
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
@@ -2402,6 +3014,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
     required TResult Function(_DeleteTodo value) deleteTodo,
     required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
     required TResult Function(_ReorderTodo value) reorderTodo,
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
@@ -2420,6 +3034,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult? Function(_DeleteTodo value)? deleteTodo,
     TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult? Function(_ReorderTodo value)? reorderTodo,
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
@@ -2438,6 +3054,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
     TResult Function(_DeleteTodo value)? deleteTodo,
     TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
     TResult Function(_ReorderTodo value)? reorderTodo,
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,

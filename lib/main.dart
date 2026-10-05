@@ -86,7 +86,8 @@ Future<void> main() async {
 
   InAppReviewHelper.checkAndAskForReview();
 
-  await NotificationService().init();
+  final notifications = NotificationService();
+  await notifications.init();
 
   await initLocalStorage();
   List items = [];
@@ -109,6 +110,12 @@ Future<void> main() async {
       .recover();
   // Finish recovery before pruning; pending drafts may own photos too.
   await NoteCleanup.pruneOrphanImages(getIt<NoteRepository>());
+
+  // Native upgrades run after recovery and do not delay the first frame.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(notifications.upgradePendingReminders(
+        ReminderData.shared.reminders, getIt<NoteRepository>()));
+  });
 
   runApp(
     MultiBlocProvider(

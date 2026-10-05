@@ -80,6 +80,20 @@ abstract final class AppButtonStyles {
     );
   }
 
+  /// Lightweight actions inside a note, retaining generous hit areas.
+  static ButtonStyle paperAction({bool destructive = false}) =>
+      paper(destructive: destructive).copyWith(
+        backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+        padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+        side: WidgetStateProperty.resolveWith((states) => BorderSide(
+              color: states.contains(WidgetState.focused)
+                  ? (destructive ? AppColors.error : AppColors.ink)
+                  : Colors.transparent,
+              width: 1.5,
+            )),
+      );
+
   static ButtonStyle _surface(ColorScheme colors,
           {required Color foreground,
           required Color background,

@@ -90,6 +90,17 @@ class NoteAutosave extends ChangeNotifier {
     if (_disposed || note == _note) return;
     assert(note.id == _note.id);
     _note = note;
+    _queueSave(note);
+  }
+
+  /// Persist intentionally seeded content, such as a selected template,
+  /// through the same recovery journal and debounce used for ordinary edits.
+  void saveInitial() {
+    if (_disposed || _exists || dirty || !hasContent(_note)) return;
+    _queueSave(_note);
+  }
+
+  void _queueSave(Note note) {
     _revision++;
     _setStatus(AutosaveStatus.pending);
     _journal =

@@ -9,40 +9,54 @@ class _AddTodoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: TextButton.icon(
-        style: AppButtonStyles.paper().copyWith(
-          backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
-          side: const WidgetStatePropertyAll(
-              BorderSide(color: Colors.transparent)),
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacings.s),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          style: AppButtonStyles.paperAction(),
+          onPressed: onAdd,
+          icon: const SizedBox(
+              width: 28, child: Icon(Icons.add_rounded, size: 20)),
+          label: Text(S.of(context).Add_todo),
         ),
-        onPressed: onAdd,
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: Text(S.of(context).Add_todo),
       ),
     );
   }
 }
 
+ButtonStyle _todoControlStyle({bool destructive = false}) =>
+    AppButtonStyles.paperAction(destructive: destructive).copyWith(
+      fixedSize: const WidgetStatePropertyAll(Size(48, 48)),
+      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+    );
+
 //* Todo list tile
 class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
     required this.index,
+    required this.id,
     this.value,
     required this.completed,
     required this.focusNode,
     this.autofocus = false,
     required this.onChanged,
+    required this.onToggle,
+    required this.onSubmitted,
+    required this.onSplit,
     required this.onRemoved,
   });
 
   final int index;
+  final String id;
   final String? value;
   final bool completed;
   final FocusNode focusNode;
   final bool autofocus;
   final Function(String value) onChanged;
+  final VoidCallback onToggle;
+  final ValueChanged<String> onSubmitted;
+  final ValueChanged<List<String>> onSplit;
   final VoidCallback onRemoved;
 
   @override
@@ -59,6 +73,51 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
   }
 
   @override
+  void didUpdateWidget(covariant _TodoFieldTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (todoController.text != widget.value) {
+      final text = widget.value ?? '';
+      final offset = todoController.selection.extentOffset;
+      todoController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(
+            offset: offset < 0 ? text.length : offset.clamp(0, text.length)),
+      );
+    }
+  }
+
+  void _onChanged(String value) {
+    final composing = todoController.value.composing;
+    if (value.contains('\n') && (!composing.isValid || composing.isCollapsed)) {
+      final lines = value
+          .split(RegExp(r'\r?\n'))
+          .map((line) => line.trim())
+          .where((line) => line.isNotEmpty)
+          .map((line) => line.characters.take(todoMaxCharCount).toString())
+          .toList();
+      if (lines.isNotEmpty) {
+        final text = lines.first;
+        todoController.value = TextEditingValue(
+          text: text,
+          selection: TextSelection.collapsed(offset: text.length),
+        );
+        if (lines.length == 1 && value.endsWith('\n')) {
+          widget.onChanged(text);
+          widget.onSubmitted(text);
+          return;
+        }
+        widget.onSplit(lines);
+        return;
+      }
+      todoController.clear();
+      widget.onChanged('');
+      widget.onSubmitted('');
+      return;
+    }
+    widget.onChanged(value);
+  }
+
+  @override
   void dispose() {
     todoController.dispose();
     super.dispose();
@@ -66,58 +125,115 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = AppTypography.formText.copyWith(
+      fontSize: 16,
+      color: AppColors.ink.withValues(alpha: widget.completed ? 0.5 : 0.88),
+      decoration: widget.completed ? TextDecoration.lineThrough : null,
+    );
+    final lineHeight =
+        MediaQuery.textScalerOf(context).scale(textStyle.fontSize ?? 16) *
+            (textStyle.height ?? 1.55);
+    // Center controls on the first line, even when the item wraps or text grows.
+    // The field adds 12px above and below its line; controls remain 48px.
+    final controlTopInset = ((lineHeight - 24) / 2).clamp(0.0, double.infinity);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            // Sits on the first line of the field below.
-            padding: const EdgeInsets.only(top: 13),
-            child: InkCheckbox(checked: widget.completed, size: 18),
+            padding: EdgeInsets.only(top: controlTopInset),
+            child: Semantics(
+              checked: widget.completed,
+              label: widget.value?.isNotEmpty == true
+                  ? widget.value
+                  : S.of(context).Todo,
+              child: IconButton(
+                key: ValueKey('todo-check-${widget.id}'),
+                style: _todoControlStyle(),
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                onPressed: widget.onToggle,
+                icon: AnimatedSwitcher(
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 160),
+                  child: InkCheckbox(
+                    key: ValueKey(widget.completed),
+                    checked: widget.completed,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 10),
           Expanded(
             child: TextField(
+              key: ValueKey('todo-field-${widget.id}'),
               controller: todoController,
               focusNode: widget.focusNode,
               autofocus: widget.autofocus,
-              style: AppTypography.formText.copyWith(fontSize: 16),
+              style: textStyle,
               decoration: InputDecoration(
                 isDense: true,
                 filled: false,
                 border: InputBorder.none,
-                // Without this the field inherits the theme's 16px inset and
-                // the todo text hangs away from its checkbox.
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 hintText: S.of(context).Todo,
+                hintMaxLines: 1,
                 hintStyle: AppTypography.formText.copyWith(
                   fontSize: 16,
                   color: AppColors.ink.withValues(alpha: 0.35),
                 ),
                 counterText: '',
               ),
-              onChanged: widget.onChanged,
-              maxLength: todoMaxCharCount,
-              maxLines: 4,
+              onChanged: _onChanged,
+              onSubmitted: widget.onSubmitted,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.multiline,
+              textCapitalization: TextCapitalization.sentences,
+              inputFormatters: [
+                TextInputFormatter.withFunction((oldValue, newValue) =>
+                    newValue.text.contains('\n')
+                        ? newValue
+                        : LengthLimitingTextInputFormatter(todoMaxCharCount)
+                            .formatEditUpdate(oldValue, newValue)),
+              ],
+              maxLines: null,
               minLines: 1,
             ),
           ),
-          IconButton(
-            style: AppButtonStyles.paper(destructive: true),
-            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-            iconSize: 18,
-            icon: const Icon(Icons.close_rounded),
-            onPressed: widget.onRemoved,
+          Padding(
+            padding: EdgeInsets.only(top: controlTopInset),
+            child: IconButton(
+              style: _todoControlStyle(destructive: true),
+              tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+              iconSize: 18,
+              icon: const Icon(Icons.close_rounded),
+              onPressed: widget.onRemoved,
+            ),
           ),
-          ReorderableDragStartListener(
-            index: widget.index,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-              child: Icon(
-                Icons.drag_handle,
-                size: 18,
-                color: AppColors.ink.withValues(alpha: 0.4),
+          Padding(
+            padding: EdgeInsets.only(top: controlTopInset),
+            child: ReorderableDragStartListener(
+              index: widget.index,
+              child: Semantics(
+                label: S.of(context).Reorder,
+                child: Tooltip(
+                  message: S.of(context).Reorder,
+                  child: SizedBox(
+                    width: 44,
+                    height: 48,
+                    child: Icon(
+                      Icons.drag_handle,
+                      size: 18,
+                      color: AppColors.ink.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -190,6 +306,20 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.state.todos.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacings.m),
+            child: Text(
+              S.of(context).Checklist_Progress(
+                    widget.state.todos.where((todo) => todo.completed).length,
+                    widget.state.todos.length,
+                  ),
+              style: AppTypography.description.copyWith(
+                color: AppColors.ink.withValues(alpha: 0.6),
+              ),
+            ),
+          ),
+        ],
         ReorderableListView.builder(
           shrinkWrap: true,
           buildDefaultDragHandles: false,
@@ -235,6 +365,7 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
               ),
               child: _TodoFieldTile(
                 index: index,
+                id: todo.id!,
                 value: todo.title,
                 completed: todo.completed,
                 focusNode: _focusNodeFor(todo.id!),
@@ -245,6 +376,37 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
                           value: value,
                           id: todo.id!,
                         ),
+                      );
+                },
+                onToggle: () {
+                  HapticFeedback.selectionClick();
+                  context.read<AddUpdateFormBloc>().add(
+                        AddUpdateFormEvent.toggleTodoCheckbox(todo.id!),
+                      );
+                },
+                onSubmitted: (value) {
+                  if (value.trim().isEmpty) {
+                    _focusNodeFor(todo.id!).unfocus();
+                    return;
+                  }
+                  final nextIndex = index + 1;
+                  if (nextIndex < widget.state.todos.length &&
+                      widget.state.todos[nextIndex].title?.trim().isEmpty !=
+                          false) {
+                    _focusNodeFor(widget.state.todos[nextIndex].id!)
+                        .requestFocus();
+                    return;
+                  }
+                  _focusNextTodo = true;
+                  context.read<AddUpdateFormBloc>().add(
+                        AddUpdateFormEvent.addEmptyTodo(afterId: todo.id),
+                      );
+                },
+                onSplit: (lines) {
+                  _focusNextTodo = lines.length > 1;
+                  context.read<AddUpdateFormBloc>().add(
+                        AddUpdateFormEvent.replaceTodoLines(
+                            id: todo.id!, lines: lines),
                       );
                 },
                 onRemoved: confirmAndDelete,

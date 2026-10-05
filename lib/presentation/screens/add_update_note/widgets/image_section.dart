@@ -44,6 +44,21 @@ class _BuildImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (state.imagePaths.isEmpty) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: const ValueKey('editor-add-photo'),
+          style: AppButtonStyles.paperAction(),
+          onPressed: () => _showImageSourceSheet(context),
+          icon: const SizedBox(
+              width: 28,
+              child: Icon(Icons.add_photo_alternate_outlined, size: 20)),
+          label: Text(S.of(context).Add_Image),
+        ),
+      );
+    }
+
     return SizedBox(
       height: 96,
       child: ListView(
@@ -64,6 +79,7 @@ class _BuildImageSection extends StatelessWidget {
           SizedBox(
             width: 88,
             child: IconButton(
+              key: const ValueKey('editor-add-photo'),
               style: AppButtonStyles.paper(),
               tooltip: S.of(context).Add_Image,
               onPressed: () => _showImageSourceSheet(context),

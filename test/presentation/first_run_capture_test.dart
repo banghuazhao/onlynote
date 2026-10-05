@@ -106,7 +106,10 @@ Finder _descriptionField() => find.byWidgetPredicate(
     );
 
 Finder _checklistField() => find.byWidgetPredicate(
-      (widget) => widget is TextField && widget.maxLines == 4,
+      (widget) =>
+          widget is TextField &&
+          widget.key is ValueKey<String> &&
+          (widget.key as ValueKey<String>).value.startsWith('todo-field-'),
     );
 
 bool _fieldHasFocus(WidgetTester tester, Finder field) {

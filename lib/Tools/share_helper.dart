@@ -21,7 +21,8 @@ class ShareHelper {
 
   static Future<void> shareNote(
       BuildContext context, Note note, ScreenshotController controller,
-      {Rect? sharePositionOrigin}) async {
+      {Rect? sharePositionOrigin,
+      Future<Uint8List?> Function()? captureImage}) async {
     if (_sharing) return;
     _sharing = true;
     ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? progress;
@@ -58,7 +59,9 @@ class ShareHelper {
       ));
       if (format == NoteShareFormat.image) {
         await shareWidgetAsImage(controller,
-            fileName: '$stem.png', sharePositionOrigin: sharePositionOrigin);
+            captureImage: captureImage,
+            fileName: '$stem.png',
+            sharePositionOrigin: sharePositionOrigin);
         return;
       }
       final photos = <Uint8List>[];
@@ -174,8 +177,11 @@ class ShareHelper {
     required String fileName,
     String? text,
     Rect? sharePositionOrigin,
+    Future<Uint8List?> Function()? captureImage,
   }) async {
-    final Uint8List? bytes = await controller.capture(pixelRatio: 3);
+    final Uint8List? bytes = captureImage == null
+        ? await controller.capture(pixelRatio: 3)
+        : await captureImage();
     if (bytes == null) {
       throw Exception('Failed to capture note image');
     }

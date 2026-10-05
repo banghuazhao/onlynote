@@ -9,6 +9,7 @@ import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/note_checklist.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -33,6 +34,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final ScreenshotController _screenshotController = ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
   bool _savingReminder = false;
+  bool _exportingImage = false;
 
   @override
   void initState() {
@@ -54,7 +56,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         note,
         _screenshotController,
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
+        captureImage: _captureNoteImage,
       );
+
+  Future<Uint8List?> _captureNoteImage() async {
+    if (!mounted) return null;
+    setState(() => _exportingImage = true);
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      return await _screenshotController.capture(pixelRatio: 3);
+    } finally {
+      if (mounted) setState(() => _exportingImage = false);
+    }
+  }
 
   Future<void> _showReminderPicker(Note note) async {
     if (_savingReminder) return;
@@ -278,6 +292,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               success: (data) => LoadedView(
                 note: data.note,
                 screenshotController: _screenshotController,
+                exportMode: _exportingImage,
                 onReminderTap: data.note.isDeleted
                     ? null
                     : () => _showReminderPicker(data.note),
@@ -297,11 +312,13 @@ class LoadedView extends StatelessWidget {
     required this.note,
     required this.screenshotController,
     required this.onReminderTap,
+    this.exportMode = false,
   });
 
   final Note note;
   final ScreenshotController screenshotController;
   final VoidCallback? onReminderTap;
+  final bool exportMode;
 
   @override
   Widget build(BuildContext context) {
@@ -381,8 +398,34 @@ class LoadedView extends StatelessWidget {
                     },
                     const SizedBox(height: AppSpacings.xxl),
                     if (note.hasTodo) ...{
-                      _BuildTodoList(
-                          todoList: note.todo, readOnly: note.isDeleted),
+                      NoteChecklist(
+                        key: ValueKey(note.id),
+                        todos: note.todo,
+                        readOnly: note.isDeleted,
+                        exportMode: exportMode,
+                        onToggle: (id) {
+                          HapticFeedback.selectionClick();
+                          context
+                              .read<NoteDetailBloc>()
+                              .add(NoteDetailEvent.toggleTodoCheckbox(id));
+                        },
+                        onReset: () async {
+                          final bloc = context.read<NoteDetailBloc>();
+                          final ids = await bloc.resetChecklist(note.id!);
+                          if (!context.mounted || ids == null) return;
+                          showTransientSnackBar(
+                              context,
+                              SnackBar(
+                                content:
+                                    Text(S.of(context).Checklist_Reset_Done),
+                                action: SnackBarAction(
+                                    label: S.of(context).Undo,
+                                    onPressed: () => bloc.add(
+                                        NoteDetailEvent.restoreCompletedTodos(
+                                            noteId: note.id!, todoIds: ids))),
+                              ));
+                        },
+                      ),
                       const SizedBox(height: AppSpacings.xxl),
                     },
                     SelectableText(
@@ -403,67 +446,6 @@ class LoadedView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _BuildTodoList extends StatelessWidget {
-  const _BuildTodoList({required this.todoList, this.readOnly = false});
-  final bool readOnly;
-  final List<Todo> todoList;
-
-  @override
-  Widget build(BuildContext context) {
-    final sortedTodos = [...todoList]..sort((left, right) {
-        if (left.completed == right.completed) return 0;
-        return left.completed ? 1 : -1;
-      });
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          S.of(context).Todo_list,
-          style: AppTypography.headline6.copyWith(
-            decoration: TextDecoration.underline,
-            decorationColor: AppColors.ink.withValues(alpha: 0.35),
-          ),
-        ),
-        const SizedBox(height: AppSpacings.m),
-        AnimatedSwitcher(
-          duration: context.tokens.motionStandard,
-          transitionBuilder: (child, animation) => FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, -0.06),
-                end: Offset.zero,
-              ).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeInOut)),
-              child: child,
-            ),
-          ),
-          child: Column(
-            key: ValueKey(sortedTodos
-                .map((todo) => '${todo.id}:${todo.completed}')
-                .join('|')),
-            children: [
-              for (final todo in sortedTodos)
-                PaperChecklistRow(
-                  key: ValueKey(todo.id),
-                  label: todo.title ?? '',
-                  completed: todo.completed,
-                  onChanged: readOnly
-                      ? null
-                      : (_) {
-                          HapticFeedback.lightImpact();
-                          context.read<NoteDetailBloc>().add(
-                              NoteDetailEvent.toggleTodoCheckbox(todo.id!));
-                        },
-                ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

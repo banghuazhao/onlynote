@@ -47,6 +47,55 @@ void main() {
   });
   tearDown(() => autosave.dispose());
 
+  test('seeded content is journaled and saved without fabricated edits',
+      () async {
+    final timestamp = DateTime(2026, 10, 5, 9, 30);
+    final note = initial.copyWith(
+      title: 'Packing list',
+      dateTime: timestamp,
+      todo: [Todo(id: 'passport', title: 'Travel documents')],
+    );
+    final seeded = NoteAutosave(
+      store: store,
+      initial: note,
+      exists: false,
+      delay: const Duration(days: 1),
+    );
+    addTearDown(seeded.dispose);
+    seeded.saveInitial();
+    seeded.saveInitial();
+    await Future<void>.delayed(Duration.zero);
+    expect(store.drafts['one'], note);
+    expect(store.notes, isEmpty);
+    expect(seeded.dirty, isTrue);
+    expect(await seeded.flush(), isTrue);
+    expect(store.notes['one'], note);
+    expect(store.notes['one']!.dateTime, timestamp);
+    expect(store.saves, hasLength(1));
+    expect(store.drafts, isEmpty);
+
+    seeded.saveInitial();
+    await seeded.flush();
+    expect(store.saves, hasLength(1));
+  });
+
+  test('saveInitial skips empty notes and existing notes', () async {
+    autosave.saveInitial();
+    await autosave.flush();
+    expect(store.drafts, isEmpty);
+    expect(store.saves, isEmpty);
+    final existing = NoteAutosave(
+      store: store,
+      initial: initial.copyWith(title: 'Already saved'),
+      exists: true,
+    );
+    addTearDown(existing.dispose);
+    existing.saveInitial();
+    await existing.flush();
+    expect(store.drafts, isEmpty);
+    expect(store.saves, isEmpty);
+  });
+
   test('writes recovery draft before committing and preserves note identity',
       () async {
     final edited = initial.copyWith(

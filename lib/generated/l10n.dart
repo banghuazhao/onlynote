@@ -75,9 +75,9 @@ class S {
     return Intl.message('Saving', name: 'Saving', desc: '', args: []);
   }
 
-  /// `Todo List`
+  /// `Checklist`
   String get Todo_list {
-    return Intl.message('Todo List', name: 'Todo_list', desc: '', args: []);
+    return Intl.message('Checklist', name: 'Todo_list', desc: '', args: []);
   }
 
   /// `Delete`
@@ -95,14 +95,14 @@ class S {
     );
   }
 
-  /// `Add todo`
+  /// `Add item`
   String get Add_todo {
-    return Intl.message('Add todo', name: 'Add_todo', desc: '', args: []);
+    return Intl.message('Add item', name: 'Add_todo', desc: '', args: []);
   }
 
-  /// `Todo..`
+  /// `Checklist item`
   String get Todo {
-    return Intl.message('Todo..', name: 'Todo', desc: '', args: []);
+    return Intl.message('Checklist item', name: 'Todo', desc: '', args: []);
   }
 
   /// `Type something...`
@@ -1852,6 +1852,241 @@ class S {
       name: 'Reminder_Next_Time',
       desc: '',
       args: [time],
+    );
+  }
+
+  /// `Templates`
+  String get Templates {
+    return Intl.message('Templates', name: 'Templates', desc: '', args: []);
+  }
+
+  /// `Start with a useful outline, then make it yours.`
+  String get Templates_Description {
+    return Intl.message(
+      'Start with a useful outline, then make it yours.',
+      name: 'Templates_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use a template`
+  String get Use_Template {
+    return Intl.message(
+      'Use a template',
+      name: 'Use_Template',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Shopping list`
+  String get Template_Shopping_Title {
+    return Intl.message(
+      'Shopping list',
+      name: 'Template_Shopping_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A checklist for groceries and household essentials.`
+  String get Template_Shopping_Summary {
+    return Intl.message(
+      'A checklist for groceries and household essentials.',
+      name: 'Template_Shopping_Summary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fruit & vegetables\nBread & grains\nMilk or dairy alternatives\nHousehold essentials`
+  String get Template_Shopping_Items {
+    return Intl.message(
+      'Fruit & vegetables\nBread & grains\nMilk or dairy alternatives\nHousehold essentials',
+      name: 'Template_Shopping_Items',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Packing list`
+  String get Template_Packing_Title {
+    return Intl.message(
+      'Packing list',
+      name: 'Template_Packing_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep travel essentials together before you leave.`
+  String get Template_Packing_Summary {
+    return Intl.message(
+      'Keep travel essentials together before you leave.',
+      name: 'Template_Packing_Summary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Travel documents\nPhone & charger\nClothes\nToiletries\nMedication`
+  String get Template_Packing_Items {
+    return Intl.message(
+      'Travel documents\nPhone & charger\nClothes\nToiletries\nMedication',
+      name: 'Template_Packing_Items',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily plan`
+  String get Template_Daily_Plan_Title {
+    return Intl.message(
+      'Daily plan',
+      name: 'Template_Daily_Plan_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a focus and leave room for a few clear priorities.`
+  String get Template_Daily_Plan_Summary {
+    return Intl.message(
+      'Choose a focus and leave room for a few clear priorities.',
+      name: 'Template_Daily_Plan_Summary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today's focus\n\nNotes\n`
+  String get Template_Daily_Plan_Body {
+    return Intl.message(
+      'Today\'s focus\n\nNotes\n',
+      name: 'Template_Daily_Plan_Body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose today's priorities\nMake time for a break\nPlan tomorrow`
+  String get Template_Daily_Plan_Items {
+    return Intl.message(
+      'Choose today\'s priorities\nMake time for a break\nPlan tomorrow',
+      name: 'Template_Daily_Plan_Items',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Meeting notes`
+  String get Template_Meeting_Title {
+    return Intl.message(
+      'Meeting notes',
+      name: 'Template_Meeting_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `An outline for the agenda, decisions, and follow-up.`
+  String get Template_Meeting_Summary {
+    return Intl.message(
+      'An outline for the agenda, decisions, and follow-up.',
+      name: 'Template_Meeting_Summary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Date:\nAttendees:\n\nAgenda\n\nNotes\n\nDecisions\n`
+  String get Template_Meeting_Body {
+    return Intl.message(
+      'Date:\nAttendees:\n\nAgenda\n\nNotes\n\nDecisions\n',
+      name: 'Template_Meeting_Body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send a summary\nFollow up on action items`
+  String get Template_Meeting_Items {
+    return Intl.message(
+      'Send a summary\nFollow up on action items',
+      name: 'Template_Meeting_Items',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{completed} of {total} complete`
+  String Checklist_Progress(Object completed, Object total) {
+    return Intl.message(
+      '$completed of $total complete',
+      name: 'Checklist_Progress',
+      desc: '',
+      args: [completed, total],
+    );
+  }
+
+  /// `Completed ({count})`
+  String Checklist_Completed(Object count) {
+    return Intl.message(
+      'Completed ($count)',
+      name: 'Checklist_Completed',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Reset checklist`
+  String get Checklist_Reset {
+    return Intl.message(
+      'Reset checklist',
+      name: 'Checklist_Reset',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checklist reset`
+  String get Checklist_Reset_Done {
+    return Intl.message(
+      'Checklist reset',
+      name: 'Checklist_Reset_Done',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All done`
+  String get Checklist_All_Done {
+    return Intl.message(
+      'All done',
+      name: 'Checklist_All_Done',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Snooze 10 min`
+  String get Reminder_Snooze_10_Minutes {
+    return Intl.message(
+      'Snooze 10 min',
+      name: 'Reminder_Snooze_10_Minutes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Snooze 1 hour`
+  String get Reminder_Snooze_1_Hour {
+    return Intl.message(
+      'Snooze 1 hour',
+      name: 'Reminder_Snooze_1_Hour',
+      desc: '',
+      args: [],
     );
   }
 }

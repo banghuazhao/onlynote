@@ -23,20 +23,24 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(notes, folders, photos) =>
       "${notes} notes · ${folders} folders · ${photos} photos";
 
-  static String m1(count) => "${count} notes";
+  static String m1(count) => "Completed (${count})";
 
-  static String m2(number) => "Note color ${number}";
+  static String m2(completed, total) => "${completed} of ${total} complete";
 
-  static String m3(time) => "Next reminder: ${time}";
+  static String m3(count) => "${count} notes";
 
-  static String m4(price) => "Remove ads permanently for ${price}.";
+  static String m4(number) => "Note color ${number}";
+
+  static String m5(time) => "Next reminder: ${time}";
+
+  static String m6(price) => "Remove ads permanently for ${price}.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
-    "Add_todo": MessageLookupByLibrary.simpleMessage("Add todo"),
+    "Add_todo": MessageLookupByLibrary.simpleMessage("Add item"),
     "Ads_Removed": MessageLookupByLibrary.simpleMessage("Ads Removed"),
     "Ads_Removed_Description": MessageLookupByLibrary.simpleMessage(
       "Ads are permanently removed on this device.",
@@ -92,6 +96,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Title": MessageLookupByLibrary.simpleMessage("Backup & Restore"),
     "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
+    "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("All done"),
+    "Checklist_Completed": m1,
+    "Checklist_Progress": m2,
+    "Checklist_Reset": MessageLookupByLibrary.simpleMessage("Reset checklist"),
+    "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage(
+      "Checklist reset",
+    ),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage(
       "Choose From Gallery",
     ),
@@ -172,7 +183,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m1,
+    "Folder_Notes_Count": m3,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage(
       "A little space for your next big idea.",
@@ -207,7 +218,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Added Successfully",
     ),
-    "Note_Color": m2,
+    "Note_Color": m4,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -315,7 +326,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m3,
+    "Reminder_Next_Time": m5,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -326,12 +337,18 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Reminder_Saved": MessageLookupByLibrary.simpleMessage("Reminder set"),
     "Reminder_Set": MessageLookupByLibrary.simpleMessage("Set reminder"),
+    "Reminder_Snooze_10_Minutes": MessageLookupByLibrary.simpleMessage(
+      "Snooze 10 min",
+    ),
+    "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
+      "Snooze 1 hour",
+    ),
     "Reminder_Time": MessageLookupByLibrary.simpleMessage("Time"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage(
       "Tomorrow morning",
     ),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m4,
+    "Remove_Ads_Price": m6,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
@@ -387,6 +404,52 @@ class MessageLookup extends MessageLookupByLibrary {
     "Small": MessageLookupByLibrary.simpleMessage("Small"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
+    "Template_Daily_Plan_Body": MessageLookupByLibrary.simpleMessage(
+      "Today\'s focus\n\nNotes\n",
+    ),
+    "Template_Daily_Plan_Items": MessageLookupByLibrary.simpleMessage(
+      "Choose today\'s priorities\nMake time for a break\nPlan tomorrow",
+    ),
+    "Template_Daily_Plan_Summary": MessageLookupByLibrary.simpleMessage(
+      "Choose a focus and leave room for a few clear priorities.",
+    ),
+    "Template_Daily_Plan_Title": MessageLookupByLibrary.simpleMessage(
+      "Daily plan",
+    ),
+    "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
+      "Date:\nAttendees:\n\nAgenda\n\nNotes\n\nDecisions\n",
+    ),
+    "Template_Meeting_Items": MessageLookupByLibrary.simpleMessage(
+      "Send a summary\nFollow up on action items",
+    ),
+    "Template_Meeting_Summary": MessageLookupByLibrary.simpleMessage(
+      "An outline for the agenda, decisions, and follow-up.",
+    ),
+    "Template_Meeting_Title": MessageLookupByLibrary.simpleMessage(
+      "Meeting notes",
+    ),
+    "Template_Packing_Items": MessageLookupByLibrary.simpleMessage(
+      "Travel documents\nPhone & charger\nClothes\nToiletries\nMedication",
+    ),
+    "Template_Packing_Summary": MessageLookupByLibrary.simpleMessage(
+      "Keep travel essentials together before you leave.",
+    ),
+    "Template_Packing_Title": MessageLookupByLibrary.simpleMessage(
+      "Packing list",
+    ),
+    "Template_Shopping_Items": MessageLookupByLibrary.simpleMessage(
+      "Fruit & vegetables\nBread & grains\nMilk or dairy alternatives\nHousehold essentials",
+    ),
+    "Template_Shopping_Summary": MessageLookupByLibrary.simpleMessage(
+      "A checklist for groceries and household essentials.",
+    ),
+    "Template_Shopping_Title": MessageLookupByLibrary.simpleMessage(
+      "Shopping list",
+    ),
+    "Templates": MessageLookupByLibrary.simpleMessage("Templates"),
+    "Templates_Description": MessageLookupByLibrary.simpleMessage(
+      "Start with a useful outline, then make it yours.",
+    ),
     "Theme_Dark": MessageLookupByLibrary.simpleMessage("Dark"),
     "Theme_Light": MessageLookupByLibrary.simpleMessage("Light"),
     "Theme_System": MessageLookupByLibrary.simpleMessage("System"),
@@ -394,13 +457,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "To get a reminder, please go to settings to open notification.",
     ),
-    "Todo": MessageLookupByLibrary.simpleMessage("Todo.."),
-    "Todo_list": MessageLookupByLibrary.simpleMessage("Todo List"),
+    "Todo": MessageLookupByLibrary.simpleMessage("Checklist item"),
+    "Todo_list": MessageLookupByLibrary.simpleMessage("Checklist"),
     "Trash": MessageLookupByLibrary.simpleMessage("Trash"),
     "Trash_Empty": MessageLookupByLibrary.simpleMessage("Trash is empty"),
     "Type_something": MessageLookupByLibrary.simpleMessage("Type something..."),
     "Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
+    "Use_Template": MessageLookupByLibrary.simpleMessage("Use a template"),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("Water Tracker"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("We Play Piano"),
     "Widget": MessageLookupByLibrary.simpleMessage("Home Screen Widget"),

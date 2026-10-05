@@ -84,7 +84,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
     //* add empty todo
     on<_AddEmptyTodo>((event, emit) {
       final todos = List<Todo>.from(state.todos);
-      todos.add(Todo.empty());
+      final afterIndex = todos.indexWhere((todo) => todo.id == event.afterId);
+      todos.insert(
+          afterIndex < 0 ? todos.length : afterIndex + 1, Todo.empty());
 
       emit(state.copyWith(todos: todos));
     });
@@ -111,6 +113,29 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       }).toList();
 
       emit(state.copyWith(todos: updatedTodoList));
+    });
+
+    on<_ToggleTodoCheckbox>((event, emit) {
+      // Preserve the user's order while they type or drag items in the editor.
+      emit(state.copyWith(todos: [
+        for (final todo in state.todos)
+          if (todo.id == event.id)
+            todo.copyWith(completed: !todo.completed)
+          else
+            todo,
+      ]));
+    });
+
+    on<_ReplaceTodoLines>((event, emit) {
+      final index = state.todos.indexWhere((todo) => todo.id == event.id);
+      if (index < 0 || event.lines.isEmpty) return;
+      final todos = List<Todo>.from(state.todos);
+      todos[index] = todos[index].copyWith(title: event.lines.first);
+      todos.insertAll(index + 1, [
+        for (final line in event.lines.skip(1))
+          Todo.empty().copyWith(title: line),
+      ]);
+      emit(state.copyWith(todos: todos));
     });
 
     //* Reorder todo item

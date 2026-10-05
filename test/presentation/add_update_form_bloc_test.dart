@@ -96,4 +96,47 @@ void main() {
 
     expect(bloc.state.imagePaths, ['note_images/two.jpg']);
   });
+
+  test('checking a draft item preserves its id and position', () async {
+    seedTodos(['a', 'b', 'c']);
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const AddUpdateFormEvent.toggleTodoCheckbox('b'));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(titles(), ['a', 'b', 'c']);
+    expect(bloc.state.todos[1].id, 'b');
+    expect(bloc.state.todos[1].completed, isTrue);
+    bloc.add(const AddUpdateFormEvent.toggleTodoCheckbox('b'));
+    await Future<void>.delayed(Duration.zero);
+    expect(bloc.state.todos[1].completed, isFalse);
+  });
+
+  test('the next item is inserted below the current item', () async {
+    seedTodos(['a', 'b', 'c']);
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const AddUpdateFormEvent.addEmptyTodo(afterId: 'b'));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(titles(), ['a', 'b', '', 'c']);
+    expect(bloc.state.todos[2].id, isNot(anyOf('a', 'b', 'c')));
+  });
+
+  test('pasting lines replaces one row and retains surrounding order',
+      () async {
+    bloc.add(AddUpdateFormEvent.initialize(todos: [
+      Todo(id: 'a', title: 'First'),
+      Todo(id: 'b', title: 'Original', completed: true),
+      Todo(id: 'c', title: 'Last'),
+    ]));
+    await Future<void>.delayed(Duration.zero);
+    bloc.add(const AddUpdateFormEvent.replaceTodoLines(
+        id: 'b', lines: ['Milk', 'Eggs', 'Bread']));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(titles(), ['First', 'Milk', 'Eggs', 'Bread', 'Last']);
+    expect(bloc.state.todos[1].id, 'b');
+    expect(bloc.state.todos[1].completed, isTrue);
+    expect(bloc.state.todos[2].completed, isFalse);
+    expect(bloc.state.todos.map((todo) => todo.id).toSet().length, 5);
+  });
 }

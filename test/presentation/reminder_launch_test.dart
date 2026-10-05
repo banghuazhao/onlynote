@@ -1,3 +1,4 @@
+import 'package:onlynote/Tools/reminder_notification_payload.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -109,7 +110,7 @@ void main() {
 
   tearDown(() => OnboardingSettings.instance.completed = false);
 
-  testWidgets('cold reminder waits for router and completes onboarding',
+  testWidgets('cold snoozed reminder opens its note and completes onboarding',
       (tester) async {
     final launch = ReminderLaunch();
     final router = _ReminderRouter(startWithOnboarding: true);
@@ -120,7 +121,17 @@ void main() {
       router.dispose();
     });
 
-    launch.handleNotificationResponse(_tap(payload: 'first'));
+    launch.handleNotificationResponse(_tap(
+        id: -42,
+        payload: const ReminderNotificationPayload(
+          noteId: 'first',
+          reminderId: 42,
+          snoozeId: -42,
+          revision: 'revision',
+          epoch: 'epoch',
+          title: 'Onlynote',
+          body: 'Reminder',
+        ).encode()));
     await _pumpRouter(tester, router);
     expect(_stack(router), [OnboardingRoute.name]);
 

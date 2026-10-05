@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_templates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,10 +40,12 @@ class AddUpdateNoteScreen extends StatefulWidget {
       {super.key,
       this.note,
       this.folderId,
+      this.template,
       this.autosaveStore,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
+  final NoteTemplate? template;
   final NoteAutosaveStore? autosaveStore;
   final NoteEditorStart start;
 
@@ -71,6 +74,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             : Hive.box(draftDatabaseBox).get(widget.note!.id) as NoteDto?;
     final initial = recovered?.toDomain() ??
         widget.note ??
+        widget.template
+            ?.createNote(S.current, folderId: widget.folderId, now: now) ??
         Note(
           id: const Uuid().v4(),
           color: colors.randomElement,
@@ -101,6 +106,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         ));
     _changes = _form.stream.listen(_capture);
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
+    if (widget.note == null && widget.template != null) {
+      _autosave.saveInitial();
+    }
   }
 
   void _capture(AddUpdateFormState state) {
@@ -214,24 +222,29 @@ class _BuildForm extends StatelessWidget {
         },
       ),
       appBar: NoteAppBar(
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          onPressed: onDone,
-          icon: const Icon(Icons.arrow_back_rounded),
+        leading: Center(
+          child: IconButton(
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: onDone,
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
         ),
-        titleWidget: Text(
-          switch (status) {
-            AutosaveStatus.saved => S.of(context).Autosave_Saved,
-            AutosaveStatus.failed => S.of(context).Autosave_Retry,
-            _ => S.of(context).Autosave_Saving,
-          },
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: status == AutosaveStatus.failed
-                    ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+        titleWidget: Padding(
+          padding: const EdgeInsetsDirectional.only(start: 12),
+          child: Text(
+            switch (status) {
+              AutosaveStatus.saved => S.of(context).Autosave_Saved,
+              AutosaveStatus.failed => S.of(context).Autosave_Retry,
+              _ => S.of(context).Autosave_Saving,
+            },
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: status == AutosaveStatus.failed
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
         ),
         actions: [
           AppButton(
@@ -260,6 +273,7 @@ class _BuildForm extends StatelessWidget {
                   kind: PaperNoteKind.sheet,
                   seed: widget.note?.id?.hashCode ?? 5,
                   tilt: false,
+                  padding: const EdgeInsetsDirectional.fromSTEB(32, 20, 16, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -267,15 +281,20 @@ class _BuildForm extends StatelessWidget {
                         state: state,
                         titleController: _titleController,
                       ),
-                      const SizedBox(height: AppSpacings.xl),
+                      const SizedBox(height: AppSpacings.l),
                       _BuildTodoListField(
                         state: state,
                         autofocusFirstTodo: widget.note == null &&
-                            widget.start == NoteEditorStart.checklist,
+                            (widget.start == NoteEditorStart.checklist ||
+                                widget.template == NoteTemplate.shopping ||
+                                widget.template == NoteTemplate.packing),
                       ),
-                      const SizedBox(height: AppSpacings.xl),
+                      SizedBox(
+                          height: state.imagePaths.isEmpty
+                              ? AppSpacings.m
+                              : AppSpacings.xl),
                       _BuildImageSection(state: state),
-                      const SizedBox(height: AppSpacings.xl),
+                      const SizedBox(height: AppSpacings.xml),
                       _BuildDescriptionField(
                         state: state,
                         descriptionController: _descriptionController,

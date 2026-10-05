@@ -1,16 +1,74 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/reminder.dart';
+import 'package:onlynote/Tools/reminder_notification_payload.dart';
+import 'package:onlynote/services/reminder_snooze.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/Tools/reminder_launch.dart';
 import 'package:onlynote/Tools/notification_timezone.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+@pragma('vm:entry-point')
+void reminderNotificationActionBackground(NotificationResponse response) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  try {
+    await NotificationService().handleSnoozeResponse(response);
+  } catch (error) {
+    debugPrint('Could not snooze reminder: $error');
+  }
+}
+
 class NotificationService {
+  NotificationService({ReminderSnoozeRegistry? snoozeRegistry})
+      : snoozeRegistry = snoozeRegistry ?? ReminderSnoozeRegistry();
+
+  final ReminderSnoozeRegistry snoozeRegistry;
+  static const _category = 'onlynote_reminder_actions';
+  static Future<void> _scheduleQueue = Future.value();
+  static Future<void> _actionQueue = Future.value();
+
+  static Future<T> _serialize<T>(Future<T> Function() operation) {
+    final result = _scheduleQueue.then((_) => operation());
+    _scheduleQueue =
+        result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return result;
+  }
+
+  Future<S> _actionLabels() async {
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final traditional = locale.scriptCode == 'Hant' ||
+        locale.countryCode == 'TW' ||
+        locale.countryCode == 'HK';
+    return S.load(locale.languageCode == 'zh'
+        ? (traditional ? const Locale('zh', 'HK') : const Locale('zh'))
+        : const Locale('en'));
+  }
+
+  Future<bool> handleSnoozeResponse(NotificationResponse response) {
+    final result = _actionQueue.then((_) => ReminderSnooze(
+          registry: snoozeRegistry,
+          schedule: (payload, due) => _scheduleNative(
+              id: payload.snoozeId,
+              title: payload.title,
+              body: payload.body,
+              time: due,
+              payload: payload.encode(),
+              repeat: ReminderRepeat.none),
+          cancel: (id) => flutterLocalNotificationsPlugin.cancel(id: id),
+        ).handleResponse(response));
+    _actionQueue =
+        result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return result;
+  }
+
   //instance of FlutterLocalNotificationsPlugin
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -20,16 +78,23 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    //Initialization Settings for iOS
-    const DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
+    final labels = await _actionLabels();
+    final initializationSettingsIOS = DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
+      notificationCategories: [
+        DarwinNotificationCategory(_category, actions: [
+          DarwinNotificationAction.plain(
+              ReminderSnooze.tenMinutes, labels.Reminder_Snooze_10_Minutes),
+          DarwinNotificationAction.plain(
+              ReminderSnooze.oneHour, labels.Reminder_Snooze_1_Hour),
+        ])
+      ],
     );
 
     //Initializing settings for both platforms (Android & iOS)
-    const InitializationSettings initializationSettings =
+    final InitializationSettings initializationSettings =
         InitializationSettings(
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
@@ -45,6 +110,8 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
       onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+      onDidReceiveBackgroundNotificationResponse:
+          reminderNotificationActionBackground,
     );
 
     // The response callback handles an already running app. A tap that starts
@@ -58,7 +125,14 @@ class NotificationService {
   }
 
   void onDidReceiveNotificationResponse(NotificationResponse response) {
-    ReminderLaunch.instance.handleNotificationResponse(response);
+    if (ReminderSnooze.isSnoozeAction(response.actionId)) {
+      unawaited(handleSnoozeResponse(response).catchError((Object error) {
+        debugPrint('Could not snooze reminder: $error');
+        return false;
+      }));
+    } else {
+      ReminderLaunch.instance.handleNotificationResponse(response);
+    }
   }
 
   Future<bool?>? requestIOSPermissions() {
@@ -138,21 +212,57 @@ class NotificationService {
     }
   }
 
-  Future<void> clearAll() async {
-    await flutterLocalNotificationsPlugin.cancelAll();
-    final pendingNotificationRequests =
-        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+  Future<void> clearAll() => _serialize(() async {
+        // Invalidate before canceling: an action already in flight checks again
+        // after scheduling and removes its own obsolete snooze.
+        await snoozeRegistry.invalidateAll();
+        await flutterLocalNotificationsPlugin.cancelAll();
+      });
 
-    debugPrint(
-        "after clear all: pendingNotificationRequests count: ${pendingNotificationRequests.length}");
-    for (PendingNotificationRequest request in pendingNotificationRequests) {
-      debugPrint("${request.id}: ${request.title}");
-    }
-  }
+  Future<void> removeNotification(Reminder reminder) => _serialize(() async {
+        final previous = await snoozeRegistry.invalidate(reminder.reminderId);
+        // Attempt both even if a platform cancellation fails for one ID.
+        await Future.wait([
+          flutterLocalNotificationsPlugin.cancel(id: reminder.reminderId),
+          if (previous != null)
+            flutterLocalNotificationsPlugin.cancel(id: previous.snoozeId),
+        ]);
+      });
 
-  Future<void> removeNotification(Reminder reminder) async {
-    await flutterLocalNotificationsPlugin.cancel(id: reminder.reminderId);
-  }
+  /// Upgrade native requests made by older releases without changing current
+  /// snoozes or reactivating reminders intentionally omitted during restore.
+  Future<void> upgradePendingReminders(
+          List<Reminder> reminders, NoteRepository notes) =>
+      _serialize(() async {
+        try {
+          final pending = await flutterLocalNotificationsPlugin
+              .pendingNotificationRequests();
+          final labels = await _actionLabels();
+          for (final request in pending) {
+            if (request.id < 0 ||
+                ReminderNotificationPayload.tryDecode(request.payload) !=
+                    null ||
+                await snoozeRegistry.hasRegistration(request.id)) {
+              continue;
+            }
+            final matches = reminders.where((r) => r.reminderId == request.id);
+            if (matches.isEmpty) continue;
+            final reminder = matches.first;
+            if (!reminder.isSchedulable(DateTime.now())) continue;
+            final note = await notes.getNote(reminder.noteId);
+            if (note.isDeleted) continue;
+            await _scheduleRegistered(
+                id: reminder.reminderId,
+                title: labels.Onlynote,
+                body: '${labels.Reminder}: ${note.title ?? ''}',
+                time: reminder.reminderDate,
+                noteId: reminder.noteId,
+                repeat: reminder.repeat);
+          }
+        } catch (error) {
+          debugPrint('Reminder action upgrade deferred: $error');
+        }
+      });
 
   Future<bool?> checkAndAskForPermission(BuildContext context) async {
     final result = await _requestPlatformPermissions();
@@ -218,18 +328,79 @@ class NotificationService {
     required DateTime time,
     required String noteId,
     ReminderRepeat repeat = ReminderRepeat.none,
-  }) async {
+  }) =>
+      _serialize(() => _scheduleRegistered(
+          id: id,
+          title: title,
+          body: body,
+          time: time,
+          noteId: noteId,
+          repeat: repeat));
+
+  Future<bool> _scheduleRegistered(
+      {required int id,
+      required String title,
+      required String body,
+      required DateTime time,
+      required String noteId,
+      required ReminderRepeat repeat}) async {
+    ReminderSnoozeRegistration? registration;
     try {
       await NotificationTimezone.initialize();
+      registration = await snoozeRegistry.prepare(
+          noteId: noteId, reminderId: id, title: title, body: body);
+      final scheduled = await _scheduleNative(
+          id: id,
+          title: title,
+          body: body,
+          time: time,
+          payload: registration.payload.encode(),
+          repeat: repeat,
+          refreshTimezone: false);
+      if (!scheduled) {
+        await snoozeRegistry.restore(registration.previous,
+            replacing: registration.payload);
+        return false;
+      }
+      if (registration.previous != null) {
+        try {
+          await flutterLocalNotificationsPlugin.cancel(
+              id: registration.previous!.snoozeId);
+        } catch (error) {
+          // Scheduling already succeeded. Keep its action revision active.
+          debugPrint('Obsolete snooze cleanup deferred: $error');
+        }
+      }
+      return true;
+    } catch (error) {
+      // Keep the native action payload and registry in agreement on failure.
+      if (registration != null) {
+        await snoozeRegistry.restore(registration.previous,
+            replacing: registration.payload);
+      }
+      debugPrint('Could not schedule reminder: $error');
+      return false;
+    }
+  }
+
+  Future<bool> _scheduleNative({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime time,
+    required String payload,
+    required ReminderRepeat repeat,
+    bool refreshTimezone = true,
+  }) async {
+    try {
+      if (refreshTimezone) await NotificationTimezone.initialize();
+      final labels = await _actionLabels();
       final pattern = time.toLocal();
-      // Native component matching chooses the next occurrence. Preserve the
-      // original weekday/time instead of a DST-normalized next occurrence.
+      // Preserve calendar components for native daily/weekly matching.
       final date = repeat == ReminderRepeat.none
           ? time
           : DateTime(2024, 1, pattern.weekday, pattern.hour, pattern.minute,
               pattern.second, pattern.millisecond, pattern.microsecond);
-      // Date pickers and repeat patterns supply local wall time. UTC imports
-      // retain their instant; local dates use the device's named timezone.
       final scheduledDate = date.isUtc
           ? tz.TZDateTime.from(date, tz.local)
           : tz.TZDateTime(tz.local, date.year, date.month, date.day, date.hour,
@@ -238,25 +409,34 @@ class NotificationService {
         id: id,
         title: title,
         body: body,
-        payload: noteId,
+        payload: payload,
         scheduledDate: scheduledDate,
         matchDateTimeComponents: switch (repeat) {
           ReminderRepeat.none => null,
           ReminderRepeat.daily => DateTimeComponents.time,
           ReminderRepeat.weekly => DateTimeComponents.dayOfWeekAndTime,
         },
-        notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails(
-                'your channel id', 'your channel name',
-                channelDescription: 'your channel description')),
-        // Inexact avoids needing the restricted SCHEDULE_EXACT_ALARM /
-        // USE_EXACT_ALARM permission on Android 12+ — fine for a note
-        // reminder, which doesn't need to-the-second precision.
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+              'your channel id', 'your channel name',
+              channelDescription: 'your channel description',
+              actions: [
+                AndroidNotificationAction(ReminderSnooze.tenMinutes,
+                    labels.Reminder_Snooze_10_Minutes),
+                AndroidNotificationAction(
+                    ReminderSnooze.oneHour, labels.Reminder_Snooze_1_Hour),
+              ]),
+          iOS: const DarwinNotificationDetails(
+              categoryIdentifier: _category,
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true),
+        ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
       return true;
-    } catch (e) {
-      debugPrint('$e');
+    } catch (error) {
+      debugPrint('Could not schedule reminder notification: $error');
       return false;
     }
   }

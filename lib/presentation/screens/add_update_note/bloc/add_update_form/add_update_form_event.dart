@@ -25,7 +25,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     DateTime? deletedAt,
   }) = _AddOrUpdateNote;
 
-  const factory AddUpdateFormEvent.addEmptyTodo() = _AddEmptyTodo;
+  const factory AddUpdateFormEvent.addEmptyTodo({String? afterId}) =
+      _AddEmptyTodo;
 
   const factory AddUpdateFormEvent.deleteTodo(String id) = _DeleteTodo;
 
@@ -33,6 +34,14 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     required String value,
     required String id,
   }) = _TodoValueChanged;
+
+  const factory AddUpdateFormEvent.toggleTodoCheckbox(String id) =
+      _ToggleTodoCheckbox;
+
+  const factory AddUpdateFormEvent.replaceTodoLines({
+    required String id,
+    required List<String> lines,
+  }) = _ReplaceTodoLines;
 
   const factory AddUpdateFormEvent.reorderTodo({
     required int oldIndex,

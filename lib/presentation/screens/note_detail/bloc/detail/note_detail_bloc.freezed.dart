@@ -20,18 +20,31 @@ mixin _$NoteDetailEvent {
   TResult when<TResult extends Object?>({
     required TResult Function(String noteId) showNote,
     required TResult Function(String todoId) toggleTodoCheckbox,
+    required TResult Function(
+            String noteId, Completer<List<String>?>? completion)
+        resetChecklist,
+    required TResult Function(String noteId, List<String> todoIds)
+        restoreCompletedTodos,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String noteId)? showNote,
     TResult? Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult? Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String noteId)? showNote,
     TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -39,18 +52,25 @@ mixin _$NoteDetailEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(_ShowNote value) showNote,
     required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ResetChecklist value) resetChecklist,
+    required TResult Function(_RestoreCompletedTodos value)
+        restoreCompletedTodos,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ShowNote value)? showNote,
     TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ResetChecklist value)? resetChecklist,
+    TResult? Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ShowNote value)? showNote,
     TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ResetChecklist value)? resetChecklist,
+    TResult Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -140,6 +160,11 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult when<TResult extends Object?>({
     required TResult Function(String noteId) showNote,
     required TResult Function(String todoId) toggleTodoCheckbox,
+    required TResult Function(
+            String noteId, Completer<List<String>?>? completion)
+        resetChecklist,
+    required TResult Function(String noteId, List<String> todoIds)
+        restoreCompletedTodos,
   }) {
     return showNote(noteId);
   }
@@ -149,6 +174,10 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String noteId)? showNote,
     TResult? Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult? Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
   }) {
     return showNote?.call(noteId);
   }
@@ -158,6 +187,10 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String noteId)? showNote,
     TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
     required TResult orElse(),
   }) {
     if (showNote != null) {
@@ -171,6 +204,9 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult map<TResult extends Object?>({
     required TResult Function(_ShowNote value) showNote,
     required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ResetChecklist value) resetChecklist,
+    required TResult Function(_RestoreCompletedTodos value)
+        restoreCompletedTodos,
   }) {
     return showNote(this);
   }
@@ -180,6 +216,8 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ShowNote value)? showNote,
     TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ResetChecklist value)? resetChecklist,
+    TResult? Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
   }) {
     return showNote?.call(this);
   }
@@ -189,6 +227,8 @@ class _$ShowNoteImpl implements _ShowNote {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ShowNote value)? showNote,
     TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ResetChecklist value)? resetChecklist,
+    TResult Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
     required TResult orElse(),
   }) {
     if (showNote != null) {
@@ -274,6 +314,11 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult when<TResult extends Object?>({
     required TResult Function(String noteId) showNote,
     required TResult Function(String todoId) toggleTodoCheckbox,
+    required TResult Function(
+            String noteId, Completer<List<String>?>? completion)
+        resetChecklist,
+    required TResult Function(String noteId, List<String> todoIds)
+        restoreCompletedTodos,
   }) {
     return toggleTodoCheckbox(todoId);
   }
@@ -283,6 +328,10 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String noteId)? showNote,
     TResult? Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult? Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
   }) {
     return toggleTodoCheckbox?.call(todoId);
   }
@@ -292,6 +341,10 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String noteId)? showNote,
     TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -305,6 +358,9 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult map<TResult extends Object?>({
     required TResult Function(_ShowNote value) showNote,
     required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ResetChecklist value) resetChecklist,
+    required TResult Function(_RestoreCompletedTodos value)
+        restoreCompletedTodos,
   }) {
     return toggleTodoCheckbox(this);
   }
@@ -314,6 +370,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_ShowNote value)? showNote,
     TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ResetChecklist value)? resetChecklist,
+    TResult? Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
   }) {
     return toggleTodoCheckbox?.call(this);
   }
@@ -323,6 +381,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_ShowNote value)? showNote,
     TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ResetChecklist value)? resetChecklist,
+    TResult Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -340,6 +400,346 @@ abstract class _ToggleTodoCheckbox implements NoteDetailEvent {
   @JsonKey(ignore: true)
   _$$ToggleTodoCheckboxImplCopyWith<_$ToggleTodoCheckboxImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ResetChecklistImplCopyWith<$Res> {
+  factory _$$ResetChecklistImplCopyWith(_$ResetChecklistImpl value,
+          $Res Function(_$ResetChecklistImpl) then) =
+      __$$ResetChecklistImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String noteId, Completer<List<String>?>? completion});
+}
+
+/// @nodoc
+class __$$ResetChecklistImplCopyWithImpl<$Res>
+    extends _$NoteDetailEventCopyWithImpl<$Res, _$ResetChecklistImpl>
+    implements _$$ResetChecklistImplCopyWith<$Res> {
+  __$$ResetChecklistImplCopyWithImpl(
+      _$ResetChecklistImpl _value, $Res Function(_$ResetChecklistImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$ResetChecklistImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<List<String>?>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ResetChecklistImpl implements _ResetChecklist {
+  const _$ResetChecklistImpl({required this.noteId, this.completion});
+
+  @override
+  final String noteId;
+  @override
+  final Completer<List<String>?>? completion;
+
+  @override
+  String toString() {
+    return 'NoteDetailEvent.resetChecklist(noteId: $noteId, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ResetChecklistImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, noteId, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ResetChecklistImplCopyWith<_$ResetChecklistImpl> get copyWith =>
+      __$$ResetChecklistImplCopyWithImpl<_$ResetChecklistImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId) showNote,
+    required TResult Function(String todoId) toggleTodoCheckbox,
+    required TResult Function(
+            String noteId, Completer<List<String>?>? completion)
+        resetChecklist,
+    required TResult Function(String noteId, List<String> todoIds)
+        restoreCompletedTodos,
+  }) {
+    return resetChecklist(noteId, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId)? showNote,
+    TResult? Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult? Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
+  }) {
+    return resetChecklist?.call(noteId, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId)? showNote,
+    TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
+    required TResult orElse(),
+  }) {
+    if (resetChecklist != null) {
+      return resetChecklist(noteId, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ShowNote value) showNote,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ResetChecklist value) resetChecklist,
+    required TResult Function(_RestoreCompletedTodos value)
+        restoreCompletedTodos,
+  }) {
+    return resetChecklist(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ShowNote value)? showNote,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ResetChecklist value)? resetChecklist,
+    TResult? Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
+  }) {
+    return resetChecklist?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ShowNote value)? showNote,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ResetChecklist value)? resetChecklist,
+    TResult Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
+    required TResult orElse(),
+  }) {
+    if (resetChecklist != null) {
+      return resetChecklist(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ResetChecklist implements NoteDetailEvent {
+  const factory _ResetChecklist(
+      {required final String noteId,
+      final Completer<List<String>?>? completion}) = _$ResetChecklistImpl;
+
+  String get noteId;
+  Completer<List<String>?>? get completion;
+  @JsonKey(ignore: true)
+  _$$ResetChecklistImplCopyWith<_$ResetChecklistImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$RestoreCompletedTodosImplCopyWith<$Res> {
+  factory _$$RestoreCompletedTodosImplCopyWith(
+          _$RestoreCompletedTodosImpl value,
+          $Res Function(_$RestoreCompletedTodosImpl) then) =
+      __$$RestoreCompletedTodosImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String noteId, List<String> todoIds});
+}
+
+/// @nodoc
+class __$$RestoreCompletedTodosImplCopyWithImpl<$Res>
+    extends _$NoteDetailEventCopyWithImpl<$Res, _$RestoreCompletedTodosImpl>
+    implements _$$RestoreCompletedTodosImplCopyWith<$Res> {
+  __$$RestoreCompletedTodosImplCopyWithImpl(_$RestoreCompletedTodosImpl _value,
+      $Res Function(_$RestoreCompletedTodosImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? todoIds = null,
+  }) {
+    return _then(_$RestoreCompletedTodosImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      todoIds: null == todoIds
+          ? _value._todoIds
+          : todoIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$RestoreCompletedTodosImpl implements _RestoreCompletedTodos {
+  const _$RestoreCompletedTodosImpl(
+      {required this.noteId, required final List<String> todoIds})
+      : _todoIds = todoIds;
+
+  @override
+  final String noteId;
+  final List<String> _todoIds;
+  @override
+  List<String> get todoIds {
+    if (_todoIds is EqualUnmodifiableListView) return _todoIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_todoIds);
+  }
+
+  @override
+  String toString() {
+    return 'NoteDetailEvent.restoreCompletedTodos(noteId: $noteId, todoIds: $todoIds)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$RestoreCompletedTodosImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            const DeepCollectionEquality().equals(other._todoIds, _todoIds));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, noteId, const DeepCollectionEquality().hash(_todoIds));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$RestoreCompletedTodosImplCopyWith<_$RestoreCompletedTodosImpl>
+      get copyWith => __$$RestoreCompletedTodosImplCopyWithImpl<
+          _$RestoreCompletedTodosImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId) showNote,
+    required TResult Function(String todoId) toggleTodoCheckbox,
+    required TResult Function(
+            String noteId, Completer<List<String>?>? completion)
+        resetChecklist,
+    required TResult Function(String noteId, List<String> todoIds)
+        restoreCompletedTodos,
+  }) {
+    return restoreCompletedTodos(noteId, todoIds);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId)? showNote,
+    TResult? Function(String todoId)? toggleTodoCheckbox,
+    TResult? Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult? Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
+  }) {
+    return restoreCompletedTodos?.call(noteId, todoIds);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId)? showNote,
+    TResult Function(String todoId)? toggleTodoCheckbox,
+    TResult Function(String noteId, Completer<List<String>?>? completion)?
+        resetChecklist,
+    TResult Function(String noteId, List<String> todoIds)?
+        restoreCompletedTodos,
+    required TResult orElse(),
+  }) {
+    if (restoreCompletedTodos != null) {
+      return restoreCompletedTodos(noteId, todoIds);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_ShowNote value) showNote,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_ResetChecklist value) resetChecklist,
+    required TResult Function(_RestoreCompletedTodos value)
+        restoreCompletedTodos,
+  }) {
+    return restoreCompletedTodos(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_ShowNote value)? showNote,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_ResetChecklist value)? resetChecklist,
+    TResult? Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
+  }) {
+    return restoreCompletedTodos?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_ShowNote value)? showNote,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_ResetChecklist value)? resetChecklist,
+    TResult Function(_RestoreCompletedTodos value)? restoreCompletedTodos,
+    required TResult orElse(),
+  }) {
+    if (restoreCompletedTodos != null) {
+      return restoreCompletedTodos(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _RestoreCompletedTodos implements NoteDetailEvent {
+  const factory _RestoreCompletedTodos(
+      {required final String noteId,
+      required final List<String> todoIds}) = _$RestoreCompletedTodosImpl;
+
+  String get noteId;
+  List<String> get todoIds;
+  @JsonKey(ignore: true)
+  _$$RestoreCompletedTodosImplCopyWith<_$RestoreCompletedTodosImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc

@@ -1,3 +1,6 @@
+import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
+import 'package:onlynote/presentation/components/note_checklist.dart';
+import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/presentation/components/button.dart';
 import 'package:onlynote/presentation/components/widget_discovery_card.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
@@ -394,3 +397,32 @@ class ButtonExamples extends StatelessWidget {
         ]),
       );
 }
+
+@Preview(name: 'Starter templates', size: Size(390, 640))
+Widget starterTemplatesPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(body: NoteTemplatePickerSheet()),
+    );
+
+@Preview(name: 'Checklist progress', size: Size(390, 500))
+Widget checklistProgressPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: Scaffold(
+          body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: PaperNote(
+          kind: PaperNoteKind.sheet,
+          color: AppColors.parchment,
+          child: NoteChecklist(todos: [
+            Todo(id: 'one', title: 'Pick up fresh bread'),
+            Todo(id: 'two', title: 'Bring a reusable bag', completed: true),
+            Todo(id: 'three', title: 'Plan dinner'),
+          ], onToggle: previewChecklistToggle, onReset: previewChecklistReset),
+        ),
+      )),
+    );
+
+void previewChecklistToggle(String id) {}
+Future<void> previewChecklistReset() async {}

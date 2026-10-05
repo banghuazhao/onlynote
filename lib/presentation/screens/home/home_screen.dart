@@ -1,4 +1,5 @@
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +153,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted && name != null && name.trim().isNotEmpty) {
       onSubmit(name.trim());
     }
+  }
+
+  Future<void> _openTemplates({String? folderId}) async {
+    final template = await showNoteTemplatePickerSheet(context);
+    if (!mounted || template == null) return;
+    context.router.push(
+      AddUpdateNoteRoute(folderId: folderId, template: template),
+    );
   }
 
   /// What the app bar title reads: the scope the note list is currently
@@ -326,6 +335,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             );
                                           },
+                                          onTemplates: () => _openTemplates(
+                                            folderId: data.selectedFolderId,
+                                          ),
                                         )
                                       : _BuildNotesList(
                                           notes: data.notes,
@@ -425,6 +437,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         .add(const HomeEvent.searchChanged(''));
                   }
                 });
+              },
+            ),
+            AppButton(
+              tooltip: S.of(context).Templates,
+              child: const Icon(Icons.dashboard_customize_outlined),
+              onPressed: () {
+                final folderId = context.read<HomeBloc>().state.mapOrNull(
+                      loaded: (s) => s.showTrash ? null : s.selectedFolderId,
+                    );
+                _openTemplates(folderId: folderId);
               },
             ),
             AppButton(
@@ -586,12 +608,14 @@ class _HomeScreenState extends State<HomeScreen> {
 class _EmptyNotes extends StatelessWidget {
   const _EmptyNotes({
     required this.onAdd,
+    required this.onTemplates,
     required this.showTrash,
     required this.hasSearch,
     required this.hasFolder,
   });
 
   final VoidCallback onAdd;
+  final VoidCallback onTemplates;
   final bool showTrash;
   final bool hasSearch;
   final bool hasFolder;
@@ -632,6 +656,12 @@ class _EmptyNotes extends StatelessWidget {
                 onPressed: onAdd,
                 icon: const Icon(Icons.add_rounded),
                 label: Text(l10n.Add_Note),
+              ),
+              SizedBox(height: context.tokens.space2),
+              TextButton.icon(
+                onPressed: onTemplates,
+                icon: const Icon(Icons.dashboard_customize_outlined),
+                label: Text(l10n.Use_Template),
               ),
             ],
           ],

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/onboarding_settings.dart';
 import 'package:onlynote/Tools/reminder.dart';
+import 'package:onlynote/Tools/reminder_notification_payload.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 
@@ -45,8 +46,8 @@ class ReminderLaunch {
   }
 
   String? _noteId(NotificationResponse response) {
-    final payload = response.payload;
-    if (payload != null && payload.trim().isNotEmpty) return payload;
+    final noteId = ReminderNotificationPayload.noteIdFrom(response.payload);
+    if (noteId != null) return noteId;
 
     // Notifications scheduled before note payloads were added still have
     // their notification ID and locally stored reminder metadata.
