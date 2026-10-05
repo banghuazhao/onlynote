@@ -207,5 +207,15 @@
     "Share_Preparing": "Preparing your note…",
     "Share_No_Text": "This note has no text. Choose an image or PDF to include its photos.",
  "Restore_Reminder_Warning": "Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.",
- "Note_Color": "Note color {number}"
+ "Note_Color": "Note color {number}",
+ "Widget_Discovery_Title": "Keep pinned notes in view",
+ "Widget_Discovery_Body": "Add a widget to your Home Screen for a quick glance at your notes.",
+ "Reminder_Repeat": "Repeat",
+ "Reminder_Repeat_Never": "Never",
+ "Reminder_Repeat_Daily": "Daily",
+ "Reminder_Repeat_Weekly": "Weekly",
+ "Reminder_Time": "Time",
+ "Reminder_Day": "Day",
+ "Reminder_Set": "Set reminder",
+ "Reminder_Next_Time": "Next reminder: {time}"
 }

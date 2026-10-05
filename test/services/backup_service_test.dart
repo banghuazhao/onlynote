@@ -125,8 +125,63 @@ void main() {
         [1, 2, 3, 4]);
     expect(restored.single.noteId, copy.id);
     expect(restored.single.reminderDate, DateTime(2027, 1, 1, 9));
+    expect(restored.single.repeat, ReminderRepeat.none);
     expect(restored.single.reminderId, isNot(1));
     expect(journal.isEmpty, isTrue);
+  });
+
+  test('backup and restore retain daily and weekly past reminder anchors',
+      () async {
+    await seed();
+    final anchor = DateTime(2020, 1, 6, 9, 30);
+    reminders = [
+      Reminder(
+          noteId: 'original',
+          reminderId: 1,
+          reminderDate: anchor,
+          repeat: ReminderRepeat.daily),
+      Reminder(
+          noteId: 'trash',
+          reminderId: 2,
+          reminderDate: anchor,
+          repeat: ReminderRepeat.weekly),
+    ];
+    final backup = decodeBackup(await service.export());
+    expect(backup.reminders.map((r) => r.repeat),
+        [ReminderRepeat.daily, ReminderRepeat.weekly]);
+    expect(backup.reminders.every((r) => r.date == anchor), isTrue);
+    expect(
+        backup.reminders.every((r) => r.isSchedulable(DateTime.now())), isTrue);
+
+    final restored = await service.restore(backup);
+    expect(restored.map((r) => r.repeat),
+        [ReminderRepeat.daily, ReminderRepeat.weekly]);
+    expect(restored.every((r) => r.reminderDate == anchor), isTrue);
+    expect(restored.every((r) => r.isSchedulable(DateTime.now())), isTrue);
+    expect(
+        restored
+            .map((r) => r.noteId)
+            .toSet()
+            .intersection({'original', 'trash'}),
+        isEmpty);
+    expect((notes.get(restored.last.noteId) as NoteDto).isDeleted, isTrue);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test('version 1 backups without repeat restore as one-time reminders',
+      () async {
+    await seed();
+    final json = decodeBackup(await service.export()).toJson();
+    for (final reminder in json['reminders'] as List) {
+      (reminder as Map<String, dynamic>).remove('repeat');
+      reminder['date'] = DateTime(2020).toIso8601String();
+    }
+    final backup = BackupContents.fromJson(json);
+    expect(backup.reminders.single.repeat, ReminderRepeat.none);
+    expect(backup.reminders.single.isSchedulable(DateTime.now()), isFalse);
+    final restored = await service.restore(backup);
+    expect(restored.single.repeat, ReminderRepeat.none);
+    expect(restored.single.isSchedulable(DateTime.now()), isFalse);
   });
 
   test('failed restore rolls back only the newly created data', () async {
@@ -191,6 +246,9 @@ void main() {
       (m) => (m['notes'] as List).first['folderId'] = 'missing',
       (m) => (m['photos'] as Map).values.first['extension'] = '../outside',
       (m) => (m['notes'] as List).add((m['notes'] as List).first),
+      (m) => (m['reminders'] as List).first['repeat'] = 'monthly',
+      (m) => (m['reminders'] as List).first['repeat'] = 1,
+      (m) => (m['reminders'] as List).first['repeat'] = null,
     ]) {
       final changed = jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
       mutation(changed);

@@ -57,16 +57,9 @@ class ReminderData extends ChangeNotifier {
   }
 
   void init(List<dynamic>? items) {
-    debugPrint('$items');
-    if (items != null && items.isNotEmpty) {
-      reminders.clear();
-      for (final dynamic e in items) {
-        final reminderMap = e as Map<dynamic, dynamic>;
-        reminders.add(Reminder(
-            reminderDate: DateTime.parse(reminderMap['reminderDate'] as String),
-            reminderId: reminderMap['reminderId'] as int,
-            noteId: reminderMap['noteId'] as String));
-      }
-    }
+    reminders = [
+      for (final item in items ?? [])
+        Reminder.fromJson(item as Map<dynamic, dynamic>),
+    ];
   }
 }

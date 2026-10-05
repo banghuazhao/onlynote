@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 
@@ -13,9 +14,13 @@ class BackupPhoto {
 }
 
 class BackupReminder {
-  BackupReminder(this.noteId, this.date);
+  BackupReminder(this.noteId, this.date, {this.repeat = ReminderRepeat.none});
   final String noteId;
   final DateTime date;
+  final ReminderRepeat repeat;
+
+  bool isSchedulable(DateTime now) =>
+      repeat != ReminderRepeat.none || date.isAfter(now);
 }
 
 class BackupContents {
@@ -78,6 +83,7 @@ class BackupContents {
             {
               'noteId': reminder.noteId,
               'date': reminder.date.toIso8601String(),
+              'repeat': reminder.repeat.name,
             }
         ],
       };
@@ -160,7 +166,14 @@ class BackupContents {
       if (!noteIds.contains(id) || !reminderNotes.add(id)) {
         throw const FormatException('Invalid reminder');
       }
-      reminders.add(BackupReminder(id, DateTime.parse(map['date'] as String)));
+      final repeat = map.containsKey('repeat')
+          ? ReminderRepeat.values.where((r) => r.name == map['repeat'])
+          : [ReminderRepeat.none];
+      if (repeat.length != 1) {
+        throw const FormatException('Invalid reminder repeat');
+      }
+      reminders.add(BackupReminder(id, DateTime.parse(map['date'] as String),
+          repeat: repeat.single));
     }
     return BackupContents(
         createdAt: createdAt,

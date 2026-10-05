@@ -207,5 +207,15 @@
     "Share_Preparing": "正在准备笔记…",
     "Share_No_Text": "此笔记没有文本，请选择图片或 PDF 来分享照片。",
  "Restore_Reminder_Warning": "笔记已恢复，但部分提醒未能安排。请打开相关笔记重新设置提醒。",
- "Note_Color": "笔记颜色 {number}"
+ "Note_Color": "笔记颜色 {number}",
+ "Widget_Discovery_Title": "让置顶备忘录随时可见",
+ "Widget_Discovery_Body": "添加主屏幕小组件，一眼查看你的备忘录。",
+ "Reminder_Repeat": "重复",
+ "Reminder_Repeat_Never": "不重复",
+ "Reminder_Repeat_Daily": "每天",
+ "Reminder_Repeat_Weekly": "每周",
+ "Reminder_Time": "时间",
+ "Reminder_Day": "星期",
+ "Reminder_Set": "设置提醒",
+ "Reminder_Next_Time": "下次提醒：{time}"
 }

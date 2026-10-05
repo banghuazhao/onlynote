@@ -41,7 +41,7 @@ class BackupService {
     final noteIds = snapshot.map((n) => n.id).toSet();
     final reminders = readReminders()
         .where((r) => noteIds.contains(r.noteId))
-        .map((r) => BackupReminder(r.noteId, r.reminderDate))
+        .map((r) => BackupReminder(r.noteId, r.reminderDate, repeat: r.repeat))
         .toList();
     final photos = <String, BackupPhoto>{};
     final photoKeys = <String, String>{};
@@ -133,7 +133,8 @@ class BackupService {
         restored.add(Reminder(
             noteId: noteIds[reminder.noteId]!,
             reminderId: id,
-            reminderDate: reminder.date));
+            reminderDate: reminder.date,
+            repeat: reminder.repeat));
       }
       await writeReminders([...existing, ...restored]);
       await notes.flush();

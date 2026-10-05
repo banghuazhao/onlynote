@@ -1769,6 +1769,91 @@ class S {
       args: [number],
     );
   }
+
+  /// `Keep pinned notes in view`
+  String get Widget_Discovery_Title {
+    return Intl.message(
+      'Keep pinned notes in view',
+      name: 'Widget_Discovery_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a widget to your Home Screen for a quick glance at your notes.`
+  String get Widget_Discovery_Body {
+    return Intl.message(
+      'Add a widget to your Home Screen for a quick glance at your notes.',
+      name: 'Widget_Discovery_Body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Repeat`
+  String get Reminder_Repeat {
+    return Intl.message('Repeat', name: 'Reminder_Repeat', desc: '', args: []);
+  }
+
+  /// `Never`
+  String get Reminder_Repeat_Never {
+    return Intl.message(
+      'Never',
+      name: 'Reminder_Repeat_Never',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily`
+  String get Reminder_Repeat_Daily {
+    return Intl.message(
+      'Daily',
+      name: 'Reminder_Repeat_Daily',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Weekly`
+  String get Reminder_Repeat_Weekly {
+    return Intl.message(
+      'Weekly',
+      name: 'Reminder_Repeat_Weekly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Time`
+  String get Reminder_Time {
+    return Intl.message('Time', name: 'Reminder_Time', desc: '', args: []);
+  }
+
+  /// `Day`
+  String get Reminder_Day {
+    return Intl.message('Day', name: 'Reminder_Day', desc: '', args: []);
+  }
+
+  /// `Set reminder`
+  String get Reminder_Set {
+    return Intl.message(
+      'Set reminder',
+      name: 'Reminder_Set',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next reminder: {time}`
+  String Reminder_Next_Time(Object time) {
+    return Intl.message(
+      'Next reminder: $time',
+      name: 'Reminder_Next_Time',
+      desc: '',
+      args: [time],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -27,7 +27,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m2(number) => "Note color ${number}";
 
-  static String m3(price) => "Remove ads permanently for ${price}.";
+  static String m3(time) => "Next reminder: ${time}";
+
+  static String m4(price) => "Remove ads permanently for ${price}.";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -308,20 +310,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Custom": MessageLookupByLibrary.simpleMessage(
       "Choose date & time",
     ),
+    "Reminder_Day": MessageLookupByLibrary.simpleMessage("Day"),
     "Reminder_Future_Time": MessageLookupByLibrary.simpleMessage(
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
+    "Reminder_Next_Time": m3,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
+    "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
+    "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
+    "Reminder_Repeat_Never": MessageLookupByLibrary.simpleMessage("Never"),
+    "Reminder_Repeat_Weekly": MessageLookupByLibrary.simpleMessage("Weekly"),
     "Reminder_Save_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not update the reminder. Please try again.",
     ),
     "Reminder_Saved": MessageLookupByLibrary.simpleMessage("Reminder set"),
+    "Reminder_Set": MessageLookupByLibrary.simpleMessage("Set reminder"),
+    "Reminder_Time": MessageLookupByLibrary.simpleMessage("Time"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage(
       "Tomorrow morning",
     ),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m3,
+    "Remove_Ads_Price": m4,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
@@ -402,6 +412,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "See your notes at a glance, without opening the app.",
+    ),
+    "Widget_Discovery_Body": MessageLookupByLibrary.simpleMessage(
+      "Add a widget to your Home Screen for a quick glance at your notes.",
+    ),
+    "Widget_Discovery_Title": MessageLookupByLibrary.simpleMessage(
+      "Keep pinned notes in view",
     ),
     "Widget_Step_Android_1": MessageLookupByLibrary.simpleMessage(
       "Touch and hold an empty area of your Home Screen.",

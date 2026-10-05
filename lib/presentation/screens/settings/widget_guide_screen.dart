@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:onlynote/Tools/widget_discovery_settings.dart';
 import 'package:onlynote/Tools/widget_sync.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
@@ -26,6 +28,9 @@ class _WidgetGuideScreenState extends State<WidgetGuideScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(WidgetDiscoverySettings.instance.complete());
+    });
     _checkPinSupport();
   }
 

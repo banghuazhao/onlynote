@@ -8,7 +8,8 @@ A minimalist notes & checklist app built with Flutter.
 
 - Quick note-taking with rich colors to organize at a glance
 - Checklist / todo items inside any note
-- Reminders with local push notifications
+- One-time, daily, and weekly reminders that open their note when tapped
+- Home Screen widgets for pinned and recent notes, with contextual setup guidance
 - One-tap image sharing — turn a note into a shareable image
 - Multi-select to bulk-delete notes
 - Localized in English, Simplified Chinese, and Traditional Chinese

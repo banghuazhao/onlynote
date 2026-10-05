@@ -103,6 +103,39 @@ void main() {
     expect(reminders.single.reminderId, 42);
   });
 
+  for (final repeat in [ReminderRepeat.daily, ReminderRepeat.weekly]) {
+    test('undo reschedules a ${repeat.name} reminder with a past anchor',
+        () async {
+      final anchor = DateTime(2020, 1, 6, 9, 30);
+      reminders = [
+        Reminder(
+            noteId: 'a', reminderId: 42, reminderDate: anchor, repeat: repeat)
+      ];
+      await service.setDeleted(['a'], deleted: true);
+      expect(scheduled, isEmpty);
+      expect(await service.setDeleted(['a'], deleted: false), isTrue);
+      expect(scheduled, {42});
+      expect(reminders.single.reminderDate, anchor);
+      expect(reminders.single.repeat, repeat);
+    });
+
+    test('failed delete reschedules a past ${repeat.name} reminder', () async {
+      reminders = [
+        Reminder(
+            noteId: 'a',
+            reminderId: 42,
+            reminderDate: DateTime(2020),
+            repeat: repeat)
+      ];
+      repository.failNextId = 'b';
+      await expectLater(
+          service.setDeleted(['a', 'b'], deleted: true), throwsStateError);
+      expect(repository.notes.values.every((n) => !n.isDeleted), isTrue);
+      expect(scheduled, {42});
+      expect(reminders.single.repeat, repeat);
+    });
+  }
+
   test('repeating a delete or undo does not mutate other notes', () async {
     await service.setDeleted(['a', 'a'], deleted: true);
     final deletedAt = repository.notes['a']!.deletedAt;

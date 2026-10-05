@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_launch.dart';
+import 'package:onlynote/Tools/notification_timezone.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
@@ -34,7 +34,13 @@ class NotificationService {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
 
-    tz.initializeTimeZones();
+    try {
+      await NotificationTimezone.initialize();
+    } catch (error) {
+      // A timezone lookup failure must not stop note access at startup.
+      // Scheduling retries the lookup and reports failure to the caller.
+      debugPrint('Could not load notification timezone: $error');
+    }
 
     await flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
@@ -201,7 +207,8 @@ class NotificationService {
         title: S.of(context).Onlynote,
         body: '${S.of(context).Reminder}: ${note.title ?? ""}',
         time: reminder.reminderDate,
-        noteId: reminder.noteId);
+        noteId: reminder.noteId,
+        repeat: reminder.repeat);
   }
 
   Future<bool> scheduleNotifications({
@@ -210,14 +217,34 @@ class NotificationService {
     required String body,
     required DateTime time,
     required String noteId,
+    ReminderRepeat repeat = ReminderRepeat.none,
   }) async {
     try {
+      await NotificationTimezone.initialize();
+      final pattern = time.toLocal();
+      // Native component matching chooses the next occurrence. Preserve the
+      // original weekday/time instead of a DST-normalized next occurrence.
+      final date = repeat == ReminderRepeat.none
+          ? time
+          : DateTime(2024, 1, pattern.weekday, pattern.hour, pattern.minute,
+              pattern.second, pattern.millisecond, pattern.microsecond);
+      // Date pickers and repeat patterns supply local wall time. UTC imports
+      // retain their instant; local dates use the device's named timezone.
+      final scheduledDate = date.isUtc
+          ? tz.TZDateTime.from(date, tz.local)
+          : tz.TZDateTime(tz.local, date.year, date.month, date.day, date.hour,
+              date.minute, date.second, date.millisecond, date.microsecond);
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
         title: title,
         body: body,
         payload: noteId,
-        scheduledDate: tz.TZDateTime.from(time, tz.local),
+        scheduledDate: scheduledDate,
+        matchDateTimeComponents: switch (repeat) {
+          ReminderRepeat.none => null,
+          ReminderRepeat.daily => DateTimeComponents.time,
+          ReminderRepeat.weekly => DateTimeComponents.dayOfWeekAndTime,
+        },
         notificationDetails: const NotificationDetails(
             android: AndroidNotificationDetails(
                 'your channel id', 'your channel name',

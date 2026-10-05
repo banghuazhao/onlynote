@@ -207,5 +207,15 @@
     "Share_Preparing": "正在準備筆記…",
     "Share_No_Text": "此筆記沒有文字，請選擇圖片或 PDF 來分享相片。",
  "Restore_Reminder_Warning": "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。",
- "Note_Color": "筆記顏色 {number}"
+ "Note_Color": "筆記顏色 {number}",
+ "Widget_Discovery_Title": "讓置頂備忘錄隨時可見",
+ "Widget_Discovery_Body": "加入主畫面小工具，一眼查看你的備忘錄。",
+ "Reminder_Repeat": "重複",
+ "Reminder_Repeat_Never": "不重複",
+ "Reminder_Repeat_Daily": "每天",
+ "Reminder_Repeat_Weekly": "每週",
+ "Reminder_Time": "時間",
+ "Reminder_Day": "星期",
+ "Reminder_Set": "設定提醒",
+ "Reminder_Next_Time": "下次提醒：{time}"
 }

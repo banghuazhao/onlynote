@@ -29,6 +29,7 @@ import '../settings/settings_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'widgets/note_card.dart';
+import 'widgets/widget_discovery_prompt.dart';
 
 @RoutePage(name: 'HomeRoute')
 class HomeScreen extends StatefulWidget {
@@ -331,6 +332,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           searchQuery: data.searchQuery,
                                           folders: data.folders,
                                           showTrash: data.showTrash,
+                                          showWidgetDiscovery:
+                                              !_isSearchVisible &&
+                                                  data.searchQuery
+                                                      .trim()
+                                                      .isEmpty &&
+                                                  data.filters.isEmpty &&
+                                                  !data.showTrash &&
+                                                  data.notes.any((note) =>
+                                                      note.isPinned &&
+                                                      !note.isDeleted),
                                           isReorderMode: _isReorderMode &&
                                               data.searchQuery.trim().isEmpty &&
                                               data.filters.isEmpty,
@@ -664,6 +675,7 @@ class _BuildNotesList extends StatefulWidget {
     required this.searchQuery,
     required this.folders,
     required this.showTrash,
+    required this.showWidgetDiscovery,
     required this.isReorderMode,
     required this.onEnterReorderMode,
   });
@@ -672,6 +684,7 @@ class _BuildNotesList extends StatefulWidget {
   final String searchQuery;
   final List<Folder> folders;
   final bool showTrash;
+  final bool showWidgetDiscovery;
   final bool isReorderMode;
   final VoidCallback onEnterReorderMode;
 
@@ -907,53 +920,65 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       orElse: () => false,
     );
 
-    return MasonryGridView.count(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacings.xl,
-        vertical: AppSpacings.xl,
-      ),
-      crossAxisCount: crossAxisCount,
-      itemCount: widget.notes.length,
-      itemBuilder: (BuildContext context, int index) {
-        final note = widget.notes[index];
-        final noteId = note.id!;
-        return FadeInUp(
-          duration: Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
-          child: KeyedSubtree(
-            key: _cardKeyFor(noteId),
-            child: NoteCard(
-              note: note,
-              searchQuery: widget.searchQuery,
-              selected: multipleDeleteBloc.isSelected(noteId),
-              selectionMode: isSelectionMode,
-              screenshotController: _screenshotControllerFor(noteId),
-              onTap: () {
-                multipleDeleteBloc.state.maybeMap(
-                  orElse: () {
-                    context.router.push(NoteDetailRoute(noteId: noteId));
-                  },
-                  selected: (_) {
-                    multipleDeleteBloc
-                        .add(MultipleDeleteEvent.toggleSelect(noteId));
-                  },
-                );
-              },
-              onLongPress: () {
-                multipleDeleteBloc.state.maybeMap(
-                  orElse: () => _showNoteContextMenu(
-                      context, note, multipleDeleteBloc, noteId),
-                  selected: (_) {
-                    multipleDeleteBloc
-                        .add(MultipleDeleteEvent.toggleSelect(noteId));
-                  },
-                );
-              },
-            ),
+    return CustomScrollView(
+      semanticChildCount: widget.notes.length,
+      slivers: [
+        SliverToBoxAdapter(
+          child: WidgetDiscoveryPrompt(
+            eligible: widget.showWidgetDiscovery && !isSelectionMode,
           ),
-        );
-      },
-      mainAxisSpacing: AppSpacings.xl,
-      crossAxisSpacing: AppSpacings.l,
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacings.xl,
+            vertical: AppSpacings.xl,
+          ),
+          sliver: SliverMasonryGrid.count(
+            crossAxisCount: crossAxisCount,
+            childCount: widget.notes.length,
+            itemBuilder: (BuildContext context, int index) {
+              final note = widget.notes[index];
+              final noteId = note.id!;
+              return FadeInUp(
+                duration: Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
+                child: KeyedSubtree(
+                  key: _cardKeyFor(noteId),
+                  child: NoteCard(
+                    note: note,
+                    searchQuery: widget.searchQuery,
+                    selected: multipleDeleteBloc.isSelected(noteId),
+                    selectionMode: isSelectionMode,
+                    screenshotController: _screenshotControllerFor(noteId),
+                    onTap: () {
+                      multipleDeleteBloc.state.maybeMap(
+                        orElse: () {
+                          context.router.push(NoteDetailRoute(noteId: noteId));
+                        },
+                        selected: (_) {
+                          multipleDeleteBloc
+                              .add(MultipleDeleteEvent.toggleSelect(noteId));
+                        },
+                      );
+                    },
+                    onLongPress: () {
+                      multipleDeleteBloc.state.maybeMap(
+                        orElse: () => _showNoteContextMenu(
+                            context, note, multipleDeleteBloc, noteId),
+                        selected: (_) {
+                          multipleDeleteBloc
+                              .add(MultipleDeleteEvent.toggleSelect(noteId));
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+            mainAxisSpacing: AppSpacings.xl,
+            crossAxisSpacing: AppSpacings.l,
+          ),
+        ),
+      ],
     );
   }
 

@@ -14,7 +14,7 @@ import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:uuid/uuid.dart';
-import 'package:onlynote/services/reminder_shortcuts.dart';
+import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
 
 import 'bloc/action/note_action_bloc.dart';
 import 'bloc/detail/note_detail_bloc.dart';
@@ -32,6 +32,7 @@ class NoteDetailScreen extends StatefulWidget {
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final ScreenshotController _screenshotController = ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
+  bool _savingReminder = false;
 
   @override
   void initState() {
@@ -55,105 +56,56 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
       );
 
-  Future<void> _showReminderPicker(BuildContext context, Note note) async {
+  Future<void> _showReminderPicker(Note note) async {
+    if (_savingReminder) return;
     final current = ReminderData.shared.getCurrentReminder(note);
-    await showAppActionSheet(
+    final result = await showAppSheet<ReminderPickerResult>(
       context: context,
-      title: S.of(context).Reminder,
-      actions: [
-        for (final shortcut in ReminderShortcut.values)
-          AppSheetAction(
-            leading: Icon(switch (shortcut) {
-              ReminderShortcut.inOneHour => Icons.schedule_outlined,
-              ReminderShortcut.tomorrowMorning => Icons.wb_sunny_outlined,
-              ReminderShortcut.nextWeek => Icons.event_outlined,
-            }),
-            title: Text(switch (shortcut) {
-              ReminderShortcut.inOneHour => S.of(context).Reminder_In_One_Hour,
-              ReminderShortcut.tomorrowMorning =>
-                S.of(context).Reminder_Tomorrow,
-              ReminderShortcut.nextWeek => S.of(context).Reminder_Next_Week,
-            }),
-            subtitle: Text(
-                _formatReminderTime(context, shortcut.resolve(DateTime.now()))),
-            onPressed: (sheetContext) {
-              Navigator.pop(sheetContext);
-              _saveReminder(note, shortcut.resolve(DateTime.now()),
-                  current: current);
-            },
-          ),
-        AppSheetAction(
-          leading: const Icon(Icons.edit_calendar_outlined),
-          title: Text(S.of(context).Reminder_Custom),
-          subtitle: current == null
-              ? null
-              : Text(_formatReminderTime(context, current.reminderDate)),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            _editReminder(note, current: current);
-          },
-        ),
-        if (current != null)
-          AppSheetAction(
-            destructive: true,
-            leading: const Icon(Icons.notifications_off_outlined),
-            title: Text(S.of(context).Delete),
-            onPressed: (sheetContext) async {
-              Navigator.pop(sheetContext);
-              try {
-                await NotificationService().removeNotification(current);
-                await ReminderData.shared.deleteReminder(current);
-                if (context.mounted) setState(() {});
-              } catch (_) {
-                if (context.mounted) {
-                  showTransientSnackBar(
-                      context,
-                      SnackBar(
-                          content: Text(S.of(context).Reminder_Save_Failed)));
-                }
-              }
-            },
-          ),
-      ],
+      builder: (_) => ReminderPickerSheet(current: current),
     );
-  }
-
-  String _formatReminderTime(BuildContext context, DateTime date) {
-    final localizations = MaterialLocalizations.of(context);
-    return '${localizations.formatMediumDate(date)} · ${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(date), alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context))}';
-  }
-
-  Future<void> _editReminder(Note note, {Reminder? current}) async {
-    final now = DateTime.now();
-    final initial = current != null && current.reminderDate.isAfter(now)
-        ? current.reminderDate
-        : now.add(const Duration(hours: 1));
-    final date = await showDatePicker(
-      context: context,
-      helpText: S.of(context).Reminder,
-      initialDate: initial,
-      firstDate: now,
-      lastDate: DateTime(now.year + 100),
-    );
-    if (date == null || !mounted) return;
-    final time = await showTimePicker(
-      context: context,
-      helpText: S.of(context).Reminder,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (time == null || !mounted) return;
-    final reminderDate =
-        DateTime(date.year, date.month, date.day, time.hour, time.minute);
-    if (!reminderDate.isAfter(DateTime.now())) {
-      showTransientSnackBar(
-          context, SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
+    if (result == null || !mounted) return;
+    if (!result.delete) {
+      await _saveReminder(note, result.date!,
+          current: current, repeat: result.repeat);
       return;
     }
-    await _saveReminder(note, reminderDate, current: current);
+    if (current == null) return;
+    _savingReminder = true;
+    final service = NotificationService();
+    final l10n = S.of(context);
+    try {
+      await service.removeNotification(current);
+      try {
+        await ReminderData.shared.deleteReminder(current);
+      } catch (_) {
+        if (current.isSchedulable(DateTime.now())) {
+          await service.scheduleNotifications(
+            id: current.reminderId,
+            title: l10n.Onlynote,
+            body: '${l10n.Reminder}: ${note.title ?? ''}',
+            time: current.reminderDate,
+            noteId: current.noteId,
+            repeat: current.repeat,
+          );
+        }
+        rethrow;
+      }
+      if (mounted) setState(() {});
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(l10n.Reminder_Save_Failed)));
+      }
+    } finally {
+      _savingReminder = false;
+    }
   }
 
   Future<void> _saveReminder(Note note, DateTime date,
-      {Reminder? current}) async {
+      {Reminder? current, ReminderRepeat repeat = ReminderRepeat.none}) async {
+    if (_savingReminder) return;
+    _savingReminder = true;
+    final l10n = S.of(context);
     try {
       final service = NotificationService();
       final allowed = await service.checkAndAskForPermission(context);
@@ -166,9 +118,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           id = (id + 1) & 0x7fffffff;
         }
       }
-      final reminder =
-          Reminder(reminderId: id, reminderDate: date, noteId: note.id!);
-      if (!date.isAfter(DateTime.now())) {
+      final reminder = Reminder(
+          reminderId: id, reminderDate: date, noteId: note.id!, repeat: repeat);
+      if (!reminder.isSchedulable(DateTime.now())) {
         showTransientSnackBar(context,
             SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
         return;
@@ -179,6 +131,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         body: '${S.of(context).Reminder}: ${note.title ?? ''}',
         time: date,
         noteId: reminder.noteId,
+        repeat: repeat,
       );
       if (!scheduled) throw StateError('Scheduling failed');
       try {
@@ -189,6 +142,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         }
       } catch (_) {
         await service.removeNotification(reminder);
+        if (current != null && current.isSchedulable(DateTime.now())) {
+          await service.scheduleNotifications(
+            id: current.reminderId,
+            title: l10n.Onlynote,
+            body: '${l10n.Reminder}: ${note.title ?? ''}',
+            time: current.reminderDate,
+            noteId: current.noteId,
+            repeat: current.repeat,
+          );
+        }
         rethrow;
       }
       if (mounted) {
@@ -201,6 +164,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         showTransientSnackBar(context,
             SnackBar(content: Text(S.of(context).Reminder_Save_Failed)));
       }
+    } finally {
+      _savingReminder = false;
     }
   }
 
@@ -273,7 +238,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         key: ValueKey(hasReminder),
                       ),
                     ),
-                    onPressed: () => _showReminderPicker(context, note),
+                    onPressed: () => _showReminderPicker(note),
                   ),
                   AppButton(
                     key: _shareButtonKey,
@@ -315,7 +280,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 screenshotController: _screenshotController,
                 onReminderTap: data.note.isDeleted
                     ? null
-                    : () => _showReminderPicker(context, data.note),
+                    : () => _showReminderPicker(data.note),
               ),
               orElse: () => const _DetailSkeleton(),
             ),
@@ -399,10 +364,13 @@ class LoadedView extends StatelessWidget {
                                   color: AppColors.ink.withValues(alpha: 0.7),
                                 ),
                                 const SizedBox(width: AppSpacings.s),
-                                Text(
-                                  currentReminder.timeString,
-                                  style: AppTypography.description.copyWith(
-                                    color: AppColors.ink.withValues(alpha: 0.7),
+                                Flexible(
+                                  child: Text(
+                                    '${formatReminderTime(context, currentReminder.nextOccurrence(DateTime.now()))}${currentReminder.isRepeating ? ' · ${reminderRepeatLabel(context, currentReminder.repeat)}' : ''}',
+                                    style: AppTypography.description.copyWith(
+                                      color:
+                                          AppColors.ink.withValues(alpha: 0.7),
+                                    ),
                                   ),
                                 ),
                               ],

@@ -105,7 +105,7 @@ class _BackupScreenState extends State<BackupScreen> {
                         const SizedBox(height: 16),
                         Text(S.of(context).Backup_Restore_Description),
                         if (contents.reminders
-                            .any((r) => r.date.isAfter(DateTime.now()))) ...[
+                            .any((r) => r.isSchedulable(DateTime.now()))) ...[
                           const SizedBox(height: 12),
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
@@ -131,20 +131,20 @@ class _BackupScreenState extends State<BackupScreen> {
       setState(() => _progress = S.of(context).Backup_Restoring);
       final reminders = await (await _service()).restore(contents);
       if (!mounted) return;
-      final future = reminders
+      final schedulable = reminders
           .where((r) =>
-              r.reminderDate.isAfter(DateTime.now()) &&
+              r.isSchedulable(DateTime.now()) &&
               !(Hive.box(databaseBox).get(r.noteId) as NoteDto).isDeleted)
           .toList();
       var remindersEnabled = true;
-      if (schedule && future.isNotEmpty) {
+      if (schedule && schedulable.isNotEmpty) {
         try {
           final service = NotificationService();
           remindersEnabled =
               await service.checkAndAskForPermission(context) == true;
           if (!mounted) return;
           if (remindersEnabled) {
-            for (final reminder in future) {
+            for (final reminder in schedulable) {
               final note =
                   Hive.box(databaseBox).get(reminder.noteId) as NoteDto;
               final scheduled = await service.scheduleNotifications(
@@ -153,6 +153,7 @@ class _BackupScreenState extends State<BackupScreen> {
                 body: '${S.of(context).Reminder}: ${note.title ?? ''}',
                 time: reminder.reminderDate,
                 noteId: reminder.noteId,
+                repeat: reminder.repeat,
               );
               remindersEnabled = scheduled && remindersEnabled;
               if (!mounted) return;

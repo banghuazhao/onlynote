@@ -1,4 +1,7 @@
 import 'package:onlynote/presentation/components/button.dart';
+import 'package:onlynote/presentation/components/widget_discovery_card.dart';
+import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
+import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:onlynote/presentation/components/note_search_filters.dart';
@@ -15,6 +18,43 @@ import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
+
+@Preview(name: 'Widget discovery', size: Size(390, 280))
+Widget widgetDiscoveryPreview() => MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: WidgetDiscoveryCard(
+            title: 'Keep pinned notes in view',
+            body:
+                'Add a widget to your Home Screen for a quick glance at your notes.',
+            actionLabel: 'Add to Home Screen',
+            onOpen: previewButtonPressed,
+            onDismiss: previewButtonPressed,
+          ),
+        ),
+      ),
+    );
+
+@Preview(name: 'Repeating reminder', size: Size(390, 620))
+Widget repeatingReminderPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: Scaffold(
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: ReminderPickerSheet(
+            current: Reminder(
+              noteId: 'preview',
+              reminderId: 1,
+              reminderDate: DateTime(2024, 1, 1, 9),
+              repeat: ReminderRepeat.weekly,
+            ),
+          ),
+        ),
+      ),
+    );
 
 @Preview(name: 'Settings section — light', size: Size(390, 260))
 Widget settingsSectionLightPreview() => MaterialApp(

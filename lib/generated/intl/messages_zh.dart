@@ -27,7 +27,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m2(number) => "笔记颜色 ${number}";
 
-  static String m3(price) => "支付 ${price} 永久移除广告。";
+  static String m3(time) => "下次提醒：${time}";
+
+  static String m4(price) => "支付 ${price} 永久移除广告。";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -234,16 +236,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
     "Reminder": MessageLookupByLibrary.simpleMessage("提醒设置"),
     "Reminder_Custom": MessageLookupByLibrary.simpleMessage("选择日期和时间"),
+    "Reminder_Day": MessageLookupByLibrary.simpleMessage("星期"),
     "Reminder_Future_Time": MessageLookupByLibrary.simpleMessage(
       "请选择将来的时间来设置提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小时后"),
+    "Reminder_Next_Time": m3,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一周后"),
+    "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重复"),
+    "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
+    "Reminder_Repeat_Never": MessageLookupByLibrary.simpleMessage("不重复"),
+    "Reminder_Repeat_Weekly": MessageLookupByLibrary.simpleMessage("每周"),
     "Reminder_Save_Failed": MessageLookupByLibrary.simpleMessage("无法更新提醒，请重试。"),
     "Reminder_Saved": MessageLookupByLibrary.simpleMessage("提醒已设置"),
+    "Reminder_Set": MessageLookupByLibrary.simpleMessage("设置提醒"),
+    "Reminder_Time": MessageLookupByLibrary.simpleMessage("时间"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m3,
+    "Remove_Ads_Price": m4,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("恢复"),
@@ -308,6 +318,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "不用打开 App，一眼看到你的备忘录。",
+    ),
+    "Widget_Discovery_Body": MessageLookupByLibrary.simpleMessage(
+      "添加主屏幕小组件，一眼查看你的备忘录。",
+    ),
+    "Widget_Discovery_Title": MessageLookupByLibrary.simpleMessage(
+      "让置顶备忘录随时可见",
     ),
     "Widget_Step_Android_1": MessageLookupByLibrary.simpleMessage("长按主屏幕空白处。"),
     "Widget_Step_Android_2": MessageLookupByLibrary.simpleMessage("点按“小部件”。"),

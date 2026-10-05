@@ -20,6 +20,7 @@ class NoteTrash {
           body: '${S.current.Reminder}: ${note.title ?? ''}',
           time: r.reminderDate,
           noteId: r.noteId,
+          repeat: r.repeat,
         ),
       );
 
@@ -53,7 +54,7 @@ class NoteTrash {
         await repository.addUpdateNote(note);
       }
       for (final (note, r) in touched) {
-        if (r.reminderDate.isAfter(DateTime.now())) {
+        if (r.isSchedulable(DateTime.now())) {
           await schedule(note, r);
         }
       }
@@ -79,8 +80,8 @@ class NoteTrash {
     // scheduler have changed. The UI explains when reminders need attention.
     var allRemindersScheduled = true;
     for (final note in originals) {
-      for (final reminder in reminders().where((r) =>
-          r.noteId == note.id && r.reminderDate.isAfter(DateTime.now()))) {
+      for (final reminder in reminders().where(
+          (r) => r.noteId == note.id && r.isSchedulable(DateTime.now()))) {
         try {
           if (!await schedule(note, reminder)) {
             allRemindersScheduled = false;
