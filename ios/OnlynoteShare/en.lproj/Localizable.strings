@@ -1,0 +1,8 @@
+"share_title" = "Save to Onlynote";
+"share_explanation" = "Save text, links, and up to 10 photos. Your note will appear when you next open Onlynote.";
+"share_save" = "Save to Onlynote";
+"share_cancel" = "Cancel";
+"share_loading" = "Saving your content…";
+"share_saved" = "Saved. Open Onlynote to view your new note.";
+"share_done" = "Done";
+"share_failed" = "Could not save this share. Try again with text or up to 10 photos (25 MB each, 100 MB total).";

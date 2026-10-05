@@ -1,0 +1,8 @@
+"share_title" = "儲存到 Onlynote";
+"share_explanation" = "儲存文字、連結及最多 10 張相片。下次開啟 Onlynote 時會顯示新筆記。";
+"share_save" = "儲存到 Onlynote";
+"share_cancel" = "取消";
+"share_loading" = "正在儲存內容…";
+"share_saved" = "已儲存。開啟 Onlynote 查看新筆記。";
+"share_done" = "完成";
+"share_failed" = "無法儲存分享內容。請使用文字或最多 10 張相片重試（每張 25 MB，總計 100 MB）。";

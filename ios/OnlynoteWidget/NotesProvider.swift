@@ -4,6 +4,7 @@ import SwiftUI
 struct NotesEntry: TimelineEntry {
     let date: Date
     let payload: WidgetPayload
+    var selectedNoteId: String? = nil
 }
 
 struct NotesProvider: TimelineProvider {
@@ -77,5 +78,26 @@ extension WidgetPayload {
                 ),
             ]
         )
+    }
+}
+
+
+@available(iOS 17.0, *)
+struct ConfigurableNotesProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> NotesEntry {
+        NotesEntry(date: Date(), payload: .sample)
+    }
+    func snapshot(for configuration: NoteWidgetConfiguration, in context: Context) async -> NotesEntry {
+        entry(for: configuration, preview: context.isPreview)
+    }
+    func timeline(for configuration: NoteWidgetConfiguration, in context: Context) async -> Timeline<NotesEntry> {
+        Timeline(entries: [entry(for: configuration, preview: false)], policy: .never)
+    }
+    private func entry(for configuration: NoteWidgetConfiguration, preview: Bool) -> NotesEntry {
+        let id = configuration.note?.id
+        let selectedId = id == WidgetNoteEntity.all.id ? nil : id
+        let payload = preview ? WidgetPayload.sample : WidgetPayload.load()
+        let displayId = preview && selectedId != nil ? payload.notes.first(where: { $0.hasChecklist })?.id : selectedId
+        return NotesEntry(date: Date(), payload: payload, selectedNoteId: displayId)
     }
 }

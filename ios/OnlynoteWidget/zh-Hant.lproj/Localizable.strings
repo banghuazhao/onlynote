@@ -21,3 +21,15 @@
 "widget.sample.4.title" = "旅行照片";
 "widget.sample.5.title" = "靈感";
 "widget.sample.5.body" = "新手引導可以再短一些";
+
+"widget.choose_note" = "選擇筆記";
+"widget.all_notes" = "所有筆記";
+"widget.selection_description" = "為此小工具選擇一篇筆記或待辦清單。";
+"widget.note_unavailable" = "筆記不可用";
+"widget.choose_another_note" = "請在小工具設定中選擇其他筆記。";
+"widget.completed" = "已完成";
+"widget.not_completed" = "未完成";
+"widget.complete_item" = "標記為已完成";
+"widget.mark_unfinished" = "標記為未完成";
+"widget.settings" = "小工具設定";
+"widget.more_items" = "還有 %d 項";

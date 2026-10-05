@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:onlynote/Tools/notification_service.dart';
+import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -45,6 +46,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   bool _savingTemplate = false;
   Note? _lastSavedNote;
   int _reviewGeneration = 0;
+  WidgetCommands? _widgetCommands;
+
+  void _refreshWidgetCompletion() {
+    if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+    if (_widgetCommands?.updates.value?.noteId == widget.noteId) {
+      context
+          .read<NoteDetailBloc>()
+          .add(NoteDetailEvent.showNote(widget.noteId));
+    }
+  }
 
   void _observeSavedChecklist(NoteDetailState state) {
     final generation = ++_reviewGeneration;
@@ -148,11 +159,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _widgetCommands = WidgetCommands.initializedInstance;
+    _widgetCommands?.updates.addListener(_refreshWidgetCompletion);
 
     if (mounted) {
       BlocProvider.of<NoteDetailBloc>(context)
           .add(NoteDetailEvent.showNote(widget.noteId));
     }
+  }
+
+  @override
+  void dispose() {
+    _widgetCommands?.updates.removeListener(_refreshWidgetCompletion);
+    super.dispose();
   }
 
   @override

@@ -279,5 +279,13 @@
   "Reminders_Snooze_Failed": "Could not snooze this reminder. Try again.",
   "Reminders_Note_Unavailable": "This note is no longer available.",
   "Photo_Capture_Failed": "Could not add the photo. Try again or choose one from your library.",
-  "Reminders_Changed": "This reminder changed. Try again."
+  "Reminders_Changed": "This reminder changed. Try again.",
+  "Reminder_Suggestion": "Remind me: {date}",
+  "Reminder_Suggestion_Dismiss": "Dismiss suggestion",
+  "Reminder_Suggestion_Confirm": "Use suggested time",
+  "Share_Import_Failed": "Could not import shared content. It is kept for retry when you reopen Onlynote.",
+  "Widget_Choose_Note_Title": "Make a widget yours",
+  "Widget_Choose_Note_iOS": "Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.",
+  "Widget_Choose_Note_Android": "When adding a widget, choose All notes or one note or checklist. Use Widget settings to change it later.",
+  "Widget_Checklist_Tip": "Tap a checkbox to update your checklist without opening Onlynote."
 }

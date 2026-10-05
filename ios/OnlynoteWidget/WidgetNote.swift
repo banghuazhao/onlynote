@@ -1,5 +1,8 @@
 import Foundation
 import SwiftUI
+import AppIntents
+import WidgetKit
+import CoreFoundation
 
 /// The snapshot the Flutter app writes into the shared App Group container.
 ///
@@ -11,20 +14,23 @@ struct WidgetPayload: Decodable {
     /// only serializes the first handful.
     let total: Int
     let notes: [WidgetNote]
+    let allNotes: [WidgetNote]
 
-    init(total: Int, notes: [WidgetNote]) {
+    init(total: Int, notes: [WidgetNote], allNotes: [WidgetNote]? = nil) {
         self.total = total
         self.notes = notes
+        self.allNotes = allNotes ?? notes
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         notes = (try? container.decode([WidgetNote].self, forKey: .notes)) ?? []
         total = (try? container.decode(Int.self, forKey: .total)) ?? notes.count
+        allNotes = (try? container.decode([WidgetNote].self, forKey: .allNotes)) ?? notes
     }
 
     private enum CodingKeys: String, CodingKey {
-        case total, notes
+        case total, notes, allNotes
     }
 
     static let empty = WidgetPayload(total: 0, notes: [])
@@ -40,7 +46,7 @@ struct WidgetPayload: Decodable {
         else {
             return .empty
         }
-        return payload
+        return WidgetCommandJournal.overlay(payload)
     }
 }
 
@@ -125,21 +131,25 @@ struct WidgetNote: Decodable, Identifiable {
 }
 
 struct WidgetTodo: Decodable {
+    let id: String?
     let title: String
     let completed: Bool
 
-    init(title: String, completed: Bool) {
+    init(id: String? = nil, title: String, completed: Bool) {
+        self.id = id
         self.title = title
         self.completed = completed
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try? container.decode(String.self, forKey: .id)
         title = (try? container.decode(String.self, forKey: .title)) ?? ""
         completed = (try? container.decode(Bool.self, forKey: .completed)) ?? false
     }
 
     private enum CodingKeys: String, CodingKey {
+        case id
         case title = "t"
         case completed = "c"
     }
@@ -155,5 +165,137 @@ extension Color {
             blue: Double(argb & 0xFF) / 255,
             opacity: Double((argb >> 24) & 0xFF) / 255
         )
+    }
+}
+
+
+/// Individual atomic files avoid lost updates between the extension and Runner.
+/// Acknowledgement removes only the IDs that Dart durably applied.
+enum WidgetCommandJournal {
+    private static let writeLock = NSLock()
+    static var directory: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: WidgetConstants.appGroupId)?
+            .appendingPathComponent("widget_commands", isDirectory: true)
+    }
+
+    static func pending() -> [[String: Any]] {
+        guard let root = directory,
+              let files = try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) else {
+            return []
+        }
+        return files.filter { $0.pathExtension == "json" }.compactMap { file in
+            guard let data = try? Data(contentsOf: file),
+                  let value = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  value["noteId"] is String, value["todoId"] is String,
+                  value["completed"] is Bool, value["createdAt"] is NSNumber else { return nil }
+            return value
+        }.sorted {
+            let lhs = ($0["createdAt"] as? NSNumber)?.int64Value ?? 0
+            let rhs = ($1["createdAt"] as? NSNumber)?.int64Value ?? 0
+            return lhs == rhs ? ($0["id"] as? String ?? "") < ($1["id"] as? String ?? "") : lhs < rhs
+        }
+    }
+
+    static func enqueue(noteId: String, todoId: String, completed: Bool) throws {
+        writeLock.lock()
+        defer { writeLock.unlock() }
+        guard let root = directory else { throw CocoaError(.fileNoSuchFile) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let id = UUID().uuidString
+        let previousTime = pending().compactMap { ($0["createdAt"] as? NSNumber)?.int64Value }.max() ?? 0
+        let timestamp = max(Int64(Date().timeIntervalSince1970 * 1_000_000), previousTime + 1)
+        let value: [String: Any] = [
+            "id": id, "noteId": noteId, "todoId": todoId, "completed": completed,
+            "createdAt": timestamp,
+        ]
+        let data = try JSONSerialization.data(withJSONObject: value)
+        try data.write(to: root.appendingPathComponent(id).appendingPathExtension("json"), options: .atomic)
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            CFNotificationName(rawValue: "com.appsbay.onlynote.widget_commands" as CFString), nil, nil, true
+        )
+    }
+
+    static func overlay(_ payload: WidgetPayload) -> WidgetPayload {
+        let commands = pending()
+        func apply(_ note: WidgetNote) -> WidgetNote {
+            var todos = note.todos
+            for command in commands where command["noteId"] as? String == note.id {
+                todos = todos.map { todo in
+                    guard let id = todo.id, id == command["todoId"] as? String,
+                          let completed = command["completed"] as? Bool else { return todo }
+                    return WidgetTodo(id: id, title: todo.title, completed: completed)
+                }
+            }
+            let delta = todos.filter(\.completed).count - note.todos.filter(\.completed).count
+            return WidgetNote(
+                id: note.id, title: note.title, body: note.body, colorValue: note.colorValue,
+                isPinned: note.isPinned, imageCount: note.imageCount, todoTotal: note.todoTotal,
+                todoDone: min(note.todoTotal, max(0, note.todoDone + delta)), todos: todos
+            )
+        }
+        return WidgetPayload(total: payload.total, notes: payload.notes.map(apply), allNotes: payload.allNotes.map(apply))
+    }
+}
+
+@available(iOS 17.0, *)
+struct WidgetNoteEntity: AppEntity {
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "widget.choose_note"
+    static var defaultQuery = WidgetNoteQuery()
+    let id: String
+    let title: String
+    var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(title)") }
+
+    static var all: WidgetNoteEntity {
+        WidgetNoteEntity(id: "__all_notes__", title: NSLocalizedString("widget.all_notes", comment: "Widget selection"))
+    }
+}
+
+@available(iOS 17.0, *)
+struct WidgetNoteQuery: EntityStringQuery {
+    func entities(for identifiers: [String]) async throws -> [WidgetNoteEntity] {
+        let notes = WidgetPayload.load().allNotes
+        return identifiers.map { id in
+            if id == WidgetNoteEntity.all.id { return .all }
+            let note = notes.first { $0.id == id }
+            return WidgetNoteEntity(id: id, title: note?.displayTitle ?? NSLocalizedString("widget.note_unavailable", comment: "Removed note"))
+        }
+    }
+    func entities(matching string: String) async throws -> [WidgetNoteEntity] {
+        try await suggestedEntities().filter { $0.title.localizedCaseInsensitiveContains(string) }
+    }
+    func suggestedEntities() async throws -> [WidgetNoteEntity] {
+        [.all] + WidgetPayload.load().allNotes.map { WidgetNoteEntity(id: $0.id, title: $0.displayTitle) }
+    }
+    func defaultResult() async -> WidgetNoteEntity? { .all }
+}
+
+@available(iOS 17.0, *)
+struct NoteWidgetConfiguration: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "widget.choose_note"
+    static var description = IntentDescription("widget.selection_description")
+    @Parameter(title: "widget.choose_note") var note: WidgetNoteEntity?
+}
+
+@available(iOS 17.0, *)
+struct CompleteWidgetTodoIntent: AppIntent {
+    static var title: LocalizedStringResource = "widget.complete_item"
+    static var openAppWhenRun: Bool = false
+    @Parameter(title: "Note ID") var noteId: String
+    @Parameter(title: "Item ID") var todoId: String
+    @Parameter(title: "Completed") var completed: Bool
+
+    init() {}
+    init(noteId: String, todoId: String, completed: Bool) {
+        self.noteId = noteId
+        self.todoId = todoId
+        self.completed = completed
+    }
+    func perform() async throws -> some IntentResult {
+        let note = WidgetPayload.load().allNotes.first { $0.id == noteId }
+        guard let note, note.todos.contains(where: { $0.id == todoId }) else { return .result() }
+        try WidgetCommandJournal.enqueue(noteId: noteId, todoId: todoId, completed: completed)
+        WidgetCenter.shared.reloadTimelines(ofKind: WidgetConstants.kind)
+        return .result()
     }
 }

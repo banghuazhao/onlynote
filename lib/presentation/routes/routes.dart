@@ -3,6 +3,8 @@ import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
+import 'package:onlynote/services/note_reminder_scheduler.dart';
+import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';

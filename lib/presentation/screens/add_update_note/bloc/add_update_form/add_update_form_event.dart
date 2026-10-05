@@ -38,6 +38,9 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
   const factory AddUpdateFormEvent.toggleTodoCheckbox(String id) =
       _ToggleTodoCheckbox;
 
+  const factory AddUpdateFormEvent.setTodoCompleted(
+      {required String id, required bool completed}) = _SetTodoCompleted;
+
   const factory AddUpdateFormEvent.replaceTodoLines({
     required String id,
     required List<String> lines,

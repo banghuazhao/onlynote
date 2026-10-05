@@ -279,5 +279,13 @@
   "Reminders_Snooze_Failed": "无法延后此提醒，请重试。",
   "Reminders_Note_Unavailable": "此笔记已不可用。",
   "Photo_Capture_Failed": "无法添加照片，请重试或从相册中选择。",
-  "Reminders_Changed": "此提醒已更改，请重试。"
+  "Reminders_Changed": "此提醒已更改，请重试。",
+  "Reminder_Suggestion": "提醒我：{date}",
+  "Reminder_Suggestion_Dismiss": "忽略建议",
+  "Reminder_Suggestion_Confirm": "使用建议时间",
+  "Share_Import_Failed": "无法导入分享内容。内容已保留，重新打开 Onlynote 时会重试。",
+  "Widget_Choose_Note_Title": "自定义小组件",
+  "Widget_Choose_Note_iOS": "长按小组件，选择“编辑小组件”，再选择笔记或待办清单。适用于 iOS 17 及以上版本。",
+  "Widget_Choose_Note_Android": "添加小组件时，可选择所有笔记或一篇笔记或待办清单。之后可通过“小组件设置”进行更改。",
+  "Widget_Checklist_Tip": "点击复选框即可更新待办清单，无需打开 Onlynote。"
 }

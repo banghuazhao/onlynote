@@ -25,9 +25,15 @@ class ReminderPickerResult {
 /// One-time shortcuts remain one tap; recurring schedules choose a wall-clock
 /// time and, for weekly reminders, a weekday rather than a future start date.
 class ReminderPickerSheet extends StatefulWidget {
-  const ReminderPickerSheet({super.key, this.current, this.allowDelete = true});
+  const ReminderPickerSheet({
+    super.key,
+    this.current,
+    this.allowDelete = true,
+    this.suggestedDate,
+  });
   final Reminder? current;
   final bool allowDelete;
+  final DateTime? suggestedDate;
 
   @override
   State<ReminderPickerSheet> createState() => _ReminderPickerSheetState();
@@ -41,8 +47,11 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
   @override
   void initState() {
     super.initState();
-    _repeat = widget.current?.repeat ?? ReminderRepeat.none;
-    final initial = widget.current?.reminderDate.toLocal() ??
+    _repeat = widget.suggestedDate != null
+        ? ReminderRepeat.none
+        : widget.current?.repeat ?? ReminderRepeat.none;
+    final initial = widget.suggestedDate?.toLocal() ??
+        widget.current?.reminderDate.toLocal() ??
         ReminderShortcut.inOneHour.resolve(DateTime.now());
     _time = TimeOfDay.fromDateTime(initial);
     _weekday = initial.weekday;
@@ -69,9 +78,9 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
 
   Future<void> _chooseDateAndTime() async {
     final now = DateTime.now();
-    final current = widget.current;
-    final initial = current != null && current.reminderDate.isAfter(now)
-        ? current.reminderDate.toLocal()
+    final seed = widget.suggestedDate ?? widget.current?.reminderDate;
+    final initial = seed != null && seed.isAfter(now)
+        ? seed.toLocal()
         : now.add(const Duration(hours: 1));
     final date = await showDatePicker(
       context: context,
@@ -134,6 +143,28 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
             ),
           ),
           if (_repeat == ReminderRepeat.none) ...[
+            if (widget.suggestedDate != null) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                child: Text(formatReminderTime(context, widget.suggestedDate!),
+                    style: Theme.of(context).textTheme.titleMedium),
+              ),
+              FilledButton.icon(
+                onPressed: () {
+                  final date = widget.suggestedDate!;
+                  if (!date.isAfter(DateTime.now())) {
+                    showTransientSnackBar(context,
+                        SnackBar(content: Text(l10n.Reminder_Future_Time)));
+                    return;
+                  }
+                  Navigator.pop(context,
+                      ReminderPickerResult.schedule(date, ReminderRepeat.none));
+                },
+                icon: const Icon(Icons.notifications_active_outlined),
+                label: Text(l10n.Reminder_Suggestion_Confirm),
+              ),
+              const Divider(indent: 12, endIndent: 12, height: 24),
+            ],
             for (final shortcut in ReminderShortcut.values)
               ListTile(
                 minVerticalPadding: 14,

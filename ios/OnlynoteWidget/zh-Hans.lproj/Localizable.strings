@@ -21,3 +21,15 @@
 "widget.sample.4.title" = "旅行照片";
 "widget.sample.5.title" = "灵感";
 "widget.sample.5.body" = "新手引导可以再短一些";
+
+"widget.choose_note" = "选择笔记";
+"widget.all_notes" = "所有笔记";
+"widget.selection_description" = "为此小组件选择一篇笔记或待办清单。";
+"widget.note_unavailable" = "笔记不可用";
+"widget.choose_another_note" = "请在小组件设置中选择其他笔记。";
+"widget.completed" = "已完成";
+"widget.not_completed" = "未完成";
+"widget.complete_item" = "标记为已完成";
+"widget.mark_unfinished" = "标记为未完成";
+"widget.settings" = "小组件设置";
+"widget.more_items" = "还有 %d 项";

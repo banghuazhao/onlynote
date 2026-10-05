@@ -2449,6 +2449,86 @@ class S {
       args: [],
     );
   }
+
+  /// `Remind me: {date}`
+  String Reminder_Suggestion(Object date) {
+    return Intl.message(
+      'Remind me: $date',
+      name: 'Reminder_Suggestion',
+      desc: '',
+      args: [date],
+    );
+  }
+
+  /// `Dismiss suggestion`
+  String get Reminder_Suggestion_Dismiss {
+    return Intl.message(
+      'Dismiss suggestion',
+      name: 'Reminder_Suggestion_Dismiss',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use suggested time`
+  String get Reminder_Suggestion_Confirm {
+    return Intl.message(
+      'Use suggested time',
+      name: 'Reminder_Suggestion_Confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not import shared content. It is kept for retry when you reopen Onlynote.`
+  String get Share_Import_Failed {
+    return Intl.message(
+      'Could not import shared content. It is kept for retry when you reopen Onlynote.',
+      name: 'Share_Import_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Make a widget yours`
+  String get Widget_Choose_Note_Title {
+    return Intl.message(
+      'Make a widget yours',
+      name: 'Widget_Choose_Note_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.`
+  String get Widget_Choose_Note_iOS {
+    return Intl.message(
+      'Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.',
+      name: 'Widget_Choose_Note_iOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `When adding a widget, choose All notes or one note or checklist. Use Widget settings to change it later.`
+  String get Widget_Choose_Note_Android {
+    return Intl.message(
+      'When adding a widget, choose All notes or one note or checklist. Use Widget settings to change it later.',
+      name: 'Widget_Choose_Note_Android',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap a checkbox to update your checklist without opening Onlynote.`
+  String get Widget_Checklist_Tip {
+    return Intl.message(
+      'Tap a checkbox to update your checklist without opening Onlynote.',
+      name: 'Widget_Checklist_Tip',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

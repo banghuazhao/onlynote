@@ -2,6 +2,7 @@ package com.appsbay.onlynote
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -20,10 +21,25 @@ class NotesWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
-        val payload = WidgetPayload.from(widgetData)
+        val payload = WidgetCommandJournal.overlay(context, WidgetPayload.from(widgetData))
 
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.notes_widget)
+            val selectedId = WidgetSelection.read(context, widgetId)
+            val selected = payload.allNotes.firstOrNull { it.id == selectedId }
+            views.setTextViewText(R.id.widget_header_title,
+                selected?.displayTitle(context) ?: if (selectedId != null) context.getString(R.string.widget_note_unavailable)
+                else context.getString(R.string.app_name))
+            val configure = Intent(context, WidgetConfigurationActivity::class.java).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                data = Uri.parse("onlynote-widget://configure/$widgetId")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            views.setOnClickPendingIntent(R.id.widget_settings,
+                PendingIntent.getActivity(context, widgetId, configure, immutableFlags()))
+            views.setTextViewText(R.id.widget_empty,
+                if (selectedId != null) context.getString(R.string.widget_choose_another_note)
+                else context.getString(R.string.widget_empty_action))
 
             views.setOnClickPendingIntent(
                 R.id.widget_new_note,
@@ -31,11 +47,17 @@ class NotesWidgetProvider : HomeWidgetProvider() {
             )
             views.setOnClickPendingIntent(
                 R.id.widget_header_title,
-                launchIntent(context, REQUEST_OPEN_APP, WidgetUris.openApp()),
+                launchIntent(context, REQUEST_OPEN_APP + widgetId, selected?.let { WidgetUris.note(it.id) } ?: WidgetUris.openApp()),
             )
 
-            bindList(context, views, widgetId)
-            bindOverflow(context, views, payload)
+            bindList(context, views, widgetId, selected?.hasChecklist == true, selectedId != null)
+            if (selectedId == null) bindOverflow(context, views, payload)
+            else if (selected?.hasChecklist == true) {
+                views.setViewVisibility(R.id.widget_more, View.VISIBLE)
+                views.setTextViewText(R.id.widget_more, "${selected.todoDone}/${selected.todoTotal}")
+                views.setOnClickPendingIntent(R.id.widget_more,
+                    launchIntent(context, REQUEST_OPEN_APP + widgetId, WidgetUris.note(selected.id)))
+            } else views.setViewVisibility(R.id.widget_more, View.GONE)
 
             appWidgetManager.updateAppWidget(widgetId, views)
             // The adapter caches its data; without this the list keeps showing
@@ -45,7 +67,7 @@ class NotesWidgetProvider : HomeWidgetProvider() {
     }
 
     @Suppress("DEPRECATION")
-    private fun bindList(context: Context, views: RemoteViews, widgetId: Int) {
+    private fun bindList(context: Context, views: RemoteViews, widgetId: Int, checklist: Boolean, selected: Boolean) {
         val serviceIntent = Intent(context, NotesWidgetService::class.java).apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             // RemoteViews adapters are cached by intent identity, and extras are
@@ -59,11 +81,13 @@ class NotesWidgetProvider : HomeWidgetProvider() {
         // to API 24.
         views.setRemoteAdapter(R.id.widget_list, serviceIntent)
         views.setEmptyView(R.id.widget_list, R.id.widget_empty)
-        views.setPendingIntentTemplate(R.id.widget_list, noteTemplate(context))
+        views.setPendingIntentTemplate(R.id.widget_list, if (checklist) todoTemplate(context, widgetId) else noteTemplate(context))
 
         views.setOnClickPendingIntent(
             R.id.widget_empty,
-            launchIntent(context, REQUEST_EMPTY_STATE, WidgetUris.newNote()),
+            if (selected) PendingIntent.getActivity(context, widgetId,
+                Intent(context, WidgetConfigurationActivity::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId), immutableFlags())
+            else launchIntent(context, REQUEST_EMPTY_STATE, WidgetUris.newNote()),
         )
     }
 
@@ -108,6 +132,43 @@ class NotesWidgetProvider : HomeWidgetProvider() {
         return PendingIntent.getActivity(context, REQUEST_NOTE_TEMPLATE, intent, flags)
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == ACTION_COMPLETE) {
+            val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+            val noteId = intent.getStringExtra("noteId") ?: return
+            val todoId = intent.getStringExtra("todoId") ?: return
+            if (!intent.hasExtra("completed") || WidgetSelection.read(context, widgetId) != noteId) return
+            val payload = WidgetCommandJournal.overlay(context, WidgetPayload.from(
+                es.antonborri.home_widget.HomeWidgetPlugin.getData(context)))
+            val note = payload.allNotes.firstOrNull { it.id == noteId } ?: return
+            if (note.todos.none { it.id == todoId }) return
+            try {
+                WidgetCommandJournal.enqueue(context, noteId, todoId, intent.getBooleanExtra("completed", false))
+                refresh(context)
+            } catch (_: Exception) {
+                // Keep the existing checkbox state when a durable queue write fails.
+            }
+            return
+        }
+        super.onReceive(context, intent)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        WidgetSelection.remove(context, appWidgetIds)
+        super.onDeleted(context, appWidgetIds)
+    }
+
+    private fun todoTemplate(context: Context, widgetId: Int): PendingIntent {
+        val intent = Intent(context, NotesWidgetProvider::class.java).apply {
+            action = ACTION_COMPLETE
+            data = Uri.parse("onlynote-widget://complete/$widgetId")
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        }
+        var flags = PendingIntent.FLAG_UPDATE_CURRENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags = flags or PendingIntent.FLAG_MUTABLE
+        return PendingIntent.getBroadcast(context, widgetId, intent, flags)
+    }
+
     private fun immutableFlags(): Int {
         var flags = PendingIntent.FLAG_UPDATE_CURRENT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -116,7 +177,15 @@ class NotesWidgetProvider : HomeWidgetProvider() {
         return flags
     }
 
-    private companion object {
+    companion object {
+        const val ACTION_COMPLETE = "com.appsbay.onlynote.COMPLETE_WIDGET_TODO"
+        fun refresh(context: Context, ids: IntArray? = null) {
+            val manager = AppWidgetManager.getInstance(context)
+            val widgetIds = ids ?: manager.getAppWidgetIds(ComponentName(context, NotesWidgetProvider::class.java))
+            if (widgetIds.isEmpty()) return
+            NotesWidgetProvider().onUpdate(context, manager, widgetIds,
+                es.antonborri.home_widget.HomeWidgetPlugin.getData(context))
+        }
         // Distinct request codes keep FLAG_UPDATE_CURRENT from folding these
         // into one another.
         const val REQUEST_NEW_NOTE = 1

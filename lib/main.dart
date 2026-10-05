@@ -28,6 +28,8 @@ import 'Tools/notification_service.dart';
 import 'Tools/onboarding_settings.dart';
 import 'Tools/reminder_data.dart';
 import 'Tools/widget_sync.dart';
+import 'Tools/widget_commands.dart';
+import 'Tools/shared_note_launch.dart';
 import 'di/di.dart';
 import 'presentation/app.dart';
 import 'presentation/screens/add_update_note/bloc/add_update_form/add_update_form_bloc.dart';
@@ -37,6 +39,7 @@ import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
 import 'services/note_autosave.dart';
 import 'services/note_photo_recovery.dart';
+import 'services/shared_note_import.dart';
 import 'services/custom_note_template_store.dart';
 import 'services/backup/backup_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -74,7 +77,6 @@ Future<void> main() async {
   await AppAppearanceSettings.instance.load();
   await OnboardingSettings.instance.load();
   await ImageStorage.init();
-  await WidgetSync.instance.init();
 
   await PurchaseService.instance.init();
 
@@ -118,10 +120,18 @@ Future<void> main() async {
   await HiveNoteAutosaveStore(
           getIt<NoteRepository>(), Hive.box(draftDatabaseBox))
       .recover();
+  await WidgetCommands.instance.init();
+  final sharedNotes = SharedNoteImport(
+    journal: Hive.box(draftDatabaseBox),
+    notes: getIt<NoteRepository>(),
+  );
+  SharedNoteLaunch.instance.configure(sharedNotes);
+  await SharedNoteLaunch.instance.recoverInbox();
   // Finish recovery before pruning; pending drafts may own photos too.
-  if (!photoRecovery.hasPendingCapture) {
+  if (!photoRecovery.hasPendingCapture && !sharedNotes.hasPendingImports) {
     await NoteCleanup.pruneOrphanImages(getIt<NoteRepository>());
   }
+  await WidgetSync.instance.init();
 
   // Native upgrades run after recovery and do not delay the first frame.
   WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -21,3 +21,15 @@
 "widget.sample.4.title" = "Trip photos";
 "widget.sample.5.title" = "Ideas";
 "widget.sample.5.body" = "Onboarding could be shorter";
+
+"widget.choose_note" = "Choose a note";
+"widget.all_notes" = "All notes";
+"widget.selection_description" = "Choose a note or checklist for this widget.";
+"widget.note_unavailable" = "Note unavailable";
+"widget.choose_another_note" = "Choose another note in widget settings.";
+"widget.completed" = "Completed";
+"widget.not_completed" = "Not completed";
+"widget.complete_item" = "Mark completed";
+"widget.mark_unfinished" = "Mark unfinished";
+"widget.settings" = "Widget settings";
+"widget.more_items" = "%d more items";

@@ -22,6 +22,8 @@ import flutter_local_notifications
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
         if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "OnlynoteAppShortcuts") {
             AppShortcutBridge.register(messenger: registrar.messenger())
+            ShareInboxBridge.register(messenger: registrar.messenger())
+            WidgetCommandBridge.register(messenger: registrar.messenger())
         }
     }
 }

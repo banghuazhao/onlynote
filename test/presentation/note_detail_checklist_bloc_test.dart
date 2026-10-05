@@ -112,6 +112,38 @@ void main() {
         [true, true, false]);
   });
 
+  test('detail taps retain completion and edits saved outside this screen',
+      () async {
+    final original = repository.notes['note']!.toDomain();
+    repository.notes['note'] = NoteDto.fromNote(original.copyWith(
+      title: 'Updated shopping list',
+      todo: [
+        for (final todo in original.todo)
+          if (todo.id == 'c') todo.copyWith(completed: true) else todo,
+      ],
+    ));
+
+    bloc.add(const NoteDetailEvent.toggleTodoCheckbox('a'));
+    await _turn();
+    final saved = repository.notes['note']!.toDomain();
+    expect(saved.title, 'Updated shopping list');
+    expect(saved.todo.every((todo) => todo.completed), isTrue);
+    expect(_loaded(bloc), saved);
+  });
+
+  test('detail tap cannot recreate an item removed outside this screen',
+      () async {
+    final original = repository.notes['note']!.toDomain();
+    repository.notes['note'] = NoteDto.fromNote(original.copyWith(
+      todo: original.todo.where((todo) => todo.id != 'a').toList(),
+    ));
+    bloc.add(const NoteDetailEvent.toggleTodoCheckbox('a'));
+    await _turn();
+    expect(repository.writes, 0);
+    expect(
+        repository.notes['note']!.todoList!.map((todo) => todo.id), ['b', 'c']);
+  });
+
   test('failed reset returns no Undo snapshot and retains saved completion',
       () async {
     repository.failWrites = true;

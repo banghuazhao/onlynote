@@ -116,6 +116,26 @@ class _WidgetGuideScreenState extends State<WidgetGuideScreen> {
                             ],
                           ),
                           SizedBox(height: tokens.space4),
+                          SectionCard(
+                            title: l10n.Widget_Choose_Note_Title,
+                            icon: Icons.checklist_rounded,
+                            children: [
+                              Text(
+                                Platform.isAndroid
+                                    ? l10n.Widget_Choose_Note_Android
+                                    : l10n.Widget_Choose_Note_iOS,
+                                style: context.textStyles.bodyMedium,
+                              ),
+                              SizedBox(height: tokens.space3),
+                              Text(
+                                l10n.Widget_Checklist_Tip,
+                                style: context.textStyles.bodySmall?.copyWith(
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: tokens.space4),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

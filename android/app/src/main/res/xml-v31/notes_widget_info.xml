@@ -6,6 +6,7 @@
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_description"
+    android:configure="com.appsbay.onlynote.WidgetConfigurationActivity"
     android:initialLayout="@layout/notes_widget"
     android:minHeight="110dp"
     android:minResizeHeight="110dp"
@@ -16,4 +17,5 @@
     android:targetCellHeight="2"
     android:targetCellWidth="4"
     android:updatePeriodMillis="0"
+    android:widgetFeatures="reconfigurable|configuration_optional"
     android:widgetCategory="home_screen" />

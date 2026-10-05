@@ -16,4 +16,17 @@
     <string name="shortcut_new_note">New Note</string>
     <string name="shortcut_new_checklist">New Checklist</string>
     <string name="shortcut_photo_note">Photo Note</string>
+    <string name="share_loading">Saving to Onlynote…</string>
+    <string name="share_failed">Could not save this share. Try again with text or up to 10 photos (25 MB each, 100 MB total).</string>
+    <string name="widget_choose_note">Choose a note</string>
+    <string name="widget_all_notes">All notes</string>
+    <string name="widget_selection_description">Choose a note or checklist for this widget.</string>
+    <string name="widget_note_unavailable">Note unavailable</string>
+    <string name="widget_choose_another_note">Choose another note in widget settings.</string>
+    <string name="widget_completed">Completed</string>
+    <string name="widget_not_completed">Not completed</string>
+    <string name="widget_complete_item">Mark completed</string>
+    <string name="widget_mark_unfinished">Mark unfinished</string>
+    <string name="widget_settings">Widget settings</string>
+    <string name="widget_more_items">%1$d more items</string>
 </resources>

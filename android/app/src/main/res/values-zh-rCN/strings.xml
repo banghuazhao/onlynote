@@ -16,4 +16,17 @@
     <string name="shortcut_new_note">新建备忘录</string>
     <string name="shortcut_new_checklist">新建清单</string>
     <string name="shortcut_photo_note">拍照备忘录</string>
+    <string name="share_loading">正在保存到 Onlynote…</string>
+    <string name="share_failed">无法保存分享内容。请使用文字或最多 10 张照片重试（每张 25 MB，总计 100 MB）。</string>
+    <string name="widget_choose_note">选择笔记</string>
+    <string name="widget_all_notes">所有笔记</string>
+    <string name="widget_selection_description">为此小组件选择一篇笔记或待办清单。</string>
+    <string name="widget_note_unavailable">笔记不可用</string>
+    <string name="widget_choose_another_note">请在小组件设置中选择其他笔记。</string>
+    <string name="widget_completed">已完成</string>
+    <string name="widget_not_completed">未完成</string>
+    <string name="widget_complete_item">标记为已完成</string>
+    <string name="widget_mark_unfinished">标记为未完成</string>
+    <string name="widget_settings">小组件设置</string>
+    <string name="widget_more_items">还有 %1$d 项</string>
 </resources>

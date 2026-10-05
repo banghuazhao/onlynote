@@ -11,6 +11,7 @@ class MainActivity: FlutterActivity() {
     private var shortcutChannel: MethodChannel? = null
     private var shortcutBridgeReady = false
     private var pendingShortcut: Map<String, String>? = null
+    private var shareChannel: MethodChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         captureShortcut(intent)
@@ -19,6 +20,35 @@ class MainActivity: FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        WidgetCommandBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        shareChannel = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "com.appsbay.onlynote/shared_notes"
+        ).also { channel ->
+            channel.setMethodCallHandler { call, result ->
+                if (call.method != "pending" && call.method != "acknowledge") {
+                    result.notImplemented()
+                } else {
+                    val id = call.argument<String>("id")
+                    Thread {
+                        try {
+                            val value = if (call.method == "pending") {
+                                ShareInboxStore.pending(applicationContext)
+                            } else {
+                                require(id != null)
+                                ShareInboxStore.acknowledge(applicationContext, id)
+                                null
+                            }
+                            runOnUiThread { result.success(value) }
+                        } catch (_: Throwable) {
+                            runOnUiThread {
+                                result.error("share_inbox", "Shared content is retained for retry.", null)
+                            }
+                        }
+                    }.start()
+                }
+            }
+        }
         shortcutBridgeReady = false
         shortcutChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -41,6 +71,10 @@ class MainActivity: FlutterActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         captureShortcut(intent)
+        if (intent.getBooleanExtra(ShareInboxStore.EXTRA_INBOX_CHANGED, false)) {
+            intent.removeExtra(ShareInboxStore.EXTRA_INBOX_CHANGED)
+            shareChannel?.invokeMethod("inboxChanged", null)
+        }
     }
 
     private fun captureShortcut(intent: Intent?) {
@@ -57,6 +91,8 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        shareChannel?.setMethodCallHandler(null)
+        shareChannel = null
         shortcutChannel?.setMethodCallHandler(null)
         shortcutChannel = null
         shortcutBridgeReady = false

@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import AppIntents
 
 struct NotesWidgetView: View {
     @Environment(\.widgetFamily) private var family
@@ -9,7 +10,13 @@ struct NotesWidgetView: View {
 
     var body: some View {
         Group {
-            if entry.payload.notes.isEmpty {
+            if let selectedId = entry.selectedNoteId {
+                if let note = entry.payload.allNotes.first(where: { $0.id == selectedId }) {
+                    SelectedNoteView(note: note)
+                } else {
+                    UnavailableNoteView()
+                }
+            } else if entry.payload.notes.isEmpty {
                 EmptyStateView()
             } else {
                 switch family {
@@ -267,5 +274,110 @@ private extension View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .background(background)
         }
+    }
+}
+
+
+// MARK: - Per-widget note/checklist selection
+
+private struct SelectedNoteView: View {
+    @Environment(\.widgetFamily) private var family
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.colorScheme) private var colorScheme
+    let note: WidgetNote
+
+    private var visibleTodos: [WidgetTodo] {
+        let limit = typeSize.isAccessibilitySize ? (family == .systemLarge ? 3 : 1)
+            : (family == .systemLarge ? 5 : (family == .systemSmall ? 1 : 2))
+        return Array(note.todos.prefix(limit))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Link(destination: WidgetConstants.noteURL(id: note.id)) {
+                HStack(spacing: 6) {
+                    Circle().fill(note.accentColor).frame(width: 9, height: 9)
+                    Text(note.displayTitle)
+                        .font(.headline)
+                        .foregroundStyle(WidgetTheme.primaryText(colorScheme))
+                        .lineLimit(family == .systemSmall ? 2 : 1)
+                    Spacer(minLength: 0)
+                    if family != .systemSmall { NoteBadge(note: note) }
+                }
+                .contentShape(Rectangle())
+            }
+            if note.hasChecklist {
+                ForEach(Array(visibleTodos.enumerated()), id: \.offset) { _, todo in
+                    if #available(iOSApplicationExtension 17.0, *), let id = todo.id, !id.isEmpty {
+                        Button(intent: CompleteWidgetTodoIntent(
+                            noteId: note.id, todoId: id, completed: !todo.completed
+                        )) {
+                            TodoWidgetLabel(todo: todo, colorScheme: colorScheme)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(todo.title)
+                        .accessibilityValue(Text(todo.completed ? "widget.completed" : "widget.not_completed"))
+                        .accessibilityHint(Text(todo.completed ? "widget.mark_unfinished" : "widget.complete_item"))
+                    } else {
+                        Link(destination: WidgetConstants.noteURL(id: note.id)) {
+                            TodoWidgetLabel(todo: todo, colorScheme: colorScheme)
+                        }
+                    }
+                }
+            } else if !note.body.isEmpty {
+                Link(destination: WidgetConstants.noteURL(id: note.id)) {
+                    Text(note.body)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(family == .systemSmall ? 4 : (family == .systemLarge ? 12 : 4))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            Spacer(minLength: 0)
+            if family == .systemSmall { NoteBadge(note: note) }
+            if family == .systemLarge && note.todoTotal > visibleTodos.count {
+                Link(destination: WidgetConstants.noteURL(id: note.id)) {
+                    Text(String(format: NSLocalizedString("widget.more_items", comment: "Additional checklist items"), note.todoTotal - visibleTodos.count))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .widgetURL(WidgetConstants.noteURL(id: note.id))
+    }
+}
+
+private struct TodoWidgetLabel: View {
+    let todo: WidgetTodo
+    let colorScheme: ColorScheme
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: todo.completed ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundStyle(todo.completed ? WidgetTheme.amber : WidgetTheme.primaryText(colorScheme).opacity(0.55))
+            Text(todo.title)
+                .strikethrough(todo.completed)
+                .font(.subheadline)
+                .foregroundStyle(todo.completed ? Color.secondary : WidgetTheme.primaryText(colorScheme))
+                .lineLimit(1)
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct UnavailableNoteView: View {
+    var body: some View {
+        Link(destination: WidgetConstants.openAppURL) {
+            VStack(spacing: 8) {
+                Image(systemName: "note.text").font(.title2).foregroundStyle(.secondary)
+                Text("widget.note_unavailable").font(.headline)
+                Text("widget.choose_another_note").font(.caption).foregroundStyle(.secondary)
+            }
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .widgetURL(WidgetConstants.openAppURL)
     }
 }

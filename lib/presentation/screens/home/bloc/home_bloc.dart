@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
@@ -130,6 +131,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _onUpdateTodo(_UpdateTodo event, Emitter<HomeState> emit) async {
+    await WidgetCommands.initializedInstance?.importPending();
     // Cards are excerpts and may have become stale while another screen edits
     // the note. Start with the latest saved note instead of the card snapshot.
     final fetched = await _getNoteUsecase(event.noteId);

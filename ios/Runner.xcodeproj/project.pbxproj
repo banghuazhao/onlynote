@@ -8,25 +8,40 @@
 
 /* Begin PBXBuildFile section */
 		07735B35DBACC5E1CA5DD5DD /* WidgetNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = C663CFCA5F4E1737F3BB0881 /* WidgetNote.swift */; };
+		0AB0099ECE1A2A3F26C8DED9 /* ShareInboxBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6767F649301BBEDA7A57E4A /* ShareInboxBridge.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		15316E84F8EDE17FCCFE6430 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 093574FDD5769487AE6106D4 /* Localizable.strings */; };
 		183245B7C2B0D08FEFEB9A31 /* NotesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DB27AEF0197E3F58AC11B7 /* NotesProvider.swift */; };
 		327FF9C33B4C2D1040BEBCD1 /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF6148CDA4384903BAC74BA /* WidgetConstants.swift */; };
 		33BC285F63B7FD73D281AC68 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF9E790F1BBF04EB20D54B3A /* Assets.xcassets */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		4178031727BFC6A4002D2861 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4178031927BFC6A4002D2861 /* InfoPlist.strings */; };
+		457D18AE26CC933559EC46A5 /* ShareInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22846A0E98316D3014B77CE4 /* ShareInbox.swift */; };
 		45EFD58AB9EDB26D9EC8453C /* OnlynoteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 902ABCABB0A488CA3C81688C /* OnlynoteWidgetBundle.swift */; };
 		45F4E1DDFF936D9C4043BD87 /* OnlynoteWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5E163F5127799EF710F7557B /* OnlynoteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4F007EEE7EF6F8A7DBDFACDB /* NotesWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C493AA2F47C3FC898B16C /* NotesWidgetView.swift */; };
+		4F8A70B151F9B2AC66E5F849 /* OnlynoteShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A7292B9958FD7C0A6470CDD4 /* OnlynoteShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		538C5DC2777A06F2FCBDF318 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECEA1063776A6C005FA1AB53 /* Foundation.framework */; };
+		6094CB1D971958634EA21AA9 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58DA4597DA9A1EF7FCCC11EB /* ShareViewController.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		9A163545A756BD0DCA1EF67A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7DFE6E2F97914E360A21FD73 /* Localizable.strings */; };
+		AD92F49E00B32CA0E4F8A264 /* WidgetCommandBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FE14417F8C43FBFCE1C03D /* WidgetCommandBridge.swift */; };
+		C3EBDDF2B610A15CDC4EC9E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ECEA1063776A6C005FA1AB53 /* Foundation.framework */; };
+		D40BE6431149781B167B734E /* ShareInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22846A0E98316D3014B77CE4 /* ShareInbox.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1FA245DA4106247C70C959AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7C4984A76FA4B4A5FA04F831;
+			remoteInfo = OnlynoteShare;
+		};
 		3A6769EABD3953C3AEFE806F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -44,6 +59,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				45F4E1DDFF936D9C4043BD87 /* OnlynoteWidget.appex in Embed Foundation Extensions */,
+				4F8A70B151F9B2AC66E5F849 /* OnlynoteShare.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -64,7 +80,10 @@
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		19BEAE671646487AC4F5AE5F /* zh-Hant */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		22846A0E98316D3014B77CE4 /* ShareInbox.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareInbox.swift; sourceTree = "<group>"; };
+		240F39DC3126371764085F38 /* OnlynoteShare.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = OnlynoteShare.entitlements; sourceTree = "<group>"; };
 		2C577C0EFC2C8DD4A991C395 /* OnlynoteWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = OnlynoteWidget.entitlements; sourceTree = "<group>"; };
+		2E44B98F411F393039819F8B /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		316C493AA2F47C3FC898B16C /* NotesWidgetView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotesWidgetView.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4178031127BFC660002D2861 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
@@ -74,6 +93,7 @@
 		4178031827BFC6A4002D2861 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4178031A27BFC6A6002D2861 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		4178031B27BFC6A7002D2861 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		58DA4597DA9A1EF7FCCC11EB /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		5E163F5127799EF710F7557B /* OnlynoteWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OnlynoteWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		62DB27AEF0197E3F58AC11B7 /* NotesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotesProvider.swift; sourceTree = "<group>"; };
 		6B698A6026C78F21041D2617 /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
@@ -91,14 +111,28 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7292B9958FD7C0A6470CDD4 /* OnlynoteShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OnlynoteShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B378CFF1C858956D2A27A652 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9FE14417F8C43FBFCE1C03D /* WidgetCommandBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetCommandBridge.swift; sourceTree = "<group>"; };
 		C663CFCA5F4E1737F3BB0881 /* WidgetNote.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetNote.swift; sourceTree = "<group>"; };
 		D5BFC23959AF22B7C6F1E6F8 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		E044170DF02F7AB465599FF6 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E6767F649301BBEDA7A57E4A /* ShareInboxBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareInboxBridge.swift; sourceTree = "<group>"; };
 		ECEA1063776A6C005FA1AB53 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		F4921B811352229CEC58CE34 /* zh-Hant */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		F50EA1027D60F2856758BF38 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FF9E790F1BBF04EB20D54B3A /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		460FC824FF2FFF699B94F6E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3EBDDF2B610A15CDC4EC9E4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8069BAEDBD2E196D0A41834E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +177,15 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
+		9635C0755268A3BF575973C5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				22846A0E98316D3014B77CE4 /* ShareInbox.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +206,8 @@
 				97C146EF1CF9000F007C117D /* Products */,
 				ED4292651A84182B17852B12 /* Frameworks */,
 				113D53B8BD47B8399A58C66B /* OnlynoteWidget */,
+				9635C0755268A3BF575973C5 /* Shared */,
+				D9EE4661971801DF353E0AB0 /* OnlynoteShare */,
 			);
 			sourceTree = "<group>";
 		};
@@ -171,6 +216,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				5E163F5127799EF710F7557B /* OnlynoteWidget.appex */,
+				A7292B9958FD7C0A6470CDD4 /* OnlynoteShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,8 +234,22 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				4178031927BFC6A4002D2861 /* InfoPlist.strings */,
 				6B698A6026C78F21041D2617 /* Runner.entitlements */,
+				E6767F649301BBEDA7A57E4A /* ShareInboxBridge.swift */,
+				B9FE14417F8C43FBFCE1C03D /* WidgetCommandBridge.swift */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		D9EE4661971801DF353E0AB0 /* OnlynoteShare */ = {
+			isa = PBXGroup;
+			children = (
+				58DA4597DA9A1EF7FCCC11EB /* ShareViewController.swift */,
+				B378CFF1C858956D2A27A652 /* Info.plist */,
+				240F39DC3126371764085F38 /* OnlynoteShare.entitlements */,
+				093574FDD5769487AE6106D4 /* Localizable.strings */,
+			);
+			name = OnlynoteShare;
+			path = OnlynoteShare;
 			sourceTree = "<group>";
 		};
 		ED4292651A84182B17852B12 /* Frameworks */ = {
@@ -203,6 +263,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7C4984A76FA4B4A5FA04F831 /* OnlynoteShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85D5E5EA5D19AD0C1045C555 /* Build configuration list for PBXNativeTarget "OnlynoteShare" */;
+			buildPhases = (
+				FFACD02D55C2F0B76996D76B /* Sources */,
+				460FC824FF2FFF699B94F6E6 /* Frameworks */,
+				9C42700BEA7D662CD649170D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OnlynoteShare;
+			productName = OnlynoteShare;
+			productReference = A7292B9958FD7C0A6470CDD4 /* OnlynoteShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
@@ -219,6 +296,7 @@
 			);
 			dependencies = (
 				D1455762B5516E2C35C7A05C /* PBXTargetDependency */,
+				477AE4C6CF44E9F211621441 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -254,6 +332,11 @@
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					7C4984A76FA4B4A5FA04F831 = {
+						CreatedOnToolsVersion = 16.0;
+						DevelopmentTeam = F694X76A5X;
+						ProvisioningStyle = Automatic;
+					};
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1100;
@@ -284,6 +367,7 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				CA0E54AC4DBC4C5E2771756C /* OnlynoteWidget */,
+				7C4984A76FA4B4A5FA04F831 /* OnlynoteShare */,
 			);
 		};
 /* End PBXProject section */
@@ -307,6 +391,14 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				4178031727BFC6A4002D2861 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C42700BEA7D662CD649170D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				15316E84F8EDE17FCCFE6430 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,12 +457,30 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				D40BE6431149781B167B734E /* ShareInbox.swift in Sources */,
+				0AB0099ECE1A2A3F26C8DED9 /* ShareInboxBridge.swift in Sources */,
+				AD92F49E00B32CA0E4F8A264 /* WidgetCommandBridge.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFACD02D55C2F0B76996D76B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6094CB1D971958634EA21AA9 /* ShareViewController.swift in Sources */,
+				457D18AE26CC933559EC46A5 /* ShareInbox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		477AE4C6CF44E9F211621441 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = OnlynoteShare;
+			target = 7C4984A76FA4B4A5FA04F831 /* OnlynoteShare */;
+			targetProxy = 1FA245DA4106247C70C959AC /* PBXContainerItemProxy */;
+		};
 		D1455762B5516E2C35C7A05C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = OnlynoteWidget;
@@ -380,6 +490,16 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		093574FDD5769487AE6106D4 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F50EA1027D60F2856758BF38 /* en */,
+				2E44B98F411F393039819F8B /* zh-Hans */,
+				F4921B811352229CEC58CE34 /* zh-Hant */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		4178031927BFC6A4002D2861 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -498,6 +618,39 @@
 			};
 			name = Profile;
 		};
+		57DF17BDB57B90C40BED99BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteShare/OnlynoteShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.appsbay.onlynote.OnlynoteShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		670F1D8CD49868A2B50B9F5A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
@@ -521,6 +674,39 @@
 				);
 				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.appsbay.onlynote.OnlynoteWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		76C198B3E0AF6D5F62A8A12D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteShare/OnlynoteShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.appsbay.onlynote.OnlynoteShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -758,6 +944,39 @@
 			};
 			name = Profile;
 		};
+		ED6BCD94B7A187B3B4F38ADC /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB31CF90195004384FC /* Generated.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteShare/OnlynoteShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.appsbay.onlynote.OnlynoteShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -767,6 +986,16 @@
 				98B4C7A62F6C1D4CDC138025 /* Release */,
 				670F1D8CD49868A2B50B9F5A /* Debug */,
 				C9AE3617EEF41BA6C96E5569 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85D5E5EA5D19AD0C1045C555 /* Build configuration list for PBXNativeTarget "OnlynoteShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				57DF17BDB57B90C40BED99BB /* Release */,
+				76C198B3E0AF6D5F62A8A12D /* Debug */,
+				ED6BCD94B7A187B3B4F38ADC /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

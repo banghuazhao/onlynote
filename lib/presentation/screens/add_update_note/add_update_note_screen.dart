@@ -9,6 +9,11 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
+import 'package:onlynote/services/note_reminder_scheduler.dart';
+import 'package:onlynote/services/reminder_date_suggestion.dart';
+import 'package:onlynote/Tools/reminder.dart';
+import 'package:onlynote/Tools/reminder_data.dart';
+import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +26,8 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
+import 'package:onlynote/presentation/components/reminder_suggestion_chip.dart';
+import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -46,6 +53,8 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.customTemplateNote,
       this.autosaveStore,
       this.photoCapture,
+      this.reminderScheduler,
+      this.widgetCommands,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
@@ -55,6 +64,8 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final Note? customTemplateNote;
   final NoteAutosaveStore? autosaveStore;
   final NotePhotoCapture? photoCapture;
+  final NoteReminderScheduler? reminderScheduler;
+  final WidgetCommands? widgetCommands;
   final NoteEditorStart start;
 
   @override
@@ -69,6 +80,14 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final NoteAutosave _autosave;
   late final StreamSubscription<AddUpdateFormState> _changes;
   late final NotePhotoCapture _photoCapture;
+  late final NoteReminderScheduler _reminderScheduler;
+  VoidCallback? _unregisterWidgetEditor;
+  Timer? _suggestionDebounce;
+  ReminderDateSuggestion? _reminderSuggestion;
+  final Set<String> _dismissedSuggestions = {};
+  String? _lastSuggestionText;
+  bool _savingReminder = false;
+  bool _presentingReminder = false;
   Animation<double>? _entryAnimation;
   bool _photoStarted = false;
   bool _addingPhoto = false;
@@ -82,6 +101,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _photoCapture = widget.photoCapture ?? NotePhotoCapture();
+    _reminderScheduler = widget.reminderScheduler ?? NoteReminderScheduler();
     final now = DateTime.now();
     final recovered =
         widget.note?.id == null || !Hive.isBoxOpen(draftDatabaseBox)
@@ -123,7 +143,16 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _changes = _form.stream.listen((state) {
       _hadUserChange = true;
       _capture(state);
+      _queueReminderSuggestion();
     });
+    final widgetCommands =
+        widget.widgetCommands ?? WidgetCommands.initializedInstance;
+    if (initial.id != null) {
+      _unregisterWidgetEditor =
+          widgetCommands?.registerEditor(initial.id!, _applyWidgetCompletion);
+    }
+    ReminderData.shared.addListener(_reminderChanged);
+    _queueReminderSuggestion();
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
     if (widget.note == null &&
         (widget.template != null || widget.customTemplateNote != null)) {
@@ -160,7 +189,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _addPhoto(ImageSource source, {bool retry = false}) async {
-    if (_addingPhoto) return;
+    if (_addingPhoto || _savingReminder || _presentingReminder || _leaving) {
+      return;
+    }
     setState(() => _addingPhoto = true);
     FocusManager.instance.primaryFocus?.unfocus();
     try {
@@ -220,6 +251,143 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  String get _reminderText => [
+        _titleController.text,
+        _descriptionController.text,
+        ..._form.state.todos.map((todo) => todo.title ?? ''),
+      ].join('\n');
+
+  void _reminderChanged() => _queueReminderSuggestion(force: true);
+
+  void _queueReminderSuggestion({bool force = false}) {
+    final text = _reminderText;
+    if (!force && text == _lastSuggestionText) return;
+    _lastSuggestionText = text;
+    _suggestionDebounce?.cancel();
+    _suggestionDebounce = Timer(const Duration(milliseconds: 450), () {
+      if (!mounted) return;
+      final suggestion = _findReminderSuggestion();
+      setState(() => _reminderSuggestion = suggestion);
+    });
+  }
+
+  ReminderDateSuggestion? _findReminderSuggestion() {
+    final suggestion = suggestReminderDate(_reminderText, now: DateTime.now());
+    if (suggestion == null || _dismissedSuggestions.contains(suggestion.key)) {
+      return null;
+    }
+    final current = _reminderScheduler.current(_autosave.note);
+    if (current?.repeat == ReminderRepeat.none) {
+      final date = current!.reminderDate.toLocal();
+      final suggested = suggestion.date;
+      if (date.year == suggested.year &&
+          date.month == suggested.month &&
+          date.day == suggested.day &&
+          date.hour == suggested.hour &&
+          date.minute == suggested.minute) {
+        return null;
+      }
+    }
+    return suggestion;
+  }
+
+  void _dismissReminderSuggestion() {
+    final suggestion = _reminderSuggestion;
+    if (suggestion == null || _savingReminder) return;
+    _dismissedSuggestions.add(suggestion.key);
+    setState(() => _reminderSuggestion = null);
+  }
+
+  Future<void> _confirmReminderSuggestion() async {
+    if (_savingReminder || _presentingReminder || _addingPhoto || _leaving) {
+      return;
+    }
+    // The last keystroke may precede the debounce. Never open a stale date.
+    final suggestion = _findReminderSuggestion();
+    if (suggestion == null || suggestion.key != _reminderSuggestion?.key) {
+      setState(() => _reminderSuggestion = suggestion);
+      return;
+    }
+    setState(() => _presentingReminder = true);
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      final result = await showAppSheet<ReminderPickerResult>(
+        context: context,
+        builder: (_) => ReminderPickerSheet(
+          current: _reminderScheduler.current(_autosave.note),
+          suggestedDate: suggestion.date,
+          allowDelete: false,
+        ),
+      );
+      if (result == null || result.delete || !mounted) return;
+      setState(() {
+        _presentingReminder = false;
+        _savingReminder = true;
+      });
+      // Save the meaningful draft first. Scheduling cannot create a reminder
+      // for content that failed to reach the notes database.
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _capture(_form.state);
+      if (!NoteAutosave.hasContent(_autosave.note) ||
+          !await _autosave.flush()) {
+        if (mounted) {
+          showTransientSnackBar(
+              context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+        }
+        return;
+      }
+      if (!mounted) return;
+      final outcome = await _reminderScheduler.save(
+          context, _autosave.note, result.date!, result.repeat);
+      if (!mounted) return;
+      switch (outcome) {
+        case NoteReminderSaveResult.saved:
+          _dismissedSuggestions.add(suggestion.key);
+          setState(() => _reminderSuggestion = null);
+          showTransientSnackBar(
+              context, SnackBar(content: Text(S.of(context).Reminder_Saved)));
+        case NoteReminderSaveResult.failed:
+          showTransientSnackBar(context,
+              SnackBar(content: Text(S.of(context).Reminder_Save_Failed)));
+        case NoteReminderSaveResult.past:
+          showTransientSnackBar(context,
+              SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
+        case NoteReminderSaveResult.denied:
+          break;
+      }
+    } finally {
+      _savingReminder = false;
+      _presentingReminder = false;
+      if (mounted) setState(() {});
+    }
+  }
+
+  Future<bool> _applyWidgetCompletion(WidgetTodoCommand command) async {
+    if (!mounted || _leaving || command.noteId != _autosave.note.id) {
+      return false;
+    }
+    // Drain queued typing/reorder events, then change only completion in the
+    // current form. Draft text, task labels, images, and ordering stay intact.
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return false;
+    final matches =
+        _form.state.todos.where((todo) => todo.id == command.todoId);
+    if (matches.isEmpty) return true; // A deleted draft row stays deleted.
+    if (matches.first.completed != command.completed) {
+      final applied = _form.stream.firstWhere((state) => state.todos.any(
+          (todo) =>
+              todo.id == command.todoId &&
+              todo.completed == command.completed));
+      _form.add(AddUpdateFormEvent.setTodoCompleted(
+          id: command.todoId, completed: command.completed));
+      await applied;
+      if (!mounted) return false;
+    }
+    _capture(_form.state);
+    return _autosave.flush();
+  }
+
   void _refreshStatus() {
     if (mounted) setState(() {});
   }
@@ -274,7 +442,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _finish() async {
-    if (_leaving || _addingPhoto) return;
+    if (_leaving || _addingPhoto || _savingReminder || _presentingReminder) {
+      return;
+    }
     if (_photoCapture.canRetry) {
       await _addPhoto(ImageSource.camera, retry: true);
       if (!mounted || _photoCapture.canRetry) return;
@@ -308,6 +478,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   @override
   void dispose() {
+    _suggestionDebounce?.cancel();
+    ReminderData.shared.removeListener(_reminderChanged);
+    _unregisterWidgetEditor?.call();
     _entryAnimation?.removeStatusListener(_onPhotoEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _changes.cancel();
@@ -324,7 +497,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         value: _form,
         child: PopScope(
           canPop: _allowPop ||
-              (!_autosave.dirty && !_photoCapture.canRetry && !_addingPhoto),
+              (!_autosave.dirty &&
+                  !_photoCapture.canRetry &&
+                  !_addingPhoto &&
+                  !_savingReminder &&
+                  !_presentingReminder),
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) {
               _finish();
@@ -342,6 +519,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               onDone: _finish,
               onAddPhoto: _addPhoto,
               addingPhoto: _addingPhoto,
+              reminderSuggestion: _reminderSuggestion,
+              savingReminder: _savingReminder,
+              onReminderSuggestion: _confirmReminderSuggestion,
+              onDismissReminderSuggestion: _dismissReminderSuggestion,
             ),
           ),
         ),
@@ -358,6 +539,10 @@ class _BuildForm extends StatelessWidget {
     required this.onDone,
     required this.onAddPhoto,
     required this.addingPhoto,
+    required this.reminderSuggestion,
+    required this.savingReminder,
+    required this.onReminderSuggestion,
+    required this.onDismissReminderSuggestion,
   })  : _titleController = titleController,
         _descriptionController = descriptionController;
 
@@ -369,6 +554,10 @@ class _BuildForm extends StatelessWidget {
   final VoidCallback onDone;
   final ValueChanged<ImageSource> onAddPhoto;
   final bool addingPhoto;
+  final ReminderDateSuggestion? reminderSuggestion;
+  final bool savingReminder;
+  final VoidCallback onReminderSuggestion;
+  final VoidCallback onDismissReminderSuggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -465,6 +654,23 @@ class _BuildForm extends StatelessWidget {
                         descriptionController: _descriptionController,
                         autofocus: widget.note == null &&
                             widget.start == NoteEditorStart.quickNote,
+                      ),
+                      AnimatedSize(
+                        duration: MediaQuery.disableAnimationsOf(context)
+                            ? Duration.zero
+                            : const Duration(milliseconds: 180),
+                        alignment: Alignment.topCenter,
+                        child: reminderSuggestion == null
+                            ? const SizedBox(width: double.infinity)
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: ReminderSuggestionChip(
+                                  date: reminderSuggestion!.date,
+                                  busy: savingReminder,
+                                  onPressed: onReminderSuggestion,
+                                  onDismiss: onDismissReminderSuggestion,
+                                ),
+                              ),
                       ),
                     ],
                   ),

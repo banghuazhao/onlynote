@@ -279,5 +279,13 @@
   "Reminders_Snooze_Failed": "無法延後此提醒，請重試。",
   "Reminders_Note_Unavailable": "此筆記已不可用。",
   "Photo_Capture_Failed": "無法加入照片，請重試或從相簿中選擇。",
-  "Reminders_Changed": "此提醒已更改，請重試。"
+  "Reminders_Changed": "此提醒已更改，請重試。",
+  "Reminder_Suggestion": "提醒我：{date}",
+  "Reminder_Suggestion_Dismiss": "忽略建議",
+  "Reminder_Suggestion_Confirm": "使用建議時間",
+  "Share_Import_Failed": "無法匯入分享內容。內容已保留，重新開啟 Onlynote 時會重試。",
+  "Widget_Choose_Note_Title": "自訂小工具",
+  "Widget_Choose_Note_iOS": "長按小工具，選擇「編輯小工具」，再選擇筆記或待辦清單。適用於 iOS 17 及以上版本。",
+  "Widget_Choose_Note_Android": "加入小工具時，可選擇所有筆記或一篇筆記或待辦清單。之後可透過「小工具設定」進行更改。",
+  "Widget_Checklist_Tip": "點按核取方塊即可更新待辦清單，無需開啟 Onlynote。"
 }

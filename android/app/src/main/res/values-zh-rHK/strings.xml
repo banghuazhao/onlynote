@@ -16,4 +16,17 @@
     <string name="shortcut_new_note">新增備忘錄</string>
     <string name="shortcut_new_checklist">新增清單</string>
     <string name="shortcut_photo_note">拍照備忘錄</string>
+    <string name="share_loading">正在儲存至 Onlynote…</string>
+    <string name="share_failed">無法儲存分享內容。請使用文字或最多 10 張照片重試（每張 25 MB，總計 100 MB）。</string>
+    <string name="widget_choose_note">選擇筆記</string>
+    <string name="widget_all_notes">所有筆記</string>
+    <string name="widget_selection_description">為此小工具選擇一篇筆記或待辦清單。</string>
+    <string name="widget_note_unavailable">筆記不可用</string>
+    <string name="widget_choose_another_note">請在小工具設定中選擇其他筆記。</string>
+    <string name="widget_completed">已完成</string>
+    <string name="widget_not_completed">未完成</string>
+    <string name="widget_complete_item">標記為已完成</string>
+    <string name="widget_mark_unfinished">標記為未完成</string>
+    <string name="widget_settings">小工具設定</string>
+    <string name="widget_more_items">還有 %1$d 項</string>
 </resources>

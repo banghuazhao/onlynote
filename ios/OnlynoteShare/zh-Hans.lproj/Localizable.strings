@@ -1,0 +1,8 @@
+"share_title" = "保存到 Onlynote";
+"share_explanation" = "保存文字、链接和最多 10 张照片。下次打开 Onlynote 时会显示新笔记。";
+"share_save" = "保存到 Onlynote";
+"share_cancel" = "取消";
+"share_loading" = "正在保存内容…";
+"share_saved" = "已保存。打开 Onlynote 查看新笔记。";
+"share_done" = "完成";
+"share_failed" = "无法保存分享内容。请使用文字或最多 10 张照片重试（每张 25 MB，总计 100 MB）。";

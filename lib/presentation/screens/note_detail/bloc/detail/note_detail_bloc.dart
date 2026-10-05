@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -56,7 +57,13 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
       if (event is _ResetChecklist) event.completion?.complete(null);
       return;
     }
-    final note = current.note;
+    await WidgetCommands.initializedInstance?.importPending();
+    final fetched = await _usecase(current.note.id!);
+    final note = fetched.fold<Note?>((_) => null, (note) => note);
+    if (note == null || note.isDeleted) {
+      if (event is _ResetChecklist) event.completion?.complete(null);
+      return;
+    }
     if (event is _ToggleTodoCheckbox) {
       if (!note.todo.any((todo) => todo.id == event.todoId)) return;
       final todos = [

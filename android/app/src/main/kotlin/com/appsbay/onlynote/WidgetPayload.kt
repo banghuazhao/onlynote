@@ -16,6 +16,7 @@ import org.json.JSONObject
 data class WidgetPayload(
     val total: Int,
     val notes: List<WidgetNote>,
+    val allNotes: List<WidgetNote> = notes,
 ) {
     companion object {
         const val KEY = "onlynote_widget_payload"
@@ -32,7 +33,13 @@ data class WidgetPayload(
                         array?.optJSONObject(index)?.let { add(WidgetNote.from(it)) }
                     }
                 }
-                WidgetPayload(json.optInt("total", notes.size), notes)
+                val allArray = json.optJSONArray("allNotes")
+                val all = if (allArray == null) notes else buildList {
+                    for (index in 0 until allArray.length()) {
+                        allArray.optJSONObject(index)?.let { add(WidgetNote.from(it)) }
+                    }
+                }
+                WidgetPayload(json.optInt("total", notes.size), notes, all)
             } catch (_: Exception) {
                 EMPTY
             }
@@ -80,7 +87,10 @@ data class WidgetNote(
             val todos = buildList {
                 for (index in 0 until (todosArray?.length() ?: 0)) {
                     todosArray?.optJSONObject(index)?.let {
-                        add(WidgetTodo(it.optString("t", ""), it.optBoolean("c", false)))
+                        add(WidgetTodo(
+                            it.optString("t", ""), it.optBoolean("c", false),
+                            it.optString("id", "").takeIf { id -> id.isNotEmpty() },
+                        ))
                     }
                 }
             }
@@ -106,6 +116,7 @@ data class WidgetNote(
 data class WidgetTodo(
     val title: String,
     val completed: Boolean,
+    val id: String? = null,
 )
 
 /**

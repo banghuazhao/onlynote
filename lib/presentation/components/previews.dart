@@ -8,6 +8,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/presentation/components/button.dart';
 import 'package:onlynote/presentation/components/widget_discovery_card.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
+import 'package:onlynote/presentation/components/reminder_suggestion_chip.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/appearance_section.dart';
@@ -572,3 +573,19 @@ Widget checklistProgressPreview() => MaterialApp(
 
 void previewChecklistToggle(String id) {}
 Future<void> previewChecklistReset() async {}
+
+@Preview(name: 'Suggested reminder', size: Size(390, 240))
+Widget reminderSuggestionPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: ReminderSuggestionChip(
+            date: DateTime(2026, 10, 7, 9),
+            onPressed: previewButtonPressed,
+            onDismiss: previewButtonPressed,
+          ),
+        ),
+      ),
+    );

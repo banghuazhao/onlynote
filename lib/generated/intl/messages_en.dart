@@ -33,9 +33,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(time) => "Next reminder: ${time}";
 
-  static String m6(price) => "Remove ads permanently for ${price}.";
+  static String m6(date) => "Remind me: ${date}";
 
-  static String m7(items, photos) =>
+  static String m7(price) => "Remove ads permanently for ${price}.";
+
+  static String m8(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -362,6 +364,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
+    "Reminder_Suggestion": m6,
+    "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
+      "Use suggested time",
+    ),
+    "Reminder_Suggestion_Dismiss": MessageLookupByLibrary.simpleMessage(
+      "Dismiss suggestion",
+    ),
     "Reminder_Time": MessageLookupByLibrary.simpleMessage("Time"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage(
       "Tomorrow morning",
@@ -393,7 +402,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m6,
+    "Remove_Ads_Price": m7,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
@@ -425,6 +434,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Share_Image": MessageLookupByLibrary.simpleMessage("Image"),
     "Share_Image_Description": MessageLookupByLibrary.simpleMessage(
       "Share the current paper view as a picture.",
+    ),
+    "Share_Import_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not import shared content. It is kept for retry when you reopen Onlynote.",
     ),
     "Share_Markdown": MessageLookupByLibrary.simpleMessage("Markdown"),
     "Share_Markdown_Description": MessageLookupByLibrary.simpleMessage(
@@ -484,7 +496,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m7,
+    "Template_Details": m8,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -554,6 +566,18 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
       "Your launcher can\'t add it automatically — follow the steps below instead.",
+    ),
+    "Widget_Checklist_Tip": MessageLookupByLibrary.simpleMessage(
+      "Tap a checkbox to update your checklist without opening Onlynote.",
+    ),
+    "Widget_Choose_Note_Android": MessageLookupByLibrary.simpleMessage(
+      "When adding a widget, choose All notes or one note or checklist. Use Widget settings to change it later.",
+    ),
+    "Widget_Choose_Note_Title": MessageLookupByLibrary.simpleMessage(
+      "Make a widget yours",
+    ),
+    "Widget_Choose_Note_iOS": MessageLookupByLibrary.simpleMessage(
+      "Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.",
     ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "See your notes at a glance, without opening the app.",

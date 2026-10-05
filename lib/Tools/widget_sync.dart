@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:onlynote/common/constants.dart';
+import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -42,7 +43,7 @@ class WidgetSync {
 
   static const _maxTitleChars = 60;
   static const _maxBodyChars = 120;
-  static const _maxTodos = 4;
+  static const _maxTodos = 100;
 
   StreamSubscription<BoxEvent>? _subscription;
   Timer? _debounce;
@@ -50,6 +51,7 @@ class WidgetSync {
   /// Call once at startup, after Hive is open and DI is configured.
   Future<void> init() async {
     await HomeWidget.setAppGroupId(appGroupId);
+    WidgetCommands.instance.syncWidgets = sync;
     await sync();
 
     _subscription ??= Hive.box(databaseBox).watch().listen((_) {
@@ -63,14 +65,7 @@ class WidgetSync {
   /// Writes the current notes to shared storage and reloads the widgets.
   Future<void> sync() async {
     try {
-      final notes = getIt<NoteRepository>().getAllNotes()
-        ..removeWhere((note) => note.isDeleted)
-        ..sort();
-
-      final payload = <String, dynamic>{
-        'total': notes.length,
-        'notes': notes.take(_maxNotes).map(_encodeNote).toList(),
-      };
+      final payload = buildPayload(getIt<NoteRepository>().getAllNotes());
 
       await HomeWidget.saveWidgetData(payloadKey, jsonEncode(payload));
       await HomeWidget.updateWidget(
@@ -92,7 +87,19 @@ class WidgetSync {
     _subscription = null;
   }
 
-  Map<String, dynamic> _encodeNote(NoteDto note) {
+  @visibleForTesting
+  static Map<String, dynamic> buildPayload(Iterable<NoteDto> source) {
+    final notes = source.where((note) => !note.isDeleted).toList()..sort();
+    return <String, dynamic>{
+      'total': notes.length,
+      'notes': notes.take(_maxNotes).map(_encodeNote).toList(),
+      // Native configuration queries need every active note; display lists
+      // still use the compact first-eight snapshot above.
+      'allNotes': notes.map(_encodeNote).toList(),
+    };
+  }
+
+  static Map<String, dynamic> _encodeNote(NoteDto note) {
     final todos = note.todoList ?? const <TodoDto>[];
 
     return <String, dynamic>{
@@ -107,6 +114,7 @@ class WidgetSync {
       'todos': todos
           .take(_maxTodos)
           .map((todo) => <String, dynamic>{
+                if (todo.id?.isNotEmpty ?? false) 'id': todo.id,
                 't': _clip(todo.title, _maxTitleChars),
                 'c': todo.completed ?? false,
               })
@@ -117,7 +125,7 @@ class WidgetSync {
 
   /// Widget rows are single-line, so newlines are collapsed here rather than
   /// leaving the native side to deal with them.
-  String _clip(String? value, int maxChars) {
+  static String _clip(String? value, int maxChars) {
     final text = (value ?? '').replaceAll(RegExp(r'\s+'), ' ').trim();
     if (text.length <= maxChars) return text;
     return '${text.substring(0, maxChars).trimRight()}…';

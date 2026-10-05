@@ -20,6 +20,8 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     Note? customTemplateNote,
     NoteAutosaveStore? autosaveStore,
     NotePhotoCapture? photoCapture,
+    NoteReminderScheduler? reminderScheduler,
+    WidgetCommands? widgetCommands,
     NoteEditorStart start = NoteEditorStart.standard,
     List<PageRouteInfo>? children,
   }) : super(
@@ -32,6 +34,8 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             customTemplateNote: customTemplateNote,
             autosaveStore: autosaveStore,
             photoCapture: photoCapture,
+            reminderScheduler: reminderScheduler,
+            widgetCommands: widgetCommands,
             start: start,
           ),
           initialChildren: children,
@@ -52,6 +56,8 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         customTemplateNote: args.customTemplateNote,
         autosaveStore: args.autosaveStore,
         photoCapture: args.photoCapture,
+        reminderScheduler: args.reminderScheduler,
+        widgetCommands: args.widgetCommands,
         start: args.start,
       );
     },
@@ -67,6 +73,8 @@ class AddUpdateNoteRouteArgs {
     this.customTemplateNote,
     this.autosaveStore,
     this.photoCapture,
+    this.reminderScheduler,
+    this.widgetCommands,
     this.start = NoteEditorStart.standard,
   });
 
@@ -84,11 +92,15 @@ class AddUpdateNoteRouteArgs {
 
   final NotePhotoCapture? photoCapture;
 
+  final NoteReminderScheduler? reminderScheduler;
+
+  final WidgetCommands? widgetCommands;
+
   final NoteEditorStart start;
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
   }
 }
 

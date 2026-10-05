@@ -33,9 +33,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m5(time) => "下次提醒：${time}";
 
-  static String m6(price) => "支付 ${price} 永久移除廣告。";
+  static String m6(date) => "提醒我：${date}";
 
-  static String m7(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m7(price) => "支付 ${price} 永久移除廣告。";
+
+  static String m8(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -277,6 +279,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "10 分鐘後提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
+    "Reminder_Suggestion": m6,
+    "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
+      "使用建議時間",
+    ),
+    "Reminder_Suggestion_Dismiss": MessageLookupByLibrary.simpleMessage("忽略建議"),
     "Reminder_Time": MessageLookupByLibrary.simpleMessage("時間"),
     "Reminder_Tomorrow": MessageLookupByLibrary.simpleMessage("明天早上"),
     "Reminders_Changed": MessageLookupByLibrary.simpleMessage("此提醒已更改，請重試。"),
@@ -302,7 +309,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m6,
+    "Remove_Ads_Price": m7,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
@@ -324,6 +331,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Share_Image": MessageLookupByLibrary.simpleMessage("圖片"),
     "Share_Image_Description": MessageLookupByLibrary.simpleMessage(
       "將目前紙張畫面分享為圖片。",
+    ),
+    "Share_Import_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法匯入分享內容。內容已保留，重新開啟 Onlynote 時會重試。",
     ),
     "Share_Markdown": MessageLookupByLibrary.simpleMessage("Markdown"),
     "Share_Markdown_Description": MessageLookupByLibrary.simpleMessage(
@@ -371,7 +381,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m7,
+    "Template_Details": m8,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -431,6 +441,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage("加入主畫面"),
     "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
       "目前的桌面不支援自動加入，請依照下面的步驟操作。",
+    ),
+    "Widget_Checklist_Tip": MessageLookupByLibrary.simpleMessage(
+      "點按核取方塊即可更新待辦清單，無需開啟 Onlynote。",
+    ),
+    "Widget_Choose_Note_Android": MessageLookupByLibrary.simpleMessage(
+      "加入小工具時，可選擇所有筆記或一篇筆記或待辦清單。之後可透過「小工具設定」進行更改。",
+    ),
+    "Widget_Choose_Note_Title": MessageLookupByLibrary.simpleMessage("自訂小工具"),
+    "Widget_Choose_Note_iOS": MessageLookupByLibrary.simpleMessage(
+      "長按小工具，選擇「編輯小工具」，再選擇筆記或待辦清單。適用於 iOS 17 及以上版本。",
     ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "不用開啟 App，一眼看到你的備忘錄。",

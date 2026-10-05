@@ -126,6 +126,18 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       ]));
     });
 
+    // Native widget commands carry an explicit state so crash recovery cannot
+    // toggle the same item twice. Merge only the matching row into the draft.
+    on<_SetTodoCompleted>((event, emit) {
+      emit(state.copyWith(todos: [
+        for (final todo in state.todos)
+          if (todo.id == event.id)
+            todo.copyWith(completed: event.completed)
+          else
+            todo,
+      ]));
+    });
+
     on<_ReplaceTodoLines>((event, emit) {
       final index = state.todos.indexWhere((todo) => todo.id == event.id);
       if (index < 0 || event.lines.isEmpty) return;
