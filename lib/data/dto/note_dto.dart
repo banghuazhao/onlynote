@@ -11,6 +11,7 @@ import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/domain/model/daily_note_date.dart';
 
 part 'note_dto.g.dart';
 
@@ -66,11 +67,15 @@ class NoteDto implements Comparable {
     this.linkedNoteIds = const [],
     this.textStyles = const [],
     this.imageLayouts = const [],
+    this.dailyNoteDateKey,
   });
 
   factory NoteDto.fromNote(Note note) {
     return NoteDto(
       id: note.id,
+      dailyNoteDateKey: isValidDailyNoteDateKey(note.dailyNoteDateKey)
+          ? note.dailyNoteDateKey
+          : null,
       title: note.title.clipToMaxLength(maxTitleCharCount),
       description: note.description,
       dateTime: note.dateTime?.toIso8601String(),
@@ -102,6 +107,8 @@ class NoteDto implements Comparable {
   Note toDomain() {
     return Note(
       id: id,
+      dailyNoteDateKey:
+          isValidDailyNoteDateKey(dailyNoteDateKey) ? dailyNoteDateKey : null,
       title: title,
       description: description,
       dateTime: dateTime != null ? DateTime.tryParse(dateTime!) : null,
@@ -161,10 +168,12 @@ class NoteDto implements Comparable {
     List<String>? linkedNoteIds,
     List<Map<dynamic, dynamic>>? textStyles,
     List<Map<dynamic, dynamic>>? imageLayouts,
+    String? dailyNoteDateKey,
     String? deletedAt,
     String? folderId,
     bool clearDeletedAt = false,
     bool clearFolderId = false,
+    bool clearDailyNoteDateKey = false,
   }) {
     return NoteDto(
       id: id ?? this.id,
@@ -181,6 +190,9 @@ class NoteDto implements Comparable {
       linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
       textStyles: textStyles ?? this.textStyles,
       imageLayouts: imageLayouts ?? this.imageLayouts,
+      dailyNoteDateKey: clearDailyNoteDateKey
+          ? null
+          : (dailyNoteDateKey ?? this.dailyNoteDateKey),
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
       voiceMemos: voiceMemos ?? this.voiceMemos,
@@ -221,6 +233,8 @@ class NoteDto implements Comparable {
   final List<Map<dynamic, dynamic>>? textStyles;
   @HiveField(16)
   final List<Map<dynamic, dynamic>>? imageLayouts;
+  @HiveField(17)
+  final String? dailyNoteDateKey;
 
   @override
   int compareTo(other) {

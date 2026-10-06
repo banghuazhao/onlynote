@@ -414,5 +414,18 @@
   "Image_Remove": "移除照片",
   "Image_Move_Before": "向前移動",
   "Image_Move_After": "向後移動",
-  "Image_Drop_Here": "將照片放在這裡"
+  "Image_Drop_Here": "將照片放在這裡",
+  "Photo_Edit": "編輯照片",
+  "Photo_Edit_Hint": "拖動邊角裁剪照片，也可以旋轉照片。",
+  "Photo_Rotate": "旋轉",
+  "Photo_Reset": "重設",
+  "Photo_Edit_Failed": "無法儲存照片，請再試一次。",
+  "Photo_Save": "儲存",
+  "Find_In_Note": "在筆記中尋找",
+  "Find_No_Matches": "沒有符合的結果",
+  "Find_Previous": "上一個結果",
+  "Find_Next": "下一個結果",
+  "Find_Close": "關閉尋找",
+  "Today_Note": "今日筆記",
+  "Today_Note_Open_Failed": "無法開啟今日筆記，請再試一次。"
 }

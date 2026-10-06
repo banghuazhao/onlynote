@@ -309,6 +309,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       isPinned: false,
       isArchived: false,
       deletedAt: null,
+      dailyNoteDateKey: null,
     );
 
     final failureOrSuccess = await _addNoteUsecase(duplicated);

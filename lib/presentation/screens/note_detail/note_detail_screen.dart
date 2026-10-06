@@ -1,4 +1,7 @@
 import 'package:onlynote/presentation/components/note_document_view.dart';
+import 'package:onlynote/presentation/components/note_find_bar.dart';
+import 'package:onlynote/presentation/components/note_search_text.dart';
+import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +64,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Note? _lastSavedNote;
   int _reviewGeneration = 0;
   WidgetCommands? _widgetCommands;
+  final NoteSearchController _findController = NoteSearchController();
+  bool _findOpen = false;
+
+  void _openFind() {
+    if (mounted) setState(() => _findOpen = true);
+  }
+
+  void _closeFind() {
+    _findController.setQuery('');
+    if (mounted) setState(() => _findOpen = false);
+  }
+
+  void _findChanged() {
+    if (mounted) setState(() {});
+  }
 
   void _refreshWidgetCompletion() {
     if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
@@ -147,6 +165,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       context: context,
       title: S.of(context).More_Options,
       actions: [
+        AppSheetAction(
+          leading: const Icon(Icons.manage_search_rounded),
+          title: Text(S.of(context).Find_In_Note),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _openFind();
+          },
+        ),
         AppSheetAction(
           leading: Icon(note.isArchived
               ? Icons.unarchive_outlined
@@ -321,6 +347,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.initState();
     _widgetCommands = WidgetCommands.initializedInstance;
     _widgetCommands?.updates.addListener(_refreshWidgetCompletion);
+    _findController.addListener(_findChanged);
 
     if (mounted) {
       BlocProvider.of<NoteDetailBloc>(context)
@@ -331,6 +358,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   void dispose() {
     _widgetCommands?.updates.removeListener(_refreshWidgetCompletion);
+    _findController.removeListener(_findChanged);
+    _findController.dispose();
     super.dispose();
   }
 
@@ -519,75 +548,110 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     return BlocConsumer<NoteDetailBloc, NoteDetailState>(
       listener: (_, state) => _observeSavedChecklist(state),
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: DeskSurface.colorOf(context),
-          appBar: NoteAppBar(
-            actions: state.whenOrNull(
-              success: (note) {
-                if (note.isDeleted) return _trashActions(note);
-                final hasReminder =
-                    ReminderData.shared.getCurrentReminder(note) != null;
-                return [
-                  AppButton(
-                    tooltip: S.of(context).Reminder,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      transitionBuilder: (child, animation) =>
-                          ScaleTransition(scale: animation, child: child),
-                      child: Icon(
-                        hasReminder
-                            ? Icons.alarm_on_outlined
-                            : Icons.alarm_add_outlined,
-                        key: ValueKey(hasReminder),
+        final note = state.whenOrNull(success: (note) => note);
+        if (note != null) {
+          _findController.setFields(noteSearchFields(note), notify: false);
+        }
+        return CallbackShortcuts(
+          bindings: {
+            if (_findOpen)
+              const SingleActivator(LogicalKeyboardKey.escape): _closeFind,
+            const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+                _openFind,
+            const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
+                _openFind,
+          },
+          child: Focus(
+            autofocus: true,
+            child: Scaffold(
+              backgroundColor: DeskSurface.colorOf(context),
+              appBar: NoteAppBar(
+                actions: state.whenOrNull(
+                  success: (note) {
+                    if (note.isDeleted) return _trashActions(note);
+                    final hasReminder =
+                        ReminderData.shared.getCurrentReminder(note) != null;
+                    return [
+                      AppButton(
+                        tooltip: S.of(context).Reminder,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          transitionBuilder: (child, animation) =>
+                              ScaleTransition(scale: animation, child: child),
+                          child: Icon(
+                            hasReminder
+                                ? Icons.alarm_on_outlined
+                                : Icons.alarm_add_outlined,
+                            key: ValueKey(hasReminder),
+                          ),
+                        ),
+                        onPressed: () => _showReminderPicker(note),
                       ),
-                    ),
-                    onPressed: () => _showReminderPicker(note),
-                  ),
-                  AppButton(
-                    key: _shareButtonKey,
-                    tooltip: S.of(context).Share,
-                    child: const Icon(Icons.share_outlined),
-                    onPressed: () => _shareNoteAsImage(note),
-                  ),
-                  AppButton(
-                    tooltip: S.of(context).Edit,
-                    child: const Icon(Icons.edit_outlined),
-                    onPressed: () async {
-                      await context.router.push(AddUpdateNoteRoute(note: note));
-                      if (!context.mounted) return;
-                      //* Reload the note so edits made on the form screen show up.
-                      context
-                          .read<NoteDetailBloc>()
-                          .add(NoteDetailEvent.showNote(widget.noteId));
-                    },
-                  ),
-                  AppButton(
-                    tooltip: S.of(context).More_Options,
-                    isLoading: _savingTemplate || _changingLibrary,
-                    child: const Icon(Icons.more_horiz_rounded),
-                    onPressed: () => _showMoreOptions(note),
-                  ),
-                ];
-              },
-            ),
-          ),
-          body: DeskSurface(
-            child: state.maybeMap(
-              error: (error) => ErrorText(error.message ?? ''),
-              success: (data) => LoadedView(
-                note: data.note,
-                screenshotController: _screenshotController,
-                exportMode: _exportingImage,
-                libraryNotes: _libraryNotes,
-                onOpenLinkedNote: _openLinkedNote,
-                onEditLinks:
-                    data.note.isDeleted ? null : () => _editLinks(data.note),
-                onChecklistActionStart: () => _reviewGeneration++,
-                onReminderTap: data.note.isDeleted
-                    ? null
-                    : () => _showReminderPicker(data.note),
+                      AppButton(
+                        key: _shareButtonKey,
+                        tooltip: S.of(context).Share,
+                        child: const Icon(Icons.share_outlined),
+                        onPressed: () => _shareNoteAsImage(note),
+                      ),
+                      AppButton(
+                        tooltip: S.of(context).Edit,
+                        child: const Icon(Icons.edit_outlined),
+                        onPressed: () async {
+                          await context.router
+                              .push(AddUpdateNoteRoute(note: note));
+                          if (!context.mounted) return;
+                          //* Reload the note so edits made on the form screen show up.
+                          context
+                              .read<NoteDetailBloc>()
+                              .add(NoteDetailEvent.showNote(widget.noteId));
+                        },
+                      ),
+                      AppButton(
+                        tooltip: S.of(context).More_Options,
+                        isLoading: _savingTemplate || _changingLibrary,
+                        child: const Icon(Icons.more_horiz_rounded),
+                        onPressed: () => _showMoreOptions(note),
+                      ),
+                    ];
+                  },
+                ),
               ),
-              orElse: () => const _DetailSkeleton(),
+              body: Column(children: [
+                if (_findOpen && note != null)
+                  NoteFindBar(
+                    controller: _findController,
+                    hintText: S.of(context).Find_In_Note,
+                    noMatchesText: S.of(context).Find_No_Matches,
+                    previousTooltip: S.of(context).Find_Previous,
+                    nextTooltip: S.of(context).Find_Next,
+                    closeTooltip: S.of(context).Find_Close,
+                    onClose: _closeFind,
+                  ),
+                Expanded(
+                    child: DeskSurface(
+                  child: state.maybeMap(
+                    error: (error) => ErrorText(error.message ?? ''),
+                    success: (data) => LoadedView(
+                      note: data.note,
+                      screenshotController: _screenshotController,
+                      exportMode: _exportingImage,
+                      searchController: _findOpen && !_exportingImage
+                          ? _findController
+                          : null,
+                      libraryNotes: _libraryNotes,
+                      onOpenLinkedNote: _openLinkedNote,
+                      onEditLinks: data.note.isDeleted
+                          ? null
+                          : () => _editLinks(data.note),
+                      onChecklistActionStart: () => _reviewGeneration++,
+                      onReminderTap: data.note.isDeleted
+                          ? null
+                          : () => _showReminderPicker(data.note),
+                    ),
+                    orElse: () => const _DetailSkeleton(),
+                  ),
+                )),
+              ]),
             ),
           ),
         );
@@ -607,6 +671,7 @@ class LoadedView extends StatelessWidget {
     this.libraryNotes = const [],
     this.onOpenLinkedNote,
     this.onEditLinks,
+    this.searchController,
   });
 
   final Note note;
@@ -617,6 +682,7 @@ class LoadedView extends StatelessWidget {
   final List<Note> libraryNotes;
   final ValueChanged<Note>? onOpenLinkedNote;
   final VoidCallback? onEditLinks;
+  final NoteSearchController? searchController;
 
   @override
   Widget build(BuildContext context) {
@@ -647,10 +713,18 @@ class LoadedView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (note.title?.isNotEmpty == true) ...[
-                      SelectableText(
-                        note.title!,
-                        style: AppTypography.headline3.copyWith(height: 1.25),
-                      ),
+                      if (searchController != null)
+                        NoteSearchText(
+                          controller: searchController!,
+                          fieldId: 'title',
+                          text: note.title!,
+                          style: AppTypography.headline3.copyWith(height: 1.25),
+                        )
+                      else
+                        SelectableText(
+                          note.title!,
+                          style: AppTypography.headline3.copyWith(height: 1.25),
+                        ),
                       const SizedBox(height: AppSpacings.l),
                     ],
                     SelectableText(
@@ -712,6 +786,18 @@ class LoadedView extends StatelessWidget {
                         todos: note.todo,
                         readOnly: note.isDeleted,
                         exportMode: exportMode,
+                        expandCompleted:
+                            searchController?.query.trim().isNotEmpty == true,
+                        titleBuilder: searchController == null
+                            ? null
+                            : (todo, style) => NoteSearchText(
+                                  controller: searchController!,
+                                  fieldId:
+                                      'todo:${todo.id ?? note.todo.indexWhere((item) => identical(item, todo))}',
+                                  text: todo.title ?? '',
+                                  style: style,
+                                  selectable: false,
+                                ),
                         onToggle: (id) {
                           onChecklistActionStart?.call();
                           HapticFeedback.selectionClick();
@@ -748,6 +834,19 @@ class LoadedView extends StatelessWidget {
                       imagePaths: note.imagePaths,
                       imageLayouts: note.imageLayouts,
                       selectable: !exportMode,
+                      textBuilder: searchController == null
+                          ? null
+                          : (text, styles, start, _) => NoteSearchText(
+                                controller: searchController!,
+                                fieldId: 'body',
+                                text: text,
+                                textOffset: start,
+                                styles: styles,
+                                style: AppTypography.headline6.copyWith(
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.ink.withValues(alpha: 0.88),
+                                ),
+                              ),
                       onImageTap: exportMode
                           ? null
                           : (path) {
@@ -803,6 +902,14 @@ class LoadedView extends StatelessWidget {
                           VoiceMemoPlayer(
                               memo: memo,
                               key: ValueKey(memo.id),
+                              transcriptBuilder: searchController == null
+                                  ? null
+                                  : (text) => NoteSearchText(
+                                        controller: searchController!,
+                                        fieldId: 'voice:${memo.id}',
+                                        text: text,
+                                        style: context.textStyles.bodyMedium,
+                                      ),
                               resolvePath: AudioStorage.instance.resolvePath),
                     ],
                   ],

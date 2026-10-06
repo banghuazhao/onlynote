@@ -16,6 +16,7 @@ class NoteDocumentView extends StatelessWidget {
     this.selectable = true,
     this.onImageTap,
     this.imageBuilder,
+    this.textBuilder,
   });
   final String text;
   final List<NoteTextStyleRange> styles;
@@ -25,6 +26,9 @@ class NoteDocumentView extends StatelessWidget {
   final bool selectable;
   final ValueChanged<String>? onImageTap;
   final NoteBlockImageBuilder? imageBuilder;
+  final Widget Function(
+          String text, List<NoteTextStyleRange> styles, int start, int end)?
+      textBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +38,18 @@ class NoteDocumentView extends StatelessWidget {
       children: [
         for (final part in noteDocumentParts(text, layouts))
           if (part is NoteTextPart && part.end > part.start)
-            FormattedNoteText(
-              text: text.substring(part.start, part.end),
-              styles: noteTextStylesForPart(styles, part.start, part.end),
-              style: style,
-              selectable: selectable,
-            )
+            textBuilder?.call(
+                  text.substring(part.start, part.end),
+                  noteTextStylesForPart(styles, part.start, part.end),
+                  part.start,
+                  part.end,
+                ) ??
+                FormattedNoteText(
+                  text: text.substring(part.start, part.end),
+                  styles: noteTextStylesForPart(styles, part.start, part.end),
+                  style: style,
+                  selectable: selectable,
+                )
           else if (part is NoteImagePart)
             NoteImageBlock(
               key: ValueKey('document-image-${part.layout.path}'),

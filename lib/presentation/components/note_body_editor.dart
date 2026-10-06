@@ -28,6 +28,7 @@ class NoteBodyEditor extends StatefulWidget {
     this.autofocus = false,
     this.paperColor,
     this.imageBuilder,
+    this.onEditImage,
   });
 
   final SimpleFormattingController controller;
@@ -39,6 +40,7 @@ class NoteBodyEditor extends StatefulWidget {
   final bool autofocus;
   final Color? paperColor;
   final NoteBlockImageBuilder? imageBuilder;
+  final ValueChanged<String>? onEditImage;
 
   @override
   State<NoteBodyEditor> createState() => _NoteBodyEditorState();
@@ -538,6 +540,9 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         onMoveEarlier: () => _moveOne(layout.path, -1),
         onMoveLater: () => _moveOne(layout.path, 1),
         onRemove: () => widget.onRemoveImage(layout.path),
+        onEdit: widget.onEditImage == null
+            ? null
+            : () => widget.onEditImage!(layout.path),
       );
 
   void _autoScroll() {

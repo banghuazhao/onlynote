@@ -7,10 +7,12 @@ class NoteSearchFilters extends StatelessWidget {
       {super.key,
       required this.selected,
       required this.onChanged,
+      this.leadingAction,
       this.onOpenLibrary});
   final Set<NoteSearchFilter> selected;
   final ValueChanged<Set<NoteSearchFilter>> onChanged;
   final VoidCallback? onOpenLibrary;
+  final Widget? leadingAction;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,11 @@ class NoteSearchFilters extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(children: [
+        if (leadingAction != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: leadingAction,
+          ),
         if (onOpenLibrary != null)
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -70,12 +77,14 @@ class UnfinishedNotesFilter extends StatelessWidget {
       required this.onChanged,
       this.onOpenReminders,
       this.onOpenLibrary,
+      this.leadingAction,
       this.libraryFilterCount = 0});
   final bool selected;
   final ValueChanged<bool> onChanged;
   final VoidCallback? onOpenReminders;
   final VoidCallback? onOpenLibrary;
   final int libraryFilterCount;
+  final Widget? leadingAction;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -83,6 +92,10 @@ class UnfinishedNotesFilter extends StatelessWidget {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(children: [
+            if (leadingAction != null) ...[
+              leadingAction!,
+              const SizedBox(width: 8),
+            ],
             FilterChip(
               key: const ValueKey('unfinished-quick-filter'),
               avatar: const Icon(Icons.check_box_outlined, size: 18),

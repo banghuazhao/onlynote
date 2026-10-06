@@ -103,6 +103,23 @@ void main() {
     expect(repository.notes['note']!.tags, ['New']);
   });
 
+  test('history restores content while retaining the current daily association',
+      () async {
+    final before =
+        NoteDto(id: 'daily', title: 'Before', dailyNoteDateKey: '2026-10-05');
+    repository.notes['daily'] = before;
+    await repository.addUpdateNote(before.copyWith(title: 'After'));
+    final version = history.versionsFor('daily').single;
+    expect(version.note.dailyNoteDateKey, '2026-10-05');
+    await repository.addUpdateNote(repository.notes['daily']!
+        .copyWith(dailyNoteDateKey: '2026-10-06', isArchived: true));
+    expect(await history.restore('daily', version.id),
+        NoteHistoryRestoreResult.restored);
+    expect(repository.notes['daily']!.title, 'Before');
+    expect(repository.notes['daily']!.dailyNoteDateKey, '2026-10-06');
+    expect(repository.notes['daily']!.isArchived, isTrue);
+  });
+
   test('typing rebases image anchors and resize or movement makes versions',
       () async {
     const path = 'note_images/photo.jpg';

@@ -16,6 +16,7 @@ class VoiceMemoPlayer extends StatefulWidget {
       this.onRemove,
       this.onTranscriptChanged,
       this.onShare,
+      this.transcriptBuilder,
       this.service});
   final VoiceMemo memo;
   final Future<String> Function(String) resolvePath;
@@ -23,6 +24,7 @@ class VoiceMemoPlayer extends StatefulWidget {
   final Future<void> Function(String?)? onTranscriptChanged;
   final Future<void> Function()? onShare;
   final VoiceMemoService? service;
+  final Widget Function(String text)? transcriptBuilder;
   @override
   State<VoiceMemoPlayer> createState() => _VoiceMemoPlayerState();
 }
@@ -236,8 +238,9 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
         if (widget.memo.transcript?.trim().isNotEmpty ?? false)
           Padding(
               padding: EdgeInsets.only(top: tokens.space3),
-              child: SelectableText(widget.memo.transcript!,
-                  style: context.textStyles.bodyMedium)),
+              child: widget.transcriptBuilder?.call(widget.memo.transcript!) ??
+                  SelectableText(widget.memo.transcript!,
+                      style: context.textStyles.bodyMedium)),
         if (_error != null)
           Padding(
               padding: EdgeInsets.only(top: tokens.space2),

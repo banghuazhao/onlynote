@@ -3,6 +3,7 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_trash.dart';
+import 'package:onlynote/services/daily_note.dart';
 
 class TrashRepository implements NoteRepository {
   final notes = <String, NoteDto>{};
@@ -101,6 +102,68 @@ void main() {
     expect(await service.setDeleted(['a'], deleted: false), isFalse);
     expect(repository.notes['a']!.isDeleted, isFalse);
     expect(reminders.single.reminderId, 42);
+  });
+
+  for (final archived in [false, true]) {
+    test(
+        'restoring an old daily note keeps the ${archived ? 'archived' : 'active'} replacement as today\'s note',
+        () async {
+      repository.notes['a'] = repository.notes['a']!.copyWith(
+          dailyNoteDateKey: '2026-10-06',
+          dateTime: DateTime(2026, 10, 6, 9).toIso8601String());
+      final original = repository.notes['a']!;
+      await service.setDeleted(['a'], deleted: true);
+      final replacement = repository.notes['b']!.copyWith(
+          title: 'My replacement thoughts',
+          dailyNoteDateKey: '2026-10-06',
+          dateTime: DateTime(2026, 10, 6, 12).toIso8601String(),
+          isArchived: archived);
+      repository.notes['b'] = replacement;
+      await service.setDeleted(['a'], deleted: false);
+      final restored = repository.notes['a']!;
+      expect(restored.isDeleted, isFalse);
+      expect(restored.dailyNoteDateKey, isNull);
+      expect(restored.title, original.title);
+      expect(restored.folderId, original.folderId);
+      expect(restored.imagePaths, original.imagePaths);
+      expect(restored.todoList, original.todoList);
+      expect(restored.dateTime, original.dateTime);
+      expect(repository.notes['b'], same(replacement));
+      final today = await DailyNoteService(repository,
+              now: () => DateTime(2026, 10, 6, 18))
+          .openToday(titleForDay: (_) => 'Should not create');
+      expect(today.id, 'b');
+      expect(today.isArchived, archived);
+    });
+  }
+
+  test('restoring a daily note with no live owner retains its association',
+      () async {
+    repository.notes['a'] =
+        repository.notes['a']!.copyWith(dailyNoteDateKey: '2026-10-06');
+    await service.setDeleted(['a'], deleted: true);
+    await service.setDeleted(['a'], deleted: false);
+    expect(repository.notes['a']!.dailyNoteDateKey, '2026-10-06');
+  });
+
+  test('failed bulk restore rolls back cleared daily identity and trash state',
+      () async {
+    repository.notes['a'] =
+        repository.notes['a']!.copyWith(dailyNoteDateKey: '2026-10-06');
+    await service.setDeleted(['a', 'b'], deleted: true);
+    final trashed = repository.notes['a']!;
+    repository.notes['owner'] =
+        NoteDto(id: 'owner', title: 'Today', dailyNoteDateKey: '2026-10-06');
+    final owner = repository.notes['owner'];
+    repository.failNextId = 'b';
+    await expectLater(
+        service.setDeleted(['a', 'b'], deleted: false), throwsStateError);
+    expect(repository.notes['a'], same(trashed));
+    expect(repository.notes['a']!.dailyNoteDateKey, '2026-10-06');
+    expect(repository.notes['a']!.isDeleted, isTrue);
+    expect(repository.notes['b']!.isDeleted, isTrue);
+    expect(repository.notes['owner'], same(owner));
+    expect(scheduled, isEmpty);
   });
 
   for (final repeat in [ReminderRepeat.daily, ReminderRepeat.weekly]) {

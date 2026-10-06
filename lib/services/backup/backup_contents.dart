@@ -6,6 +6,7 @@ import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_history.dart';
@@ -65,7 +66,7 @@ class BackupContents {
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 6,
+        'version': 7,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -128,6 +129,7 @@ class BackupContents {
         'linkedNoteIds': note.linkedNoteIds ?? [],
         'textStyles': note.textStyles ?? [],
         'imageLayouts': note.imageLayouts ?? [],
+        'dailyNoteDateKey': note.dailyNoteDateKey,
         'photos': note.imagePaths ?? [],
         'voiceMemos': note.voiceMemos ?? [],
         'todos': [
@@ -148,7 +150,8 @@ class BackupContents {
             version != 3 &&
             version != 4 &&
             version != 5 &&
-            version != 6)) {
+            version != 6 &&
+            version != 7)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -238,12 +241,17 @@ class BackupContents {
           ? _imageLayouts(
               map['imageLayouts'] ?? const [], paths, description ?? '')
           : normalizeNoteImageLayouts(const [], paths, description ?? '');
+      final dailyKey = version >= 7 ? map['dailyNoteDateKey'] : null;
+      if (dailyKey != null && !isValidDailyNoteDateKey(dailyKey)) {
+        throw const FormatException('Invalid daily note date');
+      }
       return NoteDto(
         id: id,
         title: _text(map['title'], nullable: true),
         description: description,
         textStyles: [for (final style in textStyles) style.toMap()],
         imageLayouts: [for (final layout in imageLayouts) layout.toMap()],
+        dailyNoteDateKey: dailyKey as String?,
         colorValue: color,
         dateTime: _date(map['dateTime']),
         sortOrder: map['sortOrder'] as int?,

@@ -27,6 +27,7 @@ class NoteImageBlock extends StatefulWidget {
     this.onMoveEarlier,
     this.onMoveLater,
     this.onRemove,
+    this.onEdit,
     this.onImageTap,
     this.imageBuilder,
   });
@@ -41,6 +42,7 @@ class NoteImageBlock extends StatefulWidget {
   final VoidCallback? onMoveEarlier;
   final VoidCallback? onMoveLater;
   final VoidCallback? onRemove;
+  final VoidCallback? onEdit;
   final VoidCallback? onImageTap;
   final NoteBlockImageBuilder? imageBuilder;
 
@@ -94,6 +96,12 @@ class _NoteImageBlockState extends State<NoteImageBlock> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Wrap(children: [
+                if (widget.onEdit != null)
+                  _ImageTool(
+                      label: strings.Photo_Edit,
+                      icon: Icons.crop_rotate_rounded,
+                      onPressed: widget.onEdit,
+                      key: ValueKey('image-edit-${widget.layout.path}')),
                 _ImageTool(
                     label: strings.Image_Move_Before,
                     icon: Icons.arrow_upward_rounded,

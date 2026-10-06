@@ -205,4 +205,48 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+      'partial gallery import saves completed photos and retries the rest',
+      (tester) async {
+    final store = _PhotoStore();
+    var galleryPicks = 0;
+    final copies = <String, int>{};
+    await openPhoto(
+      tester,
+      store,
+      NotePhotoCapture(
+        pick: (_) async => null,
+        pickMany: () async {
+          galleryPicks++;
+          return [XFile('/tmp/first.png'), XFile('/tmp/second.png')];
+        },
+        save: (source) async {
+          copies.update(source.path, (count) => count + 1, ifAbsent: () => 1);
+          if (source.path == '/tmp/second.png' && copies[source.path] == 1) {
+            throw StateError('Disk temporarily unavailable');
+          }
+          return 'note_images/${source.uri.pathSegments.last}';
+        },
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('editor-add-photo')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Choose_From_Gallery));
+    await tester.pumpAndSettle();
+    expect(store.saved.last.imagePaths, ['note_images/first.png']);
+    expect(find.text('Retry'), findsOneWidget);
+    await tester.enterText(_bodyField(), 'Caption while importing');
+    await tester.tap(find.text('Retry'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saved.last.imagePaths,
+        ['note_images/first.png', 'note_images/second.png']);
+    expect(store.saved.last.description, 'Caption while importing');
+    expect(galleryPicks, 1);
+    expect(copies, {'/tmp/first.png': 1, '/tmp/second.png': 2});
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -31,6 +31,7 @@ class Note with _$Note {
     @Default([]) List<String> linkedNoteIds,
     @Default([]) List<NoteTextStyleRange> textStyles,
     @Default([]) List<NoteImageLayout> imageLayouts,
+    String? dailyNoteDateKey,
   }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');

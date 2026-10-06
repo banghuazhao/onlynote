@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -63,6 +64,24 @@ class ImageStorage {
     final fileName = '${_uuid.v4()}.$extension';
     await source.copy('${imagesDir.path}/$fileName');
     return 'note_images/$fileName';
+  }
+
+  /// Edits own a fresh file, leaving the source available to note history.
+  /// Flush the bytes before publishing the final path to the editor.
+  static Future<String> saveImageBytes(Uint8List bytes) async {
+    final documentsPath = await _documentsPathAsync();
+    final imagesDir = Directory('$documentsPath/note_images');
+    await imagesDir.create(recursive: true);
+    final fileName = '${_uuid.v4()}.png';
+    final pending = File('${imagesDir.path}/$fileName.partial');
+    try {
+      await pending.writeAsBytes(bytes, flush: true);
+      await pending.rename('${imagesDir.path}/$fileName');
+      return 'note_images/$fileName';
+    } catch (_) {
+      if (await pending.exists()) await pending.delete();
+      rethrow;
+    }
   }
 
   /// Copies [paths] to fresh files so the copy owns its own images — used

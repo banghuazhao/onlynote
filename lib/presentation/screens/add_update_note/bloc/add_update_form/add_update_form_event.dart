@@ -13,6 +13,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     List<VoiceMemo>? voiceMemos,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    String? dailyNoteDateKey,
   }) = _Initialize;
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;
@@ -69,6 +70,12 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
       _AddImage;
 
   const factory AddUpdateFormEvent.removeImage(String path) = _RemoveImage;
+
+  const factory AddUpdateFormEvent.replaceImage({
+    required String oldPath,
+    required String newPath,
+    required double aspectRatio,
+  }) = _ReplaceImage;
 
   const factory AddUpdateFormEvent.voiceMemosChanged(List<VoiceMemo> value) =
       _VoiceMemosChanged;

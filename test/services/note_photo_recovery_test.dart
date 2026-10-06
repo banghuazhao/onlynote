@@ -95,6 +95,45 @@ void main() {
     expect(drafts.isEmpty, isTrue);
   });
 
+  for (final currentDay in [null, '2026-10-05']) {
+    test('photo recovery retains the persisted daily identity $currentDay',
+        () async {
+      final seed = Note(
+          id: 'origin',
+          title: 'Old daily note',
+          dailyNoteDateKey: '2026-10-06');
+      notes.notes['origin'] = NoteDto.fromNote(seed);
+      final recovery = NotePhotoRecovery(
+        drafts: drafts,
+        notes: notes,
+        retrieve: () async => ['/tmp/captured-daily-photo.jpg'],
+        save: (_) async => 'note_images/recovered-daily-photo.jpg',
+      );
+      await recovery.begin(seed);
+      await drafts.put(
+          'origin',
+          NoteDto.fromNote(seed.copyWith(
+              title: 'Keep latest draft title',
+              description: 'Keep unsaved thoughts')));
+      notes.notes['origin'] =
+          NoteDto.fromNote(seed.copyWith(dailyNoteDateKey: currentDay));
+      final owner =
+          NoteDto(id: 'today', title: 'Today', dailyNoteDateKey: '2026-10-06');
+      notes.notes['today'] = owner;
+
+      await recovery.recoverPending();
+
+      final restored = notes.notes['origin']!;
+      expect(restored.dailyNoteDateKey, currentDay);
+      expect(restored.title, 'Keep latest draft title');
+      expect(restored.description, 'Keep unsaved thoughts');
+      expect(restored.imagePaths, ['note_images/recovered-daily-photo.jpg']);
+      expect(notes.notes['today'], same(owner));
+      expect(recovery.hasPendingCapture, isFalse);
+      expect(drafts.isEmpty, isTrue);
+    });
+  }
+
   test('canceled camera removes metadata without saving an empty Photo Note',
       () async {
     final recovery = NotePhotoRecovery(
@@ -246,6 +285,40 @@ void main() {
     await recovery.recoverPending();
     expect(notes.notes['saved']!.imagePaths, ['note_images/photo.jpg']);
     expect(copies, 0);
+    expect(recovery.hasPendingCapture, isFalse);
+  });
+
+  test(
+      'batch journal appends completed copies and recovers only remaining sources',
+      () async {
+    final copied = <String>[];
+    final recovery = NotePhotoRecovery(
+      drafts: drafts,
+      notes: notes,
+      // Android may return the entire original selection after a restart.
+      retrieve: () async => ['/tmp/one.jpg', '/tmp/two.jpg', '/tmp/three.jpg'],
+      save: (source) async {
+        copied.add(source.path);
+        return 'note_images/${source.path.split('/').last}';
+      },
+    );
+    final token = await recovery.begin(Note(id: 'batch'));
+    await recovery.selectedMany(
+        token, ['/tmp/one.jpg', '/tmp/two.jpg', '/tmp/three.jpg']);
+    await recovery.copied(token, 'note_images/one.jpg',
+        sourcePath: '/tmp/one.jpg');
+    await recovery.copied(token, 'note_images/two.jpg',
+        sourcePath: '/tmp/two.jpg');
+    final record = drafts.get(NotePhotoRecovery.recordKey) as Map;
+    expect(record['sources'], ['/tmp/three.jpg']);
+    expect(record['saved'], ['note_images/one.jpg', 'note_images/two.jpg']);
+    await recovery.recoverPending();
+    expect(copied, ['/tmp/three.jpg']);
+    expect(notes.notes['batch']!.imagePaths, [
+      'note_images/one.jpg',
+      'note_images/two.jpg',
+      'note_images/three.jpg'
+    ]);
     expect(recovery.hasPendingCapture, isFalse);
   });
 

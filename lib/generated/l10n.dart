@@ -3409,6 +3409,101 @@ class S {
       args: [],
     );
   }
+
+  /// `Edit photo`
+  String get Photo_Edit {
+    return Intl.message('Edit photo', name: 'Photo_Edit', desc: '', args: []);
+  }
+
+  /// `Drag the corners to crop. Rotate if needed.`
+  String get Photo_Edit_Hint {
+    return Intl.message(
+      'Drag the corners to crop. Rotate if needed.',
+      name: 'Photo_Edit_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rotate`
+  String get Photo_Rotate {
+    return Intl.message('Rotate', name: 'Photo_Rotate', desc: '', args: []);
+  }
+
+  /// `Reset`
+  String get Photo_Reset {
+    return Intl.message('Reset', name: 'Photo_Reset', desc: '', args: []);
+  }
+
+  /// `Could not save this photo. Try again.`
+  String get Photo_Edit_Failed {
+    return Intl.message(
+      'Could not save this photo. Try again.',
+      name: 'Photo_Edit_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save`
+  String get Photo_Save {
+    return Intl.message('Save', name: 'Photo_Save', desc: '', args: []);
+  }
+
+  /// `Find in note`
+  String get Find_In_Note {
+    return Intl.message(
+      'Find in note',
+      name: 'Find_In_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matches`
+  String get Find_No_Matches {
+    return Intl.message(
+      'No matches',
+      name: 'Find_No_Matches',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Previous match`
+  String get Find_Previous {
+    return Intl.message(
+      'Previous match',
+      name: 'Find_Previous',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next match`
+  String get Find_Next {
+    return Intl.message('Next match', name: 'Find_Next', desc: '', args: []);
+  }
+
+  /// `Close search`
+  String get Find_Close {
+    return Intl.message('Close search', name: 'Find_Close', desc: '', args: []);
+  }
+
+  /// `Today’s note`
+  String get Today_Note {
+    return Intl.message('Today’s note', name: 'Today_Note', desc: '', args: []);
+  }
+
+  /// `Could not open today’s note. Try again.`
+  String get Today_Note_Open_Failed {
+    return Intl.message(
+      'Could not open today’s note. Try again.',
+      name: 'Today_Note_Open_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

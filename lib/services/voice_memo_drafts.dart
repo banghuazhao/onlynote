@@ -164,8 +164,13 @@ class VoiceMemoDrafts {
         }
         await retain(memo);
         final draft = journal.get(id);
-        final current =
+        final content =
             draft is NoteDto && draft.id == id ? draft : existing ?? seed;
+        final current = existing == null
+            ? content
+            : content.copyWith(
+                dailyNoteDateKey: existing.dailyNoteDateKey,
+                clearDailyNoteDateKey: existing.dailyNoteDateKey == null);
         if (current.isDeleted) continue;
         final updated = current.copyWith(voiceMemos: [
           for (final value in current.voiceMemos ?? <Map<dynamic, dynamic>>[])

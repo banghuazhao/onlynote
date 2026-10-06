@@ -56,6 +56,7 @@ class _BuildDescriptionField extends StatelessWidget {
     required this.focusNode,
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
+    required this.onEditImage,
     this.autofocus = false,
   }) : _descriptionController = descriptionController;
 
@@ -64,6 +65,7 @@ class _BuildDescriptionField extends StatelessWidget {
   final FocusNode focusNode;
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
+  final ValueChanged<String> onEditImage;
   final bool autofocus;
 
   @override
@@ -74,6 +76,7 @@ class _BuildDescriptionField extends StatelessWidget {
         imageLayouts: state.imageLayouts,
         onImageLayoutsChanged: onImageLayoutsChanged,
         onRemoveImage: onRemoveImage,
+        onEditImage: onEditImage,
         autofocus: autofocus,
         paperColor: state.selectedColor ?? AppColors.parchment,
       );

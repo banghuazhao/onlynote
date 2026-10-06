@@ -212,6 +212,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("Reminders"),
     "Filter_Tags": MessageLookupByLibrary.simpleMessage("Filter by tags"),
     "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("Unfinished"),
+    "Find_Close": MessageLookupByLibrary.simpleMessage("Close search"),
+    "Find_In_Note": MessageLookupByLibrary.simpleMessage("Find in note"),
+    "Find_Next": MessageLookupByLibrary.simpleMessage("Next match"),
+    "Find_No_Matches": MessageLookupByLibrary.simpleMessage("No matches"),
+    "Find_Previous": MessageLookupByLibrary.simpleMessage("Previous match"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
@@ -381,6 +386,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not add the photo. Try again or choose one from your library.",
     ),
+    "Photo_Edit": MessageLookupByLibrary.simpleMessage("Edit photo"),
+    "Photo_Edit_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save this photo. Try again.",
+    ),
+    "Photo_Edit_Hint": MessageLookupByLibrary.simpleMessage(
+      "Drag the corners to crop. Rotate if needed.",
+    ),
+    "Photo_Reset": MessageLookupByLibrary.simpleMessage("Reset"),
+    "Photo_Rotate": MessageLookupByLibrary.simpleMessage("Rotate"),
+    "Photo_Save": MessageLookupByLibrary.simpleMessage("Save"),
     "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("Choose a photo"),
     "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("Text copied"),
     "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("Copy text"),
@@ -686,6 +701,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Title": MessageLookupByLibrary.simpleMessage("Title"),
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "To get a reminder, please go to settings to open notification.",
+    ),
+    "Today_Note": MessageLookupByLibrary.simpleMessage("Today’s note"),
+    "Today_Note_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not open today’s note. Try again.",
     ),
     "Todo": MessageLookupByLibrary.simpleMessage("Checklist item"),
     "Todo_list": MessageLookupByLibrary.simpleMessage("Checklist"),

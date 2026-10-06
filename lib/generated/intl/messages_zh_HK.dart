@@ -171,6 +171,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("提醒"),
     "Filter_Tags": MessageLookupByLibrary.simpleMessage("依標籤篩選"),
     "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("未完成"),
+    "Find_Close": MessageLookupByLibrary.simpleMessage("關閉尋找"),
+    "Find_In_Note": MessageLookupByLibrary.simpleMessage("在筆記中尋找"),
+    "Find_Next": MessageLookupByLibrary.simpleMessage("下一個結果"),
+    "Find_No_Matches": MessageLookupByLibrary.simpleMessage("沒有符合的結果"),
+    "Find_Previous": MessageLookupByLibrary.simpleMessage("上一個結果"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已建立資料夾"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已刪除資料夾"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
@@ -294,6 +299,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
       "無法加入照片，請重試或從相簿中選擇。",
     ),
+    "Photo_Edit": MessageLookupByLibrary.simpleMessage("編輯照片"),
+    "Photo_Edit_Failed": MessageLookupByLibrary.simpleMessage("無法儲存照片，請再試一次。"),
+    "Photo_Edit_Hint": MessageLookupByLibrary.simpleMessage(
+      "拖動邊角裁剪照片，也可以旋轉照片。",
+    ),
+    "Photo_Reset": MessageLookupByLibrary.simpleMessage("重設"),
+    "Photo_Rotate": MessageLookupByLibrary.simpleMessage("旋轉"),
+    "Photo_Save": MessageLookupByLibrary.simpleMessage("儲存"),
     "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("選擇照片"),
     "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("已複製文字"),
     "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("複製文字"),
@@ -527,6 +540,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Title": MessageLookupByLibrary.simpleMessage("標題"),
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "想要設置日程安排提醒，請前往設置打開通知",
+    ),
+    "Today_Note": MessageLookupByLibrary.simpleMessage("今日筆記"),
+    "Today_Note_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法開啟今日筆記，請再試一次。",
     ),
     "Todo": MessageLookupByLibrary.simpleMessage("清單項目"),
     "Todo_list": MessageLookupByLibrary.simpleMessage("清單"),

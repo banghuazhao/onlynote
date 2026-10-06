@@ -37,6 +37,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: event.voiceMemos ?? [],
           tags: event.tags ?? [],
           linkedNoteIds: event.linkedNoteIds ?? [],
+          dailyNoteDateKey: event.dailyNoteDateKey,
         ),
       );
     });
@@ -89,6 +90,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
+          dailyNoteDateKey: state.dailyNoteDateKey,
           isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,
@@ -109,6 +111,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
+          dailyNoteDateKey: state.dailyNoteDateKey,
           isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,
@@ -224,6 +227,26 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           imagePaths: imagePaths,
           imageLayouts: normalizeNoteImageLayouts(
               state.imageLayouts, imagePaths, state.description ?? '')));
+    });
+
+    on<_ReplaceImage>((event, emit) {
+      if (!state.imagePaths.contains(event.oldPath)) return;
+      final paths = [
+        for (final path in state.imagePaths)
+          path == event.oldPath ? event.newPath : path,
+      ];
+      final layouts = [
+        for (final layout in state.imageLayouts)
+          layout.path == event.oldPath
+              ? layout.copyWith(
+                  path: event.newPath, aspectRatio: event.aspectRatio)
+              : layout,
+      ];
+      emit(state.copyWith(
+        imagePaths: paths,
+        imageLayouts:
+            normalizeNoteImageLayouts(layouts, paths, state.description ?? ''),
+      ));
     });
   }
 

@@ -159,6 +159,41 @@ void main() {
     expect(drafts.hasPending, isFalse);
   });
 
+  for (final currentDay in [null, '2026-10-05']) {
+    test('voice recovery retains the persisted daily identity $currentDay',
+        () async {
+      final seed = Note(
+          id: 'origin',
+          title: 'Old daily note',
+          dailyNoteDateKey: '2026-10-06');
+      notes.values['origin'] = NoteDto.fromNote(seed);
+      final memo = await drafts.prepare(seed);
+      await writeRecording(memo);
+      await journal.put(
+          'origin',
+          NoteDto.fromNote(seed.copyWith(
+              title: 'Keep latest draft title',
+              description: 'Keep unsaved thoughts')));
+      notes.values['origin'] =
+          NoteDto.fromNote(seed.copyWith(dailyNoteDateKey: currentDay));
+      final owner =
+          NoteDto(id: 'today', title: 'Today', dailyNoteDateKey: '2026-10-06');
+      notes.values['today'] = owner;
+
+      await drafts.recover();
+
+      final restored = notes.values['origin']!.toDomain();
+      expect(restored.dailyNoteDateKey, currentDay);
+      expect(restored.title, 'Keep latest draft title');
+      expect(restored.description, 'Keep unsaved thoughts');
+      expect(restored.voiceMemos.single.id, memo.id);
+      expect(restored.voiceMemos.single.durationMs, 4200);
+      expect(notes.values['today'], same(owner));
+      expect(drafts.hasPending, isFalse);
+      expect(journal.isEmpty, isTrue);
+    });
+  }
+
   for (final trashed in [false, true]) {
     test(
         'recovery does not resurrect a ${trashed ? 'trashed' : 'removed'} note',

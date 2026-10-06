@@ -16,6 +16,8 @@ class NoteChecklist extends StatefulWidget {
     this.exportMode = false,
     this.onToggle,
     this.onReset,
+    this.titleBuilder,
+    this.expandCompleted = false,
   });
 
   final List<Todo> todos;
@@ -25,6 +27,8 @@ class NoteChecklist extends StatefulWidget {
   final bool exportMode;
   final ValueChanged<String>? onToggle;
   final VoidCallback? onReset;
+  final Widget Function(Todo todo, TextStyle style)? titleBuilder;
+  final bool expandCompleted;
 
   @override
   State<NoteChecklist> createState() => _NoteChecklistState();
@@ -37,8 +41,9 @@ class _NoteChecklistState extends State<NoteChecklist> {
   Widget build(BuildContext context) {
     final active = widget.todos.where((todo) => !todo.completed).toList();
     final completed = widget.todos.where((todo) => todo.completed).toList();
-    final reduceMotion =
-        MediaQuery.disableAnimationsOf(context) || widget.exportMode;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context) ||
+        widget.exportMode ||
+        widget.expandCompleted;
     final duration = reduceMotion ? Duration.zero : context.tokens.motionFast;
     final allDone = widget.todos.isNotEmpty && active.isEmpty;
     final progress =
@@ -128,13 +133,17 @@ class _NoteChecklistState extends State<NoteChecklist> {
                   )
                 else
                   Semantics(
-                    expanded: _completedExpanded,
+                    expanded: _completedExpanded || widget.expandCompleted,
                     child: TextButton.icon(
                       key: const ValueKey('checklist-completed-toggle'),
-                      onPressed: () => setState(
-                          () => _completedExpanded = !_completedExpanded),
+                      onPressed: widget.expandCompleted
+                          ? null
+                          : () => setState(
+                              () => _completedExpanded = !_completedExpanded),
                       icon: AnimatedRotation(
-                        turns: _completedExpanded ? 0.25 : 0,
+                        turns: _completedExpanded || widget.expandCompleted
+                            ? 0.25
+                            : 0,
                         duration: duration,
                         child:
                             const Icon(Icons.chevron_right_rounded, size: 20),
@@ -149,7 +158,9 @@ class _NoteChecklistState extends State<NoteChecklist> {
                       ),
                     ),
                   ),
-                if (_completedExpanded || widget.exportMode)
+                if (_completedExpanded ||
+                    widget.exportMode ||
+                    widget.expandCompleted)
                   for (final todo in completed) _row(todo, duration),
               ],
             ],
@@ -206,7 +217,17 @@ class _NoteChecklistState extends State<NoteChecklist> {
                           todo.completed ? TextDecoration.lineThrough : null,
                       decorationColor: AppColors.ink.withValues(alpha: 0.45),
                     ),
-                    child: Text(label),
+                    child: widget.titleBuilder?.call(
+                          todo,
+                          AppTypography.formText.copyWith(
+                            color: AppColors.ink
+                                .withValues(alpha: todo.completed ? 0.5 : 0.88),
+                            decoration: todo.completed
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ) ??
+                        Text(label),
                   ),
                 ),
               ],

@@ -47,7 +47,7 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
           await drafts.delete(entry.key);
           continue;
         }
-        // Archive/folder/pinning are library actions outside the typing draft.
+        // Library metadata and daily identity are outside the typing draft.
         // Recover content without reverting those later saved library changes.
         final recovered = current == null
             ? draft
@@ -56,6 +56,8 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
                 isPinned: current.isPinned,
                 folderId: current.folderId,
                 clearFolderId: current.folderId == null,
+                dailyNoteDateKey: current.dailyNoteDateKey,
+                clearDailyNoteDateKey: current.dailyNoteDateKey == null,
                 sortOrder: current.sortOrder);
         if (NoteAutosave.hasContent(recovered.toDomain()) || current != null) {
           await repository.addUpdateNote(recovered);

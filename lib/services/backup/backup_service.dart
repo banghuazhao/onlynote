@@ -12,6 +12,7 @@ import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/saved_note_views.dart';
+import 'package:onlynote/services/daily_note.dart';
 import 'package:uuid/uuid.dart';
 
 import 'backup_contents.dart';
@@ -237,11 +238,42 @@ class BackupService {
     };
     final todoIds = <String, Map<String, String>>{};
     final memoIds = <String, Map<String, String>>{};
+    // Imports keep their content as separate notes. Only one live note owns a
+    // day: an existing association wins, then an active imported note wins over
+    // an archived one, with a stable date/ID tie break.
+    final importedDailyGroups = <String, List<NoteDto>>{};
+    for (final note in backup.notes) {
+      final key = note.dailyNoteDateKey;
+      if (key == null) continue;
+      (importedDailyGroups[key] ??= []).add(note);
+    }
+    Map<String, String?> resolveImportedDailyKeys() {
+      final existingDays = {
+        for (final note in notes.values.whereType<NoteDto>())
+          if (!note.isDeleted && note.dailyNoteDateKey != null)
+            note.dailyNoteDateKey!,
+      };
+      final keys = <String, String?>{};
+      for (final entry in importedDailyGroups.entries) {
+        final imported = existingDays.contains(entry.key)
+            ? null
+            : dailyNoteForDay(entry.value, entry.key);
+        for (final note in entry.value) {
+          keys[note.id!] =
+              note.isDeleted || imported?.id == note.id ? entry.key : null;
+        }
+      }
+      return keys;
+    }
+
+    final importedDailyKeys = resolveImportedDailyKeys();
     NoteDto restoreNote(NoteDto note) {
       final tasks = todoIds.putIfAbsent(note.id!, () => {});
       final memos = memoIds.putIfAbsent(note.id!, () => {});
       return note.copyWith(
         id: noteIds[note.id],
+        dailyNoteDateKey: importedDailyKeys[note.id],
+        clearDailyNoteDateKey: importedDailyKeys[note.id] == null,
         linkedNoteIds: [
           for (final id in note.linkedNoteIds ?? const <String>[])
             if (noteIds.containsKey(id) && id != note.id) noteIds[id]!
@@ -273,23 +305,13 @@ class BackupService {
       );
     }
 
-    final restoredHistories = {
-      for (final entry in backup.histories.entries)
-        noteIds[entry.key]!: [
-          for (final version in entry.value)
-            NoteHistoryVersion(
-                id: _uuid.v4(),
-                savedAt: version.savedAt,
-                note: restoreNote(version.note))
-        ],
-    };
     await journal.put('pending', {
       'notes': noteIds.values.toList(),
       'folders': folderIds.values.toList(),
       'templates': templateIds.values.toList(),
       'photos': [...paths.values, ...templatePaths.values],
       'audio': [...audioPaths.values, ...templateAudioPaths.values],
-      'histories': restoredHistories.keys.toList(),
+      'histories': [for (final id in backup.histories.keys) noteIds[id]!],
       'savedViews': restoredViews.map((view) => view.id).toList(),
     });
     await journal.flush();
@@ -318,8 +340,23 @@ class BackupService {
         for (final f in backup.folders)
           folderIds[f.id]!: f.copyWith(id: folderIds[f.id])
       });
+      // A daily note may have been created while media files were importing.
+      // Recheck immediately before committing so that association stays primary.
+      importedDailyKeys
+        ..clear()
+        ..addAll(resolveImportedDailyKeys());
       await notes.putAll(
           {for (final n in backup.notes) noteIds[n.id]!: restoreNote(n)});
+      final restoredHistories = {
+        for (final entry in backup.histories.entries)
+          noteIds[entry.key]!: [
+            for (final version in entry.value)
+              NoteHistoryVersion(
+                  id: _uuid.v4(),
+                  savedAt: version.savedAt,
+                  note: restoreNote(version.note))
+          ],
+      };
       if (backup.templates.isNotEmpty) {
         await templateStore!.importTemplates([
           for (final template in backup.templates)

@@ -171,6 +171,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("提醒"),
     "Filter_Tags": MessageLookupByLibrary.simpleMessage("按标签筛选"),
     "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("未完成"),
+    "Find_Close": MessageLookupByLibrary.simpleMessage("关闭查找"),
+    "Find_In_Note": MessageLookupByLibrary.simpleMessage("在笔记中查找"),
+    "Find_Next": MessageLookupByLibrary.simpleMessage("下一个结果"),
+    "Find_No_Matches": MessageLookupByLibrary.simpleMessage("没有匹配结果"),
+    "Find_Previous": MessageLookupByLibrary.simpleMessage("上一个结果"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已创建文件夹"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已删除文件夹"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
@@ -292,6 +297,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
       "无法添加照片，请重试或从相册中选择。",
     ),
+    "Photo_Edit": MessageLookupByLibrary.simpleMessage("编辑照片"),
+    "Photo_Edit_Failed": MessageLookupByLibrary.simpleMessage("无法保存照片，请重试。"),
+    "Photo_Edit_Hint": MessageLookupByLibrary.simpleMessage(
+      "拖动边角裁剪照片，也可以旋转照片。",
+    ),
+    "Photo_Reset": MessageLookupByLibrary.simpleMessage("重置"),
+    "Photo_Rotate": MessageLookupByLibrary.simpleMessage("旋转"),
+    "Photo_Save": MessageLookupByLibrary.simpleMessage("保存"),
     "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("选择照片"),
     "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("已复制文字"),
     "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("复制文字"),
@@ -527,6 +540,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Title": MessageLookupByLibrary.simpleMessage("标题"),
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "想要设置日程安排提醒，请前往设置打开通知",
+    ),
+    "Today_Note": MessageLookupByLibrary.simpleMessage("今日笔记"),
+    "Today_Note_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法打开今日笔记，请重试。",
     ),
     "Todo": MessageLookupByLibrary.simpleMessage("清单事项"),
     "Todo_list": MessageLookupByLibrary.simpleMessage("清单"),

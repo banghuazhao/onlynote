@@ -414,5 +414,18 @@
   "Image_Remove": "移除照片",
   "Image_Move_Before": "向前移动",
   "Image_Move_After": "向后移动",
-  "Image_Drop_Here": "将照片放在这里"
+  "Image_Drop_Here": "将照片放在这里",
+  "Photo_Edit": "编辑照片",
+  "Photo_Edit_Hint": "拖动边角裁剪照片，也可以旋转照片。",
+  "Photo_Rotate": "旋转",
+  "Photo_Reset": "重置",
+  "Photo_Edit_Failed": "无法保存照片，请重试。",
+  "Photo_Save": "保存",
+  "Find_In_Note": "在笔记中查找",
+  "Find_No_Matches": "没有匹配结果",
+  "Find_Previous": "上一个结果",
+  "Find_Next": "下一个结果",
+  "Find_Close": "关闭查找",
+  "Today_Note": "今日笔记",
+  "Today_Note_Open_Failed": "无法打开今日笔记，请重试。"
 }

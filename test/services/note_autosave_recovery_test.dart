@@ -186,6 +186,36 @@ void main() {
     expect(drafts.isEmpty, isTrue);
   });
 
+  for (final currentDay in [null, '2026-10-05']) {
+    test('stale draft respects the current daily association $currentDay',
+        () async {
+      final stored = Note(
+          id: 'restored',
+          title: 'Restored old thoughts',
+          dailyNoteDateKey: currentDay);
+      final owner = Note(
+          id: 'today',
+          title: 'Today\'s replacement',
+          dailyNoteDateKey: '2026-10-06');
+      await notes.put(stored.id, NoteDto.fromNote(stored));
+      await notes.put(owner.id, NoteDto.fromNote(owner));
+      await stage(stored.copyWith(
+          title: 'Keep draft edits',
+          description: 'Recover my unsaved thoughts',
+          dailyNoteDateKey: '2026-10-06'));
+
+      await recover();
+
+      final recovered = (notes.get('restored') as NoteDto).toDomain();
+      expect(recovered.dailyNoteDateKey, currentDay);
+      expect(recovered.title, 'Keep draft edits');
+      expect(recovered.description, 'Recover my unsaved thoughts');
+      expect((notes.get('today') as NoteDto).toDomain(), owner);
+      expect(repository.writes, 1);
+      expect(drafts.isEmpty, isTrue);
+    });
+  }
+
   test('legacy photo drafts recover with placement after the existing body',
       () async {
     await drafts.put(

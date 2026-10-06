@@ -72,19 +72,38 @@ class NotePhotoRecovery {
   }
 
   Future<void> selected(String token, String source) async {
-    final record = _read();
-    if (record == null || record.token != token || !_validSource(source)) {
-      throw StateError('The photo capture journal is unavailable');
-    }
-    await _write(record.copyWith(sources: [source]));
+    await selectedMany(token, [source]);
   }
 
-  Future<void> copied(String token, String path) async {
+  Future<void> selectedMany(String token, List<String> sources) async {
     final record = _read();
-    if (record == null || record.token != token || !_validSaved(path)) {
+    if (record == null ||
+        record.token != token ||
+        sources.any((source) => !_validSource(source))) {
       throw StateError('The photo capture journal is unavailable');
     }
-    await _write(record.copyWith(sources: const [], saved: [path]));
+    await _write(record.copyWith(
+        sources: sources
+            .where((source) => !record.copiedSources.contains(source))
+            .toSet()
+            .toList()));
+  }
+
+  Future<void> copied(String token, String path, {String? sourcePath}) async {
+    final record = _read();
+    if (record == null ||
+        record.token != token ||
+        !_validSaved(path) ||
+        (sourcePath != null && !_validSource(sourcePath))) {
+      throw StateError('The photo capture journal is unavailable');
+    }
+    final source = sourcePath ?? record.sources.firstOrNull;
+    await _write(record.copyWith(
+      sources: record.sources.where((item) => item != source).toList(),
+      saved: {...record.saved, path}.toList(),
+      copiedSources:
+          {...record.copiedSources, if (source != null) source}.toList(),
+    ));
   }
 
   Future<void> complete(String token) async {
@@ -119,7 +138,10 @@ class NotePhotoRecovery {
           saved: const [],
         );
         record = record.copyWith(
-            sources: {...record.sources, ...validLost}.toList());
+            sources: {
+          ...record.sources,
+          ...validLost.where((path) => !record!.copiedSources.contains(path)),
+        }.toList());
         // retrieveLostData consumes plugin state; retain its paths before I/O.
         await _write(record);
       }
@@ -157,6 +179,7 @@ class NotePhotoRecovery {
         active = active.copyWith(
           sources: active.sources.skip(1).toList(),
           saved: [...active.saved, path],
+          copiedSources: {...active.copiedSources, source}.toList(),
         );
         await _write(active, key: key);
       }
@@ -187,8 +210,15 @@ class NotePhotoRecovery {
     if (stored == null && record.existed) return null;
     if (stored?.isDeleted ?? false) return null;
     final draft = drafts.get(record.note.id!);
-    if (draft is NoteDto && draft.id == record.note.id) return draft.toDomain();
-    return (stored ?? record.note).toDomain();
+    final content = draft is NoteDto && draft.id == record.note.id
+        ? draft
+        : stored ?? record.note;
+    return (stored == null
+            ? content
+            : content.copyWith(
+                dailyNoteDateKey: stored.dailyNoteDateKey,
+                clearDailyNoteDateKey: stored.dailyNoteDateKey == null))
+        .toDomain();
   }
 
   static bool _validSource(String path) =>
@@ -210,12 +240,14 @@ class _PhotoRecord {
     required this.existed,
     required this.sources,
     required this.saved,
+    this.copiedSources = const [],
   });
   final String token;
   final NoteDto note;
   final bool existed;
   final List<String> sources;
   final List<String> saved;
+  final List<String> copiedSources;
 
   static _PhotoRecord? parse(Object? value) {
     if (value is! Map || value['version'] != 1) return null;
@@ -224,6 +256,7 @@ class _PhotoRecord {
     final sources = value['sources'];
     final saved = value['saved'];
     final existed = value['existed'];
+    final copiedSources = value['copiedSources'] ?? const <String>[];
     if (token is! String ||
         token.isEmpty ||
         note is! NoteDto ||
@@ -232,6 +265,9 @@ class _PhotoRecord {
         existed is! bool ||
         sources is! List ||
         saved is! List ||
+        copiedSources is! List ||
+        copiedSources.any((path) =>
+            path is! String || !NotePhotoRecovery._validSource(path)) ||
         sources.any((path) =>
             path is! String || !NotePhotoRecovery._validSource(path)) ||
         saved.any((path) =>
@@ -244,6 +280,7 @@ class _PhotoRecord {
       existed: existed,
       sources: sources.cast<String>(),
       saved: saved.cast<String>(),
+      copiedSources: copiedSources.cast<String>(),
     );
   }
 
@@ -254,14 +291,19 @@ class _PhotoRecord {
         'existed': existed,
         'sources': sources,
         'saved': saved,
+        'copiedSources': copiedSources,
       };
 
-  _PhotoRecord copyWith({List<String>? sources, List<String>? saved}) =>
+  _PhotoRecord copyWith(
+          {List<String>? sources,
+          List<String>? saved,
+          List<String>? copiedSources}) =>
       _PhotoRecord(
         token: token,
         note: note,
         existed: existed,
         sources: sources ?? this.sources,
         saved: saved ?? this.saved,
+        copiedSources: copiedSources ?? this.copiedSources,
       );
 }

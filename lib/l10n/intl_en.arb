@@ -414,5 +414,18 @@
   "Image_Remove": "Remove photo",
   "Image_Move_Before": "Move earlier",
   "Image_Move_After": "Move later",
-  "Image_Drop_Here": "Drop photo here"
+  "Image_Drop_Here": "Drop photo here",
+  "Photo_Edit": "Edit photo",
+  "Photo_Edit_Hint": "Drag the corners to crop. Rotate if needed.",
+  "Photo_Rotate": "Rotate",
+  "Photo_Reset": "Reset",
+  "Photo_Edit_Failed": "Could not save this photo. Try again.",
+  "Photo_Save": "Save",
+  "Find_In_Note": "Find in note",
+  "Find_No_Matches": "No matches",
+  "Find_Previous": "Previous match",
+  "Find_Next": "Next match",
+  "Find_Close": "Close search",
+  "Today_Note": "Today’s note",
+  "Today_Note_Open_Failed": "Could not open today’s note. Try again."
 }

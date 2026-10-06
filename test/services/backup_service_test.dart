@@ -90,6 +90,120 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  test('v7 daily association survives Hive reopen and portable restore',
+      () async {
+    final source = NoteDto(
+        id: 'daily',
+        title: 'Renamed daily note',
+        description: 'Keep my thoughts',
+        dailyNoteDateKey: '2026-10-06');
+    await notes.put('daily', source);
+    await notes.flush();
+    await notes.close();
+    notes = await Hive.openBox('notes');
+    expect((notes.get('daily') as NoteDto).dailyNoteDateKey, '2026-10-06');
+    final contents = BackupContents(
+        createdAt: DateTime(2026, 10, 6),
+        notes: [(notes.get('daily') as NoteDto)],
+        folders: [],
+        photos: {},
+        reminders: []);
+    final portable = decodeBackup(encodeBackup(contents));
+    expect(portable.toJson()['version'], 7);
+    expect(portable.notes.single.dailyNoteDateKey, '2026-10-06');
+    await notes.clear();
+    final restoredService = BackupService(
+        notes: notes,
+        folders: folders,
+        journal: journal,
+        documents: directory,
+        readReminders: () => reminders,
+        writeReminders: (values) async => reminders = values);
+    await restoredService.restore(portable);
+    final restored = notes.values.cast<NoteDto>().single;
+    expect(restored.id, isNot('daily'));
+    expect(restored.dailyNoteDateKey, '2026-10-06');
+    expect(restored.title, 'Renamed daily note');
+    expect(restored.description, 'Keep my thoughts');
+  });
+
+  test(
+      'daily restore keeps existing association and imports content separately',
+      () async {
+    final existing = NoteDto(
+        id: 'existing', title: 'Original', dailyNoteDateKey: '2026-10-06');
+    await notes.put(existing.id, existing);
+    final incoming = BackupContents(createdAt: DateTime(2026, 10, 6), notes: [
+      NoteDto(
+          id: 'incoming',
+          title: 'Imported thoughts',
+          description: 'Keep imported content',
+          dailyNoteDateKey: '2026-10-06')
+    ], folders: [], photos: {}, reminders: []);
+    await service.restore(incoming);
+    expect((notes.get('existing') as NoteDto).dailyNoteDateKey, '2026-10-06');
+    final imported = notes.values
+        .cast<NoteDto>()
+        .singleWhere((note) => note.id != 'existing');
+    expect(imported.dailyNoteDateKey, isNull);
+    expect(imported.description, 'Keep imported content');
+  });
+
+  test(
+      'daily restore chooses one live imported owner and ignores deleted owners',
+      () async {
+    await notes.put(
+        'deleted',
+        NoteDto(
+          id: 'deleted',
+          title: 'Deleted existing thoughts',
+          dailyNoteDateKey: '2026-10-06',
+          deletedAt: DateTime(2026, 10, 6).toIso8601String(),
+        ));
+    final incoming = BackupContents(createdAt: DateTime(2026, 10, 6), notes: [
+      NoteDto(
+          id: 'archive',
+          title: 'Archived import',
+          isArchived: true,
+          dailyNoteDateKey: '2026-10-06'),
+      NoteDto(
+          id: 'active', title: 'Active import', dailyNoteDateKey: '2026-10-06'),
+    ], folders: [], photos: {}, reminders: []);
+    await service.restore(incoming);
+    final live = notes.values.cast<NoteDto>().where((note) => !note.isDeleted);
+    expect(
+        live
+            .singleWhere((note) => note.title == 'Active import')
+            .dailyNoteDateKey,
+        '2026-10-06');
+    expect(
+        live
+            .singleWhere((note) => note.title == 'Archived import')
+            .dailyNoteDateKey,
+        isNull);
+    expect((notes.get('deleted') as NoteDto).isDeleted, isTrue);
+  });
+
+  test('legacy backups have no daily identity and v7 rejects invalid dates',
+      () {
+    final contents = BackupContents(
+        createdAt: DateTime(2026, 10, 6),
+        notes: [NoteDto(id: 'old', title: '2026-10-06')],
+        folders: [],
+        photos: {},
+        reminders: []);
+    for (var version = 1; version <= 6; version++) {
+      final json = contents.toJson()..['version'] = version;
+      expect(
+          BackupContents.fromJson(json).notes.single.dailyNoteDateKey, isNull);
+    }
+    for (final bad in ['2026-02-30', '2026-2-3', '0000-01-01', 123]) {
+      final json = contents.toJson();
+      (json['notes'] as List).single['dailyNoteDateKey'] = bad;
+      expect(() => BackupContents.fromJson(json), throwsFormatException);
+    }
+  });
+
   test(
       'v4 restores archive tags saved views and remaps links in current and history notes',
       () async {
@@ -113,7 +227,7 @@ void main() {
         folderId: 'folder',
         archiveScope: NoteArchiveScope.all);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 6);
+    expect(backup.toJson()['version'], 7);
     await service.restore(backup);
     final imported = notes.values
         .cast<NoteDto>()
@@ -180,7 +294,7 @@ void main() {
         await templates.saveFromNote(before.toDomain(), name: 'Photo');
     expect(template.imageLayouts.single.path, template.imagePaths.single);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 6);
+    expect(backup.toJson()['version'], 7);
     final archivedLayout = backup.notes.single.toDomain().imageLayouts.single;
     expect(archivedLayout.path, backup.notes.single.imagePaths!.single);
     expect(archivedLayout.textOffset, 0);
@@ -273,7 +387,7 @@ void main() {
     final template =
         await templates.saveFromNote(before.toDomain(), name: 'Formatted');
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 6);
+    expect(backup.toJson()['version'], 7);
     expect(backup.notes.single.toDomain().textStyles, isEmpty);
     expect(backup.histories['formatted']!.single.note.toDomain().textStyles,
         styles);
@@ -707,7 +821,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 6);
+    expect(backup.toJson()['version'], 7);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

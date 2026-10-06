@@ -1,7 +1,11 @@
+import 'dart:ui' as ui;
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
@@ -20,6 +24,8 @@ import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bl
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
+import 'package:onlynote/services/note_photo_edit.dart';
+import 'package:onlynote/services/note_photo_transform.dart';
 
 class _Notes implements NoteRepository {
   final values = <String, NoteDto>{};
@@ -66,10 +72,31 @@ class _IdleVoicePlatform implements VoiceMemoPlatform {
   }
 }
 
+class _PhotoEdits extends NotePhotoEditService {
+  _PhotoEdits(this.image);
+  final ui.Image image;
+  final loaded = <String>[];
+  final transforms = <NotePhotoTransform>[];
+  @override
+  Future<ui.Image> load(String path) async {
+    loaded.add(path);
+    return image.clone();
+  }
+
+  @override
+  Future<NoteEditedPhoto> save(
+      ui.Image source, NotePhotoTransform transform) async {
+    transforms.add(transform);
+    return const NoteEditedPhoto(
+        path: 'note_images/edited.png', aspectRatio: .5);
+  }
+}
+
 Future<(_Notes, _Store)> _openEditor(
   WidgetTester tester, {
   Note? note,
   List<Note> library = const [],
+  NotePhotoEditService? photoEditService,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(390, 844);
@@ -110,6 +137,7 @@ Future<(_Notes, _Store)> _openEditor(
         note: note,
         autosaveStore: store,
         voiceMemoService: service,
+        photoEditService: photoEditService,
       ),
     ),
   ));
@@ -146,6 +174,39 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
 
+  testWidgets('reopening a stale draft keeps the current daily identity',
+      (tester) async {
+    final directory = (await tester.runAsync(() =>
+        Directory.systemTemp.createTemp('onlynote-editor-daily-recovery-')))!;
+    final drafts = (await tester.runAsync(() async {
+      Hive.init(directory.path);
+      if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(TodoDtoAdapter());
+      if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(NoteDtoAdapter());
+      final box = await Hive.openBox(draftDatabaseBox);
+      await box.put(
+          'restored',
+          NoteDto.fromNote(Note(
+              id: 'restored',
+              title: 'Unsaved draft',
+              description: 'Retain my typing',
+              dailyNoteDateKey: '2026-10-06')));
+      return box;
+    }))!;
+    addTearDown(() async {
+      await drafts.close();
+      await directory.delete(recursive: true);
+    });
+    final (notes, _) = await _openEditor(tester,
+        note: Note(id: 'restored', title: 'Restored note'),
+        library: [Note(id: 'today', dailyNoteDateKey: '2026-10-06')]);
+    await _waitForAutosave(tester);
+    expect(notes.values['restored']!.title, 'Unsaved draft');
+    expect(notes.values['restored']!.description, 'Retain my typing');
+    expect(notes.values['restored']!.dailyNoteDateKey, isNull);
+    expect(notes.values['today']!.dailyNoteDateKey, '2026-10-06');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('photo resize autosaves and reopens without losing metadata',
       (tester) async {
     const path = 'note_images/photo.jpg';
@@ -158,6 +219,7 @@ void main() {
       isArchived: true,
       tags: const ['Personal'],
       linkedNoteIds: const ['packing'],
+      dailyNoteDateKey: '2026-10-06',
       imagePaths: const [path],
       imageLayouts: const [
         NoteImageLayout(
@@ -211,6 +273,115 @@ void main() {
     await _waitForAutosave(tester);
     expect(reopenedStore.saved.last.imageLayouts.single,
         saved.imageLayouts.single.copyWith(textOffset: 0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('photo editing replaces the owned copy and keeps note metadata',
+      (tester) async {
+    final recorder = ui.PictureRecorder();
+    ui.Canvas(recorder).drawRect(const ui.Rect.fromLTWH(0, 0, 100, 50),
+        ui.Paint()..color = const Color(0xFF008577));
+    final picture = recorder.endRecording();
+    final image = (await tester.runAsync(() => picture.toImage(100, 50)))!;
+    picture.dispose();
+    addTearDown(image.dispose);
+    final edits = _PhotoEdits(image);
+    const path = 'note_images/original.jpg';
+    final initial = Note(
+      id: 'current',
+      title: 'Trip',
+      description: 'Before\nAfter',
+      dailyNoteDateKey: '2026-10-06',
+      folderId: 'travel',
+      isPinned: true,
+      isArchived: true,
+      tags: const ['Personal'],
+      linkedNoteIds: const ['packing'],
+      imagePaths: const [path],
+      imageLayouts: const [
+        NoteImageLayout(
+            path: path,
+            textOffset: 7,
+            widthFactor: .7,
+            xFactor: .9,
+            aspectRatio: 2),
+      ],
+      textStyles: const [
+        NoteTextStyleRange(start: 7, end: 12, kind: NoteTextStyleKind.bold),
+      ],
+    );
+    final (notes, store) =
+        await _openEditor(tester, note: initial, photoEditService: edits);
+    await _tap(tester, find.byKey(const ValueKey('image-select-$path')));
+    await _tap(tester, find.byKey(const ValueKey('image-edit-$path')));
+    await _tap(tester, find.byKey(const ValueKey('photo-edit-rotate')));
+    await _tap(tester, find.byKey(const ValueKey('photo-edit-save')));
+    await _waitForAutosave(tester);
+    final saved = notes.values['current']!.toDomain();
+    expect(
+        saved,
+        initial.copyWith(
+          dateTime: saved.dateTime,
+          imagePaths: const ['note_images/edited.png'],
+          imageLayouts: const [
+            NoteImageLayout(
+                path: 'note_images/edited.png',
+                textOffset: 7,
+                widthFactor: .7,
+                xFactor: .9,
+                aspectRatio: .5),
+          ],
+        ));
+    expect(edits.loaded, [path]);
+    expect(edits.transforms.single.rotation, 1);
+    expect(store.drafts, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('find searches the latest draft and closing returns to typing',
+      (tester) async {
+    final initial = Note(
+      id: 'current',
+      title: 'Research',
+      description: 'Original body',
+      dailyNoteDateKey: '2026-10-06',
+      todo: [Todo(id: 'done', title: 'Completed match', completed: true)],
+      voiceMemos: [
+        VoiceMemo(
+            id: 'memo',
+            path: 'note_audio/memo.m4a',
+            durationMs: 1000,
+            createdAt: DateTime.utc(2026, 10, 6),
+            transcript: 'Spoken match')
+      ],
+    );
+    final (notes, store) = await _openEditor(tester, note: initial);
+    final body = find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 100);
+    await tester.ensureVisible(body);
+    await tester.pumpAndSettle();
+    await tester.enterText(body, 'Typed draft match');
+    await _waitForAutosave(tester);
+    final saves = store.saved.length;
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'match');
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 3'), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('note-find-next')));
+    expect(find.text('2 / 3'), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('note-find-close')));
+    expect(
+        tester.widget<TextField>(body).controller!.text, 'Typed draft match');
+    await tester.enterText(body, 'Continue writing');
+    await _waitForAutosave(tester);
+    expect(
+        notes.values['current']!.toDomain(),
+        initial.copyWith(
+            dateTime: notes.values['current']!.toDomain().dateTime,
+            description: 'Continue writing'));
+    expect(store.saved.length, saves + 1);
+    expect(store.drafts, isEmpty);
     expect(tester.takeException(), isNull);
   });
 

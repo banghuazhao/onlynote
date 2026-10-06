@@ -35,6 +35,8 @@ import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:intl/intl.dart';
+import 'package:onlynote/services/daily_note.dart';
 
 import '../settings/manage_folders_screen.dart';
 import '../settings/settings_screen.dart';
@@ -42,6 +44,7 @@ import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'widgets/note_card.dart';
 import 'widgets/widget_discovery_prompt.dart';
+import 'widgets/daily_note_shortcut.dart';
 
 @RoutePage(name: 'HomeRoute')
 class HomeScreen extends StatefulWidget {
@@ -54,6 +57,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _savedViews = SavedNoteViewStore.instance;
   bool _viewsUnavailable = false;
+  bool _openingDailyNote = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -453,6 +457,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _openDailyNote() async {
+    if (_openingDailyNote) return;
+    _cancelChecklistReview();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _openingDailyNote = true);
+    try {
+      final locale = Localizations.localeOf(context).toString();
+      final note = await DailyNoteService(getIt<NoteRepository>()).openToday(
+        titleForDay: (date) => DateFormat.yMMMMd(locale).format(date),
+      );
+      if (!mounted) return;
+      await context.router.push(AddUpdateNoteRoute(note: note));
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Today_Note_Open_Failed, isError: true);
+      }
+    } finally {
+      if (mounted) setState(() => _openingDailyNote = false);
+    }
+  }
+
+  Widget _dailyNoteShortcut() => DailyNoteShortcut(
+        onPressed: _openDailyNote,
+        isOpening: _openingDailyNote,
+      );
+
   /// What the app bar title reads: the scope the note list is currently
   /// showing.
   String _scopeLabel(BuildContext context, _FolderScope scope) {
@@ -598,6 +628,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildSearchField(context),
                   BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) => NoteSearchFilters(
+                            leadingAction: _isReorderMode
+                                ? null
+                                : context
+                                    .watch<MultipleDeleteBloc>()
+                                    .state
+                                    .mapOrNull(
+                                      initial: (_) => state.mapOrNull(
+                                        loaded: (s) => s.showTrash
+                                            ? null
+                                            : _dailyNoteShortcut(),
+                                      ),
+                                    ),
                             onOpenLibrary: _openLibraryFilters,
                             selected:
                                 state.mapOrNull(loaded: (s) => s.filters) ?? {},
@@ -615,6 +657,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           loaded: (data) => data.showTrash
                               ? const SizedBox.shrink()
                               : UnfinishedNotesFilter(
+                                  leadingAction: _dailyNoteShortcut(),
                                   onOpenReminders: () {
                                     _cancelChecklistReview();
                                     context.router.push(RemindersRoute());

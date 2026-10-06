@@ -4,6 +4,7 @@ import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/daily_note.dart';
 
 /// Keeps reminder metadata intact for Undo, while silencing notes in Trash.
 class NoteTrash {
@@ -68,7 +69,15 @@ class NoteTrash {
     try {
       for (final note in originals) {
         changed.add(note);
-        await repository.addUpdateNote(note.copyWith(clearDeletedAt: true));
+        final dayKey = note.dailyNoteDateKey;
+        final existingDailyNote = dayKey == null
+            ? null
+            : dailyNoteForDay(repository.getAllNotes(), dayKey);
+        // Restoring old thoughts keeps their content without taking today's
+        // shortcut away from a replacement note created while they were trashed.
+        await repository.addUpdateNote(note.copyWith(
+            clearDeletedAt: true,
+            clearDailyNoteDateKey: existingDailyNote != null));
       }
     } catch (_) {
       for (final note in changed.reversed) {
