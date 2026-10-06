@@ -28,6 +28,17 @@ mixin _$HomeEvent {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -49,6 +60,17 @@ mixin _$HomeEvent {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -70,6 +92,17 @@ mixin _$HomeEvent {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -90,6 +123,13 @@ mixin _$HomeEvent {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -109,6 +149,13 @@ mixin _$HomeEvent {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -128,6 +175,13 @@ mixin _$HomeEvent {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -266,6 +320,17 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -290,6 +355,17 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -314,6 +390,17 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -340,6 +427,13 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -362,6 +456,13 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -384,6 +485,13 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -464,6 +572,17 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -488,6 +607,17 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -512,6 +642,17 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -538,6 +679,13 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -560,6 +708,13 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -582,6 +737,13 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -686,6 +848,17 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -710,6 +883,17 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -734,6 +918,17 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -760,6 +955,13 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -782,6 +984,13 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -804,6 +1013,13 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -909,6 +1125,17 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -933,6 +1160,17 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -957,6 +1195,17 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -983,6 +1232,13 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1005,6 +1261,13 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1027,6 +1290,13 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1126,6 +1396,17 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1150,6 +1431,17 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1174,6 +1466,17 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1200,6 +1503,13 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1222,6 +1532,13 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1244,6 +1561,13 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1351,6 +1675,17 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1375,6 +1710,17 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1399,6 +1745,17 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1425,6 +1782,13 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1447,6 +1811,13 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1469,6 +1840,13 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1570,6 +1948,17 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1594,6 +1983,17 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1618,6 +2018,17 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1644,6 +2055,13 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1666,6 +2084,13 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1688,6 +2113,13 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1787,6 +2219,17 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1811,6 +2254,17 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1835,6 +2289,17 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1861,6 +2326,13 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1883,6 +2355,13 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1905,6 +2384,13 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1927,6 +2413,1977 @@ abstract class _ShowTrash implements HomeEvent {
   bool get show;
   @JsonKey(ignore: true)
   _$$ShowTrashImplCopyWith<_$ShowTrashImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ShowArchiveImplCopyWith<$Res> {
+  factory _$$ShowArchiveImplCopyWith(
+          _$ShowArchiveImpl value, $Res Function(_$ShowArchiveImpl) then) =
+      __$$ShowArchiveImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool show});
+}
+
+/// @nodoc
+class __$$ShowArchiveImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$ShowArchiveImpl>
+    implements _$$ShowArchiveImplCopyWith<$Res> {
+  __$$ShowArchiveImplCopyWithImpl(
+      _$ShowArchiveImpl _value, $Res Function(_$ShowArchiveImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? show = null,
+  }) {
+    return _then(_$ShowArchiveImpl(
+      null == show
+          ? _value.show
+          : show // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ShowArchiveImpl implements _ShowArchive {
+  const _$ShowArchiveImpl(this.show);
+
+  @override
+  final bool show;
+
+  @override
+  String toString() {
+    return 'HomeEvent.showArchive(show: $show)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ShowArchiveImpl &&
+            (identical(other.show, show) || other.show == show));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, show);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ShowArchiveImplCopyWith<_$ShowArchiveImpl> get copyWith =>
+      __$$ShowArchiveImplCopyWithImpl<_$ShowArchiveImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return showArchive(show);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return showArchive?.call(show);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (showArchive != null) {
+      return showArchive(show);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return showArchive(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return showArchive?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (showArchive != null) {
+      return showArchive(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ShowArchive implements HomeEvent {
+  const factory _ShowArchive(final bool show) = _$ShowArchiveImpl;
+
+  bool get show;
+  @JsonKey(ignore: true)
+  _$$ShowArchiveImplCopyWith<_$ShowArchiveImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$IncludeArchivedImplCopyWith<$Res> {
+  factory _$$IncludeArchivedImplCopyWith(_$IncludeArchivedImpl value,
+          $Res Function(_$IncludeArchivedImpl) then) =
+      __$$IncludeArchivedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({bool include});
+}
+
+/// @nodoc
+class __$$IncludeArchivedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$IncludeArchivedImpl>
+    implements _$$IncludeArchivedImplCopyWith<$Res> {
+  __$$IncludeArchivedImplCopyWithImpl(
+      _$IncludeArchivedImpl _value, $Res Function(_$IncludeArchivedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? include = null,
+  }) {
+    return _then(_$IncludeArchivedImpl(
+      null == include
+          ? _value.include
+          : include // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$IncludeArchivedImpl implements _IncludeArchived {
+  const _$IncludeArchivedImpl(this.include);
+
+  @override
+  final bool include;
+
+  @override
+  String toString() {
+    return 'HomeEvent.includeArchived(include: $include)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$IncludeArchivedImpl &&
+            (identical(other.include, include) || other.include == include));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, include);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$IncludeArchivedImplCopyWith<_$IncludeArchivedImpl> get copyWith =>
+      __$$IncludeArchivedImplCopyWithImpl<_$IncludeArchivedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return includeArchived(include);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return includeArchived?.call(include);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (includeArchived != null) {
+      return includeArchived(include);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return includeArchived(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return includeArchived?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (includeArchived != null) {
+      return includeArchived(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _IncludeArchived implements HomeEvent {
+  const factory _IncludeArchived(final bool include) = _$IncludeArchivedImpl;
+
+  bool get include;
+  @JsonKey(ignore: true)
+  _$$IncludeArchivedImplCopyWith<_$IncludeArchivedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$TagsChangedImplCopyWith<$Res> {
+  factory _$$TagsChangedImplCopyWith(
+          _$TagsChangedImpl value, $Res Function(_$TagsChangedImpl) then) =
+      __$$TagsChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({Set<String> tags});
+}
+
+/// @nodoc
+class __$$TagsChangedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$TagsChangedImpl>
+    implements _$$TagsChangedImplCopyWith<$Res> {
+  __$$TagsChangedImplCopyWithImpl(
+      _$TagsChangedImpl _value, $Res Function(_$TagsChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? tags = null,
+  }) {
+    return _then(_$TagsChangedImpl(
+      null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$TagsChangedImpl implements _TagsChanged {
+  const _$TagsChangedImpl(final Set<String> tags) : _tags = tags;
+
+  final Set<String> _tags;
+  @override
+  Set<String> get tags {
+    if (_tags is EqualUnmodifiableSetView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_tags);
+  }
+
+  @override
+  String toString() {
+    return 'HomeEvent.tagsChanged(tags: $tags)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TagsChangedImpl &&
+            const DeepCollectionEquality().equals(other._tags, _tags));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_tags));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TagsChangedImplCopyWith<_$TagsChangedImpl> get copyWith =>
+      __$$TagsChangedImplCopyWithImpl<_$TagsChangedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return tagsChanged(tags);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return tagsChanged?.call(tags);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (tagsChanged != null) {
+      return tagsChanged(tags);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return tagsChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return tagsChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (tagsChanged != null) {
+      return tagsChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _TagsChanged implements HomeEvent {
+  const factory _TagsChanged(final Set<String> tags) = _$TagsChangedImpl;
+
+  Set<String> get tags;
+  @JsonKey(ignore: true)
+  _$$TagsChangedImplCopyWith<_$TagsChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SavedViewsChangedImplCopyWith<$Res> {
+  factory _$$SavedViewsChangedImplCopyWith(_$SavedViewsChangedImpl value,
+          $Res Function(_$SavedViewsChangedImpl) then) =
+      __$$SavedViewsChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<SavedNoteView> views});
+}
+
+/// @nodoc
+class __$$SavedViewsChangedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SavedViewsChangedImpl>
+    implements _$$SavedViewsChangedImplCopyWith<$Res> {
+  __$$SavedViewsChangedImplCopyWithImpl(_$SavedViewsChangedImpl _value,
+      $Res Function(_$SavedViewsChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? views = null,
+  }) {
+    return _then(_$SavedViewsChangedImpl(
+      null == views
+          ? _value._views
+          : views // ignore: cast_nullable_to_non_nullable
+              as List<SavedNoteView>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SavedViewsChangedImpl implements _SavedViewsChanged {
+  const _$SavedViewsChangedImpl(final List<SavedNoteView> views)
+      : _views = views;
+
+  final List<SavedNoteView> _views;
+  @override
+  List<SavedNoteView> get views {
+    if (_views is EqualUnmodifiableListView) return _views;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_views);
+  }
+
+  @override
+  String toString() {
+    return 'HomeEvent.savedViewsChanged(views: $views)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SavedViewsChangedImpl &&
+            const DeepCollectionEquality().equals(other._views, _views));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_views));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SavedViewsChangedImplCopyWith<_$SavedViewsChangedImpl> get copyWith =>
+      __$$SavedViewsChangedImplCopyWithImpl<_$SavedViewsChangedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return savedViewsChanged(views);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return savedViewsChanged?.call(views);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (savedViewsChanged != null) {
+      return savedViewsChanged(views);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return savedViewsChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return savedViewsChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (savedViewsChanged != null) {
+      return savedViewsChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SavedViewsChanged implements HomeEvent {
+  const factory _SavedViewsChanged(final List<SavedNoteView> views) =
+      _$SavedViewsChangedImpl;
+
+  List<SavedNoteView> get views;
+  @JsonKey(ignore: true)
+  _$$SavedViewsChangedImplCopyWith<_$SavedViewsChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ApplySavedViewImplCopyWith<$Res> {
+  factory _$$ApplySavedViewImplCopyWith(_$ApplySavedViewImpl value,
+          $Res Function(_$ApplySavedViewImpl) then) =
+      __$$ApplySavedViewImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({SavedNoteView view});
+}
+
+/// @nodoc
+class __$$ApplySavedViewImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$ApplySavedViewImpl>
+    implements _$$ApplySavedViewImplCopyWith<$Res> {
+  __$$ApplySavedViewImplCopyWithImpl(
+      _$ApplySavedViewImpl _value, $Res Function(_$ApplySavedViewImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? view = null,
+  }) {
+    return _then(_$ApplySavedViewImpl(
+      null == view
+          ? _value.view
+          : view // ignore: cast_nullable_to_non_nullable
+              as SavedNoteView,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$ApplySavedViewImpl implements _ApplySavedView {
+  const _$ApplySavedViewImpl(this.view);
+
+  @override
+  final SavedNoteView view;
+
+  @override
+  String toString() {
+    return 'HomeEvent.applySavedView(view: $view)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ApplySavedViewImpl &&
+            (identical(other.view, view) || other.view == view));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, view);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ApplySavedViewImplCopyWith<_$ApplySavedViewImpl> get copyWith =>
+      __$$ApplySavedViewImplCopyWithImpl<_$ApplySavedViewImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return applySavedView(view);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return applySavedView?.call(view);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (applySavedView != null) {
+      return applySavedView(view);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return applySavedView(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return applySavedView?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (applySavedView != null) {
+      return applySavedView(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _ApplySavedView implements HomeEvent {
+  const factory _ApplySavedView(final SavedNoteView view) =
+      _$ApplySavedViewImpl;
+
+  SavedNoteView get view;
+  @JsonKey(ignore: true)
+  _$$ApplySavedViewImplCopyWith<_$ApplySavedViewImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SetArchivedImplCopyWith<$Res> {
+  factory _$$SetArchivedImplCopyWith(
+          _$SetArchivedImpl value, $Res Function(_$SetArchivedImpl) then) =
+      __$$SetArchivedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String noteId, bool archived, Completer<HomeArchiveResult>? completion});
+}
+
+/// @nodoc
+class __$$SetArchivedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SetArchivedImpl>
+    implements _$$SetArchivedImplCopyWith<$Res> {
+  __$$SetArchivedImplCopyWithImpl(
+      _$SetArchivedImpl _value, $Res Function(_$SetArchivedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? archived = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$SetArchivedImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      archived: null == archived
+          ? _value.archived
+          : archived // ignore: cast_nullable_to_non_nullable
+              as bool,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<HomeArchiveResult>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SetArchivedImpl implements _SetArchived {
+  const _$SetArchivedImpl(
+      {required this.noteId, required this.archived, this.completion});
+
+  @override
+  final String noteId;
+  @override
+  final bool archived;
+  @override
+  final Completer<HomeArchiveResult>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.setArchived(noteId: $noteId, archived: $archived, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SetArchivedImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            (identical(other.archived, archived) ||
+                other.archived == archived) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, noteId, archived, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SetArchivedImplCopyWith<_$SetArchivedImpl> get copyWith =>
+      __$$SetArchivedImplCopyWithImpl<_$SetArchivedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return setArchived(noteId, archived, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return setArchived?.call(noteId, archived, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setArchived != null) {
+      return setArchived(noteId, archived, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return setArchived(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return setArchived?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setArchived != null) {
+      return setArchived(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SetArchived implements HomeEvent {
+  const factory _SetArchived(
+      {required final String noteId,
+      required final bool archived,
+      final Completer<HomeArchiveResult>? completion}) = _$SetArchivedImpl;
+
+  String get noteId;
+  bool get archived;
+  Completer<HomeArchiveResult>? get completion;
+  @JsonKey(ignore: true)
+  _$$SetArchivedImplCopyWith<_$SetArchivedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SetTagsImplCopyWith<$Res> {
+  factory _$$SetTagsImplCopyWith(
+          _$SetTagsImpl value, $Res Function(_$SetTagsImpl) then) =
+      __$$SetTagsImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String noteId, List<String> tags, Completer<String?>? completion});
+}
+
+/// @nodoc
+class __$$SetTagsImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SetTagsImpl>
+    implements _$$SetTagsImplCopyWith<$Res> {
+  __$$SetTagsImplCopyWithImpl(
+      _$SetTagsImpl _value, $Res Function(_$SetTagsImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? tags = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$SetTagsImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<String?>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SetTagsImpl implements _SetTags {
+  const _$SetTagsImpl(
+      {required this.noteId, required final List<String> tags, this.completion})
+      : _tags = tags;
+
+  @override
+  final String noteId;
+  final List<String> _tags;
+  @override
+  List<String> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  @override
+  final Completer<String?>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.setTags(noteId: $noteId, tags: $tags, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SetTagsImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, noteId,
+      const DeepCollectionEquality().hash(_tags), completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SetTagsImplCopyWith<_$SetTagsImpl> get copyWith =>
+      __$$SetTagsImplCopyWithImpl<_$SetTagsImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return setTags(noteId, tags, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return setTags?.call(noteId, tags, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setTags != null) {
+      return setTags(noteId, tags, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return setTags(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return setTags?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setTags != null) {
+      return setTags(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SetTags implements HomeEvent {
+  const factory _SetTags(
+      {required final String noteId,
+      required final List<String> tags,
+      final Completer<String?>? completion}) = _$SetTagsImpl;
+
+  String get noteId;
+  List<String> get tags;
+  Completer<String?>? get completion;
+  @JsonKey(ignore: true)
+  _$$SetTagsImplCopyWith<_$SetTagsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2004,6 +4461,17 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2028,6 +4496,17 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2052,6 +4531,17 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2078,6 +4568,13 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2100,6 +4597,13 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2122,6 +4626,13 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2227,6 +4738,17 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2251,6 +4773,17 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2275,6 +4808,17 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2301,6 +4845,13 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2323,6 +4874,13 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2345,6 +4903,13 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2451,6 +5016,17 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2475,6 +5051,17 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2499,6 +5086,17 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2525,6 +5123,13 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2547,6 +5152,13 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2569,6 +5181,13 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2669,6 +5288,17 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2693,6 +5323,17 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2717,6 +5358,17 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2743,6 +5395,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2765,6 +5424,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2787,6 +5453,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2894,6 +5567,17 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2918,6 +5602,17 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2942,6 +5637,17 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2968,6 +5674,13 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2990,6 +5703,13 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3012,6 +5732,13 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3113,6 +5840,17 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3137,6 +5875,17 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3161,6 +5910,17 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3187,6 +5947,13 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -3209,6 +5976,13 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3231,6 +6005,13 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3340,6 +6121,17 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
     required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3364,6 +6156,17 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
     TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3388,6 +6191,17 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
     TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3414,6 +6228,13 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(_FiltersChanged value) filtersChanged,
     required TResult Function(_SelectFolder value) selectFolder,
     required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -3436,6 +6257,13 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(_FiltersChanged value)? filtersChanged,
     TResult? Function(_SelectFolder value)? selectFolder,
     TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3458,6 +6286,13 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(_FiltersChanged value)? filtersChanged,
     TResult Function(_SelectFolder value)? selectFolder,
     TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3499,6 +6334,13 @@ mixin _$HomeState {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -3517,6 +6359,13 @@ mixin _$HomeState {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3535,6 +6384,13 @@ mixin _$HomeState {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3634,6 +6490,13 @@ class _$InitialImpl implements _Initial {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -3655,6 +6518,13 @@ class _$InitialImpl implements _Initial {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3676,6 +6546,13 @@ class _$InitialImpl implements _Initial {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3778,6 +6655,13 @@ class _$LoadingImpl implements _Loading {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -3799,6 +6683,13 @@ class _$LoadingImpl implements _Loading {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3820,6 +6711,13 @@ class _$LoadingImpl implements _Loading {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -3888,6 +6786,13 @@ abstract class _$$LoadedImplCopyWith<$Res> {
       Set<NoteSearchFilter> filters,
       String? selectedFolderId,
       bool showTrash,
+      bool showArchive,
+      bool includeArchived,
+      int archiveCount,
+      Set<String> selectedTags,
+      List<String> availableTags,
+      List<SavedNoteView> savedViews,
+      String? selectedViewId,
       int trashCount,
       Map<String, int> folderCounts,
       int allNotesCount});
@@ -3910,6 +6815,13 @@ class __$$LoadedImplCopyWithImpl<$Res>
     Object? filters = null,
     Object? selectedFolderId = freezed,
     Object? showTrash = null,
+    Object? showArchive = null,
+    Object? includeArchived = null,
+    Object? archiveCount = null,
+    Object? selectedTags = null,
+    Object? availableTags = null,
+    Object? savedViews = null,
+    Object? selectedViewId = freezed,
     Object? trashCount = null,
     Object? folderCounts = null,
     Object? allNotesCount = null,
@@ -3939,6 +6851,34 @@ class __$$LoadedImplCopyWithImpl<$Res>
           ? _value.showTrash
           : showTrash // ignore: cast_nullable_to_non_nullable
               as bool,
+      showArchive: null == showArchive
+          ? _value.showArchive
+          : showArchive // ignore: cast_nullable_to_non_nullable
+              as bool,
+      includeArchived: null == includeArchived
+          ? _value.includeArchived
+          : includeArchived // ignore: cast_nullable_to_non_nullable
+              as bool,
+      archiveCount: null == archiveCount
+          ? _value.archiveCount
+          : archiveCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      selectedTags: null == selectedTags
+          ? _value._selectedTags
+          : selectedTags // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      availableTags: null == availableTags
+          ? _value._availableTags
+          : availableTags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      savedViews: null == savedViews
+          ? _value._savedViews
+          : savedViews // ignore: cast_nullable_to_non_nullable
+              as List<SavedNoteView>,
+      selectedViewId: freezed == selectedViewId
+          ? _value.selectedViewId
+          : selectedViewId // ignore: cast_nullable_to_non_nullable
+              as String?,
       trashCount: null == trashCount
           ? _value.trashCount
           : trashCount // ignore: cast_nullable_to_non_nullable
@@ -3965,12 +6905,22 @@ class _$LoadedImpl implements _Loaded {
       final Set<NoteSearchFilter> filters = const <NoteSearchFilter>{},
       this.selectedFolderId,
       this.showTrash = false,
+      this.showArchive = false,
+      this.includeArchived = false,
+      this.archiveCount = 0,
+      final Set<String> selectedTags = const <String>{},
+      final List<String> availableTags = const <String>[],
+      final List<SavedNoteView> savedViews = const <SavedNoteView>[],
+      this.selectedViewId,
       this.trashCount = 0,
       final Map<String, int> folderCounts = const <String, int>{},
       this.allNotesCount = 0})
       : _notes = notes,
         _folders = folders,
         _filters = filters,
+        _selectedTags = selectedTags,
+        _availableTags = availableTags,
+        _savedViews = savedViews,
         _folderCounts = folderCounts;
 
   final List<Note> _notes;
@@ -4008,6 +6958,44 @@ class _$LoadedImpl implements _Loaded {
   final bool showTrash;
   @override
   @JsonKey()
+  final bool showArchive;
+  @override
+  @JsonKey()
+  final bool includeArchived;
+  @override
+  @JsonKey()
+  final int archiveCount;
+  final Set<String> _selectedTags;
+  @override
+  @JsonKey()
+  Set<String> get selectedTags {
+    if (_selectedTags is EqualUnmodifiableSetView) return _selectedTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_selectedTags);
+  }
+
+  final List<String> _availableTags;
+  @override
+  @JsonKey()
+  List<String> get availableTags {
+    if (_availableTags is EqualUnmodifiableListView) return _availableTags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_availableTags);
+  }
+
+  final List<SavedNoteView> _savedViews;
+  @override
+  @JsonKey()
+  List<SavedNoteView> get savedViews {
+    if (_savedViews is EqualUnmodifiableListView) return _savedViews;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_savedViews);
+  }
+
+  @override
+  final String? selectedViewId;
+  @override
+  @JsonKey()
   final int trashCount;
 
   /// Active notes per folder id, for the folder picker. Counts ignore the
@@ -4032,7 +7020,7 @@ class _$LoadedImpl implements _Loaded {
 
   @override
   String toString() {
-    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, filters: $filters, selectedFolderId: $selectedFolderId, showTrash: $showTrash, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
+    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, filters: $filters, selectedFolderId: $selectedFolderId, showTrash: $showTrash, showArchive: $showArchive, includeArchived: $includeArchived, archiveCount: $archiveCount, selectedTags: $selectedTags, availableTags: $availableTags, savedViews: $savedViews, selectedViewId: $selectedViewId, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
   }
 
   @override
@@ -4049,6 +7037,20 @@ class _$LoadedImpl implements _Loaded {
                 other.selectedFolderId == selectedFolderId) &&
             (identical(other.showTrash, showTrash) ||
                 other.showTrash == showTrash) &&
+            (identical(other.showArchive, showArchive) ||
+                other.showArchive == showArchive) &&
+            (identical(other.includeArchived, includeArchived) ||
+                other.includeArchived == includeArchived) &&
+            (identical(other.archiveCount, archiveCount) ||
+                other.archiveCount == archiveCount) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedTags, _selectedTags) &&
+            const DeepCollectionEquality()
+                .equals(other._availableTags, _availableTags) &&
+            const DeepCollectionEquality()
+                .equals(other._savedViews, _savedViews) &&
+            (identical(other.selectedViewId, selectedViewId) ||
+                other.selectedViewId == selectedViewId) &&
             (identical(other.trashCount, trashCount) ||
                 other.trashCount == trashCount) &&
             const DeepCollectionEquality()
@@ -4066,6 +7068,13 @@ class _$LoadedImpl implements _Loaded {
       const DeepCollectionEquality().hash(_filters),
       selectedFolderId,
       showTrash,
+      showArchive,
+      includeArchived,
+      archiveCount,
+      const DeepCollectionEquality().hash(_selectedTags),
+      const DeepCollectionEquality().hash(_availableTags),
+      const DeepCollectionEquality().hash(_savedViews),
+      selectedViewId,
       trashCount,
       const DeepCollectionEquality().hash(_folderCounts),
       allNotesCount);
@@ -4088,14 +7097,36 @@ class _$LoadedImpl implements _Loaded {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
         loaded,
     required TResult Function(String? message) error,
   }) {
-    return loaded(notes, folders, searchQuery, filters, selectedFolderId,
-        showTrash, trashCount, folderCounts, allNotesCount);
+    return loaded(
+        notes,
+        folders,
+        searchQuery,
+        filters,
+        selectedFolderId,
+        showTrash,
+        showArchive,
+        includeArchived,
+        archiveCount,
+        selectedTags,
+        availableTags,
+        savedViews,
+        selectedViewId,
+        trashCount,
+        folderCounts,
+        allNotesCount);
   }
 
   @override
@@ -4110,14 +7141,36 @@ class _$LoadedImpl implements _Loaded {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
         loaded,
     TResult? Function(String? message)? error,
   }) {
-    return loaded?.call(notes, folders, searchQuery, filters, selectedFolderId,
-        showTrash, trashCount, folderCounts, allNotesCount);
+    return loaded?.call(
+        notes,
+        folders,
+        searchQuery,
+        filters,
+        selectedFolderId,
+        showTrash,
+        showArchive,
+        includeArchived,
+        archiveCount,
+        selectedTags,
+        availableTags,
+        savedViews,
+        selectedViewId,
+        trashCount,
+        folderCounts,
+        allNotesCount);
   }
 
   @override
@@ -4132,6 +7185,13 @@ class _$LoadedImpl implements _Loaded {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -4140,8 +7200,23 @@ class _$LoadedImpl implements _Loaded {
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(notes, folders, searchQuery, filters, selectedFolderId,
-          showTrash, trashCount, folderCounts, allNotesCount);
+      return loaded(
+          notes,
+          folders,
+          searchQuery,
+          filters,
+          selectedFolderId,
+          showTrash,
+          showArchive,
+          includeArchived,
+          archiveCount,
+          selectedTags,
+          availableTags,
+          savedViews,
+          selectedViewId,
+          trashCount,
+          folderCounts,
+          allNotesCount);
     }
     return orElse();
   }
@@ -4192,6 +7267,13 @@ abstract class _Loaded implements HomeState {
       final Set<NoteSearchFilter> filters,
       final String? selectedFolderId,
       final bool showTrash,
+      final bool showArchive,
+      final bool includeArchived,
+      final int archiveCount,
+      final Set<String> selectedTags,
+      final List<String> availableTags,
+      final List<SavedNoteView> savedViews,
+      final String? selectedViewId,
       final int trashCount,
       final Map<String, int> folderCounts,
       final int allNotesCount}) = _$LoadedImpl;
@@ -4202,6 +7284,13 @@ abstract class _Loaded implements HomeState {
   Set<NoteSearchFilter> get filters;
   String? get selectedFolderId;
   bool get showTrash;
+  bool get showArchive;
+  bool get includeArchived;
+  int get archiveCount;
+  Set<String> get selectedTags;
+  List<String> get availableTags;
+  List<SavedNoteView> get savedViews;
+  String? get selectedViewId;
   int get trashCount;
 
   /// Active notes per folder id, for the folder picker. Counts ignore the
@@ -4287,6 +7376,13 @@ class _$ErrorImpl implements _Error {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -4308,6 +7404,13 @@ class _$ErrorImpl implements _Error {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -4329,6 +7432,13 @@ class _$ErrorImpl implements _Error {
             Set<NoteSearchFilter> filters,
             String? selectedFolderId,
             bool showTrash,
+            bool showArchive,
+            bool includeArchived,
+            int archiveCount,
+            Set<String> selectedTags,
+            List<String> availableTags,
+            List<SavedNoteView> savedViews,
+            String? selectedViewId,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?

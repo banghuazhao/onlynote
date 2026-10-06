@@ -47,6 +47,39 @@ void main() {
   });
   tearDown(() => autosave.dispose());
 
+  test('clean editor adopts child route changes before subsequent typing',
+      () async {
+    final fresh = initial.copyWith(
+        title: 'Changed elsewhere',
+        isArchived: true,
+        tags: ['Project'],
+        linkedNoteIds: ['reference']);
+    expect(autosave.adoptSavedNote(fresh), isTrue);
+    expect(autosave.dirty, isFalse);
+    expect(store.saves, isEmpty);
+    autosave.update(autosave.note.copyWith(description: 'More detail'));
+    expect(await autosave.flush(), isTrue);
+    expect(store.notes['one']!.isArchived, isTrue);
+    expect(store.notes['one']!.tags, ['Project']);
+    expect(store.notes['one']!.linkedNoteIds, ['reference']);
+  });
+
+  test('adopting child state cannot replace pending or in-flight typing',
+      () async {
+    autosave.update(initial.copyWith(title: 'Pending'));
+    expect(
+        autosave.adoptSavedNote(initial.copyWith(title: 'External')), isFalse);
+    store.pauseSave = Completer<void>();
+    final pending = autosave.flush();
+    await Future<void>.delayed(Duration.zero);
+    expect(
+        autosave.adoptSavedNote(initial.copyWith(title: 'External')), isFalse);
+    store.pauseSave!.complete();
+    expect(await pending, isTrue);
+    expect(autosave.note.title, 'Pending');
+    expect(autosave.adoptSavedNote(initial.copyWith(id: 'another')), isFalse);
+  });
+
   test('seeded content is journaled and saved without fabricated edits',
       () async {
     final timestamp = DateTime(2026, 10, 5, 9, 30);

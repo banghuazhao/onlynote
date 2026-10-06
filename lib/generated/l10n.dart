@@ -1380,10 +1380,10 @@ class S {
     );
   }
 
-  /// `Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.`
+  /// `Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.`
   String get Backup_Export_Description {
     return Intl.message(
-      'Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.',
+      'Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.',
       name: 'Backup_Export_Description',
       desc: '',
       args: [],
@@ -1400,10 +1400,10 @@ class S {
     );
   }
 
-  /// `Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.`
+  /// `Restoring adds copies of the backed-up notes, folders, templates, and saved views to your library. Note links connect the restored copies. Restoring the same file again adds another set of copies.`
   String get Backup_Restore_Description {
     return Intl.message(
-      'Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.',
+      'Restoring adds copies of the backed-up notes, folders, templates, and saved views to your library. Note links connect the restored copies. Restoring the same file again adds another set of copies.',
       name: 'Backup_Restore_Description',
       desc: '',
       args: [],
@@ -1450,10 +1450,10 @@ class S {
     );
   }
 
-  /// `Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.`
+  /// `Could not create the backup. Check available storage and that all photos and recordings are accessible. Backups must fit within 256 MB.`
   String get Backup_Export_Failed {
     return Intl.message(
-      'Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.',
+      'Could not create the backup. Check available storage and that all photos and recordings are accessible. Backups must fit within 256 MB.',
       name: 'Backup_Export_Failed',
       desc: '',
       args: [],
@@ -3020,6 +3020,316 @@ class S {
     return Intl.message(
       'Could not play this recording. Please try again.',
       name: 'Voice_Play_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Archive`
+  String get Archive {
+    return Intl.message('Archive', name: 'Archive', desc: '', args: []);
+  }
+
+  /// `Archive note`
+  String get Archive_Note {
+    return Intl.message(
+      'Archive note',
+      name: 'Archive_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unarchive note`
+  String get Unarchive_Note {
+    return Intl.message(
+      'Unarchive note',
+      name: 'Unarchive_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note archived`
+  String get Note_Archived {
+    return Intl.message(
+      'Note archived',
+      name: 'Note_Archived',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note unarchived`
+  String get Note_Unarchived {
+    return Intl.message(
+      'Note unarchived',
+      name: 'Note_Unarchived',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your archived notes will appear here.`
+  String get Archive_Empty {
+    return Intl.message(
+      'Your archived notes will appear here.',
+      name: 'Archive_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tags`
+  String get Tags {
+    return Intl.message('Tags', name: 'Tags', desc: '', args: []);
+  }
+
+  /// `Edit tags`
+  String get Edit_Tags {
+    return Intl.message('Edit tags', name: 'Edit_Tags', desc: '', args: []);
+  }
+
+  /// `Add a tag`
+  String get Tag_Hint {
+    return Intl.message('Add a tag', name: 'Tag_Hint', desc: '', args: []);
+  }
+
+  /// `Use up to 20 tags, with 40 characters per tag.`
+  String get Tag_Invalid {
+    return Intl.message(
+      'Use up to 20 tags, with 40 characters per tag.',
+      name: 'Tag_Invalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Filter by tags`
+  String get Filter_Tags {
+    return Intl.message(
+      'Filter by tags',
+      name: 'Filter_Tags',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved views`
+  String get Saved_Views {
+    return Intl.message('Saved views', name: 'Saved_Views', desc: '', args: []);
+  }
+
+  /// `Save current view`
+  String get Save_Current_View {
+    return Intl.message(
+      'Save current view',
+      name: 'Save_Current_View',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View name`
+  String get Saved_View_Name {
+    return Intl.message(
+      'View name',
+      name: 'Saved_View_Name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save a search or filter to find it quickly next time.`
+  String get Saved_View_Empty {
+    return Intl.message(
+      'Save a search or filter to find it quickly next time.',
+      name: 'Saved_View_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete this saved view?`
+  String get Saved_View_Delete_Confirm {
+    return Intl.message(
+      'Delete this saved view?',
+      name: 'Saved_View_Delete_Confirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save this view. Try again.`
+  String get Saved_View_Failed {
+    return Intl.message(
+      'Could not save this view. Try again.',
+      name: 'Saved_View_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rename view`
+  String get Rename_View {
+    return Intl.message('Rename view', name: 'Rename_View', desc: '', args: []);
+  }
+
+  /// `Delete view`
+  String get Delete_View {
+    return Intl.message('Delete view', name: 'Delete_View', desc: '', args: []);
+  }
+
+  /// `View saved`
+  String get View_Saved {
+    return Intl.message('View saved', name: 'View_Saved', desc: '', args: []);
+  }
+
+  /// `Library filters`
+  String get Library_Filters {
+    return Intl.message(
+      'Library filters',
+      name: 'Library_Filters',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Include archived notes`
+  String get Include_Archived {
+    return Intl.message(
+      'Include archived notes',
+      name: 'Include_Archived',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recordings`
+  String get Share_Audio {
+    return Intl.message('Recordings', name: 'Share_Audio', desc: '', args: []);
+  }
+
+  /// `Original audio files and reviewed transcripts`
+  String get Share_Audio_Description {
+    return Intl.message(
+      'Original audio files and reviewed transcripts',
+      name: 'Share_Audio_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not share this recording. Check that the audio file is available and try again.`
+  String get Share_Audio_Failed {
+    return Intl.message(
+      'Could not share this recording. Check that the audio file is available and try again.',
+      name: 'Share_Audio_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Linked notes`
+  String get Linked_Notes {
+    return Intl.message(
+      'Linked notes',
+      name: 'Linked_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Linked from`
+  String get Linked_From {
+    return Intl.message('Linked from', name: 'Linked_From', desc: '', args: []);
+  }
+
+  /// `Link a note`
+  String get Link_Note {
+    return Intl.message('Link a note', name: 'Link_Note', desc: '', args: []);
+  }
+
+  /// `Choose linked notes`
+  String get Choose_Linked_Notes {
+    return Intl.message(
+      'Choose linked notes',
+      name: 'Choose_Linked_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search notes`
+  String get Link_Search {
+    return Intl.message(
+      'Search notes',
+      name: 'Link_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No notes to link yet. Create another note first.`
+  String get Link_Empty {
+    return Intl.message(
+      'No notes to link yet. Create another note first.',
+      name: 'Link_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note unavailable`
+  String get Link_Unavailable {
+    return Intl.message(
+      'Note unavailable',
+      name: 'Link_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove link`
+  String get Link_Remove {
+    return Intl.message('Remove link', name: 'Link_Remove', desc: '', args: []);
+  }
+
+  /// `Could not update this note. Try again.`
+  String get Link_Save_Failed {
+    return Intl.message(
+      'Could not update this note. Try again.',
+      name: 'Link_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Untitled note`
+  String get Note_Untitled {
+    return Intl.message(
+      'Untitled note',
+      name: 'Note_Untitled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open linked note`
+  String get Open_Linked_Note {
+    return Intl.message(
+      'Open linked note',
+      name: 'Open_Linked_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can link up to 100 notes. Remove a link to add another.`
+  String get Link_Limit {
+    return Intl.message(
+      'You can link up to 100 notes. Remove a link to add another.',
+      name: 'Link_Limit',
       desc: '',
       args: [],
     );

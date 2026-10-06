@@ -6,7 +6,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -46,10 +48,15 @@ class _Store implements NoteAutosaveStore {
   _Store(this.notes);
   final _Notes notes;
   final saved = <Note>[];
+  final recoveryDrafts = <String, NoteDto>{};
+  final widgetPending = <Object?>[];
+  final widgetAcknowledged = <String>[];
+  WidgetCommands? widgetCommands;
   @override
-  Future<void> writeDraft(Note note) async {}
+  Future<void> writeDraft(Note note) async =>
+      recoveryDrafts[note.id!] = NoteDto.fromNote(note);
   @override
-  Future<void> removeDraft(String id) async {}
+  Future<void> removeDraft(String id) async => recoveryDrafts.remove(id);
   @override
   Future<void> saveNote(Note note) async {
     saved.add(note);
@@ -173,11 +180,25 @@ class _Router extends RootStackRouter {
             page: PageInfo(AddUpdateNoteRoute.name, builder: (data) {
           final args = data.argsAs<AddUpdateNoteRouteArgs>();
           return AddUpdateNoteScreen(
+              start: args.start,
               note: args.note,
               autosaveStore: store,
+              widgetCommands: store.widgetCommands,
               photoTextExtraction: extraction,
               voiceMemoService: service,
               voiceMemoDrafts: drafts);
+        })),
+        AutoRoute(
+            page: PageInfo(NoteDetailRoute.name, builder: (data) {
+          final args = data.argsAs<NoteDetailRouteArgs>();
+          return Builder(
+              builder: (context) => Scaffold(
+                  key: ValueKey('test-linked-detail-${args.noteId}'),
+                  body: Center(
+                      child: TextButton(
+                          key: const ValueKey('test-return-to-editor'),
+                          onPressed: () => context.router.maybePop(),
+                          child: const Text('Return to editor')))));
         })),
       ];
 }
@@ -201,10 +222,33 @@ void main() {
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
 
   Future<(_Store, _Extraction, _Drafts, _Platform)> open(WidgetTester tester,
-      {Note? note}) async {
+      {Note? note,
+      List<Note> library = const [],
+      bool enableWidgetCommands = false,
+      NoteEditorStart start = NoteEditorStart.standard,
+      bool settleEditor = true,
+      bool reducedMotion = true}) async {
     final notes = _Notes();
-    if (note != null) notes.values[note.id!] = NoteDto.fromNote(note);
+    for (final entry in [...library, if (note != null) note]) {
+      notes.values[entry.id!] = NoteDto.fromNote(entry);
+    }
+    getIt.pushNewScope();
+    getIt.registerSingleton<NoteRepository>(notes);
     final store = _Store(notes);
+    if (enableWidgetCommands) {
+      store.widgetCommands = WidgetCommands(
+          repository: notes,
+          readPending: () async => List.of(store.widgetPending),
+          acknowledge: (ids) async {
+            store.widgetAcknowledged.addAll(ids);
+            store.widgetPending.removeWhere(
+                (value) => value is Map && ids.contains(value['id']));
+          },
+          readDraft: (id) => store.recoveryDrafts[id],
+          writeDraft: (value) async => store.recoveryDrafts[value.id!] = value,
+          removeDraft: (id) async => store.recoveryDrafts.remove(id),
+          syncWidgets: () async {});
+    }
     final extraction = _Extraction();
     final platform = _Platform();
     final service = VoiceMemoService(platform: platform);
@@ -219,6 +263,8 @@ void main() {
       await bloc.close();
       await service.dispose();
       await platform.events.close();
+      store.widgetCommands?.updates.dispose();
+      await getIt.popScope();
     });
     await tester.pumpWidget(BlocProvider.value(
         value: bloc,
@@ -233,16 +279,22 @@ void main() {
             ],
             supportedLocales: S.delegate.supportedLocales,
             builder: (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(disableAnimations: true),
+                data: MediaQuery.of(context)
+                    .copyWith(disableAnimations: reducedMotion),
                 child: child!))));
     await tester.pumpAndSettle();
-    router.push(AddUpdateNoteRoute(note: note));
-    await tester.pumpAndSettle();
+    router.push(AddUpdateNoteRoute(note: note, start: start));
+    if (settleEditor) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
     return (store, extraction, drafts, platform);
   }
 
   Future<void> tap(WidgetTester tester, Finder finder) async {
     await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
     await tester.tap(finder);
     await tester.pumpAndSettle(const Duration(milliseconds: 100));
   }
@@ -381,6 +433,119 @@ void main() {
     expect(store.saved.last.description, 'Unrelated body');
     expect(store.saved.last.todo.single.title, 'Keep this task');
     expect(find.byType(VoiceMemoPlayer), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('voice shortcut presents once after the editor transition',
+      (tester) async {
+    final (store, _, drafts, platform) = await open(tester,
+        start: NoteEditorStart.voice,
+        settleEditor: false,
+        reducedMotion: false);
+    expect(find.byKey(const ValueKey('voice-record')), findsNothing);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('voice-record')), findsOneWidget);
+    expect(drafts.prepared, 0);
+    expect(platform.calls, isNot(contains('startRecording')));
+    await tap(tester, find.text(S.current.Voice_Cancel));
+    expect(find.byKey(const ValueKey('voice-record')), findsNothing);
+    tester.view.physicalSize = const Size(450, 900);
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('voice-record')), findsNothing);
+    expect(find.byKey(const ValueKey('editor-record-voice')), findsOneWidget);
+    expect(store.saved, isEmpty);
+    expect(drafts.prepared, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'widget completion during linked navigation uses fresh saved library data',
+      (tester) async {
+    final initial = Note(
+        id: 'origin',
+        title: 'Original title',
+        description: 'Original body',
+        tags: const ['Original'],
+        linkedNoteIds: const ['linked'],
+        todo: [Todo(id: 'task', title: 'Original task')]);
+    final (store, _, _, _) = await open(tester,
+        note: initial,
+        library: [Note(id: 'linked', title: 'Related research')],
+        enableWidgetCommands: true);
+
+    await tap(tester, find.byKey(const ValueKey('linked-note-linked')));
+    expect(find.byKey(const ValueKey('test-linked-detail-linked')),
+        findsOneWidget);
+
+    // A linked detail route can reach the origin through a backlink and save
+    // edits there while its original editor remains underneath the route.
+    final editedElsewhere = initial.copyWith(
+        title: 'Latest saved title',
+        description: 'Latest saved body',
+        tags: const ['Latest'],
+        isArchived: true,
+        folderId: 'latest-folder',
+        todo: [Todo(id: 'task', title: 'Latest task label')]);
+    await store.notes.addUpdateNote(NoteDto.fromNote(editedElsewhere));
+    store.widgetPending.add({
+      'id': 'complete-task',
+      'noteId': 'origin',
+      'todoId': 'task',
+      'completed': true,
+      'createdAt': 100,
+    });
+    final imported = store.widgetCommands!.importPending();
+    await tester.pump();
+    await tester.pumpAndSettle();
+    await imported;
+
+    var saved = store.notes.values['origin']!.toDomain();
+    expect(saved.title, 'Latest saved title');
+    expect(saved.description, 'Latest saved body');
+    expect(saved.tags, ['Latest']);
+    expect(saved.isArchived, isTrue);
+    expect(saved.folderId, 'latest-folder');
+    expect(saved.todo.single.title, 'Latest task label');
+    expect(saved.todo.single.completed, isTrue);
+    expect(store.widgetAcknowledged, ['complete-task']);
+    expect(store.recoveryDrafts, isEmpty);
+
+    await tap(tester, find.byKey(const ValueKey('test-return-to-editor')));
+    expect(tester.widget<TextField>(_body()).controller!.text,
+        'Latest saved body');
+    await tester.ensureVisible(_body());
+    await tester.pumpAndSettle();
+    await tester.enterText(_body(), 'Continue editing the latest saved body');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    saved = store.notes.values['origin']!.toDomain();
+    expect(saved.description, 'Continue editing the latest saved body');
+    expect(saved.title, 'Latest saved title');
+    expect(saved.tags, ['Latest']);
+    expect(saved.isArchived, isTrue);
+    expect(saved.todo.single.completed, isTrue);
+    expect(saved.todo.single.title, 'Latest task label');
+
+    // Re-registering the editor after refresh keeps subsequent widget actions
+    // merged into the visible form instead of leaving it stale again.
+    store.widgetPending.add({
+      'id': 'reopen-task',
+      'noteId': 'origin',
+      'todoId': 'task',
+      'completed': false,
+      'createdAt': 101,
+    });
+    final reopened = store.widgetCommands!.importPending();
+    await tester.pump();
+    await tester.pumpAndSettle();
+    await reopened;
+    saved = store.notes.values['origin']!.toDomain();
+    expect(saved.todo.single.completed, isFalse);
+    expect(saved.description, 'Continue editing the latest saved body');
+    expect(saved.tags, ['Latest']);
+    expect(saved.isArchived, isTrue);
+    expect(store.widgetAcknowledged, ['complete-task', 'reopen-task']);
     expect(tester.takeException(), isNull);
   });
 }

@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">極簡備忘錄</string>
 
-    <string name="widget_description">查看置頂和最近的備忘錄，並快速新增一則。</string>
+    <string name="widget_description">查看筆記和待辦清單，並快速新增或錄音。</string>
     <string name="widget_new_note">新增</string>
     <string name="widget_untitled">無標題</string>
     <string name="widget_all_done">全部完成</string>
@@ -29,4 +29,6 @@
     <string name="widget_mark_unfinished">標記為未完成</string>
     <string name="widget_settings">小工具設定</string>
     <string name="widget_more_items">還有 %1$d 項</string>
+    <string name="shortcut_voice_note">語音備忘</string>
+    <string name="widget_voice_note">語音備忘</string>
 </resources>

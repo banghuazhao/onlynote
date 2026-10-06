@@ -15,6 +15,7 @@ class ShortcutActivity : Activity() {
             "com.appsbay.onlynote.NEW_NOTE" -> "new_note"
             "com.appsbay.onlynote.NEW_CHECKLIST" -> "new_checklist"
             "com.appsbay.onlynote.PHOTO_NOTE" -> "photo_note"
+            "com.appsbay.onlynote.VOICE_NOTE" -> "voice_note"
             else -> null
         }
         if (type != null) {

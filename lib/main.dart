@@ -1,3 +1,4 @@
+import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -123,6 +124,7 @@ Future<void> main() async {
     writeReminders: ReminderData.shared.replaceAll,
     templateStore: CustomNoteTemplateStore.instance,
     history: history,
+    savedViewStore: SavedNoteViewStore.instance,
   ).recoverInterruptedRestore();
   final voiceDrafts = VoiceMemoDrafts(
     journal: Hive.box(draftDatabaseBox),

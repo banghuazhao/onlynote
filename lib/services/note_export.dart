@@ -5,7 +5,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-enum NoteShareFormat { image, plainText, markdown, pdf }
+enum NoteShareFormat { image, plainText, markdown, pdf, audio }
 
 class NoteExport {
   static String fileStem(Note note) {
@@ -34,7 +34,10 @@ class NoteExport {
       RegExp(r'[\\`*_{}\[\]<>()#+\-.!|~]'), (m) => '\\${m[0]}');
 
   static String markdown(Note note,
-          {String? reminder, List<String> photos = const []}) =>
+          {String? reminder,
+          List<String> photos = const [],
+          List<String> recordings = const [],
+          String recordingLabel = 'Recording'}) =>
       [
         if (note.title?.isNotEmpty == true)
           '# ${_escape(note.title!).replaceAll('\n', ' ')}',
@@ -51,6 +54,8 @@ class NoteExport {
         if (reminder != null) _escape(reminder),
         for (var i = 0; i < photos.length; i++)
           '![${i + 1}](${Uri.encodeComponent(photos[i])})',
+        for (var i = 0; i < recordings.length; i++)
+          '[${_escape(recordingLabel)} ${i + 1}](${Uri.encodeComponent(recordings[i])})',
       ].join('\n\n');
 }
 

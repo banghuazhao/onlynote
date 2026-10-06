@@ -10,7 +10,8 @@ import 'package:onlynote/presentation/screens/add_update_note/add_update_note_sc
 enum AppCaptureShortcut {
   note('new_note', NoteEditorStart.quickNote),
   checklist('new_checklist', NoteEditorStart.checklist),
-  photo('photo_note', NoteEditorStart.photo);
+  photo('photo_note', NoteEditorStart.photo),
+  voice('voice_note', NoteEditorStart.voice);
 
   const AppCaptureShortcut(this.nativeType, this.editorStart);
   final String nativeType;

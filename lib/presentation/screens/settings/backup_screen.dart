@@ -14,6 +14,7 @@ import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -38,6 +39,7 @@ class _BackupScreenState extends State<BackupScreen> {
         writeReminders: ReminderData.shared.replaceAll,
         templateStore: CustomNoteTemplateStore.instance,
         history: NoteHistory.initializedInstance,
+        savedViewStore: SavedNoteViewStore.instance,
       );
 
   Future<void> _export() async {

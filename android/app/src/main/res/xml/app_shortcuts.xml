@@ -30,4 +30,14 @@
             android:targetPackage="com.appsbay.onlynote"
             android:targetClass="com.appsbay.onlynote.ShortcutActivity" />
     </shortcut>
+    <shortcut
+        android:shortcutId="voice_note"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_voice"
+        android:shortcutShortLabel="@string/shortcut_voice_note">
+        <intent
+            android:action="com.appsbay.onlynote.VOICE_NOTE"
+            android:targetPackage="com.appsbay.onlynote"
+            android:targetClass="com.appsbay.onlynote.ShortcutActivity" />
+    </shortcut>
 </shortcuts>

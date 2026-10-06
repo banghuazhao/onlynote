@@ -30,6 +30,8 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           todos: event.todos ?? [],
           imagePaths: event.imagePaths ?? [],
           voiceMemos: event.voiceMemos ?? [],
+          tags: event.tags ?? [],
+          linkedNoteIds: event.linkedNoteIds ?? [],
         ),
       );
     });
@@ -47,6 +49,12 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       if (event is _ColorChanged) {
         emit(state.copyWith(selectedColor: event.value));
       }
+      if (event is _TagsChanged) {
+        emit(state.copyWith(tags: event.value));
+      }
+      if (event is _LinksChanged) {
+        emit(state.copyWith(linkedNoteIds: event.value));
+      }
       if (event is _VoiceMemosChanged) {
         emit(state.copyWith(voiceMemos: event.value));
       }
@@ -63,6 +71,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           todo: state.todos,
           imagePaths: state.imagePaths,
           voiceMemos: state.voiceMemos,
+          tags: state.tags,
+          linkedNoteIds: state.linkedNoteIds,
+          isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,
           sortOrder: event.sortOrder,
@@ -78,6 +89,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           todo: state.todos,
           imagePaths: state.imagePaths,
           voiceMemos: state.voiceMemos,
+          tags: state.tags,
+          linkedNoteIds: state.linkedNoteIds,
+          isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,
           sortOrder: event.sortOrder,

@@ -10,6 +10,8 @@ class AddUpdateFormState with _$AddUpdateFormState {
       @Default([]) List<Todo> todos,
       @Default([]) List<String> imagePaths,
       @Default([]) List<VoiceMemo> voiceMemos,
+      @Default([]) List<String> tags,
+      @Default([]) List<String> linkedNoteIds,
       DateTime? reminderDate,
       int? reminderId}) = _AddUpdateFormState;
 

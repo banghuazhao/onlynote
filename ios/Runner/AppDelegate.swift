@@ -61,7 +61,7 @@ private enum AppShortcutBridge {
         let prefix = "com.appsbay.onlynote."
         guard shortcut.type.hasPrefix(prefix) else { return false }
         let type = String(shortcut.type.dropFirst(prefix.count))
-        guard ["new_note", "new_checklist", "photo_note"].contains(type) else { return false }
+        guard ["new_note", "new_checklist", "photo_note", "voice_note"].contains(type) else { return false }
         let request = ["id": UUID().uuidString, "type": type]
         if ready, let channel {
             channel.invokeMethod("shortcutTapped", arguments: request)

@@ -183,4 +183,52 @@ void main() {
     launch.dispose();
     messenger.setMockMethodCallHandler(channel, null);
   });
+
+  testWidgets('cold voice capture waits for routing and initializes one editor',
+      (tester) async {
+    final launch = AppShortcutLaunch(enabled: true);
+    final router = _ShortcutRouter(onboarding: true);
+    addTearDown(() async {
+      launch.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+    });
+    launch.handle(_request('voice-cold', 'voice_note'));
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router.config()));
+    await tester.pumpAndSettle();
+    launch.attach(router);
+    await tester.pumpAndSettle();
+    expect(router.stackData.map((route) => route.name),
+        [HomeRoute.name, AddUpdateNoteRoute.name]);
+    expect(find.byKey(const ValueKey('draft-voice')), findsOneWidget);
+    expect(OnboardingSettings.instance.completed, isTrue);
+    launch.handle(_request('voice-cold', 'voice_note'));
+    await tester.pumpAndSettle();
+    expect(router.stackData.length, 2);
+  });
+
+  testWidgets('warm voice capture preserves the unfinished editor underneath',
+      (tester) async {
+    final launch = AppShortcutLaunch(enabled: true);
+    final router = _ShortcutRouter();
+    addTearDown(() async {
+      launch.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+    });
+    OnboardingSettings.instance.completed = true;
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router.config()));
+    await tester.pumpAndSettle();
+    launch.attach(router);
+    launch.handle(_request('note', 'new_note'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Do not lose this draft');
+    launch.handle(_request('voice-warm', 'voice_note'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('draft-voice')), findsOneWidget);
+    expect(router.stackData.length, 3);
+    await router.maybePop();
+    await tester.pumpAndSettle();
+    expect(find.text('Do not lose this draft'), findsOneWidget);
+  });
 }

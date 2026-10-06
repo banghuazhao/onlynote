@@ -187,6 +187,20 @@ class NoteCardState extends State<NoteCard> {
                             maxLines: hasTitle ? 4 : 6,
                           ),
                         const SizedBox(height: AppSpacings.l),
+                        if (note.isArchived) ...[
+                          Text.rich(
+                            TextSpan(children: [
+                              const WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Icon(Icons.archive_outlined,
+                                      size: 14, color: AppColors.ink)),
+                              TextSpan(text: ' ${S.of(context).Archive}'),
+                            ]),
+                            style: AppTypography.description.copyWith(
+                                color: AppColors.ink.withValues(alpha: 0.65)),
+                          ),
+                          const SizedBox(height: AppSpacings.s),
+                        ],
                         Text(
                           note.date,
                           style: AppTypography.description.copyWith(
@@ -266,6 +280,23 @@ class NoteCardState extends State<NoteCard> {
                                         color: AppColors.ink
                                             .withValues(alpha: 0.7)))),
                           ]),
+                        ],
+                        if (note.tags.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Semantics(
+                            label:
+                                '${S.of(context).Tags}: ${note.tags.join(', ')}',
+                            excludeSemantics: true,
+                            child: SearchHighlight(
+                              '${note.tags.take(2).map((tag) => '#$tag').join('  ')}'
+                              '${note.tags.length > 2 ? '  +${note.tags.length - 2}' : ''}',
+                              query: widget.searchQuery,
+                              style: AppTypography.description.copyWith(
+                                  color: AppColors.ink.withValues(alpha: 0.65)),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ],
                     ),

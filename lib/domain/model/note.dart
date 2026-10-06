@@ -24,6 +24,9 @@ class Note with _$Note {
     @Default(false) bool isPinned,
     DateTime? deletedAt,
     String? folderId,
+    @Default(false) bool isArchived,
+    @Default([]) List<String> tags,
+    @Default([]) List<String> linkedNoteIds,
   }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');

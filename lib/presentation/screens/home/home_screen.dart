@@ -1,5 +1,9 @@
 import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
+import 'package:onlynote/presentation/components/library_filters_sheet.dart';
+import 'package:onlynote/presentation/components/note_tags_sheet.dart';
+import 'package:onlynote/services/note_archive.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +52,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _savedViews = SavedNoteViewStore.instance;
+  bool _viewsUnavailable = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -143,6 +149,190 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     PurchaseService.instance.addListener(_entitlementChanged);
     ReminderData.shared.addListener(_remindersChanged);
+    _savedViews.addListener(_savedViewsChanged);
+    _loadSavedViews();
+  }
+
+  void _savedViewsChanged() {
+    if (mounted) {
+      context
+          .read<HomeBloc>()
+          .add(HomeEvent.savedViewsChanged(_savedViews.views));
+    }
+  }
+
+  Future<void> _loadSavedViews() async {
+    try {
+      await _savedViews.load();
+      if (mounted) {
+        setState(() => _viewsUnavailable = false);
+        _savedViewsChanged();
+      }
+    } catch (_) {
+      if (mounted) setState(() => _viewsUnavailable = true);
+    }
+  }
+
+  Future<void> _archiveNotes(List<String> ids, bool archived) async {
+    final bloc = context.read<HomeBloc>();
+    final changes = <NoteArchiveChange>[];
+    for (final id in ids) {
+      final result = await bloc.setArchived(id, archived);
+      if (!mounted) return;
+      if (result.error != null) {
+        context.showToast(result.error!, isError: true);
+      } else if (result.change != null) {
+        changes.add(result.change!);
+      }
+    }
+    if (!mounted || changes.isEmpty) return;
+    showTransientSnackBar(
+      context,
+      SnackBar(
+        content: Text(archived
+            ? S.of(context).Note_Archived
+            : S.of(context).Note_Unarchived),
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: S.of(context).Undo,
+          onPressed: () async {
+            for (final change in changes) {
+              final result = await bloc.setArchived(
+                  change.noteId, change.previousArchived);
+              if (mounted && result.error != null) {
+                context.showToast(result.error!, isError: true);
+              }
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editTags(Note note) async {
+    try {
+      final fresh =
+          (await getIt<NoteRepository>().getNote(note.id!)).toDomain();
+      if (!mounted || fresh.isDeleted) return;
+      final suggestions = context.read<HomeBloc>().state.mapOrNull(
+                loaded: (state) => state.availableTags,
+              ) ??
+          const <String>[];
+      final tags = await showNoteTagsSheet(context,
+          tags: fresh.tags, suggestions: suggestions);
+      if (!mounted || tags == null) return;
+      final error = await context.read<HomeBloc>().setTags(note.id!, tags);
+      if (mounted && error != null) context.showToast(error, isError: true);
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Failed_to_Update_note_please_try_again,
+            isError: true);
+      }
+    }
+  }
+
+  Future<void> _openLibraryFilters() async {
+    await _loadSavedViews();
+    if (!mounted) return;
+    final bloc = context.read<HomeBloc>();
+    final data = bloc.state.mapOrNull(
+        loaded: (state) => (
+              query: state.searchQuery,
+              filters: state.filters,
+              tags: state.selectedTags,
+              availableTags: state.availableTags,
+              folderId: state.selectedFolderId,
+              showTrash: state.showTrash,
+              scope: state.showArchive
+                  ? NoteArchiveScope.archived
+                  : state.includeArchived
+                      ? NoteArchiveScope.all
+                      : NoteArchiveScope.active,
+              views: state.savedViews,
+              selectedViewId: state.selectedViewId,
+            ));
+    if (data == null) return;
+    final result = await showAppSheet<LibraryFilterResult>(
+      context: context,
+      builder: (_) => LibraryFiltersSheet(
+        filters: data.filters,
+        selectedTags: data.tags,
+        availableTags: data.availableTags,
+        scope: data.scope,
+        showTrash: data.showTrash,
+        savedViews: data.views,
+        selectedViewId: data.selectedViewId,
+        viewsUnavailable: _viewsUnavailable,
+      ),
+    );
+    if (!mounted || result == null) return;
+    _setReorderMode(false);
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    try {
+      switch (result) {
+        case CreateSavedNoteView():
+          final name = await showDialog<String>(
+              context: context,
+              builder: (_) => FolderNameDialog(
+                    title: S.of(context).Save_Current_View,
+                    labelText: S.of(context).Saved_View_Name,
+                    icon: Icons.bookmark_border_rounded,
+                    maxLength: 80,
+                  ));
+          if (!mounted || name == null) return;
+          final view = await _savedViews.create(
+            name: name,
+            query: data.query,
+            filters: result.filters,
+            tags: result.tags.toList(),
+            folderId: data.folderId,
+            archiveScope: result.scope,
+          );
+          if (!mounted) return;
+          _applyView(view);
+          context.showToast(S.of(context).View_Saved);
+        case ApplyLibraryFilters():
+          bloc.add(HomeEvent.filtersChanged(result.filters));
+          bloc.add(HomeEvent.tagsChanged(result.tags));
+          if (!data.showTrash && result.scope != data.scope) {
+            if (result.scope == NoteArchiveScope.archived) {
+              bloc.add(const HomeEvent.showArchive(true));
+            } else {
+              bloc.add(HomeEvent.includeArchived(
+                  result.scope == NoteArchiveScope.all));
+            }
+          }
+        case ApplySavedNoteView():
+          _applyView(result.view);
+        case RenameSavedNoteView():
+          final name = await showDialog<String>(
+              context: context,
+              builder: (_) => FolderNameDialog(
+                  title: S.of(context).Rename_View,
+                  labelText: S.of(context).Saved_View_Name,
+                  icon: Icons.bookmark_border_rounded,
+                  maxLength: 80,
+                  initial: result.view.name));
+          if (name != null) await _savedViews.rename(result.view.id, name);
+        case DeleteSavedNoteView():
+          final confirmed = await showConfirmDialog(context,
+              title: S.of(context).Delete_View,
+              message: S.of(context).Saved_View_Delete_Confirm);
+          if (confirmed) await _savedViews.delete(result.view.id);
+      }
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Saved_View_Failed, isError: true);
+      }
+    }
+  }
+
+  void _applyView(SavedNoteView view) {
+    _searchController.text = view.query;
+    setState(() => _isSearchVisible = view.query.trim().isNotEmpty);
+    context.read<HomeBloc>().add(HomeEvent.applySavedView(view));
   }
 
   @override
@@ -267,11 +457,15 @@ class _HomeScreenState extends State<HomeScreen> {
   /// showing.
   String _scopeLabel(BuildContext context, _FolderScope scope) {
     if (scope.showTrash) return S.of(context).Trash;
+    if (scope.selectedViewName != null) return scope.selectedViewName!;
+    if (scope.showArchive) return S.of(context).Archive;
     return scope.selectedFolder?.name ?? S.of(context).All_Notes;
   }
 
   IconData _scopeIcon(_FolderScope scope) {
     if (scope.showTrash) return Icons.delete_outline_rounded;
+    if (scope.showArchive) return Icons.archive_outlined;
+    if (scope.selectedViewName != null) return Icons.bookmark_border_rounded;
     if (scope.selectedFolderId != null) return Icons.folder_rounded;
     return Icons.notes_rounded;
   }
@@ -284,6 +478,15 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (_) => _FolderPickerSheet(scope: scope),
     );
     if (result == null || !mounted) return;
+    if (result is _SelectAll ||
+        result is _SelectFolder ||
+        result is _SelectTrash ||
+        result is _SelectArchive) {
+      _setReorderMode(false);
+      context
+          .read<MultipleDeleteBloc>()
+          .add(const MultipleDeleteEvent.clearAll());
+    }
 
     switch (result) {
       case _SelectAll():
@@ -292,6 +495,8 @@ class _HomeScreenState extends State<HomeScreen> {
         bloc.add(HomeEvent.selectFolder(id));
       case _SelectTrash():
         bloc.add(const HomeEvent.showTrash(true));
+      case _SelectArchive():
+        bloc.add(const HomeEvent.showArchive(true));
       case _CreateFolder():
         await _promptFolderName(
           title: S.of(context).New_Folder,
@@ -322,6 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     PurchaseService.instance.removeListener(_entitlementChanged);
     ReminderData.shared.removeListener(_remindersChanged);
+    _savedViews.removeListener(_savedViewsChanged);
     _searchController.dispose();
     _ad?.dispose();
     super.dispose();
@@ -364,6 +570,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   folders: data.folders,
                   selectedFolderId: data.selectedFolderId,
                   showTrash: data.showTrash,
+                  showArchive: data.showArchive,
+                  archiveCount: data.archiveCount,
+                  selectedViewName: data.savedViews
+                      .where((view) => view.id == data.selectedViewId)
+                      .firstOrNull
+                      ?.name,
                   trashCount: data.trashCount,
                   folderCounts: data.folderCounts,
                   allNotesCount: data.allNotesCount,
@@ -386,6 +598,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildSearchField(context),
                   BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) => NoteSearchFilters(
+                            onOpenLibrary: _openLibraryFilters,
                             selected:
                                 state.mapOrNull(loaded: (s) => s.filters) ?? {},
                             onChanged: (filters) => context
@@ -406,6 +619,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     _cancelChecklistReview();
                                     context.router.push(RemindersRoute());
                                   },
+                                  onOpenLibrary: _openLibraryFilters,
+                                  libraryFilterCount: data.filters.length +
+                                      data.selectedTags.length +
+                                      (data.includeArchived ? 1 : 0),
                                   selected: data.filters
                                       .contains(NoteSearchFilter.unfinished),
                                   onChanged: (selected) {
@@ -456,10 +673,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: data.notes.isEmpty
                                       ? _EmptyNotes(
                                           showTrash: data.showTrash,
+                                          showArchive: data.showArchive,
                                           hasSearch: data.searchQuery
                                                   .trim()
                                                   .isNotEmpty ||
                                               data.filters.isNotEmpty,
+                                          hasTags: data.selectedTags.isNotEmpty,
                                           hasFolder:
                                               data.selectedFolderId != null,
                                           onAdd: () {
@@ -478,6 +697,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               _cancelChecklistReview,
                                           onChecklistResult:
                                               _handleChecklistResult,
+                                          onArchive: _archiveNotes,
+                                          onEditTags: _editTags,
                                           notes: data.notes,
                                           searchQuery: data.searchQuery,
                                           unfinishedOnly: data.filters.contains(
@@ -491,10 +712,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       .isEmpty &&
                                                   data.filters.isEmpty &&
                                                   !data.showTrash &&
+                                                  !data.showArchive &&
                                                   data.notes.any((note) =>
                                                       note.isPinned &&
                                                       !note.isDeleted),
                                           isReorderMode: _isReorderMode &&
+                                              !data.showArchive &&
+                                              !data.includeArchived &&
+                                              data.selectedTags.isEmpty &&
                                               data.searchQuery.trim().isEmpty &&
                                               data.filters.isEmpty,
                                           onEnterReorderMode: () {
@@ -611,7 +836,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       loaded: (s) => s.showTrash,
                     ) ??
                 false;
+            final showArchive = context.read<HomeBloc>().state.mapOrNull(
+                      loaded: (s) => s.showArchive,
+                    ) ??
+                false;
             return [
+              if (!showTrash)
+                AppButton(
+                  tooltip: showArchive
+                      ? S.of(context).Unarchive_Note
+                      : S.of(context).Archive_Note,
+                  child: Icon(showArchive
+                      ? Icons.unarchive_outlined
+                      : Icons.archive_outlined),
+                  onPressed: () {
+                    _archiveNotes(
+                        List.of(selectedNotes.selectedIds), !showArchive);
+                    context
+                        .read<MultipleDeleteBloc>()
+                        .add(const MultipleDeleteEvent.clearAll());
+                  },
+                ),
               AppButton(
                 destructive: true,
                 tooltip: showTrash
@@ -755,6 +1000,8 @@ class _EmptyNotes extends StatelessWidget {
     required this.onAdd,
     required this.onTemplates,
     required this.showTrash,
+    required this.showArchive,
+    required this.hasTags,
     required this.hasSearch,
     required this.hasFolder,
   });
@@ -762,19 +1009,23 @@ class _EmptyNotes extends StatelessWidget {
   final VoidCallback onAdd;
   final VoidCallback onTemplates;
   final bool showTrash;
+  final bool showArchive;
+  final bool hasTags;
   final bool hasSearch;
   final bool hasFolder;
 
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
-    final message = hasSearch
+    final message = hasSearch || hasTags
         ? l10n.No_Search_Results
         : showTrash
             ? l10n.Trash_Empty
-            : hasFolder
-                ? l10n.No_Notes_In_Folder
-                : l10n.No_notes_found;
+            : showArchive
+                ? l10n.Archive_Empty
+                : hasFolder
+                    ? l10n.No_Notes_In_Folder
+                    : l10n.No_notes_found;
 
     return Center(
       child: SingleChildScrollView(
@@ -795,7 +1046,7 @@ class _EmptyNotes extends StatelessWidget {
               textAlign: TextAlign.center,
               style: context.textStyles.titleLarge,
             ),
-            if (!showTrash && !hasSearch) ...[
+            if (!showTrash && !showArchive && !hasSearch && !hasTags) ...[
               SizedBox(height: context.tokens.space4),
               FilledButton.icon(
                 onPressed: onAdd,
@@ -856,6 +1107,8 @@ class _BuildNotesList extends StatefulWidget {
     required this.onEnterReorderMode,
     required this.onChecklistActionStart,
     required this.onChecklistResult,
+    required this.onArchive,
+    required this.onEditTags,
   });
 
   final List<Note> notes;
@@ -863,6 +1116,8 @@ class _BuildNotesList extends StatefulWidget {
   final bool unfinishedOnly;
   final List<Folder> folders;
   final bool showTrash;
+  final Future<void> Function(List<String>, bool) onArchive;
+  final Future<void> Function(Note) onEditTags;
   final bool showWidgetDiscovery;
   final bool isReorderMode;
   final VoidCallback onChecklistActionStart;
@@ -994,6 +1249,26 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           : S.of(context).Onlynote,
       actions: <AppSheetAction>[
         AppSheetAction(
+          leading: Icon(note.isArchived
+              ? Icons.unarchive_outlined
+              : Icons.archive_outlined),
+          title: Text(note.isArchived
+              ? S.of(context).Unarchive_Note
+              : S.of(context).Archive_Note),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            widget.onArchive([noteId], !note.isArchived);
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.sell_outlined),
+          title: Text(S.of(context).Edit_Tags),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            widget.onEditTags(note);
+          },
+        ),
+        AppSheetAction(
           leading: Icon(
             note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
           ),
@@ -1073,7 +1348,9 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             if (mounted) setState(() {});
           },
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 280),
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 280),
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
             transitionBuilder: (child, animation) => FadeTransition(
@@ -1132,42 +1409,46 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             itemBuilder: (BuildContext context, int index) {
               final note = widget.notes[index];
               final noteId = note.id!;
-              return FadeInUp(
-                duration: Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
-                child: NoteCard(
-                  key: _cardKeyFor(noteId),
-                  note: note,
-                  searchQuery: widget.searchQuery,
-                  selected: multipleDeleteBloc.isSelected(noteId),
-                  selectionMode: isSelectionMode,
-                  unfinishedOnly: widget.unfinishedOnly,
-                  onTodoToggle: isSelectionMode || widget.showTrash
-                      ? null
-                      : (todoId) => _toggleTodo(noteId, todoId),
-                  screenshotController: _screenshotControllerFor(noteId),
-                  onTap: () {
-                    multipleDeleteBloc.state.maybeMap(
-                      orElse: () {
-                        context.router.push(NoteDetailRoute(noteId: noteId));
-                      },
-                      selected: (_) {
-                        multipleDeleteBloc
-                            .add(MultipleDeleteEvent.toggleSelect(noteId));
-                      },
-                    );
-                  },
-                  onLongPress: () {
-                    multipleDeleteBloc.state.maybeMap(
-                      orElse: () => _showNoteContextMenu(
-                          context, note, multipleDeleteBloc, noteId),
-                      selected: (_) {
-                        multipleDeleteBloc
-                            .add(MultipleDeleteEvent.toggleSelect(noteId));
-                      },
-                    );
-                  },
-                ),
+              final card = NoteCard(
+                key: _cardKeyFor(noteId),
+                note: note,
+                searchQuery: widget.searchQuery,
+                selected: multipleDeleteBloc.isSelected(noteId),
+                selectionMode: isSelectionMode,
+                unfinishedOnly: widget.unfinishedOnly,
+                onTodoToggle: isSelectionMode || widget.showTrash
+                    ? null
+                    : (todoId) => _toggleTodo(noteId, todoId),
+                screenshotController: _screenshotControllerFor(noteId),
+                onTap: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () {
+                      context.router.push(NoteDetailRoute(noteId: noteId));
+                    },
+                    selected: (_) {
+                      multipleDeleteBloc
+                          .add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
+                onLongPress: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () => _showNoteContextMenu(
+                        context, note, multipleDeleteBloc, noteId),
+                    selected: (_) {
+                      multipleDeleteBloc
+                          .add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
               );
+              return MediaQuery.disableAnimationsOf(context)
+                  ? card
+                  : FadeInUp(
+                      duration:
+                          Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
+                      child: card,
+                    );
             },
             mainAxisSpacing: AppSpacings.xl,
             crossAxisSpacing: AppSpacings.l,
@@ -1295,6 +1576,9 @@ class _FolderScope {
     required this.folders,
     required this.selectedFolderId,
     required this.showTrash,
+    required this.showArchive,
+    required this.archiveCount,
+    this.selectedViewName,
     required this.trashCount,
     required this.folderCounts,
     required this.allNotesCount,
@@ -1303,6 +1587,9 @@ class _FolderScope {
   final List<Folder> folders;
   final String? selectedFolderId;
   final bool showTrash;
+  final bool showArchive;
+  final int archiveCount;
+  final String? selectedViewName;
   final int trashCount;
   final Map<String, int> folderCounts;
   final int allNotesCount;
@@ -1396,6 +1683,10 @@ class _SelectTrash extends _FolderPickerResult {
   const _SelectTrash();
 }
 
+class _SelectArchive extends _FolderPickerResult {
+  const _SelectArchive();
+}
+
 class _CreateFolder extends _FolderPickerResult {
   const _CreateFolder();
 }
@@ -1431,7 +1722,9 @@ class _FolderPickerSheet extends StatelessWidget {
             icon: Icons.notes_rounded,
             label: l10n.All_Notes,
             count: scope.allNotesCount,
-            selected: !scope.showTrash && scope.selectedFolderId == null,
+            selected: !scope.showTrash &&
+                !scope.showArchive &&
+                scope.selectedFolderId == null,
             onTap: () => Navigator.pop(context, const _SelectAll()),
           ),
           for (final folder in scope.folders)
@@ -1439,11 +1732,20 @@ class _FolderPickerSheet extends StatelessWidget {
               icon: Icons.folder_rounded,
               label: folder.name,
               count: scope.folderCounts[folder.id] ?? 0,
-              selected: !scope.showTrash && scope.selectedFolderId == folder.id,
+              selected: !scope.showTrash &&
+                  !scope.showArchive &&
+                  scope.selectedFolderId == folder.id,
               onTap: () => Navigator.pop(context, _SelectFolder(folder.id)),
               onRename: () => Navigator.pop(context, _RenameFolder(folder)),
               onDelete: () => Navigator.pop(context, _DeleteFolder(folder)),
             ),
+          _PickerTile(
+            icon: Icons.archive_outlined,
+            label: l10n.Archive,
+            count: scope.archiveCount,
+            selected: scope.showArchive,
+            onTap: () => Navigator.pop(context, const _SelectArchive()),
+          ),
           _PickerTile(
             icon: Icons.delete_outline_rounded,
             label: l10n.Trash,

@@ -70,6 +70,14 @@
 				<key>UIApplicationShortcutItemIconSymbolName</key>
 				<string>camera</string>
 			</dict>
+			<dict>
+				<key>UIApplicationShortcutItemType</key>
+				<string>com.appsbay.onlynote.voice_note</string>
+				<key>UIApplicationShortcutItemTitle</key>
+				<string>Voice Memo</string>
+				<key>UIApplicationShortcutItemIconSymbolName</key>
+				<string>mic</string>
+			</dict>
 		</array>
 		<key>NSUserTrackingUsageDescription</key>
 		<string>Onlynote uses your device's advertising identifier to choose which ads appear in the banner at the bottom of your notes list — for example, showing stationery or productivity app ads instead of unrelated ones. What you write in your notes is never used for this and never leaves your device.</string>

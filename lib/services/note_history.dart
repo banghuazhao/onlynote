@@ -156,6 +156,9 @@ class NoteHistory extends ChangeNotifier {
           isPinned: current.isPinned,
           folderId: current.folderId,
           deletedAt: current.deletedAt,
+          isArchived: current.isArchived,
+          tags: List.of(current.tags ?? []),
+          linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
         );
         // Repository hook captures current content before replacing it. The
         // restore queue is separate from the snapshot queue to allow that hook.
@@ -308,7 +311,8 @@ class NoteHistory extends ChangeNotifier {
       (note.todoList?.any((todo) => todo.title?.trim().isNotEmpty ?? false) ??
           false) ||
       (note.imagePaths?.isNotEmpty ?? false) ||
-      (note.voiceMemos?.isNotEmpty ?? false);
+      (note.voiceMemos?.isNotEmpty ?? false) ||
+      (note.linkedNoteIds?.isNotEmpty ?? false);
 
   static bool _sameContent(NoteDto a, NoteDto b) =>
       (a.title ?? '') == (b.title ?? '') &&
@@ -325,6 +329,7 @@ class NoteHistory extends ChangeNotifier {
         ],
         a.imagePaths ?? const <String>[],
         a.voiceMemos ?? const <Map>[],
+        a.linkedNoteIds ?? const <String>[],
       ], [
         b.colorValue,
         [
@@ -333,6 +338,7 @@ class NoteHistory extends ChangeNotifier {
         ],
         b.imagePaths ?? const <String>[],
         b.voiceMemos ?? const <Map>[],
+        b.linkedNoteIds ?? const <String>[],
       ]);
 
   static bool _equal(Object? a, Object? b) {
@@ -361,6 +367,10 @@ class NoteHistory extends ChangeNotifier {
         isPinned: note.isPinned,
         deletedAt: note.deletedAt,
         folderId: note.folderId,
+        isArchived: note.isArchived,
+        tags: List.unmodifiable(note.tags ?? const <String>[]),
+        linkedNoteIds:
+            List.unmodifiable(note.linkedNoteIds ?? const <String>[]),
       );
 
   static List<TodoDto> _cloneTodos(List<TodoDto>? todos) => List.unmodifiable([

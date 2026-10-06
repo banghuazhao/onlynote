@@ -24,13 +24,15 @@ mixin _$AddUpdateFormEvent {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -42,6 +44,8 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -52,13 +56,15 @@ mixin _$AddUpdateFormEvent {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -70,6 +76,8 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -80,13 +88,15 @@ mixin _$AddUpdateFormEvent {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -98,6 +108,8 @@ mixin _$AddUpdateFormEvent {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -118,6 +130,8 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -137,6 +151,8 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -156,6 +172,8 @@ mixin _$AddUpdateFormEvent {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -191,7 +209,9 @@ abstract class _$$InitializeImplCopyWith<$Res> {
       Color? color,
       List<Todo>? todos,
       List<String>? imagePaths,
-      List<VoiceMemo>? voiceMemos});
+      List<VoiceMemo>? voiceMemos,
+      List<String>? tags,
+      List<String>? linkedNoteIds});
 }
 
 /// @nodoc
@@ -211,6 +231,8 @@ class __$$InitializeImplCopyWithImpl<$Res>
     Object? todos = freezed,
     Object? imagePaths = freezed,
     Object? voiceMemos = freezed,
+    Object? tags = freezed,
+    Object? linkedNoteIds = freezed,
   }) {
     return _then(_$InitializeImpl(
       title: freezed == title
@@ -237,6 +259,14 @@ class __$$InitializeImplCopyWithImpl<$Res>
           ? _value._voiceMemos
           : voiceMemos // ignore: cast_nullable_to_non_nullable
               as List<VoiceMemo>?,
+      tags: freezed == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      linkedNoteIds: freezed == linkedNoteIds
+          ? _value._linkedNoteIds
+          : linkedNoteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }
@@ -250,10 +280,14 @@ class _$InitializeImpl implements _Initialize {
       this.color,
       final List<Todo>? todos,
       final List<String>? imagePaths,
-      final List<VoiceMemo>? voiceMemos})
+      final List<VoiceMemo>? voiceMemos,
+      final List<String>? tags,
+      final List<String>? linkedNoteIds})
       : _todos = todos,
         _imagePaths = imagePaths,
-        _voiceMemos = voiceMemos;
+        _voiceMemos = voiceMemos,
+        _tags = tags,
+        _linkedNoteIds = linkedNoteIds;
 
   @override
   final String? title;
@@ -291,9 +325,29 @@ class _$InitializeImpl implements _Initialize {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<String>? _tags;
+  @override
+  List<String>? get tags {
+    final value = _tags;
+    if (value == null) return null;
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  final List<String>? _linkedNoteIds;
+  @override
+  List<String>? get linkedNoteIds {
+    final value = _linkedNoteIds;
+    if (value == null) return null;
+    if (_linkedNoteIds is EqualUnmodifiableListView) return _linkedNoteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   String toString() {
-    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, color: $color, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos)';
+    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, color: $color, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds)';
   }
 
   @override
@@ -309,7 +363,10 @@ class _$InitializeImpl implements _Initialize {
             const DeepCollectionEquality()
                 .equals(other._imagePaths, _imagePaths) &&
             const DeepCollectionEquality()
-                .equals(other._voiceMemos, _voiceMemos));
+                .equals(other._voiceMemos, _voiceMemos) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._linkedNoteIds, _linkedNoteIds));
   }
 
   @override
@@ -320,7 +377,9 @@ class _$InitializeImpl implements _Initialize {
       color,
       const DeepCollectionEquality().hash(_todos),
       const DeepCollectionEquality().hash(_imagePaths),
-      const DeepCollectionEquality().hash(_voiceMemos));
+      const DeepCollectionEquality().hash(_voiceMemos),
+      const DeepCollectionEquality().hash(_tags),
+      const DeepCollectionEquality().hash(_linkedNoteIds));
 
   @JsonKey(ignore: true)
   @override
@@ -337,13 +396,15 @@ class _$InitializeImpl implements _Initialize {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -355,8 +416,11 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
-    return initialize(title, description, color, todos, imagePaths, voiceMemos);
+    return initialize(title, description, color, todos, imagePaths, voiceMemos,
+        tags, linkedNoteIds);
   }
 
   @override
@@ -368,13 +432,15 @@ class _$InitializeImpl implements _Initialize {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -386,9 +452,11 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
-    return initialize?.call(
-        title, description, color, todos, imagePaths, voiceMemos);
+    return initialize?.call(title, description, color, todos, imagePaths,
+        voiceMemos, tags, linkedNoteIds);
   }
 
   @override
@@ -400,13 +468,15 @@ class _$InitializeImpl implements _Initialize {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -418,11 +488,13 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (initialize != null) {
-      return initialize(
-          title, description, color, todos, imagePaths, voiceMemos);
+      return initialize(title, description, color, todos, imagePaths,
+          voiceMemos, tags, linkedNoteIds);
     }
     return orElse();
   }
@@ -445,6 +517,8 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return initialize(this);
   }
@@ -467,6 +541,8 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return initialize?.call(this);
   }
@@ -489,6 +565,8 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (initialize != null) {
@@ -505,7 +583,9 @@ abstract class _Initialize implements AddUpdateFormEvent {
       final Color? color,
       final List<Todo>? todos,
       final List<String>? imagePaths,
-      final List<VoiceMemo>? voiceMemos}) = _$InitializeImpl;
+      final List<VoiceMemo>? voiceMemos,
+      final List<String>? tags,
+      final List<String>? linkedNoteIds}) = _$InitializeImpl;
 
   String? get title;
   String? get description;
@@ -513,6 +593,8 @@ abstract class _Initialize implements AddUpdateFormEvent {
   List<Todo>? get todos;
   List<String>? get imagePaths;
   List<VoiceMemo>? get voiceMemos;
+  List<String>? get tags;
+  List<String>? get linkedNoteIds;
   @JsonKey(ignore: true)
   _$$InitializeImplCopyWith<_$InitializeImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -588,13 +670,15 @@ class _$TitleChangedImpl implements _TitleChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -606,6 +690,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return titleChanged(value);
   }
@@ -619,13 +705,15 @@ class _$TitleChangedImpl implements _TitleChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -637,6 +725,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return titleChanged?.call(value);
   }
@@ -650,13 +740,15 @@ class _$TitleChangedImpl implements _TitleChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -668,6 +760,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -694,6 +788,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return titleChanged(this);
   }
@@ -716,6 +812,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return titleChanged?.call(this);
   }
@@ -738,6 +836,8 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -827,13 +927,15 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -845,6 +947,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return descriptionChanged(value);
   }
@@ -858,13 +962,15 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -876,6 +982,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return descriptionChanged?.call(value);
   }
@@ -889,13 +997,15 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -907,6 +1017,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -933,6 +1045,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return descriptionChanged(this);
   }
@@ -955,6 +1069,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return descriptionChanged?.call(this);
   }
@@ -977,6 +1093,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -1066,13 +1184,15 @@ class _$ColorChangedImpl implements _ColorChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -1084,6 +1204,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return colorChanged(value);
   }
@@ -1097,13 +1219,15 @@ class _$ColorChangedImpl implements _ColorChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -1115,6 +1239,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return colorChanged?.call(value);
   }
@@ -1128,13 +1254,15 @@ class _$ColorChangedImpl implements _ColorChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -1146,6 +1274,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -1172,6 +1302,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return colorChanged(this);
   }
@@ -1194,6 +1326,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return colorChanged?.call(this);
   }
@@ -1216,6 +1350,8 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -1244,6 +1380,7 @@ abstract class _$$AddOrUpdateNoteImplCopyWith<$Res> {
       {String? id,
       String? folderId,
       bool isPinned,
+      bool isArchived,
       int? sortOrder,
       DateTime? deletedAt});
 }
@@ -1262,6 +1399,7 @@ class __$$AddOrUpdateNoteImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? folderId = freezed,
     Object? isPinned = null,
+    Object? isArchived = null,
     Object? sortOrder = freezed,
     Object? deletedAt = freezed,
   }) {
@@ -1277,6 +1415,10 @@ class __$$AddOrUpdateNoteImplCopyWithImpl<$Res>
       isPinned: null == isPinned
           ? _value.isPinned
           : isPinned // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isArchived: null == isArchived
+          ? _value.isArchived
+          : isArchived // ignore: cast_nullable_to_non_nullable
               as bool,
       sortOrder: freezed == sortOrder
           ? _value.sortOrder
@@ -1297,6 +1439,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
       {this.id,
       this.folderId,
       this.isPinned = false,
+      this.isArchived = false,
       this.sortOrder,
       this.deletedAt});
 
@@ -1308,13 +1451,16 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
   @JsonKey()
   final bool isPinned;
   @override
+  @JsonKey()
+  final bool isArchived;
+  @override
   final int? sortOrder;
   @override
   final DateTime? deletedAt;
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.addOrUpdateNote(id: $id, folderId: $folderId, isPinned: $isPinned, sortOrder: $sortOrder, deletedAt: $deletedAt)';
+    return 'AddUpdateFormEvent.addOrUpdateNote(id: $id, folderId: $folderId, isPinned: $isPinned, isArchived: $isArchived, sortOrder: $sortOrder, deletedAt: $deletedAt)';
   }
 
   @override
@@ -1327,6 +1473,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
                 other.folderId == folderId) &&
             (identical(other.isPinned, isPinned) ||
                 other.isPinned == isPinned) &&
+            (identical(other.isArchived, isArchived) ||
+                other.isArchived == isArchived) &&
             (identical(other.sortOrder, sortOrder) ||
                 other.sortOrder == sortOrder) &&
             (identical(other.deletedAt, deletedAt) ||
@@ -1334,8 +1482,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, folderId, isPinned, sortOrder, deletedAt);
+  int get hashCode => Object.hash(
+      runtimeType, id, folderId, isPinned, isArchived, sortOrder, deletedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -1353,13 +1501,15 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -1371,8 +1521,11 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
-    return addOrUpdateNote(id, folderId, isPinned, sortOrder, deletedAt);
+    return addOrUpdateNote(
+        id, folderId, isPinned, isArchived, sortOrder, deletedAt);
   }
 
   @override
@@ -1384,13 +1537,15 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -1402,8 +1557,11 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
-    return addOrUpdateNote?.call(id, folderId, isPinned, sortOrder, deletedAt);
+    return addOrUpdateNote?.call(
+        id, folderId, isPinned, isArchived, sortOrder, deletedAt);
   }
 
   @override
@@ -1415,13 +1573,15 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -1433,10 +1593,13 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
-      return addOrUpdateNote(id, folderId, isPinned, sortOrder, deletedAt);
+      return addOrUpdateNote(
+          id, folderId, isPinned, isArchived, sortOrder, deletedAt);
     }
     return orElse();
   }
@@ -1459,6 +1622,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return addOrUpdateNote(this);
   }
@@ -1481,6 +1646,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return addOrUpdateNote?.call(this);
   }
@@ -1503,6 +1670,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
@@ -1517,12 +1686,14 @@ abstract class _AddOrUpdateNote implements AddUpdateFormEvent {
       {final String? id,
       final String? folderId,
       final bool isPinned,
+      final bool isArchived,
       final int? sortOrder,
       final DateTime? deletedAt}) = _$AddOrUpdateNoteImpl;
 
   String? get id;
   String? get folderId;
   bool get isPinned;
+  bool get isArchived;
   int? get sortOrder;
   DateTime? get deletedAt;
   @JsonKey(ignore: true)
@@ -1600,13 +1771,15 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -1618,6 +1791,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return addEmptyTodo(afterId);
   }
@@ -1631,13 +1806,15 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -1649,6 +1826,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return addEmptyTodo?.call(afterId);
   }
@@ -1662,13 +1841,15 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -1680,6 +1861,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -1706,6 +1889,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return addEmptyTodo(this);
   }
@@ -1728,6 +1913,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return addEmptyTodo?.call(this);
   }
@@ -1750,6 +1937,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -1838,13 +2027,15 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -1856,6 +2047,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return deleteTodo(id);
   }
@@ -1869,13 +2062,15 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -1887,6 +2082,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return deleteTodo?.call(id);
   }
@@ -1900,13 +2097,15 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -1918,6 +2117,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -1944,6 +2145,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return deleteTodo(this);
   }
@@ -1966,6 +2169,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return deleteTodo?.call(this);
   }
@@ -1988,6 +2193,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -2085,13 +2292,15 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -2103,6 +2312,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return todoValueChanged(value, id);
   }
@@ -2116,13 +2327,15 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -2134,6 +2347,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return todoValueChanged?.call(value, id);
   }
@@ -2147,13 +2362,15 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -2165,6 +2382,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -2191,6 +2410,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return todoValueChanged(this);
   }
@@ -2213,6 +2434,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return todoValueChanged?.call(this);
   }
@@ -2235,6 +2458,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -2327,13 +2552,15 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -2345,6 +2572,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return toggleTodoCheckbox(id);
   }
@@ -2358,13 +2587,15 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -2376,6 +2607,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return toggleTodoCheckbox?.call(id);
   }
@@ -2389,13 +2622,15 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -2407,6 +2642,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -2433,6 +2670,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return toggleTodoCheckbox(this);
   }
@@ -2455,6 +2694,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return toggleTodoCheckbox?.call(this);
   }
@@ -2477,6 +2718,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -2575,13 +2818,15 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -2593,6 +2838,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return setTodoCompleted(id, completed);
   }
@@ -2606,13 +2853,15 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -2624,6 +2873,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return setTodoCompleted?.call(id, completed);
   }
@@ -2637,13 +2888,15 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -2655,6 +2908,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (setTodoCompleted != null) {
@@ -2681,6 +2936,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return setTodoCompleted(this);
   }
@@ -2703,6 +2960,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return setTodoCompleted?.call(this);
   }
@@ -2725,6 +2984,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (setTodoCompleted != null) {
@@ -2833,13 +3094,15 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -2851,6 +3114,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return replaceTodoLines(id, lines);
   }
@@ -2864,13 +3129,15 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -2882,6 +3149,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return replaceTodoLines?.call(id, lines);
   }
@@ -2895,13 +3164,15 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -2913,6 +3184,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (replaceTodoLines != null) {
@@ -2939,6 +3212,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return replaceTodoLines(this);
   }
@@ -2961,6 +3236,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return replaceTodoLines?.call(this);
   }
@@ -2983,6 +3260,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (replaceTodoLines != null) {
@@ -3084,13 +3363,15 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -3102,6 +3383,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return reorderTodo(oldIndex, newIndex);
   }
@@ -3115,13 +3398,15 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -3133,6 +3418,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return reorderTodo?.call(oldIndex, newIndex);
   }
@@ -3146,13 +3433,15 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -3164,6 +3453,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (reorderTodo != null) {
@@ -3190,6 +3481,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return reorderTodo(this);
   }
@@ -3212,6 +3505,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return reorderTodo?.call(this);
   }
@@ -3234,6 +3529,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (reorderTodo != null) {
@@ -3325,13 +3622,15 @@ class _$AddImageImpl implements _AddImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -3343,6 +3642,8 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return addImage(path);
   }
@@ -3356,13 +3657,15 @@ class _$AddImageImpl implements _AddImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -3374,6 +3677,8 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return addImage?.call(path);
   }
@@ -3387,13 +3692,15 @@ class _$AddImageImpl implements _AddImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -3405,6 +3712,8 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addImage != null) {
@@ -3431,6 +3740,8 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return addImage(this);
   }
@@ -3453,6 +3764,8 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return addImage?.call(this);
   }
@@ -3475,6 +3788,8 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (addImage != null) {
@@ -3563,13 +3878,15 @@ class _$RemoveImageImpl implements _RemoveImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -3581,6 +3898,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return removeImage(path);
   }
@@ -3594,13 +3913,15 @@ class _$RemoveImageImpl implements _RemoveImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -3612,6 +3933,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return removeImage?.call(path);
   }
@@ -3625,13 +3948,15 @@ class _$RemoveImageImpl implements _RemoveImage {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -3643,6 +3968,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (removeImage != null) {
@@ -3669,6 +3996,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return removeImage(this);
   }
@@ -3691,6 +4020,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return removeImage?.call(this);
   }
@@ -3713,6 +4044,8 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (removeImage != null) {
@@ -3808,13 +4141,15 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
         addOrUpdateNote,
     required TResult Function(String? afterId) addEmptyTodo,
     required TResult Function(String id) deleteTodo,
@@ -3826,6 +4161,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(String path) addImage,
     required TResult Function(String path) removeImage,
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
   }) {
     return voiceMemosChanged(value);
   }
@@ -3839,13 +4176,15 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult? Function(String? afterId)? addEmptyTodo,
     TResult? Function(String id)? deleteTodo,
@@ -3857,6 +4196,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(String path)? addImage,
     TResult? Function(String path)? removeImage,
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
   }) {
     return voiceMemosChanged?.call(value);
   }
@@ -3870,13 +4211,15 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
-            List<VoiceMemo>? voiceMemos)?
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
-            int? sortOrder, DateTime? deletedAt)?
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
         addOrUpdateNote,
     TResult Function(String? afterId)? addEmptyTodo,
     TResult Function(String id)? deleteTodo,
@@ -3888,6 +4231,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(String path)? addImage,
     TResult Function(String path)? removeImage,
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
     required TResult orElse(),
   }) {
     if (voiceMemosChanged != null) {
@@ -3914,6 +4259,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(_AddImage value) addImage,
     required TResult Function(_RemoveImage value) removeImage,
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
   }) {
     return voiceMemosChanged(this);
   }
@@ -3936,6 +4283,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(_AddImage value)? addImage,
     TResult? Function(_RemoveImage value)? removeImage,
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
   }) {
     return voiceMemosChanged?.call(this);
   }
@@ -3958,6 +4307,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(_AddImage value)? addImage,
     TResult Function(_RemoveImage value)? removeImage,
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
     required TResult orElse(),
   }) {
     if (voiceMemosChanged != null) {
@@ -3978,6 +4329,530 @@ abstract class _VoiceMemosChanged implements AddUpdateFormEvent {
 }
 
 /// @nodoc
+abstract class _$$TagsChangedImplCopyWith<$Res> {
+  factory _$$TagsChangedImplCopyWith(
+          _$TagsChangedImpl value, $Res Function(_$TagsChangedImpl) then) =
+      __$$TagsChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<String> value});
+}
+
+/// @nodoc
+class __$$TagsChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$TagsChangedImpl>
+    implements _$$TagsChangedImplCopyWith<$Res> {
+  __$$TagsChangedImplCopyWithImpl(
+      _$TagsChangedImpl _value, $Res Function(_$TagsChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_$TagsChangedImpl(
+      null == value
+          ? _value._value
+          : value // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$TagsChangedImpl implements _TagsChanged {
+  const _$TagsChangedImpl(final List<String> value) : _value = value;
+
+  final List<String> _value;
+  @override
+  List<String> get value {
+    if (_value is EqualUnmodifiableListView) return _value;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_value);
+  }
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.tagsChanged(value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$TagsChangedImpl &&
+            const DeepCollectionEquality().equals(other._value, _value));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_value));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$TagsChangedImplCopyWith<_$TagsChangedImpl> get copyWith =>
+      __$$TagsChangedImplCopyWithImpl<_$TagsChangedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, bool completed) setTodoCompleted,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path) addImage,
+    required TResult Function(String path) removeImage,
+    required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
+  }) {
+    return tagsChanged(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, bool completed)? setTodoCompleted,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path)? addImage,
+    TResult? Function(String path)? removeImage,
+    TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
+  }) {
+    return tagsChanged?.call(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, bool completed)? setTodoCompleted,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path)? addImage,
+    TResult Function(String path)? removeImage,
+    TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (tagsChanged != null) {
+      return tagsChanged(value);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_SetTodoCompleted value) setTodoCompleted,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+    required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
+  }) {
+    return tagsChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+    TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
+  }) {
+    return tagsChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (tagsChanged != null) {
+      return tagsChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _TagsChanged implements AddUpdateFormEvent {
+  const factory _TagsChanged(final List<String> value) = _$TagsChangedImpl;
+
+  List<String> get value;
+  @JsonKey(ignore: true)
+  _$$TagsChangedImplCopyWith<_$TagsChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$LinksChangedImplCopyWith<$Res> {
+  factory _$$LinksChangedImplCopyWith(
+          _$LinksChangedImpl value, $Res Function(_$LinksChangedImpl) then) =
+      __$$LinksChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<String> value});
+}
+
+/// @nodoc
+class __$$LinksChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$LinksChangedImpl>
+    implements _$$LinksChangedImplCopyWith<$Res> {
+  __$$LinksChangedImplCopyWithImpl(
+      _$LinksChangedImpl _value, $Res Function(_$LinksChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_$LinksChangedImpl(
+      null == value
+          ? _value._value
+          : value // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$LinksChangedImpl implements _LinksChanged {
+  const _$LinksChangedImpl(final List<String> value) : _value = value;
+
+  final List<String> _value;
+  @override
+  List<String> get value {
+    if (_value is EqualUnmodifiableListView) return _value;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_value);
+  }
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.linksChanged(value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$LinksChangedImpl &&
+            const DeepCollectionEquality().equals(other._value, _value));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_value));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$LinksChangedImplCopyWith<_$LinksChangedImpl> get copyWith =>
+      __$$LinksChangedImplCopyWithImpl<_$LinksChangedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, bool completed) setTodoCompleted,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path) addImage,
+    required TResult Function(String path) removeImage,
+    required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
+  }) {
+    return linksChanged(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, bool completed)? setTodoCompleted,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path)? addImage,
+    TResult? Function(String path)? removeImage,
+    TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
+  }) {
+    return linksChanged?.call(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String? title,
+            String? description,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, bool completed)? setTodoCompleted,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path)? addImage,
+    TResult Function(String path)? removeImage,
+    TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (linksChanged != null) {
+      return linksChanged(value);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_SetTodoCompleted value) setTodoCompleted,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+    required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
+  }) {
+    return linksChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+    TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
+  }) {
+    return linksChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (linksChanged != null) {
+      return linksChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _LinksChanged implements AddUpdateFormEvent {
+  const factory _LinksChanged(final List<String> value) = _$LinksChangedImpl;
+
+  List<String> get value;
+  @JsonKey(ignore: true)
+  _$$LinksChangedImplCopyWith<_$LinksChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$AddUpdateFormState {
   String? get title => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
@@ -3985,6 +4860,8 @@ mixin _$AddUpdateFormState {
   List<Todo> get todos => throw _privateConstructorUsedError;
   List<String> get imagePaths => throw _privateConstructorUsedError;
   List<VoiceMemo> get voiceMemos => throw _privateConstructorUsedError;
+  List<String> get tags => throw _privateConstructorUsedError;
+  List<String> get linkedNoteIds => throw _privateConstructorUsedError;
   DateTime? get reminderDate => throw _privateConstructorUsedError;
   int? get reminderId => throw _privateConstructorUsedError;
 
@@ -4006,6 +4883,8 @@ abstract class $AddUpdateFormStateCopyWith<$Res> {
       List<Todo> todos,
       List<String> imagePaths,
       List<VoiceMemo> voiceMemos,
+      List<String> tags,
+      List<String> linkedNoteIds,
       DateTime? reminderDate,
       int? reminderId});
 }
@@ -4029,6 +4908,8 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
     Object? todos = null,
     Object? imagePaths = null,
     Object? voiceMemos = null,
+    Object? tags = null,
+    Object? linkedNoteIds = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
@@ -4057,6 +4938,14 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
           ? _value.voiceMemos
           : voiceMemos // ignore: cast_nullable_to_non_nullable
               as List<VoiceMemo>,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      linkedNoteIds: null == linkedNoteIds
+          ? _value.linkedNoteIds
+          : linkedNoteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
@@ -4084,6 +4973,8 @@ abstract class _$$AddUpdateFormStateImplCopyWith<$Res>
       List<Todo> todos,
       List<String> imagePaths,
       List<VoiceMemo> voiceMemos,
+      List<String> tags,
+      List<String> linkedNoteIds,
       DateTime? reminderDate,
       int? reminderId});
 }
@@ -4105,6 +4996,8 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
     Object? todos = null,
     Object? imagePaths = null,
     Object? voiceMemos = null,
+    Object? tags = null,
+    Object? linkedNoteIds = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
@@ -4133,6 +5026,14 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
           ? _value._voiceMemos
           : voiceMemos // ignore: cast_nullable_to_non_nullable
               as List<VoiceMemo>,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      linkedNoteIds: null == linkedNoteIds
+          ? _value._linkedNoteIds
+          : linkedNoteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
@@ -4155,11 +5056,15 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       final List<Todo> todos = const [],
       final List<String> imagePaths = const [],
       final List<VoiceMemo> voiceMemos = const [],
+      final List<String> tags = const [],
+      final List<String> linkedNoteIds = const [],
       this.reminderDate,
       this.reminderId})
       : _todos = todos,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
+        _tags = tags,
+        _linkedNoteIds = linkedNoteIds,
         super._();
 
   @override
@@ -4195,6 +5100,24 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
     return EqualUnmodifiableListView(_voiceMemos);
   }
 
+  final List<String> _tags;
+  @override
+  @JsonKey()
+  List<String> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  final List<String> _linkedNoteIds;
+  @override
+  @JsonKey()
+  List<String> get linkedNoteIds {
+    if (_linkedNoteIds is EqualUnmodifiableListView) return _linkedNoteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_linkedNoteIds);
+  }
+
   @override
   final DateTime? reminderDate;
   @override
@@ -4202,7 +5125,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
 
   @override
   String toString() {
-    return 'AddUpdateFormState(title: $title, description: $description, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, reminderDate: $reminderDate, reminderId: $reminderId)';
+    return 'AddUpdateFormState(title: $title, description: $description, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, reminderDate: $reminderDate, reminderId: $reminderId)';
   }
 
   @override
@@ -4220,6 +5143,9 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
                 .equals(other._imagePaths, _imagePaths) &&
             const DeepCollectionEquality()
                 .equals(other._voiceMemos, _voiceMemos) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._linkedNoteIds, _linkedNoteIds) &&
             (identical(other.reminderDate, reminderDate) ||
                 other.reminderDate == reminderDate) &&
             (identical(other.reminderId, reminderId) ||
@@ -4235,6 +5161,8 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       const DeepCollectionEquality().hash(_todos),
       const DeepCollectionEquality().hash(_imagePaths),
       const DeepCollectionEquality().hash(_voiceMemos),
+      const DeepCollectionEquality().hash(_tags),
+      const DeepCollectionEquality().hash(_linkedNoteIds),
       reminderDate,
       reminderId);
 
@@ -4254,6 +5182,8 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
       final List<Todo> todos,
       final List<String> imagePaths,
       final List<VoiceMemo> voiceMemos,
+      final List<String> tags,
+      final List<String> linkedNoteIds,
       final DateTime? reminderDate,
       final int? reminderId}) = _$AddUpdateFormStateImpl;
   _AddUpdateFormState._() : super._();
@@ -4270,6 +5200,10 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
   List<String> get imagePaths;
   @override
   List<VoiceMemo> get voiceMemos;
+  @override
+  List<String> get tags;
+  @override
+  List<String> get linkedNoteIds;
   @override
   DateTime? get reminderDate;
   @override

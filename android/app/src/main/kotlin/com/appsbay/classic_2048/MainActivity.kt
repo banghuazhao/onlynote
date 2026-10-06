@@ -81,7 +81,7 @@ class MainActivity: FlutterActivity() {
 
     private fun captureShortcut(intent: Intent?) {
         val type = intent?.getStringExtra(ShortcutActivity.EXTRA_SHORTCUT) ?: return
-        if (type !in listOf("new_note", "new_checklist", "photo_note")) return
+        if (type !in listOf("new_note", "new_checklist", "photo_note", "voice_note")) return
         // An activity recreation must not replay an already consumed action.
         intent.removeExtra(ShortcutActivity.EXTRA_SHORTCUT)
         val request = mapOf("id" to UUID.randomUUID().toString(), "type" to type)

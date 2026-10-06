@@ -6,6 +6,7 @@ import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
+import 'package:onlynote/Tools/share_helper.dart';
 
 class VoiceMemoPlayer extends StatefulWidget {
   const VoiceMemoPlayer(
@@ -14,11 +15,13 @@ class VoiceMemoPlayer extends StatefulWidget {
       required this.resolvePath,
       this.onRemove,
       this.onTranscriptChanged,
+      this.onShare,
       this.service});
   final VoiceMemo memo;
   final Future<String> Function(String) resolvePath;
   final Future<void> Function()? onRemove;
   final Future<void> Function(String?)? onTranscriptChanged;
+  final Future<void> Function()? onShare;
   final VoiceMemoService? service;
   @override
   State<VoiceMemoPlayer> createState() => _VoiceMemoPlayerState();
@@ -29,6 +32,7 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   String? _absolutePath;
   bool _busy = false;
   String? _error;
+  final _menuKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -75,6 +79,33 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
       await widget.onRemove!();
     } catch (_) {
       if (mounted) _error = S.of(context).Voice_Save_Failed;
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _share() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      if (_absolutePath != null &&
+          _service.state.value.path == _absolutePath &&
+          _service.state.value.playing) {
+        await _service.pause();
+      }
+      if (!mounted) return;
+      if (widget.onShare != null) {
+        await widget.onShare!();
+      } else {
+        await ShareHelper.shareVoiceMemo(context, widget.memo,
+            resolvePath: widget.resolvePath,
+            sharePositionOrigin: ShareHelper.shareOriginFromKey(_menuKey));
+      }
+    } catch (_) {
+      if (mounted) _error = S.of(context).Share_Audio_Failed;
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -172,27 +203,29 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
                         : formatVoiceMemoDuration(widget.memo.durationMs),
                     style: context.textStyles.bodySmall),
               ])),
-          if (widget.onTranscriptChanged != null || widget.onRemove != null)
-            PopupMenuButton<String>(
-                enabled: !_busy,
-                onSelected: (value) {
-                  if (value == 'remove') unawaited(_remove());
-                  if (value == 'transcript') unawaited(_editTranscript());
-                  if (value == 'transcribe') unawaited(_transcribe());
-                },
-                itemBuilder: (_) => [
-                      if (widget.onTranscriptChanged != null)
-                        PopupMenuItem(
-                            value: 'transcribe',
-                            child: Text(l10n.Voice_Transcribe)),
-                      if (widget.onTranscriptChanged != null)
-                        PopupMenuItem(
-                            value: 'transcript',
-                            child: Text(l10n.Voice_Edit_Transcript)),
-                      if (widget.onRemove != null)
-                        PopupMenuItem(
-                            value: 'remove', child: Text(l10n.Voice_Delete)),
-                    ]),
+          PopupMenuButton<String>(
+              key: _menuKey,
+              enabled: !_busy,
+              onSelected: (value) {
+                if (value == 'share') unawaited(_share());
+                if (value == 'remove') unawaited(_remove());
+                if (value == 'transcript') unawaited(_editTranscript());
+                if (value == 'transcribe') unawaited(_transcribe());
+              },
+              itemBuilder: (_) => [
+                    PopupMenuItem(value: 'share', child: Text(l10n.Share)),
+                    if (widget.onTranscriptChanged != null)
+                      PopupMenuItem(
+                          value: 'transcribe',
+                          child: Text(l10n.Voice_Transcribe)),
+                    if (widget.onTranscriptChanged != null)
+                      PopupMenuItem(
+                          value: 'transcript',
+                          child: Text(l10n.Voice_Edit_Transcript)),
+                    if (widget.onRemove != null)
+                      PopupMenuItem(
+                          value: 'remove', child: Text(l10n.Voice_Delete)),
+                  ]),
         ]),
         if (active && state.durationMs > 0)
           Padding(

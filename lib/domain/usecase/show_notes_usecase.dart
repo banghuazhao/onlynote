@@ -16,11 +16,13 @@ class NotesBundle {
     required this.activeNotes,
     required this.trashedNotes,
     required this.folders,
+    this.archivedNotes = const [],
   });
 
   final List<Note> activeNotes;
   final List<Note> trashedNotes;
   final List<Folder> folders;
+  final List<Note> archivedNotes;
 }
 
 @injectable
@@ -36,10 +38,13 @@ class ShowAllNotesUsecase {
 
       final active = <Note>[];
       final trashed = <Note>[];
+      final archived = <Note>[];
       for (final dto in notesDto) {
         final note = dto.toDomain();
         if (note.isDeleted) {
           trashed.add(note);
+        } else if (note.isArchived) {
+          archived.add(note);
         } else {
           active.add(note);
         }
@@ -57,6 +62,7 @@ class ShowAllNotesUsecase {
         NotesBundle(
           activeNotes: active,
           trashedNotes: trashed,
+          archivedNotes: archived,
           folders: foldersDto.map((f) => f.toDomain()).toList(),
         ),
       );

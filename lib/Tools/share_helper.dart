@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_share_sheet.dart';
 import 'package:onlynote/presentation/components/toast.dart';
 import 'package:onlynote/services/note_export.dart';
+import 'package:onlynote/services/audio_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
@@ -22,12 +24,15 @@ class ShareHelper {
   static Future<void> shareNote(
       BuildContext context, Note note, ScreenshotController controller,
       {Rect? sharePositionOrigin,
-      Future<Uint8List?> Function()? captureImage}) async {
+      Future<Uint8List?> Function()? captureImage,
+      Future<String> Function(String)? resolveAudioPath,
+      Future<ShareResult> Function(ShareParams)? share}) async {
     if (_sharing) return;
     _sharing = true;
     ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? progress;
     try {
-      final format = await showNoteShareSheet(context);
+      final format = await showNoteShareSheet(context,
+          hasRecordings: note.voiceMemos.isNotEmpty);
       if (format == null || !context.mounted) return;
       final s = S.of(context);
       final reminder = ReminderData.shared.getCurrentReminder(note);
@@ -40,8 +45,27 @@ class ShareHelper {
           context.showToast(s.Share_No_Text);
           return;
         }
-        await SharePlus.instance.share(
+        await (share ?? SharePlus.instance.share)(
             ShareParams(text: text, sharePositionOrigin: sharePositionOrigin));
+        return;
+      }
+      if (format == NoteShareFormat.audio) {
+        final recordingNames = List.generate(note.voiceMemos.length,
+            (index) => '$stem-recording-${index + 1}.m4a');
+        final files = await _recordingFiles(note.voiceMemos, recordingNames,
+            resolvePath: resolveAudioPath);
+        final transcript = _transcripts(note.voiceMemos, recordingNames);
+        if (transcript.isNotEmpty) {
+          recordingNames.add('$stem-transcripts.txt');
+          files.add(XFile.fromData(Uint8List.fromList(utf8.encode(transcript)),
+              mimeType: 'text/plain', name: recordingNames.last));
+        }
+        if (!context.mounted) return;
+        await (share ?? SharePlus.instance.share)(ShareParams(
+            files: files,
+            fileNameOverrides: recordingNames,
+            text: transcript.isEmpty ? null : transcript,
+            sharePositionOrigin: sharePositionOrigin ?? _shareOrigin(context)));
         return;
       }
       final messenger = ScaffoldMessenger.of(context);
@@ -61,6 +85,7 @@ class ShareHelper {
         await shareWidgetAsImage(controller,
             captureImage: captureImage,
             fileName: '$stem.png',
+            share: share,
             sharePositionOrigin: sharePositionOrigin);
         return;
       }
@@ -103,8 +128,16 @@ class ShareHelper {
       if (format == NoteShareFormat.markdown) {
         final photoNames =
             List.generate(photos.length, (i) => '$stem-photo-${i + 1}.png');
+        final recordingNames = List.generate(note.voiceMemos.length,
+            (index) => '$stem-recording-${index + 1}.m4a');
+        final recordings = await _recordingFiles(
+            note.voiceMemos, recordingNames,
+            resolvePath: resolveAudioPath);
         final md = NoteExport.markdown(note,
-            reminder: reminderText, photos: photoNames);
+            reminder: reminderText,
+            photos: photoNames,
+            recordings: recordingNames,
+            recordingLabel: s.Voice_Memo);
         names.add('$stem.md');
         files.add(XFile.fromData(Uint8List.fromList(utf8.encode(md)),
             mimeType: 'text/markdown', name: names.first));
@@ -113,6 +146,8 @@ class ShareHelper {
           files.add(XFile.fromData(photos[i],
               mimeType: 'image/png', name: photoNames[i]));
         }
+        names.addAll(recordingNames);
+        files.addAll(recordings);
       } else {
         final fonts = await Future.wait([
           'Roboto-Regular.ttf',
@@ -161,7 +196,7 @@ class ShareHelper {
       progress.close();
       progress = null;
       if (!context.mounted) return;
-      await SharePlus.instance.share(ShareParams(
+      await (share ?? SharePlus.instance.share)(ShareParams(
           files: files,
           fileNameOverrides: names,
           sharePositionOrigin: sharePositionOrigin));
@@ -183,6 +218,7 @@ class ShareHelper {
     String? text,
     Rect? sharePositionOrigin,
     Future<Uint8List?> Function()? captureImage,
+    Future<ShareResult> Function(ShareParams)? share,
   }) async {
     final Uint8List? bytes = captureImage == null
         ? await controller.capture(pixelRatio: 3)
@@ -191,7 +227,7 @@ class ShareHelper {
       throw Exception('Failed to capture note image');
     }
 
-    await SharePlus.instance.share(
+    await (share ?? SharePlus.instance.share)(
       ShareParams(
         files: [XFile.fromData(bytes, mimeType: 'image/png', name: fileName)],
         fileNameOverrides: [fileName],
@@ -199,6 +235,83 @@ class ShareHelper {
         sharePositionOrigin: sharePositionOrigin,
       ),
     );
+  }
+
+  /// Exports a snapshot of the recording. The owned note file is never moved
+  /// or deleted, and filename overrides are used for share_plus cache copies.
+  static Future<void> shareVoiceMemo(
+    BuildContext context,
+    VoiceMemo memo, {
+    Rect? sharePositionOrigin,
+    Future<String> Function(String)? resolvePath,
+    Future<ShareResult> Function(ShareParams)? share,
+  }) async {
+    if (_sharing) return;
+    _sharing = true;
+    try {
+      final date = memo.createdAt
+          .toIso8601String()
+          .split('.')
+          .first
+          .replaceAll(':', '-');
+      final names = ['voice-memo-$date.m4a'];
+      final files =
+          await _recordingFiles([memo], names, resolvePath: resolvePath);
+      final transcript = memo.transcript?.trim() ?? '';
+      if (transcript.isNotEmpty) {
+        names.add('voice-memo-$date.txt');
+        files.add(XFile.fromData(Uint8List.fromList(utf8.encode(transcript)),
+            mimeType: 'text/plain', name: names.last));
+      }
+      if (!context.mounted) return;
+      await (share ?? SharePlus.instance.share)(ShareParams(
+          files: files,
+          fileNameOverrides: names,
+          text: transcript.isEmpty ? null : transcript,
+          sharePositionOrigin: sharePositionOrigin ?? _shareOrigin(context)));
+    } catch (_) {
+      if (context.mounted) {
+        context.showToast(S.of(context).Share_Audio_Failed, isError: true);
+      }
+    } finally {
+      _sharing = false;
+    }
+  }
+
+  static Future<List<XFile>> _recordingFiles(
+      List<VoiceMemo> memos, List<String> names,
+      {Future<String> Function(String)? resolvePath}) async {
+    final files = <XFile>[];
+    for (var index = 0; index < memos.length; index++) {
+      final memo = memos[index];
+      if (!VoiceMemo.isManagedPath(memo.path)) {
+        throw const FormatException('Invalid recording path');
+      }
+      final path =
+          await (resolvePath ?? AudioStorage.instance.resolvePath)(memo.path);
+      final source = File(path);
+      final length = await source.length();
+      if (length <= 0 || length > 32 * 1024 * 1024) {
+        throw const FormatException('Invalid recording file');
+      }
+      files.add(XFile.fromData(await source.readAsBytes(),
+          mimeType: 'audio/mp4', name: names[index]));
+    }
+    return files;
+  }
+
+  static String _transcripts(List<VoiceMemo> memos, List<String> names) => [
+        for (var index = 0; index < memos.length; index++)
+          if (memos[index].transcript?.trim().isNotEmpty == true)
+            '${names[index]}\n${memos[index].transcript!.trim()}',
+      ].join('\n\n');
+
+  static Rect? _shareOrigin(BuildContext context) {
+    final object = context.findRenderObject();
+    if (object is! RenderBox || !object.hasSize || object.size.isEmpty) {
+      return null;
+    }
+    return object.localToGlobal(Offset.zero) & object.size;
   }
 
   /// Finds the on-screen [Rect] of the widget attached to [key].

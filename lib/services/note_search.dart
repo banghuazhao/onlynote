@@ -24,6 +24,7 @@ bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
       [
         note.title ?? '',
         note.description ?? '',
+        ...note.tags,
         ...note.todo.map((todo) => todo.title ?? ''),
         ...note.voiceMemos.map((memo) => memo.transcript ?? ''),
       ].any(pattern.hasMatch);

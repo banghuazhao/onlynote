@@ -89,7 +89,10 @@ class WidgetSync {
 
   @visibleForTesting
   static Map<String, dynamic> buildPayload(Iterable<NoteDto> source) {
-    final notes = source.where((note) => !note.isDeleted).toList()..sort();
+    final notes = source
+        .where((note) => !note.isDeleted && !note.isArchived)
+        .toList()
+      ..sort();
     return <String, dynamic>{
       'total': notes.length,
       'notes': notes.take(_maxNotes).map(_encodeNote).toList(),

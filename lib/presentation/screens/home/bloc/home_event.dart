@@ -16,6 +16,22 @@ class HomeEvent with _$HomeEvent {
       _FiltersChanged;
   const factory HomeEvent.selectFolder(String? folderId) = _SelectFolder;
   const factory HomeEvent.showTrash(bool show) = _ShowTrash;
+  const factory HomeEvent.showArchive(bool show) = _ShowArchive;
+  const factory HomeEvent.includeArchived(bool include) = _IncludeArchived;
+  const factory HomeEvent.tagsChanged(Set<String> tags) = _TagsChanged;
+  const factory HomeEvent.savedViewsChanged(List<SavedNoteView> views) =
+      _SavedViewsChanged;
+  const factory HomeEvent.applySavedView(SavedNoteView view) = _ApplySavedView;
+  const factory HomeEvent.setArchived({
+    required String noteId,
+    required bool archived,
+    Completer<HomeArchiveResult>? completion,
+  }) = _SetArchived;
+  const factory HomeEvent.setTags({
+    required String noteId,
+    required List<String> tags,
+    Completer<String?>? completion,
+  }) = _SetTags;
   const factory HomeEvent.togglePin(String noteId) = _TogglePin;
   const factory HomeEvent.restoreNotes(List<String> ids) = _RestoreNotes;
   const factory HomeEvent.permanentDelete(List<String> ids) = _PermanentDelete;

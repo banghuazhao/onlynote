@@ -15,6 +15,7 @@ import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 
 import '../support/memory_preferences.dart';
 
@@ -40,6 +41,7 @@ void main() {
   late BackupService service;
   late List<Reminder> reminders;
   late CustomNoteTemplateStore templates;
+  late SavedNoteViewStore savedViews;
   var failWrite = false;
 
   setUp(() async {
@@ -60,6 +62,7 @@ void main() {
       preferences: MemoryPreferences(),
       documentsPath: directory.path,
     );
+    savedViews = SavedNoteViewStore(preferences: MemoryPreferences());
     service = BackupService(
         notes: notes,
         folders: folders,
@@ -67,6 +70,7 @@ void main() {
         documents: directory,
         templateStore: templates,
         history: history,
+        savedViewStore: savedViews,
         readReminders: () => reminders,
         writeReminders: (values) async {
           if (failWrite) {
@@ -78,9 +82,99 @@ void main() {
   });
   tearDown(() async {
     templates.dispose();
+    savedViews.dispose();
     history.dispose();
     await Hive.close();
     await directory.delete(recursive: true);
+  });
+
+  test(
+      'v4 restores archive tags saved views and remaps links in current and history notes',
+      () async {
+    final target = NoteDto(
+        id: 'target', title: 'Reference', isArchived: true, tags: ['Work']);
+    final original = NoteDto(
+        id: 'source',
+        title: 'Project',
+        tags: ['Work'],
+        linkedNoteIds: ['target', 'missing']);
+    await folders.put('folder', FolderDto(id: 'folder', name: 'Projects'));
+    await notes.putAll({'target': target, 'source': original});
+    await history.recordBeforeSave(
+        original, original.copyWith(title: 'Project updated'),
+        forceBoundary: true);
+    await notes.put('source',
+        original.copyWith(title: 'Project updated', isArchived: true));
+    await savedViews.create(
+        name: 'Projects',
+        tags: ['Work'],
+        folderId: 'folder',
+        archiveScope: NoteArchiveScope.all);
+    final backup = decodeBackup(await service.export());
+    expect(backup.toJson()['version'], 4);
+    await service.restore(backup);
+    final imported = notes.values
+        .cast<NoteDto>()
+        .where((note) => note.id != 'target' && note.id != 'source')
+        .toList();
+    final newTarget = imported.singleWhere((note) => note.title == 'Reference');
+    final newSource =
+        imported.singleWhere((note) => note.title == 'Project updated');
+    expect(newTarget.isArchived, isTrue);
+    expect(newTarget.tags, ['Work']);
+    expect(newSource.linkedNoteIds, [newTarget.id]);
+    expect(history.versionsFor(newSource.id!).single.note.linkedNoteIds,
+        [newTarget.id]);
+    final importedView = savedViews.views.singleWhere(
+        (view) => view.name == 'Projects' && view.folderId != 'folder');
+    expect(importedView.archiveScope, NoteArchiveScope.all);
+    expect(importedView.tags, ['Work']);
+    expect(folders.get(importedView.folderId).name, 'Projects');
+  });
+
+  test(
+      'v4 failed restore rolls back imported saved views and leaves existing views',
+      () async {
+    await savedViews.create(name: 'Existing');
+    final backup = BackupContents(
+        createdAt: DateTime.now(),
+        notes: [NoteDto(id: 'incoming', title: 'Incoming')],
+        folders: [],
+        photos: {},
+        reminders: [],
+        savedViews: [SavedNoteView(id: 'view', name: 'Imported')]);
+    failWrite = true;
+    await expectLater(
+        service.restore(backup), throwsA(isA<FileSystemException>()));
+    expect(savedViews.views.map((view) => view.name), ['Existing']);
+    expect(notes.values, isEmpty);
+    expect(journal.get('pending'), isNull);
+  });
+
+  test(
+      'v3 restores without new metadata and retains audio/history compatibility',
+      () async {
+    final json = BackupContents(
+        createdAt: DateTime.now(),
+        notes: [NoteDto(id: 'old', title: 'Old')],
+        folders: [],
+        photos: {},
+        reminders: []).toJson();
+    json['version'] = 3;
+    json.remove('savedViews');
+    for (final note in json['notes'] as List) {
+      (note as Map)
+        ..remove('tags')
+        ..remove('isArchived')
+        ..remove('linkedNoteIds');
+    }
+    final backup = BackupContents.fromJson(json);
+    expect(backup.notes.single.toDomain().isArchived, isFalse);
+    expect(backup.notes.single.toDomain().tags, isEmpty);
+    expect(backup.notes.single.toDomain().linkedNoteIds, isEmpty);
+    expect(backup.savedViews, isEmpty);
+    await service.restore(backup);
+    expect(notes.length, 1);
   });
 
   Future<void> seed() async {
@@ -426,7 +520,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 3);
+    expect(backup.toJson()['version'], 4);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

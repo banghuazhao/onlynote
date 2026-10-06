@@ -46,6 +46,10 @@ class NotesWidgetProvider : HomeWidgetProvider() {
                 launchIntent(context, REQUEST_NEW_NOTE, WidgetUris.newNote()),
             )
             views.setOnClickPendingIntent(
+                R.id.widget_voice_note,
+                launchIntent(context, REQUEST_VOICE_NOTE, WidgetUris.voiceNote()),
+            )
+            views.setOnClickPendingIntent(
                 R.id.widget_header_title,
                 launchIntent(context, REQUEST_OPEN_APP + widgetId, selected?.let { WidgetUris.note(it.id) } ?: WidgetUris.openApp()),
             )
@@ -192,5 +196,6 @@ class NotesWidgetProvider : HomeWidgetProvider() {
         const val REQUEST_OPEN_APP = 2
         const val REQUEST_NOTE_TEMPLATE = 3
         const val REQUEST_EMPTY_STATE = 4
+        const val REQUEST_VOICE_NOTE = 5
     }
 }

@@ -6,6 +6,7 @@ import 'package:onlynote/Tools/onboarding_settings.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
+import 'package:onlynote/presentation/screens/add_update_note/add_update_note_screen.dart';
 
 /// Routes taps on the home screen widget into the app.
 ///
@@ -25,6 +26,7 @@ class WidgetLaunch {
   static const scheme = 'onlynote';
   static const hostNote = 'note';
   static const hostNew = 'new';
+  static const hostVoice = 'voice';
 
   StreamSubscription<Uri?>? _subscription;
 
@@ -53,6 +55,7 @@ class WidgetLaunch {
     // accepted and then silently dropped. Waiting for the next frame is what
     // makes the warm path behave like the cold one.
     WidgetsBinding.instance.addPostFrameCallback((_) => _navigate(uri));
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   void _navigate(Uri uri) {
@@ -61,6 +64,8 @@ class WidgetLaunch {
     switch (uri.host) {
       case hostNew:
         router.push(AddUpdateNoteRoute());
+      case hostVoice:
+        router.push(AddUpdateNoteRoute(start: NoteEditorStart.voice));
       case hostNote:
         final noteId = uri.queryParameters['id'];
         if (noteId == null || noteId.isEmpty) {

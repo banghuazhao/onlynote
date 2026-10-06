@@ -36,4 +36,14 @@ void main() {
     expect(todos.last.containsKey('id'), false);
     expect(todos.last['c'], false);
   });
+  test('archived notes are absent from overview and widget selection', () {
+    final payload = WidgetSync.buildPayload([
+      NoteDto(id: 'active', title: 'Visible'),
+      NoteDto(id: 'archive', title: 'Archived', isArchived: true),
+    ]);
+    expect(payload['total'], 1);
+    for (final key in ['notes', 'allNotes']) {
+      expect((payload[key] as List).map((note) => note['id']), ['active']);
+    }
+  });
 }

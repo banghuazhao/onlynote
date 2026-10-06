@@ -7,6 +7,9 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 
 const maxBackupBytes = 256 * 1024 * 1024;
 const maxBackupAudioBytes = 32 * 1024 * 1024;
@@ -44,6 +47,7 @@ class BackupContents {
     this.templates = const [],
     this.audio = const {},
     this.histories = const {},
+    this.savedViews = const [],
   });
   final DateTime createdAt;
   final List<NoteDto> notes;
@@ -53,10 +57,11 @@ class BackupContents {
   final List<CustomNoteTemplate> templates;
   final Map<String, BackupAudio> audio;
   final Map<String, List<NoteHistoryVersion>> histories;
+  final List<SavedNoteView> savedViews;
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 3,
+        'version': 4,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -90,6 +95,7 @@ class BackupContents {
             }
         ],
         'templates': [for (final template in templates) template.toJson()],
+        'savedViews': [for (final view in savedViews) view.toJson()],
         'histories': {
           for (final entry in histories.entries)
             entry.key: [
@@ -113,6 +119,9 @@ class BackupContents {
         'isPinned': note.isPinned ?? false,
         'deletedAt': note.deletedAt,
         'folderId': note.folderId,
+        'isArchived': note.isArchived,
+        'tags': note.tags ?? [],
+        'linkedNoteIds': note.linkedNoteIds ?? [],
         'photos': note.imagePaths ?? [],
         'voiceMemos': note.voiceMemos ?? [],
         'todos': [
@@ -128,7 +137,7 @@ class BackupContents {
   factory BackupContents.fromJson(Map<String, dynamic> json) {
     final version = json['version'];
     if (json['format'] != 'onlynote-backup' ||
-        (version != 1 && version != 2 && version != 3)) {
+        (version != 1 && version != 2 && version != 3 && version != 4)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -169,7 +178,7 @@ class BackupContents {
       }
       photos[_archiveKey(entry.key)] = BackupPhoto(extension, mediaBytes(map));
     }
-    if (version == 3) {
+    if (version >= 3) {
       for (final entry in _map(json['audio']).entries) {
         final map = entry.value as Map<String, dynamic>;
         if (map['extension'] != 'm4a') {
@@ -192,7 +201,7 @@ class BackupContents {
       }
       final paths = _photoRefs(map['photos'], photos);
       final memos =
-          version == 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
+          version >= 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
       final color = map['color'] as int?;
       if (color != null && (color < 0 || color > 0xffffffff)) {
         throw const FormatException('Invalid color');
@@ -220,6 +229,16 @@ class BackupContents {
         isPinned: map['isPinned'] as bool,
         deletedAt: _date(map['deletedAt']),
         folderId: folder,
+        isArchived: version == 4 ? map['isArchived'] as bool : false,
+        tags: version == 4
+            ? normalizeNoteTags(
+                _list(map['tags'], max: maxNoteTags).cast<String>())
+            : const [],
+        linkedNoteIds: version == 4
+            ? normalizeLinkedNoteIds(
+                _list(map['linkedNoteIds'], max: maxLinkedNotes).cast<String>(),
+                noteId: id)
+            : const [],
         imagePaths: paths,
         voiceMemos: [for (final memo in memos) memo.toMap()],
         todoList: todos,
@@ -257,7 +276,7 @@ class BackupContents {
       final map = raw as Map<String, dynamic>;
       final paths = _photoRefs(map['imagePaths'], photos);
       final memos =
-          version == 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
+          version >= 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
       // Archive references are not device paths; validate metadata separately.
       final template = CustomNoteTemplate.fromJson({
         ...map,
@@ -272,7 +291,7 @@ class BackupContents {
     }
     final histories = <String, List<NoteHistoryVersion>>{};
     var historyCount = 0;
-    if (version == 3) {
+    if (version >= 3) {
       for (final entry in _map(json['histories']).entries) {
         final noteId = _id(entry.key);
         if (!noteIds.contains(noteId)) {
@@ -298,7 +317,21 @@ class BackupContents {
         histories[noteId] = versions;
       }
     }
+    final savedViews = <SavedNoteView>[];
+    final viewIds = <String>{};
+    if (version == 4) {
+      for (final raw
+          in _list(json['savedViews'], max: SavedNoteViewStore.maxViews)) {
+        if (raw is! Map) throw const FormatException('Invalid saved view');
+        final view = SavedNoteView.fromJson(raw);
+        if (!viewIds.add(view.id)) {
+          throw const FormatException('Duplicate saved view');
+        }
+        savedViews.add(view.withAvailableFolders(folderIds));
+      }
+    }
     return BackupContents(
+        savedViews: savedViews,
         createdAt: createdAt,
         notes: notes,
         folders: folders,

@@ -4,9 +4,13 @@ import 'package:onlynote/services/note_search.dart';
 
 class NoteSearchFilters extends StatelessWidget {
   const NoteSearchFilters(
-      {super.key, required this.selected, required this.onChanged});
+      {super.key,
+      required this.selected,
+      required this.onChanged,
+      this.onOpenLibrary});
   final Set<NoteSearchFilter> selected;
   final ValueChanged<Set<NoteSearchFilter>> onChanged;
+  final VoidCallback? onOpenLibrary;
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +19,16 @@ class NoteSearchFilters extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(children: [
+        if (onOpenLibrary != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ActionChip(
+              key: const ValueKey('search-library-filters'),
+              avatar: const Icon(Icons.tune_rounded, size: 18),
+              label: Text(s.Library_Filters),
+              onPressed: onOpenLibrary,
+            ),
+          ),
         for (final filter in NoteSearchFilter.values)
           Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -54,10 +68,14 @@ class UnfinishedNotesFilter extends StatelessWidget {
       {super.key,
       required this.selected,
       required this.onChanged,
-      this.onOpenReminders});
+      this.onOpenReminders,
+      this.onOpenLibrary,
+      this.libraryFilterCount = 0});
   final bool selected;
   final ValueChanged<bool> onChanged;
   final VoidCallback? onOpenReminders;
+  final VoidCallback? onOpenLibrary;
+  final int libraryFilterCount;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -82,6 +100,17 @@ class UnfinishedNotesFilter extends StatelessWidget {
                   label: Text(S.of(context).Reminders_Entry),
                   onPressed: onOpenReminders,
                 ),
+              ),
+            ],
+            if (onOpenLibrary != null) ...[
+              const SizedBox(width: 8),
+              ActionChip(
+                key: const ValueKey('library-filters-shortcut'),
+                avatar: const Icon(Icons.tune_rounded, size: 18),
+                label: Text(libraryFilterCount == 0
+                    ? S.of(context).Library_Filters
+                    : '${S.of(context).Library_Filters} ($libraryFilterCount)'),
+                onPressed: onOpenLibrary,
               ),
             ],
           ]),

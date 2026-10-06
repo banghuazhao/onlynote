@@ -84,6 +84,23 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  test('link edits make versions and restore keeps current archive and tags',
+      () async {
+    final before = NoteDto(
+        id: 'note', title: 'Hub', linkedNoteIds: ['one'], tags: ['Old']);
+    repository.notes['note'] = before;
+    await repository.addUpdateNote(before.copyWith(linkedNoteIds: ['two']));
+    final version = history.versionsFor('note').single;
+    await repository.addUpdateNote(
+        repository.notes['note']!.copyWith(isArchived: true, tags: ['New']));
+    expect(history.versionsFor('note').length, 1);
+    expect(await history.restore('note', version.id),
+        NoteHistoryRestoreResult.restored);
+    expect(repository.notes['note']!.linkedNoteIds, ['one']);
+    expect(repository.notes['note']!.isArchived, isTrue);
+    expect(repository.notes['note']!.tags, ['New']);
+  });
+
   test('metadata-only edits and empty seeds never create content history',
       () async {
     final note = NoteDto(id: 'note', title: 'Keep');

@@ -1,6 +1,6 @@
 "widget.app_name" = "Onlynote";
 "widget.display_name" = "Notes";
-"widget.description" = "Your pinned and recent notes, plus a shortcut to write a new one.";
+"widget.description" = "Your notes and checklists, with shortcuts to write or record.";
 
 "widget.new_note" = "New";
 "widget.untitled" = "Untitled";
@@ -33,3 +33,5 @@
 "widget.mark_unfinished" = "Mark unfinished";
 "widget.settings" = "Widget settings";
 "widget.more_items" = "%d more items";
+
+"widget.voice_note" = "Voice Memo";

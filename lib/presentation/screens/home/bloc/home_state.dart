@@ -11,6 +11,13 @@ class HomeState with _$HomeState {
     @Default(<NoteSearchFilter>{}) Set<NoteSearchFilter> filters,
     String? selectedFolderId,
     @Default(false) bool showTrash,
+    @Default(false) bool showArchive,
+    @Default(false) bool includeArchived,
+    @Default(0) int archiveCount,
+    @Default(<String>{}) Set<String> selectedTags,
+    @Default(<String>[]) List<String> availableTags,
+    @Default(<SavedNoteView>[]) List<SavedNoteView> savedViews,
+    String? selectedViewId,
     @Default(0) int trashCount,
 
     /// Active notes per folder id, for the folder picker. Counts ignore the

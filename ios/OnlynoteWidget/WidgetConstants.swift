@@ -38,6 +38,14 @@ enum WidgetConstants {
         components.queryItems = [URLQueryItem(name: "homeWidget", value: "true")]
         return components.url!
     }()
+
+    static let voiceNoteURL: URL = {
+        var components = URLComponents()
+        components.scheme = scheme
+        components.host = "voice"
+        components.queryItems = [URLQueryItem(name: "homeWidget", value: "true")]
+        return components.url!
+    }()
 }
 
 /// Brand primitives mirrored from `lib/presentation/theme/colors.dart`.

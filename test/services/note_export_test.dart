@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_export.dart';
 
 void main() {
@@ -32,6 +33,25 @@ void main() {
     expect(NoteExport.fileStem(Note(title: '../../茶/notes:')), '_.._茶_notes_');
     expect(NoteExport.fileStem(Note(title: '...')), 'note');
     expect(NoteExport.fileStem(Note(title: 'A' * 200)).length, 50);
+  });
+  test(
+      'Markdown recordings use relative encoded links and preserve transcripts',
+      () {
+    final note = Note(description: 'Before the recording', voiceMemos: [
+      VoiceMemo(
+          id: 'memo',
+          path: 'note_audio/memo.m4a',
+          durationMs: 2500,
+          createdAt: DateTime.utc(2026, 10, 6),
+          transcript: '[Reviewed] transcript'),
+    ]);
+    final markdown = NoteExport.markdown(note,
+        recordings: ['Recording 茶 1.m4a'], recordingLabel: '語音備忘');
+    expect(markdown, contains('[語音備忘 1](Recording%20%E8%8C%B6%201.m4a)'));
+    expect(markdown, contains(r'\[Reviewed\] transcript'));
+    expect(markdown, isNot(contains('note_audio/')));
+    expect(NoteExport.plainText(note),
+        'Before the recording\n\n[Reviewed] transcript');
   });
   test('PDF paginates full long text, checklist, Chinese, and a photo',
       () async {

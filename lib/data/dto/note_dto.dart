@@ -5,6 +5,8 @@ import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/note_links.dart';
 
 part 'note_dto.g.dart';
 
@@ -55,6 +57,9 @@ class NoteDto implements Comparable {
     this.deletedAt,
     this.folderId,
     this.voiceMemos = const [],
+    this.isArchived = false,
+    this.tags = const [],
+    this.linkedNoteIds = const [],
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -71,6 +76,10 @@ class NoteDto implements Comparable {
       deletedAt: note.deletedAt?.toIso8601String(),
       folderId: note.folderId,
       voiceMemos: note.voiceMemos.map((memo) => memo.toMap()).toList(),
+      isArchived: note.isArchived,
+      tags: normalizeNoteTags(note.tags),
+      linkedNoteIds:
+          normalizeLinkedNoteIds(note.linkedNoteIds, noteId: note.id),
     );
   }
 
@@ -87,6 +96,9 @@ class NoteDto implements Comparable {
       isPinned: isPinned ?? false,
       deletedAt: deletedAt != null ? DateTime.tryParse(deletedAt!) : null,
       folderId: folderId,
+      isArchived: isArchived,
+      tags: tags ?? [],
+      linkedNoteIds: linkedNoteIds ?? [],
       voiceMemos: (voiceMemos ?? [])
           .map(VoiceMemo.tryFromMap)
           .whereType<VoiceMemo>()
@@ -100,7 +112,8 @@ class NoteDto implements Comparable {
       (description?.isNotEmpty ?? false) ||
       (todoList?.isNotEmpty ?? false) ||
       (imagePaths?.isNotEmpty ?? false) ||
-      (voiceMemos?.isNotEmpty ?? false);
+      (voiceMemos?.isNotEmpty ?? false) ||
+      (linkedNoteIds?.isNotEmpty ?? false);
 
   bool get isDeleted => deletedAt != null && deletedAt!.isNotEmpty;
 
@@ -115,6 +128,9 @@ class NoteDto implements Comparable {
     List<Map<dynamic, dynamic>>? voiceMemos,
     int? sortOrder,
     bool? isPinned,
+    bool? isArchived,
+    List<String>? tags,
+    List<String>? linkedNoteIds,
     String? deletedAt,
     String? folderId,
     bool clearDeletedAt = false,
@@ -130,6 +146,9 @@ class NoteDto implements Comparable {
       imagePaths: imagePaths ?? this.imagePaths,
       sortOrder: sortOrder ?? this.sortOrder,
       isPinned: isPinned ?? this.isPinned,
+      isArchived: isArchived ?? this.isArchived,
+      tags: tags ?? this.tags,
+      linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
       voiceMemos: voiceMemos ?? this.voiceMemos,
@@ -160,6 +179,12 @@ class NoteDto implements Comparable {
   final String? folderId;
   @HiveField(11)
   final List<Map<dynamic, dynamic>>? voiceMemos;
+  @HiveField(12, defaultValue: false)
+  final bool isArchived;
+  @HiveField(13)
+  final List<String>? tags;
+  @HiveField(14)
+  final List<String>? linkedNoteIds;
 
   @override
   int compareTo(other) {

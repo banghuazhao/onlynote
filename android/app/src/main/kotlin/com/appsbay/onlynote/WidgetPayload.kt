@@ -131,6 +131,7 @@ object WidgetUris {
         Uri.parse("$SCHEME://note?id=${Uri.encode(id)}&homeWidget=true")
 
     fun newNote(): Uri = Uri.parse("$SCHEME://new?homeWidget=true")
+    fun voiceNote(): Uri = Uri.parse("$SCHEME://voice?homeWidget=true")
 
     fun openApp(): Uri = Uri.parse("$SCHEME://open?homeWidget=true")
 }

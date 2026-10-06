@@ -3,6 +3,9 @@ import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/audio_storage.dart';
+import 'package:onlynote/services/note_archive.dart';
+import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,11 +62,38 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   List<Note> _activeNotes = [];
   List<Note> _trashedNotes = [];
+  List<Note> _archivedNotes = [];
   List<Folder> _folders = [];
   String _searchQuery = '';
   Set<NoteSearchFilter> _filters = {};
   String? _selectedFolderId;
   bool _showTrash = false;
+  bool _showArchive = false;
+  bool _includeArchived = false;
+  Set<String> _selectedTags = {};
+  List<SavedNoteView> _savedViews = [];
+  String? _selectedViewId;
+
+  Future<HomeArchiveResult> setArchived(String noteId, bool archived) {
+    if (isClosed) {
+      return Future.value(HomeArchiveResult(
+          error: _i10n.Failed_to_Update_note_please_try_again));
+    }
+    final completion = Completer<HomeArchiveResult>();
+    add(HomeEvent.setArchived(
+        noteId: noteId, archived: archived, completion: completion));
+    return completion.future;
+  }
+
+  Future<String?> setTags(String noteId, List<String> tags) {
+    if (isClosed) {
+      return Future.value(_i10n.Failed_to_Update_note_please_try_again);
+    }
+    final completion = Completer<String?>();
+    add(HomeEvent.setTags(
+        noteId: noteId, tags: List.of(tags), completion: completion));
+    return completion.future;
+  }
 
   Future<HomeChecklistResult> toggleTodo({
     required String noteId,
@@ -108,11 +138,51 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _onSearchChanged(event, emit);
     } else if (event is _FiltersChanged) {
       _filters = Set.of(event.filters);
+      _selectedViewId = null;
       emit(_buildLoaded());
     } else if (event is _SelectFolder) {
       _onSelectFolder(event, emit);
     } else if (event is _ShowTrash) {
       _onShowTrash(event, emit);
+    } else if (event is _ShowArchive) {
+      _showArchive = event.show;
+      _showTrash = false;
+      _includeArchived = false;
+      _selectedFolderId = null;
+      _selectedViewId = null;
+      emit(_buildLoaded());
+    } else if (event is _IncludeArchived) {
+      _includeArchived = event.include;
+      _showArchive = false;
+      _showTrash = false;
+      _selectedViewId = null;
+      emit(_buildLoaded());
+    } else if (event is _TagsChanged) {
+      _selectedTags = normalizeNoteTags(event.tags).toSet();
+      _selectedViewId = null;
+      emit(_buildLoaded());
+    } else if (event is _SavedViewsChanged) {
+      _savedViews = List.of(event.views);
+      if (!_savedViews.any((view) => view.id == _selectedViewId)) {
+        _selectedViewId = null;
+      }
+      emit(_buildLoaded());
+    } else if (event is _ApplySavedView) {
+      final view = event.view
+          .withAvailableFolders(_folders.map((folder) => folder.id).toSet());
+      _searchQuery = view.query;
+      _filters = Set.of(view.filters);
+      _selectedTags = view.tags.toSet();
+      _selectedFolderId = view.folderId;
+      _showTrash = false;
+      _showArchive = view.archiveScope == NoteArchiveScope.archived;
+      _includeArchived = view.archiveScope == NoteArchiveScope.all;
+      _selectedViewId = view.id;
+      emit(_buildLoaded());
+    } else if (event is _SetArchived) {
+      await _onSetArchived(event, emit);
+    } else if (event is _SetTags) {
+      await _onSetTags(event, emit);
     } else if (event is _TogglePin) {
       await _onTogglePin(event, emit);
     } else if (event is _RestoreNotes) {
@@ -169,11 +239,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       return;
     }
     if (!emit.isDone) {
-      _activeNotes = [
-        if (!_activeNotes.any((note) => note.id == updated.id)) updated,
-        for (final active in _activeNotes)
-          if (active.id == updated.id) updated else active,
-      ];
+      _replaceSavedNote(updated);
       emit(_buildLoaded());
     }
     event.completion?.complete(HomeChecklistResult(
@@ -204,6 +270,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }, (bundle) {
       _activeNotes = bundle.activeNotes;
       _trashedNotes = bundle.trashedNotes;
+      _archivedNotes = bundle.archivedNotes;
       _folders = bundle.folders;
       // If selected folder was deleted, fall back to All Notes.
       if (_selectedFolderId != null &&
@@ -237,6 +304,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       imagePaths: await ImageStorage.copyImages(event.note.imagePaths),
       voiceMemos: audio,
       isPinned: false,
+      isArchived: false,
       deletedAt: null,
     );
 
@@ -284,17 +352,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _onSearchChanged(_SearchChanged event, Emitter<HomeState> emit) {
     _searchQuery = event.query;
+    _selectedViewId = null;
     emit(_buildLoaded());
   }
 
   void _onSelectFolder(_SelectFolder event, Emitter<HomeState> emit) {
     _selectedFolderId = event.folderId;
     _showTrash = false;
+    _showArchive = false;
+    _includeArchived = false;
+    _selectedViewId = null;
     emit(_buildLoaded());
   }
 
   void _onShowTrash(_ShowTrash event, Emitter<HomeState> emit) {
     _showTrash = event.show;
+    _showArchive = false;
+    _includeArchived = false;
+    _selectedViewId = null;
     if (_showTrash) {
       _selectedFolderId = null;
     }
@@ -353,6 +428,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       (id) {
         _selectedFolderId = id;
         _showTrash = false;
+        _showArchive = false;
+        _includeArchived = false;
+        _selectedViewId = null;
         getIt<AppRouter>().context.showToast(_i10n.Folder_Created);
       },
     );
@@ -416,6 +494,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       filters: _filters,
       selectedFolderId: _selectedFolderId,
       showTrash: _showTrash,
+      showArchive: _showArchive,
+      includeArchived: _includeArchived,
+      archiveCount: _archivedNotes.length,
+      selectedTags: Set.unmodifiable(_selectedTags),
+      availableTags: _availableTags(),
+      savedViews: List.unmodifiable(_savedViews),
+      selectedViewId: _selectedViewId,
       trashCount: _trashedNotes.length,
       folderCounts: _folderCounts(),
       allNotesCount: _activeNotes.length,
@@ -433,17 +518,140 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   List<Note> _visibleNotes() {
-    Iterable<Note> notes = _showTrash ? _trashedNotes : _activeNotes;
+    Iterable<Note> notes = _showTrash
+        ? _trashedNotes
+        : _showArchive
+            ? _archivedNotes
+            : _includeArchived
+                ? [..._activeNotes, ..._archivedNotes]
+                : _activeNotes;
 
     if (!_showTrash && _selectedFolderId != null) {
       notes = notes.where((n) => n.folderId == _selectedFolderId);
     }
 
-    return notes
-        .where((note) => matchesNoteSearch(note, _searchQuery, _filters,
-            hasReminder: ReminderData.shared.getCurrentReminder(note) != null))
+    final visible = notes
+        .where((note) =>
+            _selectedTags.every((tag) =>
+                note.tags.any((value) => tagKey(value) == tagKey(tag))) &&
+            matchesNoteSearch(note, _searchQuery, _filters,
+                hasReminder:
+                    ReminderData.shared.getCurrentReminder(note) != null))
         .toList();
+    if (!_showTrash) visible.sort(_compareLibraryNotes);
+    return visible;
   }
+
+  int _compareLibraryNotes(Note a, Note b) {
+    if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+    if (a.sortOrder != null && b.sortOrder != null) {
+      final order = a.sortOrder!.compareTo(b.sortOrder!);
+      if (order != 0) return order;
+    }
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0);
+    final date = (b.dateTime ?? epoch).compareTo(a.dateTime ?? epoch);
+    return date != 0 ? date : (a.id ?? '').compareTo(b.id ?? '');
+  }
+
+  List<String> _availableTags() {
+    final tags = <String, String>{};
+    final notes =
+        _showTrash ? _trashedNotes : [..._activeNotes, ..._archivedNotes];
+    for (final note in notes) {
+      for (final tag in note.tags) {
+        tags.putIfAbsent(tagKey(tag), () => tag);
+      }
+    }
+    final labels = tags.values.toList()
+      ..sort((a, b) => tagKey(a).compareTo(tagKey(b)));
+    return List.unmodifiable(labels);
+  }
+
+  void _replaceSavedNote(Note updated) {
+    _activeNotes = [
+      if (!updated.isArchived &&
+          !_activeNotes.any((note) => note.id == updated.id))
+        updated,
+      for (final note in _activeNotes)
+        if (note.id == updated.id && !updated.isArchived)
+          updated
+        else if (note.id != updated.id)
+          note,
+    ];
+    _archivedNotes = [
+      if (updated.isArchived &&
+          !_archivedNotes.any((note) => note.id == updated.id))
+        updated,
+      for (final note in _archivedNotes)
+        if (note.id == updated.id && updated.isArchived)
+          updated
+        else if (note.id != updated.id)
+          note,
+    ];
+  }
+
+  Future<void> _onSetArchived(
+      _SetArchived event, Emitter<HomeState> emit) async {
+    final fetched = await _getNoteUsecase(event.noteId);
+    final note = fetched.fold<Note?>((_) => null, (note) => note);
+    if (note == null || note.isDeleted) {
+      event.completion?.complete(HomeArchiveResult(
+          error: _i10n.Failed_to_Update_note_please_try_again));
+      return;
+    }
+    if (note.isArchived == event.archived) {
+      event.completion?.complete(const HomeArchiveResult());
+      return;
+    }
+    final updated = note.copyWith(isArchived: event.archived);
+    final saved = await _updateNoteUsecase(updated);
+    final error = saved.fold<String?>(
+        (error) =>
+            error.message ?? _i10n.Failed_to_Update_note_please_try_again,
+        (_) => null);
+    if (error == null && !emit.isDone) {
+      _replaceSavedNote(updated);
+      emit(_buildLoaded());
+    }
+    event.completion?.complete(HomeArchiveResult(
+        error: error,
+        change: error == null
+            ? NoteArchiveChange(
+                noteId: event.noteId,
+                previousArchived: note.isArchived,
+                archived: event.archived)
+            : null));
+  }
+
+  Future<void> _onSetTags(_SetTags event, Emitter<HomeState> emit) async {
+    try {
+      final tags = normalizeNoteTags(event.tags);
+      final fetched = await _getNoteUsecase(event.noteId);
+      final note = fetched.fold<Note?>((_) => null, (note) => note);
+      if (note == null || note.isDeleted) {
+        throw StateError('Note is unavailable');
+      }
+      final updated = note.copyWith(tags: tags);
+      final saved = await _updateNoteUsecase(updated);
+      final error = saved.fold<String?>(
+          (error) =>
+              error.message ?? _i10n.Failed_to_Update_note_please_try_again,
+          (_) => null);
+      if (error == null && !emit.isDone) {
+        _replaceSavedNote(updated);
+        emit(_buildLoaded());
+      }
+      event.completion?.complete(error);
+    } catch (_) {
+      event.completion?.complete(_i10n.Failed_to_Update_note_please_try_again);
+    }
+  }
+}
+
+class HomeArchiveResult {
+  const HomeArchiveResult({this.change, this.error});
+  final NoteArchiveChange? change;
+  final String? error;
 }
 
 class HomeChecklistChange {

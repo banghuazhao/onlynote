@@ -17,6 +17,13 @@ import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_archive.dart';
+import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/domain/repository/note_repository.dart';
+import 'package:onlynote/presentation/components/note_tags_sheet.dart';
+import 'package:onlynote/presentation/components/note_links_section.dart';
+import 'package:onlynote/presentation/components/note_link_picker_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
@@ -48,6 +55,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   bool _savingReminder = false;
   bool _exportingImage = false;
   bool _savingTemplate = false;
+  bool _changingLibrary = false;
   Note? _lastSavedNote;
   int _reviewGeneration = 0;
   WidgetCommands? _widgetCommands;
@@ -138,6 +146,34 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       title: S.of(context).More_Options,
       actions: [
         AppSheetAction(
+          leading: Icon(note.isArchived
+              ? Icons.unarchive_outlined
+              : Icons.archive_outlined),
+          title: Text(note.isArchived
+              ? S.of(context).Unarchive_Note
+              : S.of(context).Archive_Note),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _setArchive(note);
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.sell_outlined),
+          title: Text(S.of(context).Edit_Tags),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _editTags(note);
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.link_rounded),
+          title: Text(S.of(context).Link_Note),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _editLinks(note);
+          },
+        ),
+        AppSheetAction(
           leading: const Icon(Icons.history_rounded),
           title: Text(S.of(context).History_Title),
           onPressed: (sheetContext) {
@@ -166,6 +202,102 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         ),
       ],
     );
+  }
+
+  List<Note> get _libraryNotes => getIt.isRegistered<NoteRepository>()
+      ? getIt<NoteRepository>()
+          .getAllNotes()
+          .map((note) => note.toDomain())
+          .toList()
+      : const [];
+
+  void _reload() {
+    if (mounted) {
+      context
+          .read<NoteDetailBloc>()
+          .add(NoteDetailEvent.showNote(widget.noteId));
+    }
+  }
+
+  Future<void> _changeLibrary(
+      Future<void> Function(NoteRepository) operation) async {
+    if (_changingLibrary || !getIt.isRegistered<NoteRepository>()) return;
+    setState(() => _changingLibrary = true);
+    try {
+      await operation(getIt<NoteRepository>());
+      _reload();
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Link_Save_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _changingLibrary = false);
+    }
+  }
+
+  Future<void> _setArchive(Note note) => _changeLibrary((repository) async {
+        final change =
+            await setNoteArchived(repository, note.id!, !note.isArchived);
+        if (!mounted || change == null) return;
+        showTransientSnackBar(
+            context,
+            SnackBar(
+              content: Text(change.archived
+                  ? S.of(context).Note_Archived
+                  : S.of(context).Note_Unarchived),
+              action: SnackBarAction(
+                  label: S.of(context).Undo,
+                  onPressed: () {
+                    _changeLibrary((repository) async {
+                      await setNoteArchived(
+                          repository, change.noteId, change.previousArchived);
+                    });
+                  }),
+            ));
+      });
+
+  Future<void> _editTags(Note note) async {
+    if (_changingLibrary) return;
+    final tags =
+        await showNoteTagsSheet(context, tags: note.tags, suggestions: [
+      for (final value in _libraryNotes)
+        if (!value.isDeleted) ...value.tags
+    ]);
+    if (!mounted || tags == null) return;
+    await _changeLibrary((repository) async {
+      final current = await repository.getNote(note.id!);
+      if (current.isDeleted) throw StateError('Note unavailable');
+      await repository
+          .addUpdateNote(current.copyWith(tags: normalizeNoteTags(tags)));
+    });
+  }
+
+  Future<void> _editLinks(Note note) async {
+    if (_changingLibrary) return;
+    final links = await showNoteLinkPickerSheet(context,
+        currentNoteId: note.id!,
+        selectedIds: note.linkedNoteIds,
+        notes: _libraryNotes);
+    if (!mounted || links == null) return;
+    await _changeLibrary((repository) async {
+      final current = await repository.getNote(note.id!);
+      if (current.isDeleted) throw StateError('Note unavailable');
+      await repository.addUpdateNote(current.copyWith(
+          linkedNoteIds: normalizeLinkedNoteIds(links, noteId: note.id)));
+    });
+  }
+
+  Future<void> _openLinkedNote(Note note) async {
+    if (_changingLibrary || note.id == null) return;
+    final current = availableLinkedNote(note.id!, _libraryNotes);
+    if (current == null) {
+      showTransientSnackBar(
+          context, SnackBar(content: Text(S.of(context).Link_Unavailable)));
+      return;
+    }
+    await context.router.push(NoteDetailRoute(noteId: current.id!));
+    _reload();
   }
 
   Future<void> _showHistory(Note note) async {
@@ -429,7 +561,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   ),
                   AppButton(
                     tooltip: S.of(context).More_Options,
-                    isLoading: _savingTemplate,
+                    isLoading: _savingTemplate || _changingLibrary,
                     child: const Icon(Icons.more_horiz_rounded),
                     onPressed: () => _showMoreOptions(note),
                   ),
@@ -444,6 +576,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 note: data.note,
                 screenshotController: _screenshotController,
                 exportMode: _exportingImage,
+                libraryNotes: _libraryNotes,
+                onOpenLinkedNote: _openLinkedNote,
+                onEditLinks:
+                    data.note.isDeleted ? null : () => _editLinks(data.note),
                 onChecklistActionStart: () => _reviewGeneration++,
                 onReminderTap: data.note.isDeleted
                     ? null
@@ -466,6 +602,9 @@ class LoadedView extends StatelessWidget {
     required this.onReminderTap,
     this.onChecklistActionStart,
     this.exportMode = false,
+    this.libraryNotes = const [],
+    this.onOpenLinkedNote,
+    this.onEditLinks,
   });
 
   final Note note;
@@ -473,6 +612,9 @@ class LoadedView extends StatelessWidget {
   final VoidCallback? onReminderTap;
   final VoidCallback? onChecklistActionStart;
   final bool exportMode;
+  final List<Note> libraryNotes;
+  final ValueChanged<Note>? onOpenLinkedNote;
+  final VoidCallback? onEditLinks;
 
   @override
   Widget build(BuildContext context) {
@@ -515,6 +657,17 @@ class LoadedView extends StatelessWidget {
                         color: AppColors.ink.withValues(alpha: 0.55),
                       ),
                     ),
+                    if (note.isArchived || note.tags.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacings.m),
+                      Wrap(spacing: 8, runSpacing: 4, children: [
+                        if (note.isArchived)
+                          Chip(
+                              avatar:
+                                  const Icon(Icons.archive_outlined, size: 18),
+                              label: Text(S.of(context).Archive)),
+                        for (final tag in note.tags) Chip(label: Text(tag)),
+                      ]),
+                    ],
                     if (currentReminder != null) ...{
                       const SizedBox(height: AppSpacings.m),
                       InkWell(
@@ -598,6 +751,21 @@ class LoadedView extends StatelessWidget {
                       const SizedBox(height: AppSpacings.xxl),
                       _BuildImageGallery(imagePaths: note.imagePaths),
                     },
+                    if (note.linkedNoteIds.isNotEmpty ||
+                        (!exportMode &&
+                            noteBacklinks(note, libraryNotes).isNotEmpty)) ...[
+                      const SizedBox(height: AppSpacings.l),
+                      NoteLinksSection(
+                        linkedNoteIds: note.linkedNoteIds,
+                        notes: libraryNotes,
+                        backlinks: exportMode
+                            ? const []
+                            : noteBacklinks(note, libraryNotes),
+                        onOpen: note.isDeleted ? null : onOpenLinkedNote,
+                        onEdit: onEditLinks,
+                        exportMode: exportMode,
+                      ),
+                    ],
                     if (note.hasVoiceMemos) ...[
                       const SizedBox(height: AppSpacings.xxl),
                       for (final memo in note.voiceMemos)

@@ -7,6 +7,10 @@ import 'package:uuid/uuid.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/presentation/components/note_links_section.dart';
+import 'package:onlynote/presentation/components/note_link_picker_sheet.dart';
+import 'package:onlynote/presentation/components/note_tags_sheet.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/photo_text_extraction.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
@@ -51,7 +55,7 @@ part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
 /// Determines which field is ready to type when a new note is opened.
-enum NoteEditorStart { standard, quickNote, checklist, photo }
+enum NoteEditorStart { standard, quickNote, checklist, photo, voice }
 
 @RoutePage(name: 'AddUpdateNoteRoute')
 class AddUpdateNoteScreen extends StatefulWidget {
@@ -98,6 +102,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final NotePhotoCapture _photoCapture;
   late final NoteReminderScheduler _reminderScheduler;
   VoidCallback? _unregisterWidgetEditor;
+  WidgetCommands? _editorWidgetCommands;
+  bool _suspendedForLinkedNote = false;
   Timer? _suggestionDebounce;
   ReminderDateSuggestion? _reminderSuggestion;
   final Set<String> _dismissedSuggestions = {};
@@ -105,7 +111,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   bool _savingReminder = false;
   bool _presentingReminder = false;
   Animation<double>? _entryAnimation;
-  bool _photoStarted = false;
+  bool _captureStarted = false;
   bool _addingPhoto = false;
   bool _presentingMedia = false;
   bool _extractingPhotoText = false;
@@ -115,6 +121,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   bool _leaving = false;
   bool _allowPop = false;
   bool _hadUserChange = false;
+  bool _refreshingFromLibrary = false;
   bool _recordedReviewSave = false;
 
   @override
@@ -161,18 +168,18 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           todos: initial.todo,
           imagePaths: initial.imagePaths,
           voiceMemos: initial.voiceMemos,
+          tags: initial.tags,
+          linkedNoteIds: initial.linkedNoteIds,
         ));
     _changes = _form.stream.listen((state) {
+      if (_refreshingFromLibrary) return;
       _hadUserChange = true;
       _capture(state);
       _queueReminderSuggestion();
     });
-    final widgetCommands =
+    _editorWidgetCommands =
         widget.widgetCommands ?? WidgetCommands.initializedInstance;
-    if (initial.id != null) {
-      _unregisterWidgetEditor =
-          widgetCommands?.registerEditor(initial.id!, _applyWidgetCompletion);
-    }
+    _registerWidgetEditor();
     ReminderData.shared.addListener(_reminderChanged);
     _queueReminderSuggestion();
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
@@ -185,29 +192,38 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.start != NoteEditorStart.photo ||
+    if ((widget.start != NoteEditorStart.photo &&
+            widget.start != NoteEditorStart.voice) ||
         widget.note != null ||
-        _photoStarted) {
+        _captureStarted) {
       return;
     }
-    _photoStarted = true;
+    _captureStarted = true;
     // UIKit needs the editor's presentation transition to finish before it
     // can present the camera. Rebuilds and resumes must not launch it twice.
     _entryAnimation = ModalRoute.of(context)?.animation;
     if (_entryAnimation != null &&
         _entryAnimation!.status != AnimationStatus.completed) {
-      _entryAnimation!.addStatusListener(_onPhotoEntryStatus);
+      _entryAnimation!.addStatusListener(_onCaptureEntryStatus);
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) unawaited(_addPhoto(ImageSource.camera));
+        if (mounted) _startCapture();
       });
     }
   }
 
-  void _onPhotoEntryStatus(AnimationStatus status) {
+  void _onCaptureEntryStatus(AnimationStatus status) {
     if (status != AnimationStatus.completed) return;
-    _entryAnimation?.removeStatusListener(_onPhotoEntryStatus);
-    if (mounted) unawaited(_addPhoto(ImageSource.camera));
+    _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
+    if (mounted) _startCapture();
+  }
+
+  void _startCapture() {
+    if (widget.start == NoteEditorStart.voice) {
+      unawaited(_recordVoiceMemo());
+    } else {
+      unawaited(_addPhoto(ImageSource.camera));
+    }
   }
 
   Future<void> _addPhoto(ImageSource source, {bool retry = false}) async {
@@ -272,6 +288,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       todo: state.todos,
       imagePaths: state.imagePaths,
       voiceMemos: state.voiceMemos,
+      tags: state.tags,
+      linkedNoteIds: state.linkedNoteIds,
     );
     if (next != _autosave.note) {
       _autosave.update(next.copyWith(dateTime: DateTime.now()));
@@ -605,14 +623,168 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  List<Note> get _libraryNotes {
+    final notes = getIt.isRegistered<NoteRepository>()
+        ? getIt<NoteRepository>()
+            .getAllNotes()
+            .map((note) => note.toDomain())
+            .toList()
+        : <Note>[];
+    return [
+      for (final note in notes)
+        if (note.id != _autosave.note.id) note,
+      _autosave.note
+    ];
+  }
+
+  Future<void> _editTags() async {
+    if (_mediaBlocked) return;
+    setState(() => _presentingMedia = true);
+    try {
+      final tags = await showNoteTagsSheet(context,
+          tags: _form.state.tags,
+          suggestions: [
+            for (final note in _libraryNotes)
+              if (!note.isDeleted) ...note.tags
+          ]);
+      if (!mounted || tags == null || listEquals(tags, _form.state.tags)) {
+        return;
+      }
+      final applied =
+          _form.stream.firstWhere((state) => listEquals(state.tags, tags));
+      _form.add(AddUpdateFormEvent.tagsChanged(tags));
+      await applied;
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  Future<void> _editLinks() async {
+    if (_mediaBlocked) return;
+    setState(() => _presentingMedia = true);
+    try {
+      final ids = await showNoteLinkPickerSheet(context,
+          currentNoteId: _autosave.note.id!,
+          selectedIds: _form.state.linkedNoteIds,
+          notes: _libraryNotes);
+      if (!mounted ||
+          ids == null ||
+          listEquals(ids, _form.state.linkedNoteIds)) {
+        return;
+      }
+      final applied = _form.stream
+          .firstWhere((state) => listEquals(state.linkedNoteIds, ids));
+      _form.add(AddUpdateFormEvent.linksChanged(ids));
+      await applied;
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  void _registerWidgetEditor() {
+    if (_unregisterWidgetEditor != null || _autosave.note.id == null) return;
+    _unregisterWidgetEditor = _editorWidgetCommands?.registerEditor(
+        _autosave.note.id!, _applyWidgetCompletion);
+  }
+
+  Future<void> _openLinkedNote(Note note) async {
+    if (_mediaBlocked || note.id == null) return;
+    _suspendedForLinkedNote = true;
+    setState(() => _presentingMedia = true);
+    try {
+      await _voiceWrites;
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _capture(_form.state);
+      if (!await _autosave.flush()) {
+        if (mounted) {
+          showTransientSnackBar(
+              context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+        }
+        return;
+      }
+      if (!mounted) return;
+      final target = availableLinkedNote(note.id!, _libraryNotes);
+      if (target == null) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Link_Unavailable)));
+        return;
+      }
+      _unregisterWidgetEditor?.call();
+      _unregisterWidgetEditor = null;
+      await context.router.push(NoteDetailRoute(noteId: target.id!));
+      await _editorWidgetCommands?.importPending();
+      if (!mounted || !getIt.isRegistered<NoteRepository>()) return;
+      // The child route can reach this note through a backlink and edit its
+      // content or archive/tags. Adopt the latest saved note before more typing.
+      NoteDto fresh;
+      try {
+        fresh = await getIt<NoteRepository>().getNote(_autosave.note.id!);
+      } catch (_) {
+        if (mounted) {
+          setState(() => _allowPop = true);
+          await context.router.maybePop();
+        }
+        return;
+      }
+      if (!mounted) return;
+      if (fresh.isDeleted) {
+        setState(() => _allowPop = true);
+        await context.router.maybePop();
+        return;
+      }
+      final refreshed = fresh.toDomain();
+      _refreshingFromLibrary = true;
+      try {
+        if (!_autosave.adoptSavedNote(refreshed)) return;
+        _titleController.text = refreshed.title ?? '';
+        _descriptionController.text = refreshed.description ?? '';
+        final state = AddUpdateFormState(
+            title: refreshed.title,
+            description: refreshed.description,
+            selectedColor: refreshed.color,
+            todos: refreshed.todo,
+            imagePaths: refreshed.imagePaths,
+            voiceMemos: refreshed.voiceMemos,
+            tags: refreshed.tags,
+            linkedNoteIds: refreshed.linkedNoteIds);
+        if (_form.state != state) {
+          final applied = _form.stream.firstWhere((value) => value == state);
+          _form.add(AddUpdateFormEvent.initialize(
+              title: refreshed.title,
+              description: refreshed.description,
+              color: refreshed.color,
+              todos: refreshed.todo,
+              imagePaths: refreshed.imagePaths,
+              voiceMemos: refreshed.voiceMemos,
+              tags: refreshed.tags,
+              linkedNoteIds: refreshed.linkedNoteIds));
+          await applied;
+        }
+      } finally {
+        _refreshingFromLibrary = false;
+      }
+      _queueReminderSuggestion();
+    } finally {
+      _suspendedForLinkedNote = false;
+      if (mounted) {
+        _registerWidgetEditor();
+        setState(() => _presentingMedia = false);
+      }
+    }
+  }
+
   Future<bool> _applyWidgetCompletion(WidgetTodoCommand command) async {
-    if (!mounted || _leaving || command.noteId != _autosave.note.id) {
+    if (!mounted ||
+        _leaving ||
+        _suspendedForLinkedNote ||
+        command.noteId != _autosave.note.id) {
       return false;
     }
     // Drain queued typing/reorder events, then change only completion in the
     // current form. Draft text, task labels, images, and ordering stay intact.
     await Future<void>.delayed(Duration.zero);
-    if (!mounted) return false;
+    if (!mounted || _suspendedForLinkedNote) return false;
     final matches =
         _form.state.todos.where((todo) => todo.id == command.todoId);
     if (matches.isEmpty) return true; // A deleted draft row stays deleted.
@@ -624,7 +796,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _form.add(AddUpdateFormEvent.setTodoCompleted(
           id: command.todoId, completed: command.completed));
       await applied;
-      if (!mounted) return false;
+      if (!mounted || _suspendedForLinkedNote) return false;
     }
     _capture(_form.state);
     return _autosave.flush();
@@ -733,7 +905,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _suggestionDebounce?.cancel();
     ReminderData.shared.removeListener(_reminderChanged);
     _unregisterWidgetEditor?.call();
-    _entryAnimation?.removeStatusListener(_onPhotoEntryStatus);
+    _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _changes.cancel();
     _form.close();
@@ -780,6 +952,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               onRemoveVoice: _removeVoiceMemo,
               onTranscriptChanged: _editVoiceTranscript,
               resolveAudioPath: _audio.resolvePath,
+              libraryNotes: _libraryNotes,
+              onEditTags: _editTags,
+              onEditLinks: _editLinks,
+              onOpenLinkedNote: _openLinkedNote,
               reminderSuggestion: _reminderSuggestion,
               savingReminder: _savingReminder,
               onReminderSuggestion: _confirmReminderSuggestion,
@@ -807,6 +983,10 @@ class _BuildForm extends StatelessWidget {
     required this.onRemoveVoice,
     required this.onTranscriptChanged,
     required this.resolveAudioPath,
+    required this.libraryNotes,
+    required this.onEditTags,
+    required this.onEditLinks,
+    required this.onOpenLinkedNote,
     required this.reminderSuggestion,
     required this.savingReminder,
     required this.onReminderSuggestion,
@@ -829,6 +1009,10 @@ class _BuildForm extends StatelessWidget {
   final Future<void> Function(VoiceMemo) onRemoveVoice;
   final Future<void> Function(VoiceMemo, String?) onTranscriptChanged;
   final Future<String> Function(String) resolveAudioPath;
+  final List<Note> libraryNotes;
+  final VoidCallback onEditTags;
+  final VoidCallback onEditLinks;
+  final ValueChanged<Note> onOpenLinkedNote;
   final ReminderDateSuggestion? reminderSuggestion;
   final bool savingReminder;
   final VoidCallback onReminderSuggestion;
@@ -972,6 +1156,27 @@ class _BuildForm extends StatelessWidget {
                         descriptionController: _descriptionController,
                         autofocus: widget.note == null &&
                             widget.start == NoteEditorStart.quickNote,
+                      ),
+                      const SizedBox(height: AppSpacings.l),
+                      Wrap(spacing: 8, runSpacing: 4, children: [
+                        for (final tag in state.tags) Chip(label: Text(tag)),
+                        TextButton.icon(
+                          key: const ValueKey('editor-edit-tags'),
+                          style: AppButtonStyles.paperAction(),
+                          onPressed:
+                              mediaBusy || addingPhoto ? null : onEditTags,
+                          icon: const Icon(Icons.sell_outlined, size: 20),
+                          label: Text(S.of(context).Edit_Tags),
+                        ),
+                      ]),
+                      NoteLinksSection(
+                        linkedNoteIds: state.linkedNoteIds,
+                        notes: libraryNotes,
+                        backlinks:
+                            noteBacklinks(widget.note ?? Note(), libraryNotes),
+                        onOpen:
+                            mediaBusy || addingPhoto ? null : onOpenLinkedNote,
+                        onEdit: mediaBusy || addingPhoto ? null : onEditLinks,
                       ),
                       AnimatedSize(
                         duration: MediaQuery.disableAnimationsOf(context)

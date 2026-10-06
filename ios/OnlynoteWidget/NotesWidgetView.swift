@@ -137,6 +137,8 @@ private struct HeaderView: View {
 
             Spacer(minLength: 0)
 
+            VoiceCaptureLink()
+
             Link(destination: WidgetConstants.newNoteURL) {
                 HStack(spacing: 4) {
                     Image(systemName: "square.and.pencil")
@@ -152,6 +154,19 @@ private struct HeaderView: View {
                 )
             }
         }
+    }
+}
+
+private struct VoiceCaptureLink: View {
+    var body: some View {
+        Link(destination: WidgetConstants.voiceNoteURL) {
+            Image(systemName: "mic.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(WidgetTheme.ink)
+                .frame(width: 28, height: 24)
+                .background(Capsule().fill(WidgetTheme.amber))
+        }
+        .accessibilityLabel(Text("widget.voice_note"))
     }
 }
 
@@ -294,7 +309,8 @@ private struct SelectedNoteView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Link(destination: WidgetConstants.noteURL(id: note.id)) {
+            HStack(spacing: 6) {
+              Link(destination: WidgetConstants.noteURL(id: note.id)) {
                 HStack(spacing: 6) {
                     Circle().fill(note.accentColor).frame(width: 9, height: 9)
                     Text(note.displayTitle)
@@ -305,6 +321,8 @@ private struct SelectedNoteView: View {
                     if family != .systemSmall { NoteBadge(note: note) }
                 }
                 .contentShape(Rectangle())
+              }
+              if family != .systemSmall { VoiceCaptureLink() }
             }
             if note.hasChecklist {
                 ForEach(Array(visibleTodos.enumerated()), id: \.offset) { _, todo in

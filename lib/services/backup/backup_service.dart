@@ -9,6 +9,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 import 'package:uuid/uuid.dart';
 
 import 'backup_contents.dart';
@@ -25,7 +26,8 @@ class BackupService {
       required this.readReminders,
       required this.writeReminders,
       this.templateStore,
-      this.history});
+      this.history,
+      this.savedViewStore});
   final Box notes;
   final Box? drafts;
   final Box folders;
@@ -35,10 +37,12 @@ class BackupService {
   final Future<void> Function(List<Reminder>) writeReminders;
   final CustomNoteTemplateStore? templateStore;
   final NoteHistory? history;
+  final SavedNoteViewStore? savedViewStore;
   static const _uuid = Uuid();
 
   Future<Uint8List> export() async {
     await templateStore?.load();
+    await savedViewStore?.load();
     final templates = templateStore?.templates.toList() ?? const [];
     final byId = {for (final n in notes.values.whereType<NoteDto>()) n.id: n};
     for (final draft in drafts?.values.whereType<NoteDto>() ?? <NoteDto>[]) {
@@ -124,6 +128,10 @@ class BackupService {
         );
     final contents = BackupContents(
       createdAt: DateTime.now(),
+      savedViews: [
+        for (final view in savedViewStore?.views ?? <SavedNoteView>[])
+          view.withAvailableFolders(folderIds.whereType<String>().toSet())
+      ],
       folders: folderSnapshot,
       photos: photos,
       audio: audio,
@@ -163,13 +171,33 @@ class BackupService {
     if (backup.histories.isNotEmpty && history == null) {
       throw StateError('History storage is unavailable');
     }
+    if (backup.savedViews.isNotEmpty && savedViewStore == null) {
+      throw StateError('Saved view storage is unavailable');
+    }
     await templateStore?.load();
+    await savedViewStore?.load();
     if (journal.containsKey('pending')) await recoverInterruptedRestore();
+    if ((savedViewStore?.views.length ?? 0) + backup.savedViews.length >
+        SavedNoteViewStore.maxViews) {
+      throw StateError('Saved view limit reached');
+    }
     final noteIds = {for (final n in backup.notes) n.id!: _newId(notes)};
     final folderIds = {for (final f in backup.folders) f.id!: _newId(folders)};
     final templateIds = {
       for (final template in backup.templates) template.id: _uuid.v4(),
     };
+    final restoredViews = [
+      for (final view in backup.savedViews)
+        SavedNoteView(
+          id: _uuid.v4(),
+          name: view.name,
+          query: view.query,
+          filters: view.filters,
+          tags: view.tags,
+          folderId: folderIds[view.folderId],
+          archiveScope: view.archiveScope,
+        ),
+    ];
     final notePhotoKeys = {
       for (final note in backup.notes) ...note.imagePaths ?? <String>[],
       for (final versions in backup.histories.values)
@@ -211,6 +239,10 @@ class BackupService {
       final memos = memoIds.putIfAbsent(note.id!, () => {});
       return note.copyWith(
         id: noteIds[note.id],
+        linkedNoteIds: [
+          for (final id in note.linkedNoteIds ?? const <String>[])
+            if (noteIds.containsKey(id) && id != note.id) noteIds[id]!
+        ],
         folderId: folderIds[note.folderId],
         clearFolderId: !folderIds.containsKey(note.folderId),
         todoList: [
@@ -254,6 +286,7 @@ class BackupService {
       'photos': [...paths.values, ...templatePaths.values],
       'audio': [...audioPaths.values, ...templateAudioPaths.values],
       'histories': restoredHistories.keys.toList(),
+      'savedViews': restoredViews.map((view) => view.id).toList(),
     });
     await journal.flush();
     try {
@@ -288,6 +321,10 @@ class BackupService {
           for (final template in backup.templates)
             template.copyWith(
               id: templateIds[template.id],
+              linkedNoteIds: [
+                for (final id in template.linkedNoteIds)
+                  if (noteIds.containsKey(id)) noteIds[id]!
+              ],
               imagePaths: [
                 for (final key in template.imagePaths) templatePaths[key]!,
               ],
@@ -301,6 +338,9 @@ class BackupService {
       }
       if (restoredHistories.isNotEmpty) {
         await history!.importVersions(restoredHistories);
+      }
+      if (restoredViews.isNotEmpty) {
+        await savedViewStore!.importViews(restoredViews);
       }
       final existing = List<Reminder>.of(readReminders());
       final usedIds = existing.map((r) => r.reminderId).toSet();
@@ -351,6 +391,14 @@ class BackupService {
   Future<void> recoverInterruptedRestore() async {
     final pending = journal.get('pending');
     if (pending == null) return;
+    final viewIds =
+        (pending['savedViews'] as List? ?? const []).cast<String>().toSet();
+    if (viewIds.isNotEmpty) {
+      if (savedViewStore == null) {
+        throw StateError('Saved view recovery storage is unavailable');
+      }
+      await savedViewStore!.deleteViews(viewIds);
+    }
     final historyIds =
         (pending['histories'] as List? ?? const []).cast<String>();
     if (historyIds.isNotEmpty) {

@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Onlynote</string>
 
-    <string name="widget_description">Your pinned and recent notes, plus a shortcut to write a new one.</string>
+    <string name="widget_description">Your notes and checklists, with shortcuts to write or record.</string>
     <string name="widget_new_note">New</string>
     <string name="widget_untitled">Untitled</string>
     <string name="widget_all_done">All done</string>
@@ -29,4 +29,6 @@
     <string name="widget_mark_unfinished">Mark unfinished</string>
     <string name="widget_settings">Widget settings</string>
     <string name="widget_more_items">%1$d more items</string>
+    <string name="shortcut_voice_note">Voice Memo</string>
+    <string name="widget_voice_note">Voice Memo</string>
 </resources>

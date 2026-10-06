@@ -40,9 +40,25 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
       final draft = entry.value;
       if (draft is! NoteDto || draft.id == null) continue;
       try {
-        if (NoteAutosave.hasContent(draft.toDomain()) ||
-            repository.getAllNotes().any((n) => n.id == draft.id)) {
-          await repository.addUpdateNote(draft);
+        final matches =
+            repository.getAllNotes().where((note) => note.id == draft.id);
+        final current = matches.isEmpty ? null : matches.first;
+        if (current?.isDeleted == true) {
+          await drafts.delete(entry.key);
+          continue;
+        }
+        // Archive/folder/pinning are library actions outside the typing draft.
+        // Recover content without reverting those later saved library changes.
+        final recovered = current == null
+            ? draft
+            : draft.copyWith(
+                isArchived: current.isArchived,
+                isPinned: current.isPinned,
+                folderId: current.folderId,
+                clearFolderId: current.folderId == null,
+                sortOrder: current.sortOrder);
+        if (NoteAutosave.hasContent(recovered.toDomain()) || current != null) {
+          await repository.addUpdateNote(recovered);
         }
         await drafts.delete(entry.key);
       } catch (error) {
@@ -84,7 +100,21 @@ class NoteAutosave extends ChangeNotifier {
       (note.title?.trim().isNotEmpty ?? false) ||
       (note.description?.trim().isNotEmpty ?? false) ||
       note.todo.any((todo) => todo.title?.trim().isNotEmpty ?? false) ||
-      note.imagePaths.isNotEmpty || note.voiceMemos.isNotEmpty;
+      note.imagePaths.isNotEmpty ||
+      note.voiceMemos.isNotEmpty ||
+      note.linkedNoteIds.isNotEmpty;
+
+  /// Refresh a clean editor after a child route has edited the same note.
+  /// Pending user edits must be flushed first; this never queues an extra save.
+  bool adoptSavedNote(Note note) {
+    if (_disposed || dirty || _inFlight != null || note.id != _note.id) {
+      return false;
+    }
+    _note = note;
+    _exists = true;
+    _setStatus(AutosaveStatus.saved);
+    return true;
+  }
 
   void update(Note note) {
     if (_disposed || note == _note) return;

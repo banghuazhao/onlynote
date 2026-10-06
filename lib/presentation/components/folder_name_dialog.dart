@@ -2,9 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 class FolderNameDialog extends StatefulWidget {
-  const FolderNameDialog({super.key, required this.title, this.initial});
+  const FolderNameDialog({
+    super.key,
+    required this.title,
+    this.initial,
+    this.labelText,
+    this.icon = Icons.folder_outlined,
+    this.maxLength,
+  });
   final String title;
   final String? initial;
+  final String? labelText;
+  final IconData icon;
+  final int? maxLength;
 
   @override
   State<FolderNameDialog> createState() => _FolderNameDialogState();
@@ -34,13 +44,15 @@ class _FolderNameDialogState extends State<FolderNameDialog> {
   @override
   Widget build(BuildContext context) => AlertDialog(
         scrollable: true,
-        icon: const Icon(Icons.folder_outlined),
+        icon: Icon(widget.icon),
         title: Text(widget.title),
         content: TextField(
           controller: _controller,
           autofocus: true,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(labelText: S.of(context).Folder_Name),
+          maxLength: widget.maxLength,
+          decoration: InputDecoration(
+              labelText: widget.labelText ?? S.of(context).Folder_Name),
           textInputAction: TextInputAction.done,
           onSubmitted: (_) => _submit(),
         ),

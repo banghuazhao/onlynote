@@ -9,6 +9,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     List<Todo>? todos,
     List<String>? imagePaths,
     List<VoiceMemo>? voiceMemos,
+    List<String>? tags,
+    List<String>? linkedNoteIds,
   }) = _Initialize;
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;
@@ -22,6 +24,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     String? id,
     String? folderId,
     @Default(false) bool isPinned,
+    @Default(false) bool isArchived,
     int? sortOrder,
     DateTime? deletedAt,
   }) = _AddOrUpdateNote;
@@ -58,4 +61,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
 
   const factory AddUpdateFormEvent.voiceMemosChanged(List<VoiceMemo> value) =
       _VoiceMemosChanged;
+  const factory AddUpdateFormEvent.tagsChanged(List<String> value) =
+      _TagsChanged;
+  const factory AddUpdateFormEvent.linksChanged(List<String> value) =
+      _LinksChanged;
 }

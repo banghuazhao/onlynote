@@ -63,6 +63,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "Allow Notification",
     ),
     "Appearance": MessageLookupByLibrary.simpleMessage("Appearance"),
+    "Archive": MessageLookupByLibrary.simpleMessage("Archive"),
+    "Archive_Empty": MessageLookupByLibrary.simpleMessage(
+      "Your archived notes will appear here.",
+    ),
+    "Archive_Note": MessageLookupByLibrary.simpleMessage("Archive note"),
     "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save your changes. Keep this note open and tap Done to retry.",
     ),
@@ -73,10 +78,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Contents": m0,
     "Backup_Export": MessageLookupByLibrary.simpleMessage("Create backup"),
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
-      "Save your notes, checklists, folders, photos, templates, and reminder dates in one Onlynote file. Includes notes in Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
+      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
     ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
-      "Could not create the backup. Check available storage and that all note photos are accessible. Backups must fit within 256 MB.",
+      "Could not create the backup. Check available storage and that all photos and recordings are accessible. Backups must fit within 256 MB.",
     ),
     "Backup_Invalid": MessageLookupByLibrary.simpleMessage(
       "This is not a supported Onlynote backup, or the file is damaged or larger than 256 MB. Nothing was imported.",
@@ -89,7 +94,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Restore": MessageLookupByLibrary.simpleMessage("Restore backup"),
     "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
-      "Restoring adds copies of the backed-up notes, folders, and templates to your library. Restoring the same file again adds another set of copies.",
+      "Restoring adds copies of the backed-up notes, folders, templates, and saved views to your library. Note links connect the restored copies. Restoring the same file again adds another set of copies.",
     ),
     "Backup_Restore_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not restore the backup. Check available storage and try again. Your existing notes have not been overwritten.",
@@ -128,6 +133,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage(
       "Choose From Gallery",
     ),
+    "Choose_Linked_Notes": MessageLookupByLibrary.simpleMessage(
+      "Choose linked notes",
+    ),
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage(
       "Classical Music Box",
     ),
@@ -152,9 +160,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Delete_Todo_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete this item?",
     ),
+    "Delete_View": MessageLookupByLibrary.simpleMessage("Delete view"),
     "Done": MessageLookupByLibrary.simpleMessage("Done"),
     "Duplicate": MessageLookupByLibrary.simpleMessage("Duplicate"),
     "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
+    "Edit_Tags": MessageLookupByLibrary.simpleMessage("Edit tags"),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
     "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
     "Failed_to_Update_note_please_try_again":
@@ -200,6 +210,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Photos": MessageLookupByLibrary.simpleMessage("Photos"),
     "Filter_Pinned": MessageLookupByLibrary.simpleMessage("Pinned"),
     "Filter_Reminders": MessageLookupByLibrary.simpleMessage("Reminders"),
+    "Filter_Tags": MessageLookupByLibrary.simpleMessage("Filter by tags"),
     "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("Unfinished"),
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
@@ -238,8 +249,29 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "History_Version": m6,
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
+    "Include_Archived": MessageLookupByLibrary.simpleMessage(
+      "Include archived notes",
+    ),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
     "Large": MessageLookupByLibrary.simpleMessage("Large"),
+    "Library_Filters": MessageLookupByLibrary.simpleMessage("Library filters"),
+    "Link_Empty": MessageLookupByLibrary.simpleMessage(
+      "No notes to link yet. Create another note first.",
+    ),
+    "Link_Limit": MessageLookupByLibrary.simpleMessage(
+      "You can link up to 100 notes. Remove a link to add another.",
+    ),
+    "Link_Note": MessageLookupByLibrary.simpleMessage("Link a note"),
+    "Link_Remove": MessageLookupByLibrary.simpleMessage("Remove link"),
+    "Link_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not update this note. Try again.",
+    ),
+    "Link_Search": MessageLookupByLibrary.simpleMessage("Search notes"),
+    "Link_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "Note unavailable",
+    ),
+    "Linked_From": MessageLookupByLibrary.simpleMessage("Linked from"),
+    "Linked_Notes": MessageLookupByLibrary.simpleMessage("Linked notes"),
     "Manage_Folders": MessageLookupByLibrary.simpleMessage("Manage Folders"),
     "Medium": MessageLookupByLibrary.simpleMessage("Medium"),
     "Metronome_Go": MessageLookupByLibrary.simpleMessage("Metronome Go"),
@@ -267,12 +299,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Added Successfully",
     ),
+    "Note_Archived": MessageLookupByLibrary.simpleMessage("Note archived"),
     "Note_Color": m7,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
     ),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
+    "Note_Unarchived": MessageLookupByLibrary.simpleMessage("Note unarchived"),
+    "Note_Untitled": MessageLookupByLibrary.simpleMessage("Untitled note"),
     "Note_Updated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Updated Successfully",
     ),
@@ -324,6 +359,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Write a note",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
+    "Open_Linked_Note": MessageLookupByLibrary.simpleMessage(
+      "Open linked note",
+    ),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "These notes will be permanently deleted along with their photos and reminders. This can\'t be undone.",
     ),
@@ -467,6 +505,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Remove_Ads_Price": m11,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
+    "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage(
@@ -485,6 +524,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "Save_As_Template": MessageLookupByLibrary.simpleMessage(
       "Save as template",
     ),
+    "Save_Current_View": MessageLookupByLibrary.simpleMessage(
+      "Save current view",
+    ),
+    "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage(
+      "Delete this saved view?",
+    ),
+    "Saved_View_Empty": MessageLookupByLibrary.simpleMessage(
+      "Save a search or filter to find it quickly next time.",
+    ),
+    "Saved_View_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save this view. Try again.",
+    ),
+    "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
+    "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
@@ -493,6 +546,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Could not save this setting. Please try again.",
     ),
     "Share": MessageLookupByLibrary.simpleMessage("Share"),
+    "Share_Audio": MessageLookupByLibrary.simpleMessage("Recordings"),
+    "Share_Audio_Description": MessageLookupByLibrary.simpleMessage(
+      "Original audio files and reviewed transcripts",
+    ),
+    "Share_Audio_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not share this recording. Check that the audio file is available and try again.",
+    ),
     "Share_Image": MessageLookupByLibrary.simpleMessage("Image"),
     "Share_Image_Description": MessageLookupByLibrary.simpleMessage(
       "Share the current paper view as a picture.",
@@ -530,6 +590,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "Starter templates",
     ),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
+    "Tag_Hint": MessageLookupByLibrary.simpleMessage("Add a tag"),
+    "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
+      "Use up to 20 tags, with 40 characters per tag.",
+    ),
+    "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -617,9 +682,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Trash": MessageLookupByLibrary.simpleMessage("Trash"),
     "Trash_Empty": MessageLookupByLibrary.simpleMessage("Trash is empty"),
     "Type_something": MessageLookupByLibrary.simpleMessage("Type something..."),
+    "Unarchive_Note": MessageLookupByLibrary.simpleMessage("Unarchive note"),
     "Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
     "Use_Template": MessageLookupByLibrary.simpleMessage("Use a template"),
+    "View_Saved": MessageLookupByLibrary.simpleMessage("View saved"),
     "Voice_Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "Voice_Delete": MessageLookupByLibrary.simpleMessage("Delete recording"),
     "Voice_Discard_Failed": MessageLookupByLibrary.simpleMessage(

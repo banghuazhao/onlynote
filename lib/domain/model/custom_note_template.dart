@@ -4,6 +4,8 @@ import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
+import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/note_links.dart';
 
 const maxTemplateNameLength = 80;
 
@@ -18,10 +20,14 @@ class CustomNoteTemplate {
     this.color,
     List<String> imagePaths = const [],
     List<VoiceMemo> voiceMemos = const [],
+    List<String> tags = const [],
+    List<String> linkedNoteIds = const [],
     required this.createdAt,
   })  : items = List.unmodifiable(items),
         imagePaths = List.unmodifiable(imagePaths),
-        voiceMemos = List.unmodifiable(voiceMemos);
+        voiceMemos = List.unmodifiable(voiceMemos),
+        tags = normalizeNoteTags(tags),
+        linkedNoteIds = normalizeLinkedNoteIds(linkedNoteIds);
 
   final String id;
   final String name;
@@ -32,6 +38,8 @@ class CustomNoteTemplate {
   final List<String> imagePaths;
   final List<VoiceMemo> voiceMemos;
   final DateTime createdAt;
+  final List<String> tags;
+  final List<String> linkedNoteIds;
 
   factory CustomNoteTemplate.fromNote(Note note,
           {required String name,
@@ -46,6 +54,8 @@ class CustomNoteTemplate {
         color: note.color?.toARGB32(),
         imagePaths: imageCopies,
         voiceMemos: voiceCopies,
+        tags: note.tags,
+        linkedNoteIds: note.linkedNoteIds,
         createdAt: DateTime.now(),
       );
 
@@ -65,6 +75,8 @@ class CustomNoteTemplate {
       color: color == null ? null : Color(color!),
       imagePaths: imageCopies,
       voiceMemos: voiceCopies,
+      tags: tags,
+      linkedNoteIds: linkedNoteIds,
       folderId: folderId,
       dateTime: created,
       sortOrder: -created.millisecondsSinceEpoch,
@@ -76,6 +88,8 @@ class CustomNoteTemplate {
     String? name,
     List<String>? imagePaths,
     List<VoiceMemo>? voiceMemos,
+    List<String>? tags,
+    List<String>? linkedNoteIds,
   }) =>
       CustomNoteTemplate(
         id: id ?? this.id,
@@ -86,6 +100,8 @@ class CustomNoteTemplate {
         color: color,
         imagePaths: imagePaths ?? this.imagePaths,
         voiceMemos: voiceMemos ?? this.voiceMemos,
+        tags: tags ?? this.tags,
+        linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
         createdAt: createdAt,
       );
 
@@ -99,6 +115,8 @@ class CustomNoteTemplate {
         'imagePaths': imagePaths,
         'voiceMemos': [for (final memo in voiceMemos) memo.toMap()],
         'createdAt': createdAt.toIso8601String(),
+        'tags': tags,
+        'linkedNoteIds': linkedNoteIds,
       };
 
   factory CustomNoteTemplate.fromJson(Map<String, dynamic> json) {
@@ -114,6 +132,11 @@ class CustomNoteTemplate {
         throw FormatException('Invalid template $key');
       }
       return value.cast<String>();
+    }
+
+    List<String> metadataList(String key) {
+      if (!json.containsKey(key)) return const [];
+      return list(key);
     }
 
     final id = text('id');
@@ -148,6 +171,8 @@ class CustomNoteTemplate {
       color: color as int?,
       imagePaths: list('imagePaths'),
       voiceMemos: memos,
+      tags: metadataList('tags'),
+      linkedNoteIds: metadataList('linkedNoteIds'),
       createdAt: createdAt,
     );
   }

@@ -1,6 +1,6 @@
 "widget.app_name" = "極簡備忘錄";
 "widget.display_name" = "備忘錄";
-"widget.description" = "查看置頂和最近的備忘錄，並快速新增一則。";
+"widget.description" = "查看筆記和待辦清單，並快速新增或錄音。";
 
 "widget.new_note" = "新增";
 "widget.untitled" = "無標題";
@@ -33,3 +33,5 @@
 "widget.mark_unfinished" = "標記為未完成";
 "widget.settings" = "小工具設定";
 "widget.more_items" = "還有 %d 項";
+
+"widget.voice_note" = "語音備忘";

@@ -28,6 +28,9 @@ mixin _$Note {
   bool get isPinned => throw _privateConstructorUsedError;
   DateTime? get deletedAt => throw _privateConstructorUsedError;
   String? get folderId => throw _privateConstructorUsedError;
+  bool get isArchived => throw _privateConstructorUsedError;
+  List<String> get tags => throw _privateConstructorUsedError;
+  List<String> get linkedNoteIds => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -50,7 +53,10 @@ abstract class $NoteCopyWith<$Res> {
       int? sortOrder,
       bool isPinned,
       DateTime? deletedAt,
-      String? folderId});
+      String? folderId,
+      bool isArchived,
+      List<String> tags,
+      List<String> linkedNoteIds});
 }
 
 /// @nodoc
@@ -78,6 +84,9 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? isPinned = null,
     Object? deletedAt = freezed,
     Object? folderId = freezed,
+    Object? isArchived = null,
+    Object? tags = null,
+    Object? linkedNoteIds = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -128,6 +137,18 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.folderId
           : folderId // ignore: cast_nullable_to_non_nullable
               as String?,
+      isArchived: null == isArchived
+          ? _value.isArchived
+          : isArchived // ignore: cast_nullable_to_non_nullable
+              as bool,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      linkedNoteIds: null == linkedNoteIds
+          ? _value.linkedNoteIds
+          : linkedNoteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -151,7 +172,10 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       int? sortOrder,
       bool isPinned,
       DateTime? deletedAt,
-      String? folderId});
+      String? folderId,
+      bool isArchived,
+      List<String> tags,
+      List<String> linkedNoteIds});
 }
 
 /// @nodoc
@@ -176,6 +200,9 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? isPinned = null,
     Object? deletedAt = freezed,
     Object? folderId = freezed,
+    Object? isArchived = null,
+    Object? tags = null,
+    Object? linkedNoteIds = null,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -226,6 +253,18 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value.folderId
           : folderId // ignore: cast_nullable_to_non_nullable
               as String?,
+      isArchived: null == isArchived
+          ? _value.isArchived
+          : isArchived // ignore: cast_nullable_to_non_nullable
+              as bool,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      linkedNoteIds: null == linkedNoteIds
+          ? _value._linkedNoteIds
+          : linkedNoteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -245,10 +284,15 @@ class _$NoteImpl extends _Note {
       this.sortOrder,
       this.isPinned = false,
       this.deletedAt,
-      this.folderId})
+      this.folderId,
+      this.isArchived = false,
+      final List<String> tags = const [],
+      final List<String> linkedNoteIds = const []})
       : _todo = todo,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
+        _tags = tags,
+        _linkedNoteIds = linkedNoteIds,
         super._();
 
   @override
@@ -297,10 +341,30 @@ class _$NoteImpl extends _Note {
   final DateTime? deletedAt;
   @override
   final String? folderId;
+  @override
+  @JsonKey()
+  final bool isArchived;
+  final List<String> _tags;
+  @override
+  @JsonKey()
+  List<String> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  final List<String> _linkedNoteIds;
+  @override
+  @JsonKey()
+  List<String> get linkedNoteIds {
+    if (_linkedNoteIds is EqualUnmodifiableListView) return _linkedNoteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_linkedNoteIds);
+  }
 
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds)';
   }
 
   @override
@@ -327,7 +391,12 @@ class _$NoteImpl extends _Note {
             (identical(other.deletedAt, deletedAt) ||
                 other.deletedAt == deletedAt) &&
             (identical(other.folderId, folderId) ||
-                other.folderId == folderId));
+                other.folderId == folderId) &&
+            (identical(other.isArchived, isArchived) ||
+                other.isArchived == isArchived) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            const DeepCollectionEquality()
+                .equals(other._linkedNoteIds, _linkedNoteIds));
   }
 
   @override
@@ -344,7 +413,10 @@ class _$NoteImpl extends _Note {
       sortOrder,
       isPinned,
       deletedAt,
-      folderId);
+      folderId,
+      isArchived,
+      const DeepCollectionEquality().hash(_tags),
+      const DeepCollectionEquality().hash(_linkedNoteIds));
 
   @JsonKey(ignore: true)
   @override
@@ -366,7 +438,10 @@ abstract class _Note extends Note {
       final int? sortOrder,
       final bool isPinned,
       final DateTime? deletedAt,
-      final String? folderId}) = _$NoteImpl;
+      final String? folderId,
+      final bool isArchived,
+      final List<String> tags,
+      final List<String> linkedNoteIds}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -393,6 +468,12 @@ abstract class _Note extends Note {
   DateTime? get deletedAt;
   @override
   String? get folderId;
+  @override
+  bool get isArchived;
+  @override
+  List<String> get tags;
+  @override
+  List<String> get linkedNoteIds;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>
