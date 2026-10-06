@@ -2,10 +2,12 @@ import 'dart:ui' show Color;
 
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/services/note_text_format.dart';
 
 const maxTemplateNameLength = 80;
 
@@ -22,12 +24,14 @@ class CustomNoteTemplate {
     List<VoiceMemo> voiceMemos = const [],
     List<String> tags = const [],
     List<String> linkedNoteIds = const [],
+    List<NoteTextStyleRange> textStyles = const [],
     required this.createdAt,
   })  : items = List.unmodifiable(items),
         imagePaths = List.unmodifiable(imagePaths),
         voiceMemos = List.unmodifiable(voiceMemos),
         tags = normalizeNoteTags(tags),
-        linkedNoteIds = normalizeLinkedNoteIds(linkedNoteIds);
+        linkedNoteIds = normalizeLinkedNoteIds(linkedNoteIds),
+        textStyles = normalizeNoteTextStyles(textStyles, body);
 
   final String id;
   final String name;
@@ -40,6 +44,7 @@ class CustomNoteTemplate {
   final DateTime createdAt;
   final List<String> tags;
   final List<String> linkedNoteIds;
+  final List<NoteTextStyleRange> textStyles;
 
   factory CustomNoteTemplate.fromNote(Note note,
           {required String name,
@@ -56,6 +61,7 @@ class CustomNoteTemplate {
         voiceMemos: voiceCopies,
         tags: note.tags,
         linkedNoteIds: note.linkedNoteIds,
+        textStyles: note.textStyles,
         createdAt: DateTime.now(),
       );
 
@@ -77,6 +83,7 @@ class CustomNoteTemplate {
       voiceMemos: voiceCopies,
       tags: tags,
       linkedNoteIds: linkedNoteIds,
+      textStyles: textStyles,
       folderId: folderId,
       dateTime: created,
       sortOrder: -created.millisecondsSinceEpoch,
@@ -90,6 +97,7 @@ class CustomNoteTemplate {
     List<VoiceMemo>? voiceMemos,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    List<NoteTextStyleRange>? textStyles,
   }) =>
       CustomNoteTemplate(
         id: id ?? this.id,
@@ -102,6 +110,7 @@ class CustomNoteTemplate {
         voiceMemos: voiceMemos ?? this.voiceMemos,
         tags: tags ?? this.tags,
         linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
+        textStyles: textStyles ?? this.textStyles,
         createdAt: createdAt,
       );
 
@@ -117,6 +126,7 @@ class CustomNoteTemplate {
         'createdAt': createdAt.toIso8601String(),
         'tags': tags,
         'linkedNoteIds': linkedNoteIds,
+        'textStyles': [for (final style in textStyles) style.toMap()],
       };
 
   factory CustomNoteTemplate.fromJson(Map<String, dynamic> json) {
@@ -157,6 +167,22 @@ class CustomNoteTemplate {
       }
       memos.add(memo);
     }
+    final body = text('body');
+    final rawStyles = json['textStyles'] ?? const [];
+    if (rawStyles is! List || rawStyles.length > 10000) {
+      throw const FormatException('Invalid template formatting');
+    }
+    final textStyles = <NoteTextStyleRange>[];
+    for (final raw in rawStyles) {
+      final style = NoteTextStyleRange.tryFromMap(raw);
+      if (style == null) {
+        throw const FormatException('Invalid template formatting');
+      }
+      textStyles.add(style);
+    }
+    if (!areValidNoteTextStyles(textStyles, body)) {
+      throw const FormatException('Invalid template formatting');
+    }
     if (id.isEmpty ||
         createdAt == null ||
         (color != null && (color is! int || color < 0 || color > 0xffffffff))) {
@@ -166,7 +192,8 @@ class CustomNoteTemplate {
       id: id,
       name: name,
       title: text('title'),
-      body: text('body'),
+      body: body,
+      textStyles: textStyles,
       items: list('items'),
       color: color as int?,
       imagePaths: list('imagePaths'),

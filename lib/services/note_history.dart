@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -159,6 +161,7 @@ class NoteHistory extends ChangeNotifier {
           isArchived: current.isArchived,
           tags: List.of(current.tags ?? []),
           linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
+          textStyles: _cloneMemos(snapshot.textStyles),
         );
         // Repository hook captures current content before replacing it. The
         // restore queue is separate from the snapshot queue to allow that hook.
@@ -319,9 +322,11 @@ class NoteHistory extends ChangeNotifier {
       (a.description ?? '') == (b.description ?? '') &&
       _sameStructure(a, b);
 
-  // Coalesce only title/body typing. A task, color, or attachment change is a
-  // discrete version so removing recent media can still be undone.
-  static bool _sameStructure(NoteDto a, NoteDto b) => _equal([
+  // Rebased ranges are part of body typing. Changing formatting itself makes
+  // a discrete version, like a task or attachment change.
+  static bool _sameStructure(NoteDto a, NoteDto b) =>
+      _sameFormatting(a, b) &&
+      _equal([
         a.colorValue,
         [
           for (final todo in a.todoList ?? const <TodoDto>[])
@@ -340,6 +345,30 @@ class NoteHistory extends ChangeNotifier {
         b.voiceMemos ?? const <Map>[],
         b.linkedNoteIds ?? const <String>[],
       ]);
+
+  static bool _sameFormatting(NoteDto a, NoteDto b) {
+    if ((a.textStyles?.isEmpty ?? true) && (b.textStyles?.isEmpty ?? true)) {
+      return true;
+    }
+    final before = a.description ?? '';
+    final after = b.description ?? '';
+    final stylesBefore = normalizeNoteTextStyles([
+      for (final raw in a.textStyles ?? const <Map>[])
+        if (NoteTextStyleRange.tryFromMap(raw) case final style?) style,
+    ], before);
+    final stylesAfter = normalizeNoteTextStyles([
+      for (final raw in b.textStyles ?? const <Map>[])
+        if (NoteTextStyleRange.tryFromMap(raw) case final style?) style,
+    ], after);
+    return _equal([
+      for (final style in before == after
+          ? stylesBefore
+          : rebaseNoteTextStyles(before, after, stylesBefore))
+        style.toMap(),
+    ], [
+      for (final style in stylesAfter) style.toMap()
+    ]);
+  }
 
   static bool _equal(Object? a, Object? b) {
     if (a is List && b is List) {
@@ -371,6 +400,7 @@ class NoteHistory extends ChangeNotifier {
         tags: List.unmodifiable(note.tags ?? const <String>[]),
         linkedNoteIds:
             List.unmodifiable(note.linkedNoteIds ?? const <String>[]),
+        textStyles: _cloneMemos(note.textStyles),
       );
 
   static List<TodoDto> _cloneTodos(List<TodoDto>? todos) => List.unmodifiable([

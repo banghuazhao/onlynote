@@ -225,6 +225,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
+    "Format_Bold": MessageLookupByLibrary.simpleMessage("Bold"),
+    "Format_Bullets": MessageLookupByLibrary.simpleMessage("Bullets"),
+    "Format_Heading": MessageLookupByLibrary.simpleMessage("Heading"),
+    "Format_Text": MessageLookupByLibrary.simpleMessage("Text style"),
     "History_Current": MessageLookupByLibrary.simpleMessage(
       "Already matches this version",
     ),

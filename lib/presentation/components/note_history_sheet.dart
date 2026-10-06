@@ -1,8 +1,10 @@
+import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
 
 Future<bool?> showNoteHistorySheet(BuildContext context,
@@ -246,7 +248,13 @@ class _HistoryPreview extends StatelessWidget {
         ],
         if (note.description?.isNotEmpty ?? false) ...[
           const SizedBox(height: 12),
-          SelectableText(note.description!),
+          FormattedNoteText(
+            text: note.description!,
+            styles: note.toDomain().textStyles,
+            style: AppTypography.formText.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
         ],
         if (note.todoList?.isNotEmpty ?? false) ...[
           const SizedBox(height: 16),

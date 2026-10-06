@@ -3334,6 +3334,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Bold`
+  String get Format_Bold {
+    return Intl.message('Bold', name: 'Format_Bold', desc: '', args: []);
+  }
+
+  /// `Heading`
+  String get Format_Heading {
+    return Intl.message('Heading', name: 'Format_Heading', desc: '', args: []);
+  }
+
+  /// `Bullets`
+  String get Format_Bullets {
+    return Intl.message('Bullets', name: 'Format_Bullets', desc: '', args: []);
+  }
+
+  /// `Text style`
+  String get Format_Text {
+    return Intl.message('Text style', name: 'Format_Text', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

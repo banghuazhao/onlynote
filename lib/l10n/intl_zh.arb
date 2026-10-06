@@ -404,5 +404,9 @@
   "Link_Save_Failed": "无法更新笔记，请重试。",
   "Note_Untitled": "无标题笔记",
   "Open_Linked_Note": "打开关联笔记",
-  "Link_Limit": "最多关联100篇笔记。请移除一个关联后再添加。"
+  "Link_Limit": "最多关联100篇笔记。请移除一个关联后再添加。",
+  "Format_Bold": "粗体",
+  "Format_Heading": "标题",
+  "Format_Bullets": "项目符号",
+  "Format_Text": "文字样式"
 }

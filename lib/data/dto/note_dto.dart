@@ -7,6 +7,8 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_text_format.dart';
 
 part 'note_dto.g.dart';
 
@@ -60,6 +62,7 @@ class NoteDto implements Comparable {
     this.isArchived = false,
     this.tags = const [],
     this.linkedNoteIds = const [],
+    this.textStyles = const [],
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -77,6 +80,11 @@ class NoteDto implements Comparable {
       folderId: note.folderId,
       voiceMemos: note.voiceMemos.map((memo) => memo.toMap()).toList(),
       isArchived: note.isArchived,
+      textStyles: [
+        for (final range
+            in normalizeNoteTextStyles(note.textStyles, note.description ?? ''))
+          range.toMap()
+      ],
       tags: normalizeNoteTags(note.tags),
       linkedNoteIds:
           normalizeLinkedNoteIds(note.linkedNoteIds, noteId: note.id),
@@ -99,6 +107,11 @@ class NoteDto implements Comparable {
       isArchived: isArchived,
       tags: tags ?? [],
       linkedNoteIds: linkedNoteIds ?? [],
+      textStyles: normalizeNoteTextStyles(
+          (textStyles ?? [])
+              .map(NoteTextStyleRange.tryFromMap)
+              .whereType<NoteTextStyleRange>(),
+          description ?? ''),
       voiceMemos: (voiceMemos ?? [])
           .map(VoiceMemo.tryFromMap)
           .whereType<VoiceMemo>()
@@ -131,6 +144,7 @@ class NoteDto implements Comparable {
     bool? isArchived,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    List<Map<dynamic, dynamic>>? textStyles,
     String? deletedAt,
     String? folderId,
     bool clearDeletedAt = false,
@@ -149,6 +163,7 @@ class NoteDto implements Comparable {
       isArchived: isArchived ?? this.isArchived,
       tags: tags ?? this.tags,
       linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
+      textStyles: textStyles ?? this.textStyles,
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
       voiceMemos: voiceMemos ?? this.voiceMemos,
@@ -185,6 +200,8 @@ class NoteDto implements Comparable {
   final List<String>? tags;
   @HiveField(14)
   final List<String>? linkedNoteIds;
+  @HiveField(15)
+  final List<Map<dynamic, dynamic>>? textStyles;
 
   @override
   int compareTo(other) {

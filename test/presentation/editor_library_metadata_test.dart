@@ -7,11 +7,13 @@ import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/add_note_usecase.dart';
 import 'package:onlynote/domain/usecase/update_note_usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
 import 'package:onlynote/presentation/screens/add_update_note/add_update_note_screen.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -142,6 +144,109 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
+
+  testWidgets('formatting alone autosaves without changing note metadata',
+      (tester) async {
+    final initial = Note(
+      id: 'current',
+      title: 'Trip',
+      description: 'Pack snacks',
+      dateTime: DateTime.utc(2026, 10, 6),
+      folderId: 'travel',
+      isPinned: true,
+      isArchived: true,
+      tags: const ['Personal'],
+      linkedNoteIds: const ['packing'],
+      voiceMemos: [
+        VoiceMemo(
+            id: 'memo',
+            path: 'note_audio/memo.m4a',
+            durationMs: 1000,
+            createdAt: DateTime.utc(2026, 10, 6))
+      ],
+    );
+    final (notes, store) = await _openEditor(tester, note: initial);
+    final body = find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 100);
+    await _tap(tester, body);
+    final field = tester.widget<TextField>(body);
+    final controller = field.controller! as SimpleFormattingController;
+    controller.selection = const TextSelection(baseOffset: 0, extentOffset: 4);
+    await tester.pump();
+    await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(controller.selection,
+        const TextSelection(baseOffset: 0, extentOffset: 4));
+    await _waitForAutosave(tester);
+
+    final saved = notes.values['current']!.toDomain();
+    expect(store.saved, isNotEmpty);
+    expect(
+        saved,
+        initial.copyWith(dateTime: saved.dateTime, textStyles: const [
+          NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.bold),
+        ]));
+    expect(store.drafts, isEmpty);
+
+    // Opening the saved note must restore the same spans and readable body.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await _openEditor(tester, note: saved);
+    final reopened = tester.widget<TextField>(body).controller!
+        as SimpleFormattingController;
+    expect(reopened.text, 'Pack snacks');
+    expect(reopened.styles, saved.textStyles);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('heading and bullets save a readable body with literal symbols',
+      (tester) async {
+    final (notes, store) = await _openEditor(tester,
+        note: Note(
+          id: 'current',
+          title: 'Ideas',
+          description: 'Weekend\n# literal **stars**',
+        ));
+    final body = find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 100);
+    await _tap(tester, body);
+    final controller = tester.widget<TextField>(body).controller!
+        as SimpleFormattingController;
+    controller.selection = const TextSelection.collapsed(offset: 3);
+    await _tap(tester, find.byKey(const ValueKey('format-heading')));
+    controller.selection = const TextSelection.collapsed(offset: 15);
+    await _tap(tester, find.byKey(const ValueKey('format-bullets')));
+    await _waitForAutosave(tester);
+    final saved = notes.values['current']!.toDomain();
+    expect(saved.description, 'Weekend\n• # literal **stars**');
+    expect(saved.textStyles, const [
+      NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.heading),
+    ]);
+    expect(store.drafts, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('bold before typing does not save an empty note', (tester) async {
+    final (notes, store) = await _openEditor(tester);
+    await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    await _waitForAutosave(tester);
+    expect(notes.values, isEmpty);
+    expect(store.saved, isEmpty);
+    expect(store.drafts, isEmpty);
+
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: '新想法💡',
+      selection: TextSelection.collapsed(offset: 5),
+    ));
+    await _waitForAutosave(tester);
+    final saved = notes.values.values.single.toDomain();
+    expect(saved.description, '新想法💡');
+    expect(saved.textStyles, const [
+      NoteTextStyleRange(start: 0, end: 5, kind: NoteTextStyleKind.bold),
+    ]);
+    expect(store.drafts, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('editing tags preserves archived note metadata and media',
       (tester) async {

@@ -5,11 +5,13 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/services/saved_note_views.dart';
+import 'package:onlynote/services/note_text_format.dart';
 
 const maxBackupBytes = 256 * 1024 * 1024;
 const maxBackupAudioBytes = 32 * 1024 * 1024;
@@ -61,7 +63,7 @@ class BackupContents {
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 4,
+        'version': 5,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -122,6 +124,7 @@ class BackupContents {
         'isArchived': note.isArchived,
         'tags': note.tags ?? [],
         'linkedNoteIds': note.linkedNoteIds ?? [],
+        'textStyles': note.textStyles ?? [],
         'photos': note.imagePaths ?? [],
         'voiceMemos': note.voiceMemos ?? [],
         'todos': [
@@ -137,7 +140,11 @@ class BackupContents {
   factory BackupContents.fromJson(Map<String, dynamic> json) {
     final version = json['version'];
     if (json['format'] != 'onlynote-backup' ||
-        (version != 1 && version != 2 && version != 3 && version != 4)) {
+        (version != 1 &&
+            version != 2 &&
+            version != 3 &&
+            version != 4 &&
+            version != 5)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -219,22 +226,27 @@ class BackupContents {
             title: _text(todo['title'], nullable: true),
             completed: todo['completed'] as bool));
       }
+      final description = _text(map['description'], nullable: true);
+      final textStyles = version >= 5
+          ? _textStyles(map['textStyles'] ?? const [], description ?? '')
+          : const <NoteTextStyleRange>[];
       return NoteDto(
         id: id,
         title: _text(map['title'], nullable: true),
-        description: _text(map['description'], nullable: true),
+        description: description,
+        textStyles: [for (final style in textStyles) style.toMap()],
         colorValue: color,
         dateTime: _date(map['dateTime']),
         sortOrder: map['sortOrder'] as int?,
         isPinned: map['isPinned'] as bool,
         deletedAt: _date(map['deletedAt']),
         folderId: folder,
-        isArchived: version == 4 ? map['isArchived'] as bool : false,
-        tags: version == 4
+        isArchived: version >= 4 ? map['isArchived'] as bool : false,
+        tags: version >= 4
             ? normalizeNoteTags(
                 _list(map['tags'], max: maxNoteTags).cast<String>())
             : const [],
-        linkedNoteIds: version == 4
+        linkedNoteIds: version >= 4
             ? normalizeLinkedNoteIds(
                 _list(map['linkedNoteIds'], max: maxLinkedNotes).cast<String>(),
                 noteId: id)
@@ -282,6 +294,7 @@ class BackupContents {
         ...map,
         'imagePaths': [],
         'voiceMemos': [],
+        if (version < 5) 'textStyles': [],
       }).copyWith(imagePaths: paths, voiceMemos: memos);
       _id(template.id);
       if (!templateIds.add(template.id)) {
@@ -319,7 +332,7 @@ class BackupContents {
     }
     final savedViews = <SavedNoteView>[];
     final viewIds = <String>{};
-    if (version == 4) {
+    if (version >= 4) {
       for (final raw
           in _list(json['savedViews'], max: SavedNoteViewStore.maxViews)) {
         if (raw is! Map) throw const FormatException('Invalid saved view');
@@ -364,6 +377,21 @@ class BackupContents {
       memos.add(memo.copyWith(path: path));
     }
     return memos;
+  }
+
+  static List<NoteTextStyleRange> _textStyles(dynamic value, String text) {
+    final styles = <NoteTextStyleRange>[];
+    for (final raw in _list(value, max: maxBackupRecords)) {
+      final style = NoteTextStyleRange.tryFromMap(raw);
+      if (style == null) {
+        throw const FormatException('Invalid text formatting');
+      }
+      styles.add(style);
+    }
+    if (!areValidNoteTextStyles(styles, text)) {
+      throw const FormatException('Invalid text formatting');
+    }
+    return normalizeNoteTextStyles(styles, text);
   }
 
   static List<String> _photoRefs(

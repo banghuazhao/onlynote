@@ -173,12 +173,13 @@ class ShareHelper {
             buildNotePdf,
             NotePdfData(
               title: note.title ?? '',
-              description: [
-                if (note.description?.isNotEmpty == true) note.description!,
+              description: note.description ?? '',
+              textStyles: note.textStyles,
+              transcripts: [
                 ...note.voiceMemos
                     .map((memo) => memo.transcript ?? '')
                     .where((text) => text.isNotEmpty),
-              ].join('\n\n'),
+              ],
               date: note.dateWithTime,
               todos:
                   note.todo.map((t) => (t.completed, t.title ?? '')).toList(),

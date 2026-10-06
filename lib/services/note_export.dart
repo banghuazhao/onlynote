@@ -2,6 +2,8 @@ import 'package:characters/characters.dart';
 import 'dart:typed_data';
 
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_text_format.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -31,7 +33,7 @@ class NoteExport {
       ].join('\n\n');
 
   static String _escape(String text) => text.replaceAllMapped(
-      RegExp(r'[\\`*_{}\[\]<>()#+\-.!|~]'), (m) => '\\${m[0]}');
+      RegExp(r'[\\`*_{}\[\]<>()#+\-.!|~&]'), (m) => '\\${m[0]}');
 
   static String markdown(Note note,
           {String? reminder,
@@ -41,7 +43,8 @@ class NoteExport {
       [
         if (note.title?.isNotEmpty == true)
           '# ${_escape(note.title!).replaceAll('\n', ' ')}',
-        if (note.description?.isNotEmpty == true) _escape(note.description!),
+        if (note.description?.isNotEmpty == true)
+          noteTextToMarkdown(note.description!, note.textStyles),
         ...note.voiceMemos
             .map((memo) => memo.transcript ?? '')
             .where((text) => text.isNotEmpty)
@@ -64,34 +67,84 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
   final regular = pw.Font.ttf(ByteData.sublistView(data.regular));
   final bold = pw.Font.ttf(ByteData.sublistView(data.bold));
   final fallback = pw.Font.ttf(ByteData.sublistView(data.fallback));
+  final boldGlyphs =
+      TtfParser(ByteData.sublistView(data.bold)).charToGlyphIndexMap;
   final document = pw.Document(title: data.title, creator: 'Onlynote');
   final baseStyle = pw.TextStyle(
-      font: regular, fontFallback: [fallback], fontSize: 12, lineSpacing: 4);
-  pw.Widget text(String value, {bool heading = false}) {
-    final style =
-        heading ? baseStyle.copyWith(font: bold, fontSize: 22) : baseStyle;
+      fontNormal: regular,
+      fontBold: bold,
+      fontFallback: [fallback],
+      fontSize: 12,
+      lineSpacing: 4);
+  pw.Widget text(String value,
+      {bool heading = false, List<NoteTextStyleRange> textStyles = const []}) {
+    final ranges = normalizeNoteTextStyles(textStyles, value).toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+    final style = heading
+        ? baseStyle.copyWith(fontWeight: pw.FontWeight.bold, fontSize: 22)
+        : baseStyle;
     final spans = <pw.InlineSpan>[];
     final buffer = StringBuffer();
+    pw.TextStyle? bufferedStyle;
+    bool? bufferedBold, bufferedHeading, bufferedSynthetic;
+    void flush() {
+      if (buffer.isEmpty) return;
+      // pdf's fill text mode omits a reset operator, so explicitly reset it
+      // between runs. This zero-size span leaves text metrics unchanged.
+      spans.add(pw.WidgetSpan(child: _ResetPdfTextMode()));
+      spans.add(pw.TextSpan(text: buffer.toString(), style: bufferedStyle));
+      buffer.clear();
+    }
+
+    var offset = 0;
+    var rangeIndex = 0;
+    final active = <NoteTextStyleRange>[];
     for (final character in value.characters) {
+      final characterEnd = offset + character.length;
+      active.removeWhere((range) => range.end <= offset);
+      while (rangeIndex < ranges.length &&
+          ranges[rangeIndex].start < characterEnd) {
+        active.add(ranges[rangeIndex++]);
+      }
+      final isHeading =
+          active.any((range) => range.kind == NoteTextStyleKind.heading);
+      final isBold = isHeading ||
+          active.any((range) => range.kind == NoteTextStyleKind.bold);
+      // The bundled CJK fallback has no bold face. A thin outline thickens
+      // only fallback glyphs, retaining selectable text and identical metrics.
+      final syntheticBold = (heading || isBold) &&
+          character.runes.any((rune) => !boldGlyphs.containsKey(rune));
+      if (bufferedBold != isBold ||
+          bufferedHeading != isHeading ||
+          bufferedSynthetic != syntheticBold) {
+        flush();
+        bufferedStyle = style.copyWith(
+            fontWeight:
+                heading || isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+            renderingMode: syntheticBold
+                ? PdfTextRenderingMode.fillAndStroke
+                : PdfTextRenderingMode.fill,
+            fontSize: isHeading ? 18 : style.fontSize);
+        bufferedBold = isBold;
+        bufferedHeading = isHeading;
+        bufferedSynthetic = syntheticBold;
+      }
       final glyph = data.glyphs[character];
       if (glyph == null) {
         buffer.write(character);
       } else {
-        if (buffer.isNotEmpty) {
-          spans.add(pw.TextSpan(text: buffer.toString()));
-          buffer.clear();
-        }
+        flush();
         final image = pw.MemoryImage(glyph);
         spans.add(pw.WidgetSpan(
             child: pw.Image(image,
-                height: style.fontSize!,
-                width: style.fontSize! * image.width! / image.height!)));
+                height: bufferedStyle!.fontSize!,
+                width:
+                    bufferedStyle.fontSize! * image.width! / image.height!)));
       }
+      offset = characterEnd;
     }
-    if (buffer.isNotEmpty) spans.add(pw.TextSpan(text: buffer.toString()));
-    return pw.RichText(
-        text: pw.TextSpan(children: spans, style: style),
-        overflow: pw.TextOverflow.span);
+    flush();
+    return _NotePdfRichText(text: pw.TextSpan(children: spans, style: style));
   }
 
   document.addPage(pw.MultiPage(
@@ -112,7 +165,11 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
       ],
       if (data.date.isNotEmpty) ...[text(data.date), pw.SizedBox(height: 16)],
       if (data.description.isNotEmpty) ...[
-        text(data.description),
+        text(data.description, textStyles: data.textStyles),
+        pw.SizedBox(height: 16)
+      ],
+      for (final transcript in data.transcripts) ...[
+        text(transcript),
         pw.SizedBox(height: 16)
       ],
       for (final todo in data.todos) ...[
@@ -133,6 +190,35 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
   return document.save();
 }
 
+class _NotePdfRichText extends pw.RichText {
+  _NotePdfRichText({required super.text})
+      : super(overflow: pw.TextOverflow.span);
+
+  @override
+  void paint(pw.Context context) {
+    context.canvas
+      ..saveContext()
+      ..setStrokeColor(PdfColors.black)
+      ..setLineWidth(.36);
+    super.paint(context);
+    context.canvas.restoreContext();
+  }
+}
+
+class _ResetPdfTextMode extends pw.Widget {
+  @override
+  void layout(pw.Context context, pw.BoxConstraints constraints,
+      {bool parentUsesSize = false}) {
+    box = const PdfRect(0, 0, 0, 0);
+  }
+
+  @override
+  void paint(pw.Context context) {
+    super.paint(context);
+    context.canvas.reset();
+  }
+}
+
 class NotePdfData {
   const NotePdfData(
       {required this.title,
@@ -144,11 +230,15 @@ class NotePdfData {
       required this.bold,
       required this.fallback,
       this.reminder,
+      this.textStyles = const [],
+      this.transcripts = const [],
       this.glyphs = const {}});
   final String title, description, date;
   final List<(bool, String)> todos;
   final List<Uint8List> photos;
   final Uint8List regular, bold, fallback;
   final String? reminder;
+  final List<NoteTextStyleRange> textStyles;
+  final List<String> transcripts;
   final Map<String, Uint8List> glyphs;
 }

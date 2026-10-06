@@ -5,6 +5,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
   const factory AddUpdateFormEvent.initialize({
     String? title,
     String? description,
+    List<NoteTextStyleRange>? textStyles,
     Color? color,
     List<Todo>? todos,
     List<String>? imagePaths,
@@ -17,6 +18,9 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
 
   const factory AddUpdateFormEvent.descriptionChanged(String value) =
       _DescriptionChanged;
+
+  const factory AddUpdateFormEvent.bodyChanged(
+      String text, List<NoteTextStyleRange> styles) = _BodyChanged;
 
   const factory AddUpdateFormEvent.colorChanged(Color value) = _ColorChanged;
 

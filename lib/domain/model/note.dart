@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'voice_memo.dart';
+import 'note_text_style.dart';
 
 part 'note.freezed.dart';
 
@@ -27,6 +28,7 @@ class Note with _$Note {
     @Default(false) bool isArchived,
     @Default([]) List<String> tags,
     @Default([]) List<String> linkedNoteIds,
+    @Default([]) List<NoteTextStyleRange> textStyles,
   }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');

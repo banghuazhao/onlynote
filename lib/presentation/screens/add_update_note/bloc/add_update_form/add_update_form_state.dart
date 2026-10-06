@@ -6,6 +6,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
   factory AddUpdateFormState(
       {String? title,
       String? description,
+      @Default([]) List<NoteTextStyleRange> textStyles,
       Color? selectedColor,
       @Default([]) List<Todo> todos,
       @Default([]) List<String> imagePaths,

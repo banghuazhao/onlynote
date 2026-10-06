@@ -1,3 +1,4 @@
+import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -740,8 +741,10 @@ class LoadedView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacings.xxl),
                     },
-                    SelectableText(
-                      note.description ?? '',
+                    FormattedNoteText(
+                      text: note.description ?? '',
+                      styles: note.textStyles,
+                      selectable: !exportMode,
                       style: AppTypography.headline6.copyWith(
                         fontWeight: FontWeight.w400,
                         color: AppColors.ink.withValues(alpha: 0.88),

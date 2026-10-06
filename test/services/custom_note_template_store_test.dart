@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
@@ -106,6 +107,45 @@ void main() {
     await store.load();
     expect(store.templates.single.voiceMemos, isEmpty);
     expect((await store.createNote('old')).voiceMemos, isEmpty);
+  });
+
+  test('formatted templates preserve readable body and styling through reuse',
+      () async {
+    const body = 'Summary\n• Bring tea\nImportant';
+    const styles = [
+      NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.heading),
+      NoteTextStyleRange(start: 20, end: 29, kind: NoteTextStyleKind.bold),
+    ];
+    final template = await store.saveFromNote(
+        Note(description: body, textStyles: styles),
+        name: 'Meeting');
+    final restarted = CustomNoteTemplateStore(
+        preferences: preferences, documentsPath: documents.path);
+    addTearDown(restarted.dispose);
+    await restarted.load();
+    expect(restarted.templates.single.body, body);
+    expect(restarted.templates.single.textStyles, styles);
+    final note = await restarted.createNote(template.id);
+    expect(note.description, body);
+    expect(note.textStyles, styles);
+  });
+
+  test('legacy template body markers are never interpreted as formatting', () {
+    final json = CustomNoteTemplate(
+            id: 'old',
+            name: 'Old',
+            body: '# Heading\n**literal**',
+            createdAt: DateTime(2026))
+        .toJson()
+      ..remove('textStyles');
+    final template = CustomNoteTemplate.fromJson(json);
+    expect(template.textStyles, isEmpty);
+    expect(template.createNote(imageCopies: []).description,
+        '# Heading\n**literal**');
+    json['textStyles'] = [
+      {'start': 0, 'end': 1000, 'kind': 'bold'}
+    ];
+    expect(() => CustomNoteTemplate.fromJson(json), throwsFormatException);
   });
 
   test('failed persistence removes audio copies and retains original audio',

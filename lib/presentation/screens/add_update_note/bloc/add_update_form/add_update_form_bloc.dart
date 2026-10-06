@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
     show AddUpdateBloc, AddUpdateEvent;
 
@@ -26,6 +27,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
         AddUpdateFormState(
           title: event.title,
           description: event.description,
+          textStyles: event.textStyles ?? [],
           selectedColor: event.color,
           todos: event.todos ?? [],
           imagePaths: event.imagePaths ?? [],
@@ -42,6 +44,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
         emit(state.copyWith(title: event.value));
       }
 
+      if (event is _BodyChanged) {
+        emit(state.copyWith(description: event.text, textStyles: event.styles));
+      }
       if (event is _DescriptionChanged) {
         emit(state.copyWith(description: event.value));
       }
@@ -67,6 +72,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           color: state.selectedColor,
           title: state.title,
           description: state.description,
+          textStyles: state.textStyles,
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
@@ -85,6 +91,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           color: state.selectedColor,
           title: state.title,
           description: state.description,
+          textStyles: state.textStyles,
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,

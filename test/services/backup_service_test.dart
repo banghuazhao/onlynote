@@ -8,6 +8,7 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
@@ -111,7 +112,7 @@ void main() {
         folderId: 'folder',
         archiveScope: NoteArchiveScope.all);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 4);
+    expect(backup.toJson()['version'], 5);
     await service.restore(backup);
     final imported = notes.values
         .cast<NoteDto>()
@@ -149,6 +150,90 @@ void main() {
     expect(savedViews.views.map((view) => view.name), ['Existing']);
     expect(notes.values, isEmpty);
     expect(journal.get('pending'), isNull);
+  });
+
+  test('v5 preserves formatting in notes, historical versions, and templates',
+      () async {
+    const body = 'Heading\n• Item\nBold';
+    const styles = [
+      NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.heading),
+      NoteTextStyleRange(start: 15, end: 19, kind: NoteTextStyleKind.bold),
+    ];
+    final before = NoteDto(
+        id: 'formatted',
+        description: body,
+        isArchived: true,
+        tags: ['Work'],
+        textStyles: [for (final style in styles) style.toMap()]);
+    final after = before.copyWith(textStyles: []);
+    await notes.put('formatted', after);
+    await history.recordBeforeSave(before, after);
+    final template =
+        await templates.saveFromNote(before.toDomain(), name: 'Formatted');
+    final backup = decodeBackup(await service.export());
+    expect(backup.toJson()['version'], 5);
+    expect(backup.notes.single.toDomain().textStyles, isEmpty);
+    expect(backup.histories['formatted']!.single.note.toDomain().textStyles,
+        styles);
+    expect(backup.templates.single.textStyles, styles);
+    await service.restore(backup);
+    final restored = notes.values
+        .cast<NoteDto>()
+        .singleWhere((note) => note.id != 'formatted');
+    expect(restored.description, body);
+    expect(restored.isArchived, isTrue);
+    expect(restored.tags, ['Work']);
+    final restoredVersion = history.versionsFor(restored.id!).single;
+    expect(restoredVersion.note.toDomain().textStyles, styles);
+    expect(await history.restore(restored.id!, restoredVersion.id),
+        NoteHistoryRestoreResult.restored);
+    expect((notes.get(restored.id) as NoteDto).toDomain().textStyles, styles);
+    expect(
+        templates.templates.singleWhere((t) => t.id != template.id).textStyles,
+        styles);
+  });
+
+  test(
+      'v4 literal body markers stay literal and missing v5 styles default empty',
+      () {
+    final json = BackupContents(
+        createdAt: DateTime.now(),
+        notes: [NoteDto(id: 'legacy', description: '# Heading\n**not bold**')],
+        folders: [],
+        photos: {},
+        reminders: []).toJson();
+    (json['notes'] as List).single.remove('textStyles');
+    final v5 = BackupContents.fromJson(json);
+    expect(v5.notes.single.toDomain().textStyles, isEmpty);
+    json['version'] = 4;
+    (json['notes'] as List).single['textStyles'] = [42];
+    final v4 = BackupContents.fromJson(json);
+    expect(v4.notes.single.description, '# Heading\n**not bold**');
+    expect(v4.notes.single.toDomain().textStyles, isEmpty);
+  });
+
+  test('v5 malformed formatting fails validation before any restore writes',
+      () async {
+    final original = BackupContents(
+        createdAt: DateTime.now(),
+        notes: [NoteDto(id: 'incoming', description: '😊x')],
+        folders: [],
+        photos: {},
+        reminders: []).toJson();
+    for (final raw in [
+      {'start': 0, 'end': 2, 'kind': 'unknown'},
+      {'start': -1, 'end': 2, 'kind': 'bold'},
+      {'start': 0, 'end': 20, 'kind': 'bold'},
+      {'start': 1, 'end': 2, 'kind': 'bold'},
+      {'start': 2, 'end': 2, 'kind': 'bold'},
+      {'start': true, 'end': 2, 'kind': 'bold'},
+    ]) {
+      final changed = jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+      (changed['notes'] as List).single['textStyles'] = [raw];
+      expect(() => BackupContents.fromJson(changed), throwsFormatException);
+    }
+    expect(notes.isEmpty, isTrue);
+    expect(journal.isEmpty, isTrue);
   });
 
   test(
@@ -520,7 +605,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 4);
+    expect(backup.toJson()['version'], 5);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

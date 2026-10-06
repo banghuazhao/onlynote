@@ -7,6 +7,9 @@ import 'package:uuid/uuid.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
+import 'package:onlynote/presentation/components/note_formatting_toolbar.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/presentation/components/note_links_section.dart';
 import 'package:onlynote/presentation/components/note_link_picker_sheet.dart';
@@ -95,7 +98,8 @@ class AddUpdateNoteScreen extends StatefulWidget {
 class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     with WidgetsBindingObserver {
   late final TextEditingController _titleController;
-  late final TextEditingController _descriptionController;
+  late final SimpleFormattingController _descriptionController;
+  final FocusNode _bodyFocus = FocusNode();
   late final AddUpdateFormBloc _form;
   late final NoteAutosave _autosave;
   late final StreamSubscription<AddUpdateFormState> _changes;
@@ -151,7 +155,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               : const [],
         );
     _titleController = TextEditingController(text: initial.title);
-    _descriptionController = TextEditingController(text: initial.description);
+    _descriptionController = SimpleFormattingController(
+        text: initial.description, styles: initial.textStyles);
     _autosave = NoteAutosave(
       store: widget.autosaveStore ??
           HiveNoteAutosaveStore(
@@ -164,6 +169,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         AddUpdateFormState(
           title: initial.title,
           description: initial.description,
+          textStyles: initial.textStyles,
           selectedColor: initial.color,
           todos: initial.todo,
           imagePaths: initial.imagePaths,
@@ -177,6 +183,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _capture(state);
       _queueReminderSuggestion();
     });
+    _descriptionController.addListener(_bodyChanged);
     _editorWidgetCommands =
         widget.widgetCommands ?? WidgetCommands.initializedInstance;
     _registerWidgetEditor();
@@ -280,10 +287,22 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  void _bodyChanged() {
+    if (_refreshingFromLibrary || !mounted || _form.isClosed) return;
+    final text = _descriptionController.text;
+    final styles = _descriptionController.styles;
+    if ((_form.state.description ?? '') == text &&
+        listEquals(_form.state.textStyles, styles)) {
+      return;
+    }
+    _form.add(AddUpdateFormEvent.bodyChanged(text, styles));
+  }
+
   void _capture(AddUpdateFormState state) {
     final next = _autosave.note.copyWith(
       title: _titleController.text,
       description: _descriptionController.text,
+      textStyles: _descriptionController.styles,
       color: state.selectedColor,
       todo: state.todos,
       imagePaths: state.imagePaths,
@@ -365,12 +384,14 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       if (text == null || text.trim().isEmpty || !mounted) return;
       // Append to the latest editor text so recognition never replaces typing.
       final previous = _descriptionController.text;
+      final retained = previous.trimRight();
+      final styles =
+          normalizeNoteTextStyles(_descriptionController.styles, retained);
       final updated =
-          '${previous.trimRight()}${previous.trim().isEmpty ? '' : '\n\n'}${text.trim()}';
-      _descriptionController.value = TextEditingValue(
-          text: updated,
-          selection: TextSelection.collapsed(offset: updated.length));
-      _form.add(AddUpdateFormEvent.descriptionChanged(updated));
+          '$retained${previous.trim().isEmpty ? '' : '\n\n'}${text.trim()}';
+      _descriptionController.setDocument(updated, styles);
+      _descriptionController.selection =
+          TextSelection.collapsed(offset: updated.length);
       await Future<void>.delayed(Duration.zero);
       _capture(_form.state);
       final saved = await _autosave.flush();
@@ -738,10 +759,12 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       try {
         if (!_autosave.adoptSavedNote(refreshed)) return;
         _titleController.text = refreshed.title ?? '';
-        _descriptionController.text = refreshed.description ?? '';
+        _descriptionController.setDocument(
+            refreshed.description ?? '', refreshed.textStyles);
         final state = AddUpdateFormState(
             title: refreshed.title,
             description: refreshed.description,
+            textStyles: refreshed.textStyles,
             selectedColor: refreshed.color,
             todos: refreshed.todo,
             imagePaths: refreshed.imagePaths,
@@ -753,6 +776,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           _form.add(AddUpdateFormEvent.initialize(
               title: refreshed.title,
               description: refreshed.description,
+              textStyles: refreshed.textStyles,
               color: refreshed.color,
               todos: refreshed.todo,
               imagePaths: refreshed.imagePaths,
@@ -912,7 +936,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _autosave.removeListener(_refreshStatus);
     unawaited(_autosave.flush().whenComplete(_autosave.dispose));
     _titleController.dispose();
+    _descriptionController.removeListener(_bodyChanged);
     _descriptionController.dispose();
+    _bodyFocus.dispose();
     super.dispose();
   }
 
@@ -941,6 +967,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               state: state,
               titleController: _titleController,
               descriptionController: _descriptionController,
+              bodyFocus: _bodyFocus,
               status: _autosave.status,
               onDone: _finish,
               onAddPhoto: _addPhoto,
@@ -970,7 +997,8 @@ class _BuildForm extends StatelessWidget {
   const _BuildForm({
     required this.widget,
     required TextEditingController titleController,
-    required TextEditingController descriptionController,
+    required SimpleFormattingController descriptionController,
+    required this.bodyFocus,
     required this.state,
     required this.status,
     required this.onDone,
@@ -996,7 +1024,8 @@ class _BuildForm extends StatelessWidget {
 
   final AddUpdateNoteScreen widget;
   final TextEditingController _titleController;
-  final TextEditingController _descriptionController;
+  final SimpleFormattingController _descriptionController;
+  final FocusNode bodyFocus;
   final AddUpdateFormState state;
   final AutosaveStatus status;
   final VoidCallback onDone;
@@ -1152,6 +1181,7 @@ class _BuildForm extends StatelessWidget {
                         ),
                       const SizedBox(height: AppSpacings.xml),
                       _BuildDescriptionField(
+                        focusNode: bodyFocus,
                         state: state,
                         descriptionController: _descriptionController,
                         autofocus: widget.note == null &&

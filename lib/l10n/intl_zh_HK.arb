@@ -404,5 +404,9 @@
   "Link_Save_Failed": "無法更新筆記，請再試一次。",
   "Note_Untitled": "無標題筆記",
   "Open_Linked_Note": "開啟連結筆記",
-  "Link_Limit": "最多連結100篇筆記。請移除一個連結後再新增。"
+  "Link_Limit": "最多連結100篇筆記。請移除一個連結後再新增。",
+  "Format_Bold": "粗體",
+  "Format_Heading": "標題",
+  "Format_Bullets": "項目符號",
+  "Format_Text": "文字樣式"
 }

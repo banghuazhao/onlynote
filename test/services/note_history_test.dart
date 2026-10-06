@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_history.dart';
 
@@ -99,6 +100,51 @@ void main() {
     expect(repository.notes['note']!.linkedNoteIds, ['one']);
     expect(repository.notes['note']!.isArchived, isTrue);
     expect(repository.notes['note']!.tags, ['New']);
+  });
+
+  test('styled typing coalesces while formatting changes create restore points',
+      () async {
+    Map<String, dynamic> bold(int end) =>
+        const NoteTextStyleRange(start: 0, end: 5, kind: NoteTextStyleKind.bold)
+            .toMap()
+          ..['end'] = end;
+    final before =
+        NoteDto(id: 'styled', description: 'Hello', textStyles: [bold(5)]);
+    repository.notes['styled'] = before;
+    await repository.addUpdateNote(
+        before.copyWith(description: 'HeXllo', textStyles: [bold(6)]));
+    now = now.add(const Duration(seconds: 1));
+    final current = repository.notes['styled']!;
+    await repository.addUpdateNote(
+        current.copyWith(description: 'HeXYllo', textStyles: [bold(7)]));
+    expect(history.versionsFor('styled').length, 1);
+    expect(history.versionsFor('styled').single.note.description, 'Hello');
+    await repository
+        .addUpdateNote(repository.notes['styled']!.copyWith(textStyles: []));
+    final formattedVersion = history.versionsFor('styled').first;
+    expect(history.versionsFor('styled').length, 2);
+    expect(formattedVersion.note.description, 'HeXYllo');
+    expect(formattedVersion.note.textStyles, [bold(7)]);
+    await repository.addUpdateNote(repository.notes['styled']!
+        .copyWith(isArchived: true, tags: ['Current']));
+    expect(await history.restore('styled', formattedVersion.id),
+        NoteHistoryRestoreResult.restored);
+    expect(repository.notes['styled']!.textStyles, [bold(7)]);
+    expect(repository.notes['styled']!.isArchived, isTrue);
+    expect(repository.notes['styled']!.tags, ['Current']);
+  });
+
+  test('formatting snapshots own their map data across later draft mutations',
+      () async {
+    final style = <String, dynamic>{'start': 0, 'end': 4, 'kind': 'bold'};
+    final before =
+        NoteDto(id: 'styled', description: 'Text', textStyles: [style]);
+    await history.recordBeforeSave(before, before.copyWith(textStyles: []));
+    style['end'] = 1;
+    final snapshot = history.versionsFor('styled').single.note;
+    expect(snapshot.textStyles!.single['end'], 4);
+    expect(
+        () => snapshot.textStyles!.single['end'] = 2, throwsUnsupportedError);
   });
 
   test('metadata-only edits and empty seeds never create content history',

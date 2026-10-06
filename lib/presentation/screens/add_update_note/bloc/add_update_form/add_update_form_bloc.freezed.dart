@@ -21,6 +21,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -30,6 +31,8 @@ mixin _$AddUpdateFormEvent {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -53,6 +56,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -62,6 +66,8 @@ mixin _$AddUpdateFormEvent {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -85,6 +91,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -94,6 +101,7 @@ mixin _$AddUpdateFormEvent {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -118,6 +126,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -139,6 +148,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -160,6 +170,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -206,6 +217,7 @@ abstract class _$$InitializeImplCopyWith<$Res> {
   $Res call(
       {String? title,
       String? description,
+      List<NoteTextStyleRange>? textStyles,
       Color? color,
       List<Todo>? todos,
       List<String>? imagePaths,
@@ -227,6 +239,7 @@ class __$$InitializeImplCopyWithImpl<$Res>
   $Res call({
     Object? title = freezed,
     Object? description = freezed,
+    Object? textStyles = freezed,
     Object? color = freezed,
     Object? todos = freezed,
     Object? imagePaths = freezed,
@@ -243,6 +256,10 @@ class __$$InitializeImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      textStyles: freezed == textStyles
+          ? _value._textStyles
+          : textStyles // ignore: cast_nullable_to_non_nullable
+              as List<NoteTextStyleRange>?,
       color: freezed == color
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
@@ -277,13 +294,15 @@ class _$InitializeImpl implements _Initialize {
   const _$InitializeImpl(
       {this.title,
       this.description,
+      final List<NoteTextStyleRange>? textStyles,
       this.color,
       final List<Todo>? todos,
       final List<String>? imagePaths,
       final List<VoiceMemo>? voiceMemos,
       final List<String>? tags,
       final List<String>? linkedNoteIds})
-      : _todos = todos,
+      : _textStyles = textStyles,
+        _todos = todos,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
         _tags = tags,
@@ -293,6 +312,16 @@ class _$InitializeImpl implements _Initialize {
   final String? title;
   @override
   final String? description;
+  final List<NoteTextStyleRange>? _textStyles;
+  @override
+  List<NoteTextStyleRange>? get textStyles {
+    final value = _textStyles;
+    if (value == null) return null;
+    if (_textStyles is EqualUnmodifiableListView) return _textStyles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final Color? color;
   final List<Todo>? _todos;
@@ -347,7 +376,7 @@ class _$InitializeImpl implements _Initialize {
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, color: $color, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds)';
+    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, textStyles: $textStyles, color: $color, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds)';
   }
 
   @override
@@ -358,6 +387,8 @@ class _$InitializeImpl implements _Initialize {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            const DeepCollectionEquality()
+                .equals(other._textStyles, _textStyles) &&
             (identical(other.color, color) || other.color == color) &&
             const DeepCollectionEquality().equals(other._todos, _todos) &&
             const DeepCollectionEquality()
@@ -374,6 +405,7 @@ class _$InitializeImpl implements _Initialize {
       runtimeType,
       title,
       description,
+      const DeepCollectionEquality().hash(_textStyles),
       color,
       const DeepCollectionEquality().hash(_todos),
       const DeepCollectionEquality().hash(_imagePaths),
@@ -393,6 +425,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -402,6 +435,8 @@ class _$InitializeImpl implements _Initialize {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -419,8 +454,8 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
   }) {
-    return initialize(title, description, color, todos, imagePaths, voiceMemos,
-        tags, linkedNoteIds);
+    return initialize(title, description, textStyles, color, todos, imagePaths,
+        voiceMemos, tags, linkedNoteIds);
   }
 
   @override
@@ -429,6 +464,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -438,6 +474,8 @@ class _$InitializeImpl implements _Initialize {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -455,8 +493,8 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
   }) {
-    return initialize?.call(title, description, color, todos, imagePaths,
-        voiceMemos, tags, linkedNoteIds);
+    return initialize?.call(title, description, textStyles, color, todos,
+        imagePaths, voiceMemos, tags, linkedNoteIds);
   }
 
   @override
@@ -465,6 +503,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -474,6 +513,7 @@ class _$InitializeImpl implements _Initialize {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -493,8 +533,8 @@ class _$InitializeImpl implements _Initialize {
     required TResult orElse(),
   }) {
     if (initialize != null) {
-      return initialize(title, description, color, todos, imagePaths,
-          voiceMemos, tags, linkedNoteIds);
+      return initialize(title, description, textStyles, color, todos,
+          imagePaths, voiceMemos, tags, linkedNoteIds);
     }
     return orElse();
   }
@@ -505,6 +545,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -529,6 +570,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -553,6 +595,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -580,6 +623,7 @@ abstract class _Initialize implements AddUpdateFormEvent {
   const factory _Initialize(
       {final String? title,
       final String? description,
+      final List<NoteTextStyleRange>? textStyles,
       final Color? color,
       final List<Todo>? todos,
       final List<String>? imagePaths,
@@ -589,6 +633,7 @@ abstract class _Initialize implements AddUpdateFormEvent {
 
   String? get title;
   String? get description;
+  List<NoteTextStyleRange>? get textStyles;
   Color? get color;
   List<Todo>? get todos;
   List<String>? get imagePaths;
@@ -667,6 +712,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -676,6 +722,8 @@ class _$TitleChangedImpl implements _TitleChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -702,6 +750,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -711,6 +760,8 @@ class _$TitleChangedImpl implements _TitleChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -737,6 +788,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -746,6 +798,7 @@ class _$TitleChangedImpl implements _TitleChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -776,6 +829,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -800,6 +854,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -824,6 +879,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -924,6 +980,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -933,6 +990,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -959,6 +1018,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -968,6 +1028,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -994,6 +1056,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1003,6 +1066,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1033,6 +1097,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -1057,6 +1122,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1081,6 +1147,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1111,6 +1178,291 @@ abstract class _DescriptionChanged implements AddUpdateFormEvent {
   String get value;
   @JsonKey(ignore: true)
   _$$DescriptionChangedImplCopyWith<_$DescriptionChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$BodyChangedImplCopyWith<$Res> {
+  factory _$$BodyChangedImplCopyWith(
+          _$BodyChangedImpl value, $Res Function(_$BodyChangedImpl) then) =
+      __$$BodyChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String text, List<NoteTextStyleRange> styles});
+}
+
+/// @nodoc
+class __$$BodyChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$BodyChangedImpl>
+    implements _$$BodyChangedImplCopyWith<$Res> {
+  __$$BodyChangedImplCopyWithImpl(
+      _$BodyChangedImpl _value, $Res Function(_$BodyChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? text = null,
+    Object? styles = null,
+  }) {
+    return _then(_$BodyChangedImpl(
+      null == text
+          ? _value.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      null == styles
+          ? _value._styles
+          : styles // ignore: cast_nullable_to_non_nullable
+              as List<NoteTextStyleRange>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$BodyChangedImpl implements _BodyChanged {
+  const _$BodyChangedImpl(this.text, final List<NoteTextStyleRange> styles)
+      : _styles = styles;
+
+  @override
+  final String text;
+  final List<NoteTextStyleRange> _styles;
+  @override
+  List<NoteTextStyleRange> get styles {
+    if (_styles is EqualUnmodifiableListView) return _styles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_styles);
+  }
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.bodyChanged(text: $text, styles: $styles)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BodyChangedImpl &&
+            (identical(other.text, text) || other.text == text) &&
+            const DeepCollectionEquality().equals(other._styles, _styles));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, text, const DeepCollectionEquality().hash(_styles));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BodyChangedImplCopyWith<_$BodyChangedImpl> get copyWith =>
+      __$$BodyChangedImplCopyWithImpl<_$BodyChangedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, bool completed) setTodoCompleted,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path) addImage,
+    required TResult Function(String path) removeImage,
+    required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
+  }) {
+    return bodyChanged(text, styles);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, bool completed)? setTodoCompleted,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path)? addImage,
+    TResult? Function(String path)? removeImage,
+    TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
+  }) {
+    return bodyChanged?.call(text, styles);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, bool completed)? setTodoCompleted,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path)? addImage,
+    TResult Function(String path)? removeImage,
+    TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (bodyChanged != null) {
+      return bodyChanged(text, styles);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_SetTodoCompleted value) setTodoCompleted,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+    required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
+  }) {
+    return bodyChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+    TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
+  }) {
+    return bodyChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
+    required TResult orElse(),
+  }) {
+    if (bodyChanged != null) {
+      return bodyChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _BodyChanged implements AddUpdateFormEvent {
+  const factory _BodyChanged(
+          final String text, final List<NoteTextStyleRange> styles) =
+      _$BodyChangedImpl;
+
+  String get text;
+  List<NoteTextStyleRange> get styles;
+  @JsonKey(ignore: true)
+  _$$BodyChangedImplCopyWith<_$BodyChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -1181,6 +1533,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1190,6 +1543,8 @@ class _$ColorChangedImpl implements _ColorChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -1216,6 +1571,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1225,6 +1581,8 @@ class _$ColorChangedImpl implements _ColorChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1251,6 +1609,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1260,6 +1619,7 @@ class _$ColorChangedImpl implements _ColorChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1290,6 +1650,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -1314,6 +1675,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1338,6 +1700,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1498,6 +1861,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1507,6 +1871,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -1534,6 +1900,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1543,6 +1910,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1570,6 +1939,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1579,6 +1949,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1610,6 +1981,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -1634,6 +2006,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1658,6 +2031,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1768,6 +2142,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1777,6 +2152,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -1803,6 +2180,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1812,6 +2190,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1838,6 +2218,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -1847,6 +2228,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -1877,6 +2259,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -1901,6 +2284,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -1925,6 +2309,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2024,6 +2409,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2033,6 +2419,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -2059,6 +2447,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2068,6 +2457,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2094,6 +2485,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2103,6 +2495,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2133,6 +2526,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -2157,6 +2551,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2181,6 +2576,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2289,6 +2685,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2298,6 +2695,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -2324,6 +2723,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2333,6 +2733,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2359,6 +2761,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2368,6 +2771,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2398,6 +2802,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -2422,6 +2827,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2446,6 +2852,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2549,6 +2956,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2558,6 +2966,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -2584,6 +2994,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2593,6 +3004,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2619,6 +3032,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2628,6 +3042,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2658,6 +3073,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -2682,6 +3098,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2706,6 +3123,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2815,6 +3233,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2824,6 +3243,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -2850,6 +3271,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2859,6 +3281,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2885,6 +3309,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -2894,6 +3319,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -2924,6 +3350,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -2948,6 +3375,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -2972,6 +3400,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3091,6 +3520,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3100,6 +3530,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -3126,6 +3558,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3135,6 +3568,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3161,6 +3596,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3170,6 +3606,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3200,6 +3637,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -3224,6 +3662,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3248,6 +3687,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3360,6 +3800,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3369,6 +3810,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -3395,6 +3838,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3404,6 +3848,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3430,6 +3876,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3439,6 +3886,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3469,6 +3917,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -3493,6 +3942,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3517,6 +3967,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3619,6 +4070,7 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3628,6 +4080,8 @@ class _$AddImageImpl implements _AddImage {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -3654,6 +4108,7 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3663,6 +4118,8 @@ class _$AddImageImpl implements _AddImage {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3689,6 +4146,7 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3698,6 +4156,7 @@ class _$AddImageImpl implements _AddImage {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3728,6 +4187,7 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -3752,6 +4212,7 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3776,6 +4237,7 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -3875,6 +4337,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3884,6 +4347,8 @@ class _$RemoveImageImpl implements _RemoveImage {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -3910,6 +4375,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3919,6 +4385,8 @@ class _$RemoveImageImpl implements _RemoveImage {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3945,6 +4413,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -3954,6 +4423,7 @@ class _$RemoveImageImpl implements _RemoveImage {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -3984,6 +4454,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -4008,6 +4479,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4032,6 +4504,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4138,6 +4611,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4147,6 +4621,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -4173,6 +4649,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4182,6 +4659,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4208,6 +4687,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4217,6 +4697,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4247,6 +4728,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -4271,6 +4753,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4295,6 +4778,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4401,6 +4885,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4410,6 +4895,8 @@ class _$TagsChangedImpl implements _TagsChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -4436,6 +4923,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4445,6 +4933,8 @@ class _$TagsChangedImpl implements _TagsChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4471,6 +4961,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4480,6 +4971,7 @@ class _$TagsChangedImpl implements _TagsChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4510,6 +5002,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -4534,6 +5027,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4558,6 +5052,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4663,6 +5158,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     required TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4672,6 +5168,8 @@ class _$LinksChangedImpl implements _LinksChanged {
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles)
+        bodyChanged,
     required TResult Function(Color value) colorChanged,
     required TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)
@@ -4698,6 +5196,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult? Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4707,6 +5206,8 @@ class _$LinksChangedImpl implements _LinksChanged {
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles)?
+        bodyChanged,
     TResult? Function(Color value)? colorChanged,
     TResult? Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4733,6 +5234,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult Function(
             String? title,
             String? description,
+            List<NoteTextStyleRange>? textStyles,
             Color? color,
             List<Todo>? todos,
             List<String>? imagePaths,
@@ -4742,6 +5244,7 @@ class _$LinksChangedImpl implements _LinksChanged {
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles)? bodyChanged,
     TResult Function(Color value)? colorChanged,
     TResult Function(String? id, String? folderId, bool isPinned,
             bool isArchived, int? sortOrder, DateTime? deletedAt)?
@@ -4772,6 +5275,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     required TResult Function(_Initialize value) initialize,
     required TResult Function(_TitleChanged value) titleChanged,
     required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
     required TResult Function(_ColorChanged value) colorChanged,
     required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
     required TResult Function(_AddEmptyTodo value) addEmptyTodo,
@@ -4796,6 +5300,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult? Function(_Initialize value)? initialize,
     TResult? Function(_TitleChanged value)? titleChanged,
     TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
     TResult? Function(_ColorChanged value)? colorChanged,
     TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4820,6 +5325,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult Function(_Initialize value)? initialize,
     TResult Function(_TitleChanged value)? titleChanged,
     TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
     TResult Function(_ColorChanged value)? colorChanged,
     TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
     TResult Function(_AddEmptyTodo value)? addEmptyTodo,
@@ -4856,6 +5362,7 @@ abstract class _LinksChanged implements AddUpdateFormEvent {
 mixin _$AddUpdateFormState {
   String? get title => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
+  List<NoteTextStyleRange> get textStyles => throw _privateConstructorUsedError;
   Color? get selectedColor => throw _privateConstructorUsedError;
   List<Todo> get todos => throw _privateConstructorUsedError;
   List<String> get imagePaths => throw _privateConstructorUsedError;
@@ -4879,6 +5386,7 @@ abstract class $AddUpdateFormStateCopyWith<$Res> {
   $Res call(
       {String? title,
       String? description,
+      List<NoteTextStyleRange> textStyles,
       Color? selectedColor,
       List<Todo> todos,
       List<String> imagePaths,
@@ -4904,6 +5412,7 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
   $Res call({
     Object? title = freezed,
     Object? description = freezed,
+    Object? textStyles = null,
     Object? selectedColor = freezed,
     Object? todos = null,
     Object? imagePaths = null,
@@ -4922,6 +5431,10 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      textStyles: null == textStyles
+          ? _value.textStyles
+          : textStyles // ignore: cast_nullable_to_non_nullable
+              as List<NoteTextStyleRange>,
       selectedColor: freezed == selectedColor
           ? _value.selectedColor
           : selectedColor // ignore: cast_nullable_to_non_nullable
@@ -4969,6 +5482,7 @@ abstract class _$$AddUpdateFormStateImplCopyWith<$Res>
   $Res call(
       {String? title,
       String? description,
+      List<NoteTextStyleRange> textStyles,
       Color? selectedColor,
       List<Todo> todos,
       List<String> imagePaths,
@@ -4992,6 +5506,7 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
   $Res call({
     Object? title = freezed,
     Object? description = freezed,
+    Object? textStyles = null,
     Object? selectedColor = freezed,
     Object? todos = null,
     Object? imagePaths = null,
@@ -5010,6 +5525,10 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      textStyles: null == textStyles
+          ? _value._textStyles
+          : textStyles // ignore: cast_nullable_to_non_nullable
+              as List<NoteTextStyleRange>,
       selectedColor: freezed == selectedColor
           ? _value.selectedColor
           : selectedColor // ignore: cast_nullable_to_non_nullable
@@ -5052,6 +5571,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
   _$AddUpdateFormStateImpl(
       {this.title,
       this.description,
+      final List<NoteTextStyleRange> textStyles = const [],
       this.selectedColor,
       final List<Todo> todos = const [],
       final List<String> imagePaths = const [],
@@ -5060,7 +5580,8 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       final List<String> linkedNoteIds = const [],
       this.reminderDate,
       this.reminderId})
-      : _todos = todos,
+      : _textStyles = textStyles,
+        _todos = todos,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
         _tags = tags,
@@ -5071,6 +5592,15 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
   final String? title;
   @override
   final String? description;
+  final List<NoteTextStyleRange> _textStyles;
+  @override
+  @JsonKey()
+  List<NoteTextStyleRange> get textStyles {
+    if (_textStyles is EqualUnmodifiableListView) return _textStyles;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_textStyles);
+  }
+
   @override
   final Color? selectedColor;
   final List<Todo> _todos;
@@ -5125,7 +5655,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
 
   @override
   String toString() {
-    return 'AddUpdateFormState(title: $title, description: $description, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, reminderDate: $reminderDate, reminderId: $reminderId)';
+    return 'AddUpdateFormState(title: $title, description: $description, textStyles: $textStyles, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, reminderDate: $reminderDate, reminderId: $reminderId)';
   }
 
   @override
@@ -5136,6 +5666,8 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            const DeepCollectionEquality()
+                .equals(other._textStyles, _textStyles) &&
             (identical(other.selectedColor, selectedColor) ||
                 other.selectedColor == selectedColor) &&
             const DeepCollectionEquality().equals(other._todos, _todos) &&
@@ -5157,6 +5689,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       runtimeType,
       title,
       description,
+      const DeepCollectionEquality().hash(_textStyles),
       selectedColor,
       const DeepCollectionEquality().hash(_todos),
       const DeepCollectionEquality().hash(_imagePaths),
@@ -5178,6 +5711,7 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
   factory _AddUpdateFormState(
       {final String? title,
       final String? description,
+      final List<NoteTextStyleRange> textStyles,
       final Color? selectedColor,
       final List<Todo> todos,
       final List<String> imagePaths,
@@ -5192,6 +5726,8 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
   String? get title;
   @override
   String? get description;
+  @override
+  List<NoteTextStyleRange> get textStyles;
   @override
   Color? get selectedColor;
   @override
