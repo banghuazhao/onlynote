@@ -114,10 +114,8 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   }
 
   Future<void> _editTranscript({String? initial}) async {
-    final changed = await showDialog<String>(
-        context: context,
-        builder: (_) => _VoiceTranscriptDialog(
-            initial: initial ?? widget.memo.transcript ?? ''));
+    final changed = await showVoiceTranscriptEditor(context,
+        initial: initial ?? widget.memo.transcript ?? '');
     if (changed == null || !mounted) return;
     try {
       await widget.onTranscriptChanged!(changed.isEmpty ? null : changed);
@@ -252,9 +250,24 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   }
 }
 
+/// Opens the transcript draft, optionally focusing the selected search match.
+///
+/// The caller persists the returned text. Cancel leaves the transcript unchanged.
+Future<String?> showVoiceTranscriptEditor(
+  BuildContext context, {
+  required String initial,
+  TextSelection? selection,
+}) =>
+    showDialog<String>(
+      context: context,
+      builder: (_) =>
+          _VoiceTranscriptDialog(initial: initial, selection: selection),
+    );
+
 class _VoiceTranscriptDialog extends StatefulWidget {
-  const _VoiceTranscriptDialog({required this.initial});
+  const _VoiceTranscriptDialog({required this.initial, this.selection});
   final String initial;
+  final TextSelection? selection;
   @override
   State<_VoiceTranscriptDialog> createState() => _VoiceTranscriptDialogState();
 }
@@ -265,6 +278,13 @@ class _VoiceTranscriptDialogState extends State<_VoiceTranscriptDialog> {
   void initState() {
     super.initState();
     _text = TextEditingController(text: widget.initial);
+    final selection = widget.selection;
+    if (selection != null) {
+      _text.selection = selection.copyWith(
+        baseOffset: selection.baseOffset.clamp(0, widget.initial.length),
+        extentOffset: selection.extentOffset.clamp(0, widget.initial.length),
+      );
+    }
   }
 
   @override
@@ -279,7 +299,10 @@ class _VoiceTranscriptDialogState extends State<_VoiceTranscriptDialog> {
         content: SizedBox(
             width: 420,
             child: TextField(
+                key: const ValueKey('voice-transcript-editor-input'),
                 controller: _text,
+                autofocus: widget.selection != null,
+                selectAllOnFocus: widget.selection == null ? null : false,
                 minLines: 3,
                 maxLines: 8,
                 maxLength: 20000,

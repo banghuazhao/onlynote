@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/services/note_web_links.dart';
 import 'formatted_note_text.dart';
 import 'note_image_block.dart';
 import 'note_outline_navigation_controller.dart';
@@ -19,6 +20,7 @@ class NoteDocumentView extends StatefulWidget {
     this.imageBuilder,
     this.textBuilder,
     this.outlineController,
+    this.onOpenUrl,
   });
   final String text;
   final List<NoteTextStyleRange> styles;
@@ -29,6 +31,7 @@ class NoteDocumentView extends StatefulWidget {
   final ValueChanged<String>? onImageTap;
   final NoteBlockImageBuilder? imageBuilder;
   final NoteOutlineNavigationController? outlineController;
+  final NoteWebLinkOpener? onOpenUrl;
   final Widget Function(
           String text, List<NoteTextStyleRange> styles, int start, int end)?
       textBuilder;
@@ -110,6 +113,7 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
                         widget.styles, part.start, part.end),
                     style: widget.style,
                     selectable: widget.selectable,
+                    onOpenUrl: widget.onOpenUrl,
                   ),
             )
           else if (part is NoteImagePart)

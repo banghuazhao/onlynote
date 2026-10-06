@@ -453,5 +453,16 @@
   "Note_Outline_Hint": "輕點標題，跳至該部分",
   "Note_Outline_Current": "目前部分",
   "Note_Undo": "復原",
-  "Note_Redo": "重做"
+  "Note_Redo": "重做",
+  "Web_Link_Open_Failed": "無法開啟此網站。",
+  "Note_FocusWriting": "專注寫作",
+  "Note_ShowWritingTools": "顯示寫作工具",
+  "Find_Edit_Match": "編輯符合內容",
+  "Find_Replace": "取代",
+  "Find_Replace_With": "取代為",
+  "Find_Replace_All": "全部取代",
+  "Find_Replace_Changed": "筆記已變更，請重新搜尋後取代。",
+  "Find_Replace_Limit": "取代後標題或清單項目會太長。",
+  "Find_Replaced": "已取代 {count} 處",
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
 }

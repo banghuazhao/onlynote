@@ -3749,6 +3749,101 @@ class S {
   String get Note_Redo {
     return Intl.message('Redo', name: 'Note_Redo', desc: '', args: []);
   }
+
+  /// `Could not open this website.`
+  String get Web_Link_Open_Failed {
+    return Intl.message(
+      'Could not open this website.',
+      name: 'Web_Link_Open_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Focus writing`
+  String get Note_FocusWriting {
+    return Intl.message(
+      'Focus writing',
+      name: 'Note_FocusWriting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show writing tools`
+  String get Note_ShowWritingTools {
+    return Intl.message(
+      'Show writing tools',
+      name: 'Note_ShowWritingTools',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit match`
+  String get Find_Edit_Match {
+    return Intl.message(
+      'Edit match',
+      name: 'Find_Edit_Match',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Replace`
+  String get Find_Replace {
+    return Intl.message('Replace', name: 'Find_Replace', desc: '', args: []);
+  }
+
+  /// `Replace with`
+  String get Find_Replace_With {
+    return Intl.message(
+      'Replace with',
+      name: 'Find_Replace_With',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Replace all`
+  String get Find_Replace_All {
+    return Intl.message(
+      'Replace all',
+      name: 'Find_Replace_All',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The note changed. Search again to replace.`
+  String get Find_Replace_Changed {
+    return Intl.message(
+      'The note changed. Search again to replace.',
+      name: 'Find_Replace_Changed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `That replacement would make a title or checklist item too long.`
+  String get Find_Replace_Limit {
+    return Intl.message(
+      'That replacement would make a title or checklist item too long.',
+      name: 'Find_Replace_Limit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Replaced {count, plural, =1{1 match} other{{count} matches}}`
+  String Find_Replaced(int count) {
+    return Intl.message(
+      'Replaced ${Intl.plural(count, one: '1 match', other: '$count matches')}',
+      name: 'Find_Replaced',
+      desc: '',
+      args: [count],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

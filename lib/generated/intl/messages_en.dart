@@ -27,25 +27,28 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m2(completed, total) => "${completed} of ${total} complete";
 
-  static String m3(count) => "${count} notes";
+  static String m3(count) =>
+      "Replaced ${Intl.plural(count, one: '1 match', other: '${count} matches')}";
 
-  static String m4(count) => "${count} photos";
+  static String m4(count) => "${count} notes";
 
-  static String m5(count) => "${count} recordings";
+  static String m5(count) => "${count} photos";
 
-  static String m6(date) => "Saved ${date}";
+  static String m6(count) => "${count} recordings";
 
-  static String m7(number) => "Note color ${number}";
+  static String m7(date) => "Saved ${date}";
 
-  static String m8(number) => "Photo ${number}";
+  static String m8(number) => "Note color ${number}";
 
-  static String m9(time) => "Next reminder: ${time}";
+  static String m9(number) => "Photo ${number}";
 
-  static String m10(date) => "Remind me: ${date}";
+  static String m10(time) => "Next reminder: ${time}";
 
-  static String m11(price) => "Remove ads permanently for ${price}.";
+  static String m11(date) => "Remind me: ${date}";
 
-  static String m12(items, photos) =>
+  static String m12(price) => "Remove ads permanently for ${price}.";
+
+  static String m13(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -256,17 +259,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Filter_Tags": MessageLookupByLibrary.simpleMessage("Filter by tags"),
     "Filter_Unfinished": MessageLookupByLibrary.simpleMessage("Unfinished"),
     "Find_Close": MessageLookupByLibrary.simpleMessage("Close search"),
+    "Find_Edit_Match": MessageLookupByLibrary.simpleMessage("Edit match"),
     "Find_In_Note": MessageLookupByLibrary.simpleMessage("Find in note"),
     "Find_Next": MessageLookupByLibrary.simpleMessage("Next match"),
     "Find_No_Matches": MessageLookupByLibrary.simpleMessage("No matches"),
     "Find_Previous": MessageLookupByLibrary.simpleMessage("Previous match"),
+    "Find_Replace": MessageLookupByLibrary.simpleMessage("Replace"),
+    "Find_Replace_All": MessageLookupByLibrary.simpleMessage("Replace all"),
+    "Find_Replace_Changed": MessageLookupByLibrary.simpleMessage(
+      "The note changed. Search again to replace.",
+    ),
+    "Find_Replace_Limit": MessageLookupByLibrary.simpleMessage(
+      "That replacement would make a title or checklist item too long.",
+    ),
+    "Find_Replace_With": MessageLookupByLibrary.simpleMessage("Replace with"),
+    "Find_Replaced": m3,
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m3,
+    "Folder_Notes_Count": m4,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage(
       "A little space for your next big idea.",
@@ -290,9 +304,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Empty": MessageLookupByLibrary.simpleMessage(
       "Saved changes will appear here.",
     ),
-    "History_Photos": m4,
+    "History_Photos": m5,
     "History_Preview": MessageLookupByLibrary.simpleMessage("Version preview"),
-    "History_Recordings": m5,
+    "History_Recordings": m6,
     "History_Restore": MessageLookupByLibrary.simpleMessage(
       "Restore this version",
     ),
@@ -306,7 +320,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This note or version is no longer available.",
     ),
-    "History_Version": m6,
+    "History_Version": m7,
     "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("Drop photo here"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
     "Image_Move": MessageLookupByLibrary.simpleMessage("Move photo"),
@@ -365,11 +379,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Added Successfully",
     ),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("Note archived"),
-    "Note_Color": m7,
+    "Note_Color": m8,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
     ),
+    "Note_FocusWriting": MessageLookupByLibrary.simpleMessage("Focus writing"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("Outline"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage(
@@ -379,6 +394,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tap a heading to jump to it",
     ),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("Redo"),
+    "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage(
+      "Show writing tools",
+    ),
     "Note_Unarchived": MessageLookupByLibrary.simpleMessage("Note unarchived"),
     "Note_Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Note_Untitled": MessageLookupByLibrary.simpleMessage("Untitled note"),
@@ -482,7 +500,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m8,
+    "Photo_Text_Photo": m9,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -537,7 +555,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m9,
+    "Reminder_Next_Time": m10,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -554,7 +572,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m10,
+    "Reminder_Suggestion": m11,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -592,7 +610,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m11,
+    "Remove_Ads_Price": m12,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -713,7 +731,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m12,
+    "Template_Details": m13,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -839,6 +857,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("Water Tracker"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("We Play Piano"),
+    "Web_Link_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not open this website.",
+    ),
     "Widget": MessageLookupByLibrary.simpleMessage("Home Screen Widget"),
     "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage(
       "Add to Home Screen",

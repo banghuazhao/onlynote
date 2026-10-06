@@ -453,5 +453,16 @@
   "Note_Outline_Hint": "轻点标题，跳转至该部分",
   "Note_Outline_Current": "当前部分",
   "Note_Undo": "撤销",
-  "Note_Redo": "重做"
+  "Note_Redo": "重做",
+  "Web_Link_Open_Failed": "无法打开此网站。",
+  "Note_FocusWriting": "专注写作",
+  "Note_ShowWritingTools": "显示写作工具",
+  "Find_Edit_Match": "编辑匹配内容",
+  "Find_Replace": "替换",
+  "Find_Replace_With": "替换为",
+  "Find_Replace_All": "全部替换",
+  "Find_Replace_Changed": "笔记已更改，请重新搜索后替换。",
+  "Find_Replace_Limit": "替换后标题或清单条目会太长。",
+  "Find_Replaced": "已替换 {count} 处",
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
 }

@@ -20,6 +20,7 @@ import 'package:onlynote/presentation/components/note_photo_editor.dart';
 import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_find_preview.dart';
 import 'package:onlynote/services/note_find.dart';
+import 'package:onlynote/services/note_replace.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/note_photo_transform.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
@@ -162,6 +163,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   bool _recordedReviewSave = false;
   bool _statusRefreshQueued = false;
   NoteSearchController? _findController;
+  bool _writingFocused = false;
+  bool _findInputComposing = false;
+  final _titleNavigationKey = GlobalKey();
+  final _todoNavigationKey = GlobalKey<_BuildTodoListFieldState>();
 
   @override
   void initState() {
@@ -577,15 +582,31 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           _descriptionController.text.substring(selection.start, selection.end);
       if (selected.length <= 80) controller.setQuery(selected);
     }
+    _editHistory.breakCoalescing();
     setState(() => _findController = controller);
+    _syncPlatformUndo();
   }
 
   void _closeFind() {
     final controller = _findController;
     if (controller == null) return;
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _findController = null);
+    setState(() {
+      _findController = null;
+      _findInputComposing = false;
+    });
     controller.dispose();
+    _syncPlatformUndo();
+  }
+
+  void _findCompositionChanged(bool value) {
+    _findInputComposing = value;
+    _refreshStatus();
+  }
+
+  void _toggleWritingFocus() {
+    if (_mediaBlocked) return;
+    setState(() => _writingFocused = !_writingFocused);
   }
 
   Note _currentDraft(AddUpdateFormState state) => _autosave.note.copyWith(
@@ -693,19 +714,21 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     return NoteEditKind.discrete;
   }
 
-  bool get _historyBlocked =>
+  bool get _editBlocked =>
       _mediaBlocked ||
       _replayingHistory ||
       _composingTodoIds.isNotEmpty ||
       _suspendedForLinkedNote ||
-      _findController != null ||
       (_titleController.value.composing.isValid &&
           !_titleController.value.composing.isCollapsed) ||
       (_descriptionController.value.composing.isValid &&
           !_descriptionController.value.composing.isCollapsed);
 
-  Future<void> _restoreHistory({required bool redo}) async {
-    if (_historyBlocked) return;
+  bool get _historyBlocked => _editBlocked || _findController != null;
+
+  Future<void> _restoreHistory(
+      {required bool redo, bool allowFind = false}) async {
+    if (allowFind ? _editBlocked : _historyBlocked) return;
     setState(() => _replayingHistory = true);
     // Drain input before moving the history pointer, keeping rapid taps atomic.
     await Future<void>.delayed(Duration.zero);
@@ -722,69 +745,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     final next = restored.applyTo(_autosave.note);
     // Pointer blocking alone does not stop an attached hardware keyboard or
     // IME from sending input while a scan intent is being written.
-    FocusManager.instance.primaryFocus?.unfocus();
+    if (!allowFind) FocusManager.instance.primaryFocus?.unfocus();
     var appliedToForm = false;
     try {
-      // Persist page intent before changing the editor, including scans whose
-      // remaining pages are still being recovered after an interrupted capture.
-      await _documentScanCapture.reconcilePages(next.imagePaths);
-      if (!mounted) return;
-      _currentImageLayouts = next.imageLayouts;
-      _titleController.value = TextEditingValue(
-          text: next.title ?? '',
-          selection: _safeSelection(restored.titleSelection, next.title ?? ''));
-      _descriptionController.setDocument(
-          next.description ?? '', next.textStyles);
-      _descriptionController.selection =
-          _safeSelection(restored.bodySelection, next.description ?? '');
-      final state = AddUpdateFormState(
-          title: next.title,
-          description: next.description,
-          textStyles: next.textStyles,
-          selectedColor: next.color,
-          todos: next.todo,
-          imagePaths: next.imagePaths,
-          imageLayouts: next.imageLayouts,
-          voiceMemos: next.voiceMemos,
-          tags: next.tags,
-          linkedNoteIds: next.linkedNoteIds,
-          dailyNoteDateKey: next.dailyNoteDateKey);
-      if (_form.state != state) {
-        final applied = _form.stream.firstWhere((value) => value == state);
-        _form.add(AddUpdateFormEvent.initialize(
-            title: next.title,
-            description: next.description,
-            textStyles: next.textStyles,
-            color: next.color,
-            todos: next.todo,
-            imagePaths: next.imagePaths,
-            imageLayouts: next.imageLayouts,
-            voiceMemos: next.voiceMemos,
-            tags: next.tags,
-            linkedNoteIds: next.linkedNoteIds,
-            dailyNoteDateKey: next.dailyNoteDateKey));
-        await applied;
-      }
-      if (!mounted) return;
+      await _applyEditSnapshot(restored, next, restoreFocus: !allowFind);
       appliedToForm = true;
-      _restoredEdit = restored;
-      _restoreRevision++;
-      _hadUserChange = true;
-      final todoIds = state.todos.map((todo) => todo.id).toSet();
-      _composingTodoIds.retainWhere(todoIds.contains);
-      _todoSelections.removeWhere((id, _) => !todoIds.contains(id));
-      _autosave.update(next.copyWith(dateTime: DateTime.now()));
-      _queueReminderSuggestion();
-      setState(() {});
-      await WidgetsBinding.instance.endOfFrame;
-      if (!mounted) return;
-      if (restored.focusedField == 'title') {
-        _titleFocus.requestFocus();
-      } else if (restored.focusedField == 'body') {
-        final selection = _descriptionController.selection;
-        await _outlineController.jumpTo(selection.extentOffset);
-        if (mounted) _descriptionController.selection = selection;
-      }
       if (!await _autosave.flush() && mounted) {
         showTransientSnackBar(
             context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
@@ -808,6 +773,182 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       if (mounted) {
         setState(() => _replayingHistory = false);
         _syncPlatformUndo();
+      }
+    }
+  }
+
+  /// Applies one complete note without recording intermediate field events.
+  /// Callers retain the history snapshot before updating autosave ownership.
+  Future<void> _applyEditSnapshot(NoteEditSnapshot restored, Note next,
+      {bool restoreFocus = true, bool reconcilePages = true}) async {
+    if (reconcilePages) {
+      await _documentScanCapture.reconcilePages(next.imagePaths);
+    }
+    if (!mounted) return;
+    _currentImageLayouts = next.imageLayouts;
+    _titleController.value = TextEditingValue(
+        text: next.title ?? '',
+        selection: _safeSelection(restored.titleSelection, next.title ?? ''));
+    _descriptionController.setDocument(next.description ?? '', next.textStyles);
+    _descriptionController.selection =
+        _safeSelection(restored.bodySelection, next.description ?? '');
+    final state = AddUpdateFormState(
+        title: next.title,
+        description: next.description,
+        textStyles: next.textStyles,
+        selectedColor: next.color,
+        todos: next.todo,
+        imagePaths: next.imagePaths,
+        imageLayouts: next.imageLayouts,
+        voiceMemos: next.voiceMemos,
+        tags: next.tags,
+        linkedNoteIds: next.linkedNoteIds,
+        dailyNoteDateKey: next.dailyNoteDateKey);
+    if (_form.state != state) {
+      final applied = _form.stream.firstWhere((value) => value == state);
+      _form.add(AddUpdateFormEvent.initialize(
+          title: next.title,
+          description: next.description,
+          textStyles: next.textStyles,
+          color: next.color,
+          todos: next.todo,
+          imagePaths: next.imagePaths,
+          imageLayouts: next.imageLayouts,
+          voiceMemos: next.voiceMemos,
+          tags: next.tags,
+          linkedNoteIds: next.linkedNoteIds,
+          dailyNoteDateKey: next.dailyNoteDateKey));
+      await applied;
+    }
+    if (!mounted) return;
+    _restoredEdit = restoreFocus ? restored : NoteEditSnapshot(note: next);
+    _restoreRevision++;
+    _hadUserChange = true;
+    final todoIds = state.todos.map((todo) => todo.id).toSet();
+    _composingTodoIds.retainWhere(todoIds.contains);
+    _todoSelections.removeWhere((id, _) => !todoIds.contains(id));
+    _autosave.update(next.copyWith(dateTime: DateTime.now()));
+    _queueReminderSuggestion();
+    setState(() {});
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    if (restoreFocus && restored.focusedField == 'title') {
+      _titleFocus.requestFocus();
+    } else if (restoreFocus && restored.focusedField == 'body') {
+      final selection = _descriptionController.selection;
+      await _outlineController.jumpTo(selection.extentOffset);
+      if (mounted) _descriptionController.selection = selection;
+    }
+  }
+
+  Future<void> _replaceFind(String replacement,
+      {NoteSearchMatch? match}) async {
+    final finder = _findController;
+    if (_editBlocked || _findInputComposing || finder == null) return;
+    final expected = finder.fields;
+    final query = finder.query;
+    setState(() => _replayingHistory = true);
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return;
+    _replayingHistory = false;
+    _capture(_form.state);
+    _replayingHistory = true;
+    try {
+      if (!identical(finder, _findController)) return;
+      final result = replaceNoteText(_currentDraft(_form.state),
+          query: query,
+          replacement: replacement,
+          match: match,
+          expectedFields: expected);
+      if (result.failure != null) {
+        showTransientSnackBar(
+            context,
+            SnackBar(
+                content: Text(result.failure == NoteReplaceFailure.lengthLimit
+                    ? S.of(context).Find_Replace_Limit
+                    : S.of(context).Find_Replace_Changed)));
+        return;
+      }
+      if (!result.changed) return;
+      final snapshot = NoteEditSnapshot(note: result.note);
+      _editHistory.record(snapshot);
+      await _applyEditSnapshot(snapshot, result.note,
+          restoreFocus: false, reconcilePages: false);
+      if (!mounted) return;
+      finder.setFields(noteSearchFields(result.note));
+      final saved = await _autosave.flush();
+      if (!mounted) return;
+      showTransientSnackBar(
+          context,
+          SnackBar(
+              content: Text(saved
+                  ? S.of(context).Find_Replaced(result.replacedCount)
+                  : S.of(context).Autosave_Failed),
+              action: SnackBarAction(
+                  label: S.of(context).Note_Undo,
+                  onPressed: () {
+                    if (_editHistory.current.sameContent(snapshot)) {
+                      unawaited(_restoreHistory(redo: false, allowFind: true));
+                    }
+                  })));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _replayingHistory = false);
+        _syncPlatformUndo();
+      }
+    }
+  }
+
+  Future<void> _editFindMatch(NoteSearchMatch match) async {
+    final finder = _findController;
+    if (_editBlocked || _findInputComposing || finder == null) return;
+    // A search result must still refer to the displayed literal text.
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted || !identical(finder, _findController)) return;
+    final current = _currentDraft(_form.state);
+    if (!findNoteMatches(noteSearchFields(current), finder.query)
+        .contains(match)) {
+      return;
+    }
+    final selection =
+        TextSelection(baseOffset: match.start, extentOffset: match.end);
+    _closeFind();
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    if (match.fieldId == 'title') {
+      _titleController.selection =
+          _safeSelection(selection, _titleController.text);
+      _titleFocus.requestFocus();
+      final fieldContext = _titleNavigationKey.currentContext;
+      if (fieldContext != null && fieldContext.mounted) {
+        revealNoteTextOffset(fieldContext, match.start);
+      }
+    } else if (match.fieldId == 'body') {
+      await _outlineController.jumpTo(match.start);
+      if (mounted) _descriptionController.selection = selection;
+    } else if (match.fieldId.startsWith('todo:')) {
+      final id = match.fieldId.substring(5);
+      await _todoNavigationKey.currentState?.selectMatch(id, selection);
+    } else if (match.fieldId.startsWith('voice:')) {
+      final id = match.fieldId.substring(6);
+      final memo =
+          current.voiceMemos.where((memo) => memo.id == id).firstOrNull;
+      if (!mounted || memo == null) return;
+      final changed = await showVoiceTranscriptEditor(context,
+          initial: memo.transcript ?? '', selection: selection);
+      if (!mounted || changed == null) return;
+      try {
+        await _editVoiceTranscript(memo, changed.isEmpty ? null : changed);
+      } catch (_) {
+        if (mounted) {
+          showTransientSnackBar(context,
+              SnackBar(content: Text(S.of(context).Voice_Save_Failed)));
+        }
       }
     }
   }
@@ -1389,7 +1530,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   // history as the visible controls, including changes with unchanged text.
   void _syncPlatformUndo() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return;
-    if (!mounted || !_editorFocusScope.hasFocus) {
+    if (!mounted || !_editorFocusScope.hasFocus || _findController != null) {
       if (identical(UndoManager.client, this)) UndoManager.client = null;
       return;
     }
@@ -1588,6 +1729,16 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                   bodyFocus: _bodyFocus,
                   titleFocus: _titleFocus,
                   outlineController: _outlineController,
+                  titleNavigationKey: _titleNavigationKey,
+                  todoNavigationKey: _todoNavigationKey,
+                  writingFocused: _writingFocused,
+                  onToggleFocus: _mediaBlocked ? null : _toggleWritingFocus,
+                  onEditFindMatch: _editFindMatch,
+                  onReplaceFind: (match, replacement) =>
+                      _replaceFind(replacement, match: match),
+                  onReplaceAllFind: _replaceFind,
+                  findActionsEnabled: !_editBlocked && !_findInputComposing,
+                  onFindCompositionChanged: _findCompositionChanged,
                   onOutline: !_historyBlocked &&
                           shouldShowNoteOutline(
                               _descriptionController.text,
@@ -1648,6 +1799,15 @@ class _BuildForm extends StatelessWidget {
     required this.bodyFocus,
     required this.titleFocus,
     required this.outlineController,
+    required this.titleNavigationKey,
+    required this.todoNavigationKey,
+    required this.writingFocused,
+    required this.onToggleFocus,
+    required this.onEditFindMatch,
+    required this.onReplaceFind,
+    required this.onReplaceAllFind,
+    required this.findActionsEnabled,
+    required this.onFindCompositionChanged,
     required this.onUndo,
     required this.onRedo,
     required this.onOutline,
@@ -1691,6 +1851,15 @@ class _BuildForm extends StatelessWidget {
   final FocusNode bodyFocus;
   final FocusNode titleFocus;
   final NoteOutlineNavigationController outlineController;
+  final GlobalKey titleNavigationKey;
+  final GlobalKey<_BuildTodoListFieldState> todoNavigationKey;
+  final bool writingFocused;
+  final VoidCallback? onToggleFocus;
+  final Future<void> Function(NoteSearchMatch) onEditFindMatch;
+  final Future<void> Function(NoteSearchMatch, String) onReplaceFind;
+  final Future<void> Function(String) onReplaceAllFind;
+  final bool findActionsEnabled;
+  final ValueChanged<bool> onFindCompositionChanged;
   final VoidCallback? onUndo;
   final VoidCallback? onRedo;
   final VoidCallback? onOutline;
@@ -1733,26 +1902,43 @@ class _BuildForm extends StatelessWidget {
       finder.setFields(noteSearchFields(findNote!), notify: false);
     }
     final strings = S.of(context);
+    final suggestion = reminderSuggestion == null
+        ? const SizedBox(width: double.infinity)
+        : Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: ReminderSuggestionChip(
+                date: reminderSuggestion!.date,
+                busy: savingReminder,
+                onPressed: onReminderSuggestion,
+                onDismiss: onDismissReminderSuggestion));
+    final suggestionSection = MediaQuery.disableAnimationsOf(context)
+        ? suggestion
+        : AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            alignment: Alignment.topCenter,
+            child: suggestion);
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyF, control: true): onFind,
         const SingleActivator(LogicalKeyboardKey.keyF, meta: true): onFind,
-        const SingleActivator(LogicalKeyboardKey.keyZ, control: true): () =>
-            onUndo?.call(),
-        const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): () =>
-            onUndo?.call(),
-        const SingleActivator(LogicalKeyboardKey.keyZ,
-            control: true, shift: true): () => onRedo?.call(),
-        const SingleActivator(LogicalKeyboardKey.keyZ, meta: true, shift: true):
-            () => onRedo?.call(),
-        const SingleActivator(LogicalKeyboardKey.keyY, control: true): () =>
-            onRedo?.call(),
+        if (finder == null) ...{
+          const SingleActivator(LogicalKeyboardKey.keyZ, control: true): () =>
+              onUndo?.call(),
+          const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): () =>
+              onUndo?.call(),
+          const SingleActivator(LogicalKeyboardKey.keyZ,
+              control: true, shift: true): () => onRedo?.call(),
+          const SingleActivator(LogicalKeyboardKey.keyZ,
+              meta: true, shift: true): () => onRedo?.call(),
+          const SingleActivator(LogicalKeyboardKey.keyY, control: true): () =>
+              onRedo?.call(),
+        },
         if (finder != null)
           const SingleActivator(LogicalKeyboardKey.escape): onCloseFind,
       },
       child: Scaffold(
         backgroundColor: DeskSurface.colorOf(context),
-        bottomNavigationBar: finder != null
+        bottomNavigationBar: finder != null || writingFocused
             ? null
             : ColorsBar(
                 selectedColor: state.selectedColor,
@@ -1803,208 +1989,242 @@ class _BuildForm extends StatelessWidget {
                 child: Text(S.of(context).Done))
           ],
         ),
-        body: Column(
-          children: [
-            if (finder == null)
-              NoteEditingActions(
-                  onUndo: onUndo, onRedo: onRedo, onOutline: onOutline),
-            if (finder != null)
-              NoteFindBar(
-                controller: finder,
-                hintText: strings.Find_In_Note,
-                noMatchesText: strings.Find_No_Matches,
-                previousTooltip: strings.Find_Previous,
-                nextTooltip: strings.Find_Next,
-                closeTooltip: strings.Find_Close,
-                onClose: onCloseFind,
-              ),
-            Expanded(
-              child: DeskSurface(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxWidth: context.tokens.contentMaxWidth),
-                    child: ListView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: EdgeInsets.fromLTRB(
-                        context.tokens.space4,
-                        context.tokens.space3,
-                        context.tokens.space4,
-                        context.tokens.space6,
-                      ),
-                      children: [
-                        PaperNote(
-                          color: state.selectedColor ?? AppColors.parchment,
-                          kind: PaperNoteKind.sheet,
-                          seed: widget.note?.id?.hashCode ?? 5,
-                          tilt: false,
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              32, 20, 16, 24),
-                          child: finder != null && findNote != null
-                              ? NoteFindPreview(
-                                  note: findNote!, controller: finder)
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _BuildTitleField(
-                                      state: state,
-                                      titleController: _titleController,
-                                      focusNode: titleFocus,
-                                    ),
-                                    const SizedBox(height: AppSpacings.l),
-                                    _BuildTodoListField(
-                                      state: state,
-                                      restoredEdit: restoredEdit,
-                                      restoreRevision: restoreRevision,
-                                      onInputChanged: onTodoInputChanged,
-                                      autofocusFirstTodo: widget.note == null &&
-                                          (widget.start ==
-                                                  NoteEditorStart.checklist ||
-                                              widget.template ==
-                                                  NoteTemplate.shopping ||
-                                              widget.template ==
-                                                  NoteTemplate.packing),
-                                    ),
-                                    SizedBox(
-                                        height: state.imagePaths.isEmpty
-                                            ? AppSpacings.m
-                                            : AppSpacings.xl),
-                                    _BuildImageSection(
-                                      state: state,
-                                      onAddPhoto: onAddPhoto,
-                                      onScanDocument: onScanDocument,
-                                      addingPhoto: addingPhoto || mediaBusy,
-                                    ),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 4,
-                                      children: [
-                                        if (state.imagePaths.isNotEmpty)
-                                          TextButton.icon(
-                                            key: const ValueKey(
-                                                'editor-extract-text'),
-                                            style:
-                                                AppButtonStyles.paperAction(),
-                                            onPressed: mediaBusy || addingPhoto
-                                                ? null
-                                                : onExtractText,
-                                            icon: extractingText
-                                                ? const SizedBox(
-                                                    width: 20,
-                                                    height: 20,
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                            strokeWidth: 2))
-                                                : const Icon(
-                                                    Icons
-                                                        .document_scanner_outlined,
-                                                    size: 20),
-                                            label: Text(extractingText
-                                                ? S
-                                                    .of(context)
-                                                    .Photo_Text_Extracting
-                                                : S
-                                                    .of(context)
-                                                    .Photo_Text_Extract),
-                                          ),
-                                        TextButton.icon(
-                                          key: const ValueKey(
-                                              'editor-record-voice'),
-                                          style: AppButtonStyles.paperAction(),
-                                          onPressed: mediaBusy || addingPhoto
-                                              ? null
-                                              : onRecordVoice,
-                                          icon: const Icon(
-                                              Icons.mic_none_rounded,
-                                              size: 20),
-                                          label: Text(S.of(context).Voice_Memo),
+        body: LayoutBuilder(
+          builder: (context, viewport) => Column(
+            children: [
+              if (finder == null)
+                NoteEditingActions(
+                    onUndo: onUndo,
+                    onRedo: onRedo,
+                    onOutline: onOutline,
+                    onToggleFocus: onToggleFocus,
+                    writingFocused: writingFocused),
+              if (finder != null)
+                ConstrainedBox(
+                  constraints:
+                      BoxConstraints(maxHeight: viewport.maxHeight * .65),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: NoteFindBar(
+                      controller: finder,
+                      hintText: strings.Find_In_Note,
+                      noMatchesText: strings.Find_No_Matches,
+                      previousTooltip: strings.Find_Previous,
+                      nextTooltip: strings.Find_Next,
+                      closeTooltip: strings.Find_Close,
+                      onClose: onCloseFind,
+                      onEditMatch: onEditFindMatch,
+                      onReplace: onReplaceFind,
+                      onReplaceAll: onReplaceAllFind,
+                      editMatchTooltip: strings.Find_Edit_Match,
+                      replaceToggleLabel: strings.Find_Replace,
+                      replaceHintText: strings.Find_Replace_With,
+                      replaceLabel: strings.Find_Replace,
+                      replaceAllLabel: strings.Find_Replace_All,
+                      actionsEnabled: findActionsEnabled,
+                      onComposingChanged: onFindCompositionChanged,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: DeskSurface(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: context.tokens.contentMaxWidth),
+                      child: ListView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        padding: EdgeInsets.fromLTRB(
+                          context.tokens.space4,
+                          context.tokens.space3,
+                          context.tokens.space4,
+                          context.tokens.space6,
+                        ),
+                        children: [
+                          PaperNote(
+                            color: state.selectedColor ?? AppColors.parchment,
+                            kind: PaperNoteKind.sheet,
+                            seed: widget.note?.id?.hashCode ?? 5,
+                            tilt: false,
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                32, 20, 16, 24),
+                            child: finder != null && findNote != null
+                                ? NoteFindPreview(
+                                    note: findNote!,
+                                    controller: finder,
+                                    onEditMatch: findActionsEnabled
+                                        ? (match) =>
+                                            unawaited(onEditFindMatch(match))
+                                        : null)
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _BuildTitleField(
+                                        key: titleNavigationKey,
+                                        state: state,
+                                        titleController: _titleController,
+                                        focusNode: titleFocus,
+                                      ),
+                                      const SizedBox(height: AppSpacings.l),
+                                      _BuildTodoListField(
+                                        key: todoNavigationKey,
+                                        showAddButton: !writingFocused,
+                                        state: state,
+                                        restoredEdit: restoredEdit,
+                                        restoreRevision: restoreRevision,
+                                        onInputChanged: onTodoInputChanged,
+                                        autofocusFirstTodo: widget.note ==
+                                                null &&
+                                            (widget.start ==
+                                                    NoteEditorStart.checklist ||
+                                                widget.template ==
+                                                    NoteTemplate.shopping ||
+                                                widget.template ==
+                                                    NoteTemplate.packing),
+                                      ),
+                                      if (!writingFocused) ...[
+                                        SizedBox(
+                                            height: state.imagePaths.isEmpty
+                                                ? AppSpacings.m
+                                                : AppSpacings.xl),
+                                        _BuildImageSection(
+                                          state: state,
+                                          onAddPhoto: onAddPhoto,
+                                          onScanDocument: onScanDocument,
+                                          addingPhoto: addingPhoto || mediaBusy,
+                                        ),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 4,
+                                          children: [
+                                            if (state.imagePaths.isNotEmpty)
+                                              TextButton.icon(
+                                                key: const ValueKey(
+                                                    'editor-extract-text'),
+                                                style: AppButtonStyles
+                                                    .paperAction(),
+                                                onPressed:
+                                                    mediaBusy || addingPhoto
+                                                        ? null
+                                                        : onExtractText,
+                                                icon: extractingText
+                                                    ? const SizedBox(
+                                                        width: 20,
+                                                        height: 20,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                strokeWidth: 2))
+                                                    : const Icon(
+                                                        Icons
+                                                            .document_scanner_outlined,
+                                                        size: 20),
+                                                label: Text(extractingText
+                                                    ? S
+                                                        .of(context)
+                                                        .Photo_Text_Extracting
+                                                    : S
+                                                        .of(context)
+                                                        .Photo_Text_Extract),
+                                              ),
+                                            TextButton.icon(
+                                              key: const ValueKey(
+                                                  'editor-record-voice'),
+                                              style:
+                                                  AppButtonStyles.paperAction(),
+                                              onPressed:
+                                                  mediaBusy || addingPhoto
+                                                      ? null
+                                                      : onRecordVoice,
+                                              icon: const Icon(
+                                                  Icons.mic_none_rounded,
+                                                  size: 20),
+                                              label: Text(
+                                                  S.of(context).Voice_Memo),
+                                            ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                    for (final memo in state.voiceMemos)
-                                      VoiceMemoPlayer(
-                                        key: ValueKey(memo.id),
-                                        memo: memo,
-                                        service: widget.voiceMemoService,
-                                        resolvePath: resolveAudioPath,
-                                        onRemove: () => onRemoveVoice(memo),
-                                        onTranscriptChanged: (text) =>
-                                            onTranscriptChanged(memo, text),
+                                      for (final memo in state.voiceMemos)
+                                        VoiceMemoPlayer(
+                                          key: ValueKey(memo.id),
+                                          memo: memo,
+                                          service: widget.voiceMemoService,
+                                          resolvePath: resolveAudioPath,
+                                          onRemove: () => onRemoveVoice(memo),
+                                          onTranscriptChanged: (text) =>
+                                              onTranscriptChanged(memo, text),
+                                        ),
+                                      if (!writingFocused ||
+                                          state.voiceMemos.isNotEmpty)
+                                        const SizedBox(height: AppSpacings.xml),
+                                      _BuildDescriptionField(
+                                        key: const ValueKey(
+                                            'note-description-section'),
+                                        outlineController: outlineController,
+                                        focusNode: bodyFocus,
+                                        onImageLayoutsChanged:
+                                            onImageLayoutsChanged,
+                                        onRemoveImage: onRemoveImage,
+                                        onEditImage: onEditImage,
+                                        state: state,
+                                        descriptionController:
+                                            _descriptionController,
+                                        autofocus: widget.note == null &&
+                                            widget.start ==
+                                                NoteEditorStart.quickNote,
                                       ),
-                                    const SizedBox(height: AppSpacings.xml),
-                                    _BuildDescriptionField(
-                                      outlineController: outlineController,
-                                      focusNode: bodyFocus,
-                                      onImageLayoutsChanged:
-                                          onImageLayoutsChanged,
-                                      onRemoveImage: onRemoveImage,
-                                      onEditImage: onEditImage,
-                                      state: state,
-                                      descriptionController:
-                                          _descriptionController,
-                                      autofocus: widget.note == null &&
-                                          widget.start ==
-                                              NoteEditorStart.quickNote,
-                                    ),
-                                    const SizedBox(height: AppSpacings.l),
-                                    Wrap(spacing: 8, runSpacing: 4, children: [
-                                      for (final tag in state.tags)
-                                        Chip(label: Text(tag)),
-                                      TextButton.icon(
-                                        key: const ValueKey('editor-edit-tags'),
-                                        style: AppButtonStyles.paperAction(),
-                                        onPressed: mediaBusy || addingPhoto
-                                            ? null
-                                            : onEditTags,
-                                        icon: const Icon(Icons.sell_outlined,
-                                            size: 20),
-                                        label: Text(S.of(context).Edit_Tags),
-                                      ),
-                                    ]),
-                                    NoteLinksSection(
-                                      linkedNoteIds: state.linkedNoteIds,
-                                      notes: libraryNotes,
-                                      backlinks: noteBacklinks(
-                                          widget.note ?? Note(), libraryNotes),
-                                      onOpen: mediaBusy || addingPhoto
-                                          ? null
-                                          : onOpenLinkedNote,
-                                      onEdit: mediaBusy || addingPhoto
-                                          ? null
-                                          : onEditLinks,
-                                    ),
-                                    AnimatedSize(
-                                      duration: MediaQuery.disableAnimationsOf(
-                                              context)
-                                          ? Duration.zero
-                                          : const Duration(milliseconds: 180),
-                                      alignment: Alignment.topCenter,
-                                      child: reminderSuggestion == null
-                                          ? const SizedBox(
-                                              width: double.infinity)
-                                          : Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 12),
-                                              child: ReminderSuggestionChip(
-                                                date: reminderSuggestion!.date,
-                                                busy: savingReminder,
-                                                onPressed: onReminderSuggestion,
-                                                onDismiss:
-                                                    onDismissReminderSuggestion,
+                                      if (!writingFocused) ...[
+                                        const SizedBox(height: AppSpacings.l),
+                                        Wrap(
+                                            spacing: 8,
+                                            runSpacing: 4,
+                                            children: [
+                                              for (final tag in state.tags)
+                                                Chip(label: Text(tag)),
+                                              TextButton.icon(
+                                                key: const ValueKey(
+                                                    'editor-edit-tags'),
+                                                style: AppButtonStyles
+                                                    .paperAction(),
+                                                onPressed:
+                                                    mediaBusy || addingPhoto
+                                                        ? null
+                                                        : onEditTags,
+                                                icon: const Icon(
+                                                    Icons.sell_outlined,
+                                                    size: 20),
+                                                label: Text(
+                                                    S.of(context).Edit_Tags),
                                               ),
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ],
+                                            ]),
+                                        NoteLinksSection(
+                                          linkedNoteIds: state.linkedNoteIds,
+                                          notes: libraryNotes,
+                                          backlinks: noteBacklinks(
+                                              widget.note ?? Note(),
+                                              libraryNotes),
+                                          onOpen: mediaBusy || addingPhoto
+                                              ? null
+                                              : onOpenLinkedNote,
+                                          onEdit: mediaBusy || addingPhoto
+                                              ? null
+                                              : onEditLinks,
+                                        ),
+                                        suggestionSection,
+                                      ],
+                                    ],
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

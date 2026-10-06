@@ -14,10 +14,18 @@ class NoteFindPreview extends StatelessWidget {
     required this.note,
     required this.controller,
     this.imageBuilder,
+    this.onEditMatch,
   });
   final Note note;
   final NoteSearchController controller;
   final NoteBlockImageBuilder? imageBuilder;
+  final ValueChanged<NoteSearchMatch>? onEditMatch;
+
+  ValueChanged<NoteSearchMatch>? get _onMatchTap => onEditMatch == null
+      ? null
+      : (match) {
+          if (controller.selectMatch(match, reveal: false)) onEditMatch!(match);
+        };
 
   @override
   Widget build(BuildContext context) => Column(
@@ -30,6 +38,8 @@ class NoteFindPreview extends StatelessWidget {
               fieldId: 'title',
               text: note.title!,
               style: AppTypography.headline3,
+              enableWebLinks: false,
+              onMatchTap: _onMatchTap,
             ),
             const SizedBox(height: 24),
           ],
@@ -58,6 +68,8 @@ class NoteFindPreview extends StatelessWidget {
                                 ? TextDecoration.lineThrough
                                 : null,
                           ),
+                          enableWebLinks: false,
+                          onMatchTap: _onMatchTap,
                         )),
                       ]),
                 ),
@@ -75,6 +87,8 @@ class NoteFindPreview extends StatelessWidget {
               textOffset: start,
               styles: styles,
               style: AppTypography.formText,
+              enableWebLinks: false,
+              onMatchTap: _onMatchTap,
             ),
           ),
           for (final memo in note.voiceMemos)
@@ -90,6 +104,8 @@ class NoteFindPreview extends StatelessWidget {
                   fieldId: 'voice:${memo.id}',
                   text: memo.transcript!,
                   style: AppTypography.formText,
+                  enableWebLinks: false,
+                  onMatchTap: _onMatchTap,
                 )),
               ]),
             ],

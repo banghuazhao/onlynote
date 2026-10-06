@@ -453,5 +453,16 @@
   "Note_Outline_Hint": "Tap a heading to jump to it",
   "Note_Outline_Current": "Current section",
   "Note_Undo": "Undo",
-  "Note_Redo": "Redo"
+  "Note_Redo": "Redo",
+  "Web_Link_Open_Failed": "Could not open this website.",
+  "Note_FocusWriting": "Focus writing",
+  "Note_ShowWritingTools": "Show writing tools",
+  "Find_Edit_Match": "Edit match",
+  "Find_Replace": "Replace",
+  "Find_Replace_With": "Replace with",
+  "Find_Replace_All": "Replace all",
+  "Find_Replace_Changed": "The note changed. Search again to replace.",
+  "Find_Replace_Limit": "That replacement would make a title or checklist item too long.",
+  "Find_Replaced": "Replaced {count, plural, =1{1 match} other{{count} matches}}",
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
 }

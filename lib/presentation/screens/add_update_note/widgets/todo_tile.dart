@@ -34,6 +34,7 @@ ButtonStyle _todoControlStyle({bool destructive = false}) =>
 //* Todo list tile
 class _TodoFieldTile extends StatefulWidget {
   const _TodoFieldTile({
+    super.key,
     required this.index,
     required this.id,
     this.value,
@@ -269,6 +270,8 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 
 class _BuildTodoListField extends StatefulWidget {
   const _BuildTodoListField({
+    super.key,
+    this.showAddButton = true,
     required this.state,
     required this.onInputChanged,
     this.restoredEdit,
@@ -277,6 +280,7 @@ class _BuildTodoListField extends StatefulWidget {
   });
   final AddUpdateFormState state;
   final bool autofocusFirstTodo;
+  final bool showAddButton;
   final void Function(String, TextEditingValue) onInputChanged;
   final NoteEditSnapshot? restoredEdit;
   final int restoreRevision;
@@ -287,6 +291,7 @@ class _BuildTodoListField extends StatefulWidget {
 
 class _BuildTodoListFieldState extends State<_BuildTodoListField> {
   final Map<String, FocusNode> _focusNodes = {};
+  final Map<String, GlobalKey<_TodoFieldTileState>> _fieldKeys = {};
   bool _focusNextTodo = false;
 
   FocusNode _focusNodeFor(String todoId) => _focusNodes.putIfAbsent(
@@ -302,6 +307,7 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
         .toList();
     for (final todoId in removedIds) {
       _focusNodes.remove(todoId)?.dispose();
+      _fieldKeys.remove(todoId);
     }
 
     if (widget.restoreRevision != oldWidget.restoreRevision) {
@@ -332,6 +338,21 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
       }
     }
     _focusNextTodo = false;
+  }
+
+  Future<void> selectMatch(String id, TextSelection selection) async {
+    final field = _fieldKeys[id]?.currentState;
+    if (field == null) return;
+    field.todoController.selection = TextSelection(
+        baseOffset:
+            selection.baseOffset.clamp(0, field.todoController.text.length),
+        extentOffset:
+            selection.extentOffset.clamp(0, field.todoController.text.length));
+    _focusNodes[id]?.requestFocus();
+    await WidgetsBinding.instance.endOfFrame;
+    if (mounted && field.mounted) {
+      revealNoteTextOffset(field.context, selection.start);
+    }
   }
 
   @override
@@ -405,6 +426,8 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
                 ),
               ),
               child: _TodoFieldTile(
+                key: _fieldKeys.putIfAbsent(
+                    todo.id!, () => GlobalKey<_TodoFieldTileState>()),
                 index: index,
                 id: todo.id!,
                 value: todo.title,
@@ -459,14 +482,15 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
             );
           },
         ),
-        _AddTodoTile(
-          onAdd: () {
-            _focusNextTodo = true;
-            context
-                .read<AddUpdateFormBloc>()
-                .add(const AddUpdateFormEvent.addEmptyTodo());
-          },
-        ),
+        if (widget.showAddButton)
+          _AddTodoTile(
+            onAdd: () {
+              _focusNextTodo = true;
+              context
+                  .read<AddUpdateFormBloc>()
+                  .add(const AddUpdateFormEvent.addEmptyTodo());
+            },
+          ),
       ],
     );
   }

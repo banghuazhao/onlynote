@@ -1,8 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_web_links.dart';
+import 'formatted_note_text.dart';
 
 /// Styled search highlights with an exact glyph target, even when one text
 /// widget contains hundreds of paragraphs below an inline photo.
@@ -16,6 +19,9 @@ class NoteSearchText extends StatefulWidget {
     this.styles = const [],
     this.style,
     this.selectable = true,
+    this.enableWebLinks = true,
+    this.onOpenUrl,
+    this.onMatchTap,
   });
   final NoteSearchController controller;
   final String fieldId;
@@ -24,6 +30,9 @@ class NoteSearchText extends StatefulWidget {
   final List<NoteTextStyleRange> styles;
   final TextStyle? style;
   final bool selectable;
+  final bool enableWebLinks;
+  final NoteWebLinkOpener? onOpenUrl;
+  final ValueChanged<NoteSearchMatch>? onMatchTap;
 
   @override
   State<NoteSearchText> createState() => _NoteSearchTextState();
@@ -32,6 +41,7 @@ class NoteSearchText extends StatefulWidget {
 class _NoteSearchTextState extends State<NoteSearchText> {
   final _textKey = GlobalKey();
   VoidCallback? _unregister;
+  final Map<NoteSearchMatch, TapGestureRecognizer> _matchRecognizers = {};
 
   @override
   void initState() {
@@ -97,8 +107,40 @@ class _NoteSearchTextState extends State<NoteSearchText> {
   @override
   void dispose() {
     _unregister?.call();
+    for (final recognizer in _matchRecognizers.values) {
+      recognizer.dispose();
+    }
     super.dispose();
   }
+
+  void _updateMatchRecognizers(List<NoteSearchMatch> matches) {
+    final wanted =
+        widget.onMatchTap == null ? <NoteSearchMatch>{} : matches.toSet();
+    for (final match in _matchRecognizers.keys.toList()) {
+      if (!wanted.contains(match)) {
+        _matchRecognizers.remove(match)!.dispose();
+      }
+    }
+    for (final match in wanted) {
+      _matchRecognizers.putIfAbsent(
+        match,
+        () => TapGestureRecognizer()
+          ..onTap = () => widget.onMatchTap?.call(match),
+      );
+    }
+  }
+
+  Widget _readingText(List<TextSpan> spans, TextStyle style,
+          {required bool selectable}) =>
+      NoteReadingText(
+        text: widget.text,
+        spans: spans,
+        style: style,
+        selectable: selectable,
+        enableWebLinks: widget.enableWebLinks && widget.selectable,
+        onOpenUrl: widget.onOpenUrl,
+        textKey: _textKey,
+      );
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -108,10 +150,9 @@ class _NoteSearchTextState extends State<NoteSearchText> {
           final formatted = buildNoteTextSpans(
               text: widget.text, styles: widget.styles, baseStyle: style);
           if (widget.controller.query.trim().isEmpty) {
-            final span = TextSpan(style: style, children: formatted);
-            return widget.selectable
-                ? SelectableText.rich(span, key: _textKey)
-                : Text.rich(span, key: _textKey);
+            _updateMatchRecognizers(const []);
+            return _readingText(formatted, style,
+                selectable: widget.selectable);
           }
           final matches = widget.controller.matches
               .where((match) =>
@@ -119,6 +160,7 @@ class _NoteSearchTextState extends State<NoteSearchText> {
                   match.start < widget.textOffset + widget.text.length &&
                   match.end > widget.textOffset)
               .toList();
+          _updateMatchRecognizers(matches);
           final result = <TextSpan>[];
           var runStart = 0;
           var matchIndex = 0;
@@ -161,14 +203,14 @@ class _NoteSearchTextState extends State<NoteSearchText> {
                           backgroundColor: active
                               ? const Color(0xFFF2BD54)
                               : const Color(0xFFFFE7A0),
-                          color: const Color(0xFF29251C))));
+                          color: const Color(0xFF29251C)),
+                  recognizer: highlighted ? _matchRecognizers[match] : null));
             }
             runStart = runEnd;
           }
           // A RenderParagraph exposes exact selection boxes. Closing find
           // restores normal text selection and copying.
-          return Text.rich(TextSpan(style: style, children: result),
-              key: _textKey, semanticsLabel: widget.text);
+          return _readingText(result, style, selectable: false);
         },
       );
 }

@@ -13,6 +13,7 @@ import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -694,6 +695,30 @@ void main() {
             .writeAsBytes(bytes!.buffer.asUint8List());
         image.dispose();
       });
+      await _tap(tester, find.byKey(const ValueKey('note-focus-writing')));
+      Future<void> capture(String path) async {
+        await tester.runAsync(() async {
+          final image = await (editor.boundary.currentContext!
+                  .findRenderObject() as RenderRepaintBoundary)
+              .toImage(pixelRatio: 2);
+          final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+          await File(path).writeAsBytes(bytes!.buffer.asUint8List());
+          image.dispose();
+        });
+      }
+
+      await capture('/tmp/onlynote-focus-writing-editor.png');
+      await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+      await tester.enterText(
+          find.byKey(const ValueKey('note-find-query')), 'walk');
+      await tester.pumpAndSettle();
+      await _tap(
+          tester, find.byKey(const ValueKey('note-find-replace-toggle')));
+      await tester.enterText(
+          find.byKey(const ValueKey('note-find-replacement')), 'stroll');
+      await tester.pumpAndSettle();
+      await capture('/tmp/onlynote-replace-editor.png');
+      expect(tester.takeException(), isNull);
     }
   });
 
@@ -719,6 +744,352 @@ void main() {
     expect(tester.widget<IconButton>(_undo()).onPressed, isNotNull);
     await _tap(tester, _undo());
     expect(editor.latest('ime').description, '茶');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('focus writing preserves real body IME and checklist selection',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(
+            id: 'focus',
+            title: '中文',
+            description: '茶',
+            todo: [Todo(id: 'task', title: 'Bring tea')]));
+    await _tap(tester, _body());
+    final field = tester.widget<TextField>(_body());
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: '茶葉',
+        selection: TextSelection.collapsed(offset: 2),
+        composing: TextRange(start: 1, end: 2)));
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-focus-writing')));
+    expect(
+        tester.widget<TextField>(_body()).controller, same(field.controller));
+    expect(
+        field.controller!.value.composing, const TextRange(start: 1, end: 2));
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+    expect(find.byKey(const ValueKey('editor-record-voice')), findsNothing);
+    expect(find.byKey(const ValueKey('editor-edit-tags')), findsNothing);
+    expect(find.text(S.current.Add_todo), findsNothing);
+    expect(find.byKey(const ValueKey('todo-field-task')), findsOneWidget);
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: '茶葉', selection: TextSelection.collapsed(offset: 2)));
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('todo-field-task')));
+    final todo =
+        tester.widget<TextField>(find.byKey(const ValueKey('todo-field-task')));
+    todo.controller!.selection =
+        const TextSelection(baseOffset: 6, extentOffset: 9);
+    await tester.pump();
+    await _tap(tester, find.byKey(const ValueKey('note-focus-writing')));
+    expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('todo-field-task')))
+            .controller,
+        same(todo.controller));
+    expect(todo.controller!.selection,
+        const TextSelection(baseOffset: 6, extentOffset: 9));
+    expect(todo.focusNode!.hasFocus, isTrue);
+    expect(find.byKey(const ValueKey('editor-record-voice')), findsOneWidget);
+    await _tap(tester, _undo());
+    expect(editor.latest('focus').description, '茶');
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final target in ['title', 'body', 'todo']) {
+    testWidgets(
+        'Find opens the exact $target match for editing without a history step',
+        (tester) async {
+      final editor = await open(tester,
+          note: Note(
+              id: 'jump-$target',
+              title: target == 'title' ? 'Tea notes' : 'Notes',
+              description: target == 'body' ? 'Bring tea today' : 'Body text',
+              todo: [
+                Todo(id: 'task', title: target == 'todo' ? 'Bring tea' : 'Task')
+              ]));
+      await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+      await tester.enterText(
+          find.byKey(const ValueKey('note-find-query')), 'tea');
+      await tester.pumpAndSettle();
+      await _tap(tester, find.byKey(const ValueKey('note-find-edit-match')));
+      expect(find.byKey(const ValueKey('note-find-query')), findsNothing);
+      final input = target == 'title'
+          ? find.byKey(const ValueKey('note-title-input'))
+          : target == 'todo'
+              ? find.byKey(const ValueKey('todo-field-task'))
+              : _body();
+      final field = tester.widget<TextField>(input);
+      expect(
+          field.controller!.selection,
+          target == 'title'
+              ? const TextSelection(baseOffset: 0, extentOffset: 3)
+              : const TextSelection(baseOffset: 6, extentOffset: 9));
+      expect(field.focusNode!.hasFocus, isTrue);
+      expect(tester.testTextInput.isVisible, isTrue);
+      expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+      await _save(tester);
+      expect(editor.latest('jump-$target').description,
+          target == 'body' ? 'Bring tea today' : 'Body text');
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets(
+      'Replace all autosaves one step with styles and inline photo positions',
+      (tester) async {
+    final directory = await tester.runAsync(
+        () => Directory.systemTemp.createTemp('onlynote-replace-photo-'));
+    final photo = File('${directory!.path}/inline.png');
+    await tester.runAsync(() => photo.writeAsBytes(base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2H7sAAAAASUVORK5CYII=')));
+    addTearDown(() => directory.delete(recursive: true));
+    final layout =
+        NoteImageLayout(path: photo.path, textOffset: 4, widthFactor: .65);
+    const styles = [
+      NoteTextStyleRange(start: 0, end: 3, kind: NoteTextStyleKind.bold),
+      NoteTextStyleRange(start: 4, end: 7, kind: NoteTextStyleKind.highlight),
+    ];
+    final original = Note(
+        id: 'replace',
+        title: 'Tea notes',
+        description: 'tea\ntea after',
+        todo: [Todo(id: 'task', title: 'Bring tea')],
+        tags: const ['weekend'],
+        linkedNoteIds: const ['other'],
+        dailyNoteDateKey: '2026-10-07',
+        textStyles: styles,
+        imagePaths: [photo.path],
+        imageLayouts: [layout]);
+    final editor = await open(tester, note: original);
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'tea');
+    await tester.pumpAndSettle();
+    expect(find.text('1 / 4'), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-toggle')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-replacement')), 'coffee');
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-all')));
+    final replaced = editor.latest('replace');
+    expect(replaced.title, 'coffee notes');
+    expect(replaced.description, 'coffee\ncoffee after');
+    expect(replaced.todo.single.title, 'Bring coffee');
+    expect(replaced.textStyles, const [
+      NoteTextStyleRange(start: 0, end: 6, kind: NoteTextStyleKind.bold),
+      NoteTextStyleRange(start: 7, end: 13, kind: NoteTextStyleKind.highlight),
+    ]);
+    expect(replaced.imageLayouts, [layout.copyWith(textOffset: 7)]);
+    expect(replaced.tags, original.tags);
+    expect(replaced.linkedNoteIds, original.linkedNoteIds);
+    expect(replaced.dailyNoteDateKey, original.dailyNoteDateKey);
+    expect(find.text(S.current.Find_No_Matches), findsOneWidget);
+    await _tap(
+        tester, find.widgetWithText(SnackBarAction, S.current.Note_Undo));
+    final restored = editor.latest('replace');
+    expect(restored.title, original.title);
+    expect(restored.description, original.description);
+    expect(restored.todo, original.todo);
+    expect(restored.textStyles, styles);
+    expect(restored.imageLayouts, [layout]);
+    expect(find.byKey(const ValueKey('note-find-query')), findsOneWidget);
+    expect(find.text('1 / 4'), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('note-find-close')));
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    await _tap(tester, _redo());
+    expect(editor.latest('replace').description, replaced.description);
+    expect(editor.latest('replace').textStyles, replaced.textStyles);
+    expect(editor.latest('replace').imageLayouts, replaced.imageLayouts);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'Replace supports deletion and rejects oversized titles atomically',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'single', title: 'Notes', description: 'Tea and tea'));
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'tea');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-toggle')));
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace')));
+    expect(editor.latest('single').description, ' and tea');
+    expect(find.text('1 / 1'), findsOneWidget);
+    await _tap(
+        tester, find.widgetWithText(SnackBarAction, S.current.Note_Undo));
+    expect(editor.latest('single').description, 'Tea and tea');
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'Notes');
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-replacement')), 'x' * 141);
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-all')));
+    expect(editor.latest('single').title, 'Notes');
+    expect(editor.latest('single').description, 'Tea and tea');
+    expect(find.text(S.current.Find_Replace_Limit), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('note-find-close')));
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('expanded replace fits real 320px Chinese editor with large text',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await open(tester,
+        locale: const Locale('zh', 'HK'),
+        textScale: 2,
+        note: Note(id: 'replace-large', title: '散步筆記', description: '今天散步。'));
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(find.byKey(const ValueKey('note-find-query')), '散步');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-toggle')));
+    expect(find.byKey(const ValueKey('note-find-replacement')), findsOneWidget);
+    expect(find.byKey(const ValueKey('note-find-replace-all')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Find edits an offscreen completed checklist item and reveals it',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await open(tester,
+        note: Note(id: 'long-checklist', title: 'Packing', todo: [
+          for (var i = 0; i < 35; i++)
+            Todo(id: 'task-$i', title: 'Packing item $i'),
+          Todo(id: 'last', title: 'Bring tea', completed: true),
+        ]));
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'tea');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-edit-match')));
+    final target = find.byKey(const ValueKey('todo-field-last'));
+    final field = tester.widget<TextField>(target);
+    expect(field.controller!.selection,
+        const TextSelection(baseOffset: 6, extentOffset: 9));
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(
+        tester.getRect(target).overlaps(const Rect.fromLTWH(0, 100, 390, 650)),
+        isTrue);
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'Find query keeps local keyboard undo and guards preview edit during IME',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'find-ime', title: 'Notes', description: 'tea'));
+    await _tap(tester, _body());
+    await tester.enterText(_body(), 'tea today');
+    await _save(tester);
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    final query = find.byKey(const ValueKey('note-find-query'));
+    await tester.enterText(query, 'tea');
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    await _shortcut(tester);
+    expect(tester.widget<TextField>(query).controller!.text, '');
+    expect(editor.latest('find-ime').description, 'tea today');
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: 'tea',
+        selection: TextSelection.collapsed(offset: 3),
+        composing: TextRange(start: 0, end: 3)));
+    await tester.pumpAndSettle();
+    expect(
+        tester
+            .widget<TextButton>(
+                find.byKey(const ValueKey('note-find-edit-match')))
+            .onPressed,
+        isNull);
+    expect(tester.widget<TextField>(query).controller!.value.composing,
+        const TextRange(start: 0, end: 3));
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: 'tea', selection: TextSelection.collapsed(offset: 3)));
+    await tester.pumpAndSettle();
+    expect(
+        tester
+            .widget<TextButton>(
+                find.byKey(const ValueKey('note-find-edit-match')))
+            .onPressed,
+        isNotNull);
+    expect(editor.latest('find-ime').description, 'tea today');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'expanded replace remains reachable on a small phone with keyboard',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await open(tester,
+        locale: const Locale('zh', 'HK'),
+        textScale: 2,
+        note: Note(id: 'keyboard-small', title: '筆記', description: '散步'));
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(find.byKey(const ValueKey('note-find-query')), '散步');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-toggle')));
+    await _tap(tester, find.byKey(const ValueKey('note-find-replacement')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-replacement')), '喝茶');
+    await _tap(tester, find.byKey(const ValueKey('note-find-replace-all')));
+    expect(find.text(S.current.Find_Replaced(1)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'Find edits a selected voice transcript and saves an undoable correction',
+      (tester) async {
+    final memo = VoiceMemo(
+        id: 'memo',
+        path: 'note_audio/memo.m4a',
+        durationMs: 5000,
+        createdAt: DateTime(2026, 10, 7),
+        transcript: 'Bring tea today');
+    final editor = await open(tester,
+        note: Note(
+            id: 'find-voice',
+            title: 'Notes',
+            description: 'Keep body',
+            voiceMemos: [memo]));
+    await _tap(tester, find.byKey(const ValueKey('editor-find-note')));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-find-query')), 'tea');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-find-edit-match')));
+    final input = find.byKey(const ValueKey('voice-transcript-editor-input'));
+    expect(input, findsOneWidget);
+    final field = tester.widget<TextField>(input);
+    expect(field.controller!.selection,
+        const TextSelection(baseOffset: 6, extentOffset: 9));
+    expect(tester.testTextInput.isVisible, isTrue);
+    await tester.enterText(input, 'Bring coffee today');
+    await _tap(tester, find.text(S.current.Voice_Save));
+    expect(editor.latest('find-voice').voiceMemos.single.transcript,
+        'Bring coffee today');
+    expect(editor.latest('find-voice').description, 'Keep body');
+    await _tap(tester, _undo());
+    expect(editor.latest('find-voice').voiceMemos.single, memo);
+    expect(editor.latest('find-voice').description, 'Keep body');
     expect(tester.takeException(), isNull);
   });
 }

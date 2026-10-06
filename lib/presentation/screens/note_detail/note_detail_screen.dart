@@ -1,4 +1,5 @@
 import 'package:onlynote/presentation/components/note_document_view.dart';
+import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_search_text.dart';
 import 'package:onlynote/services/note_find.dart';
@@ -747,11 +748,13 @@ class LoadedView extends StatelessWidget {
                           controller: searchController!,
                           fieldId: 'title',
                           text: note.title!,
+                          selectable: !exportMode,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         )
                       else
-                        SelectableText(
-                          note.title!,
+                        FormattedNoteText(
+                          text: note.title!,
+                          selectable: !exportMode,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         ),
                       const SizedBox(height: AppSpacings.l),
@@ -872,6 +875,7 @@ class LoadedView extends StatelessWidget {
                                 text: text,
                                 textOffset: start,
                                 styles: styles,
+                                selectable: !exportMode,
                                 style: AppTypography.headline6.copyWith(
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.ink.withValues(alpha: 0.88),
@@ -933,12 +937,17 @@ class LoadedView extends StatelessWidget {
                               memo: memo,
                               key: ValueKey(memo.id),
                               transcriptBuilder: searchController == null
-                                  ? null
+                                  ? (text) => FormattedNoteText(
+                                        text: text,
+                                        style: context.textStyles.bodyMedium,
+                                        selectable: !exportMode,
+                                      )
                                   : (text) => NoteSearchText(
                                         controller: searchController!,
                                         fieldId: 'voice:${memo.id}',
                                         text: text,
                                         style: context.textStyles.bodyMedium,
+                                        selectable: !exportMode,
                                       ),
                               resolvePath: AudioStorage.instance.resolvePath),
                     ],

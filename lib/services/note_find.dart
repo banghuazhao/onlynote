@@ -98,6 +98,7 @@ class NoteSearchController extends ChangeNotifier {
   bool _disposed = false;
 
   String get query => _query;
+  List<NoteSearchField> get fields => _fields;
   List<NoteSearchMatch> get matches => _matches;
   int get currentIndex => _currentIndex;
   NoteSearchMatch? get currentMatch =>
@@ -110,7 +111,7 @@ class NoteSearchController extends ChangeNotifier {
             item.$2.text == _fields[item.$1].text)) {
       return;
     }
-    _fields = List.of(fields);
+    _fields = List.unmodifiable(fields);
     final previous = currentMatch;
     _matches = List.unmodifiable(findNoteMatches(_fields, _query));
     final retained = previous == null ? -1 : _matches.indexOf(previous);
@@ -130,6 +131,19 @@ class NoteSearchController extends ChangeNotifier {
 
   void next() => _move(1);
   void previous() => _move(-1);
+
+  /// Selects a tapped occurrence without accepting a stale preview target.
+  bool selectMatch(NoteSearchMatch match, {bool reveal = true}) {
+    final index = _matches.indexOf(match);
+    if (index < 0) return false;
+    if (index != _currentIndex) {
+      _currentIndex = index;
+      notifyListeners();
+    }
+    if (reveal) revealCurrent();
+    return true;
+  }
+
   void _move(int delta) {
     if (_matches.isEmpty) return;
     _currentIndex = (_currentIndex + delta) % _matches.length;
