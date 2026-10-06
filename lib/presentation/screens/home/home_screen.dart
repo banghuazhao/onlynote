@@ -1,4 +1,5 @@
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/presentation/components/note_tags_sheet.dart';
@@ -58,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _savedViews = SavedNoteViewStore.instance;
   bool _viewsUnavailable = false;
   bool _openingDailyNote = false;
+  bool _presentingDailyCalendar = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -458,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openDailyNote() async {
-    if (_openingDailyNote) return;
+    if (_openingDailyNote || _presentingDailyCalendar) return;
     _cancelChecklistReview();
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _openingDailyNote = true);
@@ -478,9 +480,71 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _openDailyNoteCalendar() async {
+    if (_openingDailyNote || _presentingDailyCalendar) return;
+    _cancelChecklistReview();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _presentingDailyCalendar = true);
+    ({DateTime? day, bool openToday})? selection;
+    try {
+      final repository = getIt<NoteRepository>();
+      selection = await showAppSheet<({DateTime? day, bool openToday})>(
+        context: context,
+        builder: (sheetContext) => ValueListenableBuilder(
+          valueListenable: getIt<Database>().box.listenable(),
+          builder: (_, __, ___) => DailyNoteCalendarSheet(
+            notes:
+                repository.getAllNotes().map((dto) => dto.toDomain()).toList(),
+            onOpenDay: (day) =>
+                Navigator.of(sheetContext).pop((day: day, openToday: false)),
+            onOpenToday: () =>
+                Navigator.of(sheetContext).pop((day: null, openToday: true)),
+          ),
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Daily_Note_Calendar_Open_Failed,
+            isError: true);
+      }
+      return;
+    } finally {
+      if (mounted) setState(() => _presentingDailyCalendar = false);
+    }
+    if (!mounted || selection == null) return;
+    if (selection.openToday) {
+      await _openDailyNote();
+      return;
+    }
+    await _openExistingDailyNote(selection.day!);
+  }
+
+  Future<void> _openExistingDailyNote(DateTime day) async {
+    if (_openingDailyNote || _presentingDailyCalendar) return;
+    setState(() => _openingDailyNote = true);
+    try {
+      final note =
+          DailyNoteService(getIt<NoteRepository>()).existingForDay(day);
+      if (note == null) {
+        context.showToast(S.of(context).Daily_Note_Calendar_Note_Unavailable,
+            isError: true);
+        return;
+      }
+      await context.router.push(AddUpdateNoteRoute(note: note));
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Daily_Note_Calendar_Open_Failed,
+            isError: true);
+      }
+    } finally {
+      if (mounted) setState(() => _openingDailyNote = false);
+    }
+  }
+
   Widget _dailyNoteShortcut() => DailyNoteShortcut(
         onPressed: _openDailyNote,
-        isOpening: _openingDailyNote,
+        onOpenCalendar: _openDailyNoteCalendar,
+        isOpening: _openingDailyNote || _presentingDailyCalendar,
       );
 
   /// What the app bar title reads: the scope the note list is currently

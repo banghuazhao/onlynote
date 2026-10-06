@@ -22,6 +22,11 @@ class DailyNoteService {
   // Sharing the in-flight write prevents both from creating today's note.
   static final _pending = Expando<Map<String, Future<Note>>>();
 
+  /// Reads the current saved note for a day without creating missing entries.
+  Note? existingForDay(DateTime day) =>
+      dailyNoteForDay(repository.getAllNotes(), dailyNoteDateKey(day))
+          ?.toDomain();
+
   Future<Note> openToday({required String Function(DateTime) titleForDay}) {
     final now = _now().toLocal();
     final dayKey = dailyNoteDateKey(now);
@@ -66,7 +71,7 @@ class DailyNoteService {
 NoteDto? dailyNoteForDay(Iterable<NoteDto> notes, String dayKey) {
   final matching = notes
       .where((note) =>
-          note.id?.isNotEmpty == true &&
+          note.id?.trim().isNotEmpty == true &&
           !note.isDeleted &&
           note.dailyNoteDateKey == dayKey)
       .toList()

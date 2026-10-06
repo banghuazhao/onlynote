@@ -7,6 +7,7 @@ import 'package:onlynote/presentation/theme/theme.dart';
 import 'daily_note_shortcut.dart';
 
 void previewOpenDailyNote() {}
+void previewOpenDailyCalendar() {}
 void previewFilterDailyNotes(bool _) {}
 void previewDailyNoteAction() {}
 
@@ -21,8 +22,9 @@ Widget dailyNoteShortcutsPreview() => MaterialApp(
       localizationsDelegates: const [S.delegate],
       home: Scaffold(
         body: UnfinishedNotesFilter(
-          leadingAction:
-              const DailyNoteShortcut(onPressed: previewOpenDailyNote),
+          leadingAction: const DailyNoteShortcut(
+              onPressed: previewOpenDailyNote,
+              onOpenCalendar: previewOpenDailyCalendar),
           selected: false,
           onChanged: previewFilterDailyNotes,
           onOpenReminders: previewDailyNoteAction,

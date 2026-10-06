@@ -427,5 +427,15 @@
   "Find_Next": "Next match",
   "Find_Close": "Close search",
   "Today_Note": "Today’s note",
-  "Today_Note_Open_Failed": "Could not open today’s note. Try again."
+  "Today_Note_Open_Failed": "Could not open today’s note. Try again.",
+  "Daily_Note_Calendar": "Daily notes",
+  "Daily_Note_Calendar_Empty": "No daily notes yet. Start with today's note.",
+  "Daily_Note_Calendar_No_Note": "No daily note for this date.",
+  "Daily_Note_Calendar_Has_Note": "Daily note available",
+  "Daily_Note_Calendar_Today": "Today",
+  "Daily_Note_Calendar_Previous_Month": "Previous month",
+  "Daily_Note_Calendar_Next_Month": "Next month",
+  "Daily_Note_Calendar_Choose_Month": "Choose month and year",
+  "Daily_Note_Calendar_Open_Failed": "Could not open this daily note. Try again.",
+  "Daily_Note_Calendar_Note_Unavailable": "This daily note is no longer available."
 }

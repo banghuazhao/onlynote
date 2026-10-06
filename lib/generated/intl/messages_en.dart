@@ -141,6 +141,33 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("Clear filters"),
     "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(Copy)"),
+    "Daily_Note_Calendar": MessageLookupByLibrary.simpleMessage("Daily notes"),
+    "Daily_Note_Calendar_Choose_Month": MessageLookupByLibrary.simpleMessage(
+      "Choose month and year",
+    ),
+    "Daily_Note_Calendar_Empty": MessageLookupByLibrary.simpleMessage(
+      "No daily notes yet. Start with today\'s note.",
+    ),
+    "Daily_Note_Calendar_Has_Note": MessageLookupByLibrary.simpleMessage(
+      "Daily note available",
+    ),
+    "Daily_Note_Calendar_Next_Month": MessageLookupByLibrary.simpleMessage(
+      "Next month",
+    ),
+    "Daily_Note_Calendar_No_Note": MessageLookupByLibrary.simpleMessage(
+      "No daily note for this date.",
+    ),
+    "Daily_Note_Calendar_Note_Unavailable":
+        MessageLookupByLibrary.simpleMessage(
+          "This daily note is no longer available.",
+        ),
+    "Daily_Note_Calendar_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not open this daily note. Try again.",
+    ),
+    "Daily_Note_Calendar_Previous_Month": MessageLookupByLibrary.simpleMessage(
+      "Previous month",
+    ),
+    "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("Delete Folder"),
     "Delete_Folder_Confirm_Message": MessageLookupByLibrary.simpleMessage(

@@ -116,6 +116,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音樂盒"),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("清除篩選"),
     "Copy_Suffix": MessageLookupByLibrary.simpleMessage("(副本)"),
+    "Daily_Note_Calendar": MessageLookupByLibrary.simpleMessage("每日筆記"),
+    "Daily_Note_Calendar_Choose_Month": MessageLookupByLibrary.simpleMessage(
+      "選擇月份和年份",
+    ),
+    "Daily_Note_Calendar_Empty": MessageLookupByLibrary.simpleMessage(
+      "還沒有每日筆記，從今日筆記開始吧。",
+    ),
+    "Daily_Note_Calendar_Has_Note": MessageLookupByLibrary.simpleMessage(
+      "有每日筆記",
+    ),
+    "Daily_Note_Calendar_Next_Month": MessageLookupByLibrary.simpleMessage(
+      "下個月",
+    ),
+    "Daily_Note_Calendar_No_Note": MessageLookupByLibrary.simpleMessage(
+      "這一天沒有每日筆記。",
+    ),
+    "Daily_Note_Calendar_Note_Unavailable":
+        MessageLookupByLibrary.simpleMessage("這篇每日筆記已不可用。"),
+    "Daily_Note_Calendar_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法開啟每日筆記，請再試一次。",
+    ),
+    "Daily_Note_Calendar_Previous_Month": MessageLookupByLibrary.simpleMessage(
+      "上個月",
+    ),
+    "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Delete": MessageLookupByLibrary.simpleMessage("刪除"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("刪除資料夾"),
     "Delete_Folder_Confirm_Message": MessageLookupByLibrary.simpleMessage(

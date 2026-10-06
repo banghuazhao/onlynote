@@ -3504,6 +3504,106 @@ class S {
       args: [],
     );
   }
+
+  /// `Daily notes`
+  String get Daily_Note_Calendar {
+    return Intl.message(
+      'Daily notes',
+      name: 'Daily_Note_Calendar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No daily notes yet. Start with today's note.`
+  String get Daily_Note_Calendar_Empty {
+    return Intl.message(
+      'No daily notes yet. Start with today\'s note.',
+      name: 'Daily_Note_Calendar_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No daily note for this date.`
+  String get Daily_Note_Calendar_No_Note {
+    return Intl.message(
+      'No daily note for this date.',
+      name: 'Daily_Note_Calendar_No_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Daily note available`
+  String get Daily_Note_Calendar_Has_Note {
+    return Intl.message(
+      'Daily note available',
+      name: 'Daily_Note_Calendar_Has_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today`
+  String get Daily_Note_Calendar_Today {
+    return Intl.message(
+      'Today',
+      name: 'Daily_Note_Calendar_Today',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Previous month`
+  String get Daily_Note_Calendar_Previous_Month {
+    return Intl.message(
+      'Previous month',
+      name: 'Daily_Note_Calendar_Previous_Month',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next month`
+  String get Daily_Note_Calendar_Next_Month {
+    return Intl.message(
+      'Next month',
+      name: 'Daily_Note_Calendar_Next_Month',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose month and year`
+  String get Daily_Note_Calendar_Choose_Month {
+    return Intl.message(
+      'Choose month and year',
+      name: 'Daily_Note_Calendar_Choose_Month',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not open this daily note. Try again.`
+  String get Daily_Note_Calendar_Open_Failed {
+    return Intl.message(
+      'Could not open this daily note. Try again.',
+      name: 'Daily_Note_Calendar_Open_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This daily note is no longer available.`
+  String get Daily_Note_Calendar_Note_Unavailable {
+    return Intl.message(
+      'This daily note is no longer available.',
+      name: 'Daily_Note_Calendar_Note_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

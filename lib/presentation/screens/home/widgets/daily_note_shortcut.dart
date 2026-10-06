@@ -3,15 +3,19 @@ import 'package:onlynote/generated/l10n.dart';
 
 class DailyNoteShortcut extends StatelessWidget {
   const DailyNoteShortcut(
-      {super.key, required this.onPressed, this.isOpening = false});
+      {super.key,
+      required this.onPressed,
+      this.onOpenCalendar,
+      this.isOpening = false});
 
   final VoidCallback onPressed;
+  final VoidCallback? onOpenCalendar;
   final bool isOpening;
 
   @override
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    return Tooltip(
+    final todayAction = Tooltip(
       message: S.of(context).Today_Note,
       child: ActionChip(
         key: const ValueKey('daily-note-shortcut'),
@@ -27,6 +31,20 @@ class DailyNoteShortcut extends StatelessWidget {
         onPressed: isOpening ? null : onPressed,
         materialTapTargetSize: MaterialTapTargetSize.padded,
       ),
+    );
+    if (onOpenCalendar == null) return todayAction;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        todayAction,
+        const SizedBox(width: 4),
+        IconButton(
+          key: const ValueKey('daily-note-calendar-shortcut'),
+          tooltip: S.of(context).Daily_Note_Calendar,
+          onPressed: isOpening ? null : onOpenCalendar,
+          icon: const Icon(Icons.calendar_month_outlined),
+        ),
+      ],
     );
   }
 }

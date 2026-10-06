@@ -24,7 +24,9 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     var taps = 0;
-    final shortcut = DailyNoteShortcut(onPressed: () => taps++);
+    var calendarTaps = 0;
+    final shortcut = DailyNoteShortcut(
+        onPressed: () => taps++, onOpenCalendar: () => calendarTaps++);
     await pump(
         tester,
         UnfinishedNotesFilter(
@@ -36,6 +38,9 @@ void main() {
         ));
     await tester.tap(find.byKey(const ValueKey('daily-note-shortcut')));
     expect(taps, 1);
+    await tester
+        .tap(find.byKey(const ValueKey('daily-note-calendar-shortcut')));
+    expect(calendarTaps, 1);
     expect(tester.takeException(), isNull);
     await pump(
         tester,
@@ -46,6 +51,9 @@ void main() {
         ));
     await tester.tap(find.byKey(const ValueKey('daily-note-shortcut')));
     expect(taps, 2);
+    await tester
+        .tap(find.byKey(const ValueKey('daily-note-calendar-shortcut')));
+    expect(calendarTaps, 2);
     expect(tester.takeException(), isNull);
   });
 
@@ -57,6 +65,7 @@ void main() {
         DailyNoteShortcut(
           isOpening: true,
           onPressed: () => taps++,
+          onOpenCalendar: () => taps++,
         ),
         reduceMotion: true);
     expect(find.byIcon(Icons.hourglass_top_rounded), findsOneWidget);
@@ -65,5 +74,8 @@ void main() {
     expect(taps, 0);
     final chip = tester.widget<ActionChip>(find.byType(ActionChip));
     expect(chip.onPressed, isNull);
+    final calendar = tester.widget<IconButton>(
+        find.byKey(const ValueKey('daily-note-calendar-shortcut')));
+    expect(calendar.onPressed, isNull);
   });
 }

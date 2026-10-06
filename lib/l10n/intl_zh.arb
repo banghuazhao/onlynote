@@ -427,5 +427,15 @@
   "Find_Next": "下一个结果",
   "Find_Close": "关闭查找",
   "Today_Note": "今日笔记",
-  "Today_Note_Open_Failed": "无法打开今日笔记，请重试。"
+  "Today_Note_Open_Failed": "无法打开今日笔记，请重试。",
+  "Daily_Note_Calendar": "每日笔记",
+  "Daily_Note_Calendar_Empty": "还没有每日笔记，从今日笔记开始吧。",
+  "Daily_Note_Calendar_No_Note": "这一天没有每日笔记。",
+  "Daily_Note_Calendar_Has_Note": "有每日笔记",
+  "Daily_Note_Calendar_Today": "今天",
+  "Daily_Note_Calendar_Previous_Month": "上个月",
+  "Daily_Note_Calendar_Next_Month": "下个月",
+  "Daily_Note_Calendar_Choose_Month": "选择月份和年份",
+  "Daily_Note_Calendar_Open_Failed": "无法打开每日笔记，请重试。",
+  "Daily_Note_Calendar_Note_Unavailable": "这篇每日笔记已不可用。"
 }
