@@ -276,6 +276,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Format_Bold": MessageLookupByLibrary.simpleMessage("Bold"),
     "Format_Bullets": MessageLookupByLibrary.simpleMessage("Bullets"),
     "Format_Heading": MessageLookupByLibrary.simpleMessage("Heading"),
+    "Format_Highlight": MessageLookupByLibrary.simpleMessage("Highlight"),
+    "Format_Remove_Highlight": MessageLookupByLibrary.simpleMessage(
+      "Remove highlight",
+    ),
+    "Format_Select_To_Highlight": MessageLookupByLibrary.simpleMessage(
+      "Select text to highlight",
+    ),
     "Format_Text": MessageLookupByLibrary.simpleMessage("Text style"),
     "History_Current": MessageLookupByLibrary.simpleMessage(
       "Already matches this version",
@@ -364,7 +371,16 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Duplicated Successfully",
     ),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
+    "Note_Outline": MessageLookupByLibrary.simpleMessage("Outline"),
+    "Note_Outline_Current": MessageLookupByLibrary.simpleMessage(
+      "Current section",
+    ),
+    "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage(
+      "Tap a heading to jump to it",
+    ),
+    "Note_Redo": MessageLookupByLibrary.simpleMessage("Redo"),
     "Note_Unarchived": MessageLookupByLibrary.simpleMessage("Note unarchived"),
+    "Note_Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Note_Untitled": MessageLookupByLibrary.simpleMessage("Untitled note"),
     "Note_Updated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Updated Successfully",

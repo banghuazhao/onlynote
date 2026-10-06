@@ -89,8 +89,16 @@ class _FormattingPreviewState extends State<_FormattingPreview> {
         end: heading.length + 1 + emphasis.length,
         kind: NoteTextStyleKind.bold,
       ),
+      NoteTextStyleRange(
+        start: heading.length + 1,
+        end: heading.length + 1 + emphasis.length,
+        kind: NoteTextStyleKind.highlight,
+      ),
     ]);
-    _controller.selection = TextSelection.collapsed(offset: text.length);
+    _controller.selection = TextSelection(
+      baseOffset: heading.length + 1,
+      extentOffset: heading.length + 1 + emphasis.length,
+    );
   }
 
   @override

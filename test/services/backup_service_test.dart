@@ -127,6 +127,39 @@ void main() {
     expect(restored.description, 'Keep my thoughts');
   });
 
+  test('highlight survives Hive reopen and portable note restore', () async {
+    const styles = [
+      NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.bold),
+      NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.highlight),
+    ];
+    final original = NoteDto.fromNote(
+        Note(id: 'marked', description: 'Keep this', textStyles: styles));
+    await notes.put(original.id, original);
+    await notes.flush();
+    await notes.close();
+    notes = await Hive.openBox('notes');
+    final saved = notes.get('marked') as NoteDto;
+    expect(saved.toDomain().textStyles, styles);
+    final portable = decodeBackup(encodeBackup(BackupContents(
+        createdAt: DateTime(2026, 10, 7),
+        notes: [saved],
+        folders: [],
+        photos: {},
+        reminders: [])));
+    await notes.clear();
+    final restarted = BackupService(
+        notes: notes,
+        folders: folders,
+        journal: journal,
+        documents: directory,
+        readReminders: () => reminders,
+        writeReminders: (values) async => reminders = values);
+    await restarted.restore(portable);
+    final restored = notes.values.cast<NoteDto>().single;
+    expect(restored.toDomain().textStyles, styles);
+    expect(restored.description, 'Keep this');
+  });
+
   test(
       'daily restore keeps existing association and imports content separately',
       () async {
@@ -373,6 +406,7 @@ void main() {
     const body = 'Heading\n• Item\nBold';
     const styles = [
       NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.heading),
+      NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.highlight),
       NoteTextStyleRange(start: 15, end: 19, kind: NoteTextStyleKind.bold),
     ];
     final before = NoteDto(

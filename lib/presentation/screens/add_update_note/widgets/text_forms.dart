@@ -4,10 +4,12 @@ class _BuildTitleField extends StatelessWidget {
   const _BuildTitleField({
     required this.state,
     required TextEditingController titleController,
+    required this.focusNode,
   }) : _titleController = titleController;
 
   final AddUpdateFormState state;
   final TextEditingController _titleController;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,9 @@ class _BuildTitleField extends StatelessWidget {
             ),
           ),
         TextField(
+          key: const ValueKey('note-title-input'),
           controller: _titleController,
+          focusNode: focusNode,
           style: AppTypography.headline4.copyWith(height: 1.25),
           textInputAction: TextInputAction.next,
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -54,6 +58,7 @@ class _BuildDescriptionField extends StatelessWidget {
     required this.state,
     required SimpleFormattingController descriptionController,
     required this.focusNode,
+    required this.outlineController,
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
     required this.onEditImage,
@@ -63,6 +68,7 @@ class _BuildDescriptionField extends StatelessWidget {
   final AddUpdateFormState state;
   final SimpleFormattingController _descriptionController;
   final FocusNode focusNode;
+  final NoteOutlineNavigationController outlineController;
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
@@ -72,6 +78,7 @@ class _BuildDescriptionField extends StatelessWidget {
   Widget build(BuildContext context) => NoteBodyEditor(
         controller: _descriptionController,
         focusNode: focusNode,
+        outlineController: outlineController,
         imagePaths: state.imagePaths,
         imageLayouts: state.imageLayouts,
         onImageLayoutsChanged: onImageLayoutsChanged,

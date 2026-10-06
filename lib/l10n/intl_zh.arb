@@ -445,5 +445,13 @@
   "Document_Scan_Unsupported": "此设备不支持文档扫描。",
   "Document_Scan_Permission": "请在设置中允许相机访问，以扫描文档。",
   "Document_Scan_Too_Many": "每次最多扫描20页，请将文档分成几次扫描。",
-  "Document_Scan_Pending": "扫描仍在处理中，请稍后重试。"
+  "Document_Scan_Pending": "扫描仍在处理中，请稍后重试。",
+  "Format_Highlight": "高亮",
+  "Format_Remove_Highlight": "取消高亮",
+  "Format_Select_To_Highlight": "选中文字以高亮",
+  "Note_Outline": "大纲",
+  "Note_Outline_Hint": "轻点标题，跳转至该部分",
+  "Note_Outline_Current": "当前部分",
+  "Note_Undo": "撤销",
+  "Note_Redo": "重做"
 }

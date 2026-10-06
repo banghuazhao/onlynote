@@ -3,6 +3,9 @@ import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_search_text.dart';
 import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/services/note_outline.dart';
+import 'package:onlynote/presentation/components/note_outline_navigation_controller.dart';
+import 'package:onlynote/presentation/components/note_outline_sheet.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -66,6 +69,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   WidgetCommands? _widgetCommands;
   final NoteSearchController _findController = NoteSearchController();
   bool _findOpen = false;
+  final _outlineController = NoteOutlineNavigationController();
+
+  Future<void> _openOutline(Note note) async {
+    if (_exportingImage || _savingReminder || _changingLibrary) return;
+    final entries = buildNoteOutline(note.description ?? '', note.textStyles);
+    if (entries.isEmpty) return;
+    final entry =
+        await showNoteOutlineSheet(context: context, entries: entries);
+    if (!mounted || entry == null) return;
+    await _outlineController.jumpTo(entry.start);
+  }
 
   void _openFind() {
     if (mounted) setState(() => _findOpen = true);
@@ -165,6 +179,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       context: context,
       title: S.of(context).More_Options,
       actions: [
+        if (shouldShowNoteOutline(note.description ?? '',
+            buildNoteOutline(note.description ?? '', note.textStyles)))
+          AppSheetAction(
+            leading: const Icon(Icons.format_list_bulleted_rounded),
+            title: Text(S.of(context).Note_Outline),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _openOutline(note);
+            },
+          ),
         AppSheetAction(
           leading: const Icon(Icons.manage_search_rounded),
           title: Text(S.of(context).Find_In_Note),
@@ -360,6 +384,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _widgetCommands?.updates.removeListener(_refreshWidgetCompletion);
     _findController.removeListener(_findChanged);
     _findController.dispose();
+    _outlineController.dispose();
     super.dispose();
   }
 
@@ -638,6 +663,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       searchController: _findOpen && !_exportingImage
                           ? _findController
                           : null,
+                      outlineController:
+                          _exportingImage ? null : _outlineController,
                       libraryNotes: _libraryNotes,
                       onOpenLinkedNote: _openLinkedNote,
                       onEditLinks: data.note.isDeleted
@@ -672,6 +699,7 @@ class LoadedView extends StatelessWidget {
     this.onOpenLinkedNote,
     this.onEditLinks,
     this.searchController,
+    this.outlineController,
   });
 
   final Note note;
@@ -683,6 +711,7 @@ class LoadedView extends StatelessWidget {
   final ValueChanged<Note>? onOpenLinkedNote;
   final VoidCallback? onEditLinks;
   final NoteSearchController? searchController;
+  final NoteOutlineNavigationController? outlineController;
 
   @override
   Widget build(BuildContext context) {
@@ -829,6 +858,7 @@ class LoadedView extends StatelessWidget {
                       const SizedBox(height: AppSpacings.xxl),
                     },
                     NoteDocumentView(
+                      outlineController: outlineController,
                       text: note.description ?? '',
                       styles: note.textStyles,
                       imagePaths: note.imagePaths,

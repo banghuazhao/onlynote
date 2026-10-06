@@ -3684,6 +3684,71 @@ class S {
       args: [],
     );
   }
+
+  /// `Highlight`
+  String get Format_Highlight {
+    return Intl.message(
+      'Highlight',
+      name: 'Format_Highlight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove highlight`
+  String get Format_Remove_Highlight {
+    return Intl.message(
+      'Remove highlight',
+      name: 'Format_Remove_Highlight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select text to highlight`
+  String get Format_Select_To_Highlight {
+    return Intl.message(
+      'Select text to highlight',
+      name: 'Format_Select_To_Highlight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Outline`
+  String get Note_Outline {
+    return Intl.message('Outline', name: 'Note_Outline', desc: '', args: []);
+  }
+
+  /// `Tap a heading to jump to it`
+  String get Note_Outline_Hint {
+    return Intl.message(
+      'Tap a heading to jump to it',
+      name: 'Note_Outline_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Current section`
+  String get Note_Outline_Current {
+    return Intl.message(
+      'Current section',
+      name: 'Note_Outline_Current',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Undo`
+  String get Note_Undo {
+    return Intl.message('Undo', name: 'Note_Undo', desc: '', args: []);
+  }
+
+  /// `Redo`
+  String get Note_Redo {
+    return Intl.message('Redo', name: 'Note_Redo', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

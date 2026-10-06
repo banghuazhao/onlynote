@@ -11,6 +11,7 @@ import 'formatted_note_text.dart';
 import 'note_document_view.dart';
 import 'note_formatting_toolbar.dart';
 import 'note_image_block.dart';
+import 'note_outline_navigation_controller.dart';
 import 'paper_note.dart';
 import 'simple_formatting_controller.dart';
 
@@ -29,6 +30,7 @@ class NoteBodyEditor extends StatefulWidget {
     this.paperColor,
     this.imageBuilder,
     this.onEditImage,
+    this.outlineController,
   });
 
   final SimpleFormattingController controller;
@@ -41,6 +43,7 @@ class NoteBodyEditor extends StatefulWidget {
   final Color? paperColor;
   final NoteBlockImageBuilder? imageBuilder;
   final ValueChanged<String>? onEditImage;
+  final NoteOutlineNavigationController? outlineController;
 
   @override
   State<NoteBodyEditor> createState() => _NoteBodyEditorState();
@@ -57,6 +60,8 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   bool _syncing = false;
   Timer? _autoScrollTimer;
   Offset? _dragPosition;
+  final _plainTextKey = GlobalKey();
+  VoidCallback? _detachOutline;
 
   @override
   void initState() {
@@ -67,11 +72,55 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         widget.imageLayouts, widget.imagePaths, _lastText);
     widget.controller.addListener(_masterChanged);
     _syncSegments();
+    _attachOutline();
+  }
+
+  void _attachOutline() {
+    _detachOutline?.call();
+    _detachOutline =
+        widget.outlineController?.attach(owner: this, jump: _jumpTo);
+  }
+
+  Future<bool> _jumpTo(int offset) async {
+    if (!mounted || _dragging || offset > widget.controller.text.length) {
+      return false;
+    }
+    final part = _layouts.isEmpty
+        ? null
+        : _textParts()
+            .where(
+                (item) => item.part.start <= offset && item.part.end >= offset)
+            .lastOrNull;
+    final segment = part == null ? null : _segments[part.key];
+    if (_layouts.isNotEmpty && segment == null) return false;
+    // Navigating commits the current composing text without replacing it.
+    // Clearing composition before moving the caret matches a native field tap.
+    if (segment != null) _activeKey = segment.key;
+    widget.controller.value = widget.controller.value.copyWith(
+      selection: TextSelection.collapsed(offset: offset),
+      composing: TextRange.empty,
+    );
+    _syncSegments();
+    (segment?.focus ?? widget.focusNode).requestFocus();
+    setState(() => _selectedImage = null);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return false;
+    final targetContext = (segment?.renderKey ?? _plainTextKey).currentContext;
+    if (targetContext == null || !targetContext.mounted) return false;
+    return revealNoteTextOffset(
+        targetContext,
+        segment == null
+            ? offset
+            : (offset - segment.start)
+                .clamp(0, segment.controller.text.length));
   }
 
   @override
   void didUpdateWidget(NoteBodyEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.outlineController != widget.outlineController) {
+      _attachOutline();
+    }
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_masterChanged);
       widget.controller.addListener(_masterChanged);
@@ -163,7 +212,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     for (var index = 0; index < parts.length; index++) {
       final item = parts[index];
       final segment = _segments.putIfAbsent(item.key, () {
-        final focus = FocusNode();
+        final focus = FocusNode(debugLabel: 'note-body');
         final created = _TextSegment(
           key: item.key,
           focus: focus,
@@ -398,6 +447,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   }
 
   Widget _textField(_TextSegment segment, int index) => RuledWritingArea(
+        key: segment.renderKey,
         paperColor: widget.paperColor ?? AppColors.parchment,
         lineHeight: MediaQuery.textScalerOf(context)
                 .scale(AppTypography.formText.fontSize ?? 17) *
@@ -574,6 +624,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
             controller: widget.controller, focusNode: widget.focusNode),
         const SizedBox(height: 8),
         RuledWritingArea(
+          key: _plainTextKey,
           paperColor: widget.paperColor ?? AppColors.parchment,
           lineHeight: MediaQuery.textScalerOf(context)
                   .scale(AppTypography.formText.fontSize ?? 17) *
@@ -637,6 +688,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
 
   @override
   void dispose() {
+    _detachOutline?.call();
     _autoScrollTimer?.cancel();
     widget.controller.removeListener(_masterChanged);
     for (final segment in _segments.values) {
@@ -652,6 +704,7 @@ class _TextSegment {
   final String key;
   final _PartController controller;
   final FocusNode focus;
+  final GlobalKey renderKey = GlobalKey();
   Set<String> precedingImagePaths = {};
   bool hiddenNewline = false;
   int start = 0;

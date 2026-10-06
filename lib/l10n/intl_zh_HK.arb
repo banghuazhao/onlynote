@@ -445,5 +445,13 @@
   "Document_Scan_Unsupported": "此裝置不支援文件掃描。",
   "Document_Scan_Permission": "請在設定中允許相機存取，以掃描文件。",
   "Document_Scan_Too_Many": "每次最多掃描20頁，請將文件分成幾次掃描。",
-  "Document_Scan_Pending": "掃描仍在處理中，請稍後重試。"
+  "Document_Scan_Pending": "掃描仍在處理中，請稍後重試。",
+  "Format_Highlight": "螢光標記",
+  "Format_Remove_Highlight": "移除螢光標記",
+  "Format_Select_To_Highlight": "選取文字以加入螢光標記",
+  "Note_Outline": "大綱",
+  "Note_Outline_Hint": "輕點標題，跳至該部分",
+  "Note_Outline_Current": "目前部分",
+  "Note_Undo": "復原",
+  "Note_Redo": "重做"
 }

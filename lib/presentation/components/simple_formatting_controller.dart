@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 
-/// A normal native text field with three small formatting actions. The body
+/// A normal native text field with small formatting actions. The body
 /// remains plain text; no markup or replacement characters affect selection.
 class SimpleFormattingController extends TextEditingController {
   SimpleFormattingController({
@@ -29,6 +29,15 @@ class SimpleFormattingController extends TextEditingController {
   final List<_FormattingSnapshot> _redo = [];
 
   List<NoteTextStyleRange> get styles => _styles;
+
+  /// Mark only a real selection, without starting a typing mode.
+  bool get canHighlight => !_isComposing && !_selectionRange.isCollapsed;
+
+  bool get isHighlighted {
+    final selected = _selectionRange;
+    return !selected.isCollapsed &&
+        _covers(selected.start, selected.end, NoteTextStyleKind.highlight);
+  }
 
   bool get isBold {
     final selected = _selectionRange;
@@ -182,6 +191,25 @@ class SimpleFormattingController extends TextEditingController {
     notifyListeners();
   }
 
+  void toggleHighlight() {
+    if (!canHighlight) return;
+    final selected = _selectionRange;
+    _styles = normalizeNoteTextStyles(
+      isHighlighted
+          ? removeNoteTextStyle(_styles, selected.start, selected.end,
+              NoteTextStyleKind.highlight)
+          : [
+              ..._styles,
+              NoteTextStyleRange(
+                  start: selected.start,
+                  end: selected.end,
+                  kind: NoteTextStyleKind.highlight),
+            ],
+      text,
+    );
+    notifyListeners();
+  }
+
   void toggleBullets() {
     if (_isComposing) return;
     final remove = isBulleted;
@@ -205,6 +233,7 @@ class SimpleFormattingController extends TextEditingController {
         nextStyles,
         insertedBold: false,
         insertedHeading: _kindAt(start, NoteTextStyleKind.heading),
+        insertedHighlight: false,
       );
       nextSelection = TextSelection(
         baseOffset:

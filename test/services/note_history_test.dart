@@ -243,6 +243,26 @@ void main() {
         () => snapshot.textStyles!.single['end'] = 2, throwsUnsupportedError);
   });
 
+  test('highlight changes make an independent version and restore their mark',
+      () async {
+    final mark = const NoteTextStyleRange(
+            start: 0, end: 4, kind: NoteTextStyleKind.highlight)
+        .toMap();
+    final original =
+        NoteDto(id: 'mark', description: 'Keep this', textStyles: [mark]);
+    repository.notes['mark'] = original;
+    await repository.addUpdateNote(original.copyWith(textStyles: []));
+    final version = history.versionsFor('mark').single;
+    expect(version.note.toDomain().textStyles, [
+      const NoteTextStyleRange(
+          start: 0, end: 4, kind: NoteTextStyleKind.highlight),
+    ]);
+    expect(await history.restore('mark', version.id),
+        NoteHistoryRestoreResult.restored);
+    expect(repository.notes['mark']!.textStyles, [mark]);
+    expect(repository.notes['mark']!.description, 'Keep this');
+  });
+
   test('metadata-only edits and empty seeds never create content history',
       () async {
     final note = NoteDto(id: 'note', title: 'Keep');

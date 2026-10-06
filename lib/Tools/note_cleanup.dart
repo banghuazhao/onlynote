@@ -12,6 +12,7 @@ import 'package:onlynote/services/voice_memo_drafts.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
 import 'package:onlynote/services/shared_note_import.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
+import 'package:onlynote/services/note_edit_history.dart';
 
 /// Best-effort cleanup of a note's images, recordings, and reminders.
 class NoteCleanup {
@@ -69,13 +70,14 @@ class NoteCleanup {
     Iterable<String> paths, {
     required NoteRepository repository,
     Set<String> ignoreNoteIds = const {},
+    CustomNoteTemplateStore? templateStore,
   }) async {
     final candidates = paths.toSet();
     if (candidates.isEmpty) return;
 
     try {
-      candidates.removeAll(
-          await referencedImages(repository, ignoreNoteIds: ignoreNoteIds));
+      candidates.removeAll(await referencedImages(repository,
+          ignoreNoteIds: ignoreNoteIds, templateStore: templateStore));
     } catch (_) {
       return; // Missing ownership data must preserve photos, not fail a save.
     }
@@ -95,6 +97,7 @@ class NoteCleanup {
       for (final note in repository.getAllNotes())
         if (!ignoreNoteIds.contains(note.id)) ...note.imagePaths ?? const [],
       ...NoteHistory.initializedInstance?.referencedImages ?? const [],
+      ...NoteEditHistory.heldImages,
       ...DocumentScanCapture.initializedInstance?.referencedImages ?? const [],
       for (final template in store.templates) ...template.imagePaths,
     };
@@ -124,6 +127,7 @@ class NoteCleanup {
       for (final note in repository.getAllNotes())
         if (!ignoreNoteIds.contains(note.id)) ..._audioPaths(note),
       ...NoteHistory.initializedInstance?.referencedAudio ?? const [],
+      ...NoteEditHistory.heldAudio,
       ...VoiceMemoDrafts.initializedInstance?.referencedAudio ?? const [],
       for (final template in store.templates)
         for (final memo in template.voiceMemos) memo.path,

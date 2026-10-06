@@ -164,7 +164,7 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
     final spans = <pw.InlineSpan>[];
     final buffer = StringBuffer();
     pw.TextStyle? bufferedStyle;
-    bool? bufferedBold, bufferedHeading, bufferedSynthetic;
+    bool? bufferedBold, bufferedHeading, bufferedSynthetic, bufferedHighlight;
     void flush() {
       if (buffer.isEmpty) return;
       // pdf's fill text mode omits a reset operator, so explicitly reset it
@@ -188,13 +188,16 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
           active.any((range) => range.kind == NoteTextStyleKind.heading);
       final isBold = isHeading ||
           active.any((range) => range.kind == NoteTextStyleKind.bold);
+      final highlighted =
+          active.any((range) => range.kind == NoteTextStyleKind.highlight);
       // The bundled CJK fallback has no bold face. A thin outline thickens
       // only fallback glyphs, retaining selectable text and identical metrics.
       final syntheticBold = (heading || isBold) &&
           character.runes.any((rune) => !boldGlyphs.containsKey(rune));
       if (bufferedBold != isBold ||
           bufferedHeading != isHeading ||
-          bufferedSynthetic != syntheticBold) {
+          bufferedSynthetic != syntheticBold ||
+          bufferedHighlight != highlighted) {
         flush();
         bufferedStyle = style.copyWith(
             fontWeight:
@@ -202,10 +205,14 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
             renderingMode: syntheticBold
                 ? PdfTextRenderingMode.fillAndStroke
                 : PdfTextRenderingMode.fill,
-            fontSize: isHeading ? 18 : style.fontSize);
+            fontSize: isHeading ? 18 : style.fontSize,
+            background: highlighted
+                ? const pw.BoxDecoration(color: PdfColor.fromInt(0xFFFFE7A0))
+                : null);
         bufferedBold = isBold;
         bufferedHeading = isHeading;
         bufferedSynthetic = syntheticBold;
+        bufferedHighlight = highlighted;
       }
       final glyph = data.glyphs[character];
       if (glyph == null) {
@@ -214,10 +221,13 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
         flush();
         final image = pw.MemoryImage(glyph);
         spans.add(pw.WidgetSpan(
-            child: pw.Image(image,
-                height: bufferedStyle!.fontSize!,
-                width:
-                    bufferedStyle.fontSize! * image.width! / image.height!)));
+            child: pw.Container(
+                color: highlighted ? const PdfColor.fromInt(0xFFFFE7A0) : null,
+                child: pw.Image(image,
+                    height: bufferedStyle!.fontSize!,
+                    width: bufferedStyle.fontSize! *
+                        image.width! /
+                        image.height!))));
       }
       offset = characterEnd;
     }

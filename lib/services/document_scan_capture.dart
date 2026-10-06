@@ -335,6 +335,44 @@ class DocumentScanCapture {
     });
   }
 
+  /// Undo can readopt a copied page that was removed or replaced while other
+  /// pages were still awaiting retry. Persist that ownership before replaying
+  /// the edit so a subsequent restart recovers the same retained pages.
+  Future<void> restorePage(String path) async {
+    final token = _token;
+    if (token == null) return;
+    await _serialized(() async {
+      final record = _read(token);
+      if (record == null ||
+          record.abandoned ||
+          !record.saved.contains(path) ||
+          !record.discarded.contains(path)) {
+        return;
+      }
+      await _write(record.copyWith(
+          discarded:
+              record.discarded.where((value) => value != path).toList()));
+    });
+  }
+
+  /// Atomically reconcile every already copied page with an undo/redo target.
+  /// Uncopied pages retain their copy indexes; retries never rescan or duplicate
+  /// them. Call before applying the editor snapshot, and keep the editor state
+  /// unchanged if the durable intent write fails.
+  Future<void> reconcilePages(Iterable<String> presentPaths) async {
+    final present = presentPaths.toSet();
+    final token = _token;
+    if (token == null) return;
+    await _serialized(() async {
+      final record = _read(token);
+      if (record == null || record.abandoned) return;
+      final discarded =
+          record.saved.where((path) => !present.contains(path)).toList();
+      if (listEquals(discarded, record.discarded)) return;
+      await _write(record.copyWith(discarded: discarded));
+    });
+  }
+
   /// An editor relinquishes recovery ownership when it unmounts. The journal
   /// and native inbox remain available to the app's next resume/startup pass.
   void release() {

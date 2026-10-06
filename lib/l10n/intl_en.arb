@@ -445,5 +445,13 @@
   "Document_Scan_Unsupported": "Document scanning is not available on this device.",
   "Document_Scan_Permission": "Allow camera access in Settings to scan documents.",
   "Document_Scan_Too_Many": "Scan up to 20 pages at a time. Please split this document into smaller scans.",
-  "Document_Scan_Pending": "Your scan is still finishing. Try again in a moment."
+  "Document_Scan_Pending": "Your scan is still finishing. Try again in a moment.",
+  "Format_Highlight": "Highlight",
+  "Format_Remove_Highlight": "Remove highlight",
+  "Format_Select_To_Highlight": "Select text to highlight",
+  "Note_Outline": "Outline",
+  "Note_Outline_Hint": "Tap a heading to jump to it",
+  "Note_Outline_Current": "Current section",
+  "Note_Undo": "Undo",
+  "Note_Redo": "Redo"
 }

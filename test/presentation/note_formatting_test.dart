@@ -7,8 +7,11 @@ import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:onlynote/presentation/components/note_formatting_toolbar.dart';
+import 'package:onlynote/presentation/components/note_search_text.dart';
 import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
+import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_find.dart';
 
 const _bodyStyle = TextStyle(fontSize: 17, height: 1.55, fontFamily: 'Roboto');
 
@@ -91,6 +94,133 @@ List<TextSpan> _leaves(InlineSpan span) {
 }
 
 void main() {
+  testWidgets('marker highlights a selection and keeps focus and selection',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      final controller = SimpleFormattingController(text: 'Remember tea');
+      final focusNode = FocusNode();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+      await _pumpEditor(tester, controller, focusNode);
+      focusNode.requestFocus();
+      const selection = TextSelection(baseOffset: 8, extentOffset: 12);
+      controller.selection = selection;
+      await tester.pump();
+      final marker = find.byKey(const ValueKey('format-highlight'));
+      expect(find.byTooltip(S.current.Format_Highlight), findsOneWidget);
+      await tester.tap(marker);
+      await tester.pump();
+      expect(focusNode.hasFocus, isTrue);
+      expect(controller.selection, selection);
+      expect(controller.text, 'Remember tea');
+      expect(controller.isHighlighted, isTrue);
+      expect(find.byTooltip(S.current.Format_Remove_Highlight), findsOneWidget);
+      final node = tester.getSemantics(marker);
+      expect(node.flagsCollection.isButton, isTrue);
+      expect(node.flagsCollection.isSelected, Tristate.isTrue);
+      await tester.tap(marker);
+      await tester.pump();
+      expect(controller.styles, isEmpty);
+      expect(focusNode.hasFocus, isTrue);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets(
+      'marker explains selection requirement and cannot mark new typing',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      final controller = SimpleFormattingController(text: 'Idea');
+      final focusNode = FocusNode();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+      await _pumpEditor(tester, controller, focusNode);
+      focusNode.requestFocus();
+      controller.selection = const TextSelection.collapsed(offset: 4);
+      await tester.pump();
+      final marker = find.byKey(const ValueKey('format-highlight'));
+      expect(
+          find.byTooltip(S.current.Format_Select_To_Highlight), findsOneWidget);
+      expect(tester.getSemantics(marker).flagsCollection.isEnabled,
+          Tristate.isFalse);
+      await tester.tap(marker);
+      tester.testTextInput.updateEditingValue(const TextEditingValue(
+          text: 'Idea!', selection: TextSelection.collapsed(offset: 5)));
+      await tester.pump();
+      expect(controller.styles, isEmpty);
+      expect(controller.text, 'Idea!');
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('soft marker text stays readable with large type in dark reader',
+      (tester) async {
+    await _pump(
+        tester,
+        const FormattedNoteText(
+          text: '重要內容\nBody',
+          style: TextStyle(fontSize: 17, color: Colors.white),
+          styles: [
+            NoteTextStyleRange(
+                start: 0, end: 4, kind: NoteTextStyleKind.heading),
+            NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.bold),
+            NoteTextStyleRange(
+                start: 0, end: 4, kind: NoteTextStyleKind.highlight),
+          ],
+        ),
+        dark: true,
+        textScale: 2,
+        size: const Size(320, 640));
+    final reader = tester.widget<SelectableText>(find.byType(SelectableText));
+    expect(reader.textSpan!.toPlainText(), '重要內容\nBody');
+    final marked = _leaves(reader.textSpan!).first;
+    expect(marked.style?.backgroundColor, noteHighlightColor);
+    expect(marked.style?.color, noteHighlightedTextColor);
+    expect(marked.style?.fontWeight, FontWeight.w700);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('find overlays a marker and closing find restores saved color',
+      (tester) async {
+    final controller = NoteSearchController()
+      ..setFields([const NoteSearchField('body', 'Tea and milk')])
+      ..setQuery('Tea');
+    addTearDown(controller.dispose);
+    await _pump(
+        tester,
+        NoteSearchText(
+          controller: controller,
+          fieldId: 'body',
+          text: 'Tea and milk',
+          styles: const [
+            NoteTextStyleRange(start: 0, end: 12, kind: NoteTextStyleKind.bold),
+            NoteTextStyleRange(
+                start: 0, end: 12, kind: NoteTextStyleKind.highlight),
+          ],
+        ));
+    final text = tester.widget<Text>(find.byType(Text));
+    final spans = _leaves(text.textSpan!);
+    expect(spans.first.text, 'Tea');
+    expect(spans.first.style?.backgroundColor, isNot(noteHighlightColor));
+    expect(spans.first.style?.color, noteHighlightedTextColor);
+    expect(spans.last.style?.backgroundColor, noteHighlightColor);
+    expect(spans.every((span) => span.style?.fontWeight == FontWeight.w700),
+        isTrue);
+    controller.setQuery('');
+    await tester.pumpAndSettle();
+    final restored = tester.widget<SelectableText>(find.byType(SelectableText));
+    expect(restored.textSpan!.toPlainText(), 'Tea and milk');
+    expect(_leaves(restored.textSpan!).single.style?.backgroundColor,
+        noteHighlightColor);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('bold applies to selection while retaining focus and selection',
       (tester) async {
     final semantics = tester.ensureSemantics();
@@ -263,7 +393,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('three controls fit a narrow screen with large Chinese text',
+  testWidgets('formatting controls fit a narrow screen with large Chinese text',
       (tester) async {
     final controller = SimpleFormattingController(text: '週末計劃\n帶上零食和外套。');
     final focusNode = FocusNode();
@@ -278,11 +408,18 @@ void main() {
       textScale: 2,
     );
 
-    expect(find.byType(Tooltip), findsNWidgets(3));
+    expect(find.byType(Tooltip), findsNWidgets(4));
     expect(find.byTooltip(S.current.Format_Bold), findsOneWidget);
     expect(find.byTooltip(S.current.Format_Heading), findsOneWidget);
     expect(find.byTooltip(S.current.Format_Bullets), findsOneWidget);
-    for (final control in ['format-bold', 'format-heading', 'format-bullets']) {
+    expect(
+        find.byTooltip(S.current.Format_Select_To_Highlight), findsOneWidget);
+    for (final control in [
+      'format-bold',
+      'format-heading',
+      'format-bullets',
+      'format-highlight'
+    ]) {
       expect(tester.getSize(find.byKey(ValueKey(control))), const Size(48, 48));
     }
     expect(tester.takeException(), isNull);

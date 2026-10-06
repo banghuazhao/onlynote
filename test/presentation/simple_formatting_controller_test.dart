@@ -13,6 +13,11 @@ NoteTextStyleRange heading(int start, int end) => NoteTextStyleRange(
       end: end,
       kind: NoteTextStyleKind.heading,
     );
+NoteTextStyleRange highlight(int start, int end) => NoteTextStyleRange(
+      start: start,
+      end: end,
+      kind: NoteTextStyleKind.highlight,
+    );
 
 void typeValue(SimpleFormattingController controller, String text, int cursor) {
   controller.value = TextEditingValue(
@@ -22,6 +27,69 @@ void typeValue(SimpleFormattingController controller, String text, int cursor) {
 }
 
 void main() {
+  test('highlight fills mixed selections then removes only the selected mark',
+      () {
+    final controller = SimpleFormattingController(
+        text: 'abcdef', styles: [bold(0, 6), highlight(0, 2)]);
+    addTearDown(controller.dispose);
+    const selection =
+        TextSelection(baseOffset: 5, extentOffset: 1, isDirectional: true);
+    controller.selection = selection;
+    expect(controller.canHighlight, isTrue);
+    expect(controller.isHighlighted, isFalse);
+    controller.toggleHighlight();
+    expect(controller.styles, [highlight(0, 5), bold(0, 6)]);
+    expect(controller.isHighlighted, isTrue);
+    expect(controller.selection, selection);
+    expect(controller.text, 'abcdef');
+    controller.toggleHighlight();
+    expect(controller.styles, [highlight(0, 1), bold(0, 6)]);
+  });
+
+  test('highlight requires a selection and never enables a typing mode', () {
+    final controller = SimpleFormattingController(text: 'word');
+    addTearDown(controller.dispose);
+    expect(controller.canHighlight, isFalse);
+    controller.toggleHighlight();
+    controller.selection = const TextSelection.collapsed(offset: 4);
+    controller.toggleHighlight();
+    typeValue(controller, 'word!', 5);
+    expect(controller.styles, isEmpty);
+    expect(controller.isHighlighted, isFalse);
+  });
+
+  test('highlight covers whole graphemes and is inert during composition', () {
+    final controller = SimpleFormattingController(text: '👩‍💻é中');
+    addTearDown(controller.dispose);
+    controller.selection = const TextSelection(baseOffset: 1, extentOffset: 6);
+    controller.toggleHighlight();
+    expect(controller.styles, [highlight(0, 7)]);
+    const composed = TextEditingValue(
+      text: '👩‍💻é中世',
+      selection: TextSelection(baseOffset: 7, extentOffset: 9),
+      composing: TextRange(start: 8, end: 9),
+    );
+    controller.value = composed;
+    final styles = controller.styles;
+    expect(controller.canHighlight, isFalse);
+    controller.toggleHighlight();
+    expect(controller.value, composed);
+    expect(controller.styles, styles);
+  });
+
+  test('native text undo redo restores highlight with other formatting', () {
+    final controller = SimpleFormattingController(
+        text: 'word', styles: [bold(0, 4), highlight(0, 4)]);
+    addTearDown(controller.dispose);
+    controller.selection = const TextSelection.collapsed(offset: 4);
+    typeValue(controller, '', 0);
+    expect(controller.styles, isEmpty);
+    typeValue(controller, 'word', 4);
+    expect(controller.styles, [bold(0, 4), highlight(0, 4)]);
+    typeValue(controller, '', 0);
+    expect(controller.styles, isEmpty);
+  });
+
   test('selection bold toggles preserve text and directional selection', () {
     final controller =
         SimpleFormattingController(text: 'abcd', styles: [bold(0, 4)]);

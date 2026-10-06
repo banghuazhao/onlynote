@@ -3,6 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 
+/// One familiar marker color, shared by writing, reading and image sharing.
+const noteHighlightColor = Color(0xFFFFE7A0);
+const noteHighlightedTextColor = Color(0xFF29251C);
+
 /// Cleans saved formatting without cutting an emoji or combining character.
 /// Same-kind overlaps are merged so equality is stable across saves.
 List<NoteTextStyleRange> normalizeNoteTextStyles(
@@ -78,6 +82,7 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
   Iterable<NoteTextStyleRange> styles, {
   bool? insertedBold,
   bool? insertedHeading,
+  bool? insertedHighlight,
   NoteTextChange? changeOverride,
 }) {
   final clean = normalizeNoteTextStyles(styles, oldText);
@@ -115,9 +120,21 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
             oldText[change.start - 1] == '\n'));
   }
 
+  // Highlight is applied to a selection, never a sticky typing mode. Edits
+  // inside marked text keep the marker, while typing beside it stays plain.
+  bool inheritsHighlight() => clean.any((range) =>
+      range.kind == NoteTextStyleKind.highlight &&
+      (change.oldEnd > change.start
+          ? range.start <= change.start && range.end >= change.oldEnd
+          : range.start < change.start && range.end > change.start));
+
   if (change.inserted.isNotEmpty) {
     final bold = insertedBold ?? inherits(NoteTextStyleKind.bold);
     final heading = insertedHeading ?? inherits(NoteTextStyleKind.heading);
+    final highlight = insertedHighlight ??
+        (change.inserted != '\n' &&
+            change.inserted != '\n• ' &&
+            inheritsHighlight());
     if (bold) {
       result.add(NoteTextStyleRange(
         start: change.start,
@@ -130,6 +147,13 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
         start: change.start,
         end: insertEnd,
         kind: NoteTextStyleKind.heading,
+      ));
+    }
+    if (highlight) {
+      result.add(NoteTextStyleRange(
+        start: change.start,
+        end: insertEnd,
+        kind: NoteTextStyleKind.highlight,
       ));
     }
     // Pressing Return in a heading creates an ordinary next paragraph,
@@ -272,6 +296,7 @@ List<TextSpan> buildNoteTextSpans({
   required Iterable<NoteTextStyleRange> styles,
   TextStyle? baseStyle,
   TextRange composing = TextRange.empty,
+  Color? highlightColor = noteHighlightColor,
 }) {
   final clean = normalizeNoteTextStyles(styles, text);
   final boundaries = <int>{0, text.length};
@@ -288,8 +313,11 @@ List<TextSpan> buildNoteTextSpans({
       clean.where((r) => r.kind == NoteTextStyleKind.bold).toList();
   final headingRanges =
       clean.where((r) => r.kind == NoteTextStyleKind.heading).toList();
+  final highlightRanges =
+      clean.where((r) => r.kind == NoteTextStyleKind.highlight).toList();
   var boldIndex = 0;
   var headingIndex = 0;
+  var highlightIndex = 0;
   final spans = <TextSpan>[];
   for (var index = 0; index < points.length - 1; index++) {
     final start = points[index];
@@ -303,10 +331,16 @@ List<TextSpan> buildNoteTextSpans({
         headingRanges[headingIndex].end <= start) {
       headingIndex++;
     }
+    while (highlightIndex < highlightRanges.length &&
+        highlightRanges[highlightIndex].end <= start) {
+      highlightIndex++;
+    }
     final bold =
         boldIndex < boldRanges.length && boldRanges[boldIndex].start <= start;
     final heading = headingIndex < headingRanges.length &&
         headingRanges[headingIndex].start <= start;
+    final highlighted = highlightIndex < highlightRanges.length &&
+        highlightRanges[highlightIndex].start <= start;
     final underline =
         validComposing && composing.start <= start && composing.end >= end;
     var spanStyle = baseStyle ?? const TextStyle();
@@ -317,6 +351,12 @@ List<TextSpan> buildNoteTextSpans({
       );
     }
     if (bold) spanStyle = spanStyle.copyWith(fontWeight: FontWeight.w700);
+    if (highlighted && highlightColor != null) {
+      spanStyle = spanStyle.copyWith(
+        backgroundColor: highlightColor,
+        color: noteHighlightedTextColor,
+      );
+    }
     if (underline) {
       spanStyle = spanStyle.copyWith(decoration: TextDecoration.underline);
     }
@@ -347,7 +387,9 @@ String noteTextToMarkdown(
     if (bullet) result.write('- ');
     if (heading) result.write('## ');
     final boundaries = <int>{contentStart, lineEnd};
-    for (final range in clean.where((r) => r.kind == NoteTextStyleKind.bold)) {
+    for (final range in clean.where((r) =>
+        r.kind == NoteTextStyleKind.bold ||
+        r.kind == NoteTextStyleKind.highlight)) {
       if (range.start < lineEnd && range.end > contentStart) {
         boundaries.add(math.max(contentStart, range.start));
         boundaries.add(math.min(lineEnd, range.end));
@@ -362,6 +404,11 @@ String noteTextToMarkdown(
           range.kind == NoteTextStyleKind.bold &&
           range.start <= start &&
           range.end >= end);
+      final highlighted = clean.any((range) =>
+          range.kind == NoteTextStyleKind.highlight &&
+          range.start <= start &&
+          range.end >= end);
+      if (highlighted) result.write('<mark>');
       // Keep whitespace outside emphasis delimiters: Markdown does not render
       // a **bold ** run that ends with a space.
       final fragment = text.substring(start, end);
@@ -383,6 +430,7 @@ String noteTextToMarkdown(
       } else {
         result.write(_escapeMarkdown(fragment));
       }
+      if (highlighted) result.write('</mark>');
     }
     if (index != lines.length - 1) result.write('\n');
     lineStart = lineEnd + 1;

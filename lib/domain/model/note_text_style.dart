@@ -1,6 +1,6 @@
 /// Formatting is stored separately from the plain note text. Offsets use the
 /// same UTF-16 coordinates as Flutter's text selection APIs.
-enum NoteTextStyleKind { bold, heading }
+enum NoteTextStyleKind { bold, heading, highlight }
 
 class NoteTextStyleRange {
   const NoteTextStyleRange({
@@ -30,6 +30,7 @@ class NoteTextStyleRange {
     final kind = switch (rawKind) {
       'bold' => NoteTextStyleKind.bold,
       'heading' => NoteTextStyleKind.heading,
+      'highlight' => NoteTextStyleKind.highlight,
       _ => null,
     };
     if (kind == null) return null;

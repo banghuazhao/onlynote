@@ -45,6 +45,9 @@ class _TodoFieldTile extends StatefulWidget {
     required this.onSubmitted,
     required this.onSplit,
     required this.onRemoved,
+    required this.onInputChanged,
+    this.restoredSelection,
+    this.restoreRevision = 0,
   });
 
   final int index;
@@ -58,6 +61,9 @@ class _TodoFieldTile extends StatefulWidget {
   final ValueChanged<String> onSubmitted;
   final ValueChanged<List<String>> onSplit;
   final VoidCallback onRemoved;
+  final ValueChanged<TextEditingValue> onInputChanged;
+  final TextSelection? restoredSelection;
+  final int restoreRevision;
 
   @override
   State<_TodoFieldTile> createState() => _TodoFieldTileState();
@@ -70,11 +76,19 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
   void initState() {
     super.initState();
     todoController = TextEditingController(text: widget.value);
+    todoController.addListener(_inputChanged);
+    widget.focusNode.addListener(_inputChanged);
   }
+
+  void _inputChanged() => widget.onInputChanged(todoController.value);
 
   @override
   void didUpdateWidget(covariant _TodoFieldTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      oldWidget.focusNode.removeListener(_inputChanged);
+      widget.focusNode.addListener(_inputChanged);
+    }
     if (todoController.text != widget.value) {
       final text = widget.value ?? '';
       final offset = todoController.selection.extentOffset;
@@ -83,6 +97,14 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
         selection: TextSelection.collapsed(
             offset: offset < 0 ? text.length : offset.clamp(0, text.length)),
       );
+    }
+    if (widget.restoreRevision != oldWidget.restoreRevision &&
+        widget.restoredSelection?.isValid == true) {
+      final selection = widget.restoredSelection!;
+      todoController.selection = TextSelection(
+          baseOffset: selection.baseOffset.clamp(0, todoController.text.length),
+          extentOffset:
+              selection.extentOffset.clamp(0, todoController.text.length));
     }
   }
 
@@ -119,6 +141,8 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 
   @override
   void dispose() {
+    widget.focusNode.removeListener(_inputChanged);
+    todoController.removeListener(_inputChanged);
     todoController.dispose();
     super.dispose();
   }
@@ -246,10 +270,16 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
 class _BuildTodoListField extends StatefulWidget {
   const _BuildTodoListField({
     required this.state,
+    required this.onInputChanged,
+    this.restoredEdit,
+    this.restoreRevision = 0,
     this.autofocusFirstTodo = false,
   });
   final AddUpdateFormState state;
   final bool autofocusFirstTodo;
+  final void Function(String, TextEditingValue) onInputChanged;
+  final NoteEditSnapshot? restoredEdit;
+  final int restoreRevision;
 
   @override
   State<_BuildTodoListField> createState() => _BuildTodoListFieldState();
@@ -259,8 +289,8 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
   final Map<String, FocusNode> _focusNodes = {};
   bool _focusNextTodo = false;
 
-  FocusNode _focusNodeFor(String todoId) =>
-      _focusNodes.putIfAbsent(todoId, FocusNode.new);
+  FocusNode _focusNodeFor(String todoId) => _focusNodes.putIfAbsent(
+      todoId, () => FocusNode(debugLabel: 'note-todo:$todoId'));
 
   @override
   void didUpdateWidget(covariant _BuildTodoListField oldWidget) {
@@ -272,6 +302,17 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
         .toList();
     for (final todoId in removedIds) {
       _focusNodes.remove(todoId)?.dispose();
+    }
+
+    if (widget.restoreRevision != oldWidget.restoreRevision) {
+      _focusNextTodo = false;
+      final id = widget.restoredEdit?.focusedField;
+      if (id != null && currentIds.contains(id)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _focusNodes[id]?.requestFocus();
+        });
+      }
+      return;
     }
 
     if (!_focusNextTodo ||
@@ -369,6 +410,10 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
                 value: todo.title,
                 completed: todo.completed,
                 focusNode: _focusNodeFor(todo.id!),
+                onInputChanged: (value) =>
+                    widget.onInputChanged(todo.id!, value),
+                restoredSelection: widget.restoredEdit?.todoSelections[todo.id],
+                restoreRevision: widget.restoreRevision,
                 autofocus: widget.autofocusFirstTodo && index == 0,
                 onChanged: (value) {
                   context.read<AddUpdateFormBloc>().add(

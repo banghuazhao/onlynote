@@ -168,6 +168,7 @@ void main() {
     const body = 'Summary\n• Bring tea\nImportant';
     const styles = [
       NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.heading),
+      NoteTextStyleRange(start: 0, end: 7, kind: NoteTextStyleKind.highlight),
       NoteTextStyleRange(start: 20, end: 29, kind: NoteTextStyleKind.bold),
     ];
     final template = await store.saveFromNote(

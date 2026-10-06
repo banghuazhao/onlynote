@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
+import 'package:onlynote/services/note_text_format.dart';
 
-/// Three familiar controls, beside the writing field they act on.
+/// Familiar controls, beside the writing field they act on.
 ///
 /// The tap region and unfocusable buttons preserve the writer's selection and
 /// keep the keyboard open while applying a style.
@@ -71,6 +72,20 @@ class NoteFormattingToolbar extends StatelessWidget {
                         selected: controller.isBulleted,
                         onPressed: () => _apply(controller.toggleBullets),
                       ),
+                      _FormattingButton(
+                        key: const ValueKey('format-highlight'),
+                        label: !controller.canHighlight
+                            ? strings.Format_Select_To_Highlight
+                            : controller.isHighlighted
+                                ? strings.Format_Remove_Highlight
+                                : strings.Format_Highlight,
+                        icon: Icons.border_color_rounded,
+                        selected: controller.isHighlighted,
+                        selectedColor: noteHighlightColor,
+                        onPressed: controller.canHighlight
+                            ? () => _apply(controller.toggleHighlight)
+                            : null,
+                      ),
                     ],
                   ),
                 ),
@@ -88,17 +103,20 @@ class _FormattingButton extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.onPressed,
+    this.selectedColor,
   });
 
   final String label;
   final IconData icon;
   final bool selected;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final Color? selectedColor;
 
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
         selected: selected,
+        enabled: onPressed != null,
         label: label,
         onTap: onPressed,
         child: ExcludeSemantics(
@@ -119,14 +137,18 @@ class _FormattingButton extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: selected
-                        ? AppColors.ink.withValues(alpha: .12)
+                        ? selectedColor ?? AppColors.ink.withValues(alpha: .12)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(7),
                   ),
                   child: Icon(icon,
                       size: 26,
-                      color:
-                          AppColors.ink.withValues(alpha: selected ? 1 : .66)),
+                      color: AppColors.ink.withValues(
+                          alpha: onPressed == null
+                              ? .3
+                              : selected
+                                  ? 1
+                                  : .66)),
                 ),
               ),
             ),

@@ -209,6 +209,15 @@ void main() {
     expect(markdown, contains(r'\*\*literal\*\*'));
     expect(NoteExport.plainText(note), note.description);
   });
+  test('highlight exports mark tags while plain sharing retains original body',
+      () {
+    final note = Note(description: 'Remember 茶\nBody', textStyles: const [
+      NoteTextStyleRange(start: 0, end: 10, kind: NoteTextStyleKind.bold),
+      NoteTextStyleRange(start: 0, end: 10, kind: NoteTextStyleKind.highlight),
+    ]);
+    expect(NoteExport.markdown(note), '<mark>**Remember 茶**</mark>\nBody');
+    expect(NoteExport.plainText(note), 'Remember 茶\nBody');
+  });
   test(
       'Markdown recordings use relative encoded links and preserve transcripts',
       () {
@@ -339,6 +348,55 @@ void main() {
     expect(bytes.length, greaterThan(10000));
     expect(latin1.decode(bytes), contains('Roboto-Bold'));
     await File('/tmp/onlynote-formatted-export-preview.pdf')
+        .writeAsBytes(bytes);
+  });
+
+  test('PDF fills only marked ranges and preserves selectable long note text',
+      () async {
+    const opening = 'Highlighted title\nRemember 茶 😊\n';
+    final body = '$opening${'Plain text after the marker.\n' * 120}LAST LINE';
+    final bytes = await buildNotePdf(NotePdfData(
+      title: '',
+      description: body,
+      date: '',
+      todos: const [],
+      photos: const [],
+      textStyles: const [
+        NoteTextStyleRange(start: 0, end: 17, kind: NoteTextStyleKind.heading),
+        NoteTextStyleRange(
+            start: 0, end: 17, kind: NoteTextStyleKind.highlight),
+        NoteTextStyleRange(start: 18, end: 31, kind: NoteTextStyleKind.bold),
+        NoteTextStyleRange(
+            start: 18, end: 31, kind: NoteTextStyleKind.highlight),
+      ],
+      glyphs: {'😊': await File('assets/app_icon.png').readAsBytes()},
+      regular: await File('assets/fonts/Roboto-Regular.ttf').readAsBytes(),
+      bold: await File('assets/fonts/Roboto-Bold.ttf').readAsBytes(),
+      fallback: await File('assets/fonts/DroidSansFallback.ttf').readAsBytes(),
+    ));
+    final objects = _pdfObjects(bytes);
+    final pages = _pdfPages(objects);
+    expect(pages.length, greaterThan(1));
+    final streams = [
+      for (final page in pages)
+        _pdfStream(objects[int.parse(
+            RegExp(r'/Contents\s*(\d+) 0 R').firstMatch(page)![1]!)]!),
+    ];
+    bool hasMarker(String stream) =>
+        RegExp(r'([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+rg').allMatches(stream).any(
+            (match) =>
+                (double.parse(match[1]!) - 1).abs() < .001 &&
+                (double.parse(match[2]!) - 231 / 255).abs() < .001 &&
+                (double.parse(match[3]!) - 160 / 255).abs() < .001);
+    expect(hasMarker(streams.first), isTrue);
+    expect(hasMarker(streams.last), isFalse);
+    final exportedText =
+        pages.map((page) => _pdfPageText(page, objects)).join(' ');
+    expect(exportedText, contains('Highlighted title'));
+    expect(exportedText, contains('Remember 茶'));
+    expect(exportedText, contains('LAST LINE'));
+    expect(exportedText, isNot(contains('<mark>')));
+    await File('/tmp/onlynote-highlight-export-preview.pdf')
         .writeAsBytes(bytes);
   });
 

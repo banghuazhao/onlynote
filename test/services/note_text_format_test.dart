@@ -13,11 +13,18 @@ NoteTextStyleRange heading(int start, int end) => NoteTextStyleRange(
       end: end,
       kind: NoteTextStyleKind.heading,
     );
+NoteTextStyleRange highlight(int start, int end) => NoteTextStyleRange(
+      start: start,
+      end: end,
+      kind: NoteTextStyleKind.highlight,
+    );
 
 void main() {
   test('range maps reject invalid types and unsupported style kinds', () {
     final range = bold(0, 3);
     expect(NoteTextStyleRange.tryFromMap(range.toMap()), range);
+    expect(NoteTextStyleRange.tryFromMap(highlight(0, 3).toMap()),
+        highlight(0, 3));
     expect(
         NoteTextStyleRange.tryFromMap({'start': 0, 'end': 2, 'kind': 'italic'}),
         isNull);
@@ -136,5 +143,54 @@ void main() {
         noteTextToMarkdown('x#tag', [bold(1, 5)]), 'x<strong>\\#tag</strong>');
     expect(noteTextToMarkdown(' important ', [bold(0, 11)]), ' **important** ');
     expect(noteTextToMarkdown('重要內容', [bold(0, 2)]), '**重要**內容');
+  });
+
+  test('highlight edits retain interior text and do not mark boundary typing',
+      () {
+    expect(rebaseNoteTextStyles('word', 'woXrd', [highlight(0, 4)]),
+        [highlight(0, 5)]);
+    expect(rebaseNoteTextStyles('word', 'WORD', [highlight(0, 4)]),
+        [highlight(0, 4)]);
+    expect(rebaseNoteTextStyles('word', 'word!', [highlight(0, 4)]),
+        [highlight(0, 4)]);
+    expect(rebaseNoteTextStyles('word', '!word', [highlight(0, 4)]),
+        [highlight(1, 5)]);
+    expect(rebaseNoteTextStyles('word', 'wo\nrd', [highlight(0, 4)]),
+        [highlight(0, 2), highlight(3, 5)]);
+    expect(
+        rebaseNoteTextStyles('word', 'woXrd', [highlight(0, 4)],
+            insertedHighlight: false),
+        [highlight(0, 2), highlight(3, 5)]);
+  });
+
+  test('highlight spans combine heading bold IME with readable color', () {
+    final spans = buildNoteTextSpans(
+      text: '😀é中 next',
+      styles: [highlight(1, 4), heading(0, 5), bold(0, 5)],
+      baseStyle: const TextStyle(fontSize: 17, color: Colors.white),
+      composing: const TextRange(start: 2, end: 4),
+    );
+    expect(spans.map((span) => span.text).join(), '😀é中 next');
+    for (final span in spans
+        .where((span) => span.style?.backgroundColor == noteHighlightColor)) {
+      expect(span.style?.color, noteHighlightedTextColor);
+      expect(span.style?.fontSize, 19);
+      expect(span.style?.fontWeight, FontWeight.w700);
+    }
+    expect(spans.singleWhere((span) => span.text == 'é').style?.decoration,
+        TextDecoration.underline);
+    expect(spans.last.style?.backgroundColor, isNull);
+  });
+
+  test('Markdown mark spans retain literal text and overlap with heading bold',
+      () {
+    expect(
+        noteTextToMarkdown('Title\nremember',
+            [heading(0, 5), highlight(0, 5), bold(0, 5), highlight(6, 14)]),
+        '## <mark>**Title**</mark>\n<mark>remember</mark>');
+    expect(noteTextToMarkdown('ABCDEF', [highlight(0, 4), bold(2, 6)]),
+        '<mark>AB</mark><mark>**CD**</mark>**EF**');
+    expect(noteTextToMarkdown('<script> & **literal**', [highlight(0, 22)]),
+        '<mark>\\<script\\> \\& \\*\\*literal\\*\\*</mark>');
   });
 }
