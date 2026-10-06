@@ -32,6 +32,7 @@ class FormattedNoteText extends StatelessWidget {
     this.selectable = true,
     this.onOpenUrl,
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
   });
 
   final String text;
@@ -40,6 +41,7 @@ class FormattedNoteText extends StatelessWidget {
   final bool selectable;
   final NoteWebLinkOpener? onOpenUrl;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,7 @@ class FormattedNoteText extends StatelessWidget {
       onOpenUrl: onOpenUrl,
       textStyles: styles,
       onCopySelection: onCopySelection,
+      onAddSelectionToChecklist: onAddSelectionToChecklist,
     );
   }
 }
@@ -75,6 +78,7 @@ class NoteReadingText extends StatefulWidget {
     this.textKey,
     this.textStyles = const [],
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
   });
 
   final String text;
@@ -86,6 +90,7 @@ class NoteReadingText extends StatefulWidget {
   final Key? textKey;
   final List<NoteTextStyleRange> textStyles;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
 
   @override
   State<NoteReadingText> createState() => _NoteReadingTextState();
@@ -203,7 +208,8 @@ class _NoteReadingTextState extends State<NoteReadingText> {
         ? SelectableText.rich(
             span,
             key: widget.textKey,
-            contextMenuBuilder: widget.onCopySelection == null
+            contextMenuBuilder: widget.onCopySelection == null &&
+                    widget.onAddSelectionToChecklist == null
                 ? (context, state) => AdaptiveTextSelectionToolbar.editableText(
                       editableTextState: state,
                     )
@@ -211,7 +217,9 @@ class _NoteReadingTextState extends State<NoteReadingText> {
                       context,
                       state,
                       textStyles: widget.textStyles,
-                      onCopySelection: widget.onCopySelection!,
+                      onCopySelection: widget.onCopySelection,
+                      onAddSelectionToChecklist:
+                          widget.onAddSelectionToChecklist,
                     ),
           )
         : Text.rich(

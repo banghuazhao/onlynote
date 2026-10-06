@@ -34,6 +34,7 @@ class NoteBodyEditor extends StatefulWidget {
     this.onEditImage,
     this.outlineController,
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
   });
 
   final SimpleFormattingController controller;
@@ -48,6 +49,7 @@ class NoteBodyEditor extends StatefulWidget {
   final ValueChanged<String>? onEditImage;
   final NoteOutlineNavigationController? outlineController;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
 
   @override
   State<NoteBodyEditor> createState() => _NoteBodyEditorState();
@@ -81,12 +83,31 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
 
   void _attachOutline() {
     _detachOutline?.call();
-    _detachOutline =
-        widget.outlineController?.attach(owner: this, jump: _jumpTo);
+    _detachOutline = widget.outlineController?.attach(
+      owner: this,
+      jump: _jumpTo,
+      restore: (offset, {canRestore}) =>
+          _jumpTo(offset, requestFocus: false, canRestore: canRestore),
+    );
   }
 
-  Future<bool> _jumpTo(int offset) async {
-    if (!mounted || _dragging || offset > widget.controller.text.length) {
+  bool get _bodyBusyForRestore =>
+      widget.focusNode.hasFocus ||
+      (widget.controller.value.composing.isValid &&
+          !widget.controller.value.composing.isCollapsed) ||
+      _segments.values.any((segment) =>
+          segment.focus.hasFocus ||
+          (segment.controller.value.composing.isValid &&
+              !segment.controller.value.composing.isCollapsed));
+
+  Future<bool> _jumpTo(int offset,
+      {bool requestFocus = true, bool Function()? canRestore}) async {
+    if (!mounted ||
+        _dragging ||
+        offset < 0 ||
+        offset > widget.controller.text.length ||
+        (canRestore != null && !canRestore()) ||
+        (!requestFocus && _bodyBusyForRestore)) {
       return false;
     }
     final part = _layouts.isEmpty
@@ -97,26 +118,31 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
             .lastOrNull;
     final segment = part == null ? null : _segments[part.key];
     if (_layouts.isNotEmpty && segment == null) return false;
-    // Navigating commits the current composing text without replacing it.
-    // Clearing composition before moving the caret matches a native field tap.
+    // An outline tap commits composition as a native field tap does. A silent
+    // resume positions an inactive caret without focusing or changing the IME.
     if (segment != null) _activeKey = segment.key;
     widget.controller.value = widget.controller.value.copyWith(
       selection: TextSelection.collapsed(offset: offset),
-      composing: TextRange.empty,
+      composing:
+          requestFocus ? TextRange.empty : widget.controller.value.composing,
     );
     _syncSegments();
-    (segment?.focus ?? widget.focusNode).requestFocus();
+    if (requestFocus) (segment?.focus ?? widget.focusNode).requestFocus();
     setState(() => _selectedImage = null);
     await WidgetsBinding.instance.endOfFrame;
-    if (!mounted) return false;
+    if (!mounted ||
+        (canRestore != null && !canRestore()) ||
+        (!requestFocus && _bodyBusyForRestore)) {
+      return false;
+    }
     final targetContext = (segment?.renderKey ?? _plainTextKey).currentContext;
     if (targetContext == null || !targetContext.mounted) return false;
     return revealNoteTextOffset(
         targetContext,
         segment == null
             ? offset
-            : (offset - segment.start)
-                .clamp(0, segment.controller.text.length));
+            : (offset - segment.start).clamp(0, segment.controller.text.length),
+        animate: requestFocus);
   }
 
   @override
@@ -459,16 +485,18 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         child: TextField(
           key: ValueKey('note-body-${segment.key}'),
           controller: segment.controller,
-          contextMenuBuilder: (context, editable) =>
-              widget.onCopySelection == null
-                  ? AdaptiveTextSelectionToolbar.editableText(
-                      editableTextState: editable)
-                  : buildNoteSelectionContextMenu(context, editable,
-                      onCopySelection: widget.onCopySelection!,
-                      textStyles: noteTextStylesForPart(
-                          widget.controller.styles,
-                          segment.start,
-                          segment.start + segment.controller.text.length)),
+          contextMenuBuilder: (context, editable) => widget.onCopySelection ==
+                      null &&
+                  widget.onAddSelectionToChecklist == null
+              ? AdaptiveTextSelectionToolbar.editableText(
+                  editableTextState: editable)
+              : buildNoteSelectionContextMenu(context, editable,
+                  onCopySelection: widget.onCopySelection,
+                  onAddSelectionToChecklist: widget.onAddSelectionToChecklist,
+                  textStyles: noteTextStylesForPart(
+                      widget.controller.styles,
+                      segment.start,
+                      segment.start + segment.controller.text.length)),
           focusNode: segment.focus,
           autofocus: widget.autofocus && index == 0,
           style: AppTypography.formText,
@@ -645,13 +673,15 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
               (AppTypography.formText.height ?? 1.55),
           child: TextField(
             controller: widget.controller,
-            contextMenuBuilder: (context, editable) =>
-                widget.onCopySelection == null
-                    ? AdaptiveTextSelectionToolbar.editableText(
-                        editableTextState: editable)
-                    : buildNoteSelectionContextMenu(context, editable,
-                        onCopySelection: widget.onCopySelection!,
-                        textStyles: widget.controller.styles),
+            contextMenuBuilder: (context, editable) => widget.onCopySelection ==
+                        null &&
+                    widget.onAddSelectionToChecklist == null
+                ? AdaptiveTextSelectionToolbar.editableText(
+                    editableTextState: editable)
+                : buildNoteSelectionContextMenu(context, editable,
+                    onCopySelection: widget.onCopySelection,
+                    onAddSelectionToChecklist: widget.onAddSelectionToChecklist,
+                    textStyles: widget.controller.styles),
             focusNode: widget.focusNode,
             autofocus: widget.autofocus,
             style: AppTypography.formText,

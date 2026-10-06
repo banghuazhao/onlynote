@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
@@ -9,7 +10,39 @@ import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
+import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
+// The preference plugin exposes its test platform in a separate package.
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/types.dart';
+
+final class _PositionPreferencesPlatform
+    extends SharedPreferencesAsyncPlatform {
+  final values = <String, String>{};
+
+  @override
+  Future<String?> getString(
+          String key, SharedPreferencesOptions options) async =>
+      values[key];
+
+  @override
+  Future<void> setString(
+      String key, String value, SharedPreferencesOptions options) async {
+    values[key] = value;
+  }
+
+  @override
+  Future<void> clear(ClearPreferencesParameters parameters,
+      SharedPreferencesOptions options) async {
+    final allowed = parameters.filter.allowList;
+    values.removeWhere((key, _) => allowed == null || allowed.contains(key));
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 class _Database implements Database {
   _Database(this.box);
@@ -80,8 +113,18 @@ void main() {
   late _Database database;
   late NoteRepositoryImplementation repository;
   late NoteHistory history;
+  final preferences = _PositionPreferencesPlatform();
+  final originalPreferences = SharedPreferencesAsyncPlatform.instance;
+
+  setUpAll(() => SharedPreferencesAsyncPlatform.instance = preferences);
+  tearDownAll(
+      () => SharedPreferencesAsyncPlatform.instance = originalPreferences);
 
   setUp(() async {
+    for (final id in ['note', 'removed', 'kept']) {
+      await NotePositionStore.instance.remove(id);
+    }
+    preferences.values.clear();
     directory = await Directory.systemTemp.createTemp('onlynote-history-repo-');
     Hive.init(directory.path);
     if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(TodoDtoAdapter());
@@ -100,6 +143,9 @@ void main() {
         readDuration: (_) async => 1000));
   });
   tearDown(() async {
+    for (final id in ['note', 'removed', 'kept']) {
+      await NotePositionStore.instance.remove(id);
+    }
     NoteHistory.initializedInstance = null;
     VoiceMemoDrafts.initializedInstance = null;
     history.dispose();
@@ -123,6 +169,26 @@ void main() {
     });
     await drafts.put('${NotePhotoRecovery.recordKey}.deferred.$id',
         {'note': note, 'existed': false});
+    await NotePositionStore.instance.saveWriting(
+      id,
+      NoteWritingPosition.capture(
+        field: NoteWritingField.title,
+        text: note.title!,
+        selection: const TextSelection.collapsed(offset: 4),
+      ),
+    );
+    await NotePositionStore.instance.saveReading(
+      id,
+      NoteReadingPosition.capture(text: note.title!, offset: 8),
+    );
+  }
+
+  Future<void> expectPositions(String id, {required bool retained}) async {
+    final positions = await NotePositionStore.instance.read(id);
+    expect(positions.writing, retained ? isNotNull : isNull);
+    expect(positions.reading, retained ? isNotNull : isNull);
+    expect(preferences.values.containsKey(NotePositionStore.storageKey(id)),
+        retained);
   }
 
   test('repository snapshots prior saved content before updating database',
@@ -193,6 +259,7 @@ void main() {
     expect(notes.containsKey('note'), isTrue);
     expect(drafts.get('note'), isA<NoteDto>());
     expect(history.versionsFor('note').length, 1);
+    await expectPositions('note', retained: true);
     expect(
         drafts.keys
             .whereType<String>()
@@ -202,6 +269,7 @@ void main() {
     expect(await repository.recoverPendingDeletions(), isTrue);
     expect(drafts.get('note'), isA<NoteDto>());
     expect(history.versionsFor('note').length, 1);
+    await expectPositions('note', retained: true);
   });
 
   test('successful permanent deletion purges only deleted recovery ownership',
@@ -220,6 +288,8 @@ void main() {
         drafts.get('${NotePhotoRecovery.recordKey}.deferred.removed'), isNull);
     expect(drafts.get('kept'), isA<NoteDto>());
     expect(history.versionsFor('kept').length, 1);
+    await expectPositions('removed', retained: false);
+    await expectPositions('kept', retained: true);
     expect(
         drafts.keys.whereType<String>().any((key) =>
             key.startsWith(NoteRepositoryImplementation.deletionPrefix)),
@@ -243,6 +313,9 @@ void main() {
     expect(history.versionsFor('removed'), isEmpty);
     expect(drafts.values.whereType<NoteDto>(), isEmpty);
     expect(VoiceMemoDrafts.initializedInstance!.hasPending, isFalse);
+    await expectPositions('removed', retained: false);
+    expect(await repository.recoverPendingDeletions(), isTrue);
+    await expectPositions('removed', retained: false);
   });
 
   test('committed deletion keeps retry intent when history purge fails',
@@ -258,6 +331,7 @@ void main() {
     expect(notes.containsKey('removed'), isFalse);
     expect(drafts.get('removed'), isNull);
     expect(history.versionsFor('removed').length, 1);
+    await expectPositions('removed', retained: true);
     expect(
         drafts.keys.whereType<String>().any((key) =>
             key.startsWith(NoteRepositoryImplementation.deletionPrefix)),
@@ -267,6 +341,7 @@ void main() {
     NoteHistory.configure(history);
     expect(await repository.recoverPendingDeletions(), isTrue);
     expect(history.versionsFor('removed'), isEmpty);
+    await expectPositions('removed', retained: false);
     expect(
         drafts.keys.whereType<String>().any((key) =>
             key.startsWith(NoteRepositoryImplementation.deletionPrefix)),

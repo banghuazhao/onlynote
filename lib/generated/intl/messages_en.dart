@@ -44,15 +44,20 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m10(number) => "Note color ${number}";
 
-  static String m11(number) => "Photo ${number}";
+  static String m11(minutes) => "${minutes} min";
 
-  static String m12(time) => "Next reminder: ${time}";
+  static String m12(number) => "Photo ${number}";
 
-  static String m13(date) => "Remind me: ${date}";
+  static String m13(time) => "Next reminder: ${time}";
 
-  static String m14(price) => "Remove ads permanently for ${price}.";
+  static String m14(date) => "Remind me: ${date}";
 
-  static String m15(items, photos) =>
+  static String m15(price) => "Remove ads permanently for ${price}.";
+
+  static String m16(count) =>
+      "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
+
+  static String m17(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -60,6 +65,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
+    "Add_Selection_To_Checklist": MessageLookupByLibrary.simpleMessage(
+      "Add to checklist",
+    ),
     "Add_todo": MessageLookupByLibrary.simpleMessage("Add item"),
     "Ads_Removed": MessageLookupByLibrary.simpleMessage("Ads Removed"),
     "Ads_Removed_Description": MessageLookupByLibrary.simpleMessage(
@@ -416,6 +424,20 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Duplicated Successfully",
     ),
     "Note_FocusWriting": MessageLookupByLibrary.simpleMessage("Focus writing"),
+    "Note_Info": MessageLookupByLibrary.simpleMessage("Note info"),
+    "Note_Info_Characters": MessageLookupByLibrary.simpleMessage("Characters"),
+    "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
+      "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
+    ),
+    "Note_Info_Reading_Empty": MessageLookupByLibrary.simpleMessage("0 min"),
+    "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
+      "Less than 1 min",
+    ),
+    "Note_Info_Reading_Minutes": m11,
+    "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage(
+      "Estimated reading time",
+    ),
+    "Note_Info_Words": MessageLookupByLibrary.simpleMessage("Words"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("Outline"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage(
@@ -531,7 +553,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m11,
+    "Photo_Text_Photo": m12,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -586,7 +608,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m12,
+    "Reminder_Next_Time": m13,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -603,7 +625,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m13,
+    "Reminder_Suggestion": m14,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -641,7 +663,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m14,
+    "Remove_Ads_Price": m15,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -680,6 +702,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
+    "Selection_Checklist_Added": m16,
+    "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save the checklist items.",
+    ),
+    "Selection_Checklist_Too_Long": MessageLookupByLibrary.simpleMessage(
+      "One line is too long for a checklist item. Select shorter lines.",
+    ),
     "Settings": MessageLookupByLibrary.simpleMessage("Settings"),
     "Settings_Save_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save this setting. Please try again.",
@@ -762,7 +791,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m15,
+    "Template_Details": m17,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

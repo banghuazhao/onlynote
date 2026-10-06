@@ -6,6 +6,7 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
+import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -142,6 +143,9 @@ class NoteRepositoryImplementation implements NoteRepository {
       await drafts.flush();
     }
     await NoteHistory.initializedInstance?.purge(ids);
+    for (final id in ids) {
+      await NotePositionStore.instance.remove(id);
+    }
   }
 
   @override

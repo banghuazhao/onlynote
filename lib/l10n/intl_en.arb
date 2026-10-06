@@ -489,5 +489,31 @@
         "type": "String"
       }
     }
+  },
+  "Note_Info": "Note info",
+  "Note_Info_Words": "Words",
+  "Note_Info_Characters": "Characters",
+  "Note_Info_Reading_Time": "Estimated reading time",
+  "Note_Info_Reading_Empty": "0 min",
+  "Note_Info_Reading_Less_Than_Minute": "Less than 1 min",
+  "Note_Info_Reading_Minutes": "{minutes} min",
+  "Note_Info_Counting_Hint": "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
+  "Add_Selection_To_Checklist": "Add to checklist",
+  "Selection_Checklist_Too_Long": "One line is too long for a checklist item. Select shorter lines.",
+  "Selection_Checklist_Added": "Added {count, plural, =1{1 checklist item} other{{count} checklist items}}",
+  "Selection_Checklist_Failed": "Could not save the checklist items.",
+  "@Note_Info_Reading_Minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@Selection_Checklist_Added": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

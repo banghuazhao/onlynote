@@ -489,5 +489,31 @@
         "type": "String"
       }
     }
+  },
+  "Note_Info": "笔记信息",
+  "Note_Info_Words": "字数",
+  "Note_Info_Characters": "字符数",
+  "Note_Info_Reading_Time": "预计阅读时间",
+  "Note_Info_Reading_Empty": "0 分钟",
+  "Note_Info_Reading_Less_Than_Minute": "不到 1 分钟",
+  "Note_Info_Reading_Minutes": "{minutes} 分钟",
+  "Note_Info_Counting_Hint": "包含标题、正文、清单和语音转写。中日韩文字按字计数。",
+  "Add_Selection_To_Checklist": "添加到清单",
+  "Selection_Checklist_Too_Long": "有一行过长，无法作为清单项。请选择较短的行。",
+  "Selection_Checklist_Added": "已添加 {count} 项清单",
+  "Selection_Checklist_Failed": "无法保存清单项。",
+  "@Note_Info_Reading_Minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@Selection_Checklist_Added": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

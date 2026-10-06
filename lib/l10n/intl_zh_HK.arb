@@ -489,5 +489,31 @@
         "type": "String"
       }
     }
+  },
+  "Note_Info": "筆記資訊",
+  "Note_Info_Words": "字數",
+  "Note_Info_Characters": "字元數",
+  "Note_Info_Reading_Time": "預計閱讀時間",
+  "Note_Info_Reading_Empty": "0 分鐘",
+  "Note_Info_Reading_Less_Than_Minute": "不到 1 分鐘",
+  "Note_Info_Reading_Minutes": "{minutes} 分鐘",
+  "Note_Info_Counting_Hint": "包含標題、內文、清單和語音轉寫。中日韓文字按字計數。",
+  "Add_Selection_To_Checklist": "加入清單",
+  "Selection_Checklist_Too_Long": "有一行過長，無法作為清單項目。請選擇較短的行。",
+  "Selection_Checklist_Added": "已加入 {count} 項清單",
+  "Selection_Checklist_Failed": "無法儲存清單項目。",
+  "@Note_Info_Reading_Minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@Selection_Checklist_Added": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

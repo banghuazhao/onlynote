@@ -3954,6 +3954,116 @@ class S {
       args: [heading],
     );
   }
+
+  /// `Note info`
+  String get Note_Info {
+    return Intl.message('Note info', name: 'Note_Info', desc: '', args: []);
+  }
+
+  /// `Words`
+  String get Note_Info_Words {
+    return Intl.message('Words', name: 'Note_Info_Words', desc: '', args: []);
+  }
+
+  /// `Characters`
+  String get Note_Info_Characters {
+    return Intl.message(
+      'Characters',
+      name: 'Note_Info_Characters',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Estimated reading time`
+  String get Note_Info_Reading_Time {
+    return Intl.message(
+      'Estimated reading time',
+      name: 'Note_Info_Reading_Time',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `0 min`
+  String get Note_Info_Reading_Empty {
+    return Intl.message(
+      '0 min',
+      name: 'Note_Info_Reading_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Less than 1 min`
+  String get Note_Info_Reading_Less_Than_Minute {
+    return Intl.message(
+      'Less than 1 min',
+      name: 'Note_Info_Reading_Less_Than_Minute',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{minutes} min`
+  String Note_Info_Reading_Minutes(int minutes) {
+    return Intl.message(
+      '$minutes min',
+      name: 'Note_Info_Reading_Minutes',
+      desc: '',
+      args: [minutes],
+    );
+  }
+
+  /// `Includes title, note text, checklist items, and transcripts. CJK characters count individually.`
+  String get Note_Info_Counting_Hint {
+    return Intl.message(
+      'Includes title, note text, checklist items, and transcripts. CJK characters count individually.',
+      name: 'Note_Info_Counting_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to checklist`
+  String get Add_Selection_To_Checklist {
+    return Intl.message(
+      'Add to checklist',
+      name: 'Add_Selection_To_Checklist',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `One line is too long for a checklist item. Select shorter lines.`
+  String get Selection_Checklist_Too_Long {
+    return Intl.message(
+      'One line is too long for a checklist item. Select shorter lines.',
+      name: 'Selection_Checklist_Too_Long',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Added {count, plural, =1{1 checklist item} other{{count} checklist items}}`
+  String Selection_Checklist_Added(int count) {
+    return Intl.message(
+      'Added ${Intl.plural(count, one: '1 checklist item', other: '$count checklist items')}',
+      name: 'Selection_Checklist_Added',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Could not save the checklist items.`
+  String get Selection_Checklist_Failed {
+    return Intl.message(
+      'Could not save the checklist items.',
+      name: 'Selection_Checklist_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -7,12 +7,14 @@ class _BuildTitleField extends StatelessWidget {
     required TextEditingController titleController,
     required this.focusNode,
     required this.onCopySelection,
+    required this.onAddSelectionToChecklist,
   }) : _titleController = titleController;
 
   final AddUpdateFormState state;
   final TextEditingController _titleController;
   final FocusNode focusNode;
   final ValueChanged<NoteTextSelection> onCopySelection;
+  final ValueChanged<NoteTextSelection> onAddSelectionToChecklist;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,8 @@ class _BuildTitleField extends StatelessWidget {
           focusNode: focusNode,
           contextMenuBuilder: (context, editable) =>
               buildNoteSelectionContextMenu(context, editable,
-                  onCopySelection: onCopySelection),
+                  onCopySelection: onCopySelection,
+                  onAddSelectionToChecklist: onAddSelectionToChecklist),
           style: AppTypography.headline4.copyWith(height: 1.25),
           textInputAction: TextInputAction.next,
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -70,6 +73,7 @@ class _BuildDescriptionField extends StatelessWidget {
     required this.onRemoveImage,
     required this.onEditImage,
     required this.onCopySelection,
+    required this.onAddSelectionToChecklist,
     this.autofocus = false,
   }) : _descriptionController = descriptionController;
 
@@ -81,6 +85,7 @@ class _BuildDescriptionField extends StatelessWidget {
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
   final ValueChanged<NoteTextSelection> onCopySelection;
+  final ValueChanged<NoteTextSelection> onAddSelectionToChecklist;
   final bool autofocus;
 
   @override
@@ -94,6 +99,7 @@ class _BuildDescriptionField extends StatelessWidget {
         onRemoveImage: onRemoveImage,
         onEditImage: onEditImage,
         onCopySelection: onCopySelection,
+        onAddSelectionToChecklist: onAddSelectionToChecklist,
         autofocus: autofocus,
         paperColor: state.selectedColor ?? AppColors.parchment,
       );

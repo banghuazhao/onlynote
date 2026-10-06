@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_reader_sections.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_web_links.dart';
 import 'formatted_note_text.dart';
 import 'note_image_block.dart';
 import 'note_outline_navigation_controller.dart';
+import 'note_reader_position_controller.dart';
 
 class NoteDocumentView extends StatefulWidget {
   const NoteDocumentView({
@@ -23,8 +25,10 @@ class NoteDocumentView extends StatefulWidget {
     this.imageBuilder,
     this.textBuilder,
     this.outlineController,
+    this.readerPositionController,
     this.onOpenUrl,
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
     this.collapsibleSections = false,
     this.sectionToggleLabel,
   });
@@ -37,8 +41,10 @@ class NoteDocumentView extends StatefulWidget {
   final ValueChanged<String>? onImageTap;
   final NoteBlockImageBuilder? imageBuilder;
   final NoteOutlineNavigationController? outlineController;
+  final NoteReaderPositionController? readerPositionController;
   final NoteWebLinkOpener? onOpenUrl;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
 
   /// Reader-only, temporary folding. Editors, previews and exports use the
   /// original document layout unless the reader explicitly opts in.
@@ -54,16 +60,19 @@ class NoteDocumentView extends StatefulWidget {
 
 class _NoteDocumentViewState extends State<NoteDocumentView> {
   final Map<int, GlobalKey> _textKeys = {};
+  final Map<String, GlobalKey> _imageKeys = {};
   final Set<int> _collapsedSections = {};
   late List<NoteDocumentPart> _parts;
   late NoteReaderDocument _readerDocument;
   VoidCallback? _detachOutline;
+  VoidCallback? _detachPosition;
 
   @override
   void initState() {
     super.initState();
     _updateDocument();
     _attachOutline();
+    _attachPosition();
   }
 
   void _updateDocument() {
@@ -81,11 +90,23 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
         widget.outlineController?.attach(owner: this, jump: _jumpTo);
   }
 
+  void _attachPosition() {
+    _detachPosition?.call();
+    _detachPosition = widget.readerPositionController?.attach(
+      owner: this,
+      capture: _capturePosition,
+      restore: _restorePosition,
+    );
+  }
+
   @override
   void didUpdateWidget(NoteDocumentView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.outlineController != widget.outlineController) {
       _attachOutline();
+    }
+    if (oldWidget.readerPositionController != widget.readerPositionController) {
+      _attachPosition();
     }
     if (oldWidget.text != widget.text ||
         !listEquals(oldWidget.styles, widget.styles) ||
@@ -96,6 +117,7 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
   }
 
   Future<bool> _jumpTo(int offset) async {
+    widget.readerPositionController?.cancelPendingRestore();
     if (!mounted || offset < 0 || offset > widget.text.length) return false;
     final originalText = widget.text;
     if (widget.collapsibleSections) {
@@ -122,6 +144,115 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
     final targetContext = _textKeys[part.start]?.currentContext;
     if (targetContext == null || !targetContext.mounted) return false;
     return revealNoteTextOffset(targetContext, offset - part.start);
+  }
+
+  NoteReadingPosition? _capturePosition() {
+    if (!mounted) return null;
+    final viewport = NoteReaderViewport.fromContext(context);
+    if (viewport == null) return null;
+    final top = viewport.bounds.top;
+    NoteReadingPosition? closest;
+    var distance = double.infinity;
+    final direction = Directionality.of(context);
+    for (final part in _renderableParts) {
+      if (part is NoteTextPart && part.end > part.start) {
+        final partContext = _textKeys[part.start]?.currentContext;
+        if (partContext == null) continue;
+        final glyph = NoteReaderGlyph.fromContext(partContext);
+        if (glyph == null || glyph.length == 0) continue;
+        final localText = widget.text.substring(part.start, part.end);
+        final offset = clampNotePositionOffset(
+            localText, glyph.positionNearTop(top, direction));
+        final rect = glyph.globalRectForOffset(offset);
+        if (rect == null) continue;
+        final gap = (rect.top - top).abs();
+        if (gap < distance) {
+          distance = gap;
+          closest = NoteReadingPosition.capture(
+            text: widget.text,
+            offset: part.start + offset,
+            leadingDisplacement: rect.top - top,
+          );
+        }
+      } else if (part is NoteImagePart) {
+        final render =
+            _imageKeys[part.layout.path]?.currentContext?.findRenderObject();
+        if (render is! RenderBox || !render.hasSize) continue;
+        final rect = render.localToGlobal(Offset.zero) & render.size;
+        if (rect.height <= 0) continue;
+        final fraction = ((top - rect.top) / rect.height).clamp(0.0, 1.0);
+        final imageTop = rect.top + rect.height * fraction;
+        final gap = (imageTop - top).abs();
+        if (gap < distance) {
+          distance = gap;
+          closest = NoteReadingPosition.capture(
+            text: widget.text,
+            offset: part.layout.textOffset,
+            imagePath: part.layout.path,
+            imageFraction: fraction,
+            leadingDisplacement: imageTop - top,
+          );
+        }
+      }
+    }
+    return closest;
+  }
+
+  Future<bool> _restorePosition(
+      NoteReadingPosition position, bool Function() canRestore) async {
+    if (!mounted || !canRestore()) return false;
+    final originalText = widget.text;
+    final offset = position.resolve(widget.text);
+    final image = _parts
+        .whereType<NoteImagePart>()
+        .where((part) => part.layout.path == position.imagePath)
+        .firstOrNull;
+    if (widget.collapsibleSections) {
+      // A photo anchored at the next heading belongs to the preceding body.
+      // Inspect actual section ownership instead of treating its text offset
+      // as a glyph within the next section.
+      final section = image == null
+          ? _readerDocument.sections
+              .where((section) => section.containsOffset(offset,
+                  textLength: widget.text.length))
+              .lastOrNull
+          : _readerDocument.sections
+              .where((section) => section.bodyParts.any((part) =>
+                  part is NoteImagePart &&
+                  part.layout.path == image.layout.path))
+              .firstOrNull;
+      if (section != null && _collapsedSections.contains(section.start)) {
+        setState(() => _collapsedSections.remove(section.start));
+      }
+    }
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || widget.text != originalText || !canRestore()) return false;
+    final viewport = NoteReaderViewport.fromContext(context);
+    if (viewport == null) return false;
+    if (image != null) {
+      final render =
+          _imageKeys[image.layout.path]?.currentContext?.findRenderObject();
+      if (render is RenderBox && render.hasSize) {
+        final top = render.localToGlobal(Offset.zero).dy +
+            render.size.height * position.imageFraction;
+        return viewport.restoreTop(top, position.leadingDisplacement);
+      }
+    }
+    final textParts = _renderableParts.whereType<NoteTextPart>();
+    var part = textParts
+        .where((part) => part.start <= offset && part.end >= offset)
+        .lastOrNull;
+    part ??= textParts.where((part) => part.start <= offset).lastOrNull;
+    part ??= textParts.firstOrNull;
+    final partContext =
+        part == null ? null : _textKeys[part.start]?.currentContext;
+    if (part == null || partContext == null || !partContext.mounted) {
+      return false;
+    }
+    final glyph = NoteReaderGlyph.fromContext(partContext);
+    final rect = glyph?.globalRectForOffset(offset - part.start);
+    if (rect == null || !canRestore()) return false;
+    return viewport.restoreTop(rect.top, position.leadingDisplacement);
   }
 
   Iterable<NoteDocumentPart> get _renderableParts sync* {
@@ -152,6 +283,7 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
               selectable: widget.selectable,
               onOpenUrl: widget.onOpenUrl,
               onCopySelection: widget.onCopySelection,
+              onAddSelectionToChecklist: widget.onAddSelectionToChecklist,
             ),
       );
 
@@ -160,13 +292,16 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
           if (part is NoteTextPart && part.end > part.start)
             _buildText(part)
           else if (part is NoteImagePart)
-            NoteImageBlock(
-              key: ValueKey('document-image-${part.layout.path}'),
-              layout: part.layout,
-              imageBuilder: widget.imageBuilder,
-              onImageTap: widget.onImageTap == null
-                  ? null
-                  : () => widget.onImageTap!(part.layout.path),
+            KeyedSubtree(
+              key: _imageKeys.putIfAbsent(part.layout.path, GlobalKey.new),
+              child: NoteImageBlock(
+                key: ValueKey('document-image-${part.layout.path}'),
+                layout: part.layout,
+                imageBuilder: widget.imageBuilder,
+                onImageTap: widget.onImageTap == null
+                    ? null
+                    : () => widget.onImageTap!(part.layout.path),
+              ),
             ),
       ];
 
@@ -182,13 +317,16 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
     final label =
         widget.sectionToggleLabel?.call(section.heading.text, expanded) ??
             '${expanded ? 'Collapse' : 'Expand'} ${section.heading.text}';
-    void toggle() => setState(() {
-          if (expanded) {
-            _collapsedSections.add(section.start);
-          } else {
-            _collapsedSections.remove(section.start);
-          }
-        });
+    void toggle() {
+      widget.readerPositionController?.cancelPendingRestore();
+      setState(() {
+        if (expanded) {
+          _collapsedSections.add(section.start);
+        } else {
+          _collapsedSections.remove(section.start);
+        }
+      });
+    }
 
     return Column(
       key: ValueKey('note-reader-section-${section.start}'),
@@ -237,6 +375,7 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
   @override
   void dispose() {
     _detachOutline?.call();
+    _detachPosition?.call();
     super.dispose();
   }
 
@@ -247,6 +386,11 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
         .map((part) => part.start)
         .toSet();
     _textKeys.removeWhere((start, _) => !starts.contains(start));
+    final images = _renderableParts
+        .whereType<NoteImagePart>()
+        .map((part) => part.layout.path)
+        .toSet();
+    _imageKeys.removeWhere((path, _) => !images.contains(path));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: widget.collapsibleSections

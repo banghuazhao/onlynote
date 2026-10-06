@@ -8,6 +8,21 @@ import 'package:onlynote/data/repository/note_repository.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:onlynote/services/note_autosave.dart';
+// The preference plugin exposes its test platform in a separate package.
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/types.dart';
+
+final class _PositionPreferencesPlatform
+    extends SharedPreferencesAsyncPlatform {
+  @override
+  Future<void> clear(ClearPreferencesParameters parameters,
+      SharedPreferencesOptions options) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 const _scanID = 'ca118157-a3e4-47d4-97e2-1216a77b2c4a';
 const _otherID = 'ca118157-a3e4-47d4-97e2-1216a77b2c4b';
@@ -54,6 +69,12 @@ void main() {
   late _Scanner scanner;
   late DocumentScanCapture capture;
   var copies = 0;
+  final originalPreferences = SharedPreferencesAsyncPlatform.instance;
+
+  setUpAll(() =>
+      SharedPreferencesAsyncPlatform.instance = _PositionPreferencesPlatform());
+  tearDownAll(
+      () => SharedPreferencesAsyncPlatform.instance = originalPreferences);
 
   setUp(() async {
     directory =

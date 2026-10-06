@@ -24,6 +24,7 @@ class NoteSearchText extends StatefulWidget {
     this.onOpenUrl,
     this.onMatchTap,
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
   });
   final NoteSearchController controller;
   final String fieldId;
@@ -36,6 +37,7 @@ class NoteSearchText extends StatefulWidget {
   final NoteWebLinkOpener? onOpenUrl;
   final ValueChanged<NoteSearchMatch>? onMatchTap;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
 
   @override
   State<NoteSearchText> createState() => _NoteSearchTextState();
@@ -145,6 +147,7 @@ class _NoteSearchTextState extends State<NoteSearchText> {
         textKey: _textKey,
         textStyles: widget.styles,
         onCopySelection: widget.onCopySelection,
+        onAddSelectionToChecklist: widget.onAddSelectionToChecklist,
       );
 
   @override

@@ -347,18 +347,31 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
     _focusNextTodo = false;
   }
 
-  Future<void> selectMatch(String id, TextSelection selection) async {
+  Future<void> selectMatch(
+    String id,
+    TextSelection selection, {
+    bool requestFocus = true,
+    bool Function()? canRestore,
+  }) async {
     final field = _fieldKeys[id]?.currentState;
-    if (field == null) return;
+    if (field == null ||
+        canRestore?.call() == false ||
+        (!requestFocus &&
+            (_focusNodes[id]?.hasFocus == true ||
+                (field.todoController.value.composing.isValid &&
+                    !field.todoController.value.composing.isCollapsed)))) {
+      return;
+    }
     field.todoController.selection = TextSelection(
         baseOffset:
             selection.baseOffset.clamp(0, field.todoController.text.length),
         extentOffset:
             selection.extentOffset.clamp(0, field.todoController.text.length));
-    _focusNodes[id]?.requestFocus();
+    if (requestFocus) _focusNodes[id]?.requestFocus();
     await WidgetsBinding.instance.endOfFrame;
-    if (mounted && field.mounted) {
-      revealNoteTextOffset(field.context, selection.start);
+    if (mounted && field.mounted && canRestore?.call() != false) {
+      revealNoteTextOffset(field.context, selection.start,
+          animate: requestFocus);
     }
   }
 

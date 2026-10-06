@@ -6,10 +6,20 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_selection.dart';
+import 'package:onlynote/services/note_selection_checklist.dart';
 import 'package:uuid/uuid.dart';
 
 typedef NoteSelectionEditorApply = Future<bool> Function(
     NoteTextSelection selection);
+
+typedef NoteChecklistEditorApply = Future<NoteSelectionChecklistResult?>
+    Function(NoteTextSelection selection);
+
+class _ChecklistEditor {
+  const _ChecklistEditor(this.add, this.undo);
+  final NoteChecklistEditorApply add;
+  final Future<bool> Function(List<String> ids) undo;
+}
 
 /// Copies a snapshot through the destination's own autosave queue when it is
 /// open. A hidden editor must never overwrite newer copied text on returning.
@@ -24,6 +34,7 @@ class NoteSelectionTransfer {
   final NoteAutosaveStore store;
   final Note? Function(String id) readDraft;
   static final _editors = <String, List<NoteSelectionEditorApply>>{};
+  static final _checklistEditors = <String, List<_ChecklistEditor>>{};
   static Future<void>? _writes;
 
   static VoidCallback registerEditor(
@@ -33,6 +44,18 @@ class NoteSelectionTransfer {
       final editors = _editors[noteId];
       editors?.remove(apply);
       if (editors?.isEmpty ?? false) _editors.remove(noteId);
+    };
+  }
+
+  static VoidCallback registerChecklistEditor(String noteId,
+      {required NoteChecklistEditorApply add,
+      required Future<bool> Function(List<String> ids) undo}) {
+    final editor = _ChecklistEditor(add, undo);
+    (_checklistEditors[noteId] ??= []).add(editor);
+    return () {
+      final editors = _checklistEditors[noteId];
+      editors?.remove(editor);
+      if (editors?.isEmpty ?? false) _checklistEditors.remove(noteId);
     };
   }
 
@@ -62,7 +85,7 @@ class NoteSelectionTransfer {
       final next = appendSelectionToNote(destination, selection)
           .copyWith(dateTime: DateTime.now());
       return _save(next);
-    });
+    }, onError: false);
   }
 
   Future<bool> copyToNew(NoteTextSelection selection, {Color? color}) {
@@ -77,12 +100,57 @@ class NoteSelectionTransfer {
               sortOrder: -now.millisecondsSinceEpoch),
           selection);
       return _save(note);
-    });
+    }, onError: false);
+  }
+
+  Future<NoteSelectionChecklistResult?> addToChecklist(
+      String id, NoteTextSelection selection) {
+    return _serialize<NoteSelectionChecklistResult?>(() async {
+      final destination = await _checklistDestination(id);
+      if (destination == null) return null;
+      final editors = _checklistEditors[id];
+      if (editors?.isNotEmpty ?? false) return editors!.last.add(selection);
+      final result = appendSelectionToChecklist(destination, selection);
+      if (result.status != NoteSelectionChecklistStatus.ready) return result;
+      return await _save(result.note!.copyWith(dateTime: DateTime.now()))
+          ? result
+          : null;
+    }, onError: null);
+  }
+
+  Future<bool> undoChecklist(String id, List<String> addedIds) {
+    return _serialize(() async {
+      final destination = await _checklistDestination(id);
+      if (destination == null) return false;
+      final editors = _checklistEditors[id];
+      if (editors?.isNotEmpty ?? false) return editors!.last.undo(addedIds);
+      final next = undoSelectionChecklist(destination, addedIds);
+      // A failed save can leave the removal only in a recovery draft. Retry
+      // that draft even though its checklist already lacks the created rows.
+      if (identical(next, destination) && readDraft(id)?.id != id) return true;
+      return _save(next.copyWith(dateTime: DateTime.now()));
+    }, onError: false);
+  }
+
+  Future<Note?> _checklistDestination(String id) async {
+    final latest = (await repository.getNote(id)).toDomain();
+    if (latest.id != id || latest.isDeleted) return null;
+    final draft = readDraft(id);
+    return draft == null || draft.id != id
+        ? latest
+        : draft.copyWith(
+            isArchived: latest.isArchived,
+            isPinned: latest.isPinned,
+            folderId: latest.folderId,
+            dailyNoteDateKey: latest.dailyNoteDateKey,
+            sortOrder: latest.sortOrder,
+            deletedAt: latest.deletedAt);
   }
 
   /// Release the idle queue before resolving callers. This also avoids keeping
   /// a completed future and its originating widget/test zone alive forever.
-  static Future<bool> _serialize(Future<bool> Function() operation) async {
+  static Future<T> _serialize<T>(Future<T> Function() operation,
+      {required T onError}) async {
     final previous = _writes;
     final completion = Completer<void>();
     _writes = completion.future;
@@ -90,7 +158,7 @@ class NoteSelectionTransfer {
       if (previous != null) await previous;
       return await operation();
     } catch (_) {
-      return false;
+      return onError;
     } finally {
       if (identical(_writes, completion.future)) _writes = null;
       completion.complete();

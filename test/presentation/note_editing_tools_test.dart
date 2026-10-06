@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -30,13 +32,21 @@ import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_edit_history.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_selection_transfer.dart';
+import 'package:onlynote/services/note_selection_checklist.dart';
+import 'package:onlynote/services/note_position_store.dart';
 
 class _Notes implements NoteRepository {
   final values = <String, NoteDto>{};
+  Completer<void>? readGate;
   @override
   List<NoteDto> getAllNotes() => values.values.toList();
   @override
-  Future<NoteDto> getNote(String id) async => values[id]!;
+  Future<NoteDto> getNote(String id) async {
+    final gate = readGate;
+    if (gate != null) await gate.future;
+    return values[id]!;
+  }
+
   @override
   Future<void> addUpdateNote(NoteDto note) async => values[note.id!] = note;
   @override
@@ -54,6 +64,7 @@ class _Store implements NoteAutosaveStore {
   final _Notes notes;
   final saved = <Note>[];
   final drafts = <String, NoteDto>{};
+  bool failSave = false;
   @override
   Future<void> writeDraft(Note note) async =>
       drafts[note.id!] = NoteDto.fromNote(note);
@@ -61,6 +72,7 @@ class _Store implements NoteAutosaveStore {
   Future<void> removeDraft(String id) async => drafts.remove(id);
   @override
   Future<void> saveNote(Note note) async {
+    if (failSave) throw StateError('Save unavailable');
     saved.add(note);
     await notes.addUpdateNote(NoteDto.fromNote(note));
   }
@@ -100,8 +112,9 @@ class _Capture extends DocumentScanCapture {
 }
 
 class _Router extends RootStackRouter {
-  _Router(this.store);
+  _Router(this.store, this.positions);
   final _Store store;
+  final NotePositionStore positions;
   final captures = <_Capture>[];
   @override
   List<AutoRoute> get routes => [
@@ -124,9 +137,26 @@ class _Router extends RootStackRouter {
           return AddUpdateNoteScreen(
               note: args.note,
               autosaveStore: store,
+              positionStore: positions,
               documentScanCapture: capture);
         })),
       ];
+}
+
+class _DeferredPositionStorage implements NotePositionStorage {
+  _DeferredPositionStorage(this.memory);
+  final MemoryNotePositionStorage memory;
+  final ready = Completer<void>();
+  @override
+  Future<String?> read(String key) async {
+    await ready.future;
+    return memory.read(key);
+  }
+
+  @override
+  Future<void> write(String key, String value) => memory.write(key, value);
+  @override
+  Future<void> remove(String key) => memory.remove(key);
 }
 
 class _Editor {
@@ -155,6 +185,29 @@ Future<void> _save(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _showChecklistSelectionToolbar(
+    WidgetTester tester, Finder target) async {
+  final editable = tester.state<EditableTextState>(
+      find.descendant(of: target, matching: find.byType(EditableText)));
+  // Rebuild the native menu after the fixture replaces the selection range.
+  editable.hideToolbar(false);
+  expect(editable.showToolbar(), isTrue);
+  await tester.pumpAndSettle();
+  final toolbar = tester.widget<AdaptiveTextSelectionToolbar>(
+      find.byType(AdaptiveTextSelectionToolbar));
+  expect(toolbar.buttonItems!.map((item) => item.label),
+      contains(S.current.Add_Selection_To_Checklist));
+  final action = find.text(S.current.Add_Selection_To_Checklist);
+  if (action.evaluate().isEmpty) {
+    final more = find.descendant(
+        of: find.byType(AdaptiveTextSelectionToolbar),
+        matching: find.byIcon(Icons.more_vert));
+    expect(more, findsOneWidget);
+    await _tap(tester, more);
+  }
+  expect(action, findsOneWidget);
+}
+
 Future<void> _shortcut(WidgetTester tester,
     {bool meta = false, bool redo = false}) async {
   final modifier =
@@ -181,9 +234,14 @@ void main() {
       ..addFont(File('assets/fonts/Roboto-Bold.ttf')
           .readAsBytes()
           .then(ByteData.sublistView));
+    final fallback = FontLoader('DroidSansFallback')
+      ..addFont(File('assets/fonts/DroidSansFallback.ttf')
+          .readAsBytes()
+          .then(ByteData.sublistView));
     final icons = FontLoader('MaterialIcons')
       ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
     await text.load();
+    await fallback.load();
     await icons.load();
   });
   setUp(() {
@@ -193,6 +251,9 @@ void main() {
           (textStyle ?? const TextStyle()).copyWith(
               fontFamily:
                   const bool.fromEnvironment('CAPTURE_UI') ? 'Roboto' : null,
+              fontFamilyFallback: const bool.fromEnvironment('CAPTURE_UI')
+                  ? ['DroidSansFallback']
+                  : null,
               color: color,
               fontSize: fontSize,
               fontWeight: fontWeight,
@@ -202,12 +263,14 @@ void main() {
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
 
   Future<_Editor> open(WidgetTester tester,
-      {required Note note,
+      {required Note? note,
+      NotePositionStore? positions,
       List<Note> existingNotes = const [],
       Locale locale = const Locale('en'),
-      double textScale = 1}) async {
+      double textScale = 1,
+      bool dark = false}) async {
     final notes = _Notes();
-    notes.values[note.id!] = NoteDto.fromNote(note);
+    if (note != null) notes.values[note.id!] = NoteDto.fromNote(note);
     for (final existing in existingNotes) {
       notes.values[existing.id!] = NoteDto.fromNote(existing);
     }
@@ -215,8 +278,18 @@ void main() {
     getIt.registerSingleton<NoteRepository>(notes);
     final store = _Store(notes);
     final bloc = AddUpdateBloc(AddNoteUsecase(notes), UpdateNoteUsecase(notes));
-    final router = _Router(store);
+    final router = _Router(store, positions ?? NotePositionStore.memory());
     final boundary = GlobalKey();
+    final appTheme = dark ? AppTheme.dark : AppTheme.light;
+    final theme = const bool.fromEnvironment('CAPTURE_UI')
+        ? appTheme.copyWith(
+            textTheme: appTheme.textTheme.apply(
+                fontFamily: 'Roboto',
+                fontFamilyFallback: ['DroidSansFallback']),
+            primaryTextTheme: appTheme.primaryTextTheme.apply(
+                fontFamily: 'Roboto',
+                fontFamilyFallback: ['DroidSansFallback']))
+        : appTheme;
     addTearDown(() async {
       await tester.pump(const Duration(seconds: 5));
       await tester.pumpWidget(const SizedBox.shrink());
@@ -232,7 +305,7 @@ void main() {
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
             routerConfig: router.config(),
-            theme: AppTheme.light,
+            theme: theme,
             locale: locale,
             supportedLocales: S.delegate.supportedLocales,
             localizationsDelegates: const [
@@ -1342,6 +1415,458 @@ void main() {
     expect(restored.title, 'Child edit');
     expect(restored.todo, fresh.todo);
     expect(restored.tags, fresh.tags);
+    expect(tester.takeException(), isNull);
+  });
+  Future<void> addSelectedLines(
+      WidgetTester tester, Finder target, TextSelection selection) async {
+    await _tap(tester, target);
+    tester.widget<TextField>(target).controller!.selection = selection;
+    await tester.pump();
+    await _showChecklistSelectionToolbar(tester, target);
+    await _tap(tester, find.text(S.current.Add_Selection_To_Checklist));
+    await _save(tester);
+  }
+
+  testWidgets(
+      'selected lines add tasks with one undo step and preserve prose and styles',
+      (tester) async {
+    const body = '1. Tea\n2. Milk\n☐ Bread';
+    const mark =
+        NoteTextStyleRange(start: 3, end: 6, kind: NoteTextStyleKind.bold);
+    final original = Note(
+        id: 'lines',
+        title: 'Shopping',
+        description: body,
+        textStyles: [mark],
+        tags: ['groceries'],
+        todo: [Todo(id: 'old', title: 'Bag', completed: true)]);
+    final editor = await open(tester, note: original);
+    await addSelectedLines(tester, _body(),
+        const TextSelection(baseOffset: 0, extentOffset: body.length));
+    final added = editor.latest('lines');
+    expect(
+        added.todo.map((item) => item.title), ['Bag', 'Tea', 'Milk', 'Bread']);
+    expect(added.todo.skip(1).every((item) => !item.completed), isTrue);
+    expect(added.description, body);
+    expect(added.textStyles, [mark]);
+    expect(added.tags, original.tags);
+    await _tap(tester, _undo());
+    expect(editor.latest('lines').todo, original.todo);
+    expect(editor.latest('lines').description, body);
+    await _tap(tester, _redo());
+    expect(editor.latest('lines').todo, added.todo);
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('checklist snackbar Undo keeps newer typing and can be redone',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'line-undo', description: 'Tea\nMilk'));
+    await addSelectedLines(
+        tester, _body(), const TextSelection(baseOffset: 0, extentOffset: 8));
+    final ids = editor.latest('line-undo').todo.map((item) => item.id).toList();
+    // Keep the snackbar alive while making a newer content change.
+    await tester.enterText(_body(), 'Tea\nMilk\nNewest prose');
+    await tester.pump();
+    await _tap(tester, find.widgetWithText(SnackBarAction, S.current.Undo));
+    expect(editor.latest('line-undo').todo, isEmpty);
+    expect(editor.latest('line-undo').description, 'Tea\nMilk\nNewest prose');
+    await _tap(tester, _undo());
+    expect(editor.latest('line-undo').todo.map((item) => item.id), ids);
+    expect(editor.latest('line-undo').description, 'Tea\nMilk\nNewest prose');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('selected lines create checklist in an unsaved new note',
+      (tester) async {
+    final editor = await open(tester, note: null);
+    await tester.enterText(_body(), 'Tea\nMilk');
+    await tester.pump();
+    await addSelectedLines(
+        tester, _body(), const TextSelection(baseOffset: 0, extentOffset: 8));
+    final note = editor.store.notes.getAllNotes().single.toDomain();
+    expect(note.description, 'Tea\nMilk');
+    expect(note.todo.map((item) => item.title), ['Tea', 'Milk']);
+    await _tap(tester, _undo());
+    expect(editor.latest(note.id!).description, 'Tea\nMilk');
+    expect(editor.latest(note.id!).todo, isEmpty);
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'oversized selected line rejects entire checklist without history or save',
+      (tester) async {
+    final body = 'Tea\n${'x' * 101}';
+    final editor =
+        await open(tester, note: Note(id: 'long-line', description: body));
+    await addSelectedLines(tester, _body(),
+        TextSelection(baseOffset: 0, extentOffset: body.length));
+    expect(find.text(S.current.Selection_Checklist_Too_Long), findsOneWidget);
+    expect(editor.latest('long-line').todo, isEmpty);
+    expect(editor.store.saved, isEmpty);
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('editor Note info uses unsaved text and creates no history entry',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'info-draft', title: 'Title', description: 'Old'));
+    await tester.enterText(_body(), 'Two words');
+    await tester.pump();
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    await _tap(tester, find.text(S.current.Note_Info));
+    expect(find.byKey(const ValueKey('note-info-words-value')), findsOneWidget);
+    expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('note-info-words-value')))
+            .data,
+        '3');
+    expect(editor.latest('info-draft').description, anyOf('Old', 'Two words'));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'writing selection resumes on reopen silently without content writes',
+      (tester) async {
+    final positions = NotePositionStore.memory();
+    final editor = await open(tester,
+        positions: positions,
+        note: Note(
+            id: 'resume-editor',
+            title: 'Thoughts',
+            description: 'Tea and milk'));
+    await _tap(tester, _body());
+    const selection = TextSelection(baseOffset: 4, extentOffset: 7);
+    tester.widget<TextField>(_body()).controller!.selection = selection;
+    await tester.pump(const Duration(milliseconds: 300));
+    await _tap(tester, find.text(S.current.Done));
+    expect(
+        (await positions.read('resume-editor'))
+            .writing!
+            .resolve(title: 'Thoughts', body: 'Tea and milk')
+            .selection,
+        selection);
+    final writes = editor.store.saved.length;
+    editor.router
+        .push(AddUpdateNoteRoute(note: editor.latest('resume-editor')));
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(_body());
+    expect(field.controller!.selection, selection);
+    expect(field.focusNode!.hasFocus, isFalse);
+    expect(tester.testTextInput.isVisible, isFalse);
+    expect(editor.store.saved.length, writes);
+    expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('late writing restore yields to user selection and IME',
+      (tester) async {
+    final memory = MemoryNotePositionStorage();
+    final initial = NotePositionStore(storage: memory);
+    await initial.saveWriting(
+        'late-editor',
+        NoteWritingPosition.capture(
+            field: NoteWritingField.body,
+            text: 'Tea and milk',
+            selection: const TextSelection.collapsed(offset: 8)));
+    final delayed = _DeferredPositionStorage(memory);
+    await open(tester,
+        positions: NotePositionStore(storage: delayed),
+        note: Note(id: 'late-editor', description: 'Tea and milk'));
+    await _tap(tester, _body());
+    const composing = TextEditingValue(
+        text: '茶葉',
+        selection: TextSelection.collapsed(offset: 2),
+        composing: TextRange(start: 0, end: 2));
+    tester.testTextInput.updateEditingValue(composing);
+    await tester.pump();
+    delayed.ready.complete();
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(_body());
+    expect(field.controller!.value, composing);
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'reader checklist mutation uses suspended editor and latest saved child changes',
+      (tester) async {
+    final original = Note(
+        id: 'hidden-lines',
+        title: 'Original',
+        description: 'Original body',
+        todo: [Todo(id: 'old-task', title: 'Old')],
+        linkedNoteIds: ['child']);
+    final editor = await open(tester,
+        note: original, existingNotes: [Note(id: 'child', title: 'Child')]);
+    await _tap(tester, find.byKey(const ValueKey('linked-note-child')));
+    final fresh = original.copyWith(
+        title: 'New title',
+        description: 'New prose',
+        tags: ['new'],
+        todo: [Todo(id: 'old-task', title: 'New task', completed: true)]);
+    editor.store.notes.values['hidden-lines'] = NoteDto.fromNote(fresh);
+    final transfer = NoteSelectionTransfer(
+        repository: editor.store.notes,
+        store: editor.store,
+        readDraft: (id) => editor.store.drafts[id]?.toDomain());
+    NoteSelectionChecklistResult? result;
+    transfer
+        .addToChecklist('hidden-lines', NoteTextSelection(text: 'Tea\nMilk'))
+        .then((value) => result = value);
+    for (var frame = 0; frame < 20 && result == null; frame++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(result?.status, NoteSelectionChecklistStatus.ready);
+    expect(editor.latest('hidden-lines').description, 'New prose');
+    expect(editor.latest('hidden-lines').title, 'New title');
+    expect(editor.latest('hidden-lines').tags, ['new']);
+    editor.router.maybePop();
+    await tester.pumpAndSettle();
+    await _tap(tester, _undo());
+    expect(editor.latest('hidden-lines').todo, fresh.todo);
+    expect(editor.latest('hidden-lines').description, 'New prose');
+    expect(tester.takeException(), isNull);
+  });
+  for (final dark in [false, true]) {
+    testWidgets('checklist and info phone visual preview dark=$dark',
+        (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      const body =
+          'Weekend errands\n• Coffee\n2. Fresh bread\n☐ Pick up flowers';
+      final editor = await open(tester,
+          dark: dark,
+          note: Note(
+              id: 'visual-checklist',
+              title: 'Saturday notes',
+              description: body));
+      Future<void> capture(String kind) async {
+        if (!const bool.fromEnvironment('CAPTURE_UI')) return;
+        await tester.runAsync(() async {
+          final image = await (editor.boundary.currentContext!
+                  .findRenderObject() as RenderRepaintBoundary)
+              .toImage(pixelRatio: 2);
+          try {
+            final bytes =
+                await image.toByteData(format: ui.ImageByteFormat.png);
+            await File('/tmp/onlynote-$kind-${dark ? 'dark' : 'light'}.png')
+                .writeAsBytes(bytes!.buffer.asUint8List());
+          } finally {
+            image.dispose();
+          }
+        });
+      }
+
+      await _tap(tester, _body());
+      tester.widget<TextField>(_body()).controller!.selection =
+          const TextSelection(baseOffset: 16, extentOffset: body.length);
+      await tester.pump();
+      await _showChecklistSelectionToolbar(tester, _body());
+      await capture('selection-checklist');
+      await _tap(tester, find.text(S.current.Add_Selection_To_Checklist));
+      await _save(tester);
+      expect(editor.latest('visual-checklist').todo.length, 3);
+      FocusManager.instance.primaryFocus?.unfocus();
+      final scroll = tester.state<ScrollableState>(find
+          .descendant(
+              of: find.byType(ListView).first,
+              matching: find.byType(Scrollable))
+          .first);
+      scroll.position.jumpTo(0);
+      await tester.pumpAndSettle();
+      await capture('added-checklist');
+      await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+      await _tap(tester, find.text(S.current.Note_Info));
+      expect(
+          find.byKey(const ValueKey('note-info-reading-time')), findsOneWidget);
+      await capture('note-info');
+      await tester.pump(const Duration(seconds: 5));
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets(
+      'live checklist Undo retries a failed save without losing newer prose',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'retry-lines', description: 'Tea\nMilk'));
+    final transfer = NoteSelectionTransfer(
+        repository: editor.store.notes,
+        store: editor.store,
+        readDraft: (id) => editor.store.drafts[id]?.toDomain());
+    Future<T> pumpResult<T>(Future<T> future) async {
+      var complete = false;
+      late T result;
+      future.then((value) {
+        result = value;
+        complete = true;
+      });
+      for (var frame = 0; frame < 40 && !complete; frame++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      expect(complete, isTrue);
+      return result;
+    }
+
+    final addition = await pumpResult(transfer.addToChecklist(
+        'retry-lines', NoteTextSelection(text: 'Tea\nMilk')));
+    expect(addition?.status, NoteSelectionChecklistStatus.ready);
+    editor.store.failSave = true;
+    expect(
+        await pumpResult(
+            transfer.undoChecklist('retry-lines', addition!.addedTodoIds)),
+        isFalse);
+    expect(editor.latest('retry-lines').todo.length, 2);
+    expect(editor.store.drafts['retry-lines']!.toDomain().todo, isEmpty);
+    editor.store.failSave = false;
+    expect(
+        await pumpResult(
+            transfer.undoChecklist('retry-lines', addition.addedTodoIds)),
+        isTrue);
+    expect(editor.latest('retry-lines').todo, isEmpty);
+    expect(editor.store.drafts, isEmpty);
+    expect(editor.latest('retry-lines').description, 'Tea\nMilk');
+    expect(tester.takeException(), isNull);
+  });
+  for (final field in [NoteWritingField.title, NoteWritingField.todo]) {
+    testWidgets('saved $field selection restores silently in editor',
+        (tester) async {
+      final positions = NotePositionStore.memory();
+      const selection = TextSelection(baseOffset: 2, extentOffset: 6);
+      await positions.saveWriting(
+          'resume-field',
+          NoteWritingPosition.capture(
+              field: field,
+              text: field == NoteWritingField.title
+                  ? 'Weekend title'
+                  : 'Later task',
+              selection: selection,
+              todoId: field == NoteWritingField.todo ? 'later' : null));
+      final editor = await open(tester,
+          positions: positions,
+          note: Note(
+              id: 'resume-field',
+              title: 'Weekend title',
+              description: 'Body',
+              todo: [
+                for (var row = 0; row < 15; row++)
+                  Todo(id: 'task-$row', title: 'Earlier task $row'),
+                Todo(id: 'later', title: 'Later task', completed: true),
+              ]));
+      final target = find.byKey(ValueKey(field == NoteWritingField.title
+          ? 'note-title-input'
+          : 'todo-field-later'));
+      final input = tester.widget<TextField>(target);
+      expect(input.controller!.selection, selection);
+      expect(input.focusNode!.hasFocus, isFalse);
+      expect(tester.testTextInput.isVisible, isFalse);
+      expect(editor.store.saved, isEmpty);
+      expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets(
+      'late IME during checklist lookup preserves composing value and adds no tasks',
+      (tester) async {
+    final editor =
+        await open(tester, note: Note(id: 'ime-lines', description: 'Tea'));
+    await _tap(tester, _body());
+    final body = tester.widget<NoteBodyEditor>(find.byType(NoteBodyEditor));
+    final gate = Completer<void>();
+    editor.store.notes.readGate = gate;
+    body.onAddSelectionToChecklist!(NoteTextSelection(text: 'Tea'));
+    await tester.pump();
+    const composing = TextEditingValue(
+        text: '茶葉',
+        selection: TextSelection.collapsed(offset: 2),
+        composing: TextRange(start: 0, end: 2));
+    body.controller.value = composing;
+    gate.complete();
+    editor.store.notes.readGate = null;
+    await _save(tester);
+    expect(body.controller.value, composing);
+    expect(editor.latest('ime-lines').todo, isEmpty);
+    expect(editor.latest('ime-lines').description, '茶葉');
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('late writing restore yields to mouse wheel scrolling',
+      (tester) async {
+    final text = 'A paragraph for later reading.\n' * 60;
+    final memory = MemoryNotePositionStorage();
+    await NotePositionStore(storage: memory).saveWriting(
+        'wheel-editor',
+        NoteWritingPosition.capture(
+            field: NoteWritingField.body,
+            text: text,
+            selection: TextSelection.collapsed(offset: text.length - 20)));
+    final delayed = _DeferredPositionStorage(memory);
+    await open(tester,
+        positions: NotePositionStore(storage: delayed),
+        note: Note(id: 'wheel-editor', description: text));
+    final before = tester.widget<TextField>(_body()).controller!.selection;
+    await tester.sendEventToBinding(PointerScrollEvent(
+        position: tester.getCenter(find.byType(ListView).first),
+        scrollDelta: const Offset(0, 250)));
+    await tester.pump();
+    delayed.ready.complete();
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(_body()).controller!.selection, before);
+    expect(tester.testTextInput.isVisible, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets(
+      'checklist snackbar Undo targets rows after formatting returns to original content',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'same-lines', description: 'Tea\nMilk'));
+    await addSelectedLines(
+        tester, _body(), const TextSelection(baseOffset: 0, extentOffset: 8));
+    await _tap(tester, _body());
+    tester.widget<TextField>(_body()).controller!.selection =
+        const TextSelection(baseOffset: 0, extentOffset: 3);
+    await tester.pump();
+    await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    expect(
+        tester
+            .widget<NoteBodyEditor>(find.byType(NoteBodyEditor))
+            .controller
+            .styles,
+        isEmpty);
+    await _tap(tester, find.widgetWithText(SnackBarAction, S.current.Undo));
+    expect(editor.latest('same-lines').todo, isEmpty);
+    expect(editor.latest('same-lines').textStyles, isEmpty);
+    expect(editor.latest('same-lines').description, 'Tea\nMilk');
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets(
+      'very narrow editor keeps Find Info and Done accessible through More',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(180, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final editor = await open(tester,
+        note: Note(id: 'narrow-toolbar', description: 'Tea'));
+    expect(find.byKey(const ValueKey('editor-find-note')), findsNothing);
+    expect(find.byKey(const ValueKey('editor-more-note')), findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    expect(find.text(S.current.Find_In_Note), findsOneWidget);
+    expect(find.text(S.current.Note_Info), findsOneWidget);
+    expect(find.text(S.current.Done), findsOneWidget);
+    expect(editor.store.saved, isEmpty);
+    await _tap(tester, find.text(S.current.Done));
+    expect(editor.router.current.name, HomeRoute.name);
+    expect(editor.latest('narrow-toolbar').description, 'Tea');
+    expect(editor.latest('narrow-toolbar').todo, isEmpty);
     expect(tester.takeException(), isNull);
   });
 }

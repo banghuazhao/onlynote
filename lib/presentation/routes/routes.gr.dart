@@ -27,6 +27,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     VoiceMemoDrafts? voiceMemoDrafts,
     NoteReminderScheduler? reminderScheduler,
     WidgetCommands? widgetCommands,
+    NotePositionStore? positionStore,
     NoteEditorStart start = NoteEditorStart.standard,
     List<PageRouteInfo>? children,
   }) : super(
@@ -46,6 +47,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             voiceMemoDrafts: voiceMemoDrafts,
             reminderScheduler: reminderScheduler,
             widgetCommands: widgetCommands,
+            positionStore: positionStore,
             start: start,
           ),
           initialChildren: children,
@@ -73,6 +75,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         voiceMemoDrafts: args.voiceMemoDrafts,
         reminderScheduler: args.reminderScheduler,
         widgetCommands: args.widgetCommands,
+        positionStore: args.positionStore,
         start: args.start,
       );
     },
@@ -95,6 +98,7 @@ class AddUpdateNoteRouteArgs {
     this.voiceMemoDrafts,
     this.reminderScheduler,
     this.widgetCommands,
+    this.positionStore,
     this.start = NoteEditorStart.standard,
   });
 
@@ -126,11 +130,13 @@ class AddUpdateNoteRouteArgs {
 
   final WidgetCommands? widgetCommands;
 
+  final NotePositionStore? positionStore;
+
   final NoteEditorStart start;
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, positionStore: $positionStore, start: $start}';
   }
 }
 
@@ -160,6 +166,8 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
     Key? key,
     required String noteId,
     CustomNoteTemplateStore? templateStore,
+    NotePositionStore? positionStore,
+    NoteSelectionTransfer? selectionTransfer,
     List<PageRouteInfo>? children,
   }) : super(
           NoteDetailRoute.name,
@@ -167,6 +175,8 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
             key: key,
             noteId: noteId,
             templateStore: templateStore,
+            positionStore: positionStore,
+            selectionTransfer: selectionTransfer,
           ),
           rawPathParams: {'noteId': noteId},
           initialChildren: children,
@@ -185,6 +195,8 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
         key: args.key,
         noteId: args.noteId,
         templateStore: args.templateStore,
+        positionStore: args.positionStore,
+        selectionTransfer: args.selectionTransfer,
       );
     },
   );
@@ -195,6 +207,8 @@ class NoteDetailRouteArgs {
     this.key,
     required this.noteId,
     this.templateStore,
+    this.positionStore,
+    this.selectionTransfer,
   });
 
   final Key? key;
@@ -203,9 +217,13 @@ class NoteDetailRouteArgs {
 
   final CustomNoteTemplateStore? templateStore;
 
+  final NotePositionStore? positionStore;
+
+  final NoteSelectionTransfer? selectionTransfer;
+
   @override
   String toString() {
-    return 'NoteDetailRouteArgs{key: $key, noteId: $noteId, templateStore: $templateStore}';
+    return 'NoteDetailRouteArgs{key: $key, noteId: $noteId, templateStore: $templateStore, positionStore: $positionStore, selectionTransfer: $selectionTransfer}';
   }
 }
 

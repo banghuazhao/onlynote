@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:onlynote/presentation/components/note_document_view.dart';
 import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:onlynote/presentation/components/note_find_bar.dart';
@@ -7,14 +9,20 @@ import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_outline.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_selection_transfer.dart';
+import 'package:onlynote/services/note_selection_checklist.dart';
+import 'package:onlynote/services/note_position_store.dart';
+import 'package:onlynote/services/note_statistics.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/presentation/components/note_outline_navigation_controller.dart';
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
+import 'package:onlynote/presentation/components/note_info_sheet.dart';
+import 'package:onlynote/presentation/components/note_reader_position_controller.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:onlynote/Tools/notification_service.dart';
@@ -56,15 +64,20 @@ class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen(
       {super.key,
       @PathParam('noteId') required this.noteId,
-      this.templateStore});
+      this.templateStore,
+      this.positionStore,
+      this.selectionTransfer});
   final String noteId;
   final CustomNoteTemplateStore? templateStore;
+  final NotePositionStore? positionStore;
+  final NoteSelectionTransfer? selectionTransfer;
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> {
+class _NoteDetailScreenState extends State<NoteDetailScreen>
+    with WidgetsBindingObserver {
   final ScreenshotController _screenshotController = ScreenshotController();
   final GlobalKey _shareButtonKey = GlobalKey();
   bool _savingReminder = false;
@@ -77,6 +90,210 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final NoteSearchController _findController = NoteSearchController();
   bool _findOpen = false;
   final _outlineController = NoteOutlineNavigationController();
+  final _readerPositionController = NoteReaderPositionController();
+  final _readerScrollController = ScrollController();
+  Timer? _positionSaveTimer;
+  bool _positionCaptureScheduled = false;
+  Note? _positionNote;
+  NoteReadingPosition? _normalReadingPosition;
+  bool _positionLoadStarted = false;
+  bool _restoringReadingPosition = false;
+  int _readingRestoreToken = 0;
+  int _readingGeneration = 0;
+
+  NotePositionStore get _positions =>
+      widget.positionStore ?? NotePositionStore.instance;
+
+  NoteSelectionTransfer get _selectionTransfer {
+    if (widget.selectionTransfer != null) return widget.selectionTransfer!;
+    final repository = getIt<NoteRepository>();
+    final drafts = Hive.box(draftDatabaseBox);
+    return NoteSelectionTransfer(
+        repository: repository,
+        store: HiveNoteAutosaveStore(repository, drafts),
+        readDraft: (id) => (drafts.get(id) as NoteDto?)?.toDomain());
+  }
+
+  void _cancelReadingRestore() {
+    _readingGeneration++;
+    _readerPositionController.cancelPendingRestore();
+  }
+
+  void _rememberReadingPosition() {
+    if (_findOpen ||
+        _exportingImage ||
+        _restoringReadingPosition ||
+        ModalRoute.of(context)?.isCurrent == false ||
+        _positionNote?.isDeleted == true) {
+      return;
+    }
+    final position = _readerPositionController.capture();
+    if (position != null) _normalReadingPosition = position;
+  }
+
+  Future<void> _saveReadingPosition({bool capture = true}) async {
+    _positionSaveTimer?.cancel();
+    if (capture) _rememberReadingPosition();
+    final note = _positionNote;
+    final position = _normalReadingPosition;
+    if (note?.id == null || note!.isDeleted || position == null) return;
+    await _positions.saveReading(note.id!, position);
+  }
+
+  bool _readerScrollChanged(ScrollNotification notification) {
+    if (notification.depth != 0 || _findOpen || _exportingImage) return false;
+    if ((notification is ScrollStartNotification &&
+            notification.dragDetails != null) ||
+        (notification is UserScrollNotification &&
+            notification.direction != ScrollDirection.idle)) {
+      _cancelReadingRestore();
+    }
+    if (!_restoringReadingPosition &&
+        (notification is ScrollUpdateNotification ||
+            notification is ScrollEndNotification)) {
+      _rememberReadingPosition();
+      // Sliver positions are updated after scroll notifications. Record the
+      // newly drawn glyph after layout as well, so a quick exit retains the
+      // current viewport even before the preference debounce expires.
+      if (!_positionCaptureScheduled) {
+        _positionCaptureScheduled = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _positionCaptureScheduled = false;
+          if (mounted) _rememberReadingPosition();
+        });
+      }
+      _positionSaveTimer?.cancel();
+      _positionSaveTimer = Timer(const Duration(milliseconds: 280),
+          () => unawaited(_saveReadingPosition()));
+    }
+    return false;
+  }
+
+  void _observeReadingPosition(NoteDetailState state) {
+    final note = state.whenOrNull(success: (note) => note);
+    if (note == null) return;
+    _positionNote = note;
+    if (_positionLoadStarted || note.isDeleted || note.id != widget.noteId) {
+      return;
+    }
+    _positionLoadStarted = true;
+    final generation = _readingGeneration;
+    unawaited(_loadReadingPosition(note.id!, generation));
+  }
+
+  Future<void> _loadReadingPosition(String noteId, int generation) async {
+    final saved = await _positions.read(noteId);
+    if (!mounted ||
+        generation != _readingGeneration ||
+        _findOpen ||
+        _exportingImage ||
+        _positionNote?.isDeleted == true) {
+      return;
+    }
+    _normalReadingPosition = saved.reading;
+    if (saved.reading != null) {
+      await _restoreReadingPosition(saved.reading!, generation);
+    } else {
+      await WidgetsBinding.instance.endOfFrame;
+      if (mounted && generation == _readingGeneration) {
+        _rememberReadingPosition();
+      }
+    }
+  }
+
+  Future<void> _restoreReadingPosition(
+      NoteReadingPosition position, int generation) async {
+    bool allowed() =>
+        mounted &&
+        generation == _readingGeneration &&
+        !_findOpen &&
+        !_exportingImage &&
+        ModalRoute.of(context)?.isCurrent != false &&
+        _positionNote?.isDeleted != true;
+    if (!allowed()) return;
+    final token = ++_readingRestoreToken;
+    _restoringReadingPosition = true;
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!allowed()) return;
+      await _readerPositionController.restore(position, canRestore: allowed);
+    } finally {
+      if (token == _readingRestoreToken) {
+        _restoringReadingPosition = false;
+        if (allowed()) _rememberReadingPosition();
+      }
+    }
+  }
+
+  Future<void> _addSelectionToChecklist(
+      Note source, NoteTextSelection selection) async {
+    if (_changingLibrary ||
+        _exportingImage ||
+        _savingReminder ||
+        source.isDeleted ||
+        source.id != widget.noteId) {
+      return;
+    }
+    _rememberReadingPosition();
+    _cancelReadingRestore();
+    _reviewGeneration++;
+    setState(() => _changingLibrary = true);
+    try {
+      final result =
+          await _selectionTransfer.addToChecklist(source.id!, selection);
+      if (!mounted) return;
+      if (result?.status == NoteSelectionChecklistStatus.empty) return;
+      final saved = result?.status == NoteSelectionChecklistStatus.ready;
+      if (saved) _reload();
+      showTransientSnackBar(
+          context,
+          SnackBar(
+            content: Text(saved
+                ? S
+                    .of(context)
+                    .Selection_Checklist_Added(result!.addedTodoIds.length)
+                : result?.status == NoteSelectionChecklistStatus.tooLong
+                    ? S.of(context).Selection_Checklist_Too_Long
+                    : S.of(context).Selection_Checklist_Failed),
+            action: !saved
+                ? null
+                : SnackBarAction(
+                    label: S.of(context).Undo,
+                    onPressed: () => _undoSelectionChecklist(
+                        source.id!, result!.addedTodoIds)),
+          ));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Selection_Checklist_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _changingLibrary = false);
+    }
+  }
+
+  Future<void> _undoSelectionChecklist(String noteId, List<String> ids) async {
+    if (_changingLibrary || _exportingImage || _savingReminder) return;
+    _reviewGeneration++;
+    setState(() => _changingLibrary = true);
+    try {
+      final saved = await _selectionTransfer.undoChecklist(noteId, ids);
+      if (!mounted) return;
+      if (saved) {
+        _reload();
+      } else {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Selection_Checklist_Failed)));
+      }
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Selection_Checklist_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _changingLibrary = false);
+    }
+  }
 
   Future<void> _copySelection(Note source, NoteTextSelection selection) async {
     if (_changingLibrary || _exportingImage || _savingReminder) return;
@@ -85,12 +302,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       final destination = await showNoteCopyDestinationPicker(context,
           notes: _libraryNotes, sourceNoteId: source.id);
       if (!mounted || destination == null) return;
-      final repository = getIt<NoteRepository>();
-      final drafts = Hive.box(draftDatabaseBox);
-      final transfer = NoteSelectionTransfer(
-          repository: repository,
-          store: HiveNoteAutosaveStore(repository, drafts),
-          readDraft: (id) => (drafts.get(id) as NoteDto?)?.toDomain());
+      final transfer = _selectionTransfer;
       final saved = destination.isNewNote
           ? await transfer.copyToNew(selection, color: source.color)
           : await transfer.copyToExisting(destination.noteId!, selection);
@@ -115,6 +327,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (_exportingImage || _savingReminder || _changingLibrary) return;
     final entries = buildNoteOutline(note.description ?? '', note.textStyles);
     if (entries.isEmpty) return;
+    _cancelReadingRestore();
     final entry =
         await showNoteOutlineSheet(context: context, entries: entries);
     if (!mounted || entry == null) return;
@@ -122,12 +335,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   void _openFind() {
+    if (_findOpen || _exportingImage || _positionNote?.isDeleted == true) {
+      return;
+    }
+    _rememberReadingPosition();
+    _positionSaveTimer?.cancel();
+    _cancelReadingRestore();
     if (mounted) setState(() => _findOpen = true);
   }
 
   void _closeFind() {
+    if (!_findOpen) return;
+    _cancelReadingRestore();
+    final generation = _readingGeneration;
     _findController.setQuery('');
     if (mounted) setState(() => _findOpen = false);
+    final position = _normalReadingPosition;
+    if (position != null) {
+      unawaited(_restoreReadingPosition(position, generation));
+    }
   }
 
   void _findChanged() {
@@ -235,6 +461,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
             _openFind();
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.info_outline_rounded),
+          title: Text(S.of(context).Note_Info),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            showNoteInfoSheet(
+                context: context, statistics: NoteStatistics.fromNote(note));
           },
         ),
         AppSheetAction(
@@ -388,6 +623,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           context, SnackBar(content: Text(S.of(context).Link_Unavailable)));
       return;
     }
+    await _saveReadingPosition();
+    if (!mounted) return;
     await context.router.push(NoteDetailRoute(noteId: current.id!));
     _reload();
   }
@@ -409,6 +646,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _widgetCommands = WidgetCommands.initializedInstance;
     _widgetCommands?.updates.addListener(_refreshWidgetCompletion);
     _findController.addListener(_findChanged);
@@ -421,16 +659,41 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   void dispose() {
+    _positionSaveTimer?.cancel();
+    unawaited(_saveReadingPosition(capture: false));
+    _cancelReadingRestore();
+    WidgetsBinding.instance.removeObserver(this);
     _widgetCommands?.updates.removeListener(_refreshWidgetCompletion);
     _findController.removeListener(_findChanged);
     _findController.dispose();
     _outlineController.dispose();
+    _readerPositionController.dispose();
+    _readerScrollController.dispose();
     super.dispose();
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      unawaited(_saveReadingPosition());
+    }
+  }
+
+  @override
+  void didUpdateWidget(NoteDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.noteId != widget.noteId) {
+      unawaited(_saveReadingPosition());
+      _cancelReadingRestore();
+      _positionLoadStarted = false;
+      _normalReadingPosition = null;
+      _positionNote = null;
+      _findOpen = false;
+      _findController.setQuery('');
+      context
+          .read<NoteDetailBloc>()
+          .add(NoteDetailEvent.showNote(widget.noteId));
+    }
   }
 
   Future<void> _shareNoteAsImage(Note note) => ShareHelper.shareNote(
@@ -443,12 +706,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   Future<Uint8List?> _captureNoteImage() async {
     if (!mounted) return null;
+    _rememberReadingPosition();
+    _positionSaveTimer?.cancel();
+    _cancelReadingRestore();
+    final generation = _readingGeneration;
     setState(() => _exportingImage = true);
     try {
       await WidgetsBinding.instance.endOfFrame;
       return await _screenshotController.capture(pixelRatio: 3);
     } finally {
-      if (mounted) setState(() => _exportingImage = false);
+      if (mounted) {
+        setState(() => _exportingImage = false);
+        final position = _normalReadingPosition;
+        if (position != null) {
+          await _restoreReadingPosition(position, generation);
+        }
+      }
     }
   }
 
@@ -611,117 +884,153 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NoteDetailBloc, NoteDetailState>(
-      listener: (_, state) => _observeSavedChecklist(state),
+      listener: (_, state) {
+        _observeSavedChecklist(state);
+        _observeReadingPosition(state);
+      },
       builder: (context, state) {
         final note = state.whenOrNull(success: (note) => note);
         if (note != null) {
+          _observeReadingPosition(state);
           _findController.setFields(noteSearchFields(note), notify: false);
         }
-        return CallbackShortcuts(
-          bindings: {
-            if (_findOpen)
-              const SingleActivator(LogicalKeyboardKey.escape): _closeFind,
-            const SingleActivator(LogicalKeyboardKey.keyF, control: true):
-                _openFind,
-            const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
-                _openFind,
+        return PopScope(
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) unawaited(_saveReadingPosition());
           },
-          child: Focus(
-            autofocus: true,
-            child: Scaffold(
-              backgroundColor: DeskSurface.colorOf(context),
-              appBar: NoteAppBar(
-                actions: state.whenOrNull(
-                  success: (note) {
-                    if (note.isDeleted) return _trashActions(note);
-                    final hasReminder =
-                        ReminderData.shared.getCurrentReminder(note) != null;
-                    return [
-                      AppButton(
-                        tooltip: S.of(context).Reminder,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          transitionBuilder: (child, animation) =>
-                              ScaleTransition(scale: animation, child: child),
-                          child: Icon(
-                            hasReminder
-                                ? Icons.alarm_on_outlined
-                                : Icons.alarm_add_outlined,
-                            key: ValueKey(hasReminder),
+          child: Listener(
+            onPointerDown: (_) => _cancelReadingRestore(),
+            onPointerSignal: (_) => _cancelReadingRestore(),
+            child: CallbackShortcuts(
+              bindings: {
+                if (_findOpen)
+                  const SingleActivator(LogicalKeyboardKey.escape): _closeFind,
+                const SingleActivator(LogicalKeyboardKey.keyF, control: true):
+                    _openFind,
+                const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
+                    _openFind,
+              },
+              child: Focus(
+                autofocus: true,
+                child: Scaffold(
+                  backgroundColor: DeskSurface.colorOf(context),
+                  appBar: NoteAppBar(
+                    actions: state.whenOrNull(
+                      success: (note) {
+                        if (note.isDeleted) return _trashActions(note);
+                        final hasReminder =
+                            ReminderData.shared.getCurrentReminder(note) !=
+                                null;
+                        return [
+                          AppButton(
+                            tooltip: S.of(context).Reminder,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, animation) =>
+                                  ScaleTransition(
+                                      scale: animation, child: child),
+                              child: Icon(
+                                hasReminder
+                                    ? Icons.alarm_on_outlined
+                                    : Icons.alarm_add_outlined,
+                                key: ValueKey(hasReminder),
+                              ),
+                            ),
+                            onPressed: () => _showReminderPicker(note),
+                          ),
+                          AppButton(
+                            key: _shareButtonKey,
+                            tooltip: S.of(context).Share,
+                            child: const Icon(Icons.share_outlined),
+                            onPressed: () => _shareNoteAsImage(note),
+                          ),
+                          AppButton(
+                            tooltip: S.of(context).Edit,
+                            child: const Icon(Icons.edit_outlined),
+                            onPressed: () async {
+                              if (_changingLibrary || _exportingImage) return;
+                              await _saveReadingPosition();
+                              if (!context.mounted) return;
+                              await context.router
+                                  .push(AddUpdateNoteRoute(note: note));
+                              if (!context.mounted) return;
+                              //* Reload the note so edits made on the form screen show up.
+                              context
+                                  .read<NoteDetailBloc>()
+                                  .add(NoteDetailEvent.showNote(widget.noteId));
+                            },
+                          ),
+                          AppButton(
+                            tooltip: S.of(context).More_Options,
+                            isLoading: _savingTemplate || _changingLibrary,
+                            child: const Icon(Icons.more_horiz_rounded),
+                            onPressed: () => _showMoreOptions(note),
+                          ),
+                        ];
+                      },
+                    ),
+                  ),
+                  body: Column(children: [
+                    if (_findOpen && note != null)
+                      NoteFindBar(
+                        controller: _findController,
+                        hintText: S.of(context).Find_In_Note,
+                        noMatchesText: S.of(context).Find_No_Matches,
+                        previousTooltip: S.of(context).Find_Previous,
+                        nextTooltip: S.of(context).Find_Next,
+                        closeTooltip: S.of(context).Find_Close,
+                        onClose: _closeFind,
+                      ),
+                    Expanded(
+                        child: DeskSurface(
+                      child: state.maybeMap(
+                        error: (error) => ErrorText(error.message ?? ''),
+                        success: (data) =>
+                            NotificationListener<ScrollNotification>(
+                          onNotification: _readerScrollChanged,
+                          child: LoadedView(
+                            note: data.note,
+                            screenshotController: _screenshotController,
+                            exportMode: _exportingImage,
+                            searchController: _findOpen && !_exportingImage
+                                ? _findController
+                                : null,
+                            outlineController:
+                                _exportingImage ? null : _outlineController,
+                            scrollController: _readerScrollController,
+                            readerPositionController: data.note.isDeleted ||
+                                    _exportingImage ||
+                                    _findOpen
+                                ? null
+                                : _readerPositionController,
+                            onCopySelection:
+                                data.note.isDeleted || _exportingImage
+                                    ? null
+                                    : (selection) =>
+                                        _copySelection(data.note, selection),
+                            onAddSelectionToChecklist:
+                                data.note.isDeleted || _exportingImage
+                                    ? null
+                                    : (selection) => _addSelectionToChecklist(
+                                        data.note, selection),
+                            libraryNotes: _libraryNotes,
+                            onOpenLinkedNote: _openLinkedNote,
+                            onEditLinks: data.note.isDeleted
+                                ? null
+                                : () => _editLinks(data.note),
+                            onChecklistActionStart: () => _reviewGeneration++,
+                            checklistReadOnly: _changingLibrary,
+                            onReminderTap: data.note.isDeleted
+                                ? null
+                                : () => _showReminderPicker(data.note),
                           ),
                         ),
-                        onPressed: () => _showReminderPicker(note),
+                        orElse: () => const _DetailSkeleton(),
                       ),
-                      AppButton(
-                        key: _shareButtonKey,
-                        tooltip: S.of(context).Share,
-                        child: const Icon(Icons.share_outlined),
-                        onPressed: () => _shareNoteAsImage(note),
-                      ),
-                      AppButton(
-                        tooltip: S.of(context).Edit,
-                        child: const Icon(Icons.edit_outlined),
-                        onPressed: () async {
-                          await context.router
-                              .push(AddUpdateNoteRoute(note: note));
-                          if (!context.mounted) return;
-                          //* Reload the note so edits made on the form screen show up.
-                          context
-                              .read<NoteDetailBloc>()
-                              .add(NoteDetailEvent.showNote(widget.noteId));
-                        },
-                      ),
-                      AppButton(
-                        tooltip: S.of(context).More_Options,
-                        isLoading: _savingTemplate || _changingLibrary,
-                        child: const Icon(Icons.more_horiz_rounded),
-                        onPressed: () => _showMoreOptions(note),
-                      ),
-                    ];
-                  },
+                    )),
+                  ]),
                 ),
               ),
-              body: Column(children: [
-                if (_findOpen && note != null)
-                  NoteFindBar(
-                    controller: _findController,
-                    hintText: S.of(context).Find_In_Note,
-                    noMatchesText: S.of(context).Find_No_Matches,
-                    previousTooltip: S.of(context).Find_Previous,
-                    nextTooltip: S.of(context).Find_Next,
-                    closeTooltip: S.of(context).Find_Close,
-                    onClose: _closeFind,
-                  ),
-                Expanded(
-                    child: DeskSurface(
-                  child: state.maybeMap(
-                    error: (error) => ErrorText(error.message ?? ''),
-                    success: (data) => LoadedView(
-                      note: data.note,
-                      screenshotController: _screenshotController,
-                      exportMode: _exportingImage,
-                      searchController: _findOpen && !_exportingImage
-                          ? _findController
-                          : null,
-                      outlineController:
-                          _exportingImage ? null : _outlineController,
-                      onCopySelection: data.note.isDeleted || _exportingImage
-                          ? null
-                          : (selection) => _copySelection(data.note, selection),
-                      libraryNotes: _libraryNotes,
-                      onOpenLinkedNote: _openLinkedNote,
-                      onEditLinks: data.note.isDeleted
-                          ? null
-                          : () => _editLinks(data.note),
-                      onChecklistActionStart: () => _reviewGeneration++,
-                      onReminderTap: data.note.isDeleted
-                          ? null
-                          : () => _showReminderPicker(data.note),
-                    ),
-                    orElse: () => const _DetailSkeleton(),
-                  ),
-                )),
-              ]),
             ),
           ),
         );
@@ -744,6 +1053,10 @@ class LoadedView extends StatelessWidget {
     this.searchController,
     this.outlineController,
     this.onCopySelection,
+    this.onAddSelectionToChecklist,
+    this.readerPositionController,
+    this.scrollController,
+    this.checklistReadOnly = false,
   });
 
   final Note note;
@@ -757,6 +1070,10 @@ class LoadedView extends StatelessWidget {
   final NoteSearchController? searchController;
   final NoteOutlineNavigationController? outlineController;
   final ValueChanged<NoteTextSelection>? onCopySelection;
+  final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
+  final NoteReaderPositionController? readerPositionController;
+  final ScrollController? scrollController;
+  final bool checklistReadOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -766,6 +1083,7 @@ class LoadedView extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
         child: ListView(
+          controller: scrollController,
           padding: EdgeInsets.fromLTRB(
             context.tokens.space4,
             context.tokens.space3,
@@ -794,6 +1112,8 @@ class LoadedView extends StatelessWidget {
                           text: note.title!,
                           selectable: !exportMode,
                           onCopySelection: exportMode ? null : onCopySelection,
+                          onAddSelectionToChecklist:
+                              exportMode ? null : onAddSelectionToChecklist,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         )
                       else
@@ -801,6 +1121,8 @@ class LoadedView extends StatelessWidget {
                           text: note.title!,
                           selectable: !exportMode,
                           onCopySelection: exportMode ? null : onCopySelection,
+                          onAddSelectionToChecklist:
+                              exportMode ? null : onAddSelectionToChecklist,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         ),
                       const SizedBox(height: AppSpacings.l),
@@ -862,7 +1184,7 @@ class LoadedView extends StatelessWidget {
                       NoteChecklist(
                         key: ValueKey(note.id),
                         todos: note.todo,
-                        readOnly: note.isDeleted,
+                        readOnly: note.isDeleted || checklistReadOnly,
                         exportMode: exportMode,
                         expandCompleted:
                             searchController?.query.trim().isNotEmpty == true,
@@ -908,12 +1230,18 @@ class LoadedView extends StatelessWidget {
                     },
                     NoteDocumentView(
                       outlineController: outlineController,
+                      readerPositionController:
+                          exportMode || searchController != null
+                              ? null
+                              : readerPositionController,
                       collapsibleSections:
                           !exportMode && searchController == null,
                       sectionToggleLabel: (heading, expanded) => expanded
                           ? S.of(context).Collapse_Section(heading)
                           : S.of(context).Expand_Section(heading),
                       onCopySelection: exportMode ? null : onCopySelection,
+                      onAddSelectionToChecklist:
+                          exportMode ? null : onAddSelectionToChecklist,
                       text: note.description ?? '',
                       styles: note.textStyles,
                       imagePaths: note.imagePaths,
@@ -930,6 +1258,9 @@ class LoadedView extends StatelessWidget {
                                 selectable: !exportMode,
                                 onCopySelection:
                                     exportMode ? null : onCopySelection,
+                                onAddSelectionToChecklist: exportMode
+                                    ? null
+                                    : onAddSelectionToChecklist,
                                 style: AppTypography.headline6.copyWith(
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.ink.withValues(alpha: 0.88),
@@ -997,6 +1328,9 @@ class LoadedView extends StatelessWidget {
                                         selectable: !exportMode,
                                         onCopySelection:
                                             exportMode ? null : onCopySelection,
+                                        onAddSelectionToChecklist: exportMode
+                                            ? null
+                                            : onAddSelectionToChecklist,
                                       )
                                   : (text) => NoteSearchText(
                                         controller: searchController!,
@@ -1006,6 +1340,9 @@ class LoadedView extends StatelessWidget {
                                         selectable: !exportMode,
                                         onCopySelection:
                                             exportMode ? null : onCopySelection,
+                                        onAddSelectionToChecklist: exportMode
+                                            ? null
+                                            : onAddSelectionToChecklist,
                                       ),
                               resolvePath: AudioStorage.instance.resolvePath),
                     ],

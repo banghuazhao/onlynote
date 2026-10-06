@@ -23,6 +23,10 @@ import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_replace.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_selection_transfer.dart';
+import 'package:onlynote/services/note_selection_checklist.dart';
+import 'package:onlynote/services/note_position_store.dart';
+import 'package:onlynote/services/note_statistics.dart';
+import 'package:onlynote/presentation/components/note_info_sheet.dart';
 import 'package:onlynote/presentation/components/note_selection_menu.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
@@ -99,6 +103,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.voiceMemoDrafts,
       this.reminderScheduler,
       this.widgetCommands,
+      this.positionStore,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
@@ -115,6 +120,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final VoiceMemoDrafts? voiceMemoDrafts;
   final NoteReminderScheduler? reminderScheduler;
   final WidgetCommands? widgetCommands;
+  final NotePositionStore? positionStore;
   final NoteEditorStart start;
 
   @override
@@ -145,6 +151,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final NoteReminderScheduler _reminderScheduler;
   VoidCallback? _unregisterWidgetEditor;
   VoidCallback? _unregisterSelectionEditor;
+  VoidCallback? _unregisterChecklistEditor;
   WidgetCommands? _editorWidgetCommands;
   bool _suspendedForLinkedNote = false;
   Timer? _suggestionDebounce;
@@ -172,6 +179,16 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   bool _findInputComposing = false;
   final _titleNavigationKey = GlobalKey();
   final _todoNavigationKey = GlobalKey<_BuildTodoListFieldState>();
+  Timer? _writingPositionTimer;
+  int _writingInteraction = 0;
+  bool _restoringWritingPosition = false;
+  NoteWritingField? _lastWritingField;
+  String? _lastWritingTodo;
+  NoteEditSnapshot? _lastChecklistAddition;
+  int? _lastChecklistUndoCount;
+  List<String> _lastChecklistIds = const [];
+  NotePositionStore get _positions =>
+      widget.positionStore ?? NotePositionStore.instance;
 
   @override
   void initState() {
@@ -259,11 +276,16 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _descriptionController.addListener(_bodyChanged);
     _titleController.addListener(_selectionChanged);
     FocusManager.instance.addListener(_syncPlatformUndo);
+    FocusManager.instance.addListener(_writingFocusChanged);
     _editorWidgetCommands =
         widget.widgetCommands ?? WidgetCommands.initializedInstance;
     _registerWidgetEditor();
     _unregisterSelectionEditor = NoteSelectionTransfer.registerEditor(
         _autosave.note.id!, _appendCopiedSelection);
+    _unregisterChecklistEditor = NoteSelectionTransfer.registerChecklistEditor(
+        _autosave.note.id!,
+        add: _appendChecklistSelection,
+        undo: _undoAddedChecklist);
     ReminderData.shared.addListener(_reminderChanged);
     _queueReminderSuggestion();
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
@@ -271,6 +293,153 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         (widget.template != null || widget.customTemplateNote != null)) {
       _autosave.saveInitial();
     }
+    if (widget.note != null) unawaited(_restoreWritingPosition());
+  }
+
+  void _writingGesture(PointerDownEvent _) => _writingInteraction++;
+
+  void _writingFocusChanged() {
+    if (!mounted ||
+        _restoringWritingPosition ||
+        !_editorFocusScope.hasFocus ||
+        _replayingHistory ||
+        _refreshingFromLibrary ||
+        _suspendedForLinkedNote) {
+      return;
+    }
+    final label = FocusManager.instance.primaryFocus?.debugLabel;
+    if (_titleFocus.hasFocus) {
+      _lastWritingField = NoteWritingField.title;
+    } else if (_bodyFocus.hasFocus || label == 'note-body') {
+      _lastWritingField = NoteWritingField.body;
+    } else if (label?.startsWith('note-todo:') == true) {
+      _lastWritingField = NoteWritingField.todo;
+      _lastWritingTodo = label!.substring(10);
+    } else {
+      return;
+    }
+    _writingInteraction++;
+    _writingPositionTimer?.cancel();
+    _writingPositionTimer = Timer(const Duration(milliseconds: 250),
+        () => unawaited(_rememberWritingPosition()));
+  }
+
+  Future<void> _rememberWritingPosition() async {
+    _writingPositionTimer?.cancel();
+    final field = _lastWritingField;
+    if (field == null ||
+        _restoringWritingPosition ||
+        _suspendedForLinkedNote ||
+        !NoteAutosave.hasContent(_currentDraft(_form.state))) {
+      return;
+    }
+    String text;
+    TextSelection selection;
+    if (field == NoteWritingField.title) {
+      text = _titleController.text;
+      selection = _titleController.selection;
+    } else if (field == NoteWritingField.todo) {
+      final todo = _form.state.todos
+          .where((item) => item.id == _lastWritingTodo)
+          .firstOrNull;
+      if (todo == null) return;
+      text = todo.title ?? '';
+      selection = _todoSelections[_lastWritingTodo] ??
+          const TextSelection.collapsed(offset: 0);
+    } else {
+      text = _descriptionController.text;
+      selection = _descriptionController.selection;
+    }
+    if (!selection.isValid) return;
+    await _positions.saveWriting(
+        _autosave.note.id!,
+        NoteWritingPosition.capture(
+            field: field,
+            text: text,
+            selection: selection,
+            todoId: _lastWritingTodo,
+            bodyText: _descriptionController.text,
+            bodySelection: _descriptionController.selection));
+  }
+
+  Future<void> _restoreWritingPosition() async {
+    final generation = _writingInteraction;
+    bool allowed() =>
+        mounted &&
+        generation == _writingInteraction &&
+        !_editorFocusScope.hasFocus &&
+        !_editBlocked &&
+        _findController == null;
+    final saved = (await _positions.read(_autosave.note.id!)).writing;
+    if (saved == null || !allowed()) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!allowed()) return;
+    final resolved = saved.resolve(
+        title: _titleController.text,
+        body: _descriptionController.text,
+        todos: {
+          for (final item in _form.state.todos)
+            if (item.id != null) item.id!: item.title ?? ''
+        });
+    _restoringWritingPosition = true;
+    try {
+      _lastWritingField = resolved.field;
+      _lastWritingTodo = resolved.todoId;
+      switch (resolved.field) {
+        case NoteWritingField.title:
+          _titleController.selection = resolved.selection;
+          final target = _titleNavigationKey.currentContext;
+          if (target != null && target.mounted && allowed()) {
+            revealNoteTextOffset(target, resolved.selection.extentOffset,
+                animate: false);
+          }
+        case NoteWritingField.body:
+          await _outlineController.restoreTo(resolved.selection.extentOffset,
+              canRestore: allowed);
+          if (allowed()) _descriptionController.selection = resolved.selection;
+        case NoteWritingField.todo:
+          _todoSelections[resolved.todoId!] = resolved.selection;
+          await _todoNavigationKey.currentState?.selectMatch(
+              resolved.todoId!, resolved.selection,
+              requestFocus: false, canRestore: allowed);
+      }
+    } finally {
+      _restoringWritingPosition = false;
+    }
+  }
+
+  void _showEditorMore() {
+    showAppActionSheet(
+        context: context,
+        title: S.of(context).More_Options,
+        actions: [
+          if (MediaQuery.sizeOf(context).width < 260)
+            AppSheetAction(
+                leading: const Icon(Icons.search_rounded),
+                title: Text(S.of(context).Find_In_Note),
+                onPressed: (sheetContext) {
+                  Navigator.pop(sheetContext);
+                  _openFind();
+                }),
+          AppSheetAction(
+              leading: const Icon(Icons.info_outline_rounded),
+              title: Text(S.of(context).Note_Info),
+              onPressed: (sheetContext) {
+                Navigator.pop(sheetContext);
+                showNoteInfoSheet(
+                    context: context,
+                    statistics:
+                        NoteStatistics.fromNote(_currentDraft(_form.state)));
+              }),
+          if (MediaQuery.sizeOf(context).width < 260)
+            AppSheetAction(
+                leading: const Icon(Icons.check_rounded),
+                title: Text(S.of(context).Done),
+                onPressed: (sheetContext) {
+                  Navigator.pop(sheetContext);
+                  _finish();
+                }),
+        ]);
   }
 
   @override
@@ -472,6 +641,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         _form.isClosed) {
       return;
     }
+    _writingFocusChanged();
     final text = _descriptionController.text;
     final styles = _descriptionController.styles;
     if ((_form.state.description ?? '') == text &&
@@ -676,6 +846,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _composingTodoIds.remove(id);
     }
     if (_replayingHistory || _refreshingFromLibrary || !mounted) return;
+    _writingFocusChanged();
     if (_form.state.todos
         .any((todo) => todo.id == id && (todo.title ?? '') == value.text)) {
       _selectionChanged();
@@ -686,6 +857,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   void _selectionChanged() {
     if (!mounted || _replayingHistory || _refreshingFromLibrary) return;
+    _writingFocusChanged();
     // Cursor movement updates the live snapshot without adding a content step.
     // A pending text event still needs its preceding snapshot for undo.
     if ((_editHistory.current.note.title ?? '') == _titleController.text &&
@@ -1420,74 +1592,196 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
-  Future<bool> _appendCopiedSelection(NoteTextSelection selection) async {
-    if (!mounted ||
-        _leaving ||
-        _replayingHistory ||
-        _refreshingFromLibrary ||
-        (_mediaBlocked && !_suspendedForLinkedNote) ||
-        _composingTodoIds.isNotEmpty ||
-        (!_titleController.value.composing.isCollapsed &&
-            _titleController.value.composing.isValid) ||
-        (!_descriptionController.value.composing.isCollapsed &&
-            _descriptionController.value.composing.isValid)) {
-      return false;
-    }
+  bool get _selectionComposing =>
+      _composingTodoIds.isNotEmpty ||
+      (_titleController.value.composing.isValid &&
+          !_titleController.value.composing.isCollapsed) ||
+      (_descriptionController.value.composing.isValid &&
+          !_descriptionController.value.composing.isCollapsed);
+
+  void _beginSelectionMutation() {
+    // Close this editor's input connection before awaiting repository or media
+    // work; a hidden editor must leave its child reader's focus alone.
+    if (_editorFocusScope.hasFocus) _editorFocusScope.unfocus();
     setState(() => _replayingHistory = true);
+  }
+
+  bool get _selectionMutationBusy =>
+      !mounted ||
+      _leaving ||
+      _replayingHistory ||
+      _refreshingFromLibrary ||
+      (_mediaBlocked && !_suspendedForLinkedNote) ||
+      _selectionComposing;
+
+  Future<Note?> _selectionDestination({bool allowNew = false}) async {
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return null;
+    _captureTimer?.cancel();
+    _replayingHistory = false;
+    _capture(_form.state);
+    _replayingHistory = true;
+    Note latest;
     try {
-      await Future<void>.delayed(Duration.zero);
-      if (!mounted) return false;
-      _captureTimer?.cancel();
-      _replayingHistory = false;
-      _capture(_form.state);
-      _replayingHistory = true;
-      final latest = (await getIt<NoteRepository>().getNote(_autosave.note.id!))
+      latest = (await getIt<NoteRepository>().getNote(_autosave.note.id!))
           .toDomain();
-      if (!mounted || latest.isDeleted || latest.isArchived) return false;
-      // A child route may have edited this note through a backlink. The editor
-      // was flushed before navigation, so its hidden fields can be stale.
-      final current = (_suspendedForLinkedNote
-              ? latest.copyWith(
-                  title: latest.title ?? '',
-                  description: latest.description ?? '')
-              : _currentDraft(_form.state))
-          .copyWith(
-              isPinned: latest.isPinned,
-              isArchived: latest.isArchived,
-              folderId: latest.folderId,
-              dailyNoteDateKey: latest.dailyNoteDateKey,
-              sortOrder: latest.sortOrder,
-              deletedAt: latest.deletedAt);
-      if (_suspendedForLinkedNote) {
-        await _documentScanCapture.reconcilePages(current.imagePaths);
-        if (!mounted) return false;
-        final baseline = _editSnapshot(current);
-        if (!_editHistory.current.sameContent(baseline)) {
-          _editHistory.reset(baseline);
-        } else {
-          _editHistory.record(baseline);
-        }
+    } catch (_) {
+      if (!allowNew || widget.note != null || _suspendedForLinkedNote) rethrow;
+      latest = _currentDraft(_form.state);
+    }
+    if (!mounted || latest.isDeleted) return null;
+    // A linked reader can edit this note while these fields are hidden.
+    final current = (_suspendedForLinkedNote
+            ? latest.copyWith(
+                title: latest.title ?? '',
+                description: latest.description ?? '')
+            : _currentDraft(_form.state))
+        .copyWith(
+            isPinned: latest.isPinned,
+            isArchived: latest.isArchived,
+            folderId: latest.folderId,
+            dailyNoteDateKey: latest.dailyNoteDateKey,
+            sortOrder: latest.sortOrder,
+            deletedAt: latest.deletedAt);
+    if (_suspendedForLinkedNote) {
+      await _documentScanCapture.reconcilePages(current.imagePaths);
+      if (!mounted) return null;
+      final baseline = _editSnapshot(current);
+      if (!_editHistory.current.sameContent(baseline)) {
+        _editHistory.reset(baseline);
+      } else {
+        _editHistory.record(baseline);
+      }
+    }
+    return current;
+  }
+
+  void _finishSelectionMutation() {
+    _replayingHistory = false;
+    if (mounted) {
+      if (!_suspendedForLinkedNote) {
+        _bodyChanged();
+        _capture(_form.state);
+      }
+      _refreshStatus();
+      _syncPlatformUndo();
+    }
+  }
+
+  Future<bool> _appendCopiedSelection(NoteTextSelection selection) async {
+    if (_selectionMutationBusy) return false;
+    _beginSelectionMutation();
+    try {
+      final current = await _selectionDestination();
+      if (current == null || current.isArchived || _selectionComposing) {
+        return false;
       }
       final next = appendSelectionToNote(current, selection);
       final snapshot = _editSnapshot(next);
       _editHistory.record(snapshot);
       await _applyEditSnapshot(snapshot, next,
           restoreFocus: false, reconcilePages: false);
-      if (!mounted) return false;
-      return await _autosave.flush();
+      return mounted && await _autosave.flush();
     } catch (_) {
       return false;
     } finally {
-      _replayingHistory = false;
-      if (mounted) {
-        _refreshStatus();
-        _syncPlatformUndo();
-      }
+      _finishSelectionMutation();
     }
+  }
+
+  Future<NoteSelectionChecklistResult?> _appendChecklistSelection(
+      NoteTextSelection selection) async {
+    if (_selectionMutationBusy) return null;
+    // Reject oversized rows before touching the current draft or history.
+    final parsed = appendSelectionToChecklist(_autosave.note, selection);
+    if (parsed.status != NoteSelectionChecklistStatus.ready) return parsed;
+    _beginSelectionMutation();
+    try {
+      final current = await _selectionDestination(allowNew: true);
+      if (current == null || _selectionComposing) return null;
+      final result = appendSelectionToChecklist(current, selection);
+      final next = result.note!;
+      final snapshot = _editSnapshot(next);
+      _editHistory.record(snapshot);
+      await _applyEditSnapshot(snapshot, next,
+          restoreFocus: false, reconcilePages: false);
+      if (!mounted || !await _autosave.flush()) return null;
+      _lastChecklistAddition = snapshot;
+      _lastChecklistUndoCount = _editHistory.undoCount;
+      _lastChecklistIds = result.addedTodoIds;
+      return result;
+    } catch (_) {
+      return null;
+    } finally {
+      _finishSelectionMutation();
+    }
+  }
+
+  Future<bool> _undoAddedChecklist(List<String> ids) async {
+    if (_selectionMutationBusy) return false;
+    _beginSelectionMutation();
+    try {
+      final current = await _selectionDestination(allowNew: true);
+      if (current == null || _selectionComposing) return false;
+      final next = undoSelectionChecklist(current, ids);
+      if (identical(next, current)) return await _autosave.flush();
+      NoteEditSnapshot? restored;
+      if (listEquals(ids, _lastChecklistIds) &&
+          _lastChecklistUndoCount == _editHistory.undoCount &&
+          _lastChecklistAddition != null &&
+          _lastChecklistAddition!.sameContent(_editSnapshot(current))) {
+        restored = _editHistory.undo();
+      }
+      final snapshot = restored ?? _editSnapshot(next);
+      if (restored == null) _editHistory.record(snapshot);
+      await _applyEditSnapshot(snapshot, snapshot.applyTo(current),
+          restoreFocus: false, reconcilePages: false);
+      return mounted && await _autosave.flush();
+    } catch (_) {
+      return false;
+    } finally {
+      _finishSelectionMutation();
+    }
+  }
+
+  Future<void> _addSelectionToChecklist(NoteTextSelection selection) async {
+    final result = await _appendChecklistSelection(selection);
+    if (!mounted) return;
+    final strings = S.of(context);
+    if (result?.status == NoteSelectionChecklistStatus.empty) return;
+    if (result?.status != NoteSelectionChecklistStatus.ready) {
+      showTransientSnackBar(
+          context,
+          SnackBar(
+              content: Text(
+                  result?.status == NoteSelectionChecklistStatus.tooLong
+                      ? strings.Selection_Checklist_Too_Long
+                      : strings.Selection_Checklist_Failed)));
+      return;
+    }
+    showTransientSnackBar(
+        context,
+        SnackBar(
+            content: Text(
+                strings.Selection_Checklist_Added(result!.addedTodoIds.length)),
+            action: SnackBarAction(
+                label: strings.Undo,
+                onPressed: () async {
+                  final saved = await _undoAddedChecklist(result.addedTodoIds);
+                  if (!saved && mounted) {
+                    showTransientSnackBar(
+                        context,
+                        SnackBar(
+                            content: Text(
+                                S.of(context).Selection_Checklist_Failed)));
+                  }
+                })));
   }
 
   Future<void> _openLinkedNote(Note note) async {
     if (_mediaBlocked || note.id == null) return;
+    await _rememberWritingPosition();
+    if (!mounted) return;
     _suspendedForLinkedNote = true;
     setState(() => _presentingMedia = true);
     try {
@@ -1707,6 +2001,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           .onBackground());
     }
     if (state != AppLifecycleState.resumed) {
+      unawaited(_rememberWritingPosition());
       _capture(_form.state);
       unawaited(_autosave.flush());
     }
@@ -1735,6 +2030,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     await Future<void>.delayed(Duration.zero);
     if (!mounted) return;
     _capture(_form.state);
+    await _rememberWritingPosition();
     final saved = await _autosave.flush();
     if (!mounted) return;
     _leaving = false;
@@ -1764,17 +2060,21 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   @override
   void dispose() {
+    unawaited(_rememberWritingPosition());
+    _writingPositionTimer?.cancel();
     final pendingInput = _captureTimer?.isActive == true ||
         _titleController.text != (_autosave.note.title ?? '') ||
         _descriptionController.text != (_autosave.note.description ?? '') ||
         !listEquals(_descriptionController.styles, _autosave.note.textStyles);
     _captureTimer?.cancel();
     FocusManager.instance.removeListener(_syncPlatformUndo);
+    FocusManager.instance.removeListener(_writingFocusChanged);
     if (identical(UndoManager.client, this)) UndoManager.client = null;
     _suggestionDebounce?.cancel();
     ReminderData.shared.removeListener(_reminderChanged);
     _unregisterWidgetEditor?.call();
     _unregisterSelectionEditor?.call();
+    _unregisterChecklistEditor?.call();
     _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _autosave.removeListener(_refreshStatus);
@@ -1804,95 +2104,107 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   @override
-  Widget build(BuildContext context) => FocusScope(
-        node: _editorFocusScope,
-        child: BlocProvider.value(
-          value: _form,
-          child: PopScope(
-            canPop: _allowPop ||
-                (!_autosave.dirty &&
-                    _captureTimer?.isActive != true &&
-                    !_replayingHistory &&
-                    !_photoCapture.canRetry &&
-                    !_documentScanCapture.canRetry &&
-                    !_addingPhoto &&
-                    !_presentingMedia &&
-                    _voiceMutations == 0 &&
-                    !_savingReminder &&
-                    !_presentingReminder),
-            onPopInvokedWithResult: (didPop, _) {
-              if (!didPop) {
-                _finish();
-              } else {
-                unawaited(_recordReviewOnExit());
-              }
-            },
-            child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
-              builder: (context, state) => AbsorbPointer(
-                absorbing: _replayingHistory,
-                child: _BuildForm(
-                  widget: widget,
-                  state: state,
-                  titleController: _titleController,
-                  descriptionController: _descriptionController,
-                  bodyFocus: _bodyFocus,
-                  titleFocus: _titleFocus,
-                  outlineController: _outlineController,
-                  titleNavigationKey: _titleNavigationKey,
-                  todoNavigationKey: _todoNavigationKey,
-                  writingFocused: _writingFocused,
-                  onToggleFocus: _mediaBlocked ? null : _toggleWritingFocus,
-                  onEditFindMatch: _editFindMatch,
-                  onReplaceFind: (match, replacement) =>
-                      _replaceFind(replacement, match: match),
-                  onReplaceAllFind: _replaceFind,
-                  findActionsEnabled: !_editBlocked && !_findInputComposing,
-                  onFindCompositionChanged: _findCompositionChanged,
-                  onOutline: !_historyBlocked &&
-                          shouldShowNoteOutline(
-                              _descriptionController.text,
-                              buildNoteOutline(_descriptionController.text,
-                                  _descriptionController.styles))
-                      ? _openOutline
-                      : null,
-                  onUndo: !_historyBlocked && _editHistory.canUndo
-                      ? () => _restoreHistory(redo: false)
-                      : null,
-                  onRedo: !_historyBlocked && _editHistory.canRedo
-                      ? () => _restoreHistory(redo: true)
-                      : null,
-                  restoredEdit: _restoredEdit,
-                  restoreRevision: _restoreRevision,
-                  onTodoInputChanged: _todoInputChanged,
-                  onCopySelection: _copySelection,
-                  onImageLayoutsChanged: _imageLayoutsChanged,
-                  onRemoveImage: _removeInlineImage,
-                  onEditImage: _editPhoto,
-                  onFind: _openFind,
-                  onCloseFind: _closeFind,
-                  findController: _findController,
-                  findNote:
-                      _findController == null ? null : _currentDraft(state),
-                  status: _autosave.status,
-                  onDone: _finish,
-                  onAddPhoto: _addPhoto,
-                  onScanDocument: _scanDocument,
-                  addingPhoto: _addingPhoto,
-                  mediaBusy: _presentingMedia,
-                  extractingText: _extractingPhotoText,
-                  onExtractText: _extractPhotoText,
-                  onRecordVoice: _recordVoiceMemo,
-                  onRemoveVoice: _removeVoiceMemo,
-                  onTranscriptChanged: _editVoiceTranscript,
-                  resolveAudioPath: _audio.resolvePath,
-                  libraryNotes: _libraryNotes,
-                  onEditTags: _editTags,
-                  onEditLinks: _editLinks,
-                  onOpenLinkedNote: _openLinkedNote,
-                  reminderSuggestion: _reminderSuggestion,
-                  savingReminder: _savingReminder,
-                  onReminderSuggestion: _confirmReminderSuggestion,
-                  onDismissReminderSuggestion: _dismissReminderSuggestion,
+  Widget build(BuildContext context) => Listener(
+        onPointerDown: _writingGesture,
+        onPointerSignal: (_) => _writingInteraction++,
+        child: NotificationListener<UserScrollNotification>(
+          onNotification: (_) {
+            _writingInteraction++;
+            return false;
+          },
+          child: FocusScope(
+            node: _editorFocusScope,
+            child: BlocProvider.value(
+              value: _form,
+              child: PopScope(
+                canPop: _allowPop ||
+                    (!_autosave.dirty &&
+                        _captureTimer?.isActive != true &&
+                        !_replayingHistory &&
+                        !_photoCapture.canRetry &&
+                        !_documentScanCapture.canRetry &&
+                        !_addingPhoto &&
+                        !_presentingMedia &&
+                        _voiceMutations == 0 &&
+                        !_savingReminder &&
+                        !_presentingReminder),
+                onPopInvokedWithResult: (didPop, _) {
+                  if (!didPop) {
+                    _finish();
+                  } else {
+                    unawaited(_recordReviewOnExit());
+                  }
+                },
+                child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
+                  builder: (context, state) => AbsorbPointer(
+                    absorbing: _replayingHistory,
+                    child: _BuildForm(
+                      widget: widget,
+                      state: state,
+                      titleController: _titleController,
+                      descriptionController: _descriptionController,
+                      bodyFocus: _bodyFocus,
+                      titleFocus: _titleFocus,
+                      outlineController: _outlineController,
+                      titleNavigationKey: _titleNavigationKey,
+                      todoNavigationKey: _todoNavigationKey,
+                      writingFocused: _writingFocused,
+                      onToggleFocus: _mediaBlocked ? null : _toggleWritingFocus,
+                      onEditFindMatch: _editFindMatch,
+                      onReplaceFind: (match, replacement) =>
+                          _replaceFind(replacement, match: match),
+                      onReplaceAllFind: _replaceFind,
+                      findActionsEnabled: !_editBlocked && !_findInputComposing,
+                      onFindCompositionChanged: _findCompositionChanged,
+                      onOutline: !_historyBlocked &&
+                              shouldShowNoteOutline(
+                                  _descriptionController.text,
+                                  buildNoteOutline(_descriptionController.text,
+                                      _descriptionController.styles))
+                          ? _openOutline
+                          : null,
+                      onUndo: !_historyBlocked && _editHistory.canUndo
+                          ? () => _restoreHistory(redo: false)
+                          : null,
+                      onRedo: !_historyBlocked && _editHistory.canRedo
+                          ? () => _restoreHistory(redo: true)
+                          : null,
+                      restoredEdit: _restoredEdit,
+                      restoreRevision: _restoreRevision,
+                      onTodoInputChanged: _todoInputChanged,
+                      onCopySelection: _copySelection,
+                      onAddSelectionToChecklist: _addSelectionToChecklist,
+                      onMore: _showEditorMore,
+                      onImageLayoutsChanged: _imageLayoutsChanged,
+                      onRemoveImage: _removeInlineImage,
+                      onEditImage: _editPhoto,
+                      onFind: _openFind,
+                      onCloseFind: _closeFind,
+                      findController: _findController,
+                      findNote:
+                          _findController == null ? null : _currentDraft(state),
+                      status: _autosave.status,
+                      onDone: _finish,
+                      onAddPhoto: _addPhoto,
+                      onScanDocument: _scanDocument,
+                      addingPhoto: _addingPhoto,
+                      mediaBusy: _presentingMedia,
+                      extractingText: _extractingPhotoText,
+                      onExtractText: _extractPhotoText,
+                      onRecordVoice: _recordVoiceMemo,
+                      onRemoveVoice: _removeVoiceMemo,
+                      onTranscriptChanged: _editVoiceTranscript,
+                      resolveAudioPath: _audio.resolvePath,
+                      libraryNotes: _libraryNotes,
+                      onEditTags: _editTags,
+                      onEditLinks: _editLinks,
+                      onOpenLinkedNote: _openLinkedNote,
+                      reminderSuggestion: _reminderSuggestion,
+                      savingReminder: _savingReminder,
+                      onReminderSuggestion: _confirmReminderSuggestion,
+                      onDismissReminderSuggestion: _dismissReminderSuggestion,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1925,6 +2237,8 @@ class _BuildForm extends StatelessWidget {
     required this.restoreRevision,
     required this.onTodoInputChanged,
     required this.onCopySelection,
+    required this.onAddSelectionToChecklist,
+    required this.onMore,
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
     required this.onEditImage,
@@ -1978,6 +2292,8 @@ class _BuildForm extends StatelessWidget {
   final int restoreRevision;
   final void Function(String, TextEditingValue) onTodoInputChanged;
   final ValueChanged<NoteTextSelection> onCopySelection;
+  final ValueChanged<NoteTextSelection> onAddSelectionToChecklist;
+  final VoidCallback onMore;
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
@@ -2014,6 +2330,7 @@ class _BuildForm extends StatelessWidget {
       finder.setFields(noteSearchFields(findNote!), notify: false);
     }
     final strings = S.of(context);
+    final compactAppBar = MediaQuery.sizeOf(context).width < 260;
     final suggestion = reminderSuggestion == null
         ? const SizedBox(width: double.infinity)
         : Padding(
@@ -2088,17 +2405,25 @@ class _BuildForm extends StatelessWidget {
             ),
           ),
           actions: [
+            if (!compactAppBar)
+              IconButton(
+                key: const ValueKey('editor-find-note'),
+                tooltip: strings.Find_In_Note,
+                onPressed: mediaBusy || addingPhoto ? null : onFind,
+                icon: const Icon(Icons.search_rounded),
+              ),
             IconButton(
-              key: const ValueKey('editor-find-note'),
-              tooltip: strings.Find_In_Note,
-              onPressed: mediaBusy || addingPhoto ? null : onFind,
-              icon: const Icon(Icons.search_rounded),
+              key: const ValueKey('editor-more-note'),
+              tooltip: strings.More_Options,
+              onPressed: mediaBusy || addingPhoto ? null : onMore,
+              icon: const Icon(Icons.more_horiz_rounded),
             ),
-            AppButton(
-                primary: true,
-                tooltip: S.of(context).Done,
-                onPressed: onDone,
-                child: Text(S.of(context).Done))
+            if (!compactAppBar)
+              AppButton(
+                  primary: true,
+                  tooltip: S.of(context).Done,
+                  onPressed: onDone,
+                  child: Text(S.of(context).Done))
           ],
         ),
         body: LayoutBuilder(
@@ -2179,6 +2504,8 @@ class _BuildForm extends StatelessWidget {
                                         titleController: _titleController,
                                         focusNode: titleFocus,
                                         onCopySelection: onCopySelection,
+                                        onAddSelectionToChecklist:
+                                            onAddSelectionToChecklist,
                                       ),
                                       const SizedBox(height: AppSpacings.l),
                                       _BuildTodoListField(
@@ -2278,6 +2605,8 @@ class _BuildForm extends StatelessWidget {
                                             'note-description-section'),
                                         outlineController: outlineController,
                                         onCopySelection: onCopySelection,
+                                        onAddSelectionToChecklist:
+                                            onAddSelectionToChecklist,
                                         focusNode: bodyFocus,
                                         onImageLayoutsChanged:
                                             onImageLayoutsChanged,
