@@ -6,11 +6,13 @@ class _BuildTitleField extends StatelessWidget {
     required this.state,
     required TextEditingController titleController,
     required this.focusNode,
+    required this.onCopySelection,
   }) : _titleController = titleController;
 
   final AddUpdateFormState state;
   final TextEditingController _titleController;
   final FocusNode focusNode;
+  final ValueChanged<NoteTextSelection> onCopySelection;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,9 @@ class _BuildTitleField extends StatelessWidget {
           key: const ValueKey('note-title-input'),
           controller: _titleController,
           focusNode: focusNode,
+          contextMenuBuilder: (context, editable) =>
+              buildNoteSelectionContextMenu(context, editable,
+                  onCopySelection: onCopySelection),
           style: AppTypography.headline4.copyWith(height: 1.25),
           textInputAction: TextInputAction.next,
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -64,6 +69,7 @@ class _BuildDescriptionField extends StatelessWidget {
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
     required this.onEditImage,
+    required this.onCopySelection,
     this.autofocus = false,
   }) : _descriptionController = descriptionController;
 
@@ -74,6 +80,7 @@ class _BuildDescriptionField extends StatelessWidget {
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
+  final ValueChanged<NoteTextSelection> onCopySelection;
   final bool autofocus;
 
   @override
@@ -86,6 +93,7 @@ class _BuildDescriptionField extends StatelessWidget {
         onImageLayoutsChanged: onImageLayoutsChanged,
         onRemoveImage: onRemoveImage,
         onEditImage: onEditImage,
+        onCopySelection: onCopySelection,
         autofocus: autofocus,
         paperColor: state.selectedColor ?? AppColors.parchment,
       );

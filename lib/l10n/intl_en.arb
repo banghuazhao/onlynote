@@ -464,5 +464,30 @@
   "Find_Replace_Changed": "The note changed. Search again to replace.",
   "Find_Replace_Limit": "That replacement would make a title or checklist item too long.",
   "Find_Replaced": "Replaced {count, plural, =1{1 match} other{{count} matches}}",
-  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}},
+  "Copy_Selection_To_Note": "Copy to note",
+  "Copy_Selection_Destination": "Choose a note to add the selected text.",
+  "Copy_Selection_New_Note": "New note",
+  "Copy_Selection_New_Note_Hint": "Create a note with the selected text.",
+  "Copy_Selection_Search_Notes": "Search notes",
+  "Copy_Selection_No_Notes": "Create a new note to keep this text.",
+  "Copy_Selection_No_Matches": "No matching notes",
+  "Copy_Selection_Saved": "Text copied to note",
+  "Copy_Selection_Failed": "Could not save the copied text.",
+  "Collapse_Section": "Collapse {heading}",
+  "Expand_Section": "Expand {heading}",
+  "@Collapse_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  },
+  "@Expand_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  }
 }

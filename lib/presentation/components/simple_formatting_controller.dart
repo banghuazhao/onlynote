@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_numbered_list.dart';
 import 'package:onlynote/services/note_text_format.dart';
 
 /// A normal native text field with small formatting actions. The body
@@ -277,28 +278,39 @@ class SimpleFormattingController extends TextEditingController {
     // Leave IME composition untouched. Native input owns its active range.
     final composing = next.composing.isValid && !next.composing.isCollapsed;
     var change = _textChange(previous.text, next.text);
-    if (!composing &&
-        change.inserted == '\n' &&
-        change.start == change.oldEnd &&
-        previous.selection.isCollapsed) {
-      final paragraph = _paragraphAt(previous.text, change.start);
+    final returnOffset = _nativeReturnOffset(previous, next);
+    if (!composing && returnOffset != null) {
+      // The native caret identifies the inserted newline even when adjacent
+      // paragraphs or an image separator contain identical text.
+      change = NoteTextChange(
+          start: returnOffset, oldEnd: returnOffset, inserted: '\n');
+      final paragraph = _paragraphAt(previous.text, returnOffset);
       final line = previous.text.substring(paragraph.start, paragraph.end);
-      if (line.startsWith('• ') && change.start >= paragraph.start + 2) {
-        if (line == '• ' && change.start == paragraph.end) {
+      final numbered = noteNumberedListMarker(line);
+      final prefix = line.startsWith('• ') ? '• ' : numbered?.prefix;
+      if (prefix != null && returnOffset >= paragraph.start + prefix.length) {
+        if (line == prefix && returnOffset == paragraph.end) {
           final updated =
-              next.text.replaceRange(paragraph.start, change.start + 1, '');
+              next.text.replaceRange(paragraph.start, returnOffset + 1, '');
           next = TextEditingValue(
             text: updated,
             selection: TextSelection.collapsed(offset: paragraph.start),
           );
+          change = NoteTextChange(
+              start: paragraph.start, oldEnd: returnOffset, inserted: '');
         } else {
+          final nextPrefix = numbered?.nextPrefix ?? prefix;
           next = TextEditingValue(
             text: next.text
-                .replaceRange(change.start + 1, change.start + 1, '• '),
-            selection: TextSelection.collapsed(offset: change.start + 3),
+                .replaceRange(returnOffset + 1, returnOffset + 1, nextPrefix),
+            selection: TextSelection.collapsed(
+                offset: returnOffset + 1 + nextPrefix.length),
           );
+          change = NoteTextChange(
+              start: returnOffset,
+              oldEnd: returnOffset,
+              inserted: '\n$nextPrefix');
         }
-        change = _textChange(previous.text, next.text);
       }
     }
     // Flutter can undo a group of several keystrokes in one value change.
@@ -406,6 +418,28 @@ class SimpleFormattingController extends TextEditingController {
     final following = text.indexOf('\n', cursor);
     return TextRange(
         start: preceding + 1, end: following < 0 ? text.length : following);
+  }
+
+  int? _nativeReturnOffset(TextEditingValue before, TextEditingValue after) {
+    if (before.composing.isValid && !before.composing.isCollapsed ||
+        !before.selection.isValid ||
+        !before.selection.isCollapsed ||
+        !after.selection.isValid ||
+        !after.selection.isCollapsed ||
+        after.text.length != before.text.length + 1) {
+      return null;
+    }
+    final offset = before.selection.extentOffset;
+    if (offset < 0 ||
+        offset > before.text.length ||
+        after.selection.extentOffset != offset + 1 ||
+        _editedPartStart != null && offset < _editedPartStart! ||
+        _editedPartEnd != null && offset > _editedPartEnd!) {
+      return null;
+    }
+    return after.text == before.text.replaceRange(offset, offset, '\n')
+        ? offset
+        : null;
   }
 
   static int _moveOffset(int offset, int start, int end, int insertedLength) {

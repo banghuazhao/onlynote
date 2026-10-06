@@ -2,7 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/note_selection_menu.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_web_links.dart';
 
@@ -29,6 +31,7 @@ class FormattedNoteText extends StatelessWidget {
     this.style,
     this.selectable = true,
     this.onOpenUrl,
+    this.onCopySelection,
   });
 
   final String text;
@@ -36,6 +39,7 @@ class FormattedNoteText extends StatelessWidget {
   final TextStyle? style;
   final bool selectable;
   final NoteWebLinkOpener? onOpenUrl;
+  final ValueChanged<NoteTextSelection>? onCopySelection;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,8 @@ class FormattedNoteText extends StatelessWidget {
       selectable: selectable,
       enableWebLinks: selectable,
       onOpenUrl: onOpenUrl,
+      textStyles: styles,
+      onCopySelection: onCopySelection,
     );
   }
 }
@@ -67,6 +73,8 @@ class NoteReadingText extends StatefulWidget {
     this.enableWebLinks = true,
     this.onOpenUrl,
     this.textKey,
+    this.textStyles = const [],
+    this.onCopySelection,
   });
 
   final String text;
@@ -76,6 +84,8 @@ class NoteReadingText extends StatefulWidget {
   final bool enableWebLinks;
   final NoteWebLinkOpener? onOpenUrl;
   final Key? textKey;
+  final List<NoteTextStyleRange> textStyles;
+  final ValueChanged<NoteTextSelection>? onCopySelection;
 
   @override
   State<NoteReadingText> createState() => _NoteReadingTextState();
@@ -190,7 +200,20 @@ class _NoteReadingTextState extends State<NoteReadingText> {
     final spans = _linkedSpans();
     final span = TextSpan(style: widget.style, children: spans);
     return widget.selectable
-        ? SelectableText.rich(span, key: widget.textKey)
+        ? SelectableText.rich(
+            span,
+            key: widget.textKey,
+            contextMenuBuilder: widget.onCopySelection == null
+                ? (context, state) => AdaptiveTextSelectionToolbar.editableText(
+                      editableTextState: state,
+                    )
+                : (context, state) => buildNoteSelectionContextMenu(
+                      context,
+                      state,
+                      textStyles: widget.textStyles,
+                      onCopySelection: widget.onCopySelection!,
+                    ),
+          )
         : Text.rich(
             span,
             key: widget.textKey,

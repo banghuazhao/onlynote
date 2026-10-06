@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_find.dart';
+import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_web_links.dart';
 import 'formatted_note_text.dart';
@@ -22,6 +23,7 @@ class NoteSearchText extends StatefulWidget {
     this.enableWebLinks = true,
     this.onOpenUrl,
     this.onMatchTap,
+    this.onCopySelection,
   });
   final NoteSearchController controller;
   final String fieldId;
@@ -33,6 +35,7 @@ class NoteSearchText extends StatefulWidget {
   final bool enableWebLinks;
   final NoteWebLinkOpener? onOpenUrl;
   final ValueChanged<NoteSearchMatch>? onMatchTap;
+  final ValueChanged<NoteTextSelection>? onCopySelection;
 
   @override
   State<NoteSearchText> createState() => _NoteSearchTextState();
@@ -140,6 +143,8 @@ class _NoteSearchTextState extends State<NoteSearchText> {
         enableWebLinks: widget.enableWebLinks && widget.selectable,
         onOpenUrl: widget.onOpenUrl,
         textKey: _textKey,
+        textStyles: widget.styles,
+        onCopySelection: widget.onCopySelection,
       );
 
   @override

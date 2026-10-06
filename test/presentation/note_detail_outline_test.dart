@@ -13,6 +13,9 @@ import 'package:onlynote/domain/usecase/get_note_usecase.dart';
 import 'package:onlynote/domain/usecase/update_note_usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
+import 'package:onlynote/presentation/components/formatted_note_text.dart';
+import 'package:onlynote/presentation/components/note_document_view.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'package:onlynote/presentation/screens/note_detail/note_detail_screen.dart';
@@ -133,4 +136,69 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+      'actual reader folds sections while image export includes all text',
+      (tester) async {
+    const body = 'Heading\nSecret paragraph\nNext\nLast';
+    final next = body.indexOf('Next');
+    final note = Note(
+        id: 'export-sections',
+        title: 'Notes',
+        description: body,
+        dateTime: DateTime(2026, 10, 7),
+        textStyles: [
+          const NoteTextStyleRange(
+              start: 0, end: 7, kind: NoteTextStyleKind.heading),
+          NoteTextStyleRange(
+              start: next, end: next + 4, kind: NoteTextStyleKind.heading),
+        ]);
+    var exporting = false;
+    late StateSetter update;
+    await tester.pumpWidget(MaterialApp(
+        theme: AppTheme.light,
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        home: Scaffold(body: StatefulBuilder(builder: (context, setState) {
+          update = setState;
+          return LoadedView(
+              note: note,
+              screenshotController: ScreenshotController(),
+              onReminderTap: null,
+              exportMode: exporting,
+              onCopySelection: (_) {});
+        }))));
+    await tester.pumpAndSettle();
+    final secret = find.byWidgetPredicate((widget) =>
+        widget is FormattedNoteText && widget.text == 'Secret paragraph\n');
+    expect(secret, findsOneWidget);
+    final toggle = find.byKey(const ValueKey('note-section-toggle-0'));
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(secret, findsNothing);
+    update(() => exporting = true);
+    await tester.pumpAndSettle();
+    expect(toggle, findsNothing);
+    final exported =
+        tester.widget<NoteDocumentView>(find.byType(NoteDocumentView));
+    expect(exported.collapsibleSections, isFalse);
+    expect(exported.onCopySelection, isNull);
+    expect(
+        find.byWidgetPredicate((widget) =>
+            widget is FormattedNoteText &&
+            widget.text == body &&
+            !widget.selectable),
+        findsOneWidget);
+    update(() => exporting = false);
+    await tester.pumpAndSettle();
+    expect(secret, findsNothing);
+    expect(toggle, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -3844,6 +3844,116 @@ class S {
       args: [count],
     );
   }
+
+  /// `Copy to note`
+  String get Copy_Selection_To_Note {
+    return Intl.message(
+      'Copy to note',
+      name: 'Copy_Selection_To_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a note to add the selected text.`
+  String get Copy_Selection_Destination {
+    return Intl.message(
+      'Choose a note to add the selected text.',
+      name: 'Copy_Selection_Destination',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New note`
+  String get Copy_Selection_New_Note {
+    return Intl.message(
+      'New note',
+      name: 'Copy_Selection_New_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create a note with the selected text.`
+  String get Copy_Selection_New_Note_Hint {
+    return Intl.message(
+      'Create a note with the selected text.',
+      name: 'Copy_Selection_New_Note_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search notes`
+  String get Copy_Selection_Search_Notes {
+    return Intl.message(
+      'Search notes',
+      name: 'Copy_Selection_Search_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create a new note to keep this text.`
+  String get Copy_Selection_No_Notes {
+    return Intl.message(
+      'Create a new note to keep this text.',
+      name: 'Copy_Selection_No_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching notes`
+  String get Copy_Selection_No_Matches {
+    return Intl.message(
+      'No matching notes',
+      name: 'Copy_Selection_No_Matches',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text copied to note`
+  String get Copy_Selection_Saved {
+    return Intl.message(
+      'Text copied to note',
+      name: 'Copy_Selection_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save the copied text.`
+  String get Copy_Selection_Failed {
+    return Intl.message(
+      'Could not save the copied text.',
+      name: 'Copy_Selection_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Collapse {heading}`
+  String Collapse_Section(String heading) {
+    return Intl.message(
+      'Collapse $heading',
+      name: 'Collapse_Section',
+      desc: '',
+      args: [heading],
+    );
+  }
+
+  /// `Expand {heading}`
+  String Expand_Section(String heading) {
+    return Intl.message(
+      'Expand $heading',
+      name: 'Expand_Section',
+      desc: '',
+      args: [heading],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

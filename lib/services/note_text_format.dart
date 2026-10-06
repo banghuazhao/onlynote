@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_numbered_list.dart';
 
 /// One familiar marker color, shared by writing, reading and image sharing.
 const noteHighlightColor = Color(0xFFFFE7A0);
@@ -131,10 +132,9 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
   if (change.inserted.isNotEmpty) {
     final bold = insertedBold ?? inherits(NoteTextStyleKind.bold);
     final heading = insertedHeading ?? inherits(NoteTextStyleKind.heading);
-    final highlight = insertedHighlight ??
-        (change.inserted != '\n' &&
-            change.inserted != '\n• ' &&
-            inheritsHighlight());
+    final paragraphBreak = isNoteParagraphBreak(change.inserted);
+    final highlight =
+        insertedHighlight ?? (!paragraphBreak && inheritsHighlight());
     if (bold) {
       result.add(NoteTextStyleRange(
         start: change.start,
@@ -158,7 +158,7 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
     }
     // Pressing Return in a heading creates an ordinary next paragraph,
     // including the trailing text when Return is pressed mid-paragraph.
-    if (change.inserted == '\n' || change.inserted == '\n• ') {
+    if (paragraphBreak) {
       final priorHeading = clean.where((range) =>
           range.kind == NoteTextStyleKind.heading &&
           range.start <= change.start &&
@@ -379,12 +379,15 @@ String noteTextToMarkdown(
     final line = lines[index];
     final lineEnd = lineStart + line.length;
     final bullet = line.startsWith('• ');
-    final contentStart = lineStart + (bullet ? 2 : 0);
+    final numbered = noteNumberedListMarker(line);
+    final contentStart =
+        lineStart + (bullet ? 2 : numbered?.prefix.length ?? 0);
     final heading = clean.any((range) =>
         range.kind == NoteTextStyleKind.heading &&
         range.start < lineEnd &&
         range.end > lineStart);
     if (bullet) result.write('- ');
+    if (numbered != null) result.write(numbered.prefix);
     if (heading) result.write('## ');
     final boundaries = <int>{contentStart, lineEnd};
     for (final range in clean.where((r) =>

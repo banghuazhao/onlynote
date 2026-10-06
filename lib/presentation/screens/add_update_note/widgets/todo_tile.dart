@@ -47,6 +47,7 @@ class _TodoFieldTile extends StatefulWidget {
     required this.onSplit,
     required this.onRemoved,
     required this.onInputChanged,
+    required this.onCopySelection,
     this.restoredSelection,
     this.restoreRevision = 0,
   });
@@ -63,6 +64,7 @@ class _TodoFieldTile extends StatefulWidget {
   final ValueChanged<List<String>> onSplit;
   final VoidCallback onRemoved;
   final ValueChanged<TextEditingValue> onInputChanged;
+  final ValueChanged<NoteTextSelection> onCopySelection;
   final TextSelection? restoredSelection;
   final int restoreRevision;
 
@@ -196,6 +198,9 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
             child: TextField(
               key: ValueKey('todo-field-${widget.id}'),
               controller: todoController,
+              contextMenuBuilder: (context, editable) =>
+                  buildNoteSelectionContextMenu(context, editable,
+                      onCopySelection: widget.onCopySelection),
               focusNode: widget.focusNode,
               autofocus: widget.autofocus,
               style: textStyle,
@@ -274,6 +279,7 @@ class _BuildTodoListField extends StatefulWidget {
     this.showAddButton = true,
     required this.state,
     required this.onInputChanged,
+    required this.onCopySelection,
     this.restoredEdit,
     this.restoreRevision = 0,
     this.autofocusFirstTodo = false,
@@ -282,6 +288,7 @@ class _BuildTodoListField extends StatefulWidget {
   final bool autofocusFirstTodo;
   final bool showAddButton;
   final void Function(String, TextEditingValue) onInputChanged;
+  final ValueChanged<NoteTextSelection> onCopySelection;
   final NoteEditSnapshot? restoredEdit;
   final int restoreRevision;
 
@@ -426,6 +433,7 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
                 ),
               ),
               child: _TodoFieldTile(
+                onCopySelection: widget.onCopySelection,
                 key: _fieldKeys.putIfAbsent(
                     todo.id!, () => GlobalKey<_TodoFieldTileState>()),
                 index: index,

@@ -7,6 +7,8 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_selection.dart';
+import 'note_selection_menu.dart';
 import 'formatted_note_text.dart';
 import 'note_document_view.dart';
 import 'note_formatting_toolbar.dart';
@@ -31,6 +33,7 @@ class NoteBodyEditor extends StatefulWidget {
     this.imageBuilder,
     this.onEditImage,
     this.outlineController,
+    this.onCopySelection,
   });
 
   final SimpleFormattingController controller;
@@ -44,6 +47,7 @@ class NoteBodyEditor extends StatefulWidget {
   final NoteBlockImageBuilder? imageBuilder;
   final ValueChanged<String>? onEditImage;
   final NoteOutlineNavigationController? outlineController;
+  final ValueChanged<NoteTextSelection>? onCopySelection;
 
   @override
   State<NoteBodyEditor> createState() => _NoteBodyEditorState();
@@ -455,6 +459,16 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         child: TextField(
           key: ValueKey('note-body-${segment.key}'),
           controller: segment.controller,
+          contextMenuBuilder: (context, editable) =>
+              widget.onCopySelection == null
+                  ? AdaptiveTextSelectionToolbar.editableText(
+                      editableTextState: editable)
+                  : buildNoteSelectionContextMenu(context, editable,
+                      onCopySelection: widget.onCopySelection!,
+                      textStyles: noteTextStylesForPart(
+                          widget.controller.styles,
+                          segment.start,
+                          segment.start + segment.controller.text.length)),
           focusNode: segment.focus,
           autofocus: widget.autofocus && index == 0,
           style: AppTypography.formText,
@@ -631,6 +645,13 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
               (AppTypography.formText.height ?? 1.55),
           child: TextField(
             controller: widget.controller,
+            contextMenuBuilder: (context, editable) =>
+                widget.onCopySelection == null
+                    ? AdaptiveTextSelectionToolbar.editableText(
+                        editableTextState: editable)
+                    : buildNoteSelectionContextMenu(context, editable,
+                        onCopySelection: widget.onCopySelection!,
+                        textStyles: widget.controller.styles),
             focusNode: widget.focusNode,
             autofocus: widget.autofocus,
             style: AppTypography.formText,

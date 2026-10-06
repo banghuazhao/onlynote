@@ -5,6 +5,12 @@ import 'package:onlynote/presentation/components/note_search_text.dart';
 import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_outline.dart';
+import 'package:onlynote/services/note_selection.dart';
+import 'package:onlynote/services/note_selection_transfer.dart';
+import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/presentation/components/note_outline_navigation_controller.dart';
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
@@ -71,6 +77,39 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   final NoteSearchController _findController = NoteSearchController();
   bool _findOpen = false;
   final _outlineController = NoteOutlineNavigationController();
+
+  Future<void> _copySelection(Note source, NoteTextSelection selection) async {
+    if (_changingLibrary || _exportingImage || _savingReminder) return;
+    setState(() => _changingLibrary = true);
+    try {
+      final destination = await showNoteCopyDestinationPicker(context,
+          notes: _libraryNotes, sourceNoteId: source.id);
+      if (!mounted || destination == null) return;
+      final repository = getIt<NoteRepository>();
+      final drafts = Hive.box(draftDatabaseBox);
+      final transfer = NoteSelectionTransfer(
+          repository: repository,
+          store: HiveNoteAutosaveStore(repository, drafts),
+          readDraft: (id) => (drafts.get(id) as NoteDto?)?.toDomain());
+      final saved = destination.isNewNote
+          ? await transfer.copyToNew(selection, color: source.color)
+          : await transfer.copyToExisting(destination.noteId!, selection);
+      if (!mounted) return;
+      showTransientSnackBar(
+          context,
+          SnackBar(
+              content: Text(saved
+                  ? S.of(context).Copy_Selection_Saved
+                  : S.of(context).Copy_Selection_Failed)));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Copy_Selection_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _changingLibrary = false);
+    }
+  }
 
   Future<void> _openOutline(Note note) async {
     if (_exportingImage || _savingReminder || _changingLibrary) return;
@@ -666,6 +705,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           : null,
                       outlineController:
                           _exportingImage ? null : _outlineController,
+                      onCopySelection: data.note.isDeleted || _exportingImage
+                          ? null
+                          : (selection) => _copySelection(data.note, selection),
                       libraryNotes: _libraryNotes,
                       onOpenLinkedNote: _openLinkedNote,
                       onEditLinks: data.note.isDeleted
@@ -701,6 +743,7 @@ class LoadedView extends StatelessWidget {
     this.onEditLinks,
     this.searchController,
     this.outlineController,
+    this.onCopySelection,
   });
 
   final Note note;
@@ -713,6 +756,7 @@ class LoadedView extends StatelessWidget {
   final VoidCallback? onEditLinks;
   final NoteSearchController? searchController;
   final NoteOutlineNavigationController? outlineController;
+  final ValueChanged<NoteTextSelection>? onCopySelection;
 
   @override
   Widget build(BuildContext context) {
@@ -749,12 +793,14 @@ class LoadedView extends StatelessWidget {
                           fieldId: 'title',
                           text: note.title!,
                           selectable: !exportMode,
+                          onCopySelection: exportMode ? null : onCopySelection,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         )
                       else
                         FormattedNoteText(
                           text: note.title!,
                           selectable: !exportMode,
+                          onCopySelection: exportMode ? null : onCopySelection,
                           style: AppTypography.headline3.copyWith(height: 1.25),
                         ),
                       const SizedBox(height: AppSpacings.l),
@@ -862,6 +908,12 @@ class LoadedView extends StatelessWidget {
                     },
                     NoteDocumentView(
                       outlineController: outlineController,
+                      collapsibleSections:
+                          !exportMode && searchController == null,
+                      sectionToggleLabel: (heading, expanded) => expanded
+                          ? S.of(context).Collapse_Section(heading)
+                          : S.of(context).Expand_Section(heading),
+                      onCopySelection: exportMode ? null : onCopySelection,
                       text: note.description ?? '',
                       styles: note.textStyles,
                       imagePaths: note.imagePaths,
@@ -876,6 +928,8 @@ class LoadedView extends StatelessWidget {
                                 textOffset: start,
                                 styles: styles,
                                 selectable: !exportMode,
+                                onCopySelection:
+                                    exportMode ? null : onCopySelection,
                                 style: AppTypography.headline6.copyWith(
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.ink.withValues(alpha: 0.88),
@@ -941,6 +995,8 @@ class LoadedView extends StatelessWidget {
                                         text: text,
                                         style: context.textStyles.bodyMedium,
                                         selectable: !exportMode,
+                                        onCopySelection:
+                                            exportMode ? null : onCopySelection,
                                       )
                                   : (text) => NoteSearchText(
                                         controller: searchController!,
@@ -948,6 +1004,8 @@ class LoadedView extends StatelessWidget {
                                         text: text,
                                         style: context.textStyles.bodyMedium,
                                         selectable: !exportMode,
+                                        onCopySelection:
+                                            exportMode ? null : onCopySelection,
                                       ),
                               resolvePath: AudioStorage.instance.resolvePath),
                     ],

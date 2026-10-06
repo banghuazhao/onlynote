@@ -464,5 +464,30 @@
   "Find_Replace_Changed": "筆記已變更，請重新搜尋後取代。",
   "Find_Replace_Limit": "取代後標題或清單項目會太長。",
   "Find_Replaced": "已取代 {count} 處",
-  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}},
+  "Copy_Selection_To_Note": "複製到筆記",
+  "Copy_Selection_Destination": "選擇筆記，加入所選文字。",
+  "Copy_Selection_New_Note": "新增筆記",
+  "Copy_Selection_New_Note_Hint": "用所選文字建立筆記。",
+  "Copy_Selection_Search_Notes": "搜尋筆記",
+  "Copy_Selection_No_Notes": "新增筆記以儲存這段文字。",
+  "Copy_Selection_No_Matches": "沒有相符的筆記",
+  "Copy_Selection_Saved": "文字已複製到筆記",
+  "Copy_Selection_Failed": "無法儲存複製的文字。",
+  "Collapse_Section": "收起{heading}",
+  "Expand_Section": "展開{heading}",
+  "@Collapse_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  },
+  "@Expand_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  }
 }

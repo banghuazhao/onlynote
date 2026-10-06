@@ -464,5 +464,30 @@
   "Find_Replace_Changed": "笔记已更改，请重新搜索后替换。",
   "Find_Replace_Limit": "替换后标题或清单条目会太长。",
   "Find_Replaced": "已替换 {count} 处",
-  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}}
+  "@Find_Replaced": {"placeholders": {"count": {"type": "int"}}},
+  "Copy_Selection_To_Note": "复制到笔记",
+  "Copy_Selection_Destination": "选择笔记，添加所选文字。",
+  "Copy_Selection_New_Note": "新建笔记",
+  "Copy_Selection_New_Note_Hint": "用所选文字创建笔记。",
+  "Copy_Selection_Search_Notes": "搜索笔记",
+  "Copy_Selection_No_Notes": "新建笔记以保存这段文字。",
+  "Copy_Selection_No_Matches": "没有匹配的笔记",
+  "Copy_Selection_Saved": "文字已复制到笔记",
+  "Copy_Selection_Failed": "无法保存复制的文字。",
+  "Collapse_Section": "收起{heading}",
+  "Expand_Section": "展开{heading}",
+  "@Collapse_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  },
+  "@Expand_Section": {
+    "placeholders": {
+      "heading": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -28,6 +28,8 @@ import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_edit_history.dart';
+import 'package:onlynote/services/note_selection.dart';
+import 'package:onlynote/services/note_selection_transfer.dart';
 
 class _Notes implements NoteRepository {
   final values = <String, NoteDto>{};
@@ -107,6 +109,9 @@ class _Router extends RootStackRouter {
             initial: true,
             page: PageInfo(HomeRoute.name,
                 builder: (_) => const Scaffold(body: Text('Library')))),
+        AutoRoute(
+            page: PageInfo(NoteDetailRoute.name,
+                builder: (_) => const Scaffold(body: Text('Linked reader')))),
         AutoRoute(
             page: PageInfo(AddUpdateNoteRoute.name, builder: (data) {
           final args = data.argsAs<AddUpdateNoteRouteArgs>();
@@ -198,10 +203,14 @@ void main() {
 
   Future<_Editor> open(WidgetTester tester,
       {required Note note,
+      List<Note> existingNotes = const [],
       Locale locale = const Locale('en'),
       double textScale = 1}) async {
     final notes = _Notes();
     notes.values[note.id!] = NoteDto.fromNote(note);
+    for (final existing in existingNotes) {
+      notes.values[existing.id!] = NoteDto.fromNote(existing);
+    }
     getIt.pushNewScope();
     getIt.registerSingleton<NoteRepository>(notes);
     final store = _Store(notes);
@@ -1090,6 +1099,249 @@ void main() {
     await _tap(tester, _undo());
     expect(editor.latest('find-voice').voiceMemos.single, memo);
     expect(editor.latest('find-voice').description, 'Keep body');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'native selection copies formatting to a new note without changing source',
+      (tester) async {
+    const highlight =
+        NoteTextStyleRange(start: 5, end: 8, kind: NoteTextStyleKind.highlight);
+    final editor = await open(tester,
+        note: Note(
+            id: 'source-copy',
+            title: 'Keep',
+            description: 'Keep tea',
+            textStyles: [highlight]));
+    await _tap(tester, _body());
+    final field = tester.widget<TextField>(_body());
+    field.controller!.selection =
+        const TextSelection(baseOffset: 5, extentOffset: 8);
+    await tester.pump();
+    final editable =
+        find.descendant(of: _body(), matching: find.byType(EditableText));
+    tester.state<EditableTextState>(editable).showToolbar();
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Copy_Selection_To_Note));
+    if (const bool.fromEnvironment('CAPTURE_UI')) {
+      await tester.runAsync(() async {
+        final render = editor.boundary.currentContext!.findRenderObject()
+            as RenderRepaintBoundary;
+        final image = await render.toImage(pixelRatio: 1);
+        try {
+          final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+          await File('/tmp/onlynote-copy-note-picker.png')
+              .writeAsBytes(bytes!.buffer.asUint8List());
+        } finally {
+          image.dispose();
+        }
+      });
+    }
+    await _tap(tester, find.byKey(const ValueKey('note-copy-new')));
+    await _save(tester);
+    final copies = editor.store.notes
+        .getAllNotes()
+        .where((note) => note.id != 'source-copy');
+    final copied = copies.single.toDomain();
+    expect(copied.description, 'tea');
+    expect(copied.textStyles, [
+      const NoteTextStyleRange(
+          start: 0, end: 3, kind: NoteTextStyleKind.highlight)
+    ]);
+    final source = editor.latest('source-copy');
+    expect(source.description, 'Keep tea');
+    expect(source.textStyles, [highlight]);
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'copy picker appends to latest existing note and preserves its content',
+      (tester) async {
+    final editor = await open(tester,
+        note: Note(id: 'copy-from', description: 'Selected tea'));
+    editor.store.notes.values['copy-to'] = NoteDto.fromNote(Note(
+        id: 'copy-to',
+        title: 'Shopping',
+        description: 'Original',
+        tags: ['home'],
+        todo: [Todo(id: 'todo', title: 'Milk', completed: true)]));
+    await _tap(tester, _body());
+    final field = tester.widget<TextField>(_body());
+    field.controller!.selection =
+        const TextSelection(baseOffset: 9, extentOffset: 12);
+    await tester.pump();
+    tester
+        .state<EditableTextState>(
+            find.descendant(of: _body(), matching: find.byType(EditableText)))
+        .showToolbar();
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Copy_Selection_To_Note));
+    // An update while choosing a destination must be retained.
+    editor.store.notes.values['copy-to'] =
+        editor.store.notes.values['copy-to']!.copyWith(description: 'Newest');
+    await _tap(
+        tester, find.byKey(const ValueKey('note-copy-existing-copy-to')));
+    await _save(tester);
+    final destination = editor.latest('copy-to');
+    expect(destination.description, 'Newest\n\ntea');
+    expect(destination.title, 'Shopping');
+    expect(destination.tags, ['home']);
+    expect(destination.todo.single.completed, isTrue);
+    expect(editor.latest('copy-from').description, 'Selected tea');
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'copy into open editor merges unsaved typing with one undoable step',
+      (tester) async {
+    final editor =
+        await open(tester, note: Note(id: 'open-copy', description: 'Saved'));
+    await _tap(tester, _body());
+    await tester.enterText(_body(), 'Unsaved typing');
+    final transfer = NoteSelectionTransfer(
+        repository: editor.store.notes,
+        store: editor.store,
+        readDraft: (id) => editor.store.drafts[id]?.toDomain());
+    bool? saved;
+    transfer
+        .copyToExisting('open-copy', NoteTextSelection(text: 'Copied'))
+        .then((value) => saved = value);
+    for (var frame = 0; frame < 20 && saved == null; frame++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(saved, isTrue);
+    expect(editor.latest('open-copy').description, 'Unsaved typing\n\nCopied');
+    expect(tester.widget<TextField>(_body()).controller!.text,
+        'Unsaved typing\n\nCopied');
+    await _tap(tester, _undo());
+    expect(editor.latest('open-copy').description, 'Unsaved typing');
+    await _tap(tester, _redo());
+    expect(editor.latest('open-copy').description, 'Unsaved typing\n\nCopied');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'numbered Return before a photo preserves anchors styles and note undo',
+      (tester) async {
+    final directory = await tester.runAsync(
+        () => Directory.systemTemp.createTemp('onlynote-numbered-photo-'));
+    final photo = File('${directory!.path}/inline.png');
+    await tester.runAsync(() => photo.writeAsBytes(base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=')));
+    addTearDown(() => directory.delete(recursive: true));
+    final layout = NoteImageLayout(
+        path: photo.path,
+        textOffset: 7,
+        widthFactor: .4,
+        xFactor: 0,
+        aspectRatio: 1);
+    const highlight =
+        NoteTextStyleRange(start: 3, end: 6, kind: NoteTextStyleKind.highlight);
+    final editor = await open(tester,
+        note: Note(
+            id: 'numbered-photo',
+            title: 'Tea',
+            description: '1. Tea\nAfter',
+            imagePaths: [photo.path],
+            imageLayouts: [layout],
+            textStyles: [highlight]));
+    final before = find.byKey(ValueKey('note-body-before:${photo.path}'));
+    await _tap(tester, before);
+    final field = tester.widget<TextField>(before);
+    field.controller!.selection = const TextSelection.collapsed(offset: 6);
+    await tester.pump();
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: '1. Tea\n', selection: TextSelection.collapsed(offset: 7)));
+    await tester.pumpAndSettle();
+    await _save(tester);
+    expect(editor.latest('numbered-photo').description, '1. Tea\n2. \nAfter');
+    expect(editor.latest('numbered-photo').imageLayouts,
+        [layout.copyWith(textOffset: 11)]);
+    expect(editor.latest('numbered-photo').textStyles, [highlight]);
+    await _tap(tester, _undo());
+    expect(editor.latest('numbered-photo').description, '1. Tea\nAfter');
+    expect(editor.latest('numbered-photo').imageLayouts, [layout]);
+    await _tap(tester, _redo());
+    expect(editor.latest('numbered-photo').description, '1. Tea\n2. \nAfter');
+    expect(editor.latest('numbered-photo').imageLayouts,
+        [layout.copyWith(textOffset: 11)]);
+    // The native inline field clips formatting into the copied passage.
+    await _tap(tester, before);
+    tester.widget<TextField>(before).controller!.selection =
+        const TextSelection(baseOffset: 3, extentOffset: 6);
+    await tester.pump();
+    tester
+        .state<EditableTextState>(
+            find.descendant(of: before, matching: find.byType(EditableText)))
+        .showToolbar();
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Copy_Selection_To_Note));
+    await _tap(tester, find.byKey(const ValueKey('note-copy-new')));
+    await _save(tester);
+    final copy = editor.store.notes
+        .getAllNotes()
+        .where((note) => note.id != 'numbered-photo')
+        .single
+        .toDomain();
+    expect(copy.description, 'Tea');
+    expect(copy.textStyles, [
+      const NoteTextStyleRange(
+          start: 0, end: 3, kind: NoteTextStyleKind.highlight)
+    ]);
+    expect(copy.imagePaths, isEmpty);
+    expect(editor.latest('numbered-photo').imageLayouts,
+        [layout.copyWith(textOffset: 11)]);
+    await tester.pump(const Duration(seconds: 5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'copy into a suspended editor retains changes saved through child routes',
+      (tester) async {
+    final original = Note(
+        id: 'hidden-copy',
+        title: 'Original',
+        description: 'Old body',
+        tags: ['old'],
+        todo: [Todo(id: 'task', title: 'Old task')],
+        linkedNoteIds: ['child']);
+    final child = Note(id: 'child', title: 'Child', description: 'Selected');
+    final editor = await open(tester, note: original, existingNotes: [child]);
+    await _tap(tester, find.byKey(const ValueKey('linked-note-child')));
+    expect(find.text('Linked reader'), findsOneWidget);
+    final fresh = original.copyWith(
+        title: 'Child edit',
+        description: 'Newest body',
+        tags: ['new'],
+        todo: [Todo(id: 'task', title: 'New task', completed: true)]);
+    editor.store.notes.values['hidden-copy'] = NoteDto.fromNote(fresh);
+    final transfer = NoteSelectionTransfer(
+        repository: editor.store.notes,
+        store: editor.store,
+        readDraft: (id) => editor.store.drafts[id]?.toDomain());
+    bool? copied;
+    transfer
+        .copyToExisting('hidden-copy', NoteTextSelection(text: 'Selected'))
+        .then((value) => copied = value);
+    for (var frame = 0; frame < 20 && copied == null; frame++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(copied, isTrue);
+    final saved = editor.latest('hidden-copy');
+    expect(saved.title, 'Child edit');
+    expect(saved.description, 'Newest body\n\nSelected');
+    expect(saved.todo, fresh.todo);
+    expect(saved.tags, fresh.tags);
+    editor.router.maybePop();
+    await tester.pumpAndSettle();
+    await _tap(tester, _undo());
+    final restored = editor.latest('hidden-copy');
+    expect(restored.description, 'Newest body');
+    expect(restored.title, 'Child edit');
+    expect(restored.todo, fresh.todo);
+    expect(restored.tags, fresh.tags);
     expect(tester.takeException(), isNull);
   });
 }

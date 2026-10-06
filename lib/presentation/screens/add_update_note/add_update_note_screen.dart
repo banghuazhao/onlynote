@@ -21,6 +21,10 @@ import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_find_preview.dart';
 import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_replace.dart';
+import 'package:onlynote/services/note_selection.dart';
+import 'package:onlynote/services/note_selection_transfer.dart';
+import 'package:onlynote/presentation/components/note_selection_menu.dart';
+import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/note_photo_transform.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
@@ -140,6 +144,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final DocumentScanCapture _documentScanCapture;
   late final NoteReminderScheduler _reminderScheduler;
   VoidCallback? _unregisterWidgetEditor;
+  VoidCallback? _unregisterSelectionEditor;
   WidgetCommands? _editorWidgetCommands;
   bool _suspendedForLinkedNote = false;
   Timer? _suggestionDebounce;
@@ -257,6 +262,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _editorWidgetCommands =
         widget.widgetCommands ?? WidgetCommands.initializedInstance;
     _registerWidgetEditor();
+    _unregisterSelectionEditor = NoteSelectionTransfer.registerEditor(
+        _autosave.note.id!, _appendCopiedSelection);
     ReminderData.shared.addListener(_reminderChanged);
     _queueReminderSuggestion();
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
@@ -1378,6 +1385,107 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         _autosave.note.id!, _applyWidgetCompletion);
   }
 
+  Future<void> _copySelection(NoteTextSelection selection) async {
+    if (_editBlocked) return;
+    setState(() => _presentingMedia = true);
+    try {
+      final destination = await showNoteCopyDestinationPicker(context,
+          notes: _libraryNotes, sourceNoteId: _autosave.note.id);
+      if (!mounted || destination == null) return;
+      final transfer = NoteSelectionTransfer(
+        repository: getIt<NoteRepository>(),
+        store: _autosave.store,
+        readDraft: (id) => Hive.isBoxOpen(draftDatabaseBox)
+            ? (Hive.box(draftDatabaseBox).get(id) as NoteDto?)?.toDomain()
+            : null,
+      );
+      final saved = destination.isNewNote
+          ? await transfer.copyToNew(selection,
+              color: _form.state.selectedColor)
+          : await transfer.copyToExisting(destination.noteId!, selection);
+      if (!mounted) return;
+      showTransientSnackBar(
+          context,
+          SnackBar(
+              content: Text(saved
+                  ? S.of(context).Copy_Selection_Saved
+                  : S.of(context).Copy_Selection_Failed)));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Copy_Selection_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  Future<bool> _appendCopiedSelection(NoteTextSelection selection) async {
+    if (!mounted ||
+        _leaving ||
+        _replayingHistory ||
+        _refreshingFromLibrary ||
+        (_mediaBlocked && !_suspendedForLinkedNote) ||
+        _composingTodoIds.isNotEmpty ||
+        (!_titleController.value.composing.isCollapsed &&
+            _titleController.value.composing.isValid) ||
+        (!_descriptionController.value.composing.isCollapsed &&
+            _descriptionController.value.composing.isValid)) {
+      return false;
+    }
+    setState(() => _replayingHistory = true);
+    try {
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return false;
+      _captureTimer?.cancel();
+      _replayingHistory = false;
+      _capture(_form.state);
+      _replayingHistory = true;
+      final latest = (await getIt<NoteRepository>().getNote(_autosave.note.id!))
+          .toDomain();
+      if (!mounted || latest.isDeleted || latest.isArchived) return false;
+      // A child route may have edited this note through a backlink. The editor
+      // was flushed before navigation, so its hidden fields can be stale.
+      final current = (_suspendedForLinkedNote
+              ? latest.copyWith(
+                  title: latest.title ?? '',
+                  description: latest.description ?? '')
+              : _currentDraft(_form.state))
+          .copyWith(
+              isPinned: latest.isPinned,
+              isArchived: latest.isArchived,
+              folderId: latest.folderId,
+              dailyNoteDateKey: latest.dailyNoteDateKey,
+              sortOrder: latest.sortOrder,
+              deletedAt: latest.deletedAt);
+      if (_suspendedForLinkedNote) {
+        await _documentScanCapture.reconcilePages(current.imagePaths);
+        if (!mounted) return false;
+        final baseline = _editSnapshot(current);
+        if (!_editHistory.current.sameContent(baseline)) {
+          _editHistory.reset(baseline);
+        } else {
+          _editHistory.record(baseline);
+        }
+      }
+      final next = appendSelectionToNote(current, selection);
+      final snapshot = _editSnapshot(next);
+      _editHistory.record(snapshot);
+      await _applyEditSnapshot(snapshot, next,
+          restoreFocus: false, reconcilePages: false);
+      if (!mounted) return false;
+      return await _autosave.flush();
+    } catch (_) {
+      return false;
+    } finally {
+      _replayingHistory = false;
+      if (mounted) {
+        _refreshStatus();
+        _syncPlatformUndo();
+      }
+    }
+  }
+
   Future<void> _openLinkedNote(Note note) async {
     if (_mediaBlocked || note.id == null) return;
     _suspendedForLinkedNote = true;
@@ -1666,6 +1774,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _suggestionDebounce?.cancel();
     ReminderData.shared.removeListener(_reminderChanged);
     _unregisterWidgetEditor?.call();
+    _unregisterSelectionEditor?.call();
     _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _autosave.removeListener(_refreshStatus);
@@ -1755,6 +1864,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                   restoredEdit: _restoredEdit,
                   restoreRevision: _restoreRevision,
                   onTodoInputChanged: _todoInputChanged,
+                  onCopySelection: _copySelection,
                   onImageLayoutsChanged: _imageLayoutsChanged,
                   onRemoveImage: _removeInlineImage,
                   onEditImage: _editPhoto,
@@ -1814,6 +1924,7 @@ class _BuildForm extends StatelessWidget {
     required this.restoredEdit,
     required this.restoreRevision,
     required this.onTodoInputChanged,
+    required this.onCopySelection,
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
     required this.onEditImage,
@@ -1866,6 +1977,7 @@ class _BuildForm extends StatelessWidget {
   final NoteEditSnapshot? restoredEdit;
   final int restoreRevision;
   final void Function(String, TextEditingValue) onTodoInputChanged;
+  final ValueChanged<NoteTextSelection> onCopySelection;
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
@@ -2066,6 +2178,7 @@ class _BuildForm extends StatelessWidget {
                                         state: state,
                                         titleController: _titleController,
                                         focusNode: titleFocus,
+                                        onCopySelection: onCopySelection,
                                       ),
                                       const SizedBox(height: AppSpacings.l),
                                       _BuildTodoListField(
@@ -2075,6 +2188,7 @@ class _BuildForm extends StatelessWidget {
                                         restoredEdit: restoredEdit,
                                         restoreRevision: restoreRevision,
                                         onInputChanged: onTodoInputChanged,
+                                        onCopySelection: onCopySelection,
                                         autofocusFirstTodo: widget.note ==
                                                 null &&
                                             (widget.start ==
@@ -2163,6 +2277,7 @@ class _BuildForm extends StatelessWidget {
                                         key: const ValueKey(
                                             'note-description-section'),
                                         outlineController: outlineController,
+                                        onCopySelection: onCopySelection,
                                         focusNode: bodyFocus,
                                         onImageLayoutsChanged:
                                             onImageLayoutsChanged,
