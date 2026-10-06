@@ -188,6 +188,22 @@ class MessageLookup extends MessageLookupByLibrary {
       "Delete this item?",
     ),
     "Delete_View": MessageLookupByLibrary.simpleMessage("Delete view"),
+    "Document_Scan": MessageLookupByLibrary.simpleMessage("Scan document"),
+    "Document_Scan_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not finish adding the scanned pages. Please try again.",
+    ),
+    "Document_Scan_Pending": MessageLookupByLibrary.simpleMessage(
+      "Your scan is still finishing. Try again in a moment.",
+    ),
+    "Document_Scan_Permission": MessageLookupByLibrary.simpleMessage(
+      "Allow camera access in Settings to scan documents.",
+    ),
+    "Document_Scan_Too_Many": MessageLookupByLibrary.simpleMessage(
+      "Scan up to 20 pages at a time. Please split this document into smaller scans.",
+    ),
+    "Document_Scan_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "Document scanning is not available on this device.",
+    ),
     "Done": MessageLookupByLibrary.simpleMessage("Done"),
     "Duplicate": MessageLookupByLibrary.simpleMessage("Duplicate"),
     "Edit": MessageLookupByLibrary.simpleMessage("Edit"),

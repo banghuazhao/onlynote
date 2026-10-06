@@ -69,4 +69,6 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     // Bundled model recognizes both Latin and Chinese without a first-use download.
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+    // Google Play services provides document capture, cropping, and page review.
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
 }

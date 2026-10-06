@@ -7,6 +7,7 @@ import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
@@ -96,6 +97,17 @@ class NoteRepositoryImplementation implements NoteRepository {
   }
 
   Future<void> _purgeDeletedState(Set<String> ids) async {
+    final documentScans = DocumentScanCapture.initializedInstance;
+    if (documentScans != null) {
+      await documentScans.purgeNotes(ids);
+    } else if (Hive.isBoxOpen(draftDatabaseBox)) {
+      // Pending native UI still owns this record until its terminal result.
+      // Mark its seed abandoned so recovery cannot recreate a deleted note.
+      await DocumentScanCapture(
+        journalBox: Hive.box(draftDatabaseBox),
+        repository: this,
+      ).purgeNotes(ids);
+    }
     if (Hive.isBoxOpen(draftDatabaseBox)) {
       final drafts = Hive.box(draftDatabaseBox);
       for (final id in ids) {

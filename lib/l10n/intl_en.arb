@@ -439,5 +439,11 @@
   "Daily_Note_Calendar_Next_Month": "Next month",
   "Daily_Note_Calendar_Choose_Month": "Choose month and year",
   "Daily_Note_Calendar_Open_Failed": "Could not open this daily note. Try again.",
-  "Daily_Note_Calendar_Note_Unavailable": "This daily note is no longer available."
+  "Daily_Note_Calendar_Note_Unavailable": "This daily note is no longer available.",
+  "Document_Scan": "Scan document",
+  "Document_Scan_Failed": "Could not finish adding the scanned pages. Please try again.",
+  "Document_Scan_Unsupported": "Document scanning is not available on this device.",
+  "Document_Scan_Permission": "Allow camera access in Settings to scan documents.",
+  "Document_Scan_Too_Many": "Scan up to 20 pages at a time. Please split this document into smaller scans.",
+  "Document_Scan_Pending": "Your scan is still finishing. Try again in a moment."
 }

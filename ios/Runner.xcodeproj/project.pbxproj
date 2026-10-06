@@ -34,6 +34,7 @@
 		D40BE6431149781B167B734E /* ShareInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22846A0E98316D3014B77CE4 /* ShareInbox.swift */; };
 		7696CFA95C7D4D4680D53E1F /* PhotoTextBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3D48CA36C7412D9606D867 /* PhotoTextBridge.swift */; };
 		0A1AC1E610D240D994D5022A /* VoiceMemoBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A84D19C219C4CEBB7CD2E05 /* VoiceMemoBridge.swift */; };
+		768072FF3C094B6C9FB17D80 /* DocumentScanBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E218D717854F06880312EF /* DocumentScanBridge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +127,7 @@
 		FF9E790F1BBF04EB20D54B3A /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DF3D48CA36C7412D9606D867 /* PhotoTextBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoTextBridge.swift; sourceTree = "<group>"; };
 		4A84D19C219C4CEBB7CD2E05 /* VoiceMemoBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoBridge.swift; sourceTree = "<group>"; };
+		79E218D717854F06880312EF /* DocumentScanBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentScanBridge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +244,7 @@
 				B9FE14417F8C43FBFCE1C03D /* WidgetCommandBridge.swift */,
 				4A84D19C219C4CEBB7CD2E05 /* VoiceMemoBridge.swift */,
 				DF3D48CA36C7412D9606D867 /* PhotoTextBridge.swift */,
+				79E218D717854F06880312EF /* DocumentScanBridge.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -468,6 +471,7 @@
 				AD92F49E00B32CA0E4F8A264 /* WidgetCommandBridge.swift in Sources */,
 				0A1AC1E610D240D994D5022A /* VoiceMemoBridge.swift in Sources */,
 				7696CFA95C7D4D4680D53E1F /* PhotoTextBridge.swift in Sources */,
+				768072FF3C094B6C9FB17D80 /* DocumentScanBridge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

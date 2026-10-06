@@ -18,6 +18,7 @@ import 'package:onlynote/presentation/components/toast.dart'
     show showTransientSnackBar;
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/services/photo_search_index.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'routes/routes.dart';
@@ -33,6 +34,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> with WidgetsBindingObserver {
   AppRouter get _router => getIt<AppRouter>();
   WidgetCommands? _widgetCommands;
+  late final DocumentScanner _documentScanner;
 
   @override
   void initState() {
@@ -40,6 +42,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _widgetCommands = WidgetCommands.initializedInstance;
     _widgetCommands?.updates.addListener(_refreshLibrary);
+    _documentScanner = DocumentScanner.instance;
+    _documentScanner.addListener(_recoverDocumentScans);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!OnboardingSettings.instance.completed) {
         await _router.replaceAll([const OnboardingRoute()]);
@@ -78,12 +82,23 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     if (mounted) context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
   }
 
+  void _recoverDocumentScans() {
+    final capture = DocumentScanCapture.initializedInstance;
+    if (!mounted || capture == null) return;
+    unawaited(capture.recover().then((_) {
+      _refreshLibrary();
+    }).catchError((Object error) {
+      debugPrint('Document scan recovery deferred: $error');
+    }));
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     PhotoSearchIndex.initializedInstance
         ?.setActive(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) {
       unawaited(_widgetCommands?.importPending());
+      _recoverDocumentScans();
     }
   }
 
@@ -91,6 +106,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _widgetCommands?.updates.removeListener(_refreshLibrary);
+    _documentScanner.removeListener(_recoverDocumentScans);
     SharedNoteLaunch.instance.detach();
     AppShortcutLaunch.instance.detach();
     ReminderLaunch.instance.detach();

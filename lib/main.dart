@@ -42,6 +42,7 @@ import 'services/purchase_service.dart';
 import 'services/photo_search_index.dart';
 import 'services/note_autosave.dart';
 import 'services/note_photo_recovery.dart';
+import 'services/document_scan_capture.dart';
 import 'services/note_history.dart';
 import 'services/audio_storage.dart';
 import 'services/voice_memo_drafts.dart';
@@ -134,6 +135,12 @@ Future<void> main() async {
   );
   VoiceMemoDrafts.configure(voiceDrafts);
   final noteRepository = getIt<NoteRepository>();
+  final documentScans = DocumentScanCapture(
+    journalBox: Hive.box(draftDatabaseBox),
+    repository: noteRepository,
+  );
+  // Deletion recovery needs the scanner journal to abandon deleted origins.
+  DocumentScanCapture.configure(documentScans);
   var deletionRecoveryComplete = true;
   if (noteRepository is NoteRepositoryImplementation) {
     deletionRecoveryComplete = await noteRepository.recoverPendingDeletions();
@@ -143,6 +150,8 @@ Future<void> main() async {
     notes: getIt<NoteRepository>(),
   );
   if (deletionRecoveryComplete) {
+    // Adopt completed native pages before ordinary drafts and media pruning.
+    await documentScans.recover();
     await photoRecovery.recover();
     await voiceDrafts.recover();
     await HiveNoteAutosaveStore(
@@ -160,6 +169,7 @@ Future<void> main() async {
   if (deletionRecoveryComplete &&
       !photoRecovery.hasPendingCapture &&
       !sharedNotes.hasPendingImports &&
+      !documentScans.hasPending &&
       !voiceDrafts.hasPending) {
     await NoteCleanup.pruneOrphanImages(getIt<NoteRepository>());
     await NoteCleanup.pruneOrphanAudio(getIt<NoteRepository>());

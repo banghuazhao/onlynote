@@ -4,10 +4,12 @@ class _BuildImageSection extends StatelessWidget {
   const _BuildImageSection({
     required this.state,
     required this.onAddPhoto,
+    required this.onScanDocument,
     required this.addingPhoto,
   });
   final AddUpdateFormState state;
   final ValueChanged<ImageSource> onAddPhoto;
+  final VoidCallback onScanDocument;
   final bool addingPhoto;
 
   void _showImageSourceSheet(BuildContext context) {
@@ -29,6 +31,14 @@ class _BuildImageSection extends StatelessWidget {
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
             onAddPhoto(ImageSource.camera);
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.document_scanner_outlined),
+          title: Text(S.of(context).Document_Scan),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            onScanDocument();
           },
         ),
       ],

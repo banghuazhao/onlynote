@@ -33,6 +33,8 @@ import 'package:onlynote/presentation/components/voice_memo_composer.dart';
 import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
+import 'package:onlynote/services/scanned_note.dart';
 import 'package:onlynote/services/note_reminder_scheduler.dart';
 import 'package:onlynote/services/reminder_date_suggestion.dart';
 import 'package:onlynote/Tools/reminder.dart';
@@ -79,6 +81,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.customTemplateNote,
       this.autosaveStore,
       this.photoCapture,
+      this.documentScanCapture,
       this.photoEditService,
       this.photoTextExtraction,
       this.voiceMemoService,
@@ -94,6 +97,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final Note? customTemplateNote;
   final NoteAutosaveStore? autosaveStore;
   final NotePhotoCapture? photoCapture;
+  final DocumentScanCapture? documentScanCapture;
   final NotePhotoEditService? photoEditService;
   final PhotoTextExtraction? photoTextExtraction;
   final VoiceMemoService? voiceMemoService;
@@ -116,6 +120,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final NoteAutosave _autosave;
   late final StreamSubscription<AddUpdateFormState> _changes;
   late final NotePhotoCapture _photoCapture;
+  late final DocumentScanCapture _documentScanCapture;
   late final NoteReminderScheduler _reminderScheduler;
   VoidCallback? _unregisterWidgetEditor;
   WidgetCommands? _editorWidgetCommands;
@@ -146,6 +151,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _photoCapture = widget.photoCapture ?? NotePhotoCapture();
+    _documentScanCapture = widget.documentScanCapture ?? DocumentScanCapture();
     _reminderScheduler = widget.reminderScheduler ?? NoteReminderScheduler();
     final now = DateTime.now();
     final recovered =
@@ -321,6 +327,97 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  Future<void> _scanDocument({bool retry = false}) async {
+    if (_mediaBlocked) return;
+    setState(() => _addingPhoto = true);
+    final selection = _descriptionController.selection;
+    final offset = selection.isValid ? selection.extentOffset : null;
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      // Save the latest form events before recording the scanner's origin.
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _capture(_form.state);
+      if (!await _autosave.flush()) {
+        if (mounted) {
+          showTransientSnackBar(
+              context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+        }
+        return;
+      }
+      final result = await (retry
+          ? _documentScanCapture.retry()
+          : _documentScanCapture.scan(_autosave.note));
+      if (!mounted) return;
+      if (result.savedPaths.isNotEmpty) {
+        final updated = appendScannedPages(
+            _currentDraft(_form.state), result.savedPaths,
+            textOffset: offset);
+        // Wait for adoption before flushing; a native callback can arrive
+        // while the editor has queued another field event.
+        final adopted = _form.stream.firstWhere((state) =>
+            listEquals(state.imagePaths, updated.imagePaths) &&
+            listEquals(state.imageLayouts, updated.imageLayouts));
+        _currentImageLayouts = updated.imageLayouts;
+        _form.add(AddUpdateFormEvent.initialize(
+          title: updated.title,
+          description: updated.description,
+          textStyles: updated.textStyles,
+          color: updated.color,
+          todos: updated.todo,
+          imagePaths: updated.imagePaths,
+          imageLayouts: updated.imageLayouts,
+          voiceMemos: updated.voiceMemos,
+          tags: updated.tags,
+          linkedNoteIds: updated.linkedNoteIds,
+          dailyNoteDateKey: updated.dailyNoteDateKey,
+        ));
+        await adopted;
+        if (!mounted) return;
+        _capture(_form.state);
+        if (!await _autosave.flush()) {
+          if (mounted) {
+            showTransientSnackBar(context,
+                SnackBar(content: Text(S.of(context).Autosave_Failed)));
+          }
+          return;
+        }
+      }
+      if (result.status == DocumentScanStatus.pages) {
+        if (result.error != null) throw result.error!;
+        await _documentScanCapture.complete();
+      } else if (result.status != DocumentScanStatus.cancelled) {
+        if (mounted) _showScanMessage(result.status);
+      }
+    } catch (_) {
+      if (mounted) _showScanMessage(DocumentScanStatus.failed);
+    } finally {
+      if (mounted) setState(() => _addingPhoto = false);
+    }
+  }
+
+  void _showScanMessage(DocumentScanStatus status) {
+    final strings = S.of(context);
+    final message = switch (status) {
+      DocumentScanStatus.unsupported => strings.Document_Scan_Unsupported,
+      DocumentScanStatus.permissionDenied => strings.Document_Scan_Permission,
+      DocumentScanStatus.tooManyPages => strings.Document_Scan_Too_Many,
+      DocumentScanStatus.pending => strings.Document_Scan_Pending,
+      _ => strings.Document_Scan_Failed,
+    };
+    showTransientSnackBar(
+        context,
+        SnackBar(
+          content: Text(message),
+          action: _documentScanCapture.isJournaled
+              ? SnackBarAction(
+                  label: strings.Retry,
+                  onPressed: () => _scanDocument(retry: true),
+                )
+              : null,
+        ));
+  }
+
   void _bodyChanged() {
     if (_refreshingFromLibrary || !mounted || _form.isClosed) return;
     final text = _descriptionController.text;
@@ -345,10 +442,25 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _form.add(AddUpdateFormEvent.imageLayoutsChanged(layouts));
   }
 
-  void _removeInlineImage(String path) {
-    _currentImageLayouts =
-        _currentImageLayouts.where((layout) => layout.path != path).toList();
-    _form.add(AddUpdateFormEvent.removeImage(path));
+  Future<void> _removeInlineImage(String path) async {
+    if (_mediaBlocked || !_form.state.imagePaths.contains(path)) return;
+    setState(() => _presentingMedia = true);
+    try {
+      // A reviewed page may still be held by an interrupted scan. Record the
+      // explicit removal before changing the form so recovery respects it.
+      await _documentScanCapture.discardPage(path);
+      if (!mounted || !_form.state.imagePaths.contains(path)) return;
+      _currentImageLayouts =
+          _currentImageLayouts.where((layout) => layout.path != path).toList();
+      _form.add(AddUpdateFormEvent.removeImage(path));
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
   }
 
   Future<void> _editPhoto(String path) async {
@@ -375,6 +487,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       );
       if (edited == null || !mounted) return;
       if (!_form.state.imagePaths.contains(path)) return;
+      await _documentScanCapture.discardPage(path);
+      if (!mounted || !_form.state.imagePaths.contains(path)) return;
       _currentImageLayouts = [
         for (final layout in _currentImageLayouts)
           layout.path == path
@@ -1043,6 +1157,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       await _addPhoto(ImageSource.camera, retry: true);
       if (!mounted || _photoCapture.canRetry) return;
     }
+    if (_documentScanCapture.canRetry) {
+      await _scanDocument(retry: true);
+      if (!mounted || _documentScanCapture.canRetry) return;
+    }
     _leaving = true;
     await _voiceWrites;
     // Allow queued form events to apply before flushing the final snapshot.
@@ -1064,6 +1182,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       // the recorded path again if clearing its metadata must be retried.
       debugPrint('Photo capture journal cleanup deferred: $error');
     }
+    try {
+      await _documentScanCapture.complete();
+    } catch (error) {
+      debugPrint('Document scan cleanup deferred: $error');
+    }
     if (!mounted) return;
     setState(() => _allowPop = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1079,6 +1202,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _changes.cancel();
+    _documentScanCapture.release();
     _form.close();
     _autosave.removeListener(_refreshStatus);
     unawaited(_autosave.flush().whenComplete(_autosave.dispose));
@@ -1097,6 +1221,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           canPop: _allowPop ||
               (!_autosave.dirty &&
                   !_photoCapture.canRetry &&
+                  !_documentScanCapture.canRetry &&
                   !_addingPhoto &&
                   !_presentingMedia &&
                   _voiceMutations == 0 &&
@@ -1126,6 +1251,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               status: _autosave.status,
               onDone: _finish,
               onAddPhoto: _addPhoto,
+              onScanDocument: _scanDocument,
               addingPhoto: _addingPhoto,
               mediaBusy: _presentingMedia,
               extractingText: _extractingPhotoText,
@@ -1165,6 +1291,7 @@ class _BuildForm extends StatelessWidget {
     required this.status,
     required this.onDone,
     required this.onAddPhoto,
+    required this.onScanDocument,
     required this.addingPhoto,
     required this.mediaBusy,
     required this.extractingText,
@@ -1199,6 +1326,7 @@ class _BuildForm extends StatelessWidget {
   final AutosaveStatus status;
   final VoidCallback onDone;
   final ValueChanged<ImageSource> onAddPhoto;
+  final VoidCallback onScanDocument;
   final bool addingPhoto;
   final bool mediaBusy;
   final bool extractingText;
@@ -1346,6 +1474,7 @@ class _BuildForm extends StatelessWidget {
                                     _BuildImageSection(
                                       state: state,
                                       onAddPhoto: onAddPhoto,
+                                      onScanDocument: onScanDocument,
                                       addingPhoto: addingPhoto || mediaBusy,
                                     ),
                                     Wrap(

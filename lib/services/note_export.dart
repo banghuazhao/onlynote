@@ -225,46 +225,95 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
     return _NotePdfRichText(text: pw.TextSpan(children: spans, style: style));
   }
 
-  document.addPage(pw.MultiPage(
-    pageFormat: PdfPageFormat.a4,
-    margin: const pw.EdgeInsets.all(40),
-    // Bound pathological input but allow ordinary long notes to span pages.
-    maxPages: 1000,
-    theme: pw.ThemeData.withFont(
-        base: regular, bold: bold, fontFallback: [fallback]),
-    footer: (context) => pw.Align(
-        alignment: pw.Alignment.centerRight,
-        child: pw.Text('${context.pageNumber} / ${context.pagesCount}',
-            style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600))),
-    build: (_) => [
-      if (data.title.isNotEmpty) ...[
-        text(data.title, heading: true),
-        pw.SizedBox(height: 12)
-      ],
-      if (data.date.isNotEmpty) ...[text(data.date), pw.SizedBox(height: 16)],
-      for (final part in noteDocumentParts(data.description, layouts))
-        if (part is NoteTextPart && part.end > part.start) ...[
-          text(data.description.substring(part.start, part.end),
-              textStyles: _partStyles(data.textStyles, part)),
-          pw.SizedBox(height: 16)
-        ] else if (part is NoteImagePart) ...[
-          photo(part.layout),
-          pw.SizedBox(height: 16),
-        ],
-      for (final transcript in data.transcripts) ...[
-        text(transcript),
-        pw.SizedBox(height: 16)
-      ],
-      for (final todo in data.todos) ...[
-        text('${todo.$1 ? '[x]' : '[ ]'} ${todo.$2}'),
-        pw.SizedBox(height: 6)
-      ],
-      if (data.reminder != null) ...[
-        pw.SizedBox(height: 12),
-        text(data.reminder!)
-      ],
-    ],
-  ));
+  final scanOnly = layouts.isNotEmpty &&
+      layouts.length == data.photos.length &&
+      layouts.every((layout) => layout.isDocumentPage) &&
+      data.description.trim().isEmpty &&
+      data.todos.isEmpty &&
+      data.transcripts.every((value) => value.trim().isEmpty) &&
+      (data.reminder?.trim().isEmpty ?? true);
+  final content = <pw.Widget>[];
+  var addedPages = false;
+
+  void flushContent({bool allowEmpty = false}) {
+    if (content.isEmpty && !allowEmpty) return;
+    final widgets = List<pw.Widget>.of(content);
+    content.clear();
+    document.addPage(pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(40),
+      // Bound pathological input but allow ordinary long notes to span pages.
+      maxPages: 1000,
+      theme: pw.ThemeData.withFont(
+          base: regular, bold: bold, fontFallback: [fallback]),
+      footer: (context) => pw.Align(
+          alignment: pw.Alignment.centerRight,
+          child: pw.Text('${context.pageNumber} / ${context.pagesCount}',
+              style:
+                  const pw.TextStyle(fontSize: 9, color: PdfColors.grey600))),
+      build: (_) => widgets,
+    ));
+    addedPages = true;
+  }
+
+  void addScanPage(NoteImageLayout layout) {
+    flushContent();
+    final image = pw.MemoryImage(data.photos[imageIndices[layout.path]!]);
+    final format = image.width! > image.height!
+        ? PdfPageFormat.a4.landscape
+        : PdfPageFormat.a4;
+    document.addPage(pw.Page(
+      pageFormat: format,
+      margin: const pw.EdgeInsets.all(16),
+      build: (_) => pw.Center(
+        child: pw.Image(image,
+            width: format.width - 32,
+            height: format.height - 32,
+            fit: pw.BoxFit.contain),
+      ),
+    ));
+    addedPages = true;
+  }
+
+  // A document-only note exports its actual pages, with its title retained as
+  // PDF metadata. Ordinary notes keep their existing title/date presentation.
+  if (!scanOnly) {
+    if (data.title.isNotEmpty) {
+      content
+          .addAll([text(data.title, heading: true), pw.SizedBox(height: 12)]);
+    }
+    if (data.date.isNotEmpty) {
+      content.addAll([text(data.date), pw.SizedBox(height: 16)]);
+    }
+  }
+  for (final part in noteDocumentParts(data.description, layouts)) {
+    if (part is NoteTextPart && part.end > part.start && !scanOnly) {
+      content.addAll([
+        text(data.description.substring(part.start, part.end),
+            textStyles: _partStyles(data.textStyles, part)),
+        pw.SizedBox(height: 16),
+      ]);
+    } else if (part is NoteImagePart) {
+      if (part.layout.isDocumentPage) {
+        addScanPage(part.layout);
+      } else {
+        content.addAll([photo(part.layout), pw.SizedBox(height: 16)]);
+      }
+    }
+  }
+  for (final transcript in data.transcripts) {
+    if (!scanOnly) content.addAll([text(transcript), pw.SizedBox(height: 16)]);
+  }
+  for (final todo in data.todos) {
+    content.addAll([
+      text('${todo.$1 ? '[x]' : '[ ]'} ${todo.$2}'),
+      pw.SizedBox(height: 6),
+    ]);
+  }
+  if (data.reminder != null && !scanOnly) {
+    content.addAll([pw.SizedBox(height: 12), text(data.reminder!)]);
+  }
+  flushContent(allowEmpty: !addedPages);
   return document.save();
 }
 

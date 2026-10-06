@@ -7,6 +7,7 @@ class NoteImageLayout {
     this.widthFactor = .85,
     this.xFactor = .5,
     this.aspectRatio = 4 / 3,
+    this.isDocumentPage = false,
   });
 
   final String path;
@@ -18,6 +19,7 @@ class NoteImageLayout {
   /// Alignment within the space left after sizing: 0 is left, 1 is right.
   final double xFactor;
   final double aspectRatio;
+  final bool isDocumentPage;
 
   NoteImageLayout copyWith({
     String? path,
@@ -25,6 +27,7 @@ class NoteImageLayout {
     double? widthFactor,
     double? xFactor,
     double? aspectRatio,
+    bool? isDocumentPage,
   }) =>
       NoteImageLayout(
         path: path ?? this.path,
@@ -32,6 +35,7 @@ class NoteImageLayout {
         widthFactor: widthFactor ?? this.widthFactor,
         xFactor: xFactor ?? this.xFactor,
         aspectRatio: aspectRatio ?? this.aspectRatio,
+        isDocumentPage: isDocumentPage ?? this.isDocumentPage,
       );
 
   Map<String, dynamic> toMap() => {
@@ -40,6 +44,7 @@ class NoteImageLayout {
         'widthFactor': widthFactor,
         'xFactor': xFactor,
         'aspectRatio': aspectRatio,
+        if (isDocumentPage) 'isDocumentPage': true,
       };
 
   static NoteImageLayout? tryFromMap(Object? value) {
@@ -49,6 +54,7 @@ class NoteImageLayout {
     final widthFactor = value['widthFactor'] ?? .85;
     final xFactor = value['xFactor'] ?? .5;
     final aspectRatio = value['aspectRatio'] ?? 4 / 3;
+    final isDocumentPage = value['isDocumentPage'] ?? false;
     if (path is! String ||
         path.trim().isEmpty ||
         textOffset is! int ||
@@ -56,6 +62,7 @@ class NoteImageLayout {
         widthFactor is! num ||
         xFactor is! num ||
         aspectRatio is! num ||
+        isDocumentPage is! bool ||
         !widthFactor.isFinite ||
         !xFactor.isFinite ||
         !aspectRatio.isFinite) {
@@ -67,6 +74,7 @@ class NoteImageLayout {
       widthFactor: widthFactor.toDouble(),
       xFactor: xFactor.toDouble(),
       aspectRatio: aspectRatio.toDouble(),
+      isDocumentPage: isDocumentPage,
     );
   }
 
@@ -77,11 +85,12 @@ class NoteImageLayout {
       other.textOffset == textOffset &&
       other.widthFactor == widthFactor &&
       other.xFactor == xFactor &&
-      other.aspectRatio == aspectRatio;
+      other.aspectRatio == aspectRatio &&
+      other.isDocumentPage == isDocumentPage;
 
   @override
-  int get hashCode =>
-      Object.hash(path, textOffset, widthFactor, xFactor, aspectRatio);
+  int get hashCode => Object.hash(
+      path, textOffset, widthFactor, xFactor, aspectRatio, isDocumentPage);
 
   @override
   String toString() =>

@@ -90,13 +90,23 @@ class ShareHelper {
         return;
       }
       final photos = <Uint8List>[];
+      final documentPages = {
+        for (final layout in note.imageLayouts)
+          if (layout.isDocumentPage) layout.path,
+      };
       for (final path in note.imagePaths) {
         // Normalize images for portable attachments and cap export resolution.
         // Missing files fail visibly rather than silently dropping photos.
         final bytes = await File(ImageStorage.resolvePath(path)).readAsBytes();
         final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
         final descriptor = await ui.ImageDescriptor.encoded(buffer);
-        final scale = 1800 /
+        // Scanned pages retain roughly A4 print resolution for small text.
+        // Other photos and portable Markdown attachments keep the usual cap.
+        final maxEdge =
+            format == NoteShareFormat.pdf && documentPages.contains(path)
+                ? 3508
+                : 1800;
+        final scale = maxEdge /
             (descriptor.width > descriptor.height
                 ? descriptor.width
                 : descriptor.height);

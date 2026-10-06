@@ -20,6 +20,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     Note? customTemplateNote,
     NoteAutosaveStore? autosaveStore,
     NotePhotoCapture? photoCapture,
+    DocumentScanCapture? documentScanCapture,
     NotePhotoEditService? photoEditService,
     PhotoTextExtraction? photoTextExtraction,
     VoiceMemoService? voiceMemoService,
@@ -38,6 +39,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             customTemplateNote: customTemplateNote,
             autosaveStore: autosaveStore,
             photoCapture: photoCapture,
+            documentScanCapture: documentScanCapture,
             photoEditService: photoEditService,
             photoTextExtraction: photoTextExtraction,
             voiceMemoService: voiceMemoService,
@@ -64,6 +66,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         customTemplateNote: args.customTemplateNote,
         autosaveStore: args.autosaveStore,
         photoCapture: args.photoCapture,
+        documentScanCapture: args.documentScanCapture,
         photoEditService: args.photoEditService,
         photoTextExtraction: args.photoTextExtraction,
         voiceMemoService: args.voiceMemoService,
@@ -85,6 +88,7 @@ class AddUpdateNoteRouteArgs {
     this.customTemplateNote,
     this.autosaveStore,
     this.photoCapture,
+    this.documentScanCapture,
     this.photoEditService,
     this.photoTextExtraction,
     this.voiceMemoService,
@@ -108,6 +112,8 @@ class AddUpdateNoteRouteArgs {
 
   final NotePhotoCapture? photoCapture;
 
+  final DocumentScanCapture? documentScanCapture;
+
   final NotePhotoEditService? photoEditService;
 
   final PhotoTextExtraction? photoTextExtraction;
@@ -124,7 +130,7 @@ class AddUpdateNoteRouteArgs {
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
   }
 }
 

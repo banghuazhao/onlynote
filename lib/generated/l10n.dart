@@ -3624,6 +3624,66 @@ class S {
       args: [],
     );
   }
+
+  /// `Scan document`
+  String get Document_Scan {
+    return Intl.message(
+      'Scan document',
+      name: 'Document_Scan',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not finish adding the scanned pages. Please try again.`
+  String get Document_Scan_Failed {
+    return Intl.message(
+      'Could not finish adding the scanned pages. Please try again.',
+      name: 'Document_Scan_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Document scanning is not available on this device.`
+  String get Document_Scan_Unsupported {
+    return Intl.message(
+      'Document scanning is not available on this device.',
+      name: 'Document_Scan_Unsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Allow camera access in Settings to scan documents.`
+  String get Document_Scan_Permission {
+    return Intl.message(
+      'Allow camera access in Settings to scan documents.',
+      name: 'Document_Scan_Permission',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan up to 20 pages at a time. Please split this document into smaller scans.`
+  String get Document_Scan_Too_Many {
+    return Intl.message(
+      'Scan up to 20 pages at a time. Please split this document into smaller scans.',
+      name: 'Document_Scan_Too_Many',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your scan is still finishing. Try again in a moment.`
+  String get Document_Scan_Pending {
+    return Intl.message(
+      'Your scan is still finishing. Try again in a moment.',
+      name: 'Document_Scan_Pending',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

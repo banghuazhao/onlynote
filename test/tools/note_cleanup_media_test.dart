@@ -16,6 +16,7 @@ import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
 import 'package:onlynote/services/shared_note_import.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
 
 import '../support/memory_preferences.dart';
 
@@ -122,6 +123,10 @@ void main() {
       'seed': note('voice-seed'),
       'memo': memo('pending').toMap(),
     });
+    await drafts.put('${DocumentScanCapture.journalPrefix}scan', {
+      'note': note('scan-seed'),
+      'saved': ['note_images/scan-copied.jpg'],
+    });
 
     expect(
         await NoteCleanup.referencedImages(notes, templateStore: templates), {
@@ -134,6 +139,8 @@ void main() {
       'note_images/share-seed.jpg',
       'note_images/share-copied.jpg',
       'note_images/voice-seed.jpg',
+      'note_images/scan-seed.jpg',
+      'note_images/scan-copied.jpg',
     });
     expect(await NoteCleanup.referencedAudio(notes, templateStore: templates), {
       'note_audio/current.m4a',
@@ -144,6 +151,7 @@ void main() {
       'note_audio/share-seed.m4a',
       'note_audio/voice-seed.m4a',
       'note_audio/pending.m4a',
+      'note_audio/scan-seed.m4a',
     });
   });
 
@@ -199,5 +207,23 @@ void main() {
     await NoteCleanup.pruneOrphanAudio(notes,
         templateStore: templates, audio: audio);
     expect(await retained.exists(), isTrue);
+  });
+
+  test('unresolved document scan prevents media pruning without a global owner',
+      () async {
+    final orphan = await file(memo('orphan').path);
+    final key = '${DocumentScanCapture.journalPrefix}interrupted';
+    await drafts.put(key, {'version': 1});
+    expect(DocumentScanCapture.initializedInstance, isNull);
+    expect(NoteCleanup.hasPendingMediaRecovery, isTrue);
+    await NoteCleanup.pruneOrphanAudio(notes,
+        templateStore: templates, audio: audio);
+    expect(await orphan.exists(), isTrue);
+
+    await drafts.delete(key);
+    expect(NoteCleanup.hasPendingMediaRecovery, isFalse);
+    await NoteCleanup.pruneOrphanAudio(notes,
+        templateStore: templates, audio: audio);
+    expect(await orphan.exists(), isFalse);
   });
 }

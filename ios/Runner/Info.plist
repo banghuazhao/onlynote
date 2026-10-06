@@ -88,7 +88,7 @@
 		<key>NSSpeechRecognitionUsageDescription</key>
 		<string>Transcribe a voice memo on your device when you choose Transcribe.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Onlynote needs access to your camera so you can take a photo to attach to a note.</string>
+		<string>Take photos and scan documents to add to your notes.</string>
 		<key>SKAdNetworkItems</key>
 		<array>
 			<dict>

@@ -11,6 +11,7 @@ import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';
 import 'package:onlynote/services/note_photo_recovery.dart';
 import 'package:onlynote/services/shared_note_import.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
 
 /// Best-effort cleanup of a note's images, recordings, and reminders.
 class NoteCleanup {
@@ -94,6 +95,7 @@ class NoteCleanup {
       for (final note in repository.getAllNotes())
         if (!ignoreNoteIds.contains(note.id)) ...note.imagePaths ?? const [],
       ...NoteHistory.initializedInstance?.referencedImages ?? const [],
+      ...DocumentScanCapture.initializedInstance?.referencedImages ?? const [],
       for (final template in store.templates) ...template.imagePaths,
     };
     for (final record in _journalValues()) {
@@ -153,12 +155,14 @@ class NoteCleanup {
       : const [];
 
   static bool get hasPendingMediaRecovery =>
-      Hive.isBoxOpen(draftDatabaseBox) &&
-      Hive.box(draftDatabaseBox).keys.whereType<String>().any((key) =>
-          key.startsWith(NotePhotoRecovery.recordKey) ||
-          key.startsWith(SharedNoteImport.journalPrefix) ||
-          key.startsWith(VoiceMemoDrafts.prefix) ||
-          key.startsWith('_note_delete_pending_v1.'));
+      DocumentScanCapture.initializedInstance?.hasPending == true ||
+      (Hive.isBoxOpen(draftDatabaseBox) &&
+          Hive.box(draftDatabaseBox).keys.whereType<String>().any((key) =>
+              key.startsWith(NotePhotoRecovery.recordKey) ||
+              key.startsWith(SharedNoteImport.journalPrefix) ||
+              key.startsWith(VoiceMemoDrafts.prefix) ||
+              key.startsWith(DocumentScanCapture.journalPrefix) ||
+              key.startsWith('_note_delete_pending_v1.')));
 
   static Future<void> deleteUnreferencedAudio(
     Iterable<String> paths, {

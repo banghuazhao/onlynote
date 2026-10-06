@@ -12,9 +12,11 @@ class MainActivity: FlutterActivity() {
     private var shortcutBridgeReady = false
     private var pendingShortcut: Map<String, String>? = null
     private var shareChannel: MethodChannel? = null
+    private var documentScanBridge: DocumentScanBridge? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         captureShortcut(intent)
+        documentScanBridge = DocumentScanBridge(this, savedInstanceState)
         super.onCreate(savedInstanceState)
     }
 
@@ -22,6 +24,7 @@ class MainActivity: FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         WidgetCommandBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
         PhotoTextBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        documentScanBridge?.register(flutterEngine.dartExecutor.binaryMessenger)
         VoiceMemoBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
         shareChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -93,6 +96,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        documentScanBridge?.dispose()
         VoiceMemoBridge.dispose()
         shareChannel?.setMethodCallHandler(null)
         shareChannel = null
@@ -104,10 +108,12 @@ class MainActivity: FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
+        documentScanBridge?.onResume()
         VoiceMemoBridge.onResume()
     }
 
     override fun onPause() {
+        documentScanBridge?.onPause()
         VoiceMemoBridge.onBackground()
         super.onPause()
     }
@@ -118,7 +124,20 @@ class MainActivity: FlutterActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (documentScanBridge?.onActivityResult(requestCode, resultCode, data) != true) {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        documentScanBridge?.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onDestroy() {
+        documentScanBridge?.dispose()
         VoiceMemoBridge.dispose()
         super.onDestroy()
     }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -7,6 +8,125 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_export.dart';
+
+Map<int, String> _pdfObjects(Uint8List bytes) => {
+      for (final match in RegExp(r'(\d+) 0 obj\s*(.*?)\s*endobj', dotAll: true)
+          .allMatches(latin1.decode(bytes)))
+        int.parse(match[1]!): match[2]!,
+    };
+
+List<String> _pdfPages(Map<int, String> objects) => objects.values
+    .where((value) => RegExp(r'/Type\s*/Page(?!s)').hasMatch(value))
+    .toList();
+
+String _pdfStream(String object) {
+  final start = object.indexOf('stream\n') + 'stream\n'.length;
+  final end = object.lastIndexOf('\nendstream');
+  final bytes = latin1.encode(object.substring(start, end));
+  return latin1
+      .decode(object.contains('/FlateDecode') ? zlib.decode(bytes) : bytes);
+}
+
+List<int> _pdfImageWidths(String page, Map<int, String> objects) {
+  final resources = RegExp(r'/XObject<<(.*?)>>', dotAll: true).firstMatch(page);
+  return [
+    for (final reference
+        in RegExp(r'/I\d+\s+(\d+) 0 R').allMatches(resources?[1] ?? ''))
+      int.parse(RegExp(r'/Width\s*(\d+)')
+          .firstMatch(objects[int.parse(reference[1]!)]!)![1]!),
+  ];
+}
+
+/// Read this producer's ToUnicode mappings so assertions check actual exported
+/// content, including text that lies after a dedicated scanned document page.
+String _pdfPageText(String page, Map<int, String> objects) {
+  final fonts = <String, Map<String, String>>{};
+  final resources = RegExp(r'/Font<<(.*?)>>', dotAll: true).firstMatch(page);
+  for (final reference
+      in RegExp(r'/(F\d+)\s+(\d+) 0 R').allMatches(resources?[1] ?? '')) {
+    final font = objects[int.parse(reference[2]!)]!;
+    final unicode = RegExp(r'/ToUnicode\s*(\d+) 0 R').firstMatch(font);
+    if (unicode == null) continue;
+    final mapping = _pdfStream(objects[int.parse(unicode[1]!)]!);
+    fonts[reference[1]!] = {
+      for (final pair
+          in RegExp(r'<([0-9A-F]{4})>\s*<([0-9A-F]+)>').allMatches(mapping))
+        pair[1]!: String.fromCharCodes([
+          for (var offset = 0; offset < pair[2]!.length; offset += 4)
+            int.parse(pair[2]!.substring(offset, offset + 4), radix: 16),
+        ]),
+    };
+  }
+  final contentReference = RegExp(r'/Contents\s*(\d+) 0 R').firstMatch(page)!;
+  final content = _pdfStream(objects[int.parse(contentReference[1]!)]!);
+  final words = <String>[];
+  String? font;
+  for (final token in RegExp(r'/(F\d+)\s+[\d.]+\s+Tf|<([0-9a-fA-F]+)>')
+      .allMatches(content)) {
+    if (token[1] != null) {
+      font = token[1];
+      continue;
+    }
+    final value = token[2]!;
+    words.add([
+      for (var offset = 0; offset + 4 <= value.length; offset += 4)
+        fonts[font]?[value.substring(offset, offset + 4).toUpperCase()] ?? '',
+    ].join());
+  }
+  return words.join(' ').replaceAll(RegExp(r'\s+'), ' ');
+}
+
+Future<Uint8List> _documentImage(int width, int height, int markerColor) async {
+  final recorder = ui.PictureRecorder();
+  final canvas = ui.Canvas(recorder);
+  canvas.drawRect(ui.Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+      ui.Paint()..color = const ui.Color(0xffffffff));
+  canvas.drawRect(ui.Rect.fromLTWH(0, 0, width.toDouble(), 4),
+      ui.Paint()..color = ui.Color(markerColor));
+  canvas.drawRect(
+      ui.Rect.fromLTWH(0, (height - 4).toDouble(), width.toDouble(), 4),
+      ui.Paint()..color = ui.Color(markerColor));
+  for (var y = 12.0; y < height - 8; y += 9) {
+    canvas.drawRect(ui.Rect.fromLTWH(8, y, (width - 16).toDouble(), 2),
+        ui.Paint()..color = const ui.Color(0xff333333));
+  }
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(width, height);
+  try {
+    return (await image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  } finally {
+    image.dispose();
+    picture.dispose();
+  }
+}
+
+Future<NotePdfData> _documentPdfData({
+  required List<Uint8List> photos,
+  required List<String> paths,
+  required List<NoteImageLayout> layouts,
+  String title = 'Scanned contract',
+  String description = '',
+  String date = 'October 7, 2026',
+  List<(bool, String)> todos = const [],
+  List<String> transcripts = const [],
+  String? reminder,
+}) async =>
+    NotePdfData(
+      title: title,
+      description: description,
+      date: date,
+      todos: todos,
+      transcripts: transcripts,
+      reminder: reminder,
+      photos: photos,
+      imagePaths: paths,
+      imageLayouts: layouts,
+      regular: await File('assets/fonts/Roboto-Regular.ttf').readAsBytes(),
+      bold: await File('assets/fonts/Roboto-Bold.ttf').readAsBytes(),
+      fallback: await File('assets/fonts/DroidSansFallback.ttf').readAsBytes(),
+    );
 
 void main() {
   test(
@@ -220,5 +340,104 @@ void main() {
     expect(latin1.decode(bytes), contains('Roboto-Bold'));
     await File('/tmp/onlynote-formatted-export-preview.pdf')
         .writeAsBytes(bytes);
+  });
+
+  test('document-only PDF has one complete page per scan in reviewed order',
+      () async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    final bytes = await buildNotePdf(await _documentPdfData(
+      photos: [
+        await _documentImage(90, 140, 0xff336699),
+        await _documentImage(160, 80, 0xffaa5533),
+      ],
+      paths: const ['portrait', 'landscape'],
+      // The user's reviewed order is independent of attachment file order.
+      layouts: const [
+        NoteImageLayout(path: 'landscape', textOffset: 0, isDocumentPage: true),
+        NoteImageLayout(path: 'portrait', textOffset: 0, isDocumentPage: true),
+      ],
+    ));
+    final objects = _pdfObjects(bytes);
+    final pages = _pdfPages(objects);
+    expect(pages, hasLength(2));
+    expect(_pdfImageWidths(pages[0], objects), [160]);
+    expect(_pdfImageWidths(pages[1], objects), [90]);
+    expect(pages[0], contains('/MediaBox[0 0 841.88976 595.27559]'));
+    expect(pages[1], contains('/MediaBox[0 0 595.27559 841.88976]'));
+    expect(pages.every((page) => !page.contains('/Font')), isTrue);
+    expect(latin1.decode(bytes), contains('Scanned contract'));
+    await File('/tmp/onlynote-scan-pages-preview.pdf').writeAsBytes(bytes);
+  });
+
+  test(
+      'mixed PDF keeps ordinary photos and text before between and after scans',
+      () async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    const body =
+        'Before the first scan\nBetween the scans\nAfter the second scan';
+    final bytes = await buildNotePdf(await _documentPdfData(
+      title: 'Mixed document note',
+      description: body,
+      photos: [
+        await _documentImage(64, 64, 0xff448866),
+        await _documentImage(90, 140, 0xff336699),
+        await _documentImage(160, 80, 0xffaa5533),
+      ],
+      paths: const ['photo', 'first-scan', 'second-scan'],
+      layouts: [
+        const NoteImageLayout(path: 'photo', textOffset: 0, widthFactor: .25),
+        NoteImageLayout(
+            path: 'first-scan',
+            textOffset: body.indexOf('Between'),
+            isDocumentPage: true),
+        NoteImageLayout(
+            path: 'second-scan',
+            textOffset: body.indexOf('After'),
+            isDocumentPage: true),
+      ],
+      todos: const [(false, 'File the original')],
+      transcripts: const ['Reviewed voice transcript'],
+      reminder: 'Reminder: Friday morning',
+    ));
+    final objects = _pdfObjects(bytes);
+    final pages = _pdfPages(objects);
+    expect(pages, hasLength(5));
+    expect(pages.map((page) => _pdfImageWidths(page, objects)), [
+      [64],
+      [90],
+      [],
+      [160],
+      []
+    ]);
+    final firstText = _pdfPageText(pages[0], objects);
+    expect(firstText, contains('Mixed document note'));
+    expect(firstText, contains('October 7, 2026'));
+    expect(firstText, contains('Before the first scan'));
+    expect(_pdfPageText(pages[2], objects), contains('Between the scans'));
+    final lastText = _pdfPageText(pages[4], objects);
+    expect(lastText, contains('After the second scan'));
+    expect(lastText, contains('Reviewed voice transcript'));
+    expect(lastText, contains('File the original'));
+    expect(lastText, contains('Reminder: Friday morning'));
+    expect(pages[1].contains('/Font'), isFalse);
+    expect(pages[3].contains('/Font'), isFalse);
+    await File('/tmp/onlynote-scan-mixed-preview.pdf').writeAsBytes(bytes);
+  });
+
+  test('unmarked landscape photos retain normal portrait note PDF export',
+      () async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    final bytes = await buildNotePdf(await _documentPdfData(
+      title: 'Ordinary photo',
+      photos: [await _documentImage(160, 80, 0xffaa5533)],
+      paths: const ['photo'],
+      layouts: const [NoteImageLayout(path: 'photo', textOffset: 0)],
+    ));
+    final objects = _pdfObjects(bytes);
+    final page = _pdfPages(objects).single;
+    expect(page, contains('/MediaBox[0 0 595.27559 841.88976]'));
+    expect(_pdfImageWidths(page, objects), [160]);
+    expect(_pdfPageText(page, objects), contains('Ordinary photo'));
+    expect(_pdfPageText(page, objects), contains('October 7, 2026'));
   });
 }

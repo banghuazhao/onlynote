@@ -439,5 +439,11 @@
   "Daily_Note_Calendar_Next_Month": "下個月",
   "Daily_Note_Calendar_Choose_Month": "選擇月份和年份",
   "Daily_Note_Calendar_Open_Failed": "無法開啟每日筆記，請再試一次。",
-  "Daily_Note_Calendar_Note_Unavailable": "這篇每日筆記已不可用。"
+  "Daily_Note_Calendar_Note_Unavailable": "這篇每日筆記已不可用。",
+  "Document_Scan": "掃描文件",
+  "Document_Scan_Failed": "無法完成加入掃描頁面，請重試。",
+  "Document_Scan_Unsupported": "此裝置不支援文件掃描。",
+  "Document_Scan_Permission": "請在設定中允許相機存取，以掃描文件。",
+  "Document_Scan_Too_Many": "每次最多掃描20頁，請將文件分成幾次掃描。",
+  "Document_Scan_Pending": "掃描仍在處理中，請稍後重試。"
 }

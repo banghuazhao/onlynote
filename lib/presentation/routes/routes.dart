@@ -3,6 +3,7 @@ import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
+import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/photo_text_extraction.dart';
 import 'package:onlynote/services/voice_memo_drafts.dart';

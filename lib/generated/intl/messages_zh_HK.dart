@@ -159,6 +159,22 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Delete_Todo_Confirm_Title": MessageLookupByLibrary.simpleMessage("刪除此項？"),
     "Delete_View": MessageLookupByLibrary.simpleMessage("刪除檢視"),
+    "Document_Scan": MessageLookupByLibrary.simpleMessage("掃描文件"),
+    "Document_Scan_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法完成加入掃描頁面，請重試。",
+    ),
+    "Document_Scan_Pending": MessageLookupByLibrary.simpleMessage(
+      "掃描仍在處理中，請稍後重試。",
+    ),
+    "Document_Scan_Permission": MessageLookupByLibrary.simpleMessage(
+      "請在設定中允許相機存取，以掃描文件。",
+    ),
+    "Document_Scan_Too_Many": MessageLookupByLibrary.simpleMessage(
+      "每次最多掃描20頁，請將文件分成幾次掃描。",
+    ),
+    "Document_Scan_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "此裝置不支援文件掃描。",
+    ),
     "Done": MessageLookupByLibrary.simpleMessage("完成"),
     "Duplicate": MessageLookupByLibrary.simpleMessage("複製"),
     "Edit": MessageLookupByLibrary.simpleMessage("編輯"),
