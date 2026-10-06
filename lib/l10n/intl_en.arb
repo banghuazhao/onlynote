@@ -287,5 +287,85 @@
   "Widget_Choose_Note_Title": "Make a widget yours",
   "Widget_Choose_Note_iOS": "Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.",
   "Widget_Choose_Note_Android": "When adding a widget, choose All notes or one note or checklist. Use Widget settings to change it later.",
-  "Widget_Checklist_Tip": "Tap a checkbox to update your checklist without opening Onlynote."
+  "Widget_Checklist_Tip": "Tap a checkbox to update your checklist without opening Onlynote.",
+  "Photo_Text_Extract": "Extract text",
+  "Photo_Text_Extracting": "Reading photo…",
+  "Photo_Text_Review": "Text from photo",
+  "Photo_Text_Review_Hint": "Review and edit the text before inserting it into your note.",
+  "Photo_Text_Insert": "Insert text",
+  "Photo_Text_Copy": "Copy text",
+  "Photo_Text_Copied": "Text copied",
+  "Photo_Text_No_Text": "No text found. Try a clearer photo with larger text.",
+  "Photo_Text_Unsupported": "Text extraction is not available on this device.",
+  "Photo_Text_Failed": "Could not read text from this photo. Please try again.",
+  "Photo_Text_Field": "Extracted text",
+  "Photo_Text_Choose": "Choose a photo",
+  "Photo_Text_Photo": "Photo {number}",
+  "Photo_Text_Insert_Done": "Text added to note",
+  "History_Title": "Note history",
+  "History_Empty": "Saved changes will appear here.",
+  "History_Version": "Saved {date}",
+  "History_Restore": "Restore this version",
+  "History_Restored": "Version restored",
+  "History_Restore_Failed": "Could not restore this version. Try again.",
+  "History_Unavailable": "This note or version is no longer available.",
+  "History_Current": "Already matches this version",
+  "History_Preview": "Version preview",
+  "History_Photos": "{count} photos",
+  "History_Recordings": "{count} recordings",
+  "Voice_Memo": "Voice memo",
+  "Voice_Record": "Record",
+  "Voice_Stop": "Stop recording",
+  "Voice_Play": "Play",
+  "Voice_Pause": "Pause",
+  "Voice_Transcribe": "Transcribe",
+  "Voice_Transcribing": "Transcribing…",
+  "Voice_Review_Transcript": "Review transcript",
+  "Voice_Save": "Save recording",
+  "Voice_Cancel": "Cancel",
+  "Voice_Delete": "Delete recording",
+  "Voice_Recording_Hint": "Record up to 5 minutes. Transcription is optional.",
+  "Voice_Interrupted": "Recording stopped when the app was interrupted. Review it before saving.",
+  "Voice_Record_Failed": "Could not record. Please try again.",
+  "Voice_Permission_Denied": "Allow microphone access in Settings to record a voice memo.",
+  "Voice_Transcription_Unavailable": "On-device transcription is unavailable for this language or device. You can still save the recording.",
+  "Voice_Transcription_Failed": "Could not transcribe. Your recording is safe; retry or save without text.",
+  "Voice_Save_Failed": "Could not save the recording. Please try again.",
+  "Voice_Discard_Failed": "Could not discard the recording. Please try again.",
+  "Voice_Transcript_Hint": "Review and edit the transcript.",
+  "Voice_Transcription_Language": "Transcription language",
+  "Voice_Language_English": "English",
+  "Voice_Language_Chinese": "Chinese (Simplified)",
+  "Voice_Language_Chinese_Traditional": "Chinese (Traditional)",
+  "Voice_Edit_Transcript": "Edit transcript",
+  "@Photo_Text_Photo": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Photos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Recordings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Version": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "Photo_Text_Copy_Failed": "Could not copy text. Please try again.",
+  "Voice_Play_Failed": "Could not play this recording. Please try again."
 }

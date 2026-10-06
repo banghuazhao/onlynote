@@ -2529,6 +2529,501 @@ class S {
       args: [],
     );
   }
+
+  /// `Extract text`
+  String get Photo_Text_Extract {
+    return Intl.message(
+      'Extract text',
+      name: 'Photo_Text_Extract',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reading photo…`
+  String get Photo_Text_Extracting {
+    return Intl.message(
+      'Reading photo…',
+      name: 'Photo_Text_Extracting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text from photo`
+  String get Photo_Text_Review {
+    return Intl.message(
+      'Text from photo',
+      name: 'Photo_Text_Review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review and edit the text before inserting it into your note.`
+  String get Photo_Text_Review_Hint {
+    return Intl.message(
+      'Review and edit the text before inserting it into your note.',
+      name: 'Photo_Text_Review_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Insert text`
+  String get Photo_Text_Insert {
+    return Intl.message(
+      'Insert text',
+      name: 'Photo_Text_Insert',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy text`
+  String get Photo_Text_Copy {
+    return Intl.message(
+      'Copy text',
+      name: 'Photo_Text_Copy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text copied`
+  String get Photo_Text_Copied {
+    return Intl.message(
+      'Text copied',
+      name: 'Photo_Text_Copied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No text found. Try a clearer photo with larger text.`
+  String get Photo_Text_No_Text {
+    return Intl.message(
+      'No text found. Try a clearer photo with larger text.',
+      name: 'Photo_Text_No_Text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text extraction is not available on this device.`
+  String get Photo_Text_Unsupported {
+    return Intl.message(
+      'Text extraction is not available on this device.',
+      name: 'Photo_Text_Unsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not read text from this photo. Please try again.`
+  String get Photo_Text_Failed {
+    return Intl.message(
+      'Could not read text from this photo. Please try again.',
+      name: 'Photo_Text_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Extracted text`
+  String get Photo_Text_Field {
+    return Intl.message(
+      'Extracted text',
+      name: 'Photo_Text_Field',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a photo`
+  String get Photo_Text_Choose {
+    return Intl.message(
+      'Choose a photo',
+      name: 'Photo_Text_Choose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo {number}`
+  String Photo_Text_Photo(int number) {
+    return Intl.message(
+      'Photo $number',
+      name: 'Photo_Text_Photo',
+      desc: '',
+      args: [number],
+    );
+  }
+
+  /// `Text added to note`
+  String get Photo_Text_Insert_Done {
+    return Intl.message(
+      'Text added to note',
+      name: 'Photo_Text_Insert_Done',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note history`
+  String get History_Title {
+    return Intl.message(
+      'Note history',
+      name: 'History_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved changes will appear here.`
+  String get History_Empty {
+    return Intl.message(
+      'Saved changes will appear here.',
+      name: 'History_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved {date}`
+  String History_Version(String date) {
+    return Intl.message(
+      'Saved $date',
+      name: 'History_Version',
+      desc: '',
+      args: [date],
+    );
+  }
+
+  /// `Restore this version`
+  String get History_Restore {
+    return Intl.message(
+      'Restore this version',
+      name: 'History_Restore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Version restored`
+  String get History_Restored {
+    return Intl.message(
+      'Version restored',
+      name: 'History_Restored',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not restore this version. Try again.`
+  String get History_Restore_Failed {
+    return Intl.message(
+      'Could not restore this version. Try again.',
+      name: 'History_Restore_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note or version is no longer available.`
+  String get History_Unavailable {
+    return Intl.message(
+      'This note or version is no longer available.',
+      name: 'History_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already matches this version`
+  String get History_Current {
+    return Intl.message(
+      'Already matches this version',
+      name: 'History_Current',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Version preview`
+  String get History_Preview {
+    return Intl.message(
+      'Version preview',
+      name: 'History_Preview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} photos`
+  String History_Photos(int count) {
+    return Intl.message(
+      '$count photos',
+      name: 'History_Photos',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count} recordings`
+  String History_Recordings(int count) {
+    return Intl.message(
+      '$count recordings',
+      name: 'History_Recordings',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Voice memo`
+  String get Voice_Memo {
+    return Intl.message('Voice memo', name: 'Voice_Memo', desc: '', args: []);
+  }
+
+  /// `Record`
+  String get Voice_Record {
+    return Intl.message('Record', name: 'Voice_Record', desc: '', args: []);
+  }
+
+  /// `Stop recording`
+  String get Voice_Stop {
+    return Intl.message(
+      'Stop recording',
+      name: 'Voice_Stop',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Play`
+  String get Voice_Play {
+    return Intl.message('Play', name: 'Voice_Play', desc: '', args: []);
+  }
+
+  /// `Pause`
+  String get Voice_Pause {
+    return Intl.message('Pause', name: 'Voice_Pause', desc: '', args: []);
+  }
+
+  /// `Transcribe`
+  String get Voice_Transcribe {
+    return Intl.message(
+      'Transcribe',
+      name: 'Voice_Transcribe',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transcribing…`
+  String get Voice_Transcribing {
+    return Intl.message(
+      'Transcribing…',
+      name: 'Voice_Transcribing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review transcript`
+  String get Voice_Review_Transcript {
+    return Intl.message(
+      'Review transcript',
+      name: 'Voice_Review_Transcript',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save recording`
+  String get Voice_Save {
+    return Intl.message(
+      'Save recording',
+      name: 'Voice_Save',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get Voice_Cancel {
+    return Intl.message('Cancel', name: 'Voice_Cancel', desc: '', args: []);
+  }
+
+  /// `Delete recording`
+  String get Voice_Delete {
+    return Intl.message(
+      'Delete recording',
+      name: 'Voice_Delete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Record up to 5 minutes. Transcription is optional.`
+  String get Voice_Recording_Hint {
+    return Intl.message(
+      'Record up to 5 minutes. Transcription is optional.',
+      name: 'Voice_Recording_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recording stopped when the app was interrupted. Review it before saving.`
+  String get Voice_Interrupted {
+    return Intl.message(
+      'Recording stopped when the app was interrupted. Review it before saving.',
+      name: 'Voice_Interrupted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not record. Please try again.`
+  String get Voice_Record_Failed {
+    return Intl.message(
+      'Could not record. Please try again.',
+      name: 'Voice_Record_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Allow microphone access in Settings to record a voice memo.`
+  String get Voice_Permission_Denied {
+    return Intl.message(
+      'Allow microphone access in Settings to record a voice memo.',
+      name: 'Voice_Permission_Denied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `On-device transcription is unavailable for this language or device. You can still save the recording.`
+  String get Voice_Transcription_Unavailable {
+    return Intl.message(
+      'On-device transcription is unavailable for this language or device. You can still save the recording.',
+      name: 'Voice_Transcription_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not transcribe. Your recording is safe; retry or save without text.`
+  String get Voice_Transcription_Failed {
+    return Intl.message(
+      'Could not transcribe. Your recording is safe; retry or save without text.',
+      name: 'Voice_Transcription_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save the recording. Please try again.`
+  String get Voice_Save_Failed {
+    return Intl.message(
+      'Could not save the recording. Please try again.',
+      name: 'Voice_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not discard the recording. Please try again.`
+  String get Voice_Discard_Failed {
+    return Intl.message(
+      'Could not discard the recording. Please try again.',
+      name: 'Voice_Discard_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review and edit the transcript.`
+  String get Voice_Transcript_Hint {
+    return Intl.message(
+      'Review and edit the transcript.',
+      name: 'Voice_Transcript_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transcription language`
+  String get Voice_Transcription_Language {
+    return Intl.message(
+      'Transcription language',
+      name: 'Voice_Transcription_Language',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `English`
+  String get Voice_Language_English {
+    return Intl.message(
+      'English',
+      name: 'Voice_Language_English',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chinese (Simplified)`
+  String get Voice_Language_Chinese {
+    return Intl.message(
+      'Chinese (Simplified)',
+      name: 'Voice_Language_Chinese',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chinese (Traditional)`
+  String get Voice_Language_Chinese_Traditional {
+    return Intl.message(
+      'Chinese (Traditional)',
+      name: 'Voice_Language_Chinese_Traditional',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit transcript`
+  String get Voice_Edit_Transcript {
+    return Intl.message(
+      'Edit transcript',
+      name: 'Voice_Edit_Transcript',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not copy text. Please try again.`
+  String get Photo_Text_Copy_Failed {
+    return Intl.message(
+      'Could not copy text. Please try again.',
+      name: 'Photo_Text_Copy_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not play this recording. Please try again.`
+  String get Voice_Play_Failed {
+    return Intl.message(
+      'Could not play this recording. Please try again.',
+      name: 'Voice_Play_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

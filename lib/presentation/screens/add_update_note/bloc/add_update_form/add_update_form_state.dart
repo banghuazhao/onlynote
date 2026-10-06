@@ -9,6 +9,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
       Color? selectedColor,
       @Default([]) List<Todo> todos,
       @Default([]) List<String> imagePaths,
+      @Default([]) List<VoiceMemo> voiceMemos,
       DateTime? reminderDate,
       int? reminderId}) = _AddUpdateFormState;
 

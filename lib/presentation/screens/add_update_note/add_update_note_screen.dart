@@ -7,6 +7,14 @@ import 'package:uuid/uuid.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/audio_storage.dart';
+import 'package:onlynote/services/photo_text_extraction.dart';
+import 'package:onlynote/services/voice_memo_drafts.dart';
+import 'package:onlynote/services/voice_memo_service.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/presentation/components/photo_text_review_sheet.dart';
+import 'package:onlynote/presentation/components/voice_memo_composer.dart';
+import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
 import 'package:onlynote/services/note_reminder_scheduler.dart';
@@ -15,10 +23,12 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:onlynote/Tools/image_storage.dart';
+import 'package:onlynote/Tools/note_cleanup.dart';
 import 'package:onlynote/Tools/in_app_reviewer_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/random.dart';
@@ -53,6 +63,9 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.customTemplateNote,
       this.autosaveStore,
       this.photoCapture,
+      this.photoTextExtraction,
+      this.voiceMemoService,
+      this.voiceMemoDrafts,
       this.reminderScheduler,
       this.widgetCommands,
       this.start = NoteEditorStart.standard});
@@ -64,6 +77,9 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final Note? customTemplateNote;
   final NoteAutosaveStore? autosaveStore;
   final NotePhotoCapture? photoCapture;
+  final PhotoTextExtraction? photoTextExtraction;
+  final VoiceMemoService? voiceMemoService;
+  final VoiceMemoDrafts? voiceMemoDrafts;
   final NoteReminderScheduler? reminderScheduler;
   final WidgetCommands? widgetCommands;
   final NoteEditorStart start;
@@ -91,6 +107,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   Animation<double>? _entryAnimation;
   bool _photoStarted = false;
   bool _addingPhoto = false;
+  bool _presentingMedia = false;
+  bool _extractingPhotoText = false;
+  VoiceMemoDrafts? _recordingDrafts;
+  Future<void> _voiceWrites = Future.value();
+  int _voiceMutations = 0;
   bool _leaving = false;
   bool _allowPop = false;
   bool _hadUserChange = false;
@@ -139,6 +160,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           selectedColor: initial.color,
           todos: initial.todo,
           imagePaths: initial.imagePaths,
+          voiceMemos: initial.voiceMemos,
         ));
     _changes = _form.stream.listen((state) {
       _hadUserChange = true;
@@ -189,7 +211,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _addPhoto(ImageSource source, {bool retry = false}) async {
-    if (_addingPhoto || _savingReminder || _presentingReminder || _leaving) {
+    if (_addingPhoto ||
+        _presentingMedia ||
+        _savingReminder ||
+        _presentingReminder ||
+        _leaving) {
       return;
     }
     setState(() => _addingPhoto = true);
@@ -245,16 +271,228 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       color: state.selectedColor,
       todo: state.todos,
       imagePaths: state.imagePaths,
+      voiceMemos: state.voiceMemos,
     );
     if (next != _autosave.note) {
       _autosave.update(next.copyWith(dateTime: DateTime.now()));
     }
   }
 
+  AudioStorage get _audio =>
+      widget.voiceMemoDrafts?.audio ?? AudioStorage.instance;
+
+  VoiceMemoDrafts get _voiceDrafts =>
+      _recordingDrafts ??= widget.voiceMemoDrafts ??
+          VoiceMemoDrafts(
+            journal: Hive.box(draftDatabaseBox),
+            notes: getIt<NoteRepository>(),
+            audio: _audio,
+            readDuration:
+                (widget.voiceMemoService ?? VoiceMemoService.instance).duration,
+          );
+
+  bool get _mediaBlocked =>
+      _presentingMedia ||
+      _voiceMutations > 0 ||
+      _addingPhoto ||
+      _savingReminder ||
+      _presentingReminder ||
+      _leaving;
+
+  Future<void> _extractPhotoText() async {
+    if (_mediaBlocked || _form.state.imagePaths.isEmpty) return;
+    setState(() => _presentingMedia = true);
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      final paths = List<String>.of(_form.state.imagePaths);
+      final path = paths.length == 1
+          ? paths.single
+          : await showAppSheet<String>(
+              context: context,
+              builder: (sheetContext) => AppSheet(
+                title: S.of(sheetContext).Photo_Text_Choose,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final (index, path) in paths.indexed)
+                      ListTile(
+                        leading: NoteImage(path: path, width: 48, height: 48),
+                        title: Text(
+                            S.of(sheetContext).Photo_Text_Photo(index + 1)),
+                        onTap: () => Navigator.pop(sheetContext, path),
+                      ),
+                  ],
+                ),
+              ),
+            );
+      if (path == null || !mounted) return;
+      setState(() => _extractingPhotoText = true);
+      final result = await (widget.photoTextExtraction ?? PhotoTextExtraction())
+          .extract(path);
+      if (!mounted) return;
+      setState(() => _extractingPhotoText = false);
+      if (result.status != PhotoTextStatus.text) {
+        final strings = S.of(context);
+        final message = switch (result.status) {
+          PhotoTextStatus.noText => strings.Photo_Text_No_Text,
+          PhotoTextStatus.unsupported => strings.Photo_Text_Unsupported,
+          _ => strings.Photo_Text_Failed,
+        };
+        showTransientSnackBar(context, SnackBar(content: Text(message)));
+        return;
+      }
+      final text = await showAppSheet<String>(
+          context: context,
+          builder: (_) => PhotoTextReviewSheet(text: result.text));
+      if (text == null || text.trim().isEmpty || !mounted) return;
+      // Append to the latest editor text so recognition never replaces typing.
+      final previous = _descriptionController.text;
+      final updated =
+          '${previous.trimRight()}${previous.trim().isEmpty ? '' : '\n\n'}${text.trim()}';
+      _descriptionController.value = TextEditingValue(
+          text: updated,
+          selection: TextSelection.collapsed(offset: updated.length));
+      _form.add(AddUpdateFormEvent.descriptionChanged(updated));
+      await Future<void>.delayed(Duration.zero);
+      _capture(_form.state);
+      final saved = await _autosave.flush();
+      if (mounted) {
+        showTransientSnackBar(
+            context,
+            SnackBar(
+                content: Text(saved
+                    ? S.of(context).Photo_Text_Insert_Done
+                    : S.of(context).Autosave_Failed)));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _presentingMedia = false;
+          _extractingPhotoText = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _setVoiceMemos(List<VoiceMemo> memos) async {
+    if (listEquals(_form.state.voiceMemos, memos)) return;
+    final applied =
+        _form.stream.firstWhere((state) => listEquals(state.voiceMemos, memos));
+    _form.add(AddUpdateFormEvent.voiceMemosChanged(memos));
+    await applied;
+    _capture(_form.state);
+  }
+
+  Future<T> _serializeVoiceChange<T>(Future<T> Function() change) {
+    if (_leaving) return Future.error(StateError('Editor is closing'));
+    _voiceMutations++;
+    if (mounted) setState(() {});
+    final result = _voiceWrites.then<T>((_) {
+      if (!mounted) throw StateError('Editor is closed');
+      return change();
+    });
+    _voiceWrites =
+        result.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return result.whenComplete(() {
+      _voiceMutations--;
+      if (mounted) setState(() {});
+    });
+  }
+
+  Future<VoiceMemo> _saveVoiceDraft(VoiceMemo memo) =>
+      _serializeVoiceChange(() async {
+        await _voiceDrafts.retain(memo);
+        await Future<void>.delayed(Duration.zero);
+        await _setVoiceMemos([
+          for (final existing in _form.state.voiceMemos)
+            if (existing.id != memo.id) existing,
+          memo,
+        ]);
+        if (!await _autosave.flush()) throw StateError('Recording save failed');
+        try {
+          await _voiceDrafts.complete(memo);
+        } catch (error) {
+          // The note already owns the recording; startup can clear its journal.
+          debugPrint('Recording journal cleanup deferred: $error');
+        }
+        return memo;
+      });
+
+  Future<void> _discardVoiceDraft(VoiceMemo memo) =>
+      _serializeVoiceChange(() async {
+        if (_form.state.voiceMemos.any((existing) => existing.id == memo.id)) {
+          await _setVoiceMemos(_form.state.voiceMemos
+              .where((existing) => existing.id != memo.id)
+              .toList());
+          if (!await _autosave.flush()) {
+            throw StateError('Recording discard failed');
+          }
+        }
+        await _voiceDrafts.discard(memo);
+      });
+
+  Future<void> _recordVoiceMemo() async {
+    if (_mediaBlocked) return;
+    setState(() => _presentingMedia = true);
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      await Future<void>.delayed(Duration.zero);
+      _capture(_form.state);
+      if (!await _autosave.flush()) throw StateError('Draft save failed');
+      if (!mounted) return;
+      await showVoiceMemoComposer(
+        context,
+        service: widget.voiceMemoService,
+        createDraft: () => _voiceDrafts.prepare(_autosave.note),
+        resolvePath: _audio.resolvePath,
+        retainDraft: (memo) => _voiceDrafts.retain(memo),
+        saveDraft: _saveVoiceDraft,
+        discardDraft: _discardVoiceDraft,
+      );
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Voice_Save_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  Future<void> _removeVoiceMemo(VoiceMemo memo) =>
+      _serializeVoiceChange(() async {
+        final before = List<VoiceMemo>.of(_form.state.voiceMemos);
+        await _setVoiceMemos(
+            before.where((existing) => existing.id != memo.id).toList());
+        if (!await _autosave.flush()) {
+          await _setVoiceMemos(before);
+          throw StateError('Recording removal failed');
+        }
+        await NoteCleanup.deleteUnreferencedAudio([memo.path],
+            repository:
+                widget.voiceMemoDrafts?.notes ?? getIt<NoteRepository>(),
+            audio: _audio);
+      });
+
+  Future<void> _editVoiceTranscript(VoiceMemo memo, String? text) =>
+      _serializeVoiceChange(() async {
+        await _setVoiceMemos([
+          for (final existing in _form.state.voiceMemos)
+            if (existing.id == memo.id)
+              existing.copyWith(transcript: text, clearTranscript: text == null)
+            else
+              existing,
+        ]);
+        if (!await _autosave.flush()) {
+          throw StateError('Transcript save failed');
+        }
+      });
+
   String get _reminderText => [
         _titleController.text,
         _descriptionController.text,
         ..._form.state.todos.map((todo) => todo.title ?? ''),
+        ..._form.state.voiceMemos.map((memo) => memo.transcript ?? ''),
       ].join('\n');
 
   void _reminderChanged() => _queueReminderSuggestion(force: true);
@@ -299,7 +537,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _confirmReminderSuggestion() async {
-    if (_savingReminder || _presentingReminder || _addingPhoto || _leaving) {
+    if (_savingReminder ||
+        _presentingReminder ||
+        _addingPhoto ||
+        _presentingMedia ||
+        _leaving) {
       return;
     }
     // The last keystroke may precede the debounce. Never open a stale date.
@@ -435,6 +677,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited((widget.voiceMemoService ?? VoiceMemoService.instance)
+          .onBackground());
+    }
     if (state != AppLifecycleState.resumed) {
       _capture(_form.state);
       unawaited(_autosave.flush());
@@ -442,7 +689,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _finish() async {
-    if (_leaving || _addingPhoto || _savingReminder || _presentingReminder) {
+    if (_leaving ||
+        _addingPhoto ||
+        _presentingMedia ||
+        _savingReminder ||
+        _presentingReminder) {
       return;
     }
     if (_photoCapture.canRetry) {
@@ -450,6 +701,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       if (!mounted || _photoCapture.canRetry) return;
     }
     _leaving = true;
+    await _voiceWrites;
     // Allow queued form events to apply before flushing the final snapshot.
     await Future<void>.delayed(Duration.zero);
     if (!mounted) return;
@@ -500,6 +752,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               (!_autosave.dirty &&
                   !_photoCapture.canRetry &&
                   !_addingPhoto &&
+                  !_presentingMedia &&
+                  _voiceMutations == 0 &&
                   !_savingReminder &&
                   !_presentingReminder),
           onPopInvokedWithResult: (didPop, _) {
@@ -519,6 +773,13 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               onDone: _finish,
               onAddPhoto: _addPhoto,
               addingPhoto: _addingPhoto,
+              mediaBusy: _presentingMedia,
+              extractingText: _extractingPhotoText,
+              onExtractText: _extractPhotoText,
+              onRecordVoice: _recordVoiceMemo,
+              onRemoveVoice: _removeVoiceMemo,
+              onTranscriptChanged: _editVoiceTranscript,
+              resolveAudioPath: _audio.resolvePath,
               reminderSuggestion: _reminderSuggestion,
               savingReminder: _savingReminder,
               onReminderSuggestion: _confirmReminderSuggestion,
@@ -539,6 +800,13 @@ class _BuildForm extends StatelessWidget {
     required this.onDone,
     required this.onAddPhoto,
     required this.addingPhoto,
+    required this.mediaBusy,
+    required this.extractingText,
+    required this.onExtractText,
+    required this.onRecordVoice,
+    required this.onRemoveVoice,
+    required this.onTranscriptChanged,
+    required this.resolveAudioPath,
     required this.reminderSuggestion,
     required this.savingReminder,
     required this.onReminderSuggestion,
@@ -554,6 +822,13 @@ class _BuildForm extends StatelessWidget {
   final VoidCallback onDone;
   final ValueChanged<ImageSource> onAddPhoto;
   final bool addingPhoto;
+  final bool mediaBusy;
+  final bool extractingText;
+  final VoidCallback onExtractText;
+  final VoidCallback onRecordVoice;
+  final Future<void> Function(VoiceMemo) onRemoveVoice;
+  final Future<void> Function(VoiceMemo, String?) onTranscriptChanged;
+  final Future<String> Function(String) resolveAudioPath;
   final ReminderDateSuggestion? reminderSuggestion;
   final bool savingReminder;
   final VoidCallback onReminderSuggestion;
@@ -646,8 +921,51 @@ class _BuildForm extends StatelessWidget {
                       _BuildImageSection(
                         state: state,
                         onAddPhoto: onAddPhoto,
-                        addingPhoto: addingPhoto,
+                        addingPhoto: addingPhoto || mediaBusy,
                       ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          if (state.imagePaths.isNotEmpty)
+                            TextButton.icon(
+                              key: const ValueKey('editor-extract-text'),
+                              style: AppButtonStyles.paperAction(),
+                              onPressed: mediaBusy || addingPhoto
+                                  ? null
+                                  : onExtractText,
+                              icon: extractingText
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2))
+                                  : const Icon(Icons.document_scanner_outlined,
+                                      size: 20),
+                              label: Text(extractingText
+                                  ? S.of(context).Photo_Text_Extracting
+                                  : S.of(context).Photo_Text_Extract),
+                            ),
+                          TextButton.icon(
+                            key: const ValueKey('editor-record-voice'),
+                            style: AppButtonStyles.paperAction(),
+                            onPressed:
+                                mediaBusy || addingPhoto ? null : onRecordVoice,
+                            icon: const Icon(Icons.mic_none_rounded, size: 20),
+                            label: Text(S.of(context).Voice_Memo),
+                          ),
+                        ],
+                      ),
+                      for (final memo in state.voiceMemos)
+                        VoiceMemoPlayer(
+                          key: ValueKey(memo.id),
+                          memo: memo,
+                          service: widget.voiceMemoService,
+                          resolvePath: resolveAudioPath,
+                          onRemove: () => onRemoveVoice(memo),
+                          onTranscriptChanged: (text) =>
+                              onTranscriptChanged(memo, text),
+                        ),
                       const SizedBox(height: AppSpacings.xml),
                       _BuildDescriptionField(
                         state: state,

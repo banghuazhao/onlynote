@@ -39,10 +39,13 @@ void showTransientSnackBar(BuildContext context, SnackBar snackBar) {
   final controller = messenger.showSnackBar(snackBar);
 
   var closed = false;
-  unawaited(controller.closed.then((_) => closed = true));
-  Future<void>.delayed(snackBar.duration + const Duration(milliseconds: 100),
-      () {
-    if (!closed) controller.close();
+  Timer? fallback;
+  unawaited(controller.closed.then((_) {
+    closed = true;
+    fallback?.cancel();
+  }));
+  fallback = Timer(snackBar.duration + const Duration(milliseconds: 100), () {
+    if (!closed && messenger.mounted) controller.close();
   });
 }
 

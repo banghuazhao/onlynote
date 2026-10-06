@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/audio_storage.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -216,6 +218,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _DuplicateNote event,
     Emitter<HomeState> emit,
   ) async {
+    List<VoiceMemo> audio;
+    try {
+      audio = await AudioStorage.instance.copyToNote(event.note.voiceMemos);
+    } catch (_) {
+      final context = getIt<AppRouter>().context;
+      if (context.mounted) {
+        context.showToast(_i10n.Voice_Save_Failed, isError: true);
+      }
+      return;
+    }
     final duplicated = event.note.copyWith(
       title: '${event.note.title ?? ''} ${_i10n.Copy_Suffix}',
       dateTime: DateTime.now(),
@@ -223,11 +235,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       // Its own copies of the images: sharing the files would mean deleting
       // either note takes the other note's pictures with it.
       imagePaths: await ImageStorage.copyImages(event.note.imagePaths),
+      voiceMemos: audio,
       isPinned: false,
       deletedAt: null,
     );
 
     final failureOrSuccess = await _addNoteUsecase(duplicated);
+    if (failureOrSuccess.isLeft()) {
+      await AudioStorage.instance.deletePaths(audio.map((memo) => memo.path));
+      await ImageStorage.deleteImages(duplicated.imagePaths);
+    }
 
     failureOrSuccess.fold(
       (error) => getIt<AppRouter>()

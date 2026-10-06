@@ -15,6 +15,10 @@ import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/components/note_checklist.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/audio_storage.dart';
+import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/presentation/components/note_history_sheet.dart';
+import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -134,6 +138,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       title: S.of(context).More_Options,
       actions: [
         AppSheetAction(
+          leading: const Icon(Icons.history_rounded),
+          title: Text(S.of(context).History_Title),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _showHistory(note);
+          },
+        ),
+        AppSheetAction(
           leading: const Icon(Icons.bookmarks_outlined),
           title: Text(S.of(context).Save_As_Template),
           onPressed: (sheetContext) {
@@ -154,6 +166,20 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _showHistory(Note note) async {
+    final history = NoteHistory.initializedInstance;
+    if (history == null || note.id == null) return;
+    final restored =
+        await showNoteHistorySheet(context, noteId: note.id!, history: history);
+    if (restored == true && mounted) {
+      context
+          .read<NoteDetailBloc>()
+          .add(NoteDetailEvent.showNote(widget.noteId));
+      showTransientSnackBar(
+          context, SnackBar(content: Text(S.of(context).History_Restored)));
+    }
   }
 
   @override
@@ -572,6 +598,23 @@ class LoadedView extends StatelessWidget {
                       const SizedBox(height: AppSpacings.xxl),
                       _BuildImageGallery(imagePaths: note.imagePaths),
                     },
+                    if (note.hasVoiceMemos) ...[
+                      const SizedBox(height: AppSpacings.xxl),
+                      for (final memo in note.voiceMemos)
+                        if (exportMode) ...[
+                          Text(
+                              '${S.of(context).Voice_Memo} · ${Duration(milliseconds: memo.durationMs).inMinutes}:${(Duration(milliseconds: memo.durationMs).inSeconds % 60).toString().padLeft(2, '0')}',
+                              style: AppTypography.headline6),
+                          if (memo.transcript?.isNotEmpty == true)
+                            Text(memo.transcript!,
+                                style: AppTypography.cardBody),
+                          const SizedBox(height: AppSpacings.m),
+                        ] else
+                          VoiceMemoPlayer(
+                              memo: memo,
+                              key: ValueKey(memo.id),
+                              resolvePath: AudioStorage.instance.resolvePath),
+                    ],
                   ],
                 ),
               ),

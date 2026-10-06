@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
     show AddUpdateBloc, AddUpdateEvent;
 
@@ -28,6 +29,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           selectedColor: event.color,
           todos: event.todos ?? [],
           imagePaths: event.imagePaths ?? [],
+          voiceMemos: event.voiceMemos ?? [],
         ),
       );
     });
@@ -45,6 +47,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       if (event is _ColorChanged) {
         emit(state.copyWith(selectedColor: event.value));
       }
+      if (event is _VoiceMemosChanged) {
+        emit(state.copyWith(voiceMemos: event.value));
+      }
     });
 
     //* add or update note to local database.
@@ -57,6 +62,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          voiceMemos: state.voiceMemos,
           folderId: event.folderId,
           isPinned: event.isPinned,
           sortOrder: event.sortOrder,
@@ -71,6 +77,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          voiceMemos: state.voiceMemos,
           folderId: event.folderId,
           isPinned: event.isPinned,
           sortOrder: event.sortOrder,

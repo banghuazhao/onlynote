@@ -29,15 +29,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m3(count) => "${count} 則備忘錄";
 
-  static String m4(number) => "筆記顏色 ${number}";
+  static String m4(count) => "${count} 張照片";
 
-  static String m5(time) => "下次提醒：${time}";
+  static String m5(count) => "${count} 段錄音";
 
-  static String m6(date) => "提醒我：${date}";
+  static String m6(date) => "儲存於 ${date}";
 
-  static String m7(price) => "支付 ${price} 永久移除廣告。";
+  static String m7(number) => "筆記顏色 ${number}";
 
-  static String m8(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m8(number) => "照片 ${number}";
+
+  static String m9(time) => "下次提醒：${time}";
+
+  static String m10(date) => "提醒我：${date}";
+
+  static String m11(price) => "支付 ${price} 永久移除廣告。";
+
+  static String m12(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -165,6 +173,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "Font_Preview": MessageLookupByLibrary.simpleMessage("留一點空間，記錄下一個好想法。"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字體大小"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("字體樣式"),
+    "History_Current": MessageLookupByLibrary.simpleMessage("已與此版本相同"),
+    "History_Empty": MessageLookupByLibrary.simpleMessage("儲存的修改會顯示在這裡。"),
+    "History_Photos": m4,
+    "History_Preview": MessageLookupByLibrary.simpleMessage("版本預覽"),
+    "History_Recordings": m5,
+    "History_Restore": MessageLookupByLibrary.simpleMessage("還原此版本"),
+    "History_Restore_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法還原此版本，請重試。",
+    ),
+    "History_Restored": MessageLookupByLibrary.simpleMessage("已還原版本"),
+    "History_Title": MessageLookupByLibrary.simpleMessage("備忘錄歷史"),
+    "History_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此備忘錄或版本已無法使用。",
+    ),
+    "History_Version": m6,
     "Image_Guru": MessageLookupByLibrary.simpleMessage("咕嚕濾鏡"),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
     "Large": MessageLookupByLibrary.simpleMessage("大"),
@@ -189,7 +212,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "目前沒有備忘錄..\n點擊  +  添加",
     ),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加備忘錄"),
-    "Note_Color": m4,
+    "Note_Color": m7,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("已刪除備忘錄"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "已成功複製備忘錄",
@@ -237,6 +260,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
       "無法加入照片，請重試或從相簿中選擇。",
     ),
+    "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("選擇照片"),
+    "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("已複製文字"),
+    "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("複製文字"),
+    "Photo_Text_Copy_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法複製文字。請重試。",
+    ),
+    "Photo_Text_Extract": MessageLookupByLibrary.simpleMessage("提取文字"),
+    "Photo_Text_Extracting": MessageLookupByLibrary.simpleMessage("正在讀取照片…"),
+    "Photo_Text_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法讀取照片中的文字，請重試。",
+    ),
+    "Photo_Text_Field": MessageLookupByLibrary.simpleMessage("提取的文字"),
+    "Photo_Text_Insert": MessageLookupByLibrary.simpleMessage("插入文字"),
+    "Photo_Text_Insert_Done": MessageLookupByLibrary.simpleMessage("已將文字加入備忘錄"),
+    "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
+      "未找到文字。請嘗試文字更大、更清晰的照片。",
+    ),
+    "Photo_Text_Photo": m8,
+    "Photo_Text_Review": MessageLookupByLibrary.simpleMessage("照片中的文字"),
+    "Photo_Text_Review_Hint": MessageLookupByLibrary.simpleMessage(
+      "加入備忘錄前，請檢查並編輯文字。",
+    ),
+    "Photo_Text_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "此裝置不支援提取文字。",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("置頂"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("純色紙張"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -266,7 +314,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "請選擇將來的時間來設定提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小時後"),
-    "Reminder_Next_Time": m5,
+    "Reminder_Next_Time": m9,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一星期後"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重複"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
@@ -279,7 +327,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "10 分鐘後提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
-    "Reminder_Suggestion": m6,
+    "Reminder_Suggestion": m10,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "使用建議時間",
     ),
@@ -309,7 +357,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m7,
+    "Remove_Ads_Price": m11,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
@@ -381,7 +429,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m8,
+    "Template_Details": m12,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -435,6 +483,46 @@ class MessageLookup extends MessageLookupByLibrary {
     "Undo": MessageLookupByLibrary.simpleMessage("復原"),
     "Unpin": MessageLookupByLibrary.simpleMessage("取消置頂"),
     "Use_Template": MessageLookupByLibrary.simpleMessage("使用範本"),
+    "Voice_Cancel": MessageLookupByLibrary.simpleMessage("取消"),
+    "Voice_Delete": MessageLookupByLibrary.simpleMessage("刪除錄音"),
+    "Voice_Discard_Failed": MessageLookupByLibrary.simpleMessage("無法捨棄錄音，請重試。"),
+    "Voice_Edit_Transcript": MessageLookupByLibrary.simpleMessage("編輯轉錄文字"),
+    "Voice_Interrupted": MessageLookupByLibrary.simpleMessage(
+      "App 中斷時錄音已停止，請檢查後儲存。",
+    ),
+    "Voice_Language_Chinese": MessageLookupByLibrary.simpleMessage("中文（簡體）"),
+    "Voice_Language_Chinese_Traditional": MessageLookupByLibrary.simpleMessage(
+      "中文（繁體）",
+    ),
+    "Voice_Language_English": MessageLookupByLibrary.simpleMessage("英語"),
+    "Voice_Memo": MessageLookupByLibrary.simpleMessage("語音備忘錄"),
+    "Voice_Pause": MessageLookupByLibrary.simpleMessage("暫停"),
+    "Voice_Permission_Denied": MessageLookupByLibrary.simpleMessage(
+      "請在設定中允許使用咪高峰以錄製語音備忘錄。",
+    ),
+    "Voice_Play": MessageLookupByLibrary.simpleMessage("播放"),
+    "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage("無法播放此錄音。請重試。"),
+    "Voice_Record": MessageLookupByLibrary.simpleMessage("錄音"),
+    "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage("無法錄音，請重試。"),
+    "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
+      "最多錄製 5 分鐘，可選擇轉成文字。",
+    ),
+    "Voice_Review_Transcript": MessageLookupByLibrary.simpleMessage("檢查轉錄文字"),
+    "Voice_Save": MessageLookupByLibrary.simpleMessage("儲存錄音"),
+    "Voice_Save_Failed": MessageLookupByLibrary.simpleMessage("無法儲存錄音，請重試。"),
+    "Voice_Stop": MessageLookupByLibrary.simpleMessage("停止錄音"),
+    "Voice_Transcribe": MessageLookupByLibrary.simpleMessage("轉成文字"),
+    "Voice_Transcribing": MessageLookupByLibrary.simpleMessage("正在轉成文字…"),
+    "Voice_Transcript_Hint": MessageLookupByLibrary.simpleMessage("檢查並編輯轉錄文字。"),
+    "Voice_Transcription_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法轉成文字。錄音已保留，可重試或直接儲存錄音。",
+    ),
+    "Voice_Transcription_Language": MessageLookupByLibrary.simpleMessage(
+      "轉錄語言",
+    ),
+    "Voice_Transcription_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此語言或裝置暫不支援本機轉錄，您仍可儲存錄音。",
+    ),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("喝水吧"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("彈鋼琴"),
     "Widget": MessageLookupByLibrary.simpleMessage("主畫面小工具"),

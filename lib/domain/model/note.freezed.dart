@@ -23,6 +23,7 @@ mixin _$Note {
   DateTime? get dateTime => throw _privateConstructorUsedError;
   List<Todo> get todo => throw _privateConstructorUsedError;
   List<String> get imagePaths => throw _privateConstructorUsedError;
+  List<VoiceMemo> get voiceMemos => throw _privateConstructorUsedError;
   int? get sortOrder => throw _privateConstructorUsedError;
   bool get isPinned => throw _privateConstructorUsedError;
   DateTime? get deletedAt => throw _privateConstructorUsedError;
@@ -45,6 +46,7 @@ abstract class $NoteCopyWith<$Res> {
       DateTime? dateTime,
       List<Todo> todo,
       List<String> imagePaths,
+      List<VoiceMemo> voiceMemos,
       int? sortOrder,
       bool isPinned,
       DateTime? deletedAt,
@@ -71,6 +73,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? dateTime = freezed,
     Object? todo = null,
     Object? imagePaths = null,
+    Object? voiceMemos = null,
     Object? sortOrder = freezed,
     Object? isPinned = null,
     Object? deletedAt = freezed,
@@ -105,6 +108,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.imagePaths
           : imagePaths // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      voiceMemos: null == voiceMemos
+          ? _value.voiceMemos
+          : voiceMemos // ignore: cast_nullable_to_non_nullable
+              as List<VoiceMemo>,
       sortOrder: freezed == sortOrder
           ? _value.sortOrder
           : sortOrder // ignore: cast_nullable_to_non_nullable
@@ -140,6 +147,7 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       DateTime? dateTime,
       List<Todo> todo,
       List<String> imagePaths,
+      List<VoiceMemo> voiceMemos,
       int? sortOrder,
       bool isPinned,
       DateTime? deletedAt,
@@ -163,6 +171,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? dateTime = freezed,
     Object? todo = null,
     Object? imagePaths = null,
+    Object? voiceMemos = null,
     Object? sortOrder = freezed,
     Object? isPinned = null,
     Object? deletedAt = freezed,
@@ -197,6 +206,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value._imagePaths
           : imagePaths // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      voiceMemos: null == voiceMemos
+          ? _value._voiceMemos
+          : voiceMemos // ignore: cast_nullable_to_non_nullable
+              as List<VoiceMemo>,
       sortOrder: freezed == sortOrder
           ? _value.sortOrder
           : sortOrder // ignore: cast_nullable_to_non_nullable
@@ -228,12 +241,14 @@ class _$NoteImpl extends _Note {
       this.dateTime,
       final List<Todo> todo = const [],
       final List<String> imagePaths = const [],
+      final List<VoiceMemo> voiceMemos = const [],
       this.sortOrder,
       this.isPinned = false,
       this.deletedAt,
       this.folderId})
       : _todo = todo,
         _imagePaths = imagePaths,
+        _voiceMemos = voiceMemos,
         super._();
 
   @override
@@ -264,6 +279,15 @@ class _$NoteImpl extends _Note {
     return EqualUnmodifiableListView(_imagePaths);
   }
 
+  final List<VoiceMemo> _voiceMemos;
+  @override
+  @JsonKey()
+  List<VoiceMemo> get voiceMemos {
+    if (_voiceMemos is EqualUnmodifiableListView) return _voiceMemos;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_voiceMemos);
+  }
+
   @override
   final int? sortOrder;
   @override
@@ -276,7 +300,7 @@ class _$NoteImpl extends _Note {
 
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId)';
   }
 
   @override
@@ -294,6 +318,8 @@ class _$NoteImpl extends _Note {
             const DeepCollectionEquality().equals(other._todo, _todo) &&
             const DeepCollectionEquality()
                 .equals(other._imagePaths, _imagePaths) &&
+            const DeepCollectionEquality()
+                .equals(other._voiceMemos, _voiceMemos) &&
             (identical(other.sortOrder, sortOrder) ||
                 other.sortOrder == sortOrder) &&
             (identical(other.isPinned, isPinned) ||
@@ -314,6 +340,7 @@ class _$NoteImpl extends _Note {
       dateTime,
       const DeepCollectionEquality().hash(_todo),
       const DeepCollectionEquality().hash(_imagePaths),
+      const DeepCollectionEquality().hash(_voiceMemos),
       sortOrder,
       isPinned,
       deletedAt,
@@ -335,6 +362,7 @@ abstract class _Note extends Note {
       final DateTime? dateTime,
       final List<Todo> todo,
       final List<String> imagePaths,
+      final List<VoiceMemo> voiceMemos,
       final int? sortOrder,
       final bool isPinned,
       final DateTime? deletedAt,
@@ -355,6 +383,8 @@ abstract class _Note extends Note {
   List<Todo> get todo;
   @override
   List<String> get imagePaths;
+  @override
+  List<VoiceMemo> get voiceMemos;
   @override
   int? get sortOrder;
   @override

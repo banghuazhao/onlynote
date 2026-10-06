@@ -84,7 +84,7 @@ class NoteAutosave extends ChangeNotifier {
       (note.title?.trim().isNotEmpty ?? false) ||
       (note.description?.trim().isNotEmpty ?? false) ||
       note.todo.any((todo) => todo.title?.trim().isNotEmpty ?? false) ||
-      note.imagePaths.isNotEmpty;
+      note.imagePaths.isNotEmpty || note.voiceMemos.isNotEmpty;
 
   void update(Note note) {
     if (_disposed || note == _note) return;

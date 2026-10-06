@@ -21,6 +21,8 @@ class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         WidgetCommandBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        PhotoTextBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
+        VoiceMemoBridge.register(this, flutterEngine.dartExecutor.binaryMessenger)
         shareChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "com.appsbay.onlynote/shared_notes"
@@ -91,11 +93,33 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        VoiceMemoBridge.dispose()
         shareChannel?.setMethodCallHandler(null)
         shareChannel = null
         shortcutChannel?.setMethodCallHandler(null)
         shortcutChannel = null
         shortcutBridgeReady = false
         super.cleanUpFlutterEngine(flutterEngine)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        VoiceMemoBridge.onResume()
+    }
+
+    override fun onPause() {
+        VoiceMemoBridge.onBackground()
+        super.onPause()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (!VoiceMemoBridge.onRequestPermissionsResult(requestCode, grantResults)) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    override fun onDestroy() {
+        VoiceMemoBridge.dispose()
+        super.onDestroy()
     }
 }

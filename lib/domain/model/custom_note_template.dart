@@ -2,11 +2,12 @@ import 'dart:ui' show Color;
 
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
 
 const maxTemplateNameLength = 80;
 
-/// Reusable content owns separate photo files and never stores task identities.
+/// Reusable content owns separate media files and never stores task identities.
 class CustomNoteTemplate {
   CustomNoteTemplate({
     required this.id,
@@ -16,9 +17,11 @@ class CustomNoteTemplate {
     List<String> items = const [],
     this.color,
     List<String> imagePaths = const [],
+    List<VoiceMemo> voiceMemos = const [],
     required this.createdAt,
   })  : items = List.unmodifiable(items),
-        imagePaths = List.unmodifiable(imagePaths);
+        imagePaths = List.unmodifiable(imagePaths),
+        voiceMemos = List.unmodifiable(voiceMemos);
 
   final String id;
   final String name;
@@ -27,10 +30,13 @@ class CustomNoteTemplate {
   final List<String> items;
   final int? color;
   final List<String> imagePaths;
+  final List<VoiceMemo> voiceMemos;
   final DateTime createdAt;
 
   factory CustomNoteTemplate.fromNote(Note note,
-          {required String name, required List<String> imageCopies}) =>
+          {required String name,
+          required List<String> imageCopies,
+          List<VoiceMemo> voiceCopies = const []}) =>
       CustomNoteTemplate(
         id: const Uuid().v4(),
         name: validatedTemplateName(name),
@@ -39,11 +45,13 @@ class CustomNoteTemplate {
         items: note.todo.map((item) => item.title ?? '').toList(),
         color: note.color?.toARGB32(),
         imagePaths: imageCopies,
+        voiceMemos: voiceCopies,
         createdAt: DateTime.now(),
       );
 
   Note createNote({
     required List<String> imageCopies,
+    List<VoiceMemo> voiceCopies = const [],
     String? folderId,
     DateTime? now,
   }) {
@@ -56,6 +64,7 @@ class CustomNoteTemplate {
       todo: [for (final item in items) Todo(id: uuid.v4(), title: item)],
       color: color == null ? null : Color(color!),
       imagePaths: imageCopies,
+      voiceMemos: voiceCopies,
       folderId: folderId,
       dateTime: created,
       sortOrder: -created.millisecondsSinceEpoch,
@@ -66,6 +75,7 @@ class CustomNoteTemplate {
     String? id,
     String? name,
     List<String>? imagePaths,
+    List<VoiceMemo>? voiceMemos,
   }) =>
       CustomNoteTemplate(
         id: id ?? this.id,
@@ -75,6 +85,7 @@ class CustomNoteTemplate {
         items: items,
         color: color,
         imagePaths: imagePaths ?? this.imagePaths,
+        voiceMemos: voiceMemos ?? this.voiceMemos,
         createdAt: createdAt,
       );
 
@@ -86,6 +97,7 @@ class CustomNoteTemplate {
         'items': items,
         'color': color,
         'imagePaths': imagePaths,
+        'voiceMemos': [for (final memo in voiceMemos) memo.toMap()],
         'createdAt': createdAt.toIso8601String(),
       };
 
@@ -108,6 +120,20 @@ class CustomNoteTemplate {
     final name = validatedTemplateName(text('name'));
     final createdAt = DateTime.tryParse(text('createdAt'));
     final color = json['color'];
+    final rawMemos =
+        json.containsKey('voiceMemos') ? json['voiceMemos'] : const [];
+    if (rawMemos is! List || rawMemos.length > 100) {
+      throw const FormatException('Invalid template recordings');
+    }
+    final memos = <VoiceMemo>[];
+    final memoIds = <String>{};
+    for (final raw in rawMemos) {
+      final memo = VoiceMemo.tryFromMap(raw);
+      if (memo == null || memo.durationMs <= 0 || !memoIds.add(memo.id)) {
+        throw const FormatException('Invalid template recording');
+      }
+      memos.add(memo);
+    }
     if (id.isEmpty ||
         createdAt == null ||
         (color != null && (color is! int || color < 0 || color > 0xffffffff))) {
@@ -121,6 +147,7 @@ class CustomNoteTemplate {
       items: list('items'),
       color: color as int?,
       imagePaths: list('imagePaths'),
+      voiceMemos: memos,
       createdAt: createdAt,
     );
   }

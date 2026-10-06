@@ -11,6 +11,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/data/repository/note_repository.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/observer.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
@@ -39,6 +40,10 @@ import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
 import 'services/note_autosave.dart';
 import 'services/note_photo_recovery.dart';
+import 'services/note_history.dart';
+import 'services/audio_storage.dart';
+import 'services/voice_memo_drafts.dart';
+import 'services/voice_memo_service.dart';
 import 'services/shared_note_import.dart';
 import 'services/custom_note_template_store.dart';
 import 'services/backup/backup_service.dart';
@@ -61,6 +66,7 @@ Future<void> main() async {
   await Hive.openBox(folderDatabaseBox);
   await Hive.openBox(draftDatabaseBox);
   await Hive.openBox(backupRecoveryBox);
+  await Hive.openBox(noteHistoryBox);
 
   //* Update statusbar theme
   SystemChrome.setSystemUIOverlayStyle(
@@ -71,12 +77,16 @@ Future<void> main() async {
   );
 
   setupLocator();
+  final history = NoteHistory(
+      box: Hive.box(noteHistoryBox), repository: getIt<NoteRepository>());
+  NoteHistory.configure(history);
 
   await AppTypographySettings.instance.load();
   await AppLayoutSettings.instance.load();
   await AppAppearanceSettings.instance.load();
   await OnboardingSettings.instance.load();
   await ImageStorage.init();
+  await AudioStorage.instance.init();
 
   await PurchaseService.instance.init();
 
@@ -105,21 +115,37 @@ Future<void> main() async {
   ReminderData.shared.init(items);
   await BackupService(
     notes: Hive.box(databaseBox),
+    drafts: Hive.box(draftDatabaseBox),
     folders: Hive.box(folderDatabaseBox),
     journal: Hive.box(backupRecoveryBox),
     documents: await getApplicationDocumentsDirectory(),
     readReminders: () => ReminderData.shared.reminders,
     writeReminders: ReminderData.shared.replaceAll,
     templateStore: CustomNoteTemplateStore.instance,
+    history: history,
   ).recoverInterruptedRestore();
+  final voiceDrafts = VoiceMemoDrafts(
+    journal: Hive.box(draftDatabaseBox),
+    notes: getIt<NoteRepository>(),
+    readDuration: VoiceMemoService.instance.duration,
+  );
+  VoiceMemoDrafts.configure(voiceDrafts);
+  final noteRepository = getIt<NoteRepository>();
+  var deletionRecoveryComplete = true;
+  if (noteRepository is NoteRepositoryImplementation) {
+    deletionRecoveryComplete = await noteRepository.recoverPendingDeletions();
+  }
   final photoRecovery = NotePhotoRecovery(
     drafts: Hive.box(draftDatabaseBox),
     notes: getIt<NoteRepository>(),
   );
-  await photoRecovery.recover();
-  await HiveNoteAutosaveStore(
-          getIt<NoteRepository>(), Hive.box(draftDatabaseBox))
-      .recover();
+  if (deletionRecoveryComplete) {
+    await photoRecovery.recover();
+    await voiceDrafts.recover();
+    await HiveNoteAutosaveStore(
+            getIt<NoteRepository>(), Hive.box(draftDatabaseBox))
+        .recover();
+  }
   await WidgetCommands.instance.init();
   final sharedNotes = SharedNoteImport(
     journal: Hive.box(draftDatabaseBox),
@@ -128,8 +154,12 @@ Future<void> main() async {
   SharedNoteLaunch.instance.configure(sharedNotes);
   await SharedNoteLaunch.instance.recoverInbox();
   // Finish recovery before pruning; pending drafts may own photos too.
-  if (!photoRecovery.hasPendingCapture && !sharedNotes.hasPendingImports) {
+  if (deletionRecoveryComplete &&
+      !photoRecovery.hasPendingCapture &&
+      !sharedNotes.hasPendingImports &&
+      !voiceDrafts.hasPending) {
     await NoteCleanup.pruneOrphanImages(getIt<NoteRepository>());
+    await NoteCleanup.pruneOrphanAudio(getIt<NoteRepository>());
   }
   await WidgetSync.instance.init();
 

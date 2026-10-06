@@ -29,15 +29,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m3(count) => "${count} notes";
 
-  static String m4(number) => "Note color ${number}";
+  static String m4(count) => "${count} photos";
 
-  static String m5(time) => "Next reminder: ${time}";
+  static String m5(count) => "${count} recordings";
 
-  static String m6(date) => "Remind me: ${date}";
+  static String m6(date) => "Saved ${date}";
 
-  static String m7(price) => "Remove ads permanently for ${price}.";
+  static String m7(number) => "Note color ${number}";
 
-  static String m8(items, photos) =>
+  static String m8(number) => "Photo ${number}";
+
+  static String m9(time) => "Next reminder: ${time}";
+
+  static String m10(date) => "Remind me: ${date}";
+
+  static String m11(price) => "Remove ads permanently for ${price}.";
+
+  static String m12(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -206,6 +214,29 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Font_Size": MessageLookupByLibrary.simpleMessage("Font Size"),
     "Font_Style": MessageLookupByLibrary.simpleMessage("Font Style"),
+    "History_Current": MessageLookupByLibrary.simpleMessage(
+      "Already matches this version",
+    ),
+    "History_Empty": MessageLookupByLibrary.simpleMessage(
+      "Saved changes will appear here.",
+    ),
+    "History_Photos": m4,
+    "History_Preview": MessageLookupByLibrary.simpleMessage("Version preview"),
+    "History_Recordings": m5,
+    "History_Restore": MessageLookupByLibrary.simpleMessage(
+      "Restore this version",
+    ),
+    "History_Restore_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not restore this version. Try again.",
+    ),
+    "History_Restored": MessageLookupByLibrary.simpleMessage(
+      "Version restored",
+    ),
+    "History_Title": MessageLookupByLibrary.simpleMessage("Note history"),
+    "History_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "This note or version is no longer available.",
+    ),
+    "History_Version": m6,
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
     "Large": MessageLookupByLibrary.simpleMessage("Large"),
@@ -236,7 +267,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Added Successfully",
     ),
-    "Note_Color": m4,
+    "Note_Color": m7,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -302,6 +333,37 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Capture_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not add the photo. Try again or choose one from your library.",
     ),
+    "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("Choose a photo"),
+    "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("Text copied"),
+    "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("Copy text"),
+    "Photo_Text_Copy_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not copy text. Please try again.",
+    ),
+    "Photo_Text_Extract": MessageLookupByLibrary.simpleMessage("Extract text"),
+    "Photo_Text_Extracting": MessageLookupByLibrary.simpleMessage(
+      "Reading photo…",
+    ),
+    "Photo_Text_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not read text from this photo. Please try again.",
+    ),
+    "Photo_Text_Field": MessageLookupByLibrary.simpleMessage("Extracted text"),
+    "Photo_Text_Insert": MessageLookupByLibrary.simpleMessage("Insert text"),
+    "Photo_Text_Insert_Done": MessageLookupByLibrary.simpleMessage(
+      "Text added to note",
+    ),
+    "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
+      "No text found. Try a clearer photo with larger text.",
+    ),
+    "Photo_Text_Photo": m8,
+    "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
+      "Text from photo",
+    ),
+    "Photo_Text_Review_Hint": MessageLookupByLibrary.simpleMessage(
+      "Review and edit the text before inserting it into your note.",
+    ),
+    "Photo_Text_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "Text extraction is not available on this device.",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("Pin"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("Plain paper"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -347,7 +409,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m5,
+    "Reminder_Next_Time": m9,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -364,7 +426,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m6,
+    "Reminder_Suggestion": m10,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -402,7 +464,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m7,
+    "Remove_Ads_Price": m11,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
@@ -496,7 +558,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m8,
+    "Template_Details": m12,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -558,6 +620,62 @@ class MessageLookup extends MessageLookupByLibrary {
     "Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
     "Use_Template": MessageLookupByLibrary.simpleMessage("Use a template"),
+    "Voice_Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "Voice_Delete": MessageLookupByLibrary.simpleMessage("Delete recording"),
+    "Voice_Discard_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not discard the recording. Please try again.",
+    ),
+    "Voice_Edit_Transcript": MessageLookupByLibrary.simpleMessage(
+      "Edit transcript",
+    ),
+    "Voice_Interrupted": MessageLookupByLibrary.simpleMessage(
+      "Recording stopped when the app was interrupted. Review it before saving.",
+    ),
+    "Voice_Language_Chinese": MessageLookupByLibrary.simpleMessage(
+      "Chinese (Simplified)",
+    ),
+    "Voice_Language_Chinese_Traditional": MessageLookupByLibrary.simpleMessage(
+      "Chinese (Traditional)",
+    ),
+    "Voice_Language_English": MessageLookupByLibrary.simpleMessage("English"),
+    "Voice_Memo": MessageLookupByLibrary.simpleMessage("Voice memo"),
+    "Voice_Pause": MessageLookupByLibrary.simpleMessage("Pause"),
+    "Voice_Permission_Denied": MessageLookupByLibrary.simpleMessage(
+      "Allow microphone access in Settings to record a voice memo.",
+    ),
+    "Voice_Play": MessageLookupByLibrary.simpleMessage("Play"),
+    "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not play this recording. Please try again.",
+    ),
+    "Voice_Record": MessageLookupByLibrary.simpleMessage("Record"),
+    "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not record. Please try again.",
+    ),
+    "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
+      "Record up to 5 minutes. Transcription is optional.",
+    ),
+    "Voice_Review_Transcript": MessageLookupByLibrary.simpleMessage(
+      "Review transcript",
+    ),
+    "Voice_Save": MessageLookupByLibrary.simpleMessage("Save recording"),
+    "Voice_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save the recording. Please try again.",
+    ),
+    "Voice_Stop": MessageLookupByLibrary.simpleMessage("Stop recording"),
+    "Voice_Transcribe": MessageLookupByLibrary.simpleMessage("Transcribe"),
+    "Voice_Transcribing": MessageLookupByLibrary.simpleMessage("Transcribing…"),
+    "Voice_Transcript_Hint": MessageLookupByLibrary.simpleMessage(
+      "Review and edit the transcript.",
+    ),
+    "Voice_Transcription_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not transcribe. Your recording is safe; retry or save without text.",
+    ),
+    "Voice_Transcription_Language": MessageLookupByLibrary.simpleMessage(
+      "Transcription language",
+    ),
+    "Voice_Transcription_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "On-device transcription is unavailable for this language or device. You can still save the recording.",
+    ),
     "Water_Tracker": MessageLookupByLibrary.simpleMessage("Water Tracker"),
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("We Play Piano"),
     "Widget": MessageLookupByLibrary.simpleMessage("Home Screen Widget"),

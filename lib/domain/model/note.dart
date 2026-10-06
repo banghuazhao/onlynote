@@ -3,6 +3,7 @@ import 'dart:ui' show Color;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'voice_memo.dart';
 
 part 'note.freezed.dart';
 
@@ -18,6 +19,7 @@ class Note with _$Note {
     DateTime? dateTime,
     @Default([]) List<Todo> todo,
     @Default([]) List<String> imagePaths,
+    @Default([]) List<VoiceMemo> voiceMemos,
     int? sortOrder,
     @Default(false) bool isPinned,
     DateTime? deletedAt,
@@ -34,6 +36,8 @@ class Note with _$Note {
   bool get hasTodo => todo.isNotEmpty;
 
   bool get hasImages => imagePaths.isNotEmpty;
+
+  bool get hasVoiceMemos => voiceMemos.isNotEmpty;
 
   bool get isDeleted => deletedAt != null;
 }

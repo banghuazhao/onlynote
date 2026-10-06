@@ -19,6 +19,9 @@ class NoteExport {
   static String plainText(Note note, {String? reminder}) => [
         if (note.title?.isNotEmpty == true) note.title!,
         if (note.description?.isNotEmpty == true) note.description!,
+        ...note.voiceMemos
+            .map((memo) => memo.transcript ?? '')
+            .where((text) => text.isNotEmpty),
         if (note.todo.isNotEmpty)
           note.todo
               .map((todo) =>
@@ -36,6 +39,10 @@ class NoteExport {
         if (note.title?.isNotEmpty == true)
           '# ${_escape(note.title!).replaceAll('\n', ' ')}',
         if (note.description?.isNotEmpty == true) _escape(note.description!),
+        ...note.voiceMemos
+            .map((memo) => memo.transcript ?? '')
+            .where((text) => text.isNotEmpty)
+            .map(_escape),
         if (note.todo.isNotEmpty)
           note.todo
               .map((todo) =>

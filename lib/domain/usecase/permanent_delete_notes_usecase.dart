@@ -21,8 +21,13 @@ class PermanentDeleteNotesUsecase {
       for (final id in ids) {
         notes.add(await _repository.getNote(id));
       }
-      await NoteCleanup.cleanupNotes(notes, repository: _repository);
       await _repository.deleteMultiNotes(ids);
+      try {
+        await NoteCleanup.cleanupNotes(notes, repository: _repository);
+      } catch (_) {
+        // Database deletion is complete. Native housekeeping can retry without
+        // presenting a failed deletion for a note that no longer exists.
+      }
       return right(unit);
     } catch (_) {
       return left(NoteError(message: _i10n.Failed_to_delete_notes));

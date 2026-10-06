@@ -287,5 +287,85 @@
   "Widget_Choose_Note_Title": "自訂小工具",
   "Widget_Choose_Note_iOS": "長按小工具，選擇「編輯小工具」，再選擇筆記或待辦清單。適用於 iOS 17 及以上版本。",
   "Widget_Choose_Note_Android": "加入小工具時，可選擇所有筆記或一篇筆記或待辦清單。之後可透過「小工具設定」進行更改。",
-  "Widget_Checklist_Tip": "點按核取方塊即可更新待辦清單，無需開啟 Onlynote。"
+  "Widget_Checklist_Tip": "點按核取方塊即可更新待辦清單，無需開啟 Onlynote。",
+  "Photo_Text_Extract": "提取文字",
+  "Photo_Text_Extracting": "正在讀取照片…",
+  "Photo_Text_Review": "照片中的文字",
+  "Photo_Text_Review_Hint": "加入備忘錄前，請檢查並編輯文字。",
+  "Photo_Text_Insert": "插入文字",
+  "Photo_Text_Copy": "複製文字",
+  "Photo_Text_Copied": "已複製文字",
+  "Photo_Text_No_Text": "未找到文字。請嘗試文字更大、更清晰的照片。",
+  "Photo_Text_Unsupported": "此裝置不支援提取文字。",
+  "Photo_Text_Failed": "無法讀取照片中的文字，請重試。",
+  "Photo_Text_Field": "提取的文字",
+  "Photo_Text_Choose": "選擇照片",
+  "Photo_Text_Photo": "照片 {number}",
+  "Photo_Text_Insert_Done": "已將文字加入備忘錄",
+  "History_Title": "備忘錄歷史",
+  "History_Empty": "儲存的修改會顯示在這裡。",
+  "History_Version": "儲存於 {date}",
+  "History_Restore": "還原此版本",
+  "History_Restored": "已還原版本",
+  "History_Restore_Failed": "無法還原此版本，請重試。",
+  "History_Unavailable": "此備忘錄或版本已無法使用。",
+  "History_Current": "已與此版本相同",
+  "History_Preview": "版本預覽",
+  "History_Photos": "{count} 張照片",
+  "History_Recordings": "{count} 段錄音",
+  "Voice_Memo": "語音備忘錄",
+  "Voice_Record": "錄音",
+  "Voice_Stop": "停止錄音",
+  "Voice_Play": "播放",
+  "Voice_Pause": "暫停",
+  "Voice_Transcribe": "轉成文字",
+  "Voice_Transcribing": "正在轉成文字…",
+  "Voice_Review_Transcript": "檢查轉錄文字",
+  "Voice_Save": "儲存錄音",
+  "Voice_Cancel": "取消",
+  "Voice_Delete": "刪除錄音",
+  "Voice_Recording_Hint": "最多錄製 5 分鐘，可選擇轉成文字。",
+  "Voice_Interrupted": "App 中斷時錄音已停止，請檢查後儲存。",
+  "Voice_Record_Failed": "無法錄音，請重試。",
+  "Voice_Permission_Denied": "請在設定中允許使用咪高峰以錄製語音備忘錄。",
+  "Voice_Transcription_Unavailable": "此語言或裝置暫不支援本機轉錄，您仍可儲存錄音。",
+  "Voice_Transcription_Failed": "無法轉成文字。錄音已保留，可重試或直接儲存錄音。",
+  "Voice_Save_Failed": "無法儲存錄音，請重試。",
+  "Voice_Discard_Failed": "無法捨棄錄音，請重試。",
+  "Voice_Transcript_Hint": "檢查並編輯轉錄文字。",
+  "Voice_Transcription_Language": "轉錄語言",
+  "Voice_Language_English": "英語",
+  "Voice_Language_Chinese": "中文（簡體）",
+  "Voice_Language_Chinese_Traditional": "中文（繁體）",
+  "Voice_Edit_Transcript": "編輯轉錄文字",
+  "@Photo_Text_Photo": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Photos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Recordings": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@History_Version": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "Photo_Text_Copy_Failed": "無法複製文字。請重試。",
+  "Voice_Play_Failed": "無法播放此錄音。請重試。"
 }

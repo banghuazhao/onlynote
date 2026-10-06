@@ -1,4 +1,3 @@
-
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
@@ -104,7 +103,19 @@ class NoteCardState extends State<NoteCard> {
         ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
     final hasTitle = note.title?.isNotEmpty == true;
-    final hasDescription = note.description?.isNotEmpty == true;
+    final transcripts = note.voiceMemos
+        .map((memo) => memo.transcript ?? '')
+        .where((text) => text.isNotEmpty)
+        .toList();
+    final pattern = searchPattern(widget.searchQuery);
+    final transcriptMatch = pattern == null
+        ? null
+        : transcripts.where(pattern.hasMatch).firstOrNull;
+    final excerpt = transcriptMatch ??
+        (note.description?.isNotEmpty == true
+            ? note.description!
+            : transcripts.join('\n'));
+    final hasDescription = excerpt.isNotEmpty;
     // Always a light paper: everything drawn on it is ink-coloured.
     final paperColor = note.color ?? AppColors.parchment;
     final seed = note.id?.hashCode ?? note.date.hashCode;
@@ -167,8 +178,7 @@ class NoteCardState extends State<NoteCard> {
                           const SizedBox(height: AppSpacings.m),
                         if (hasDescription)
                           SearchHighlight(
-                            searchExcerpt(
-                                note.description!, widget.searchQuery),
+                            searchExcerpt(excerpt, widget.searchQuery),
                             query: widget.searchQuery,
                             style: hasTitle
                                 ? AppTypography.cardBody
@@ -241,6 +251,21 @@ class NoteCardState extends State<NoteCard> {
                             path: note.imagePaths.first,
                             extraCount: note.imagePaths.length - 1,
                           ),
+                        ],
+                        if (note.hasVoiceMemos) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Row(children: [
+                            const Icon(Icons.mic_none_rounded,
+                                size: 16, color: AppColors.ink),
+                            const SizedBox(width: 6),
+                            Flexible(
+                                child: Text(
+                                    S.of(context).History_Recordings(
+                                        note.voiceMemos.length),
+                                    style: AppTypography.description.copyWith(
+                                        color: AppColors.ink
+                                            .withValues(alpha: 0.7)))),
+                          ]),
                         ],
                       ],
                     ),

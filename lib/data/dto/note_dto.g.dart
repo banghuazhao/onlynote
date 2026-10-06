@@ -68,13 +68,16 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       isPinned: fields[8] as bool?,
       deletedAt: fields[9] as String?,
       folderId: fields[10] as String?,
+      voiceMemos: (fields[11] as List?)
+          ?.map((dynamic e) => (e as Map).cast<dynamic, dynamic>())
+          ?.toList(),
     );
   }
 
   @override
   void write(BinaryWriter writer, NoteDto obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -96,7 +99,9 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       ..writeByte(9)
       ..write(obj.deletedAt)
       ..writeByte(10)
-      ..write(obj.folderId);
+      ..write(obj.folderId)
+      ..writeByte(11)
+      ..write(obj.voiceMemos);
   }
 
   @override

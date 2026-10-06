@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 
 part 'note_dto.g.dart';
 
@@ -53,6 +54,7 @@ class NoteDto implements Comparable {
     this.isPinned = false,
     this.deletedAt,
     this.folderId,
+    this.voiceMemos = const [],
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -68,6 +70,7 @@ class NoteDto implements Comparable {
       isPinned: note.isPinned,
       deletedAt: note.deletedAt?.toIso8601String(),
       folderId: note.folderId,
+      voiceMemos: note.voiceMemos.map((memo) => memo.toMap()).toList(),
     );
   }
 
@@ -84,6 +87,10 @@ class NoteDto implements Comparable {
       isPinned: isPinned ?? false,
       deletedAt: deletedAt != null ? DateTime.tryParse(deletedAt!) : null,
       folderId: folderId,
+      voiceMemos: (voiceMemos ?? [])
+          .map(VoiceMemo.tryFromMap)
+          .whereType<VoiceMemo>()
+          .toList(),
     );
   }
 
@@ -92,7 +99,8 @@ class NoteDto implements Comparable {
       (title?.isNotEmpty ?? false) ||
       (description?.isNotEmpty ?? false) ||
       (todoList?.isNotEmpty ?? false) ||
-      (imagePaths?.isNotEmpty ?? false);
+      (imagePaths?.isNotEmpty ?? false) ||
+      (voiceMemos?.isNotEmpty ?? false);
 
   bool get isDeleted => deletedAt != null && deletedAt!.isNotEmpty;
 
@@ -104,6 +112,7 @@ class NoteDto implements Comparable {
     String? dateTime,
     List<TodoDto>? todoList,
     List<String>? imagePaths,
+    List<Map<dynamic, dynamic>>? voiceMemos,
     int? sortOrder,
     bool? isPinned,
     String? deletedAt,
@@ -123,6 +132,7 @@ class NoteDto implements Comparable {
       isPinned: isPinned ?? this.isPinned,
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
+      voiceMemos: voiceMemos ?? this.voiceMemos,
     );
   }
 
@@ -148,6 +158,8 @@ class NoteDto implements Comparable {
   final String? deletedAt;
   @HiveField(10)
   final String? folderId;
+  @HiveField(11)
+  final List<Map<dynamic, dynamic>>? voiceMemos;
 
   @override
   int compareTo(other) {

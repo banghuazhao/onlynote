@@ -6,7 +6,9 @@ import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/note_history.dart';
 import 'package:uuid/uuid.dart';
 
 import 'backup_contents.dart';
@@ -22,7 +24,8 @@ class BackupService {
       required this.documents,
       required this.readReminders,
       required this.writeReminders,
-      this.templateStore});
+      this.templateStore,
+      this.history});
   final Box notes;
   final Box? drafts;
   final Box folders;
@@ -31,6 +34,7 @@ class BackupService {
   final List<Reminder> Function() readReminders;
   final Future<void> Function(List<Reminder>) writeReminders;
   final CustomNoteTemplateStore? templateStore;
+  final NoteHistory? history;
   static const _uuid = Uuid();
 
   Future<Uint8List> export() async {
@@ -44,16 +48,29 @@ class BackupService {
     final folderSnapshot = folders.values.whereType<FolderDto>().toList();
     final folderIds = folderSnapshot.map((f) => f.id).toSet();
     final noteIds = snapshot.map((n) => n.id).toSet();
+    final histories = {
+      if (history != null)
+        for (final note in snapshot)
+          if (history!.versionsFor(note.id!).isNotEmpty)
+            note.id!: history!.versionsFor(note.id!),
+    };
+    final historyNotes = [
+      for (final versions in histories.values)
+        for (final version in versions) version.note,
+    ];
     final reminders = readReminders()
         .where((r) => noteIds.contains(r.noteId))
         .map((r) => BackupReminder(r.noteId, r.reminderDate, repeat: r.repeat))
         .toList();
     final photos = <String, BackupPhoto>{};
     final photoKeys = <String, String>{};
+    final audio = <String, BackupAudio>{};
+    final audioKeys = <String, String>{};
     var totalBytes = 0;
     for (final imagePaths in [
       for (final note in snapshot) note.imagePaths ?? <String>[],
       for (final template in templates) template.imagePaths,
+      for (final note in historyNotes) note.imagePaths ?? <String>[],
     ]) {
       for (final path in imagePaths) {
         if (photoKeys.containsKey(path)) continue;
@@ -75,26 +92,62 @@ class BackupService {
         photos[key] = BackupPhoto(extension, bytes);
       }
     }
+    for (final memos in [
+      for (final note in [...snapshot, ...historyNotes])
+        _managedMemos(note.voiceMemos),
+      for (final template in templates) template.voiceMemos,
+    ]) {
+      for (final memo in memos) {
+        if (audioKeys.containsKey(memo.path)) continue;
+        final file = File('${documents.path}/${memo.path}');
+        final size = await file.length();
+        totalBytes += size;
+        if (size <= 0 ||
+            size > maxBackupAudioBytes ||
+            totalBytes > maxBackupBytes * .7) {
+          throw const FormatException('Backup recording too large or empty');
+        }
+        final key = 'audio_${audio.length}';
+        audioKeys[memo.path] = key;
+        audio[key] = BackupAudio(await file.readAsBytes());
+      }
+    }
+    NoteDto archiveNote(NoteDto note) => note.copyWith(
+          imagePaths: [
+            for (final path in note.imagePaths ?? <String>[]) photoKeys[path]!
+          ],
+          voiceMemos: [
+            for (final memo in _managedMemos(note.voiceMemos))
+              memo.copyWith(path: audioKeys[memo.path]!).toMap()
+          ],
+          clearFolderId: !folderIds.contains(note.folderId),
+        );
     final contents = BackupContents(
       createdAt: DateTime.now(),
       folders: folderSnapshot,
       photos: photos,
+      audio: audio,
       reminders: reminders,
       templates: [
         for (final template in templates)
           template.copyWith(imagePaths: [
             for (final path in template.imagePaths) photoKeys[path]!,
+          ], voiceMemos: [
+            for (final memo in template.voiceMemos)
+              memo.copyWith(path: audioKeys[memo.path]!)
           ]),
       ],
-      notes: [
-        for (final note in snapshot)
-          note.copyWith(
-            imagePaths: [
-              for (final path in note.imagePaths ?? <String>[]) photoKeys[path]!
-            ],
-            clearFolderId: !folderIds.contains(note.folderId),
-          )
-      ],
+      notes: [for (final note in snapshot) archiveNote(note)],
+      histories: {
+        for (final entry in histories.entries)
+          entry.key: [
+            for (final version in entry.value)
+              NoteHistoryVersion(
+                  id: version.id,
+                  savedAt: version.savedAt,
+                  note: archiveNote(version.note))
+          ],
+      },
     );
     return compute(encodeBackup, contents);
   }
@@ -102,8 +155,13 @@ class BackupService {
   /// Restore only creates new IDs. The journal rolls back a partial import on
   /// I/O failure or on next launch, without ever deleting pre-existing data.
   Future<List<Reminder>> restore(BackupContents backup) async {
+    // Validate even callers that construct contents directly, before any writes.
+    backup = BackupContents.fromJson(backup.toJson());
     if (backup.templates.isNotEmpty && templateStore == null) {
       throw StateError('Template storage is unavailable');
+    }
+    if (backup.histories.isNotEmpty && history == null) {
+      throw StateError('History storage is unavailable');
     }
     await templateStore?.load();
     if (journal.containsKey('pending')) await recoverInterruptedRestore();
@@ -114,6 +172,9 @@ class BackupService {
     };
     final notePhotoKeys = {
       for (final note in backup.notes) ...note.imagePaths ?? <String>[],
+      for (final versions in backup.histories.values)
+        for (final version in versions)
+          ...version.note.imagePaths ?? <String>[],
     };
     final templatePhotoKeys = {
       for (final template in backup.templates) ...template.imagePaths,
@@ -126,11 +187,73 @@ class BackupService {
       for (final key in templatePhotoKeys)
         key: 'template_images/${_uuid.v4()}.${backup.photos[key]!.extension}',
     };
+    final noteAudioKeys = {
+      for (final note in backup.notes)
+        for (final memo in note.voiceMemos ?? const <Map>[])
+          memo['path'] as String,
+      for (final versions in backup.histories.values)
+        for (final version in versions)
+          for (final memo in version.note.voiceMemos ?? const <Map>[])
+            memo['path'] as String,
+    };
+    final audioPaths = {
+      for (final key in noteAudioKeys) key: 'note_audio/${_uuid.v4()}.m4a',
+    };
+    final templateAudioPaths = {
+      for (final template in backup.templates)
+        for (final memo in template.voiceMemos)
+          memo.path: 'template_audio/${_uuid.v4()}.m4a',
+    };
+    final todoIds = <String, Map<String, String>>{};
+    final memoIds = <String, Map<String, String>>{};
+    NoteDto restoreNote(NoteDto note) {
+      final tasks = todoIds.putIfAbsent(note.id!, () => {});
+      final memos = memoIds.putIfAbsent(note.id!, () => {});
+      return note.copyWith(
+        id: noteIds[note.id],
+        folderId: folderIds[note.folderId],
+        clearFolderId: !folderIds.containsKey(note.folderId),
+        todoList: [
+          for (final todo in note.todoList ?? const <TodoDto>[])
+            TodoDto(
+                id: todo.id == null
+                    ? _uuid.v4()
+                    : tasks.putIfAbsent(todo.id!, _uuid.v4),
+                title: todo.title,
+                completed: todo.completed)
+        ],
+        imagePaths: [
+          for (final key in note.imagePaths ?? const <String>[]) paths[key]!
+        ],
+        voiceMemos: [
+          for (final memo in note.voiceMemos ?? const <Map>[])
+            {
+              ...memo,
+              'id': memos.putIfAbsent(
+                  '${memo['id']}\u0000${memo['path']}', _uuid.v4),
+              'path': audioPaths[memo['path']]!,
+            }
+        ],
+      );
+    }
+
+    final restoredHistories = {
+      for (final entry in backup.histories.entries)
+        noteIds[entry.key]!: [
+          for (final version in entry.value)
+            NoteHistoryVersion(
+                id: _uuid.v4(),
+                savedAt: version.savedAt,
+                note: restoreNote(version.note))
+        ],
+    };
     await journal.put('pending', {
       'notes': noteIds.values.toList(),
       'folders': folderIds.values.toList(),
       'templates': templateIds.values.toList(),
       'photos': [...paths.values, ...templatePaths.values],
+      'audio': [...audioPaths.values, ...templateAudioPaths.values],
+      'histories': restoredHistories.keys.toList(),
     });
     await journal.flush();
     try {
@@ -147,21 +270,19 @@ class BackupService {
         await File('${documents.path}/${entry.value}')
             .writeAsBytes(backup.photos[entry.key]!.bytes, flush: true);
       }
+      for (final group in [audioPaths, templateAudioPaths]) {
+        for (final entry in group.entries) {
+          final file = File('${documents.path}/${entry.value}');
+          await file.parent.create(recursive: true);
+          await file.writeAsBytes(backup.audio[entry.key]!.bytes, flush: true);
+        }
+      }
       await folders.putAll({
         for (final f in backup.folders)
           folderIds[f.id]!: f.copyWith(id: folderIds[f.id])
       });
-      await notes.putAll({
-        for (final n in backup.notes)
-          noteIds[n.id]!: n.copyWith(
-            id: noteIds[n.id],
-            folderId: folderIds[n.folderId],
-            clearFolderId: n.folderId == null,
-            imagePaths: [
-              for (final key in n.imagePaths ?? <String>[]) paths[key]!
-            ],
-          )
-      });
+      await notes.putAll(
+          {for (final n in backup.notes) noteIds[n.id]!: restoreNote(n)});
       if (backup.templates.isNotEmpty) {
         await templateStore!.importTemplates([
           for (final template in backup.templates)
@@ -170,8 +291,16 @@ class BackupService {
               imagePaths: [
                 for (final key in template.imagePaths) templatePaths[key]!,
               ],
+              voiceMemos: [
+                for (final memo in template.voiceMemos)
+                  memo.copyWith(
+                      id: _uuid.v4(), path: templateAudioPaths[memo.path]!)
+              ],
             ),
         ]);
+      }
+      if (restoredHistories.isNotEmpty) {
+        await history!.importVersions(restoredHistories);
       }
       final existing = List<Reminder>.of(readReminders());
       final usedIds = existing.map((r) => r.reminderId).toSet();
@@ -207,9 +336,29 @@ class BackupService {
     return id;
   }
 
+  static List<VoiceMemo> _managedMemos(List<Map>? raw) {
+    final memos = <VoiceMemo>[];
+    for (final map in raw ?? const <Map>[]) {
+      final memo = VoiceMemo.tryFromMap(map);
+      if (memo == null || memo.durationMs <= 0) {
+        throw const FormatException('Invalid source recording');
+      }
+      memos.add(memo);
+    }
+    return memos;
+  }
+
   Future<void> recoverInterruptedRestore() async {
     final pending = journal.get('pending');
     if (pending == null) return;
+    final historyIds =
+        (pending['histories'] as List? ?? const []).cast<String>();
+    if (historyIds.isNotEmpty) {
+      if (history == null) {
+        throw StateError('History recovery storage is unavailable');
+      }
+      await history!.purge(historyIds);
+    }
     final templateIds =
         (pending['templates'] as List? ?? const []).cast<String>().toSet();
     if (templateIds.isNotEmpty) {
@@ -233,6 +382,13 @@ class BackupService {
       final file = File('${documents.path}/$path');
       if (await file.exists()) await file.delete();
     }
+    for (final path in (pending['audio'] as List? ?? const []).cast<String>()) {
+      if (!VoiceMemo.isManagedPath(path)) continue;
+      final file = File('${documents.path}/$path');
+      if (await file.exists()) await file.delete();
+    }
+    await notes.flush();
+    await folders.flush();
     await journal.delete('pending');
     await journal.flush();
   }

@@ -11,3 +11,6 @@
 "New Checklist" = "New Checklist";
 "Photo Note" = "Photo Note";
 "NSUserTrackingUsageDescription" = "Onlynote uses your device's advertising identifier to choose which ads appear in the banner at the bottom of your notes list — for example, showing stationery or productivity app ads instead of unrelated ones. What you write in your notes is never used for this and never leaves your device.";
+
+"NSMicrophoneUsageDescription" = "Record voice memos attached to your notes.";
+"NSSpeechRecognitionUsageDescription" = "Transcribe a voice memo on your device when you choose Transcribe.";

@@ -8,11 +8,13 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/note_history.dart';
 
 import '../support/memory_preferences.dart';
 
@@ -33,7 +35,8 @@ class BoxRepository implements NoteRepository {
 
 void main() {
   late Directory directory;
-  late Box notes, folders, journal, drafts;
+  late Box notes, folders, journal, drafts, historyBox;
+  late NoteHistory history;
   late BackupService service;
   late List<Reminder> reminders;
   late CustomNoteTemplateStore templates;
@@ -49,6 +52,8 @@ void main() {
     folders = await Hive.openBox('folders');
     journal = await Hive.openBox('journal');
     drafts = await Hive.openBox('drafts');
+    historyBox = await Hive.openBox('history');
+    history = NoteHistory(box: historyBox, repository: BoxRepository(notes));
     reminders = [];
     failWrite = false;
     templates = CustomNoteTemplateStore(
@@ -61,6 +66,7 @@ void main() {
         journal: journal,
         documents: directory,
         templateStore: templates,
+        history: history,
         readReminders: () => reminders,
         writeReminders: (values) async {
           if (failWrite) {
@@ -72,6 +78,7 @@ void main() {
   });
   tearDown(() async {
     templates.dispose();
+    history.dispose();
     await Hive.close();
     await directory.delete(recursive: true);
   });
@@ -108,6 +115,277 @@ void main() {
           reminderDate: DateTime(2027, 1, 1, 9))
     ];
   }
+
+  Future<VoiceMemo> audioMemo({String id = 'source-audio'}) async {
+    final memo = VoiceMemo(
+        id: id,
+        path: 'note_audio/$id.m4a',
+        durationMs: 12000,
+        createdAt: DateTime(2026, 10, 6),
+        transcript: 'Keep this transcript 保留转录');
+    final file = File('${directory.path}/${memo.path}');
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes([6, 7, 8, 9], flush: true);
+    return memo;
+  }
+
+  test(
+      'v3 restores owned note/template audio with metadata and fresh identities',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    final original =
+        (notes.get('original') as NoteDto).copyWith(voiceMemos: [memo.toMap()]);
+    await notes.put('original', original);
+    final template =
+        await templates.saveFromNote(original.toDomain(), name: 'Audio');
+    final backup = decodeBackup(await service.export());
+    expect(backup.audio, hasLength(2));
+    expect(backup.audio.values.first.bytes, [6, 7, 8, 9]);
+    expect(backup.notes.first.voiceMemos!.single['path'], startsWith('audio_'));
+    await service.restore(backup);
+    final restored = notes.values.cast<NoteDto>().singleWhere(
+        (note) => note.title == original.title && note.id != original.id);
+    final restoredMemo = VoiceMemo.tryFromMap(restored.voiceMemos!.single)!;
+    expect(restoredMemo.id, isNot(memo.id));
+    expect(restoredMemo.path, isNot(memo.path));
+    expect(restoredMemo.path, startsWith('note_audio/'));
+    expect(restoredMemo.durationMs, memo.durationMs);
+    expect(restoredMemo.createdAt, memo.createdAt);
+    expect(restoredMemo.transcript, memo.transcript);
+    final restoredTemplate =
+        templates.templates.singleWhere((t) => t.id != template.id);
+    final templateMemo = restoredTemplate.voiceMemos.single;
+    expect(templateMemo.id, isNot(template.voiceMemos.single.id));
+    expect(templateMemo.path, startsWith('template_audio/'));
+    expect(templateMemo.path, isNot(restoredMemo.path));
+    await File('${directory.path}/${memo.path}').delete();
+    await templates.delete(template.id);
+    for (final restoredAudio in [restoredMemo, templateMemo]) {
+      expect(
+          await File('${directory.path}/${restoredAudio.path}').readAsBytes(),
+          [6, 7, 8, 9]);
+    }
+  });
+
+  test(
+      'v3 preserves snapshot-only media and restores older versions of new notes',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    final before =
+        (notes.get('original') as NoteDto).copyWith(voiceMemos: [memo.toMap()]);
+    final after =
+        before.copyWith(title: 'Current', imagePaths: [], voiceMemos: []);
+    await history.recordBeforeSave(before, after);
+    await notes.put('original', after);
+    final originalVersion = history.versionsFor('original').single;
+    final backup = decodeBackup(await service.export());
+    expect(backup.audio, hasLength(1));
+    expect(backup.photos, hasLength(1));
+    expect(backup.histories['original']!.single.note.voiceMemos, hasLength(1));
+    await service.restore(backup);
+    final restored = notes.values
+        .cast<NoteDto>()
+        .singleWhere((n) => n.title == 'Current' && n.id != 'original');
+    final version = history.versionsFor(restored.id!).single;
+    expect(version.id, isNot(originalVersion.id));
+    expect(version.note.id, restored.id);
+    expect(version.note.todoList!.single.id, isNot('todo'));
+    expect(version.note.voiceMemos!.single['id'], isNot(memo.id));
+    expect(version.note.imagePaths!.single, isNot('note_images/a.png'));
+    final restoredAudio =
+        VoiceMemo.tryFromMap(version.note.voiceMemos!.single)!;
+    expect(await File('${directory.path}/${restoredAudio.path}').readAsBytes(),
+        [6, 7, 8, 9]);
+    expect(await history.restore(restored.id!, version.id),
+        NoteHistoryRestoreResult.restored);
+    final older = notes.get(restored.id) as NoteDto;
+    expect(older.title, 'Keep me');
+    expect(older.voiceMemos!.single['path'], restoredAudio.path);
+    expect(
+        await File('${directory.path}/${older.imagePaths!.single}')
+            .readAsBytes(),
+        [1, 2, 3, 4]);
+    expect(history.versionsFor('original').single.id, originalVersion.id);
+  });
+
+  test(
+      'restored current and historical content share stable fresh media/task IDs',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    final before =
+        (notes.get('original') as NoteDto).copyWith(voiceMemos: [memo.toMap()]);
+    final after = before.copyWith(title: 'Current');
+    await history.recordBeforeSave(before, after);
+    await notes.put('original', after);
+    await service.restore(decodeBackup(await service.export()));
+    final restored = notes.values
+        .cast<NoteDto>()
+        .singleWhere((n) => n.title == 'Current' && n.id != 'original');
+    final snapshot = history.versionsFor(restored.id!).single.note;
+    expect(snapshot.voiceMemos, restored.voiceMemos);
+    expect(snapshot.imagePaths, restored.imagePaths);
+    expect(snapshot.todoList!.single.id, restored.todoList!.single.id);
+    expect(snapshot.todoList!.single.id, isNot('todo'));
+  });
+
+  test('failed restore removes new history and audio while retaining originals',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    final before =
+        (notes.get('original') as NoteDto).copyWith(voiceMemos: [memo.toMap()]);
+    final after = before.copyWith(title: 'Current');
+    await history.recordBeforeSave(before, after);
+    await notes.put('original', after);
+    final template =
+        await templates.saveFromNote(before.toDomain(), name: 'Keep');
+    final backup = decodeBackup(await service.export());
+    failWrite = true;
+    await expectLater(
+        service.restore(backup), throwsA(isA<FileSystemException>()));
+    expect(notes.keys.toSet(), {'original', 'trash'});
+    expect(historyBox.keys.toList(), ['original']);
+    expect(templates.templates.single.id, template.id);
+    expect(await Directory('${directory.path}/note_audio').list().length, 1);
+    expect(
+        await Directory('${directory.path}/template_audio').list().length, 1);
+    expect(await File('${directory.path}/${memo.path}').readAsBytes(),
+        [6, 7, 8, 9]);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test(
+      'interrupted restore purges imported histories and audio with safe paths',
+      () async {
+    await seed();
+    final originalMemo = await audioMemo();
+    final partialMemo = await audioMemo(id: 'partial');
+    final partial = NoteDto(
+        id: 'partial', title: 'Partial', voiceMemos: [partialMemo.toMap()]);
+    await notes.put('partial', partial);
+    await history.importVersions({
+      'partial': [
+        NoteHistoryVersion(
+            id: 'version', savedAt: DateTime(2026), note: partial)
+      ]
+    });
+    await journal.put('pending', {
+      'notes': ['partial'],
+      'folders': [],
+      'photos': [],
+      'audio': [partialMemo.path, '../note_audio/source-audio.m4a'],
+      'histories': ['partial'],
+    });
+    await service.recoverInterruptedRestore();
+    expect(notes.containsKey('partial'), isFalse);
+    expect(history.versionsFor('partial'), isEmpty);
+    expect(
+        await File('${directory.path}/${partialMemo.path}').exists(), isFalse);
+    expect(
+        await File('${directory.path}/${originalMemo.path}').exists(), isTrue);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test('missing source audio fails export without silently losing recordings',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    await notes.put(
+        'original',
+        (notes.get('original') as NoteDto)
+            .copyWith(voiceMemos: [memo.toMap()]));
+    await File('${directory.path}/${memo.path}').delete();
+    await expectLater(service.export(), throwsA(isA<FileSystemException>()));
+  });
+
+  test('v2 backups without voice or history fields retain compatibility',
+      () async {
+    await seed();
+    final json = decodeBackup(await service.export()).toJson();
+    json['version'] = 2;
+    json.remove('audio');
+    json.remove('histories');
+    for (final note in json['notes'] as List) {
+      (note as Map).remove('voiceMemos');
+    }
+    final backup = BackupContents.fromJson(json);
+    expect(backup.audio, isEmpty);
+    expect(backup.histories, isEmpty);
+    expect(backup.notes.every((n) => n.voiceMemos!.isEmpty), isTrue);
+    await service.restore(backup);
+    expect(notes.length, 4);
+  });
+
+  test(
+      'v3 rejects unsafe, missing, duplicate and invalid recording/history data',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    final before =
+        (notes.get('original') as NoteDto).copyWith(voiceMemos: [memo.toMap()]);
+    final after = before.copyWith(title: 'Current');
+    await history.recordBeforeSave(before, after);
+    await notes.put('original', after);
+    final original = decodeBackup(await service.export()).toJson();
+    for (final mutate in <void Function(Map<String, dynamic>)>[
+      (m) => m.remove('audio'),
+      (m) => m.remove('histories'),
+      (m) => (m['audio'] as Map).values.first['extension'] = 'mp3',
+      (m) => (m['audio'] as Map).values.first['data'] = '',
+      (m) => (m['notes'] as List).first['voiceMemos'].first['path'] =
+          '../source.m4a',
+      (m) => (m['notes'] as List).first['voiceMemos'].first['path'] = 'missing',
+      (m) => (m['notes'] as List).first['voiceMemos'].first['durationMs'] = -1,
+      (m) => (m['notes'] as List).first['voiceMemos'].first['durationMs'] = 0,
+      (m) => (m['notes'] as List).first['voiceMemos'].first['createdAt'] =
+          'bad date',
+      (m) => (m['notes'] as List).first['voiceMemos'].first['transcript'] = 42,
+      (m) {
+        final list = (m['notes'] as List).first['voiceMemos'] as List;
+        list.add(list.first);
+      },
+      (m) {
+        final note = (m['notes'] as List).first;
+        note['voiceMemos'] = List.filled(101, note['voiceMemos'].first);
+      },
+      (m) => (m['histories'] as Map).values.first.first['note']['id'] =
+          'missing-note',
+      (m) => (m['histories'] as Map).values.first.first['savedAt'] = 'bad date',
+      (m) {
+        final versions = (m['histories'] as Map).values.first as List;
+        versions.add(versions.first);
+      },
+    ]) {
+      final changed = jsonDecode(jsonEncode(original)) as Map<String, dynamic>;
+      mutate(changed);
+      expect(
+          () => decodeBackup(
+              Uint8List.fromList(utf8.encode(jsonEncode(changed)))),
+          throwsFormatException);
+    }
+    expect(notes.length, 2);
+    expect(historyBox.keys.toList(), ['original']);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  test('oversized individual recordings are rejected before restore writes',
+      () async {
+    await seed();
+    final memo = await audioMemo();
+    await notes.put(
+        'original',
+        (notes.get('original') as NoteDto)
+            .copyWith(voiceMemos: [memo.toMap()]));
+    final json = decodeBackup(await service.export()).toJson();
+    (json['audio'] as Map).values.first['data'] =
+        base64Encode(Uint8List(maxBackupAudioBytes + 1));
+    expect(() => BackupContents.fromJson(json), throwsFormatException);
+    expect(notes.length, 2);
+    expect(journal.isEmpty, isTrue);
+  });
 
   test(
       'roundtrip includes photos, checklists, trash, folders and reminder dates',
@@ -148,7 +426,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 2);
+    expect(backup.toJson()['version'], 3);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

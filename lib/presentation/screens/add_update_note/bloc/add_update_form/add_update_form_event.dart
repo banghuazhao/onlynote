@@ -8,6 +8,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     Color? color,
     List<Todo>? todos,
     List<String>? imagePaths,
+    List<VoiceMemo>? voiceMemos,
   }) = _Initialize;
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;
@@ -54,4 +55,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
   const factory AddUpdateFormEvent.addImage(String path) = _AddImage;
 
   const factory AddUpdateFormEvent.removeImage(String path) = _RemoveImage;
+
+  const factory AddUpdateFormEvent.voiceMemosChanged(List<VoiceMemo> value) =
+      _VoiceMemosChanged;
 }

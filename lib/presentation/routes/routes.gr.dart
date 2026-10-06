@@ -20,6 +20,9 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     Note? customTemplateNote,
     NoteAutosaveStore? autosaveStore,
     NotePhotoCapture? photoCapture,
+    PhotoTextExtraction? photoTextExtraction,
+    VoiceMemoService? voiceMemoService,
+    VoiceMemoDrafts? voiceMemoDrafts,
     NoteReminderScheduler? reminderScheduler,
     WidgetCommands? widgetCommands,
     NoteEditorStart start = NoteEditorStart.standard,
@@ -34,6 +37,9 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             customTemplateNote: customTemplateNote,
             autosaveStore: autosaveStore,
             photoCapture: photoCapture,
+            photoTextExtraction: photoTextExtraction,
+            voiceMemoService: voiceMemoService,
+            voiceMemoDrafts: voiceMemoDrafts,
             reminderScheduler: reminderScheduler,
             widgetCommands: widgetCommands,
             start: start,
@@ -56,6 +62,9 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         customTemplateNote: args.customTemplateNote,
         autosaveStore: args.autosaveStore,
         photoCapture: args.photoCapture,
+        photoTextExtraction: args.photoTextExtraction,
+        voiceMemoService: args.voiceMemoService,
+        voiceMemoDrafts: args.voiceMemoDrafts,
         reminderScheduler: args.reminderScheduler,
         widgetCommands: args.widgetCommands,
         start: args.start,
@@ -73,6 +82,9 @@ class AddUpdateNoteRouteArgs {
     this.customTemplateNote,
     this.autosaveStore,
     this.photoCapture,
+    this.photoTextExtraction,
+    this.voiceMemoService,
+    this.voiceMemoDrafts,
     this.reminderScheduler,
     this.widgetCommands,
     this.start = NoteEditorStart.standard,
@@ -92,6 +104,12 @@ class AddUpdateNoteRouteArgs {
 
   final NotePhotoCapture? photoCapture;
 
+  final PhotoTextExtraction? photoTextExtraction;
+
+  final VoiceMemoService? voiceMemoService;
+
+  final VoiceMemoDrafts? voiceMemoDrafts;
+
   final NoteReminderScheduler? reminderScheduler;
 
   final WidgetCommands? widgetCommands;
@@ -100,7 +118,7 @@ class AddUpdateNoteRouteArgs {
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, start: $start}';
   }
 }
 

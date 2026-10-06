@@ -1,4 +1,11 @@
 import 'dart:convert';
+import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/presentation/components/photo_text_review_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_sheet.dart';
+import 'package:onlynote/presentation/components/voice_memo_player.dart';
+import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/voice_memo_service.dart';
 
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
@@ -31,6 +38,73 @@ import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
+
+@Preview(name: 'Review photo text', size: Size(390, 600))
+Widget photoTextPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(
+          body: PhotoTextReviewSheet(
+        text: 'Weekend market\nBread, citrus, flowers\n周末市场：面包、柑橘、鲜花',
+      )),
+    );
+
+List<NoteHistoryVersion> previewHistoryVersions() => [
+      NoteHistoryVersion(
+          id: 'version',
+          savedAt: DateTime(2026, 10, 6, 9, 30),
+          note: NoteDto.fromNote(Note(
+              id: 'preview',
+              title: 'Weekend market',
+              description: 'Bread, citrus, and flowers.',
+              todo: [Todo(id: 'bag', title: 'Bring tote bags')]))),
+    ];
+
+@Preview(name: 'Saved note versions', size: Size(390, 580))
+Widget noteHistoryPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: const Scaffold(
+          body: NoteHistorySheet(
+              noteId: 'preview', readVersions: previewHistoryVersions)),
+    );
+
+/// Preview playback is simulated and never opens native media APIs.
+class PreviewVoiceMemoPlatform implements VoiceMemoPlatform {
+  @override
+  Stream<Object?> get states => const Stream.empty();
+  @override
+  Future<Object?> invoke(String method,
+          [Map<String, Object?>? arguments]) async =>
+      {
+        'phase': method == 'play' ? 'playing' : 'paused',
+        'path': '/preview/note_audio/preview.m4a',
+        'durationMs': 42000,
+        'positionMs': 12000,
+      };
+}
+
+Future<String> previewAudioPath(String path) async => '/preview/$path';
+
+@Preview(name: 'Voice memo and reviewed transcript', size: Size(390, 320))
+Widget voiceMemoPreview() => MaterialApp(
+      theme: AppTheme.light,
+      localizationsDelegates: const [S.delegate],
+      home: Scaffold(
+          body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: VoiceMemoPlayer(
+          memo: VoiceMemo(
+              id: 'preview',
+              path: 'note_audio/preview.m4a',
+              durationMs: 42000,
+              createdAt: DateTime(2026, 10, 6),
+              transcript: 'Remember to pick up flowers on the way home.'),
+          resolvePath: previewAudioPath,
+          service: VoiceMemoService(platform: PreviewVoiceMemoPlatform()),
+        ),
+      )),
+    );
 
 @Preview(name: 'Today and upcoming reminders', size: Size(390, 740))
 Widget remindersAgendaPreview() {

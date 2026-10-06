@@ -5,12 +5,22 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/services/note_history.dart';
 
 const maxBackupBytes = 256 * 1024 * 1024;
+const maxBackupAudioBytes = 32 * 1024 * 1024;
+const maxBackupRecords = 10000;
+const maxBackupMemosPerNote = 100;
 
 class BackupPhoto {
   BackupPhoto(this.extension, this.bytes);
   final String extension;
+  final Uint8List bytes;
+}
+
+class BackupAudio {
+  BackupAudio(this.bytes);
   final Uint8List bytes;
 }
 
@@ -25,60 +35,50 @@ class BackupReminder {
 }
 
 class BackupContents {
-  BackupContents(
-      {required this.createdAt,
-      required this.notes,
-      required this.folders,
-      required this.photos,
-      required this.reminders,
-      this.templates = const []});
+  BackupContents({
+    required this.createdAt,
+    required this.notes,
+    required this.folders,
+    required this.photos,
+    required this.reminders,
+    this.templates = const [],
+    this.audio = const {},
+    this.histories = const {},
+  });
   final DateTime createdAt;
   final List<NoteDto> notes;
   final List<FolderDto> folders;
   final Map<String, BackupPhoto> photos;
   final List<BackupReminder> reminders;
   final List<CustomNoteTemplate> templates;
+  final Map<String, BackupAudio> audio;
+  final Map<String, List<NoteHistoryVersion>> histories;
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 2,
+        'version': 3,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
             {
               'id': folder.id,
               'name': folder.name,
-              'sortOrder': folder.sortOrder,
+              'sortOrder': folder.sortOrder
             }
         ],
-        'notes': [
-          for (final note in notes)
-            {
-              'id': note.id,
-              'title': note.title,
-              'description': note.description,
-              'color': note.colorValue,
-              'dateTime': note.dateTime,
-              'sortOrder': note.sortOrder,
-              'isPinned': note.isPinned ?? false,
-              'deletedAt': note.deletedAt,
-              'folderId': note.folderId,
-              'photos': note.imagePaths ?? [],
-              'todos': [
-                for (final todo in note.todoList ?? <TodoDto>[])
-                  {
-                    'id': todo.id,
-                    'title': todo.title,
-                    'completed': todo.completed ?? false,
-                  }
-              ],
-            }
-        ],
+        'notes': [for (final note in notes) _noteJson(note)],
         'photos': {
           for (final entry in photos.entries)
             entry.key: {
               'extension': entry.value.extension,
               'data': base64Encode(entry.value.bytes),
+            }
+        },
+        'audio': {
+          for (final entry in audio.entries)
+            entry.key: {
+              'extension': 'm4a',
+              'data': base64Encode(entry.value.bytes)
             }
         },
         'reminders': [
@@ -90,62 +90,130 @@ class BackupContents {
             }
         ],
         'templates': [for (final template in templates) template.toJson()],
+        'histories': {
+          for (final entry in histories.entries)
+            entry.key: [
+              for (final version in entry.value)
+                {
+                  'id': version.id,
+                  'savedAt': version.savedAt.toIso8601String(),
+                  'note': _noteJson(version.note),
+                }
+            ]
+        },
+      };
+
+  static Map<String, dynamic> _noteJson(NoteDto note) => {
+        'id': note.id,
+        'title': note.title,
+        'description': note.description,
+        'color': note.colorValue,
+        'dateTime': note.dateTime,
+        'sortOrder': note.sortOrder,
+        'isPinned': note.isPinned ?? false,
+        'deletedAt': note.deletedAt,
+        'folderId': note.folderId,
+        'photos': note.imagePaths ?? [],
+        'voiceMemos': note.voiceMemos ?? [],
+        'todos': [
+          for (final todo in note.todoList ?? <TodoDto>[])
+            {
+              'id': todo.id,
+              'title': todo.title,
+              'completed': todo.completed ?? false,
+            }
+        ],
       };
 
   factory BackupContents.fromJson(Map<String, dynamic> json) {
+    final version = json['version'];
     if (json['format'] != 'onlynote-backup' ||
-        (json['version'] != 1 && json['version'] != 2)) {
+        (version != 1 && version != 2 && version != 3)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
     final folders = <FolderDto>[];
     final folderIds = <String>{};
-    for (final raw in json['folders'] as List) {
+    for (final raw in _list(json['folders'])) {
       final map = raw as Map<String, dynamic>;
       final id = _id(map['id']);
       if (!folderIds.add(id)) throw const FormatException('Duplicate folder');
-      final name = map['name'] as String;
+      final name = _text(map['name'])!;
       if (name.trim().isEmpty) throw const FormatException('Empty folder');
       folders.add(
           FolderDto(id: id, name: name, sortOrder: map['sortOrder'] as int?));
     }
     final photos = <String, BackupPhoto>{};
+    final audio = <String, BackupAudio>{};
     var total = 0;
-    for (final entry in (json['photos'] as Map<String, dynamic>).entries) {
+    Uint8List mediaBytes(Map<String, dynamic> map, {bool recording = false}) {
+      final encoded = map['data'];
+      if (encoded is! String || encoded.length > maxBackupBytes) {
+        throw const FormatException('Invalid media data');
+      }
+      final bytes = base64Decode(encoded);
+      total += bytes.length;
+      if (total > maxBackupBytes ||
+          bytes.isEmpty ||
+          (recording && bytes.length > maxBackupAudioBytes)) {
+        throw const FormatException('Invalid media size');
+      }
+      return bytes;
+    }
+
+    for (final entry in _map(json['photos']).entries) {
       final map = entry.value as Map<String, dynamic>;
       final extension = map['extension'] as String;
       if (!RegExp(r'^[a-zA-Z0-9]{1,10}$').hasMatch(extension)) {
         throw const FormatException('Invalid photo type');
       }
-      final bytes = base64Decode(map['data'] as String);
-      total += bytes.length;
-      if (total > maxBackupBytes || bytes.isEmpty) {
-        throw const FormatException('Invalid photo size');
+      photos[_archiveKey(entry.key)] = BackupPhoto(extension, mediaBytes(map));
+    }
+    if (version == 3) {
+      for (final entry in _map(json['audio']).entries) {
+        final map = entry.value as Map<String, dynamic>;
+        if (map['extension'] != 'm4a') {
+          throw const FormatException('Invalid recording type');
+        }
+        audio[_archiveKey(entry.key)] =
+            BackupAudio(mediaBytes(map, recording: true));
       }
-      photos[_id(entry.key)] = BackupPhoto(extension, bytes);
+    }
+    if (photos.length + audio.length > maxBackupRecords) {
+      throw const FormatException('Too many media files');
     }
     final notes = <NoteDto>[];
     final noteIds = <String>{};
-    for (final raw in json['notes'] as List) {
-      final map = raw as Map<String, dynamic>;
+    NoteDto noteFromJson(Map<String, dynamic> map) {
       final id = _id(map['id']);
-      if (!noteIds.add(id)) throw const FormatException('Duplicate note');
       final folder = map['folderId'] as String?;
       if (folder != null && !folderIds.contains(folder)) {
         throw const FormatException('Missing folder');
       }
-      final paths = (map['photos'] as List).cast<String>();
-      if (paths.any((p) => !photos.containsKey(p))) {
-        throw const FormatException('Missing photo');
-      }
+      final paths = _photoRefs(map['photos'], photos);
+      final memos =
+          version == 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
       final color = map['color'] as int?;
       if (color != null && (color < 0 || color > 0xffffffff)) {
         throw const FormatException('Invalid color');
       }
-      notes.add(NoteDto(
+      final todos = <TodoDto>[];
+      final todoIds = <String>{};
+      for (final raw in _list(map['todos'])) {
+        final todo = raw as Map<String, dynamic>;
+        final todoId = todo['id'] == null ? null : _id(todo['id']);
+        if (todoId != null && !todoIds.add(todoId)) {
+          throw const FormatException('Duplicate task');
+        }
+        todos.add(TodoDto(
+            id: todoId,
+            title: _text(todo['title'], nullable: true),
+            completed: todo['completed'] as bool));
+      }
+      return NoteDto(
         id: id,
-        title: map['title'] as String?,
-        description: map['description'] as String?,
+        title: _text(map['title'], nullable: true),
+        description: _text(map['description'], nullable: true),
         colorValue: color,
         dateTime: _date(map['dateTime']),
         sortOrder: map['sortOrder'] as int?,
@@ -153,19 +221,19 @@ class BackupContents {
         deletedAt: _date(map['deletedAt']),
         folderId: folder,
         imagePaths: paths,
-        todoList: [
-          for (final todo in map['todos'] as List)
-            TodoDto(
-              id: (todo as Map<String, dynamic>)['id'] as String?,
-              title: todo['title'] as String?,
-              completed: todo['completed'] as bool,
-            )
-        ],
-      ));
+        voiceMemos: [for (final memo in memos) memo.toMap()],
+        todoList: todos,
+      );
+    }
+
+    for (final raw in _list(json['notes'])) {
+      final note = noteFromJson(raw as Map<String, dynamic>);
+      if (!noteIds.add(note.id!)) throw const FormatException('Duplicate note');
+      notes.add(note);
     }
     final reminders = <BackupReminder>[];
     final reminderNotes = <String>{};
-    for (final raw in json['reminders'] as List) {
+    for (final raw in _list(json['reminders'])) {
       final map = raw as Map<String, dynamic>;
       final id = _id(map['noteId']);
       if (!noteIds.contains(id) || !reminderNotes.add(id)) {
@@ -182,22 +250,53 @@ class BackupContents {
     }
     final templates = <CustomNoteTemplate>[];
     final templateIds = <String>{};
-    if (json['version'] == 2 && json['templates'] is! List) {
+    if (version != 1 && json['templates'] is! List) {
       throw const FormatException('Missing templates');
     }
-    for (final raw in (json['templates'] as List? ?? const [])) {
+    for (final raw in _list(json['templates'] ?? const [])) {
       final map = raw as Map<String, dynamic>;
-      final paths = (map['imagePaths'] as List).cast<String>();
-      if (paths.any((path) => !photos.containsKey(path))) {
-        throw const FormatException('Missing template photo');
-      }
-      // Photo references in a backup are archive keys, not device paths.
-      final template = CustomNoteTemplate.fromJson({...map, 'imagePaths': []})
-          .copyWith(imagePaths: paths);
+      final paths = _photoRefs(map['imagePaths'], photos);
+      final memos =
+          version == 3 ? _memoRefs(map['voiceMemos'], audio) : <VoiceMemo>[];
+      // Archive references are not device paths; validate metadata separately.
+      final template = CustomNoteTemplate.fromJson({
+        ...map,
+        'imagePaths': [],
+        'voiceMemos': [],
+      }).copyWith(imagePaths: paths, voiceMemos: memos);
+      _id(template.id);
       if (!templateIds.add(template.id)) {
         throw const FormatException('Duplicate template');
       }
       templates.add(template);
+    }
+    final histories = <String, List<NoteHistoryVersion>>{};
+    var historyCount = 0;
+    if (version == 3) {
+      for (final entry in _map(json['histories']).entries) {
+        final noteId = _id(entry.key);
+        if (!noteIds.contains(noteId)) {
+          throw const FormatException('Missing history note');
+        }
+        final versions = <NoteHistoryVersion>[];
+        final versionIds = <String>{};
+        for (final raw in _list(entry.value, max: 100)) {
+          if (++historyCount > maxBackupRecords) {
+            throw const FormatException('Too much history');
+          }
+          final map = raw as Map<String, dynamic>;
+          final id = _id(map['id'], max: 128);
+          final note = noteFromJson(map['note'] as Map<String, dynamic>);
+          if (note.id != noteId || !versionIds.add(id)) {
+            throw const FormatException('Invalid history version');
+          }
+          versions.add(NoteHistoryVersion(
+              id: id,
+              savedAt: DateTime.parse(map['savedAt'] as String),
+              note: note));
+        }
+        histories[noteId] = versions;
+      }
     }
     return BackupContents(
         createdAt: createdAt,
@@ -205,12 +304,77 @@ class BackupContents {
         folders: folders,
         photos: photos,
         reminders: reminders,
-        templates: templates);
+        templates: templates,
+        audio: audio,
+        histories: histories);
   }
 
-  static String _id(dynamic value) {
-    if (value is! String || value.isEmpty || value.length > 512) {
+  static List<VoiceMemo> _memoRefs(
+      dynamic value, Map<String, BackupAudio> audio) {
+    final memos = <VoiceMemo>[];
+    final ids = <String>{};
+    for (final raw in _list(value, max: maxBackupMemosPerNote)) {
+      final map = raw as Map<String, dynamic>;
+      final path = _archiveKey(map['path']);
+      if (!audio.containsKey(path)) {
+        throw const FormatException('Missing recording');
+      }
+      final memo =
+          VoiceMemo.tryFromMap({...map, 'path': 'note_audio/validation.m4a'});
+      if (memo == null ||
+          memo.durationMs <= 0 ||
+          memo.durationMs > const Duration(hours: 24).inMilliseconds ||
+          (memo.transcript?.length ?? 0) > 1024 * 1024 ||
+          !ids.add(memo.id)) {
+        throw const FormatException('Invalid recording metadata');
+      }
+      memos.add(memo.copyWith(path: path));
+    }
+    return memos;
+  }
+
+  static List<String> _photoRefs(
+      dynamic value, Map<String, BackupPhoto> photos) {
+    final paths = _list(value).map(_archiveKey).toList();
+    if (paths.any((p) => !photos.containsKey(p))) {
+      throw const FormatException('Missing photo');
+    }
+    return paths;
+  }
+
+  static List _list(dynamic value, {int max = maxBackupRecords}) {
+    if (value is! List || value.length > max) {
+      throw const FormatException('Invalid list');
+    }
+    return value;
+  }
+
+  static Map<String, dynamic> _map(dynamic value) {
+    if (value is! Map<String, dynamic> || value.length > maxBackupRecords) {
+      throw const FormatException('Invalid map');
+    }
+    return value;
+  }
+
+  static String? _text(dynamic value, {bool nullable = false}) {
+    if (value == null && nullable) return null;
+    if (value is! String || value.length > 1024 * 1024) {
+      throw const FormatException('Invalid text');
+    }
+    return value;
+  }
+
+  static String _id(dynamic value, {int max = 512}) {
+    if (value is! String || value.isEmpty || value.length > max) {
       throw const FormatException('Invalid ID');
+    }
+    return value;
+  }
+
+  static String _archiveKey(dynamic value) {
+    if (value is! String ||
+        !RegExp(r'^[A-Za-z0-9_-]{1,128}$').hasMatch(value)) {
+      throw const FormatException('Invalid media reference');
     }
     return value;
   }

@@ -24,6 +24,8 @@ import flutter_local_notifications
             AppShortcutBridge.register(messenger: registrar.messenger())
             ShareInboxBridge.register(messenger: registrar.messenger())
             WidgetCommandBridge.register(messenger: registrar.messenger())
+            PhotoTextBridge.register(messenger: registrar.messenger())
+            VoiceMemoBridge.register(messenger: registrar.messenger())
         }
     }
 }

@@ -11,3 +11,6 @@
 "New Checklist" = "新增清單";
 "Photo Note" = "拍照備忘錄";
 "NSUserTrackingUsageDescription" = "極簡備忘錄會使用你裝置的廣告識別碼來決定備忘錄清單底部橫幅裡顯示哪些廣告——例如顯示文具或效率類 App 的廣告，而不是無關內容。你寫的備忘錄內容不會用於此用途，也不會離開你的裝置。";
+
+"NSMicrophoneUsageDescription" = "錄製語音備忘並附加到筆記。";
+"NSSpeechRecognitionUsageDescription" = "選擇轉寫時，在裝置上將語音備忘轉換為文字。";

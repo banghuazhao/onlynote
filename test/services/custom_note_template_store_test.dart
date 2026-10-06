@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 
 import '../support/memory_preferences.dart';
@@ -43,6 +45,153 @@ void main() {
     await file.parent.create(recursive: true);
     return file.writeAsBytes([1, 2, 3, 4], flush: true);
   }
+
+  Future<VoiceMemo> sourceAudio() async {
+    final file = File('${documents.path}/note_audio/source.m4a');
+    await file.parent.create(recursive: true);
+    await file.writeAsBytes([4, 5, 6, 7], flush: true);
+    return VoiceMemo(
+        id: 'original-recording',
+        path: 'note_audio/source.m4a',
+        durationMs: 42000,
+        createdAt: DateTime(2026, 10, 6),
+        transcript: 'Meeting notes 会议记录');
+  }
+
+  test('recordings own independent template and reusable note files', () async {
+    final memo = await sourceAudio();
+    final template =
+        await store.saveFromNote(Note(voiceMemos: [memo]), name: 'Meeting');
+    final savedMemo = template.voiceMemos.single;
+    expect(savedMemo.path, startsWith('template_audio/'));
+    expect(savedMemo.id, isNot(memo.id));
+    expect(savedMemo.durationMs, memo.durationMs);
+    expect(savedMemo.transcript, memo.transcript);
+    expect(savedMemo.createdAt, memo.createdAt);
+    await File('${documents.path}/${memo.path}').delete();
+
+    final restarted = CustomNoteTemplateStore(
+        preferences: preferences,
+        audio: AudioStorage(documentsPath: documents.path),
+        documentsPath: documents.path);
+    addTearDown(restarted.dispose);
+    await restarted.load();
+    expect(restarted.templates.single.voiceMemos, [savedMemo]);
+    final first = await restarted.createNote(template.id);
+    final second = await restarted.createNote(template.id);
+    expect(first.voiceMemos.single.path, startsWith('note_audio/'));
+    expect(first.voiceMemos.single.path, isNot(second.voiceMemos.single.path));
+    expect(first.voiceMemos.single.id, isNot(second.voiceMemos.single.id));
+    expect(first.voiceMemos.single.id, isNot(savedMemo.id));
+    expect(first.voiceMemos.single.transcript, memo.transcript);
+    await restarted.delete(template.id);
+    expect(await File('${documents.path}/${savedMemo.path}').exists(), isFalse);
+    for (final note in [first, second]) {
+      expect(
+          await File('${documents.path}/${note.voiceMemos.single.path}')
+              .readAsBytes(),
+          [4, 5, 6, 7]);
+    }
+  });
+
+  test('old templates without recordings still load', () async {
+    final old =
+        CustomNoteTemplate(id: 'old', name: 'Old', createdAt: DateTime(2026))
+            .toJson()
+          ..remove('voiceMemos');
+    preferences.values[CustomNoteTemplateStore.storageKey] = jsonEncode({
+      'version': 1,
+      'templates': [old]
+    });
+    await store.load();
+    expect(store.templates.single.voiceMemos, isEmpty);
+    expect((await store.createNote('old')).voiceMemos, isEmpty);
+  });
+
+  test('failed persistence removes audio copies and retains original audio',
+      () async {
+    final memo = await sourceAudio();
+    final original =
+        await store.saveFromNote(Note(title: 'Keep'), name: 'Keep');
+    preferences.failWrites = true;
+    await expectLater(store.saveFromNote(Note(voiceMemos: [memo]), name: 'New'),
+        throwsStateError);
+    expect(store.templates.single.id, original.id);
+    expect(await Directory('${documents.path}/template_audio').list().toList(),
+        isEmpty);
+    expect(await File('${documents.path}/${memo.path}').readAsBytes(),
+        [4, 5, 6, 7]);
+  });
+
+  test('failed photo capture removes already copied template audio', () async {
+    final memo = await sourceAudio();
+    await expectLater(
+        store.saveFromNote(
+            Note(voiceMemos: [memo], imagePaths: ['note_images/missing.jpg']),
+            name: 'Missing'),
+        throwsA(isA<FileSystemException>()));
+    expect(store.templates, isEmpty);
+    expect(await Directory('${documents.path}/template_audio').list().toList(),
+        isEmpty);
+    expect(await File('${documents.path}/${memo.path}').exists(), isTrue);
+  });
+
+  test('missing audio rolls back partial capture without saving a template',
+      () async {
+    final memo = await sourceAudio();
+    await expectLater(
+        store.saveFromNote(
+            Note(voiceMemos: [
+              memo,
+              memo.copyWith(id: 'missing', path: 'note_audio/missing.m4a')
+            ]),
+            name: 'Missing'),
+        throwsA(isA<FileSystemException>()));
+    expect(store.templates, isEmpty);
+    expect(await Directory('${documents.path}/template_audio').list().toList(),
+        isEmpty);
+    expect(preferences.values, isEmpty);
+  });
+
+  test('failed reuse removes fresh note audio while preserving template media',
+      () async {
+    final memo = await sourceAudio();
+    await sourcePhoto();
+    final template = await store.saveFromNote(
+        Note(voiceMemos: [memo], imagePaths: ['note_images/source.jpg']),
+        name: 'Keep');
+    await File('${documents.path}/${template.imagePaths.single}').delete();
+    await expectLater(
+        store.createNote(template.id), throwsA(isA<FileSystemException>()));
+    final noteAudio =
+        await Directory('${documents.path}/note_audio').list().toList();
+    expect(
+        noteAudio.map((file) => file.path), ['${documents.path}/${memo.path}']);
+    expect(
+        await File('${documents.path}/${template.voiceMemos.single.path}')
+            .readAsBytes(),
+        [4, 5, 6, 7]);
+    expect(store.templates.single.id, template.id);
+  });
+
+  test('unsafe template audio blocks mutation and retains existing files',
+      () async {
+    final memo = await sourceAudio();
+    final record = CustomNoteTemplate(
+        id: 'unsafe-audio',
+        name: 'Unsafe',
+        voiceMemos: [memo],
+        createdAt: DateTime(2026));
+    final saved = jsonEncode({
+      'version': 1,
+      'templates': [record.toJson()]
+    });
+    preferences.values[CustomNoteTemplateStore.storageKey] = saved;
+    await expectLater(store.load(), throwsFormatException);
+    await expectLater(store.delete('unsafe-audio'), throwsFormatException);
+    expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+    expect(await File('${documents.path}/${memo.path}').exists(), isTrue);
+  });
 
   test(
       'save, restart and reuse preserves content with independent photos and IDs',
