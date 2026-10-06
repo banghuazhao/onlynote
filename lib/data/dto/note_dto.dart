@@ -9,6 +9,8 @@ import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/services/note_document.dart';
 
 part 'note_dto.g.dart';
 
@@ -63,6 +65,7 @@ class NoteDto implements Comparable {
     this.tags = const [],
     this.linkedNoteIds = const [],
     this.textStyles = const [],
+    this.imageLayouts = const [],
   });
 
   factory NoteDto.fromNote(Note note) {
@@ -74,6 +77,11 @@ class NoteDto implements Comparable {
       colorValue: note.color?.toARGB32(),
       todoList: note.todo.map((todo) => TodoDto.fromDomain(todo)).toList(),
       imagePaths: note.imagePaths,
+      imageLayouts: [
+        for (final layout in normalizeNoteImageLayouts(
+            note.imageLayouts, note.imagePaths, note.description ?? ''))
+          layout.toMap(),
+      ],
       sortOrder: note.sortOrder,
       isPinned: note.isPinned,
       deletedAt: note.deletedAt?.toIso8601String(),
@@ -100,6 +108,13 @@ class NoteDto implements Comparable {
       color: colorValue != null ? Color(colorValue!) : null,
       todo: todoList?.map((todo) => todo.toDomain()).toList() ?? [],
       imagePaths: imagePaths ?? [],
+      imageLayouts: normalizeNoteImageLayouts(
+        (imageLayouts ?? [])
+            .map(NoteImageLayout.tryFromMap)
+            .whereType<NoteImageLayout>(),
+        imagePaths ?? [],
+        description ?? '',
+      ),
       sortOrder: sortOrder,
       isPinned: isPinned ?? false,
       deletedAt: deletedAt != null ? DateTime.tryParse(deletedAt!) : null,
@@ -145,6 +160,7 @@ class NoteDto implements Comparable {
     List<String>? tags,
     List<String>? linkedNoteIds,
     List<Map<dynamic, dynamic>>? textStyles,
+    List<Map<dynamic, dynamic>>? imageLayouts,
     String? deletedAt,
     String? folderId,
     bool clearDeletedAt = false,
@@ -164,6 +180,7 @@ class NoteDto implements Comparable {
       tags: tags ?? this.tags,
       linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
       textStyles: textStyles ?? this.textStyles,
+      imageLayouts: imageLayouts ?? this.imageLayouts,
       deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
       folderId: clearFolderId ? null : (folderId ?? this.folderId),
       voiceMemos: voiceMemos ?? this.voiceMemos,
@@ -202,6 +219,8 @@ class NoteDto implements Comparable {
   final List<String>? linkedNoteIds;
   @HiveField(15)
   final List<Map<dynamic, dynamic>>? textStyles;
+  @HiveField(16)
+  final List<Map<dynamic, dynamic>>? imageLayouts;
 
   @override
   int compareTo(other) {

@@ -5,6 +5,7 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_history.dart';
@@ -12,6 +13,7 @@ import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_document.dart';
 
 const maxBackupBytes = 256 * 1024 * 1024;
 const maxBackupAudioBytes = 32 * 1024 * 1024;
@@ -63,7 +65,7 @@ class BackupContents {
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 5,
+        'version': 6,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -125,6 +127,7 @@ class BackupContents {
         'tags': note.tags ?? [],
         'linkedNoteIds': note.linkedNoteIds ?? [],
         'textStyles': note.textStyles ?? [],
+        'imageLayouts': note.imageLayouts ?? [],
         'photos': note.imagePaths ?? [],
         'voiceMemos': note.voiceMemos ?? [],
         'todos': [
@@ -144,7 +147,8 @@ class BackupContents {
             version != 2 &&
             version != 3 &&
             version != 4 &&
-            version != 5)) {
+            version != 5 &&
+            version != 6)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -230,11 +234,16 @@ class BackupContents {
       final textStyles = version >= 5
           ? _textStyles(map['textStyles'] ?? const [], description ?? '')
           : const <NoteTextStyleRange>[];
+      final imageLayouts = version >= 6
+          ? _imageLayouts(
+              map['imageLayouts'] ?? const [], paths, description ?? '')
+          : normalizeNoteImageLayouts(const [], paths, description ?? '');
       return NoteDto(
         id: id,
         title: _text(map['title'], nullable: true),
         description: description,
         textStyles: [for (final style in textStyles) style.toMap()],
+        imageLayouts: [for (final layout in imageLayouts) layout.toMap()],
         colorValue: color,
         dateTime: _date(map['dateTime']),
         sortOrder: map['sortOrder'] as int?,
@@ -292,10 +301,11 @@ class BackupContents {
       // Archive references are not device paths; validate metadata separately.
       final template = CustomNoteTemplate.fromJson({
         ...map,
-        'imagePaths': [],
+        'imagePaths': paths,
         'voiceMemos': [],
         if (version < 5) 'textStyles': [],
-      }).copyWith(imagePaths: paths, voiceMemos: memos);
+        if (version < 6) 'imageLayouts': [],
+      }).copyWith(voiceMemos: memos);
       _id(template.id);
       if (!templateIds.add(template.id)) {
         throw const FormatException('Duplicate template');
@@ -392,6 +402,22 @@ class BackupContents {
       throw const FormatException('Invalid text formatting');
     }
     return normalizeNoteTextStyles(styles, text);
+  }
+
+  static List<NoteImageLayout> _imageLayouts(
+      dynamic value, List<String> imagePaths, String text) {
+    final layouts = <NoteImageLayout>[];
+    for (final raw in _list(value, max: maxBackupRecords)) {
+      final layout = NoteImageLayout.tryFromMap(raw);
+      if (layout == null) {
+        throw const FormatException('Invalid image layout');
+      }
+      layouts.add(layout);
+    }
+    if (!areValidNoteImageLayouts(layouts, imagePaths, text)) {
+      throw const FormatException('Invalid image layout');
+    }
+    return normalizeNoteImageLayouts(layouts, imagePaths, text);
   }
 
   static List<String> _photoRefs(

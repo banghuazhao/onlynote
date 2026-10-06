@@ -77,13 +77,16 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       textStyles: (fields[15] as List?)
           ?.map((dynamic e) => (e as Map).cast<dynamic, dynamic>())
           ?.toList(),
+      imageLayouts: (fields[16] as List?)
+          ?.map((dynamic e) => (e as Map).cast<dynamic, dynamic>())
+          ?.toList(),
     );
   }
 
   @override
   void write(BinaryWriter writer, NoteDto obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -115,7 +118,9 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       ..writeByte(14)
       ..write(obj.linkedNoteIds)
       ..writeByte(15)
-      ..write(obj.textStyles);
+      ..write(obj.textStyles)
+      ..writeByte(16)
+      ..write(obj.imageLayouts);
   }
 
   @override

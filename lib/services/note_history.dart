@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -162,6 +164,7 @@ class NoteHistory extends ChangeNotifier {
           tags: List.of(current.tags ?? []),
           linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
           textStyles: _cloneMemos(snapshot.textStyles),
+          imageLayouts: _cloneMemos(snapshot.imageLayouts),
         );
         // Repository hook captures current content before replacing it. The
         // restore queue is separate from the snapshot queue to allow that hook.
@@ -326,6 +329,7 @@ class NoteHistory extends ChangeNotifier {
   // a discrete version, like a task or attachment change.
   static bool _sameStructure(NoteDto a, NoteDto b) =>
       _sameFormatting(a, b) &&
+      _sameImageLayouts(a, b) &&
       _equal([
         a.colorValue,
         [
@@ -370,6 +374,54 @@ class NoteHistory extends ChangeNotifier {
     ]);
   }
 
+  static bool _sameImageLayouts(NoteDto a, NoteDto b) {
+    final before = a.description ?? '';
+    final after = b.description ?? '';
+    List<NoteImageLayout> layouts(NoteDto note, String body) =>
+        normalizeNoteImageLayouts([
+          for (final raw in note.imageLayouts ?? const <Map>[])
+            if (NoteImageLayout.tryFromMap(raw) case final layout?) layout,
+        ], note.imagePaths ?? const [], body);
+    final layoutsBefore = layouts(a, before);
+    final layoutsAfter = layouts(b, after);
+    List<List<Object>> geometry(Iterable<NoteImageLayout> values) => [
+          for (final layout in values)
+            [
+              layout.path,
+              layout.widthFactor,
+              layout.xFactor,
+              layout.aspectRatio
+            ],
+        ];
+    if (!_equal(geometry(layoutsBefore), geometry(layoutsAfter))) return false;
+    bool matches(Iterable<NoteImageLayout> expected) => _equal([
+          for (final layout in expected) layout.toMap(),
+        ], [
+          for (final layout in layoutsAfter) layout.toMap(),
+        ]);
+    if (before == after) return matches(layoutsBefore);
+    if (matches(rebaseNoteImageLayouts(
+        before, after, layoutsBefore, a.imagePaths ?? const []))) {
+      return true;
+    }
+    // Editing a text block after a photo gives its starting anchor a different
+    // insertion affinity. Repeated text can make a global diff ambiguous too.
+    // Try each valid edited block context before declaring a layout change.
+    final preceding = <String>{};
+    for (final part in noteDocumentParts(before, layoutsBefore)) {
+      if (part is NoteImagePart) preceding.add(part.layout.path);
+      if (part is NoteTextPart &&
+          matches(rebaseNoteImageLayouts(
+              before, after, layoutsBefore, a.imagePaths ?? const [],
+              editedPartStart: part.start,
+              editedPartEnd: part.end,
+              precedingImagePaths: preceding))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static bool _equal(Object? a, Object? b) {
     if (a is List && b is List) {
       return a.length == b.length &&
@@ -401,6 +453,7 @@ class NoteHistory extends ChangeNotifier {
         linkedNoteIds:
             List.unmodifiable(note.linkedNoteIds ?? const <String>[]),
         textStyles: _cloneMemos(note.textStyles),
+        imageLayouts: _cloneMemos(note.imageLayouts),
       );
 
   static List<TodoDto> _cloneTodos(List<TodoDto>? todos) => List.unmodifiable([

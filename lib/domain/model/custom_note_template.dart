@@ -2,12 +2,14 @@ import 'dart:ui' show Color;
 
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_document.dart';
 
 const maxTemplateNameLength = 80;
 
@@ -25,13 +27,16 @@ class CustomNoteTemplate {
     List<String> tags = const [],
     List<String> linkedNoteIds = const [],
     List<NoteTextStyleRange> textStyles = const [],
+    List<NoteImageLayout> imageLayouts = const [],
     required this.createdAt,
   })  : items = List.unmodifiable(items),
         imagePaths = List.unmodifiable(imagePaths),
         voiceMemos = List.unmodifiable(voiceMemos),
         tags = normalizeNoteTags(tags),
         linkedNoteIds = normalizeLinkedNoteIds(linkedNoteIds),
-        textStyles = normalizeNoteTextStyles(textStyles, body);
+        textStyles = normalizeNoteTextStyles(textStyles, body),
+        imageLayouts =
+            normalizeNoteImageLayouts(imageLayouts, imagePaths, body);
 
   final String id;
   final String name;
@@ -45,6 +50,7 @@ class CustomNoteTemplate {
   final List<String> tags;
   final List<String> linkedNoteIds;
   final List<NoteTextStyleRange> textStyles;
+  final List<NoteImageLayout> imageLayouts;
 
   factory CustomNoteTemplate.fromNote(Note note,
           {required String name,
@@ -62,6 +68,8 @@ class CustomNoteTemplate {
         tags: note.tags,
         linkedNoteIds: note.linkedNoteIds,
         textStyles: note.textStyles,
+        imageLayouts: _remapImages(note.imageLayouts, note.imagePaths,
+            imageCopies, note.description ?? ''),
         createdAt: DateTime.now(),
       );
 
@@ -84,6 +92,7 @@ class CustomNoteTemplate {
       tags: tags,
       linkedNoteIds: linkedNoteIds,
       textStyles: textStyles,
+      imageLayouts: _remapImages(imageLayouts, imagePaths, imageCopies, body),
       folderId: folderId,
       dateTime: created,
       sortOrder: -created.millisecondsSinceEpoch,
@@ -98,6 +107,7 @@ class CustomNoteTemplate {
     List<String>? tags,
     List<String>? linkedNoteIds,
     List<NoteTextStyleRange>? textStyles,
+    List<NoteImageLayout>? imageLayouts,
   }) =>
       CustomNoteTemplate(
         id: id ?? this.id,
@@ -111,6 +121,11 @@ class CustomNoteTemplate {
         tags: tags ?? this.tags,
         linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
         textStyles: textStyles ?? this.textStyles,
+        imageLayouts: imageLayouts ??
+            (imagePaths == null
+                ? this.imageLayouts
+                : _remapImages(
+                    this.imageLayouts, this.imagePaths, imagePaths, body)),
         createdAt: createdAt,
       );
 
@@ -127,6 +142,7 @@ class CustomNoteTemplate {
         'tags': tags,
         'linkedNoteIds': linkedNoteIds,
         'textStyles': [for (final style in textStyles) style.toMap()],
+        'imageLayouts': [for (final layout in imageLayouts) layout.toMap()],
       };
 
   factory CustomNoteTemplate.fromJson(Map<String, dynamic> json) {
@@ -183,6 +199,22 @@ class CustomNoteTemplate {
     if (!areValidNoteTextStyles(textStyles, body)) {
       throw const FormatException('Invalid template formatting');
     }
+    final imagePaths = list('imagePaths');
+    final rawLayouts = json['imageLayouts'] ?? const [];
+    if (rawLayouts is! List || rawLayouts.length > 10000) {
+      throw const FormatException('Invalid template image layout');
+    }
+    final imageLayouts = <NoteImageLayout>[];
+    for (final raw in rawLayouts) {
+      final layout = NoteImageLayout.tryFromMap(raw);
+      if (layout == null) {
+        throw const FormatException('Invalid template image layout');
+      }
+      imageLayouts.add(layout);
+    }
+    if (!areValidNoteImageLayouts(imageLayouts, imagePaths, body)) {
+      throw const FormatException('Invalid template image layout');
+    }
     if (id.isEmpty ||
         createdAt == null ||
         (color != null && (color is! int || color < 0 || color > 0xffffffff))) {
@@ -194,15 +226,31 @@ class CustomNoteTemplate {
       title: text('title'),
       body: body,
       textStyles: textStyles,
+      imageLayouts: imageLayouts,
       items: list('items'),
       color: color as int?,
-      imagePaths: list('imagePaths'),
+      imagePaths: imagePaths,
       voiceMemos: memos,
       tags: metadataList('tags'),
       linkedNoteIds: metadataList('linkedNoteIds'),
       createdAt: createdAt,
     );
   }
+}
+
+List<NoteImageLayout> _remapImages(Iterable<NoteImageLayout> layouts,
+    List<String> oldPaths, List<String> newPaths, String body) {
+  if (oldPaths.length != newPaths.length) {
+    throw const FormatException('Image copies do not match template photos');
+  }
+  final paths = {
+    for (var index = 0; index < oldPaths.length; index++)
+      oldPaths[index]: newPaths[index],
+  };
+  return [
+    for (final layout in normalizeNoteImageLayouts(layouts, oldPaths, body))
+      layout.copyWith(path: paths[layout.path]!),
+  ];
 }
 
 String validatedTemplateName(String name) {

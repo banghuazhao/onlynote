@@ -408,5 +408,11 @@
   "Format_Bold": "粗体",
   "Format_Heading": "标题",
   "Format_Bullets": "项目符号",
-  "Format_Text": "文字样式"
+  "Format_Text": "文字样式",
+  "Image_Move": "移动照片",
+  "Image_Resize": "调整照片大小",
+  "Image_Remove": "移除照片",
+  "Image_Move_Before": "向前移动",
+  "Image_Move_After": "向后移动",
+  "Image_Drop_Here": "将照片放在这里"
 }

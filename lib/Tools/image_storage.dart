@@ -69,12 +69,18 @@ class ImageStorage {
   /// when a note is duplicated, otherwise both notes point at the same file
   /// and deleting either one breaks the other.
   static Future<List<String>> copyImages(List<String> paths) async {
-    final copies = <String>[];
+    return (await copyImagePaths(paths)).values.toList();
+  }
+
+  /// Retains source-to-copy identity so photo layouts survive duplication,
+  /// including when one missing file cannot be copied.
+  static Future<Map<String, String>> copyImagePaths(List<String> paths) async {
+    final copies = <String, String>{};
     for (final path in paths) {
       try {
         final source = File(resolvePath(path));
         if (!await source.exists()) continue;
-        copies.add(await saveImage(source));
+        copies[path] = await saveImage(source);
       } catch (_) {
         // Best-effort: a failed copy just means the duplicate has one
         // image fewer, which beats failing the whole duplication.

@@ -180,6 +180,98 @@ void main() {
     expect(controller.styles, [bold(0, 2)]);
   });
 
+  test('identical document replacements notify their new revision', () {
+    final controller =
+        SimpleFormattingController(text: 'body', styles: [bold(0, 4)]);
+    addTearDown(controller.dispose);
+    controller.selection = const TextSelection.collapsed(offset: 4);
+    final revisions = <int>[];
+    controller.addListener(() => revisions.add(controller.documentRevision));
+    controller.setDocument('body', [bold(0, 4)]);
+    controller.setDocument('body', [bold(0, 4)]);
+    expect(revisions, [1, 2]);
+    typeValue(controller, 'body!', 5);
+    expect(revisions, [1, 2, 2]);
+    expect(controller.styles, [bold(0, 5)]);
+  });
+
+  test('segment edits move styles on repeated text and retain native undo', () {
+    final controller =
+        SimpleFormattingController(text: 'A\nA\n', styles: [bold(2, 3)]);
+    addTearDown(controller.dispose);
+    controller.selection = const TextSelection.collapsed(offset: 1);
+    controller.applySegmentValue(
+      const TextEditingValue(
+          text: 'A\nA\nA\n', selection: TextSelection.collapsed(offset: 3)),
+      editedPartStart: 0,
+      editedPartEnd: 1,
+    );
+    expect(controller.styles, [bold(4, 5)]);
+    expect(controller.selection.extentOffset, 3);
+    controller.applySegmentValue(
+      const TextEditingValue(
+          text: 'A\nA\n', selection: TextSelection.collapsed(offset: 1)),
+      editedPartStart: 0,
+      editedPartEnd: 3,
+    );
+    expect(controller.styles, [bold(2, 3)]);
+    controller.applySegmentValue(
+      const TextEditingValue(
+          text: 'A\nA\nA\n', selection: TextSelection.collapsed(offset: 3)),
+      editedPartStart: 0,
+      editedPartEnd: 1,
+    );
+    expect(controller.styles, [bold(4, 5)]);
+  });
+
+  test('segment typing preserves pending bold and native composition', () {
+    final controller = SimpleFormattingController(text: 'A\nA');
+    addTearDown(controller.dispose);
+    controller.selection = const TextSelection.collapsed(offset: 1);
+    controller.toggleBold();
+    const composed = TextEditingValue(
+      text: 'A👩‍💻\nA',
+      selection: TextSelection.collapsed(offset: 6),
+      composing: TextRange(start: 1, end: 6),
+    );
+    controller.applySegmentValue(composed,
+        editedPartStart: 0, editedPartEnd: 1);
+    expect(controller.value, composed);
+    expect(controller.styles, [bold(1, 6)]);
+  });
+
+  test('Return before a structural separator exits heading and continues list',
+      () {
+    final headingController = SimpleFormattingController(
+        text: 'Title\nAfter', styles: [heading(0, 5), bold(6, 11)]);
+    addTearDown(headingController.dispose);
+    headingController.selection = const TextSelection.collapsed(offset: 5);
+    headingController.applySegmentValue(
+      const TextEditingValue(
+          text: 'Title\n\nAfter',
+          selection: TextSelection.collapsed(offset: 6)),
+      editedPartStart: 0,
+      editedPartEnd: 5,
+    );
+    expect(headingController.styles, [heading(0, 5), bold(7, 12)]);
+    expect(headingController.isHeading, isFalse);
+
+    final bulletController = SimpleFormattingController(
+        text: '• milk\nAfter', styles: [bold(7, 12)]);
+    addTearDown(bulletController.dispose);
+    bulletController.selection = const TextSelection.collapsed(offset: 6);
+    bulletController.applySegmentValue(
+      const TextEditingValue(
+          text: '• milk\n\nAfter',
+          selection: TextSelection.collapsed(offset: 7)),
+      editedPartStart: 0,
+      editedPartEnd: 6,
+    );
+    expect(bulletController.text, '• milk\n• \nAfter');
+    expect(bulletController.selection.extentOffset, 9);
+    expect(bulletController.styles, [bold(10, 15)]);
+  });
+
   test('native text undo and redo restore their companion style snapshots', () {
     final controller =
         SimpleFormattingController(text: 'word', styles: [bold(0, 4)]);

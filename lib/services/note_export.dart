@@ -1,9 +1,12 @@
 import 'package:characters/characters.dart';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -43,8 +46,8 @@ class NoteExport {
       [
         if (note.title?.isNotEmpty == true)
           '# ${_escape(note.title!).replaceAll('\n', ' ')}',
-        if (note.description?.isNotEmpty == true)
-          noteTextToMarkdown(note.description!, note.textStyles),
+        if ((note.description?.isNotEmpty ?? false) || photos.isNotEmpty)
+          _markdownBody(note, photos),
         ...note.voiceMemos
             .map((memo) => memo.transcript ?? '')
             .where((text) => text.isNotEmpty)
@@ -55,12 +58,57 @@ class NoteExport {
                   '- [${todo.completed ? 'x' : ' '}] ${_escape(todo.title ?? '').replaceAll('\n', '\n  ')}')
               .join('\n'),
         if (reminder != null) _escape(reminder),
-        for (var i = 0; i < photos.length; i++)
-          '![${i + 1}](${Uri.encodeComponent(photos[i])})',
         for (var i = 0; i < recordings.length; i++)
           '[${_escape(recordingLabel)} ${i + 1}](${Uri.encodeComponent(recordings[i])})',
       ].join('\n\n');
+
+  static String _markdownBody(Note note, List<String> photos) {
+    final body = note.description ?? '';
+    final layouts =
+        normalizeNoteImageLayouts(note.imageLayouts, note.imagePaths, body);
+    final imageIndices = {
+      for (var index = 0; index < note.imagePaths.length; index++)
+        note.imagePaths[index]: index,
+    };
+    final used = <int>{};
+    return [
+      for (final part in noteDocumentParts(body, layouts))
+        if (part is NoteTextPart && part.end > part.start)
+          noteTextToMarkdown(body.substring(part.start, part.end),
+              _partStyles(note.textStyles, part))
+        else if (part is NoteImagePart &&
+            imageIndices.containsKey(part.layout.path) &&
+            imageIndices[part.layout.path]! < photos.length)
+          _markdownPhoto(
+              part.layout, imageIndices[part.layout.path]!, photos, used),
+      for (var index = 0; index < photos.length; index++)
+        if (!used.contains(index))
+          '![${index + 1}](${Uri.encodeComponent(photos[index])})',
+    ].join('\n\n');
+  }
+
+  static String _markdownPhoto(
+      NoteImageLayout layout, int index, List<String> photos, Set<int> used) {
+    used.add(index);
+    String number(double value) =>
+        value.toStringAsFixed(3).replaceFirst(RegExp(r'\.?0+$'), '');
+    final width = number(layout.widthFactor * 100);
+    final left = number((1 - layout.widthFactor) * layout.xFactor * 100);
+    return '<img src="${Uri.encodeComponent(photos[index])}" alt="${index + 1}" '
+        'style="display:block;width:$width%;margin-left:$left%;">';
+  }
 }
+
+List<NoteTextStyleRange> _partStyles(
+        Iterable<NoteTextStyleRange> styles, NoteTextPart part) =>
+    [
+      for (final style in styles)
+        if (style.end > part.start && style.start < part.end)
+          NoteTextStyleRange(
+              start: math.max(style.start, part.start) - part.start,
+              end: math.min(style.end, part.end) - part.start,
+              kind: style.kind),
+    ];
 
 /// Pure PDF generation runs in an isolate; the UI loads fonts and photos first.
 Future<Uint8List> buildNotePdf(NotePdfData data) async {
@@ -76,6 +124,36 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
       fontFallback: [fallback],
       fontSize: 12,
       lineSpacing: 4);
+  final imagePaths = data.imagePaths.length == data.photos.length
+      ? data.imagePaths
+      : List.generate(data.photos.length, (index) => 'photo_$index');
+  final imageIndices = {
+    for (var index = 0; index < imagePaths.length; index++)
+      imagePaths[index]: index,
+  };
+  final layouts = normalizeNoteImageLayouts(
+      data.imageLayouts, imagePaths, data.description);
+  final pageWidth = PdfPageFormat.a4.width - 80;
+  // Leave room for page margins and the page-number footer. Taller pictures
+  // shrink to a complete frame instead of being cropped or overflowing a page.
+  final maxPhotoHeight = PdfPageFormat.a4.height - 80 - 40;
+  pw.Widget photo(NoteImageLayout layout) {
+    final image = pw.MemoryImage(data.photos[imageIndices[layout.path]!]);
+    // The source proportion matches the reader and keeps older photos whose
+    // saved layout used the legacy default ratio from acquiring empty frames.
+    final ratio = image.width! / image.height!;
+    final width =
+        math.min(pageWidth * layout.widthFactor, maxPhotoHeight * ratio);
+    final height = width / ratio;
+    return pw.SizedBox(
+        width: pageWidth,
+        height: height,
+        child: pw.Align(
+            alignment: pw.Alignment(layout.xFactor * 2 - 1, 0),
+            child: pw.Image(image,
+                width: width, height: height, fit: pw.BoxFit.contain)));
+  }
+
   pw.Widget text(String value,
       {bool heading = false, List<NoteTextStyleRange> textStyles = const []}) {
     final ranges = normalizeNoteTextStyles(textStyles, value).toList()
@@ -164,10 +242,15 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
         pw.SizedBox(height: 12)
       ],
       if (data.date.isNotEmpty) ...[text(data.date), pw.SizedBox(height: 16)],
-      if (data.description.isNotEmpty) ...[
-        text(data.description, textStyles: data.textStyles),
-        pw.SizedBox(height: 16)
-      ],
+      for (final part in noteDocumentParts(data.description, layouts))
+        if (part is NoteTextPart && part.end > part.start) ...[
+          text(data.description.substring(part.start, part.end),
+              textStyles: _partStyles(data.textStyles, part)),
+          pw.SizedBox(height: 16)
+        ] else if (part is NoteImagePart) ...[
+          photo(part.layout),
+          pw.SizedBox(height: 16),
+        ],
       for (final transcript in data.transcripts) ...[
         text(transcript),
         pw.SizedBox(height: 16)
@@ -179,11 +262,6 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
       if (data.reminder != null) ...[
         pw.SizedBox(height: 12),
         text(data.reminder!)
-      ],
-      for (final photo in data.photos) ...[
-        pw.SizedBox(height: 16),
-        pw.Image(pw.MemoryImage(photo),
-            width: 515, height: 500, fit: pw.BoxFit.contain),
       ],
     ],
   ));
@@ -231,6 +309,8 @@ class NotePdfData {
       required this.fallback,
       this.reminder,
       this.textStyles = const [],
+      this.imagePaths = const [],
+      this.imageLayouts = const [],
       this.transcripts = const [],
       this.glyphs = const {}});
   final String title, description, date;
@@ -239,6 +319,8 @@ class NotePdfData {
   final Uint8List regular, bold, fallback;
   final String? reminder;
   final List<NoteTextStyleRange> textStyles;
+  final List<String> imagePaths;
+  final List<NoteImageLayout> imageLayouts;
   final List<String> transcripts;
   final Map<String, Uint8List> glyphs;
 }

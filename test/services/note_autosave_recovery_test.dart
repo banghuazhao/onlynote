@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 
@@ -155,14 +157,57 @@ void main() {
         folderId: 'folder',
         isPinned: true,
         sortOrder: -42,
-        tags: const ['Work'],
-        linkedNoteIds: const ['reference'],
-        imagePaths: const ['note_images/retained.jpg']);
+        tags: const [
+          'Work'
+        ],
+        linkedNoteIds: const [
+          'reference'
+        ],
+        imagePaths: const [
+          'note_images/retained.jpg'
+        ],
+        imageLayouts: const [
+          NoteImageLayout(
+              path: 'note_images/retained.jpg',
+              textOffset: 11,
+              widthFactor: .6,
+              xFactor: .2,
+              aspectRatio: 2),
+        ],
+        textStyles: const [
+          NoteTextStyleRange(start: 0, end: 6, kind: NoteTextStyleKind.bold),
+        ]);
     await stage(draft);
 
     await recover();
 
     expect((notes.get('active') as NoteDto).toDomain(), draft);
+    expect(repository.writes, 1);
+    expect(drafts.isEmpty, isTrue);
+  });
+
+  test('legacy photo drafts recover with placement after the existing body',
+      () async {
+    await drafts.put(
+        'legacy',
+        NoteDto(
+          id: 'legacy',
+          description: 'Original body',
+          imagePaths: const ['note_images/legacy.jpg'],
+          imageLayouts: null,
+        ));
+    await drafts.flush();
+    await drafts.close();
+    drafts = await Hive.openBox('autosave_recovery_drafts');
+
+    await recover();
+
+    final recovered = (notes.get('legacy') as NoteDto).toDomain();
+    expect(recovered.description, 'Original body');
+    expect(recovered.imagePaths, ['note_images/legacy.jpg']);
+    expect(recovered.imageLayouts, const [
+      NoteImageLayout(path: 'note_images/legacy.jpg', textOffset: 13),
+    ]);
     expect(repository.writes, 1);
     expect(drafts.isEmpty, isTrue);
   });

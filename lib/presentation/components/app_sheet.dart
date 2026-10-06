@@ -22,9 +22,11 @@ Future<T?> showAppSheet<T>({
     );
 
 class AppSheet extends StatelessWidget {
-  const AppSheet({super.key, required this.title, required this.child});
+  const AppSheet(
+      {super.key, required this.title, required this.child, this.footer});
   final String title;
   final Widget child;
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +68,13 @@ class AppSheet extends StatelessWidget {
                 child: child,
               ),
             ),
+            if (footer != null) ...[
+              Divider(height: 1, color: theme.colorScheme.outlineVariant),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+                child: footer,
+              ),
+            ],
           ],
         ),
       ),

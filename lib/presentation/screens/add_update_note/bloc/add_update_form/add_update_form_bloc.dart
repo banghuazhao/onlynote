@@ -6,6 +6,8 @@ import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
     show AddUpdateBloc, AddUpdateEvent;
 
@@ -31,6 +33,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           selectedColor: event.color,
           todos: event.todos ?? [],
           imagePaths: event.imagePaths ?? [],
+          imageLayouts: event.imageLayouts ?? [],
           voiceMemos: event.voiceMemos ?? [],
           tags: event.tags ?? [],
           linkedNoteIds: event.linkedNoteIds ?? [],
@@ -45,7 +48,13 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       }
 
       if (event is _BodyChanged) {
-        emit(state.copyWith(description: event.text, textStyles: event.styles));
+        emit(state.copyWith(
+            description: event.text,
+            textStyles: event.styles,
+            imageLayouts: event.layouts));
+      }
+      if (event is _ImageLayoutsChanged) {
+        emit(state.copyWith(imageLayouts: event.value));
       }
       if (event is _DescriptionChanged) {
         emit(state.copyWith(description: event.value));
@@ -76,6 +85,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          imageLayouts: state.imageLayouts,
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
@@ -95,6 +105,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           dateTime: DateTime.now(),
           todo: state.todos,
           imagePaths: state.imagePaths,
+          imageLayouts: state.imageLayouts,
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
@@ -192,7 +203,15 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
     //* Images
     on<_AddImage>((event, emit) {
       final imagePaths = List<String>.from(state.imagePaths)..add(event.path);
-      emit(state.copyWith(imagePaths: imagePaths));
+      emit(state.copyWith(
+          imagePaths: imagePaths,
+          imageLayouts: normalizeNoteImageLayouts([
+            ...state.imageLayouts,
+            NoteImageLayout(
+                path: event.path,
+                textOffset:
+                    event.textOffset ?? (state.description ?? '').length)
+          ], imagePaths, state.description ?? '')));
     });
 
     //* Only drops the path from the draft. The file itself is deleted when
@@ -201,7 +220,10 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
     on<_RemoveImage>((event, emit) {
       final imagePaths = List<String>.from(state.imagePaths)
         ..remove(event.path);
-      emit(state.copyWith(imagePaths: imagePaths));
+      emit(state.copyWith(
+          imagePaths: imagePaths,
+          imageLayouts: normalizeNoteImageLayouts(
+              state.imageLayouts, imagePaths, state.description ?? '')));
     });
   }
 

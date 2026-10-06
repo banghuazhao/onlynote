@@ -78,10 +78,11 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
   Iterable<NoteTextStyleRange> styles, {
   bool? insertedBold,
   bool? insertedHeading,
+  NoteTextChange? changeOverride,
 }) {
   final clean = normalizeNoteTextStyles(styles, oldText);
   if (oldText == newText) return clean;
-  final change = noteTextChange(oldText, newText);
+  final change = changeOverride ?? noteTextChange(oldText, newText);
   final delta = newText.length - oldText.length;
   final insertEnd = change.start + change.inserted.length;
   final result = <NoteTextStyleRange>[];
@@ -163,8 +164,43 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
 }
 
 /// The smallest changed region whose ends are safe character boundaries in
-/// both documents. Also used by the editor's list continuation behavior.
-NoteTextChange noteTextChange(String before, String after) {
+/// both documents. Optional part bounds keep repeated text in other paragraphs
+/// from shifting the detected edit. Invalid bounds fall back to a full diff.
+NoteTextChange noteTextChange(
+  String before,
+  String after, {
+  int? editedPartStart,
+  int? editedPartEnd,
+}) {
+  final delta = after.length - before.length;
+  if (editedPartStart != null &&
+      editedPartEnd != null &&
+      editedPartStart >= 0 &&
+      editedPartEnd >= editedPartStart &&
+      editedPartEnd <= before.length &&
+      editedPartEnd + delta >= editedPartStart &&
+      editedPartEnd + delta <= after.length &&
+      before.substring(0, editedPartStart) ==
+          after.substring(0, editedPartStart) &&
+      before.substring(editedPartEnd) ==
+          after.substring(editedPartEnd + delta)) {
+    final oldBoundaries = _graphemeBoundaries(before).toSet();
+    final newBoundaries = _graphemeBoundaries(after).toSet();
+    if (oldBoundaries.contains(editedPartStart) &&
+        oldBoundaries.contains(editedPartEnd) &&
+        newBoundaries.contains(editedPartStart) &&
+        newBoundaries.contains(editedPartEnd + delta)) {
+      final local = noteTextChange(
+        before.substring(editedPartStart, editedPartEnd),
+        after.substring(editedPartStart, editedPartEnd + delta),
+      );
+      return NoteTextChange(
+        start: editedPartStart + local.start,
+        oldEnd: editedPartStart + local.oldEnd,
+        inserted: local.inserted,
+      );
+    }
+  }
   var prefix = 0;
   while (prefix < before.length &&
       prefix < after.length &&

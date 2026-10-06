@@ -32,6 +32,7 @@ mixin _$Note {
   List<String> get tags => throw _privateConstructorUsedError;
   List<String> get linkedNoteIds => throw _privateConstructorUsedError;
   List<NoteTextStyleRange> get textStyles => throw _privateConstructorUsedError;
+  List<NoteImageLayout> get imageLayouts => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -58,7 +59,8 @@ abstract class $NoteCopyWith<$Res> {
       bool isArchived,
       List<String> tags,
       List<String> linkedNoteIds,
-      List<NoteTextStyleRange> textStyles});
+      List<NoteTextStyleRange> textStyles,
+      List<NoteImageLayout> imageLayouts});
 }
 
 /// @nodoc
@@ -90,6 +92,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? tags = null,
     Object? linkedNoteIds = null,
     Object? textStyles = null,
+    Object? imageLayouts = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -156,6 +159,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.textStyles
           : textStyles // ignore: cast_nullable_to_non_nullable
               as List<NoteTextStyleRange>,
+      imageLayouts: null == imageLayouts
+          ? _value.imageLayouts
+          : imageLayouts // ignore: cast_nullable_to_non_nullable
+              as List<NoteImageLayout>,
     ) as $Val);
   }
 }
@@ -183,7 +190,8 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       bool isArchived,
       List<String> tags,
       List<String> linkedNoteIds,
-      List<NoteTextStyleRange> textStyles});
+      List<NoteTextStyleRange> textStyles,
+      List<NoteImageLayout> imageLayouts});
 }
 
 /// @nodoc
@@ -212,6 +220,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? tags = null,
     Object? linkedNoteIds = null,
     Object? textStyles = null,
+    Object? imageLayouts = null,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -278,6 +287,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value._textStyles
           : textStyles // ignore: cast_nullable_to_non_nullable
               as List<NoteTextStyleRange>,
+      imageLayouts: null == imageLayouts
+          ? _value._imageLayouts
+          : imageLayouts // ignore: cast_nullable_to_non_nullable
+              as List<NoteImageLayout>,
     ));
   }
 }
@@ -301,13 +314,15 @@ class _$NoteImpl extends _Note {
       this.isArchived = false,
       final List<String> tags = const [],
       final List<String> linkedNoteIds = const [],
-      final List<NoteTextStyleRange> textStyles = const []})
+      final List<NoteTextStyleRange> textStyles = const [],
+      final List<NoteImageLayout> imageLayouts = const []})
       : _todo = todo,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
         _tags = tags,
         _linkedNoteIds = linkedNoteIds,
         _textStyles = textStyles,
+        _imageLayouts = imageLayouts,
         super._();
 
   @override
@@ -386,9 +401,18 @@ class _$NoteImpl extends _Note {
     return EqualUnmodifiableListView(_textStyles);
   }
 
+  final List<NoteImageLayout> _imageLayouts;
+  @override
+  @JsonKey()
+  List<NoteImageLayout> get imageLayouts {
+    if (_imageLayouts is EqualUnmodifiableListView) return _imageLayouts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_imageLayouts);
+  }
+
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, textStyles: $textStyles)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, textStyles: $textStyles, imageLayouts: $imageLayouts)';
   }
 
   @override
@@ -422,7 +446,9 @@ class _$NoteImpl extends _Note {
             const DeepCollectionEquality()
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
             const DeepCollectionEquality()
-                .equals(other._textStyles, _textStyles));
+                .equals(other._textStyles, _textStyles) &&
+            const DeepCollectionEquality()
+                .equals(other._imageLayouts, _imageLayouts));
   }
 
   @override
@@ -443,7 +469,8 @@ class _$NoteImpl extends _Note {
       isArchived,
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_linkedNoteIds),
-      const DeepCollectionEquality().hash(_textStyles));
+      const DeepCollectionEquality().hash(_textStyles),
+      const DeepCollectionEquality().hash(_imageLayouts));
 
   @JsonKey(ignore: true)
   @override
@@ -469,7 +496,8 @@ abstract class _Note extends Note {
       final bool isArchived,
       final List<String> tags,
       final List<String> linkedNoteIds,
-      final List<NoteTextStyleRange> textStyles}) = _$NoteImpl;
+      final List<NoteTextStyleRange> textStyles,
+      final List<NoteImageLayout> imageLayouts}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -504,6 +532,8 @@ abstract class _Note extends Note {
   List<String> get linkedNoteIds;
   @override
   List<NoteTextStyleRange> get textStyles;
+  @override
+  List<NoteImageLayout> get imageLayouts;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/audio_storage.dart';
@@ -58,6 +59,59 @@ void main() {
         createdAt: DateTime(2026, 10, 6),
         transcript: 'Meeting notes 会议记录');
   }
+
+  test('photo layouts follow independent copies when a template is reused',
+      () async {
+    await sourcePhoto();
+    const layout = NoteImageLayout(
+        path: 'note_images/source.jpg',
+        textOffset: 6,
+        widthFactor: .45,
+        xFactor: 1,
+        aspectRatio: 2);
+    final template = await store.saveFromNote(
+        Note(
+            description: 'First\nSecond',
+            imagePaths: [layout.path],
+            imageLayouts: [layout]),
+        name: 'Photo');
+    expect(template.imageLayouts.single,
+        layout.copyWith(path: template.imagePaths.single));
+    final restarted = CustomNoteTemplateStore(
+        preferences: preferences, documentsPath: documents.path);
+    addTearDown(restarted.dispose);
+    await restarted.load();
+    final first = await restarted.createNote(template.id);
+    final second = await restarted.createNote(template.id);
+    expect(first.imagePaths.single, isNot(second.imagePaths.single));
+    for (final note in [first, second]) {
+      expect(note.imageLayouts.single,
+          layout.copyWith(path: note.imagePaths.single));
+      expect(
+          await File('${documents.path}/${note.imagePaths.single}')
+              .readAsBytes(),
+          [1, 2, 3, 4]);
+    }
+  });
+
+  test(
+      'legacy templates place their photos after the body and reject bad layouts',
+      () {
+    final json = CustomNoteTemplate(
+            id: 'old',
+            name: 'Photo',
+            body: 'Body',
+            imagePaths: ['template_images/photo.jpg'],
+            createdAt: DateTime(2026))
+        .toJson()
+      ..remove('imageLayouts');
+    final template = CustomNoteTemplate.fromJson(json);
+    expect(template.imageLayouts.single.textOffset, 4);
+    json['imageLayouts'] = [
+      NoteImageLayout(path: 'missing.jpg', textOffset: 4).toMap()
+    ];
+    expect(() => CustomNoteTemplate.fromJson(json), throwsFormatException);
+  });
 
   test('recordings own independent template and reusable note files', () async {
     final memo = await sourceAudio();

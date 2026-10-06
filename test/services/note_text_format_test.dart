@@ -91,6 +91,24 @@ void main() {
     expect(mark.inserted, 'è');
   });
 
+  test('segment diff resolves repetitions and rejects unsafe character cuts',
+      () {
+    final local = noteTextChange('A\nA\n', 'A\nA\nA\n',
+        editedPartStart: 0, editedPartEnd: 1);
+    expect(local.start, 1);
+    expect(local.oldEnd, 1);
+    expect(local.inserted, '\nA');
+    expect(
+        rebaseNoteTextStyles('A\nA\n', 'A\nA\nA\n', [bold(2, 3)],
+            changeOverride: local),
+        [bold(4, 5)]);
+    final unsafe =
+        noteTextChange('😀z', '😃z', editedPartStart: 1, editedPartEnd: 2);
+    expect(unsafe.start, 0);
+    expect(unsafe.oldEnd, 2);
+    expect(unsafe.inserted, '😃');
+  });
+
   test('display spans preserve all visible text and combine styles', () {
     final spans = buildNoteTextSpans(
       text: 'Title\nbody',

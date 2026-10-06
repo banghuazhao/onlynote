@@ -8,6 +8,7 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -112,7 +113,7 @@ void main() {
         folderId: 'folder',
         archiveScope: NoteArchiveScope.all);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 5);
+    expect(backup.toJson()['version'], 6);
     await service.restore(backup);
     final imported = notes.values
         .cast<NoteDto>()
@@ -152,6 +153,107 @@ void main() {
     expect(journal.get('pending'), isNull);
   });
 
+  test('v6 preserves and remaps photo layout in notes history and templates',
+      () async {
+    const path = 'note_images/photo.jpg';
+    final photo = File('${directory.path}/$path');
+    await photo.parent.create(recursive: true);
+    await photo.writeAsBytes([1, 2, 3, 4]);
+    const body = 'First\nSecond';
+    const layout = NoteImageLayout(
+        path: path,
+        textOffset: 6,
+        widthFactor: .55,
+        xFactor: .8,
+        aspectRatio: 1.5);
+    final before = NoteDto(
+        id: 'photo-note',
+        description: body,
+        imagePaths: [path],
+        imageLayouts: [layout.toMap()]);
+    final after = before.copyWith(imageLayouts: [
+      layout.copyWith(widthFactor: .75, textOffset: 0).toMap(),
+    ]);
+    await history.recordBeforeSave(before, after);
+    await notes.put(before.id, after);
+    final template =
+        await templates.saveFromNote(before.toDomain(), name: 'Photo');
+    expect(template.imageLayouts.single.path, template.imagePaths.single);
+    final backup = decodeBackup(await service.export());
+    expect(backup.toJson()['version'], 6);
+    final archivedLayout = backup.notes.single.toDomain().imageLayouts.single;
+    expect(archivedLayout.path, backup.notes.single.imagePaths!.single);
+    expect(archivedLayout.textOffset, 0);
+    expect(archivedLayout.widthFactor, .75);
+    await service.restore(backup);
+    final restored =
+        notes.values.cast<NoteDto>().singleWhere((n) => n.id != before.id);
+    final restoredLayout = restored.toDomain().imageLayouts.single;
+    expect(restoredLayout.path, restored.imagePaths!.single);
+    expect(restoredLayout.path, isNot(path));
+    expect(restoredLayout.widthFactor, .75);
+    expect(restoredLayout.xFactor, .8);
+    expect(restoredLayout.aspectRatio, 1.5);
+    final version = history.versionsFor(restored.id!).single;
+    expect(version.note.toDomain().imageLayouts.single,
+        layout.copyWith(path: restoredLayout.path));
+    expect(await history.restore(restored.id!, version.id),
+        NoteHistoryRestoreResult.restored);
+    expect(
+        (notes.get(restored.id) as NoteDto)
+            .toDomain()
+            .imageLayouts
+            .single
+            .textOffset,
+        6);
+    final restoredTemplate =
+        templates.templates.singleWhere((t) => t.id != template.id);
+    expect(restoredTemplate.imageLayouts.single,
+        layout.copyWith(path: restoredTemplate.imagePaths.single));
+    expect(await File('${directory.path}/${restoredLayout.path}').readAsBytes(),
+        [1, 2, 3, 4]);
+  });
+
+  test('v1 through v5 place legacy photos after the body', () {
+    for (var version = 1; version <= 5; version++) {
+      final json = BackupContents(createdAt: DateTime.now(), notes: [
+        NoteDto(id: 'legacy', description: 'Body', imagePaths: ['photo'])
+      ], folders: [], photos: {
+        'photo': BackupPhoto('png', Uint8List.fromList([1]))
+      }, reminders: []).toJson();
+      json['version'] = version;
+      (json['notes'] as List).single['imageLayouts'] = [42];
+      final restored = BackupContents.fromJson(json).notes.single.toDomain();
+      expect(restored.imageLayouts.single.path, 'photo');
+      expect(restored.imageLayouts.single.textOffset, 4);
+    }
+  });
+
+  test('v6 rejects malformed photo layouts before any import', () {
+    final json = BackupContents(createdAt: DateTime.now(), notes: [
+      NoteDto(id: 'note', description: 'Body\nTail', imagePaths: ['photo'])
+    ], folders: [], photos: {
+      'photo': BackupPhoto('png', Uint8List.fromList([1]))
+    }, reminders: []).toJson();
+    final map = (json['notes'] as List).single as Map;
+    const valid = NoteImageLayout(path: 'photo', textOffset: 5);
+    for (final change in [
+      {'path': 'missing'},
+      {'textOffset': 100},
+      {'textOffset': 2},
+      {'widthFactor': 0},
+      {'xFactor': 2},
+      {'aspectRatio': -1},
+    ]) {
+      map['imageLayouts'] = [
+        {...valid.toMap(), ...change}
+      ];
+      expect(() => BackupContents.fromJson(json), throwsFormatException);
+    }
+    map['imageLayouts'] = [valid.toMap(), valid.toMap()];
+    expect(() => BackupContents.fromJson(json), throwsFormatException);
+  });
+
   test('v5 preserves formatting in notes, historical versions, and templates',
       () async {
     const body = 'Heading\n• Item\nBold';
@@ -171,7 +273,7 @@ void main() {
     final template =
         await templates.saveFromNote(before.toDomain(), name: 'Formatted');
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 5);
+    expect(backup.toJson()['version'], 6);
     expect(backup.notes.single.toDomain().textStyles, isEmpty);
     expect(backup.histories['formatted']!.single.note.toDomain().textStyles,
         styles);
@@ -605,7 +707,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 5);
+    expect(backup.toJson()['version'], 6);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

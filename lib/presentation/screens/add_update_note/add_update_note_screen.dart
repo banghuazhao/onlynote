@@ -9,7 +9,9 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
-import 'package:onlynote/presentation/components/note_formatting_toolbar.dart';
+import 'package:onlynote/presentation/components/note_body_editor.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/presentation/components/note_links_section.dart';
 import 'package:onlynote/presentation/components/note_link_picker_sheet.dart';
@@ -100,6 +102,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   late final TextEditingController _titleController;
   late final SimpleFormattingController _descriptionController;
   final FocusNode _bodyFocus = FocusNode();
+  List<NoteImageLayout> _currentImageLayouts = const [];
   late final AddUpdateFormBloc _form;
   late final NoteAutosave _autosave;
   late final StreamSubscription<AddUpdateFormState> _changes;
@@ -139,7 +142,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         widget.note?.id == null || !Hive.isBoxOpen(draftDatabaseBox)
             ? null
             : Hive.box(draftDatabaseBox).get(widget.note!.id) as NoteDto?;
-    final initial = recovered?.toDomain() ??
+    final seed = recovered?.toDomain() ??
         widget.note ??
         widget.customTemplateNote ??
         widget.template
@@ -154,6 +157,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               ? [Todo.empty()]
               : const [],
         );
+    final initial = seed.copyWith(
+        imageLayouts: normalizeNoteImageLayouts(
+            seed.imageLayouts, seed.imagePaths, seed.description ?? ''));
+    _currentImageLayouts = initial.imageLayouts;
     _titleController = TextEditingController(text: initial.title);
     _descriptionController = SimpleFormattingController(
         text: initial.description, styles: initial.textStyles);
@@ -173,12 +180,15 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           selectedColor: initial.color,
           todos: initial.todo,
           imagePaths: initial.imagePaths,
+          imageLayouts: initial.imageLayouts,
           voiceMemos: initial.voiceMemos,
           tags: initial.tags,
           linkedNoteIds: initial.linkedNoteIds,
         ));
     _changes = _form.stream.listen((state) {
       if (_refreshingFromLibrary) return;
+      _currentImageLayouts = normalizeNoteImageLayouts(
+          state.imageLayouts, state.imagePaths, _descriptionController.text);
       _hadUserChange = true;
       _capture(state);
       _queueReminderSuggestion();
@@ -258,7 +268,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         }
         return;
       }
-      _form.add(AddUpdateFormEvent.addImage(path));
+      _form.add(AddUpdateFormEvent.addImage(path,
+          textOffset: _descriptionController.selection.isValid
+              ? _descriptionController.selection.extentOffset
+              : null));
       await Future<void>.delayed(Duration.zero);
       if (!mounted) return;
       _capture(_form.state);
@@ -292,10 +305,29 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     final text = _descriptionController.text;
     final styles = _descriptionController.styles;
     if ((_form.state.description ?? '') == text &&
-        listEquals(_form.state.textStyles, styles)) {
+        listEquals(_form.state.textStyles, styles) &&
+        listEquals(_form.state.imageLayouts, _currentImageLayouts)) {
       return;
     }
-    _form.add(AddUpdateFormEvent.bodyChanged(text, styles));
+    _form.add(
+        AddUpdateFormEvent.bodyChanged(text, styles, _currentImageLayouts));
+  }
+
+  void _imageLayoutsChanged(List<NoteImageLayout> layouts) {
+    if (_refreshingFromLibrary ||
+        !mounted ||
+        _form.isClosed ||
+        listEquals(_currentImageLayouts, layouts)) {
+      return;
+    }
+    _currentImageLayouts = layouts;
+    _form.add(AddUpdateFormEvent.imageLayoutsChanged(layouts));
+  }
+
+  void _removeInlineImage(String path) {
+    _currentImageLayouts =
+        _currentImageLayouts.where((layout) => layout.path != path).toList();
+    _form.add(AddUpdateFormEvent.removeImage(path));
   }
 
   void _capture(AddUpdateFormState state) {
@@ -306,6 +338,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       color: state.selectedColor,
       todo: state.todos,
       imagePaths: state.imagePaths,
+      imageLayouts: _currentImageLayouts,
       voiceMemos: state.voiceMemos,
       tags: state.tags,
       linkedNoteIds: state.linkedNoteIds,
@@ -389,6 +422,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           normalizeNoteTextStyles(_descriptionController.styles, retained);
       final updated =
           '$retained${previous.trim().isEmpty ? '' : '\n\n'}${text.trim()}';
+      _imageLayoutsChanged(normalizeNoteImageLayouts(
+          normalizeNoteImageLayouts(
+              _currentImageLayouts, _form.state.imagePaths, retained),
+          _form.state.imagePaths,
+          updated));
       _descriptionController.setDocument(updated, styles);
       _descriptionController.selection =
           TextSelection.collapsed(offset: updated.length);
@@ -759,6 +797,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       try {
         if (!_autosave.adoptSavedNote(refreshed)) return;
         _titleController.text = refreshed.title ?? '';
+        _currentImageLayouts = refreshed.imageLayouts;
         _descriptionController.setDocument(
             refreshed.description ?? '', refreshed.textStyles);
         final state = AddUpdateFormState(
@@ -768,6 +807,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             selectedColor: refreshed.color,
             todos: refreshed.todo,
             imagePaths: refreshed.imagePaths,
+            imageLayouts: refreshed.imageLayouts,
             voiceMemos: refreshed.voiceMemos,
             tags: refreshed.tags,
             linkedNoteIds: refreshed.linkedNoteIds);
@@ -780,6 +820,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               color: refreshed.color,
               todos: refreshed.todo,
               imagePaths: refreshed.imagePaths,
+              imageLayouts: refreshed.imageLayouts,
               voiceMemos: refreshed.voiceMemos,
               tags: refreshed.tags,
               linkedNoteIds: refreshed.linkedNoteIds));
@@ -968,6 +1009,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               titleController: _titleController,
               descriptionController: _descriptionController,
               bodyFocus: _bodyFocus,
+              onImageLayoutsChanged: _imageLayoutsChanged,
+              onRemoveImage: _removeInlineImage,
               status: _autosave.status,
               onDone: _finish,
               onAddPhoto: _addPhoto,
@@ -999,6 +1042,8 @@ class _BuildForm extends StatelessWidget {
     required TextEditingController titleController,
     required SimpleFormattingController descriptionController,
     required this.bodyFocus,
+    required this.onImageLayoutsChanged,
+    required this.onRemoveImage,
     required this.state,
     required this.status,
     required this.onDone,
@@ -1026,6 +1071,8 @@ class _BuildForm extends StatelessWidget {
   final TextEditingController _titleController;
   final SimpleFormattingController _descriptionController;
   final FocusNode bodyFocus;
+  final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
+  final ValueChanged<String> onRemoveImage;
   final AddUpdateFormState state;
   final AutosaveStatus status;
   final VoidCallback onDone;
@@ -1182,6 +1229,8 @@ class _BuildForm extends StatelessWidget {
                       const SizedBox(height: AppSpacings.xml),
                       _BuildDescriptionField(
                         focusNode: bodyFocus,
+                        onImageLayoutsChanged: onImageLayoutsChanged,
+                        onRemoveImage: onRemoveImage,
                         state: state,
                         descriptionController: _descriptionController,
                         autofocus: widget.note == null &&

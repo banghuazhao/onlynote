@@ -1,4 +1,5 @@
-import 'package:onlynote/presentation/components/formatted_note_text.dart';
+import 'package:onlynote/presentation/components/note_document_view.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -741,19 +742,37 @@ class LoadedView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacings.xxl),
                     },
-                    FormattedNoteText(
+                    NoteDocumentView(
                       text: note.description ?? '',
                       styles: note.textStyles,
+                      imagePaths: note.imagePaths,
+                      imageLayouts: note.imageLayouts,
                       selectable: !exportMode,
+                      onImageTap: exportMode
+                          ? null
+                          : (path) {
+                              final paths = noteDocumentParts(
+                                      note.description ?? '',
+                                      normalizeNoteImageLayouts(
+                                          note.imageLayouts,
+                                          note.imagePaths,
+                                          note.description ?? ''))
+                                  .whereType<NoteImagePart>()
+                                  .map((part) => part.layout.path)
+                                  .toList();
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  fullscreenDialog: true,
+                                  builder: (_) => _FullScreenImageViewer(
+                                      imagePaths: paths,
+                                      initialIndex: paths
+                                          .indexOf(path)
+                                          .clamp(0, paths.length - 1))));
+                            },
                       style: AppTypography.headline6.copyWith(
                         fontWeight: FontWeight.w400,
                         color: AppColors.ink.withValues(alpha: 0.88),
                       ),
                     ),
-                    if (note.hasImages) ...{
-                      const SizedBox(height: AppSpacings.xxl),
-                      _BuildImageGallery(imagePaths: note.imagePaths),
-                    },
                     if (note.linkedNoteIds.isNotEmpty ||
                         (!exportMode &&
                             noteBacklinks(note, libraryNotes).isNotEmpty)) ...[
@@ -792,57 +811,6 @@ class LoadedView extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _BuildImageGallery extends StatelessWidget {
-  const _BuildImageGallery({required this.imagePaths});
-  final List<String> imagePaths;
-
-  void _openFullScreen(BuildContext context, int initialIndex) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => _FullScreenImageViewer(
-          imagePaths: imagePaths,
-          initialIndex: initialIndex,
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 118,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: imagePaths.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacings.l),
-        itemBuilder: (context, index) {
-          return Material(
-            color: Colors.white.withValues(alpha: 0.86),
-            elevation: 1,
-            shadowColor: Colors.black26,
-            child: InkWell(
-              onTap: () => _openFullScreen(context, index),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(6, 6, 6, 14),
-                child: Hero(
-                  tag: 'note-image-${imagePaths[index]}',
-                  child: NoteImage(
-                    path: imagePaths[index],
-                    width: 100,
-                    height: 88,
-                    semanticLabel: S.of(context).Choose_From_Gallery,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }

@@ -6,9 +6,11 @@ import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:uuid/uuid.dart';
 
@@ -120,6 +122,7 @@ class BackupService {
           imagePaths: [
             for (final path in note.imagePaths ?? <String>[]) photoKeys[path]!
           ],
+          imageLayouts: _remapImageLayouts(note, photoKeys),
           voiceMemos: [
             for (final memo in _managedMemos(note.voiceMemos))
               memo.copyWith(path: audioKeys[memo.path]!).toMap()
@@ -257,6 +260,7 @@ class BackupService {
         imagePaths: [
           for (final key in note.imagePaths ?? const <String>[]) paths[key]!
         ],
+        imageLayouts: _remapImageLayouts(note, paths),
         voiceMemos: [
           for (final memo in note.voiceMemos ?? const <Map>[])
             {
@@ -441,3 +445,13 @@ class BackupService {
     await journal.flush();
   }
 }
+
+List<Map<String, dynamic>> _remapImageLayouts(
+        NoteDto note, Map<String, String> paths) =>
+    [
+      for (final layout in normalizeNoteImageLayouts([
+        for (final raw in note.imageLayouts ?? const <Map>[])
+          if (NoteImageLayout.tryFromMap(raw) case final layout?) layout,
+      ], note.imagePaths ?? const [], note.description ?? ''))
+        layout.copyWith(path: paths[layout.path]!).toMap(),
+    ];

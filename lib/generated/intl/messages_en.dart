@@ -252,7 +252,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "This note or version is no longer available.",
     ),
     "History_Version": m6,
+    "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("Drop photo here"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
+    "Image_Move": MessageLookupByLibrary.simpleMessage("Move photo"),
+    "Image_Move_After": MessageLookupByLibrary.simpleMessage("Move later"),
+    "Image_Move_Before": MessageLookupByLibrary.simpleMessage("Move earlier"),
+    "Image_Remove": MessageLookupByLibrary.simpleMessage("Remove photo"),
+    "Image_Resize": MessageLookupByLibrary.simpleMessage("Resize photo"),
     "Include_Archived": MessageLookupByLibrary.simpleMessage(
       "Include archived notes",
     ),

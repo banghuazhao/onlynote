@@ -10,6 +10,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
       Color? selectedColor,
       @Default([]) List<Todo> todos,
       @Default([]) List<String> imagePaths,
+      @Default([]) List<NoteImageLayout> imageLayouts,
       @Default([]) List<VoiceMemo> voiceMemos,
       @Default([]) List<String> tags,
       @Default([]) List<String> linkedNoteIds,

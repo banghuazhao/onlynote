@@ -10,6 +10,8 @@ import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/add_note_usecase.dart';
@@ -305,7 +307,21 @@ void main() {
         note: Note(
             id: 'photo-note',
             description: 'Existing body',
-            imagePaths: const ['note_images/photo.png']));
+            imagePaths: const [
+              'note_images/photo.png'
+            ],
+            imageLayouts: const [
+              NoteImageLayout(
+                  path: 'note_images/photo.png',
+                  textOffset: 13,
+                  widthFactor: .6,
+                  xFactor: .2,
+                  aspectRatio: 2),
+            ],
+            textStyles: const [
+              NoteTextStyleRange(
+                  start: 0, end: 8, kind: NoteTextStyleKind.bold),
+            ]));
     final recognition = Completer<PhotoTextResult>();
     extraction.action = () async => await recognition.future;
     final extract = find.byKey(const ValueKey('editor-extract-text'));
@@ -325,10 +341,27 @@ void main() {
     await tester.enterText(review, 'Reviewed and corrected text');
     await tap(tester, find.text(S.current.Photo_Text_Insert));
     expect(tester.widget<TextField>(_body()).controller!.text,
-        'Existing body with my newest edit\n\nReviewed and corrected text');
+        'Existing body with my newest edit');
+    expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('note-body-end')))
+            .controller!
+            .text,
+        '\nReviewed and corrected text');
     expect(store.saved.last.description,
         'Existing body with my newest edit\n\nReviewed and corrected text');
     expect(store.saved.last.imagePaths, ['note_images/photo.png']);
+    expect(store.saved.last.imageLayouts, const [
+      NoteImageLayout(
+          path: 'note_images/photo.png',
+          textOffset: 34,
+          widthFactor: .6,
+          xFactor: .2,
+          aspectRatio: 2),
+    ]);
+    expect(store.saved.last.textStyles, const [
+      NoteTextStyleRange(start: 0, end: 8, kind: NoteTextStyleKind.bold),
+    ]);
     expect(extraction.calls, ['note_images/photo.png']);
     expect(tester.takeException(), isNull);
     await tester.pump(const Duration(seconds: 5));

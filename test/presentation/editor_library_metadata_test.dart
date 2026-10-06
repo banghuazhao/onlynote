@@ -7,6 +7,7 @@ import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -144,6 +145,108 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
+
+  testWidgets('photo resize autosaves and reopens without losing metadata',
+      (tester) async {
+    const path = 'note_images/photo.jpg';
+    final initial = Note(
+      id: 'current',
+      title: 'Trip',
+      description: 'Before\nAfter',
+      folderId: 'travel',
+      isPinned: true,
+      isArchived: true,
+      tags: const ['Personal'],
+      linkedNoteIds: const ['packing'],
+      imagePaths: const [path],
+      imageLayouts: const [
+        NoteImageLayout(
+            path: path,
+            textOffset: 7,
+            widthFactor: .75,
+            xFactor: .8,
+            aspectRatio: 2),
+      ],
+      textStyles: const [
+        NoteTextStyleRange(start: 7, end: 12, kind: NoteTextStyleKind.bold),
+      ],
+    );
+    final (notes, store) = await _openEditor(tester, note: initial);
+    await _tap(tester, find.byKey(const ValueKey('image-select-$path')));
+    final handle = find.byKey(const ValueKey('image-resize-$path'));
+    await tester.ensureVisible(handle);
+    await tester.pumpAndSettle();
+    await tester.drag(handle, const Offset(-40, 0));
+    await tester.pumpAndSettle();
+    await _waitForAutosave(tester);
+    final saved = notes.values['current']!.toDomain();
+    expect(saved.imageLayouts.single.widthFactor, lessThan(.75));
+    expect(saved.imageLayouts.single.aspectRatio, 2);
+    expect(saved.imageLayouts.single.textOffset, 7);
+    expect(saved.imageLayouts.single.xFactor, .8);
+    expect(
+        saved,
+        initial.copyWith(
+            dateTime: saved.dateTime, imageLayouts: saved.imageLayouts));
+    expect(store.drafts, isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    final (_, reopenedStore) = await _openEditor(tester, note: saved);
+    expect(
+        tester
+            .widget<TextField>(
+                find.byKey(const ValueKey('note-body-before:$path')))
+            .controller!
+            .text,
+        'Before');
+    expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('note-body-end')))
+            .controller!
+            .text,
+        'After');
+    await _tap(tester, find.byKey(const ValueKey('image-select-$path')));
+    await _tap(tester, find.byKey(const ValueKey('image-earlier-$path')));
+    await _waitForAutosave(tester);
+    expect(reopenedStore.saved.last.imageLayouts.single,
+        saved.imageLayouts.single.copyWith(textOffset: 0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('editing before a photo rebases saved styles and photo position',
+      (tester) async {
+    const path = 'note_images/photo.jpg';
+    final (notes, store) = await _openEditor(tester,
+        note: Note(
+          id: 'current',
+          description: 'Before\nAfter',
+          imagePaths: const [path],
+          imageLayouts: const [NoteImageLayout(path: path, textOffset: 7)],
+          textStyles: const [
+            NoteTextStyleRange(start: 7, end: 12, kind: NoteTextStyleKind.bold),
+          ],
+        ));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-body-before:$path')), 'Longer before');
+    await _waitForAutosave(tester);
+    final saved = notes.values['current']!.toDomain();
+    expect(saved.description, 'Longer before\nAfter');
+    expect(saved.imageLayouts.single.textOffset, 14);
+    expect(saved.textStyles, const [
+      NoteTextStyleRange(start: 14, end: 19, kind: NoteTextStyleKind.bold),
+    ]);
+    await _tap(tester, find.byKey(const ValueKey('image-select-$path')));
+    await _tap(tester, find.byKey(const ValueKey('image-remove-$path')));
+    await _waitForAutosave(tester);
+    final removed = notes.values['current']!.toDomain();
+    expect(removed.imagePaths, isEmpty);
+    expect(removed.imageLayouts, isEmpty);
+    expect(removed.description, saved.description);
+    expect(removed.textStyles, saved.textStyles);
+    expect(store.drafts, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('formatting alone autosaves without changing note metadata',
       (tester) async {

@@ -408,5 +408,11 @@
   "Format_Bold": "Bold",
   "Format_Heading": "Heading",
   "Format_Bullets": "Bullets",
-  "Format_Text": "Text style"
+  "Format_Text": "Text style",
+  "Image_Move": "Move photo",
+  "Image_Resize": "Resize photo",
+  "Image_Remove": "Remove photo",
+  "Image_Move_Before": "Move earlier",
+  "Image_Move_After": "Move later",
+  "Image_Drop_Here": "Drop photo here"
 }

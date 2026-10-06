@@ -1,4 +1,4 @@
-import 'package:onlynote/presentation/components/formatted_note_text.dart';
+import 'package:onlynote/presentation/components/note_document_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
@@ -96,6 +96,49 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
         const <NoteHistoryVersion>[];
     return AppSheet(
       title: selected == null ? s.History_Title : s.History_Preview,
+      footer: selected == null
+          ? null
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_result != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+                    child: Text(
+                      switch (_result!) {
+                        NoteHistoryRestoreResult.failed =>
+                          s.History_Restore_Failed,
+                        NoteHistoryRestoreResult.unavailable =>
+                          s.History_Unavailable,
+                        NoteHistoryRestoreResult.unchanged => s.History_Current,
+                        NoteHistoryRestoreResult.restored => s.History_Restored,
+                      },
+                      key: const ValueKey('history-restore-result'),
+                      style: TextStyle(
+                          color: _result == NoteHistoryRestoreResult.failed ||
+                                  _result ==
+                                      NoteHistoryRestoreResult.unavailable
+                              ? Theme.of(context).colorScheme.error
+                              : null),
+                    ),
+                  ),
+                FilledButton.icon(
+                  key: const ValueKey('history-restore-action'),
+                  onPressed: _restoring ? null : _restore,
+                  icon: _restoring
+                      ? MediaQuery.disableAnimationsOf(context)
+                          ? const Icon(Icons.hourglass_empty_rounded)
+                          : const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.restore_rounded),
+                  label: Text(_result == NoteHistoryRestoreResult.failed
+                      ? s.Retry
+                      : s.History_Restore),
+                ),
+              ],
+            ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         child: selected == null
@@ -160,44 +203,6 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
                     padding: const EdgeInsets.all(12),
                     child: _HistoryPreview(version: selected),
                   ),
-                  if (_result != null)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-                      child: Text(
-                        switch (_result!) {
-                          NoteHistoryRestoreResult.failed =>
-                            s.History_Restore_Failed,
-                          NoteHistoryRestoreResult.unavailable =>
-                            s.History_Unavailable,
-                          NoteHistoryRestoreResult.unchanged =>
-                            s.History_Current,
-                          NoteHistoryRestoreResult.restored =>
-                            s.History_Restored,
-                        },
-                        key: const ValueKey('history-restore-result'),
-                        style: TextStyle(
-                            color: _result == NoteHistoryRestoreResult.failed ||
-                                    _result ==
-                                        NoteHistoryRestoreResult.unavailable
-                                ? Theme.of(context).colorScheme.error
-                                : null),
-                      ),
-                    ),
-                  FilledButton.icon(
-                    key: const ValueKey('history-restore-action'),
-                    onPressed: _restoring ? null : _restore,
-                    icon: _restoring
-                        ? MediaQuery.disableAnimationsOf(context)
-                            ? const Icon(Icons.hourglass_empty_rounded)
-                            : const SizedBox.square(
-                                dimension: 18,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.restore_rounded),
-                    label: Text(_result == NoteHistoryRestoreResult.failed
-                        ? s.Retry
-                        : s.History_Restore),
-                  ),
                 ],
               ),
       ),
@@ -246,11 +251,14 @@ class _HistoryPreview extends StatelessWidget {
           SelectableText(note.title!,
               style: Theme.of(context).textTheme.titleLarge),
         ],
-        if (note.description?.isNotEmpty ?? false) ...[
+        if ((note.description?.isNotEmpty ?? false) ||
+            (note.imagePaths?.isNotEmpty ?? false)) ...[
           const SizedBox(height: 12),
-          FormattedNoteText(
-            text: note.description!,
+          NoteDocumentView(
+            text: note.description ?? '',
             styles: note.toDomain().textStyles,
+            imagePaths: note.imagePaths ?? const [],
+            imageLayouts: note.toDomain().imageLayouts,
             style: AppTypography.formText.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'voice_memo.dart';
 import 'note_text_style.dart';
+import 'note_image_layout.dart';
 
 part 'note.freezed.dart';
 
@@ -29,6 +30,7 @@ class Note with _$Note {
     @Default([]) List<String> tags,
     @Default([]) List<String> linkedNoteIds,
     @Default([]) List<NoteTextStyleRange> textStyles,
+    @Default([]) List<NoteImageLayout> imageLayouts,
   }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');

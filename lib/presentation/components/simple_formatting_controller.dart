@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
@@ -16,8 +15,15 @@ class SimpleFormattingController extends TextEditingController {
   }
 
   List<NoteTextStyleRange> _styles = const [];
+  int _documentRevision = 0;
+
+  /// Explicit document replacement lets segmented editors distinguish a
+  /// library refresh from ordinary typing and keep supplied photo positions.
+  int get documentRevision => _documentRevision;
   bool? _typingBold;
   bool _typingBoldExplicit = false;
+  int? _editedPartStart;
+  int? _editedPartEnd;
   int? _emptyHeadingAt;
   final List<_FormattingSnapshot> _undo = [];
   final List<_FormattingSnapshot> _redo = [];
@@ -63,9 +69,8 @@ class SimpleFormattingController extends TextEditingController {
   /// Replaces the saved document and clears temporary typing modes. Inserting
   /// OCR/transcript text with the existing ranges therefore keeps it plain.
   void setDocument(String text, List<NoteTextStyleRange> styles) {
+    _documentRevision++;
     final clean = normalizeNoteTextStyles(styles, text);
-    final changedStyles = !listEquals(_styles, clean);
-    final changedTyping = _typingBold != null || _emptyHeadingAt != null;
     _styles = clean;
     _typingBold = null;
     _typingBoldExplicit = false;
@@ -86,8 +91,35 @@ class SimpleFormattingController extends TextEditingController {
           : TextSelection.collapsed(offset: text.length),
     );
     super.value = next;
-    if (next == oldValue && (changedStyles || changedTyping)) notifyListeners();
+    if (next == oldValue) notifyListeners();
   }
+
+  /// Applies a native editing value from one text part of an image document.
+  /// Keeping its changed region local avoids assigning styles to the wrong
+  /// paragraph when two parts contain identical text.
+  void applySegmentValue(
+    TextEditingValue next, {
+    required int editedPartStart,
+    required int editedPartEnd,
+  }) {
+    final previousStart = _editedPartStart;
+    final previousEnd = _editedPartEnd;
+    _editedPartStart = editedPartStart;
+    _editedPartEnd = editedPartEnd;
+    try {
+      value = next;
+    } finally {
+      _editedPartStart = previousStart;
+      _editedPartEnd = previousEnd;
+    }
+  }
+
+  NoteTextChange _textChange(String before, String after) => noteTextChange(
+        before,
+        after,
+        editedPartStart: _editedPartStart,
+        editedPartEnd: _editedPartEnd,
+      );
 
   void toggleBold() {
     if (_isComposing) return;
@@ -215,7 +247,7 @@ class SimpleFormattingController extends TextEditingController {
     }
     // Leave IME composition untouched. Native input owns its active range.
     final composing = next.composing.isValid && !next.composing.isCollapsed;
-    var change = noteTextChange(previous.text, next.text);
+    var change = _textChange(previous.text, next.text);
     if (!composing &&
         change.inserted == '\n' &&
         change.start == change.oldEnd &&
@@ -237,7 +269,7 @@ class SimpleFormattingController extends TextEditingController {
             selection: TextSelection.collapsed(offset: change.start + 3),
           );
         }
-        change = noteTextChange(previous.text, next.text);
+        change = _textChange(previous.text, next.text);
       }
     }
     // Flutter can undo a group of several keystrokes in one value change.
@@ -278,6 +310,7 @@ class SimpleFormattingController extends TextEditingController {
         _styles,
         insertedBold: _typingBold,
         insertedHeading: heading ? true : null,
+        changeOverride: change,
       );
       if (change.inserted.contains('\n') &&
           (_kindAt(change.start, NoteTextStyleKind.heading) || heading)) {

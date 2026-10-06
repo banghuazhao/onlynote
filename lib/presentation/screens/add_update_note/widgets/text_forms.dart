@@ -54,66 +54,27 @@ class _BuildDescriptionField extends StatelessWidget {
     required this.state,
     required SimpleFormattingController descriptionController,
     required this.focusNode,
+    required this.onImageLayoutsChanged,
+    required this.onRemoveImage,
     this.autofocus = false,
   }) : _descriptionController = descriptionController;
 
   final AddUpdateFormState state;
   final SimpleFormattingController _descriptionController;
   final FocusNode focusNode;
+  final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
+  final ValueChanged<String> onRemoveImage;
   final bool autofocus;
 
   @override
-  Widget build(BuildContext context) {
-    final lineHeight = MediaQuery.textScalerOf(context)
-            .scale(AppTypography.formText.fontSize ?? 17) *
-        (AppTypography.formText.height ?? 1.55);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        NoteFormattingToolbar(
-            controller: _descriptionController, focusNode: focusNode),
-        const SizedBox(height: 8),
-        RuledWritingArea(
-          paperColor: state.selectedColor ?? AppColors.parchment,
-          lineHeight: lineHeight,
-          child: Stack(
-            children: [
-              if (state.showDescriptionHint)
-                Opacity(
-                  opacity: 0.55,
-                  child: Text(
-                    S.of(context).Type_something,
-                    style: AppTypography.formText.copyWith(
-                      color: AppColors.ink.withValues(alpha: 0.4),
-                    ),
-                    softWrap: true,
-                  ),
-                ),
-              TextField(
-                controller: _descriptionController,
-                focusNode: focusNode,
-                autofocus: autofocus,
-                style: AppTypography.formText,
-                strutStyle: StrutStyle.fromTextStyle(
-                  AppTypography.formText,
-                  forceStrutHeight: true,
-                ),
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                onTapOutside: (_) => FocusScope.of(context).unfocus(),
-                decoration: const InputDecoration(
-                  filled: false,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                minLines: 6,
-                maxLines: 100,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => NoteBodyEditor(
+        controller: _descriptionController,
+        focusNode: focusNode,
+        imagePaths: state.imagePaths,
+        imageLayouts: state.imageLayouts,
+        onImageLayoutsChanged: onImageLayoutsChanged,
+        onRemoveImage: onRemoveImage,
+        autofocus: autofocus,
+        paperColor: state.selectedColor ?? AppColors.parchment,
+      );
 }

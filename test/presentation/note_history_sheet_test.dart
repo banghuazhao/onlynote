@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_sheet.dart';
@@ -183,6 +184,55 @@ void main() {
         isNotNull);
   });
 
+  testWidgets('restore footer stays visible while a tall photo preview scrolls',
+      (tester) async {
+    const path = 'note_images/tall.jpg';
+    final version = NoteHistoryVersion(
+        id: 'tall',
+        savedAt: DateTime.utc(2026, 10, 10),
+        note: NoteDto(
+            id: 'note',
+            title: 'Tall photo preview',
+            description: 'Before photo\n${'More text below the photo.\n' * 80}',
+            imagePaths: [
+              path
+            ],
+            imageLayouts: [
+              const NoteImageLayout(
+                      path: path,
+                      textOffset: 13,
+                      widthFactor: .85,
+                      aspectRatio: .1)
+                  .toMap(),
+            ]));
+    var restores = 0;
+    await _open(tester, versions: [version], restore: (_) async {
+      restores++;
+      return NoteHistoryRestoreResult.unchanged;
+    });
+    await tester.tap(find.byKey(const ValueKey('history-version-tall')));
+    await tester.pumpAndSettle();
+    final action = find.byKey(const ValueKey('history-restore-action'));
+    expect(action.hitTestable(), findsOneWidget);
+    final originalRect = tester.getRect(action);
+    expect(originalRect.bottom,
+        lessThanOrEqualTo(tester.view.physicalSize.height));
+    final preview = find.descendant(
+        of: find.byType(AppSheet),
+        matching: find.byType(SingleChildScrollView));
+    await tester.drag(preview, const Offset(0, -250));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(action), originalRect);
+    expect(action.hitTestable(), findsOneWidget);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(restores, 1);
+    expect(find.byKey(const ValueKey('history-restore-result')).hitTestable(),
+        findsOneWidget);
+    expect(action.hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('empty history explains when versions are saved', (tester) async {
     await _open(tester, versions: []);
     expect(find.text(S.current.History_Empty), findsOneWidget);
@@ -202,8 +252,12 @@ void main() {
         restore: (_) async => NoteHistoryRestoreResult.unchanged);
     await tester.tap(find.byKey(const ValueKey('history-version-version')));
     await tester.pumpAndSettle();
-    await tester
-        .ensureVisible(find.byKey(const ValueKey('history-restore-action')));
+    final action = find.byKey(const ValueKey('history-restore-action'));
+    expect(action.hitTestable(), findsOneWidget);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('history-restore-result')).hitTestable(),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
     expect(
         find.byKey(const ValueKey('history-restore-action')), findsOneWidget);

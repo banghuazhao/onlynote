@@ -12,12 +12,15 @@ class NoteFormattingToolbar extends StatelessWidget {
     super.key,
     required this.controller,
     required this.focusNode,
+    this.beforeApply,
   });
 
   final SimpleFormattingController controller;
   final FocusNode focusNode;
+  final VoidCallback? beforeApply;
 
   void _apply(VoidCallback action) {
+    beforeApply?.call();
     // A new, unfocused field starts with an invalid selection. Establish its
     // cursor before a typing mode so the first focus update keeps that mode.
     if (!controller.selection.isValid) {

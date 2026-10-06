@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_history.dart';
 
@@ -100,6 +101,84 @@ void main() {
     expect(repository.notes['note']!.linkedNoteIds, ['one']);
     expect(repository.notes['note']!.isArchived, isTrue);
     expect(repository.notes['note']!.tags, ['New']);
+  });
+
+  test('typing rebases image anchors and resize or movement makes versions',
+      () async {
+    const path = 'note_images/photo.jpg';
+    const layout = NoteImageLayout(path: path, textOffset: 2, widthFactor: .6);
+    final before = NoteDto(
+        id: 'photo',
+        description: 'A\nB',
+        imagePaths: [path],
+        imageLayouts: [layout.toMap()]);
+    repository.notes['photo'] = before;
+    await repository.addUpdateNote(before.copyWith(
+        description: 'AX\nB',
+        imageLayouts: [layout.copyWith(textOffset: 3).toMap()]));
+    now = now.add(const Duration(seconds: 1));
+    await repository.addUpdateNote(repository.notes['photo']!.copyWith(
+        description: 'AXY\nB',
+        imageLayouts: [layout.copyWith(textOffset: 4).toMap()]));
+    expect(history.versionsFor('photo').length, 1);
+    await repository.addUpdateNote(repository.notes['photo']!.copyWith(
+        imageLayouts: [
+          layout.copyWith(textOffset: 4, widthFactor: .8).toMap()
+        ]));
+    final resizedVersion = history.versionsFor('photo').first;
+    expect(history.versionsFor('photo').length, 2);
+    expect(resizedVersion.note.toDomain().imageLayouts.single.widthFactor, .6);
+    await repository.addUpdateNote(repository.notes['photo']!.copyWith(
+        imageLayouts: [
+          layout.copyWith(textOffset: 0, widthFactor: .8).toMap()
+        ]));
+    expect(history.versionsFor('photo').length, 3);
+    await repository.addUpdateNote(repository.notes['photo']!
+        .copyWith(isArchived: true, tags: ['Current'], folderId: 'folder'));
+    expect(await history.restore('photo', resizedVersion.id),
+        NoteHistoryRestoreResult.restored);
+    final restored = repository.notes['photo']!;
+    expect(restored.toDomain().imageLayouts.single,
+        layout.copyWith(textOffset: 4));
+    expect(restored.isArchived, isTrue);
+    expect(restored.tags, ['Current']);
+    expect(restored.folderId, 'folder');
+  });
+
+  test('typing in the block after a photo coalesces without moving that photo',
+      () async {
+    const layout =
+        NoteImageLayout(path: 'note_images/photo.jpg', textOffset: 2);
+    final before = NoteDto(
+        id: 'photo',
+        description: 'A\nB',
+        imagePaths: [layout.path],
+        imageLayouts: [layout.toMap()]);
+    repository.notes['photo'] = before;
+    await repository.addUpdateNote(before.copyWith(description: 'A\nXB'));
+    now = now.add(const Duration(seconds: 1));
+    await repository.addUpdateNote(before.copyWith(description: 'A\nXYB'));
+    expect(history.versionsFor('photo').length, 1);
+    expect(repository.notes['photo']!.toDomain().imageLayouts.single, layout);
+  });
+
+  test('image layout snapshots own their map data', () async {
+    final layout =
+        NoteImageLayout(path: 'note_images/photo.jpg', textOffset: 0).toMap();
+    final before = NoteDto(
+        id: 'photo',
+        imagePaths: ['note_images/photo.jpg'],
+        imageLayouts: [layout]);
+    await history.recordBeforeSave(
+        before,
+        before.copyWith(imageLayouts: [
+          {...layout, 'widthFactor': .5},
+        ]));
+    layout['widthFactor'] = .25;
+    final snapshot = history.versionsFor('photo').single.note;
+    expect(snapshot.imageLayouts!.single['widthFactor'], .85);
+    expect(() => snapshot.imageLayouts!.single['widthFactor'] = .5,
+        throwsUnsupportedError);
   });
 
   test('styled typing coalesces while formatting changes create restore points',

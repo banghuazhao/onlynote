@@ -3354,6 +3354,61 @@ class S {
   String get Format_Text {
     return Intl.message('Text style', name: 'Format_Text', desc: '', args: []);
   }
+
+  /// `Move photo`
+  String get Image_Move {
+    return Intl.message('Move photo', name: 'Image_Move', desc: '', args: []);
+  }
+
+  /// `Resize photo`
+  String get Image_Resize {
+    return Intl.message(
+      'Resize photo',
+      name: 'Image_Resize',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove photo`
+  String get Image_Remove {
+    return Intl.message(
+      'Remove photo',
+      name: 'Image_Remove',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Move earlier`
+  String get Image_Move_Before {
+    return Intl.message(
+      'Move earlier',
+      name: 'Image_Move_Before',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Move later`
+  String get Image_Move_After {
+    return Intl.message(
+      'Move later',
+      name: 'Image_Move_After',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drop photo here`
+  String get Image_Drop_Here {
+    return Intl.message(
+      'Drop photo here',
+      name: 'Image_Drop_Here',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

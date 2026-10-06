@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/note_tags.dart';
@@ -295,13 +296,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       return;
     }
+    final images = await ImageStorage.copyImagePaths(event.note.imagePaths);
     final duplicated = event.note.copyWith(
       title: '${event.note.title ?? ''} ${_i10n.Copy_Suffix}',
       dateTime: DateTime.now(),
       todo: event.note.todo.map((todo) => todo.copyWith()).toList(),
       // Its own copies of the images: sharing the files would mean deleting
       // either note takes the other note's pictures with it.
-      imagePaths: await ImageStorage.copyImages(event.note.imagePaths),
+      imagePaths: images.values.toList(),
+      imageLayouts: remapNoteImageLayouts(event.note.imageLayouts, images),
       voiceMemos: audio,
       isPinned: false,
       isArchived: false,

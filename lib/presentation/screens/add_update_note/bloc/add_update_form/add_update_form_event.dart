@@ -9,6 +9,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     Color? color,
     List<Todo>? todos,
     List<String>? imagePaths,
+    List<NoteImageLayout>? imageLayouts,
     List<VoiceMemo>? voiceMemos,
     List<String>? tags,
     List<String>? linkedNoteIds,
@@ -20,7 +21,12 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
       _DescriptionChanged;
 
   const factory AddUpdateFormEvent.bodyChanged(
-      String text, List<NoteTextStyleRange> styles) = _BodyChanged;
+      String text,
+      List<NoteTextStyleRange> styles,
+      List<NoteImageLayout> layouts) = _BodyChanged;
+
+  const factory AddUpdateFormEvent.imageLayoutsChanged(
+      List<NoteImageLayout> value) = _ImageLayoutsChanged;
 
   const factory AddUpdateFormEvent.colorChanged(Color value) = _ColorChanged;
 
@@ -59,7 +65,8 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     required int newIndex,
   }) = _ReorderTodo;
 
-  const factory AddUpdateFormEvent.addImage(String path) = _AddImage;
+  const factory AddUpdateFormEvent.addImage(String path, {int? textOffset}) =
+      _AddImage;
 
   const factory AddUpdateFormEvent.removeImage(String path) = _RemoveImage;
 

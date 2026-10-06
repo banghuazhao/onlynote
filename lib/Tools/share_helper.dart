@@ -175,6 +175,8 @@ class ShareHelper {
               title: note.title ?? '',
               description: note.description ?? '',
               textStyles: note.textStyles,
+              imagePaths: note.imagePaths,
+              imageLayouts: note.imageLayouts,
               transcripts: [
                 ...note.voiceMemos
                     .map((memo) => memo.transcript ?? '')
