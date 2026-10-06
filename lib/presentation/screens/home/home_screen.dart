@@ -1,4 +1,6 @@
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/photo_search_status.dart';
+import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
@@ -774,78 +776,104 @@ class _HomeScreenState extends State<HomeScreen> {
                             orElse: () => const _LoadingSkeleton(),
                             error: (error) =>
                                 _HomeError(message: error.message ?? ''),
-                            loaded: (data) => Column(
-                              children: [
-                                Expanded(
-                                  child: data.notes.isEmpty
-                                      ? _EmptyNotes(
-                                          showTrash: data.showTrash,
-                                          showArchive: data.showArchive,
-                                          hasSearch: data.searchQuery
+                            loaded: (data) => _watchPhotoSearch(
+                                data.searchQuery,
+                                () => Column(
+                                      children: [
+                                        PhotoSearchStatus(
+                                          indexing: data.searchQuery
                                                   .trim()
-                                                  .isNotEmpty ||
-                                              data.filters.isNotEmpty,
-                                          hasTags: data.selectedTags.isNotEmpty,
-                                          hasFolder:
-                                              data.selectedFolderId != null,
-                                          onAdd: () {
-                                            context.router.push(
-                                              AddUpdateNoteRoute(
-                                                folderId: data.selectedFolderId,
-                                              ),
-                                            );
-                                          },
-                                          onTemplates: () => _openTemplates(
-                                            folderId: data.selectedFolderId,
-                                          ),
-                                        )
-                                      : _BuildNotesList(
-                                          onChecklistActionStart:
-                                              _cancelChecklistReview,
-                                          onChecklistResult:
-                                              _handleChecklistResult,
-                                          onArchive: _archiveNotes,
-                                          onEditTags: _editTags,
-                                          notes: data.notes,
-                                          searchQuery: data.searchQuery,
-                                          unfinishedOnly: data.filters.contains(
-                                              NoteSearchFilter.unfinished),
-                                          folders: data.folders,
-                                          showTrash: data.showTrash,
-                                          showWidgetDiscovery:
-                                              !_isSearchVisible &&
-                                                  data.searchQuery
-                                                      .trim()
-                                                      .isEmpty &&
-                                                  data.filters.isEmpty &&
-                                                  !data.showTrash &&
-                                                  !data.showArchive &&
-                                                  data.notes.any((note) =>
-                                                      note.isPinned &&
-                                                      !note.isDeleted),
-                                          isReorderMode: _isReorderMode &&
-                                              !data.showArchive &&
-                                              !data.includeArchived &&
-                                              data.selectedTags.isEmpty &&
-                                              data.searchQuery.trim().isEmpty &&
-                                              data.filters.isEmpty,
-                                          onEnterReorderMode: () {
-                                            _searchController.clear();
-                                            context.read<HomeBloc>().add(
-                                                const HomeEvent.searchChanged(
-                                                    ''));
-                                            context.read<HomeBloc>().add(
-                                                const HomeEvent.filtersChanged(
-                                                    {}));
-                                            setState(() {
-                                              _isSearchVisible = false;
-                                              _isReorderMode = true;
-                                            });
-                                          },
+                                                  .isNotEmpty &&
+                                              (PhotoSearchIndex
+                                                      .initializedInstance
+                                                      ?.isIndexing ??
+                                                  false),
                                         ),
-                                ),
-                              ],
-                            ),
+                                        Expanded(
+                                          child: data.notes.isEmpty
+                                              ? _EmptyNotes(
+                                                  showTrash: data.showTrash,
+                                                  showArchive: data.showArchive,
+                                                  hasSearch: data.searchQuery
+                                                          .trim()
+                                                          .isNotEmpty ||
+                                                      data.filters.isNotEmpty,
+                                                  hasTags: data
+                                                      .selectedTags.isNotEmpty,
+                                                  hasFolder:
+                                                      data.selectedFolderId !=
+                                                          null,
+                                                  onAdd: () {
+                                                    context.router.push(
+                                                      AddUpdateNoteRoute(
+                                                        folderId: data
+                                                            .selectedFolderId,
+                                                      ),
+                                                    );
+                                                  },
+                                                  onTemplates: () =>
+                                                      _openTemplates(
+                                                    folderId:
+                                                        data.selectedFolderId,
+                                                  ),
+                                                )
+                                              : _BuildNotesList(
+                                                  onChecklistActionStart:
+                                                      _cancelChecklistReview,
+                                                  onChecklistResult:
+                                                      _handleChecklistResult,
+                                                  onArchive: _archiveNotes,
+                                                  onEditTags: _editTags,
+                                                  notes: data.notes,
+                                                  searchQuery: data.searchQuery,
+                                                  unfinishedOnly: data.filters
+                                                      .contains(NoteSearchFilter
+                                                          .unfinished),
+                                                  folders: data.folders,
+                                                  showTrash: data.showTrash,
+                                                  showWidgetDiscovery:
+                                                      !_isSearchVisible &&
+                                                          data.searchQuery
+                                                              .trim()
+                                                              .isEmpty &&
+                                                          data.filters
+                                                              .isEmpty &&
+                                                          !data.showTrash &&
+                                                          !data.showArchive &&
+                                                          data.notes.any((note) =>
+                                                              note.isPinned &&
+                                                              !note.isDeleted),
+                                                  isReorderMode:
+                                                      _isReorderMode &&
+                                                          !data.showArchive &&
+                                                          !data
+                                                              .includeArchived &&
+                                                          data.selectedTags
+                                                              .isEmpty &&
+                                                          data.searchQuery
+                                                              .trim()
+                                                              .isEmpty &&
+                                                          data.filters.isEmpty,
+                                                  onEnterReorderMode: () {
+                                                    _searchController.clear();
+                                                    context
+                                                        .read<HomeBloc>()
+                                                        .add(const HomeEvent
+                                                            .searchChanged(''));
+                                                    context
+                                                        .read<HomeBloc>()
+                                                        .add(const HomeEvent
+                                                            .filtersChanged(
+                                                            {}));
+                                                    setState(() {
+                                                      _isSearchVisible = false;
+                                                      _isReorderMode = true;
+                                                    });
+                                                  },
+                                                ),
+                                        ),
+                                      ],
+                                    )),
                           );
                         },
                       ),
@@ -874,6 +902,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _watchPhotoSearch(String query, Widget Function() builder) {
+    final index = PhotoSearchIndex.initializedInstance;
+    if (index == null || query.trim().isEmpty) return builder();
+    return ListenableBuilder(
+      listenable: index,
+      builder: (context, _) => builder(),
     );
   }
 
@@ -1520,6 +1557,10 @@ class __BuildNotesListState extends State<_BuildNotesList> {
                 key: _cardKeyFor(noteId),
                 note: note,
                 searchQuery: widget.searchQuery,
+                photoSearchText: PhotoSearchIndex.initializedInstance
+                    ?.matchingText(note, widget.searchQuery),
+                photoSearchImagePath: PhotoSearchIndex.initializedInstance
+                    ?.matchingPhotoPath(note, widget.searchQuery),
                 selected: multipleDeleteBloc.isSelected(noteId),
                 selectionMode: isSelectionMode,
                 unfinishedOnly: widget.unfinishedOnly,

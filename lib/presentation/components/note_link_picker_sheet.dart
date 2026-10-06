@@ -4,6 +4,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/photo_search_index.dart';
 
 Future<List<String>?> showNoteLinkPickerSheet(
   BuildContext context, {
@@ -40,6 +41,7 @@ class NoteLinkPickerSheet extends StatefulWidget {
 
 class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
   final _search = TextEditingController();
+  final _photoSearchIndex = PhotoSearchIndex.initializedInstance;
   late final Set<String> _selected = {
     ...normalizeLinkedNoteIds(widget.selectedIds, noteId: widget.currentNoteId),
   };
@@ -53,7 +55,18 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
       }.values.toList();
 
   @override
+  void initState() {
+    super.initState();
+    _photoSearchIndex?.addListener(_photoSearchUpdated);
+  }
+
+  void _photoSearchUpdated() {
+    if (mounted && _search.text.trim().isNotEmpty) setState(() {});
+  }
+
+  @override
   void dispose() {
+    _photoSearchIndex?.removeListener(_photoSearchUpdated);
     _search.dispose();
     super.dispose();
   }
@@ -67,8 +80,9 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
     final unavailable =
         _selected.where((id) => !knownIds.contains(id)).toList();
     final matches = available
-        .where((note) =>
-            matchesNoteSearch(note, _search.text, const {}, hasReminder: false))
+        .where((note) => matchesNoteSearch(note, _search.text, const {},
+            hasReminder: false,
+            photoText: _photoSearchIndex?.textsForNote(note) ?? const []))
         .toList();
     return SafeArea(
       top: false,

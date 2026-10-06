@@ -3,7 +3,7 @@ import 'package:onlynote/domain/model/note.dart';
 enum NoteSearchFilter { checklists, photos, reminders, pinned, unfinished }
 
 bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
-    {required bool hasReminder}) {
+    {required bool hasReminder, Iterable<String> photoText = const []}) {
   if (filters.contains(NoteSearchFilter.checklists) && !note.hasTodo) {
     return false;
   }
@@ -27,6 +27,7 @@ bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
         ...note.tags,
         ...note.todo.map((todo) => todo.title ?? ''),
         ...note.voiceMemos.map((memo) => memo.transcript ?? ''),
+        ...photoText,
       ].any(pattern.hasMatch);
 }
 

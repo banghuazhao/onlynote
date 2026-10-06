@@ -17,6 +17,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/toast.dart'
     show showTransientSnackBar;
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
+import 'package:onlynote/services/photo_search_index.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'routes/routes.dart';
@@ -79,6 +80,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    PhotoSearchIndex.initializedInstance
+        ?.setActive(state == AppLifecycleState.resumed);
     if (state == AppLifecycleState.resumed) {
       unawaited(_widgetCommands?.importPending());
     }

@@ -3,6 +3,25 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/services/note_search.dart';
 
 void main() {
+  test('photo text matches literal queries and composes with existing filters',
+      () {
+    final photo = Note(id: 'receipt', imagePaths: ['note_images/receipt.jpg']);
+    for (final query in ['market', '茶', '12.50', '[paid]']) {
+      expect(
+          matchesNoteSearch(photo, query, {NoteSearchFilter.photos},
+              hasReminder: false, photoText: ['MARKET 茶\nTotal 12.50 [paid]']),
+          isTrue);
+    }
+    expect(
+        matchesNoteSearch(photo, 'market', {NoteSearchFilter.pinned},
+            hasReminder: false, photoText: ['MARKET']),
+        isFalse);
+    expect(
+        matchesNoteSearch(photo, '.*', {},
+            hasReminder: false, photoText: ['MARKET']),
+        isFalse);
+    expect(matchesNoteSearch(photo, 'market', {}, hasReminder: false), isFalse);
+  });
   final note = Note(
       id: 'a',
       title: 'Trip [ideas]',

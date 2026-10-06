@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_archive.dart';
@@ -46,6 +47,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // the first saved result; pin/folder changes cannot race that write.
     on<HomeEvent>(_handleEvent,
         transformer: (events, mapper) => events.asyncExpand(mapper));
+    _photoSearchIndex = PhotoSearchIndex.initializedInstance;
+    _photoSearchIndex?.addListener(_photoSearchUpdated);
   }
 
   final ShowAllNotesUsecase _showNotesUsecase;
@@ -60,6 +63,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final MoveNoteToFolderUsecase _moveNoteToFolderUsecase;
   final GetNoteUsecase _getNoteUsecase;
   final UpdateNoteUsecase _updateNoteUsecase;
+  late final PhotoSearchIndex? _photoSearchIndex;
+
+  void _photoSearchUpdated() {
+    // Reapply the active query as recognition completes, preserving every
+    // folder, tag and saved-view filter. No refresh is needed for plain Home.
+    if (!isClosed && _searchQuery.trim().isNotEmpty) {
+      add(const HomeEvent.getAllNotes());
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _photoSearchIndex?.removeListener(_photoSearchUpdated);
+    return super.close();
+  }
 
   List<Note> _activeNotes = [];
   List<Note> _trashedNotes = [];
@@ -539,6 +557,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             _selectedTags.every((tag) =>
                 note.tags.any((value) => tagKey(value) == tagKey(tag))) &&
             matchesNoteSearch(note, _searchQuery, _filters,
+                photoText: _photoSearchIndex?.textsForNote(note) ?? const [],
                 hasReminder:
                     ReminderData.shared.getCurrentReminder(note) != null))
         .toList();

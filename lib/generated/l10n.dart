@@ -360,6 +360,26 @@ class S {
     );
   }
 
+  /// `Text in photo`
+  String get Photo_Search_Text_In_Photo {
+    return Intl.message(
+      'Text in photo',
+      name: 'Photo_Search_Text_In_Photo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Making photo text searchable…`
+  String get Photo_Search_Indexing {
+    return Intl.message(
+      'Making photo text searchable…',
+      name: 'Photo_Search_Indexing',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `No notes match your search.`
   String get No_Search_Results {
     return Intl.message(

@@ -36,6 +36,8 @@
  "Permanent_Delete_Confirm_Title": "Delete forever?",
  "Permanent_Delete_Confirm_Message": "These notes will be permanently deleted along with their photos and reminders. This can't be undone.",
  "Search_Notes": "Search notes",
+ "Photo_Search_Text_In_Photo": "Text in photo",
+ "Photo_Search_Indexing": "Making photo text searchable…",
  "No_Search_Results": "No notes match your search.",
  "No_Notes_In_Folder": "No notes in this folder yet.\nTap + to add one.",
  "Trash_Empty": "Trash is empty",

@@ -330,6 +330,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Reset": MessageLookupByLibrary.simpleMessage("重置"),
     "Photo_Rotate": MessageLookupByLibrary.simpleMessage("旋转"),
     "Photo_Save": MessageLookupByLibrary.simpleMessage("保存"),
+    "Photo_Search_Indexing": MessageLookupByLibrary.simpleMessage(
+      "正在识别照片文字以便搜索…",
+    ),
+    "Photo_Search_Text_In_Photo": MessageLookupByLibrary.simpleMessage(
+      "照片中的文字",
+    ),
     "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("选择照片"),
     "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("已复制文字"),
     "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("复制文字"),

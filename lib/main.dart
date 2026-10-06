@@ -39,6 +39,7 @@ import 'presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart
 import 'presentation/screens/note_detail/bloc/action/note_action_bloc.dart';
 import 'presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'services/purchase_service.dart';
+import 'services/photo_search_index.dart';
 import 'services/note_autosave.dart';
 import 'services/note_photo_recovery.dart';
 import 'services/note_history.dart';
@@ -165,8 +166,21 @@ Future<void> main() async {
   }
   await WidgetSync.instance.init();
 
+  // Photo text is a rebuildable search cache, separate from saved notes.
+  // Recognition starts after the first frame so large libraries open quickly.
+  try {
+    final cache = await Hive.openBox(PhotoSearchIndex.boxName);
+    PhotoSearchIndex.configure(PhotoSearchIndex(
+      notes: Hive.box(databaseBox),
+      cache: cache,
+    ));
+  } catch (error) {
+    debugPrint('Photo search cache unavailable: $error');
+  }
+
   // Native upgrades run after recovery and do not delay the first frame.
   WidgetsBinding.instance.addPostFrameCallback((_) {
+    unawaited(PhotoSearchIndex.initializedInstance?.start());
     unawaited(notifications.upgradePendingReminders(
         ReminderData.shared.reminders, getIt<NoteRepository>()));
   });

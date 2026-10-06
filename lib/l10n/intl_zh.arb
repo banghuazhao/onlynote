@@ -36,6 +36,8 @@
   "Permanent_Delete_Confirm_Title": "永久删除？",
   "Permanent_Delete_Confirm_Message": "这些备忘录及其照片、提醒将被永久删除，且无法恢复。",
   "Search_Notes": "搜索备忘录",
+  "Photo_Search_Text_In_Photo": "照片中的文字",
+  "Photo_Search_Indexing": "正在识别照片文字以便搜索…",
   "No_Search_Results": "没有匹配的备忘录。",
   "No_Notes_In_Folder": "此文件夹暂无备忘录。\n点击 + 添加。",
   "Trash_Empty": "回收站为空",

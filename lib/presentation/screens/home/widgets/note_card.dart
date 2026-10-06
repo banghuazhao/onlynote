@@ -22,6 +22,8 @@ class NoteCard extends StatefulWidget {
     required this.note,
     this.selected = false,
     this.searchQuery = '',
+    this.photoSearchText,
+    this.photoSearchImagePath,
     this.selectionMode = false,
     this.unfinishedOnly = false,
     this.onTodoToggle,
@@ -32,6 +34,12 @@ class NoteCard extends StatefulWidget {
 
   final Note note;
   final String searchQuery;
+
+  /// Derived text that explains a photo search result without changing the note.
+  final String? photoSearchText;
+
+  /// The photo responsible for the match; the stored image order is preserved.
+  final String? photoSearchImagePath;
   final bool selected;
   final bool selectionMode;
   final bool unfinishedOnly;
@@ -108,6 +116,17 @@ class NoteCardState extends State<NoteCard> {
         .where((text) => text.isNotEmpty)
         .toList();
     final pattern = searchPattern(widget.searchQuery);
+    final rawPhotoSearchText = widget.photoSearchText?.trim();
+    final compactPhotoSearchText =
+        rawPhotoSearchText?.replaceAll(RegExp(r'\s+'), ' ');
+    final photoSearchText =
+        pattern?.hasMatch(compactPhotoSearchText ?? '') == true
+            ? compactPhotoSearchText
+            : rawPhotoSearchText;
+    final hasPhotoMatch = !_exportingImage &&
+        pattern != null &&
+        photoSearchText != null &&
+        pattern.hasMatch(photoSearchText);
     final transcriptMatch = pattern == null
         ? null
         : transcripts.where(pattern.hasMatch).firstOrNull;
@@ -186,6 +205,48 @@ class NoteCardState extends State<NoteCard> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: hasTitle ? 4 : 6,
                           ),
+                        if (hasPhotoMatch) ...[
+                          if (hasTitle || hasDescription)
+                            const SizedBox(height: AppSpacings.m),
+                          Column(
+                            key: const ValueKey('photo-search-match'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.image_search_rounded,
+                                      size: 14,
+                                      color: AppColors.ink
+                                          .withValues(alpha: 0.65)),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      S.of(context).Photo_Search_Text_In_Photo,
+                                      style: AppTypography.description.copyWith(
+                                        color: AppColors.ink
+                                            .withValues(alpha: 0.65),
+                                        fontSize: 12 *
+                                            AppTypographySettings
+                                                .instance.scale,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacings.s),
+                              SearchHighlight(
+                                _photoSearchExcerpt(
+                                    photoSearchText, widget.searchQuery),
+                                key: const ValueKey('photo-search-excerpt'),
+                                query: widget.searchQuery,
+                                style: AppTypography.cardBody,
+                                maxLines: 3,
+                              ),
+                            ],
+                          ),
+                        ],
                         const SizedBox(height: AppSpacings.l),
                         if (note.isArchived) ...[
                           Text.rich(
@@ -262,7 +323,11 @@ class NoteCardState extends State<NoteCard> {
                         if (note.hasImages) ...[
                           const SizedBox(height: AppSpacings.m),
                           _PolaroidThumb(
-                            path: note.imagePaths.first,
+                            path: hasPhotoMatch &&
+                                    note.imagePaths
+                                        .contains(widget.photoSearchImagePath)
+                                ? widget.photoSearchImagePath!
+                                : note.imagePaths.first,
                             extraCount: note.imagePaths.length - 1,
                           ),
                         ],
@@ -335,6 +400,13 @@ class NoteCardState extends State<NoteCard> {
       ),
     );
   }
+}
+
+/// Keep the match near the start so a narrow card's three lines reveal it.
+String _photoSearchExcerpt(String text, String query) {
+  final match = searchPattern(query)?.firstMatch(text);
+  if (match == null || match.start == 0) return text;
+  return '…${text.substring(match.start)}';
 }
 
 class _PolaroidThumb extends StatelessWidget {

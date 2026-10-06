@@ -423,6 +423,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Reset": MessageLookupByLibrary.simpleMessage("Reset"),
     "Photo_Rotate": MessageLookupByLibrary.simpleMessage("Rotate"),
     "Photo_Save": MessageLookupByLibrary.simpleMessage("Save"),
+    "Photo_Search_Indexing": MessageLookupByLibrary.simpleMessage(
+      "Making photo text searchable…",
+    ),
+    "Photo_Search_Text_In_Photo": MessageLookupByLibrary.simpleMessage(
+      "Text in photo",
+    ),
     "Photo_Text_Choose": MessageLookupByLibrary.simpleMessage("Choose a photo"),
     "Photo_Text_Copied": MessageLookupByLibrary.simpleMessage("Text copied"),
     "Photo_Text_Copy": MessageLookupByLibrary.simpleMessage("Copy text"),
