@@ -132,7 +132,8 @@ void main() {
       }
       expect(repository.writes, 0);
       expect(
-          detail.state.whenOrNull(success: (note) => note.description), body);
+          tester.widget<LoadedView>(find.byType(LoadedView)).note.description,
+          body);
       expect(tester.takeException(), isNull);
     });
   }

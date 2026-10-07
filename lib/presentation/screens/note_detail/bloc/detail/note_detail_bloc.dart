@@ -24,6 +24,11 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
 
   final GetNoteUsecase _usecase;
   final UpdateNoteUsecase _updateUsecase;
+
+  /// Each routed reader owns its note, checklist requests and loading state.
+  /// Share the injected usecases without sharing another route's live state.
+  NoteDetailBloc createSibling() => NoteDetailBloc(_usecase, _updateUsecase);
+
   bool _lastSaveWasTodoToggle = false;
   bool get lastSaveWasTodoToggle => _lastSaveWasTodoToggle;
 

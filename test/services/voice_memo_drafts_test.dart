@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -125,8 +126,8 @@ void main() {
     final restored = notes.values['note']!.toDomain();
     expect(restored.title, 'Latest title');
     expect(restored.description, 'Do not replace my draft');
-    expect(restored.folderId, 'folder');
-    expect(restored.isPinned, isTrue);
+    expect(restored.folderId, isNull);
+    expect(restored.isPinned, isFalse);
     expect(restored.todo.single.completed, isTrue);
     expect(restored.imagePaths, ['note_images/keep.jpg']);
     expect(restored.voiceMemos.map((memo) => memo.id), ['other', memo.id]);
@@ -138,6 +139,128 @@ void main() {
     await drafts.recover();
     expect(notes.writes, 1);
   });
+
+  for (final folder in [null, 'current-folder']) {
+    test('voice recovery keeps latest library metadata for $folder', () async {
+      final seed = Note(
+          id: 'origin',
+          title: 'Saved title',
+          isPinned: true,
+          folderId: 'old-folder',
+          sortOrder: -12,
+          dailyNoteDateKey: '2026-10-06');
+      notes.values['origin'] = NoteDto.fromNote(seed);
+      final memo = await drafts.prepare(seed);
+      await writeRecording(memo);
+      final pending = seed.copyWith(
+          title: 'Pending title',
+          description: 'Keep my unsaved writing',
+          todo: [Todo(id: 'task', title: 'Pending task')],
+          tags: ['Pending tag'],
+          linkedNoteIds: ['pending-link']);
+      await journal.put('origin', NoteDto.fromNote(pending));
+      notes.values['origin'] = NoteDto.fromNote(seed.copyWith(
+          isArchived: true,
+          isPinned: false,
+          folderId: folder,
+          sortOrder: folder == null ? null : 78,
+          dailyNoteDateKey: null,
+          tags: ['Saved tag'],
+          linkedNoteIds: ['saved-link']));
+
+      await drafts.recover();
+
+      final restored = notes.values['origin']!.toDomain();
+      expect(restored.isArchived, isTrue);
+      expect(restored.isPinned, isFalse);
+      expect(restored.folderId, folder);
+      expect(restored.sortOrder, folder == null ? null : 78);
+      expect(restored.dailyNoteDateKey, isNull);
+      expect(restored.title, pending.title);
+      expect(restored.description, pending.description);
+      expect(restored.todo, pending.todo);
+      expect(restored.tags, pending.tags);
+      expect(restored.linkedNoteIds, pending.linkedNoteIds);
+      expect(restored.voiceMemos.single.id, memo.id);
+      expect(journal.isEmpty, isTrue);
+    });
+  }
+
+  test('voice recovery rereads newer note edits after duration inspection',
+      () async {
+    final seed = Note(id: 'origin', title: 'Before', description: 'Old body');
+    notes.values['origin'] = NoteDto.fromNote(seed);
+    final memo = await drafts.prepare(seed);
+    await writeRecording(memo);
+    final inspecting = Completer<void>();
+    final duration = Completer<int>();
+    final recovery = VoiceMemoDrafts(
+        journal: journal,
+        notes: notes,
+        audio: audio,
+        readDuration: (_) {
+          inspecting.complete();
+          return duration.future;
+        });
+    final recovering = recovery.recover();
+    await inspecting.future;
+    final latest = seed.copyWith(
+        title: 'Newest title',
+        description: 'Keep the latest body',
+        isArchived: true,
+        isPinned: true,
+        folderId: 'new-folder',
+        sortOrder: 99);
+    notes.values['origin'] = NoteDto.fromNote(latest);
+    duration.complete(4200);
+    await recovering;
+
+    final restored = notes.values['origin']!.toDomain();
+    expect(restored.title, latest.title);
+    expect(restored.description, latest.description);
+    expect(restored.isArchived, isTrue);
+    expect(restored.isPinned, isTrue);
+    expect(restored.folderId, 'new-folder');
+    expect(restored.sortOrder, 99);
+    expect(restored.voiceMemos.single.id, memo.id);
+    expect(journal.isEmpty, isTrue);
+  });
+
+  for (final trashed in [false, true]) {
+    test(
+        'voice recovery never resurrects owner ${trashed ? 'trashed' : 'removed'} during duration inspection',
+        () async {
+      final seed = Note(id: 'origin', description: 'Original');
+      notes.values['origin'] = NoteDto.fromNote(seed);
+      final memo = await drafts.prepare(seed);
+      final file = await writeRecording(memo);
+      final inspecting = Completer<void>();
+      final duration = Completer<int>();
+      final recovery = VoiceMemoDrafts(
+          journal: journal,
+          notes: notes,
+          audio: audio,
+          readDuration: (_) {
+            inspecting.complete();
+            return duration.future;
+          });
+      final recovering = recovery.recover();
+      await inspecting.future;
+      if (trashed) {
+        notes.values['origin'] = NoteDto.fromNote(
+            seed.copyWith(deletedAt: DateTime.utc(2026, 10, 7)));
+      } else {
+        notes.values.remove('origin');
+      }
+      duration.complete(4200);
+      await recovering;
+
+      expect(notes.writes, 0);
+      expect(notes.values['origin']?.isDeleted ?? !trashed, isTrue);
+      expect(journal.isEmpty, isTrue);
+      expect(await file.exists(), isFalse);
+    });
+  }
 
   test('failed save retains recording journal through ordinary draft recovery',
       () async {

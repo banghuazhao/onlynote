@@ -62,6 +62,27 @@ void main() {
             hasReminder: true),
         isFalse);
   });
+  test('blank editor placeholders do not appear as checklist notes', () {
+    for (final todos in [
+      [Todo.empty()],
+      [Todo(title: ' \n\t '), Todo(title: null, completed: true)],
+    ]) {
+      final plain = Note(title: 'An ordinary note', todo: todos);
+      expect(
+          matchesNoteSearch(plain, '', {NoteSearchFilter.checklists},
+              hasReminder: false),
+          isFalse);
+      expect(
+          matchesNoteSearch(plain, 'ordinary', {}, hasReminder: false), isTrue);
+    }
+    expect(
+        matchesNoteSearch(
+            Note(todo: [Todo(title: 'Finished', completed: true)]),
+            '',
+            {NoteSearchFilter.checklists},
+            hasReminder: false),
+        isTrue);
+  });
   test('Unfinished requires a nonempty unchecked item and composes with search',
       () {
     expect(
@@ -90,6 +111,35 @@ void main() {
             hasReminder: false),
         isFalse);
   });
+  test('Unfinished search excludes matches only in completed task labels', () {
+    final checklist = Note(title: 'Shopping', todo: [
+      Todo(title: 'Tea', completed: true),
+      Todo(title: 'Milk'),
+    ]);
+    expect(matchesNoteSearch(checklist, 'tea', {}, hasReminder: false), isTrue);
+    expect(
+        matchesNoteSearch(checklist, 'tea', {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isFalse);
+    expect(
+        matchesNoteSearch(checklist, 'milk', {NoteSearchFilter.unfinished},
+            hasReminder: false),
+        isTrue);
+    for (final current in [
+      checklist.copyWith(title: 'Tea shopping'),
+      checklist.copyWith(description: 'Tea party'),
+      checklist.copyWith(tags: ['Tea']),
+    ]) {
+      expect(
+          matchesNoteSearch(current, 'tea', {NoteSearchFilter.unfinished},
+              hasReminder: false),
+          isTrue);
+    }
+    expect(
+        matchesNoteSearch(checklist, 'tea', {NoteSearchFilter.unfinished},
+            hasReminder: false, photoText: ['Tea receipt']),
+        isTrue);
+  });
   test(
       'excerpt reveals a match deep in a note without breaking surrogate pairs',
       () {
@@ -99,5 +149,34 @@ void main() {
     expect(excerpt, contains('Tea at noon'));
     expect(excerpt.length, lessThan(60));
     expect(searchExcerpt('Short note', 'note'), 'Short note');
+  });
+  test('excerpt clips combining and joined emoji at complete graphemes', () {
+    for (final grapheme in ['e\u0301', '👩🏽‍💻', '🇳🇿', '♥️']) {
+      final tail = 'A' * (31 - grapheme.length);
+      final text = '${'B' * 50}$grapheme${tail}Needle';
+      // The preferred clip lies one UTF-16 unit into the grapheme.
+      expect(searchExcerpt(text, 'needle'), '…${tail}Needle');
+    }
+  });
+  test('excerpt retains a whole long grapheme containing the query start', () {
+    final grapheme = 'e${'\u0301' * 40}';
+    final text = '${'B' * 50}${grapheme}Needle';
+    expect(searchExcerpt(text, '\u0301Needle'), '…${grapheme}Needle');
+  });
+  test('immediate excerpts preserve the whole grapheme containing a match', () {
+    for (final (grapheme, query) in [
+      ('e\u0301', '\u0301'),
+      ('👩🏽‍💻', '💻'),
+      ('🇳🇿', '🇿'),
+      ('♥️', '\uFE0F'),
+    ]) {
+      expect(searchExcerpt('Intro $grapheme detail', query, leadingContext: 0),
+          '…$grapheme detail');
+      expect(searchExcerpt('$grapheme detail', query, leadingContext: 0),
+          '$grapheme detail');
+    }
+    expect(searchExcerpt('Short Needle detail', 'needle', leadingContext: 0),
+        '…Needle detail');
+    expect(searchExcerpt('No match', 'needle', leadingContext: 0), 'No match');
   });
 }

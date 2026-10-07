@@ -138,8 +138,9 @@ class VoiceMemoDrafts {
             seed.id != id) {
           continue;
         }
-        final existing =
+        var existing =
             notes.getAllNotes().where((note) => note.id == id).firstOrNull;
+        final previouslyStored = existing != null;
         if (existing?.isDeleted == true ||
             (existing == null &&
                 (record['committed'] == true || record['existed'] == true))) {
@@ -163,14 +164,18 @@ class VoiceMemoDrafts {
           memo = memo.copyWith(durationMs: duration);
         }
         await retain(memo);
+        // File validation and duration inspection can outlive a library edit
+        // or deletion. Resolve the owner again before adopting the recording.
+        existing =
+            notes.getAllNotes().where((note) => note.id == id).firstOrNull;
+        if (_unavailable(existing, record, previouslyStored)) {
+          await discard(memo);
+          continue;
+        }
         final draft = journal.get(id);
         final content =
             draft is NoteDto && draft.id == id ? draft : existing ?? seed;
-        final current = existing == null
-            ? content
-            : content.copyWith(
-                dailyNoteDateKey: existing.dailyNoteDateKey,
-                clearDailyNoteDateKey: existing.dailyNoteDateKey == null);
+        final current = _mergeLibraryMetadata(content, existing);
         if (current.isDeleted) continue;
         final updated = current.copyWith(voiceMemos: [
           for (final value in current.voiceMemos ?? <Map<dynamic, dynamic>>[])
@@ -179,7 +184,16 @@ class VoiceMemoDrafts {
         ]);
         await journal.put(id, updated);
         await journal.flush();
-        await notes.addUpdateNote(updated);
+        // Draft I/O is another suspension point. A deleted note must never be
+        // recreated, and the latest library placement wins over this draft.
+        existing =
+            notes.getAllNotes().where((note) => note.id == id).firstOrNull;
+        if (_unavailable(existing, record, previouslyStored)) {
+          await journal.delete(id);
+          await discard(memo);
+          continue;
+        }
+        await notes.addUpdateNote(_mergeLibraryMetadata(updated, existing));
         await journal.delete(id);
         await complete(memo);
       } catch (error) {
@@ -187,4 +201,23 @@ class VoiceMemoDrafts {
       }
     }
   }
+
+  static bool _unavailable(
+          NoteDto? existing, Map record, bool previouslyStored) =>
+      existing?.isDeleted == true ||
+      (existing == null &&
+          (previouslyStored ||
+              record['committed'] == true ||
+              record['existed'] == true));
+
+  static NoteDto _mergeLibraryMetadata(NoteDto content, NoteDto? existing) =>
+      existing == null
+          ? content
+          : NoteDto.fromNote(content.toDomain().copyWith(
+                isArchived: existing.isArchived,
+                isPinned: existing.isPinned ?? false,
+                folderId: existing.folderId,
+                dailyNoteDateKey: existing.dailyNoteDateKey,
+                sortOrder: existing.sortOrder,
+              ));
 }

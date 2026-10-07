@@ -2780,20 +2780,24 @@ class S {
     );
   }
 
-  /// `{count} photos`
+  /// `{count, plural, one{1 photo} other{{count} photos}}`
   String History_Photos(int count) {
-    return Intl.message(
-      '$count photos',
+    return Intl.plural(
+      count,
+      one: '1 photo',
+      other: '$count photos',
       name: 'History_Photos',
       desc: '',
       args: [count],
     );
   }
 
-  /// `{count} recordings`
+  /// `{count, plural, one{1 recording} other{{count} recordings}}`
   String History_Recordings(int count) {
-    return Intl.message(
-      '$count recordings',
+    return Intl.plural(
+      count,
+      one: '1 recording',
+      other: '$count recordings',
       name: 'History_Recordings',
       desc: '',
       args: [count],
@@ -4062,6 +4066,30 @@ class S {
       name: 'Selection_Checklist_Failed',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 linked note} other{{count} linked notes}}`
+  String Card_Linked_Notes_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 linked note',
+      other: '$count linked notes',
+      name: 'Card_Linked_Notes_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 scanned page} other{{count} scanned pages}}`
+  String Card_Scanned_Pages_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 scanned page',
+      other: '$count scanned pages',
+      name: 'Card_Scanned_Pages_Count',
+      desc: '',
+      args: [count],
     );
   }
 }

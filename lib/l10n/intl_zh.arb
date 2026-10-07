@@ -515,5 +515,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Card_Linked_Notes_Count": "{count} 篇关联笔记",
+  "Card_Scanned_Pages_Count": "{count} 页扫描文档"
 }

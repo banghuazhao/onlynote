@@ -515,5 +515,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Card_Linked_Notes_Count": "{count} 篇關聯筆記",
+  "Card_Scanned_Pages_Count": "{count} 頁掃描文件"
 }

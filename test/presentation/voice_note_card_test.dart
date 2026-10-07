@@ -73,6 +73,9 @@ void main() {
     expect(excerpt.text.length, lessThan(80));
     expect(excerpt.query, '買茶');
     expect(find.text('Written body without this query'), findsNothing);
+    expect(
+        find.byKey(const ValueKey('card-transcript-source')), findsOneWidget);
+    expect(find.text(S.current.Voice_Memo), findsOneWidget);
     expect(find.text(S.current.History_Recordings(2)), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

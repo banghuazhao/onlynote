@@ -91,7 +91,9 @@ void main() {
     expect(find.text('Keep this recorded thought'), findsOneWidget);
     expect(find.text('1:02'), findsOneWidget);
     expect(find.textContaining('2 photos', findRichText: true), findsOneWidget);
-    expect(find.textContaining('1 recordings', findRichText: true),
+    expect(
+        find.textContaining(S.current.History_Recordings(1),
+            findRichText: true),
         findsOneWidget);
     expect(find.byType(Checkbox), findsNothing);
     for (final editable

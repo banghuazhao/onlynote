@@ -17,6 +17,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
+import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/Tools/image_storage.dart';
@@ -30,6 +31,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/presentation/theme/note_grid_layout.dart';
@@ -46,6 +48,7 @@ import '../settings/settings_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'widgets/note_card.dart';
+import 'widgets/note_reorder_card.dart';
 import 'widgets/widget_discovery_prompt.dart';
 import 'widgets/daily_note_shortcut.dart';
 
@@ -709,9 +712,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             onOpenLibrary: _openLibraryFilters,
                             selected:
                                 state.mapOrNull(loaded: (s) => s.filters) ?? {},
-                            onChanged: (filters) => context
-                                .read<HomeBloc>()
-                                .add(HomeEvent.filtersChanged(filters)),
+                            onChanged: _changeSearchFilters,
                           )),
                 ],
                 if (!_isSearchVisible && !_isReorderMode)
@@ -774,8 +775,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (_, state) {
                           return state.maybeMap(
                             orElse: () => const _LoadingSkeleton(),
-                            error: (error) =>
-                                _HomeError(message: error.message ?? ''),
+                            error: (error) => _HomeError(
+                              message: error.message ?? '',
+                              onRetry: () => context
+                                  .read<HomeBloc>()
+                                  .add(const HomeEvent.getAllNotes()),
+                            ),
                             loaded: (data) => _watchPhotoSearch(
                                 data.searchQuery,
                                 () => Column(
@@ -843,6 +848,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           data.notes.any((note) =>
                                                               note.isPinned &&
                                                               !note.isDeleted),
+                                                  allowReorder: !data
+                                                          .showArchive &&
+                                                      !data.includeArchived &&
+                                                      data.selectedTags.isEmpty,
                                                   isReorderMode:
                                                       _isReorderMode &&
                                                           !data.showArchive &&
@@ -914,6 +923,82 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _toggleSearch() {
+    setState(() {
+      _isSearchVisible = !_isSearchVisible;
+      if (!_isSearchVisible) {
+        _searchController.clear();
+        final filters = context.read<HomeBloc>().state.mapOrNull(
+                  loaded: (data) => data.filters,
+                ) ??
+            <NoteSearchFilter>{};
+        context.read<HomeBloc>().add(HomeEvent.filtersChanged({
+              if (filters.contains(NoteSearchFilter.unfinished))
+                NoteSearchFilter.unfinished,
+            }));
+        context.read<HomeBloc>().add(const HomeEvent.searchChanged(''));
+      }
+    });
+  }
+
+  String? _creationFolder() => context.read<HomeBloc>().state.mapOrNull(
+      loaded: (state) => state.showTrash ? null : state.selectedFolderId);
+
+  void _showTemplates() => _openTemplates(folderId: _creationFolder());
+
+  void _addNote() =>
+      context.router.push(AddUpdateNoteRoute(folderId: _creationFolder()));
+
+  void _openCurrentFolderPicker() {
+    context.read<HomeBloc>().state.mapOrNull(loaded: (data) {
+      _openFolderPicker(_FolderScope(
+        folders: data.folders,
+        selectedFolderId: data.selectedFolderId,
+        showTrash: data.showTrash,
+        showArchive: data.showArchive,
+        archiveCount: data.archiveCount,
+        selectedViewName: data.savedViews
+            .where((view) => view.id == data.selectedViewId)
+            .firstOrNull
+            ?.name,
+        trashCount: data.trashCount,
+        folderCounts: data.folderCounts,
+        allNotesCount: data.allNotesCount,
+      ));
+    });
+  }
+
+  Future<void> _deleteSelected(List<String> ids,
+      {required bool forever}) async {
+    final selection = context.read<MultipleDeleteBloc>();
+    if (!forever) {
+      selection.add(const MultipleDeleteEvent.delete());
+      return;
+    }
+    final confirmed = await showConfirmDialog(
+      context,
+      title: S.of(context).Permanent_Delete_Confirm_Title,
+      message: S.of(context).Permanent_Delete_Confirm_Message,
+    );
+    if (!confirmed || !mounted) return;
+    context.read<HomeBloc>().add(HomeEvent.permanentDelete(List.of(ids)));
+    selection.add(const MultipleDeleteEvent.clearAll());
+  }
+
+  void _archiveSelected(List<String> ids, bool archived) {
+    _archiveNotes(List.of(ids), archived);
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+  }
+
+  void _restoreSelected(List<String> ids) {
+    context.read<HomeBloc>().add(HomeEvent.restoreNotes(List.of(ids)));
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+  }
+
   List<Widget>? _buildAppBarActions(BuildContext context) {
     if (_isReorderMode) {
       return [
@@ -928,51 +1013,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return context.watch<MultipleDeleteBloc>().state.mapOrNull(
           initial: (_) => [
-            AppButton(
-              tooltip: S.of(context).Search_Notes,
-              child: Icon(
-                _isSearchVisible ? Icons.search_off : Icons.search,
-              ),
-              onPressed: () {
-                setState(() {
-                  _isSearchVisible = !_isSearchVisible;
-                  if (!_isSearchVisible) {
-                    _searchController.clear();
-                    final filters = context.read<HomeBloc>().state.mapOrNull(
-                              loaded: (data) => data.filters,
-                            ) ??
-                        <NoteSearchFilter>{};
-                    context.read<HomeBloc>().add(HomeEvent.filtersChanged({
-                          if (filters.contains(NoteSearchFilter.unfinished))
-                            NoteSearchFilter.unfinished,
-                        }));
-                    context
-                        .read<HomeBloc>()
-                        .add(const HomeEvent.searchChanged(''));
+            if (MediaQuery.sizeOf(context).width < 360)
+              PopupMenuButton<String>(
+                key: const ValueKey('home-more'),
+                tooltip: S.of(context).More_Options,
+                style: AppButtonStyles.icon(Theme.of(context).colorScheme),
+                onSelected: (action) {
+                  switch (action) {
+                    case 'search':
+                      _toggleSearch();
+                    case 'templates':
+                      _showTemplates();
+                    case 'folders':
+                      _openCurrentFolderPicker();
                   }
-                });
-              },
-            ),
-            AppButton(
-              tooltip: S.of(context).Templates,
-              child: const Icon(Icons.dashboard_customize_outlined),
-              onPressed: () {
-                final folderId = context.read<HomeBloc>().state.mapOrNull(
-                      loaded: (s) => s.showTrash ? null : s.selectedFolderId,
-                    );
-                _openTemplates(folderId: folderId);
-              },
-            ),
+                },
+                itemBuilder: (context) => [
+                  if (MediaQuery.sizeOf(context).width < 280)
+                    PopupMenuItem(
+                        value: 'folders', child: Text(S.of(context).Folders)),
+                  PopupMenuItem(
+                      value: 'search', child: Text(S.of(context).Search_Notes)),
+                  PopupMenuItem(
+                      value: 'templates', child: Text(S.of(context).Templates)),
+                ],
+                icon: const Icon(Icons.more_horiz_rounded),
+              )
+            else ...[
+              AppButton(
+                tooltip: S.of(context).Search_Notes,
+                onPressed: _toggleSearch,
+                child: Icon(
+                  _isSearchVisible ? Icons.search_off : Icons.search,
+                ),
+              ),
+              AppButton(
+                tooltip: S.of(context).Templates,
+                onPressed: _showTemplates,
+                child: const Icon(Icons.dashboard_customize_outlined),
+              ),
+            ],
             AppButton(
               primary: true,
               tooltip: S.of(context).Add_Note,
+              onPressed: _addNote,
               child: const Icon(Icons.add),
-              onPressed: () {
-                final folderId = context.read<HomeBloc>().state.mapOrNull(
-                      loaded: (s) => s.showTrash ? null : s.selectedFolderId,
-                    );
-                context.router.push(AddUpdateNoteRoute(folderId: folderId));
-              },
             ),
           ],
           selected: (selectedNotes) {
@@ -984,77 +1069,77 @@ class _HomeScreenState extends State<HomeScreen> {
                       loaded: (s) => s.showArchive,
                     ) ??
                 false;
+            final ids = selectedNotes.selectedIds;
+            final archiveLabel = showArchive
+                ? S.of(context).Unarchive_Note
+                : S.of(context).Archive_Note;
+            final deleteLabel =
+                showTrash ? S.of(context).Delete_Forever : S.of(context).Delete;
             return [
-              if (!showTrash)
-                AppButton(
-                  tooltip: showArchive
-                      ? S.of(context).Unarchive_Note
-                      : S.of(context).Archive_Note,
-                  child: Icon(showArchive
-                      ? Icons.unarchive_outlined
-                      : Icons.archive_outlined),
-                  onPressed: () {
-                    _archiveNotes(
-                        List.of(selectedNotes.selectedIds), !showArchive);
-                    context
-                        .read<MultipleDeleteBloc>()
-                        .add(const MultipleDeleteEvent.clearAll());
+              if (MediaQuery.sizeOf(context).width < 360)
+                PopupMenuButton<String>(
+                  key: const ValueKey('home-selection-more'),
+                  tooltip: S.of(context).More_Options,
+                  style: AppButtonStyles.icon(Theme.of(context).colorScheme),
+                  icon: const Icon(Icons.more_horiz_rounded),
+                  onSelected: (action) {
+                    switch (action) {
+                      case 'archive':
+                        _archiveSelected(ids, !showArchive);
+                      case 'delete':
+                        _deleteSelected(ids, forever: showTrash);
+                      case 'restore':
+                        _restoreSelected(ids);
+                    }
                   },
-                ),
-              AppButton(
-                destructive: true,
-                tooltip: showTrash
-                    ? S.of(context).Delete_Forever
-                    : S.of(context).Delete,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${selectedNotes.selectedIds.length}',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      showTrash
-                          ? Icons.delete_forever_outlined
-                          : Icons.delete_outline,
-                    ),
+                  itemBuilder: (context) => [
+                    if (!showTrash)
+                      PopupMenuItem(
+                          value: 'archive', child: Text(archiveLabel)),
+                    PopupMenuItem(
+                        value: 'delete',
+                        child: Text('$deleteLabel (${ids.length})')),
+                    if (showTrash)
+                      PopupMenuItem(
+                          value: 'restore', child: Text(S.of(context).Restore)),
                   ],
-                ),
-                onPressed: () async {
-                  if (showTrash) {
-                    final confirmed = await showConfirmDialog(
-                      context,
-                      title: S.of(context).Permanent_Delete_Confirm_Title,
-                      message: S.of(context).Permanent_Delete_Confirm_Message,
-                    );
-                    if (!confirmed || !context.mounted) return;
-                    context.read<HomeBloc>().add(
-                          HomeEvent.permanentDelete(selectedNotes.selectedIds),
-                        );
-                    context
-                        .read<MultipleDeleteBloc>()
-                        .add(const MultipleDeleteEvent.clearAll());
-                  } else {
-                    context
-                        .read<MultipleDeleteBloc>()
-                        .add(const MultipleDeleteEvent.delete());
-                  }
-                },
-              ),
-              if (showTrash)
+                )
+              else ...[
+                if (!showTrash)
+                  AppButton(
+                    tooltip: archiveLabel,
+                    child: Icon(showArchive
+                        ? Icons.unarchive_outlined
+                        : Icons.archive_outlined),
+                    onPressed: () => _archiveSelected(ids, !showArchive),
+                  ),
                 AppButton(
-                  tooltip: S.of(context).Restore,
-                  child: const Icon(Icons.restore_outlined),
-                  onPressed: () {
-                    context.read<HomeBloc>().add(
-                          HomeEvent.restoreNotes(selectedNotes.selectedIds),
-                        );
-                    context
-                        .read<MultipleDeleteBloc>()
-                        .add(const MultipleDeleteEvent.clearAll());
-                  },
+                  destructive: true,
+                  tooltip: deleteLabel,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${selectedNotes.selectedIds.length}',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        showTrash
+                            ? Icons.delete_forever_outlined
+                            : Icons.delete_outline,
+                      ),
+                    ],
+                  ),
+                  onPressed: () => _deleteSelected(ids, forever: showTrash),
                 ),
+                if (showTrash)
+                  AppButton(
+                    tooltip: S.of(context).Restore,
+                    child: const Icon(Icons.restore_outlined),
+                    onPressed: () => _restoreSelected(ids),
+                  ),
+              ],
               AppButton(
                 tooltip: S.of(context).Cancel,
                 child: const Icon(Icons.close),
@@ -1089,6 +1174,20 @@ class _HomeScreenState extends State<HomeScreen> {
         );
   }
 
+  void _changeSearchQuery(String query) {
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    context.read<HomeBloc>().add(HomeEvent.searchChanged(query));
+  }
+
+  void _changeSearchFilters(Set<NoteSearchFilter> filters) {
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    context.read<HomeBloc>().add(HomeEvent.filtersChanged(filters));
+  }
+
   Widget _buildSearchField(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -1117,9 +1216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: const Icon(Icons.clear),
                     onPressed: () {
                       _searchController.clear();
-                      context
-                          .read<HomeBloc>()
-                          .add(const HomeEvent.searchChanged(''));
+                      _changeSearchQuery('');
                       setState(() {});
                     },
                   ),
@@ -1130,7 +1227,7 @@ class _HomeScreenState extends State<HomeScreen> {
             isDense: true,
           ),
           onChanged: (value) {
-            context.read<HomeBloc>().add(HomeEvent.searchChanged(value));
+            _changeSearchQuery(value);
             setState(() {});
           },
         ),
@@ -1212,13 +1309,14 @@ class _EmptyNotes extends StatelessWidget {
 }
 
 class _HomeError extends StatelessWidget {
-  const _HomeError({required this.message});
+  const _HomeError({required this.message, required this.onRetry});
   final String message;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: EdgeInsets.all(context.tokens.space5),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1232,6 +1330,13 @@ class _HomeError extends StatelessWidget {
             ),
             SizedBox(height: context.tokens.space4),
             ErrorText(message),
+            SizedBox(height: context.tokens.space4),
+            FilledButton.icon(
+              key: const ValueKey('home-retry'),
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(S.of(context).Retry),
+            ),
           ],
         ),
       ),
@@ -1248,6 +1353,7 @@ class _BuildNotesList extends StatefulWidget {
     required this.showTrash,
     required this.showWidgetDiscovery,
     required this.isReorderMode,
+    required this.allowReorder,
     required this.onEnterReorderMode,
     required this.onChecklistActionStart,
     required this.onChecklistResult,
@@ -1264,6 +1370,7 @@ class _BuildNotesList extends StatefulWidget {
   final Future<void> Function(Note) onEditTags;
   final bool showWidgetDiscovery;
   final bool isReorderMode;
+  final bool allowReorder;
   final VoidCallback onChecklistActionStart;
   final ValueChanged<HomeChecklistResult> onChecklistResult;
   final VoidCallback onEnterReorderMode;
@@ -1281,6 +1388,14 @@ class __BuildNotesListState extends State<_BuildNotesList> {
 
   GlobalKey<NoteCardState> _cardKeyFor(String noteId) =>
       _cardKeys.putIfAbsent(noteId, () => GlobalKey<NoteCardState>());
+
+  @override
+  void didUpdateWidget(covariant _BuildNotesList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final ids = widget.notes.map((note) => note.id).toSet();
+    _cardKeys.removeWhere((id, _) => !ids.contains(id));
+    _screenshotControllers.removeWhere((id, _) => !ids.contains(id));
+  }
 
   Future<void> _shareNote(
     BuildContext context,
@@ -1454,14 +1569,15 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             multipleDeleteBloc.add(MultipleDeleteEvent.toggleSelect(noteId));
           },
         ),
-        AppSheetAction(
-          leading: const Icon(Icons.swap_vert),
-          title: Text(S.of(context).Reorder),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            widget.onEnterReorderMode();
-          },
-        ),
+        if (widget.allowReorder)
+          AppSheetAction(
+            leading: const Icon(Icons.swap_vert),
+            title: Text(S.of(context).Reorder),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              widget.onEnterReorderMode();
+            },
+          ),
         AppSheetAction(
           destructive: true,
           leading: const Icon(Icons.delete_outline),
@@ -1486,6 +1602,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           width: constraints.maxWidth,
           textScaler: MediaQuery.textScalerOf(context),
           preferredColumns: AppLayoutSettings.instance.cardSize.columns,
+          appFontScale: AppTypographySettings.instance.scale,
         );
         return FocusDetector(
           onFocusGained: () {
@@ -1511,7 +1628,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
               // scroll position.
               key: ValueKey('${widget.isReorderMode}:${widget.showTrash}'),
               child: widget.isReorderMode && !widget.showTrash
-                  ? _buildReorderableGrid(context, crossAxisCount)
+                  ? _buildReorderableGrid(
+                      context, crossAxisCount, constraints.maxWidth)
                   : _buildMasonryGrid(
                       context,
                       multipleDeleteBloc,
@@ -1534,6 +1652,9 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       orElse: () => false,
     );
 
+    final noteIndices = <String, int>{
+      for (var i = 0; i < widget.notes.length; i++) widget.notes[i].id!: i,
+    };
     return CustomScrollView(
       semanticChildCount: widget.notes.length,
       slivers: [
@@ -1547,57 +1668,66 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             horizontal: AppSpacings.xl,
             vertical: AppSpacings.xl,
           ),
-          sliver: SliverMasonryGrid.count(
-            crossAxisCount: crossAxisCount,
-            childCount: widget.notes.length,
-            itemBuilder: (BuildContext context, int index) {
-              final note = widget.notes[index];
-              final noteId = note.id!;
-              final card = NoteCard(
-                key: _cardKeyFor(noteId),
-                note: note,
-                searchQuery: widget.searchQuery,
-                photoSearchText: PhotoSearchIndex.initializedInstance
-                    ?.matchingText(note, widget.searchQuery),
-                photoSearchImagePath: PhotoSearchIndex.initializedInstance
-                    ?.matchingPhotoPath(note, widget.searchQuery),
-                selected: multipleDeleteBloc.isSelected(noteId),
-                selectionMode: isSelectionMode,
-                unfinishedOnly: widget.unfinishedOnly,
-                onTodoToggle: isSelectionMode || widget.showTrash
-                    ? null
-                    : (todoId) => _toggleTodo(noteId, todoId),
-                screenshotController: _screenshotControllerFor(noteId),
-                onTap: () {
-                  multipleDeleteBloc.state.maybeMap(
-                    orElse: () {
-                      context.router.push(NoteDetailRoute(noteId: noteId));
-                    },
-                    selected: (_) {
-                      multipleDeleteBloc
-                          .add(MultipleDeleteEvent.toggleSelect(noteId));
-                    },
-                  );
-                },
-                onLongPress: () {
-                  multipleDeleteBloc.state.maybeMap(
-                    orElse: () => _showNoteContextMenu(
-                        context, note, multipleDeleteBloc, noteId),
-                    selected: (_) {
-                      multipleDeleteBloc
-                          .add(MultipleDeleteEvent.toggleSelect(noteId));
-                    },
-                  );
-                },
-              );
-              return MediaQuery.disableAnimationsOf(context)
-                  ? card
-                  : FadeInUp(
-                      duration:
-                          Duration(milliseconds: 80 + (index.clamp(0, 6) * 40)),
-                      child: card,
+          sliver: SliverMasonryGrid(
+            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final note = widget.notes[index];
+                final noteId = note.id!;
+                final card = NoteCard(
+                  key: _cardKeyFor(noteId),
+                  note: note,
+                  searchQuery: widget.searchQuery,
+                  photoSearchText: PhotoSearchIndex.initializedInstance
+                      ?.matchingText(note, widget.searchQuery),
+                  photoSearchImagePath: PhotoSearchIndex.initializedInstance
+                      ?.matchingPhotoPath(note, widget.searchQuery),
+                  selected: multipleDeleteBloc.isSelected(noteId),
+                  selectionMode: isSelectionMode,
+                  unfinishedOnly: widget.unfinishedOnly,
+                  onTodoToggle: isSelectionMode || widget.showTrash
+                      ? null
+                      : (todoId) => _toggleTodo(noteId, todoId),
+                  screenshotController: _screenshotControllerFor(noteId),
+                  onTap: () {
+                    multipleDeleteBloc.state.maybeMap(
+                      orElse: () {
+                        context.router.push(NoteDetailRoute(noteId: noteId));
+                      },
+                      selected: (_) {
+                        multipleDeleteBloc
+                            .add(MultipleDeleteEvent.toggleSelect(noteId));
+                      },
                     );
-            },
+                  },
+                  onLongPress: () {
+                    multipleDeleteBloc.state.maybeMap(
+                      orElse: () => _showNoteContextMenu(
+                          context, note, multipleDeleteBloc, noteId),
+                      selected: (_) {
+                        multipleDeleteBloc
+                            .add(MultipleDeleteEvent.toggleSelect(noteId));
+                      },
+                    );
+                  },
+                );
+                return KeyedSubtree(
+                  key: ValueKey(noteId),
+                  child: MediaQuery.disableAnimationsOf(context)
+                      ? card
+                      : FadeInUp(
+                          from: 12,
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          child: card,
+                        ),
+                );
+              },
+              childCount: widget.notes.length,
+              findChildIndexCallback: (key) =>
+                  key is ValueKey<String> ? noteIndices[key.value] : null,
+            ),
             mainAxisSpacing: AppSpacings.xl,
             crossAxisSpacing: AppSpacings.l,
           ),
@@ -1606,7 +1736,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     );
   }
 
-  Widget _buildReorderableGrid(BuildContext context, int crossAxisCount) {
+  Widget _buildReorderableGrid(
+      BuildContext context, int crossAxisCount, double width) {
     final notes = List<Note>.from(widget.notes);
 
     return ReorderableGridView.count(
@@ -1615,7 +1746,12 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         vertical: AppSpacings.xl,
       ),
       crossAxisCount: crossAxisCount,
-      childAspectRatio: 1.3,
+      childAspectRatio: noteReorderAspectRatio(
+        width: width,
+        columns: crossAxisCount,
+        textScaler: MediaQuery.textScalerOf(context),
+        appFontScale: AppTypographySettings.instance.scale,
+      ),
       mainAxisSpacing: AppSpacings.xl,
       crossAxisSpacing: AppSpacings.l,
       onReorder: (oldIndex, newIndex) {
@@ -1626,46 +1762,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       },
       children: [
         for (final note in notes)
-          _ReorderableNoteTile(key: ValueKey(note.id), note: note),
+          NoteReorderCard(key: ValueKey(note.id), note: note),
       ],
-    );
-  }
-}
-
-class _ReorderableNoteTile extends StatelessWidget {
-  const _ReorderableNoteTile({super.key, required this.note});
-  final Note note;
-
-  @override
-  Widget build(BuildContext context) {
-    final headlineText =
-        note.title?.isNotEmpty == true ? note.title! : (note.description ?? '');
-
-    return PaperNote(
-      color: note.color ?? AppColors.parchment,
-      seed: note.id?.hashCode ?? 0,
-      pinned: note.isPinned,
-      tilt: false,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            headlineText,
-            style: AppTypography.cardTitle,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-          ),
-          const SizedBox(height: AppSpacings.m),
-          Text(
-            note.date,
-            style: AppTypography.description.copyWith(
-              color: AppColors.ink.withValues(alpha: 0.55),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1675,42 +1773,46 @@ class _LoadingSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColumns = AppLayoutSettings.instance.cardSize.columns;
-    final crossAxisCount =
-        MediaQuery.of(context).size.width > 600 ? baseColumns + 1 : baseColumns;
-
-    return ShimmerWrapper(
-      child: GridView.builder(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacings.xl,
-          vertical: AppSpacings.xl,
-        ),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: AppSpacings.xl,
-          crossAxisSpacing: AppSpacings.l,
-          childAspectRatio: 1.1,
-        ),
-        itemCount: crossAxisCount * 3,
-        itemBuilder: (context, index) => DecoratedBox(
-          decoration: BoxDecoration(
-            color: Color.lerp(
-              AppColors.parchment,
-              AppColors.ink,
-              0.04 + (index % 3) * 0.02,
-            ),
-            borderRadius: BorderRadius.circular(5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 10,
-                offset: const Offset(1, 4),
+    return LayoutBuilder(builder: (context, constraints) {
+      final crossAxisCount = noteGridColumns(
+        width: constraints.maxWidth,
+        textScaler: MediaQuery.textScalerOf(context),
+        preferredColumns: AppLayoutSettings.instance.cardSize.columns,
+        appFontScale: AppTypographySettings.instance.scale,
+      );
+      return ShimmerWrapper(
+        child: GridView.builder(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacings.xl,
+            vertical: AppSpacings.xl,
+          ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: AppSpacings.xl,
+            crossAxisSpacing: AppSpacings.l,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: crossAxisCount * 3,
+          itemBuilder: (context, index) => DecoratedBox(
+            decoration: BoxDecoration(
+              color: Color.lerp(
+                AppColors.parchment,
+                AppColors.ink,
+                0.04 + (index % 3) * 0.02,
               ),
-            ],
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 10,
+                  offset: const Offset(1, 4),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -1769,45 +1871,53 @@ class _FolderPickerTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
 
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: Semantics(
-        button: true,
-        // The label alone reads as a heading; the hint is what tells a screen
-        // reader user this is also how you switch folders.
-        hint: S.of(context).Folders,
-        child: TextButton(
-          onPressed: onTap,
-          style: TextButton.styleFrom(padding: EdgeInsets.zero),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.space2,
-              vertical: tokens.space1,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
-                SizedBox(width: tokens.space2),
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textStyles.titleLarge,
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxWidth < 56) return const SizedBox.shrink();
+      final compact = constraints.maxWidth < 120;
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Semantics(
+          button: true,
+          // The label alone reads as a heading; the hint is what tells a screen
+          // reader user this is also how you switch folders.
+          hint: S.of(context).Folders,
+          child: TextButton(
+            onPressed: onTap,
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: compact ? tokens.space1 : tokens.space2,
+                vertical: tokens.space1,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!compact) ...[
+                    Icon(icon,
+                        size: 20, color: context.colors.onSurfaceVariant),
+                    SizedBox(width: tokens.space2),
+                  ],
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textStyles.titleLarge,
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.expand_more_rounded,
-                  size: 20,
-                  color: context.colors.onSurfaceVariant,
-                ),
-              ],
+                  if (!compact)
+                    Icon(
+                      Icons.expand_more_rounded,
+                      size: 20,
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

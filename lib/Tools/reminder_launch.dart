@@ -108,12 +108,20 @@ class ReminderLaunch {
             await OnboardingSettings.instance.complete();
             if (!identical(router, _router)) return;
             await router.replaceAll([const HomeRoute(), destination]);
-          } else if (current.name == AddUpdateNoteRoute.name) {
+          } else if (router.stackData
+              .any((route) => route.name == AddUpdateNoteRoute.name)) {
             // Preserve the editor and its save/retry state. Back from the
             // reminder returns to the draft, and finishing that edit refreshes
             // its original detail screen. push completes only when popped,
             // so it must not block delivery of later notification taps.
-            unawaited(router.push<void>(destination));
+            // A second tap can arrive from the reminder reader above a draft.
+            // navigate would find an older detail below that editor and remove
+            // the unsaved draft. Replace only the current reader in that case.
+            if (current.name == NoteDetailRoute.name) {
+              unawaited(router.replace<void>(destination));
+            } else {
+              unawaited(router.push<void>(destination));
+            }
           } else {
             // Reuse the detail route's place in the stack. The note-specific
             // widget key reloads a different note without stacking screens

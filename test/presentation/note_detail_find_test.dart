@@ -143,7 +143,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('note-find-query')), findsNothing);
     expect(repository.writes, 0);
-    expect(detail.state.whenOrNull(success: (note) => note.description),
+    expect(tester.widget<LoadedView>(find.byType(LoadedView)).note.description,
         'Tea note body');
     expect(tester.takeException(), isNull);
   });

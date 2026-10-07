@@ -1,10 +1,12 @@
+import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
 
 enum NoteSearchFilter { checklists, photos, reminders, pinned, unfinished }
 
 bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
     {required bool hasReminder, Iterable<String> photoText = const []}) {
-  if (filters.contains(NoteSearchFilter.checklists) && !note.hasTodo) {
+  if (filters.contains(NoteSearchFilter.checklists) &&
+      !note.todo.any((todo) => todo.title?.trim().isNotEmpty == true)) {
     return false;
   }
   if (filters.contains(NoteSearchFilter.photos) && !note.hasImages) {
@@ -25,7 +27,11 @@ bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
         note.title ?? '',
         note.description ?? '',
         ...note.tags,
-        ...note.todo.map((todo) => todo.title ?? ''),
+        ...note.todo
+            .where((todo) =>
+                !filters.contains(NoteSearchFilter.unfinished) ||
+                !todo.completed)
+            .map((todo) => todo.title ?? ''),
         ...note.voiceMemos.map((memo) => memo.transcript ?? ''),
         ...photoText,
       ].any(pattern.hasMatch);
@@ -36,13 +42,20 @@ RegExp? searchPattern(String query) => query.trim().isEmpty
     : RegExp(RegExp.escape(query.trim()), caseSensitive: false, unicode: true);
 
 /// Start a card excerpt near its first match so long notes explain the result.
-String searchExcerpt(String text, String query) {
+/// A zero [leadingContext] reveals the match immediately in a short OCR preview.
+String searchExcerpt(String text, String query, {int leadingContext = 30}) {
+  assert(leadingContext >= 0);
   final match = searchPattern(query)?.firstMatch(text);
-  if (match == null || match.start < 45) return text;
-  var start = match.start - 30;
-  // Avoid cutting a UTF-16 surrogate pair in half.
-  if (text.codeUnitAt(start) >= 0xDC00 && text.codeUnitAt(start) <= 0xDFFF) {
-    start++;
+  if (match == null || (leadingContext != 0 && match.start < 45)) return text;
+  final preferredStart = (match.start - leadingContext).clamp(0, match.start);
+  var start = 0;
+  for (final character in text.characters) {
+    // Start at a complete grapheme after the desired clip. If the query
+    // begins inside a longer grapheme, retain that entire grapheme instead.
+    if (start >= preferredStart || start + character.length > match.start) {
+      break;
+    }
+    start += character.length;
   }
-  return '…${text.substring(start)}';
+  return start == 0 ? text : '…${text.substring(start)}';
 }

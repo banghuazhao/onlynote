@@ -31,6 +31,30 @@ class _PhotoNotes implements NoteRepository {
   }
 }
 
+class _JournalHook implements Box {
+  _JournalHook(this.box, this.afterNoteWrite);
+  final Box box;
+  final void Function() afterNoteWrite;
+
+  @override
+  dynamic get(dynamic key, {dynamic defaultValue}) =>
+      box.get(key, defaultValue: defaultValue);
+  @override
+  Iterable<dynamic> get keys => box.keys;
+  @override
+  Future<void> put(dynamic key, dynamic value) async {
+    await box.put(key, value);
+    if (key == 'existing' && value is NoteDto) afterNoteWrite();
+  }
+
+  @override
+  Future<void> flush() => box.flush();
+  @override
+  Future<void> delete(dynamic key) => box.delete(key);
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   late Directory directory;
   late Box drafts;
@@ -94,6 +118,63 @@ void main() {
     expect(recovery.hasPendingCapture, isFalse);
     expect(drafts.isEmpty, isTrue);
   });
+
+  for (final currentFolder in [null, 'new-folder']) {
+    test('photo recovery keeps latest library metadata for $currentFolder',
+        () async {
+      final seed = Note(
+          id: 'origin',
+          title: 'Original',
+          folderId: 'old-folder',
+          sortOrder: 5,
+          dailyNoteDateKey: '2026-10-06');
+      notes.notes['origin'] = NoteDto.fromNote(seed);
+      final recovery = NotePhotoRecovery(
+        drafts: drafts,
+        notes: notes,
+        retrieve: () async => ['/tmp/captured-library-photo.jpg'],
+        save: (_) async => 'note_images/recovered-library-photo.jpg',
+      );
+      await recovery.begin(seed);
+      final pending = seed.copyWith(
+          title: 'Draft title',
+          description: 'Keep pending prose',
+          todo: [Todo(id: 'pending-task', title: 'Keep pending task')],
+          imagePaths: ['note_images/draft-photo.jpg'],
+          tags: ['Draft tag'],
+          linkedNoteIds: ['draft-link']);
+      await drafts.put('origin', NoteDto.fromNote(pending));
+      notes.notes['origin'] = NoteDto.fromNote(seed.copyWith(
+          title: 'Saved title',
+          isPinned: true,
+          isArchived: true,
+          folderId: currentFolder,
+          sortOrder: 1234,
+          dailyNoteDateKey: null,
+          tags: ['Saved tag'],
+          linkedNoteIds: ['saved-link']));
+
+      await recovery.recoverPending();
+
+      final restored = notes.notes['origin']!.toDomain();
+      expect(restored.isPinned, isTrue);
+      expect(restored.isArchived, isTrue);
+      expect(restored.folderId, currentFolder);
+      expect(restored.sortOrder, 1234);
+      expect(restored.dailyNoteDateKey, isNull);
+      expect(restored.title, pending.title);
+      expect(restored.description, pending.description);
+      expect(restored.todo, pending.todo);
+      expect(restored.tags, pending.tags);
+      expect(restored.linkedNoteIds, pending.linkedNoteIds);
+      expect(restored.imagePaths, [
+        'note_images/draft-photo.jpg',
+        'note_images/recovered-library-photo.jpg',
+      ]);
+      expect(recovery.hasPendingCapture, isFalse);
+      expect(drafts.isEmpty, isTrue);
+    });
+  }
 
   for (final currentDay in [null, '2026-10-05']) {
     test('photo recovery retains the persisted daily identity $currentDay',
@@ -287,6 +368,82 @@ void main() {
     expect(copies, 0);
     expect(recovery.hasPendingCapture, isFalse);
   });
+
+  test('photo copying merges prose and metadata changed during file I/O',
+      () async {
+    final origin =
+        Note(id: 'existing', description: 'Before copy', folderId: 'old');
+    notes.notes['existing'] = NoteDto.fromNote(origin);
+    final recovery = NotePhotoRecovery(
+      drafts: drafts,
+      notes: notes,
+      retrieve: () async => ['/tmp/captured.jpg'],
+      save: (_) async {
+        notes.notes['existing'] = NoteDto.fromNote(origin.copyWith(
+            description: 'Edited while the image copied',
+            isArchived: true,
+            isPinned: true,
+            folderId: null,
+            sortOrder: 200));
+        return 'note_images/copied.jpg';
+      },
+    );
+    await recovery.begin(origin);
+    await recovery.recoverPending();
+
+    final saved = notes.notes['existing']!.toDomain();
+    expect(saved.description, 'Edited while the image copied');
+    expect(saved.isArchived, isTrue);
+    expect(saved.isPinned, isTrue);
+    expect(saved.folderId, isNull);
+    expect(saved.sortOrder, 200);
+    expect(saved.imagePaths, ['note_images/copied.jpg']);
+    expect(drafts.isEmpty, isTrue);
+  });
+
+  for (final trashed in [false, true]) {
+    for (final duringJournal in [false, true]) {
+      for (final savedBeforeCapture in [false, true]) {
+        test(
+            'deletion during ${duringJournal ? 'journal' : 'copy'} keeps '
+            '${trashed ? 'trashed' : 'removed'} photo origin deleted '
+            '(saved before capture: $savedBeforeCapture)', () async {
+          final origin = Note(id: 'existing', title: 'Before capture');
+          if (savedBeforeCapture) {
+            notes.notes['existing'] = NoteDto.fromNote(origin);
+          }
+          void removeOrigin() {
+            if (trashed) {
+              notes.notes['existing'] = NoteDto.fromNote(
+                  origin.copyWith(deletedAt: DateTime(2026, 10, 7)));
+            } else {
+              notes.notes.remove('existing');
+            }
+          }
+
+          final recovery = NotePhotoRecovery(
+            drafts: duringJournal ? _JournalHook(drafts, removeOrigin) : drafts,
+            notes: notes,
+            retrieve: () async => ['/tmp/captured.jpg'],
+            save: (_) async {
+              if (!duringJournal) removeOrigin();
+              return 'note_images/copied.jpg';
+            },
+          );
+          await recovery.begin(origin);
+          // The editor can finish its first autosave while the camera is open.
+          notes.notes['existing'] = NoteDto.fromNote(origin);
+          await recovery.recoverPending();
+          expect(notes.notes['existing']?.isDeleted ?? !trashed, isTrue);
+          expect(notes.notes['existing']?.imagePaths ?? [], isEmpty);
+          expect(drafts.isEmpty, isTrue);
+          expect(recovery.hasPendingCapture, isFalse);
+          await HiveNoteAutosaveStore(notes, drafts).recover();
+          expect(notes.notes['existing']?.isDeleted ?? !trashed, isTrue);
+        });
+      }
+    }
+  }
 
   test(
       'batch journal appends completed copies and recovers only remaining sources',

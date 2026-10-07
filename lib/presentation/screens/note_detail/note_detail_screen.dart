@@ -60,7 +60,7 @@ import 'bloc/action/note_action_bloc.dart';
 import 'bloc/detail/note_detail_bloc.dart';
 
 @RoutePage(name: 'NoteDetailRoute')
-class NoteDetailScreen extends StatefulWidget {
+class NoteDetailScreen extends StatefulWidget implements AutoRouteWrapper {
   const NoteDetailScreen(
       {super.key,
       @PathParam('noteId') required this.noteId,
@@ -71,6 +71,12 @@ class NoteDetailScreen extends StatefulWidget {
   final CustomNoteTemplateStore? templateStore;
   final NotePositionStore? positionStore;
   final NoteSelectionTransfer? selectionTransfer;
+
+  @override
+  Widget wrappedRoute(BuildContext context) => BlocProvider<NoteDetailBloc>(
+        create: (_) => context.read<NoteDetailBloc>().createSibling(),
+        child: this,
+      );
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -103,6 +109,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   NotePositionStore get _positions =>
       widget.positionStore ?? NotePositionStore.instance;
+
+  bool get _compactToolbar => MediaQuery.sizeOf(context).width < 280;
 
   NoteSelectionTransfer get _selectionTransfer {
     if (widget.selectionTransfer != null) return widget.selectionTransfer!;
@@ -445,6 +453,32 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       context: context,
       title: S.of(context).More_Options,
       actions: [
+        if (_compactToolbar) ...[
+          AppSheetAction(
+            leading: const Icon(Icons.alarm_add_outlined),
+            title: Text(S.of(context).Reminder),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _showReminderPicker(note);
+            },
+          ),
+          AppSheetAction(
+            leading: const Icon(Icons.share_outlined),
+            title: Text(S.of(context).Share),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _shareNoteAsImage(note);
+            },
+          ),
+          AppSheetAction(
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(S.of(context).Edit),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _editNote(note);
+            },
+          ),
+        ],
         if (shouldShowNoteOutline(note.description ?? '',
             buildNoteOutline(note.description ?? '', note.textStyles)))
           AppSheetAction(
@@ -544,6 +578,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           .read<NoteDetailBloc>()
           .add(NoteDetailEvent.showNote(widget.noteId));
     }
+  }
+
+  Future<void> _editNote(Note note) async {
+    if (_changingLibrary || _exportingImage) return;
+    await _saveReadingPosition();
+    if (!mounted) return;
+    await context.router.push(AddUpdateNoteRoute(note: note));
+    _reload();
   }
 
   Future<void> _changeLibrary(
@@ -838,48 +880,87 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     }
   }
 
-  List<Widget> _trashActions(Note note) => [
-        AppButton(
-            key: _shareButtonKey,
-            tooltip: S.of(context).Share,
-            child: const Icon(Icons.share_outlined),
-            onPressed: () => _shareNoteAsImage(note)),
-        AppButton(
-            tooltip: S.of(context).Restore,
-            child: const Icon(Icons.restore_outlined),
-            onPressed: () async {
-              final result = await getIt<RestoreNotesUsecase>()([note.id!]);
-              if (!mounted) return;
-              result.fold(
-                  (error) =>
-                      context.showToast('${error.message}', isError: true),
-                  (remindersRestored) {
-                context
-                    .read<NoteDetailBloc>()
-                    .add(NoteDetailEvent.showNote(note.id!));
-                context.showToast(remindersRestored
-                    ? S.of(context).Notes_Restored
-                    : S.of(context).Restore_Reminder_Warning);
-              });
-            }),
-        AppButton(
-            destructive: true,
-            tooltip: S.of(context).Delete_Forever,
-            child: const Icon(Icons.delete_forever_outlined),
-            onPressed: () async {
-              final confirmed = await showConfirmDialog(context,
-                  title: S.of(context).Permanent_Delete_Confirm_Title,
-                  message: S.of(context).Permanent_Delete_Confirm_Message);
-              if (!confirmed || !mounted) return;
-              final result =
-                  await getIt<PermanentDeleteNotesUsecase>()([note.id!]);
-              if (!mounted) return;
-              result.fold(
-                  (error) =>
-                      context.showToast('${error.message}', isError: true),
-                  (_) => context.router.popUntilRoot());
-            }),
-      ];
+  Future<void> _restoreNote(Note note) async {
+    final result = await getIt<RestoreNotesUsecase>()([note.id!]);
+    if (!mounted) return;
+    result.fold((error) => context.showToast('${error.message}', isError: true),
+        (remindersRestored) {
+      _reload();
+      context.showToast(remindersRestored
+          ? S.of(context).Notes_Restored
+          : S.of(context).Restore_Reminder_Warning);
+    });
+  }
+
+  Future<void> _deleteForever(Note note) async {
+    final confirmed = await showConfirmDialog(context,
+        title: S.of(context).Permanent_Delete_Confirm_Title,
+        message: S.of(context).Permanent_Delete_Confirm_Message);
+    if (!confirmed || !mounted) return;
+    final result = await getIt<PermanentDeleteNotesUsecase>()([note.id!]);
+    if (!mounted) return;
+    result.fold((error) => context.showToast('${error.message}', isError: true),
+        (_) => context.router.popUntilRoot());
+  }
+
+  void _showTrashOptions(Note note) {
+    showAppActionSheet(
+      context: context,
+      title: S.of(context).More_Options,
+      actions: [
+        AppSheetAction(
+          leading: const Icon(Icons.share_outlined),
+          title: Text(S.of(context).Share),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _shareNoteAsImage(note);
+          },
+        ),
+        AppSheetAction(
+          leading: const Icon(Icons.restore_outlined),
+          title: Text(S.of(context).Restore),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _restoreNote(note);
+          },
+        ),
+        AppSheetAction(
+          destructive: true,
+          leading: const Icon(Icons.delete_forever_outlined),
+          title: Text(S.of(context).Delete_Forever),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _deleteForever(note);
+          },
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _trashActions(Note note) => _compactToolbar
+      ? [
+          AppButton(
+              key: _shareButtonKey,
+              tooltip: S.of(context).More_Options,
+              child: const Icon(Icons.more_horiz_rounded),
+              onPressed: () => _showTrashOptions(note)),
+        ]
+      : [
+          AppButton(
+              key: _shareButtonKey,
+              tooltip: S.of(context).Share,
+              child: const Icon(Icons.share_outlined),
+              onPressed: () => _shareNoteAsImage(note)),
+          AppButton(
+              tooltip: S.of(context).Restore,
+              child: const Icon(Icons.restore_outlined),
+              onPressed: () => _restoreNote(note)),
+          AppButton(
+              destructive: true,
+              tooltip: S.of(context).Delete_Forever,
+              child: const Icon(Icons.delete_forever_outlined),
+              onPressed: () => _deleteForever(note)),
+        ];
 
   @override
   Widget build(BuildContext context) {
@@ -922,45 +1003,40 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                             ReminderData.shared.getCurrentReminder(note) !=
                                 null;
                         return [
-                          AppButton(
-                            tooltip: S.of(context).Reminder,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              transitionBuilder: (child, animation) =>
-                                  ScaleTransition(
-                                      scale: animation, child: child),
-                              child: Icon(
-                                hasReminder
-                                    ? Icons.alarm_on_outlined
-                                    : Icons.alarm_add_outlined,
-                                key: ValueKey(hasReminder),
+                          if (!_compactToolbar) ...[
+                            AppButton(
+                              tooltip: S.of(context).Reminder,
+                              child: AnimatedSwitcher(
+                                duration:
+                                    MediaQuery.disableAnimationsOf(context)
+                                        ? Duration.zero
+                                        : const Duration(milliseconds: 200),
+                                transitionBuilder: (child, animation) =>
+                                    ScaleTransition(
+                                        scale: animation, child: child),
+                                child: Icon(
+                                  hasReminder
+                                      ? Icons.alarm_on_outlined
+                                      : Icons.alarm_add_outlined,
+                                  key: ValueKey(hasReminder),
+                                ),
                               ),
+                              onPressed: () => _showReminderPicker(note),
                             ),
-                            onPressed: () => _showReminderPicker(note),
-                          ),
+                            AppButton(
+                              key: _shareButtonKey,
+                              tooltip: S.of(context).Share,
+                              child: const Icon(Icons.share_outlined),
+                              onPressed: () => _shareNoteAsImage(note),
+                            ),
+                            AppButton(
+                              tooltip: S.of(context).Edit,
+                              child: const Icon(Icons.edit_outlined),
+                              onPressed: () => _editNote(note),
+                            ),
+                          ],
                           AppButton(
-                            key: _shareButtonKey,
-                            tooltip: S.of(context).Share,
-                            child: const Icon(Icons.share_outlined),
-                            onPressed: () => _shareNoteAsImage(note),
-                          ),
-                          AppButton(
-                            tooltip: S.of(context).Edit,
-                            child: const Icon(Icons.edit_outlined),
-                            onPressed: () async {
-                              if (_changingLibrary || _exportingImage) return;
-                              await _saveReadingPosition();
-                              if (!context.mounted) return;
-                              await context.router
-                                  .push(AddUpdateNoteRoute(note: note));
-                              if (!context.mounted) return;
-                              //* Reload the note so edits made on the form screen show up.
-                              context
-                                  .read<NoteDetailBloc>()
-                                  .add(NoteDetailEvent.showNote(widget.noteId));
-                            },
-                          ),
-                          AppButton(
+                            key: _compactToolbar ? _shareButtonKey : null,
                             tooltip: S.of(context).More_Options,
                             isLoading: _savingTemplate || _changingLibrary,
                             child: const Icon(Icons.more_horiz_rounded),

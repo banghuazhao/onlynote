@@ -1,8 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
@@ -29,6 +32,8 @@ class NoteCard extends StatefulWidget {
     this.onTodoToggle,
     this.onLongPress,
     this.onTap,
+    this.onShare,
+    this.thumbnailBuilder,
     this.screenshotController,
   });
 
@@ -46,6 +51,11 @@ class NoteCard extends StatefulWidget {
   final ValueChanged<String>? onTodoToggle;
   final Function()? onLongPress;
   final Function()? onTap;
+
+  /// Preview collaborators can stay in memory without opening native sharing
+  /// or loading files. The ordinary home card keeps its native defaults.
+  final VoidCallback? onShare;
+  final Widget Function(BuildContext context, String path)? thumbnailBuilder;
 
   /// Lets a parent capture the same rendered content for its own actions
   /// (e.g. a long-press context menu's "Share" item). Falls back to an
@@ -84,24 +94,32 @@ class NoteCardState extends State<NoteCard> {
     if (_pressed != value) setState(() => _pressed = value);
   }
 
-  Future<void> _shareNoteAsImage() => ShareHelper.shareNote(
-        context,
-        widget.note,
-        _screenshotController,
-        sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
-        captureImage: captureImage,
-      );
+  Future<void> _shareNoteAsImage() {
+    if (widget.onShare != null) {
+      widget.onShare!();
+      return Future.value();
+    }
+    return ShareHelper.shareNote(
+      context,
+      widget.note,
+      _screenshotController,
+      sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
+      captureImage: captureImage,
+    );
+  }
 
   Iterable<Todo> _visibleTodos(Note note) {
-    final todos = widget.unfinishedOnly
-        ? note.todo.where(
-            (todo) => !todo.completed && todo.title?.trim().isNotEmpty == true)
-        : note.todo;
+    final todos = note.todo.where((todo) =>
+        todo.title?.trim().isNotEmpty == true &&
+        (!widget.unfinishedOnly || !todo.completed));
     final pattern = searchPattern(widget.searchQuery);
-    if (pattern == null) return todos.take(3);
     return [
-      ...todos.where((t) => pattern.hasMatch(t.title ?? '')),
-      ...todos.where((t) => !pattern.hasMatch(t.title ?? '')),
+      if (pattern != null)
+        ...todos.where((todo) => pattern.hasMatch(todo.title!)),
+      ...todos.where((todo) =>
+          !todo.completed && !(pattern?.hasMatch(todo.title!) ?? false)),
+      ...todos.where((todo) =>
+          todo.completed && !(pattern?.hasMatch(todo.title!) ?? false)),
     ].take(3);
   }
 
@@ -110,9 +128,34 @@ class NoteCardState extends State<NoteCard> {
     final Reminder? currentReminder =
         ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
-    final hasTitle = note.title?.isNotEmpty == true;
+    final strings = S.of(context);
+    final title = note.title?.trim() ?? '';
+    final body = note.description?.trim() ?? '';
+    final hasTitle = title.isNotEmpty;
+    final todos = note.todo
+        .where((todo) => todo.title?.trim().isNotEmpty == true)
+        .toList();
+    final scanPaths = note.imageLayouts
+        .where((layout) =>
+            layout.isDocumentPage && note.imagePaths.contains(layout.path))
+        .map((layout) => layout.path)
+        .toSet();
+    final photoCount = note.imagePaths.length - scanPaths.length;
+    final imageLabel = [
+      if (photoCount > 0) strings.History_Photos(photoCount),
+      if (scanPaths.isNotEmpty)
+        strings.Card_Scanned_Pages_Count(scanPaths.length),
+    ].join(', ');
+    final linkedCount = note.linkedNoteIds
+        .where((id) => id.trim().isNotEmpty && id != note.id)
+        .toSet()
+        .length;
+    final date = note.dateTime == null
+        ? null
+        : DateFormat.yMMMd(Localizations.localeOf(context).toString())
+            .format(note.dateTime!);
     final transcripts = note.voiceMemos
-        .map((memo) => memo.transcript ?? '')
+        .map((memo) => memo.transcript?.trim() ?? '')
         .where((text) => text.isNotEmpty)
         .toList();
     final pattern = searchPattern(widget.searchQuery);
@@ -130,19 +173,23 @@ class NoteCardState extends State<NoteCard> {
     final transcriptMatch = pattern == null
         ? null
         : transcripts.where(pattern.hasMatch).firstOrNull;
-    final excerpt = transcriptMatch ??
-        (note.description?.isNotEmpty == true
-            ? note.description!
-            : transcripts.join('\n'));
+    final excerpt =
+        transcriptMatch ?? (body.isNotEmpty ? body : transcripts.join('\n'));
+    final fromTranscript =
+        transcriptMatch != null || (body.isEmpty && transcripts.isNotEmpty);
     final hasDescription = excerpt.isNotEmpty;
+    final displayTags = [
+      if (pattern != null) ...note.tags.where(pattern.hasMatch),
+      ...note.tags.where((tag) => !(pattern?.hasMatch(tag) ?? false)),
+    ].take(2);
     // Always a light paper: everything drawn on it is ink-coloured.
     final paperColor = note.color ?? AppColors.parchment;
     final seed = note.id?.hashCode ?? note.date.hashCode;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return Semantics(
-      button: true,
-      selected: widget.selected,
+      button: widget.onTap != null,
+      selected: widget.selectionMode ? widget.selected : null,
       child: AnimatedScale(
         scale: _pressed ? 0.985 : 1.0,
         duration: reduceMotion || _exportingImage
@@ -187,7 +234,7 @@ class NoteCardState extends State<NoteCard> {
                       children: [
                         if (hasTitle)
                           SearchHighlight(
-                            searchExcerpt(note.title!, widget.searchQuery),
+                            searchExcerpt(title, widget.searchQuery),
                             query: widget.searchQuery,
                             style: AppTypography.cardTitle,
                             overflow: TextOverflow.ellipsis,
@@ -195,6 +242,17 @@ class NoteCardState extends State<NoteCard> {
                           ),
                         if (hasTitle && hasDescription)
                           const SizedBox(height: AppSpacings.m),
+                        if (hasDescription && fromTranscript)
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: AppSpacings.s),
+                            child: Text(
+                              strings.Voice_Memo,
+                              key: const ValueKey('card-transcript-source'),
+                              style: AppTypography.description.copyWith(
+                                  color: AppColors.ink.withValues(alpha: .65)),
+                            ),
+                          ),
                         if (hasDescription)
                           SearchHighlight(
                             searchExcerpt(excerpt, widget.searchQuery),
@@ -247,53 +305,23 @@ class NoteCardState extends State<NoteCard> {
                             ],
                           ),
                         ],
-                        const SizedBox(height: AppSpacings.l),
-                        if (note.isArchived) ...[
-                          Text.rich(
-                            TextSpan(children: [
-                              const WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,
-                                  child: Icon(Icons.archive_outlined,
-                                      size: 14, color: AppColors.ink)),
-                              TextSpan(text: ' ${S.of(context).Archive}'),
-                            ]),
-                            style: AppTypography.description.copyWith(
-                                color: AppColors.ink.withValues(alpha: 0.65)),
-                          ),
-                          const SizedBox(height: AppSpacings.s),
-                        ],
-                        Text(
-                          note.date,
-                          style: AppTypography.description.copyWith(
-                            color: AppColors.ink.withValues(alpha: 0.55),
-                            fontSize: 12 * AppTypographySettings.instance.scale,
-                          ),
-                        ),
-                        if (currentReminder != null) ...[
-                          const SizedBox(height: AppSpacings.m),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.alarm_rounded,
-                                size: 14,
-                                color: AppColors.ink.withValues(alpha: 0.62),
-                              ),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  currentReminder.timeString,
-                                  style: AppTypography.description.copyWith(
-                                    color:
-                                        AppColors.ink.withValues(alpha: 0.62),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (note.hasTodo) ...[
+                        if (todos.isNotEmpty) ...[
                           const SizedBox(height: AppSpacings.l),
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(bottom: AppSpacings.s),
+                            child: Text(
+                              strings.Checklist_Progress(
+                                  todos.where((todo) => todo.completed).length,
+                                  todos.length),
+                              key: const ValueKey('card-checklist-progress'),
+                              style: AppTypography.description.copyWith(
+                                color: AppColors.ink.withValues(alpha: .65),
+                                fontSize:
+                                    12 * AppTypographySettings.instance.scale,
+                              ),
+                            ),
+                          ),
                           for (final todo in _visibleTodos(note))
                             Padding(
                               padding:
@@ -316,7 +344,7 @@ class NoteCardState extends State<NoteCard> {
                                 searchQuery: widget.searchQuery,
                                 completed: todo.completed,
                                 dense: true,
-                                maxLines: 1,
+                                maxLines: 2,
                               ),
                             ),
                         ],
@@ -329,7 +357,53 @@ class NoteCardState extends State<NoteCard> {
                                 ? widget.photoSearchImagePath!
                                 : note.imagePaths.first,
                             extraCount: note.imagePaths.length - 1,
+                            semanticLabel: imageLabel,
+                            documentPages: scanPaths,
+                            builder: widget.thumbnailBuilder,
                           ),
+                        ],
+                        if (date != null ||
+                            note.isArchived ||
+                            currentReminder != null) ...[
+                          const SizedBox(height: AppSpacings.l),
+                          if (date != null)
+                            Text(
+                              date,
+                              key: const ValueKey('card-date'),
+                              style: AppTypography.description.copyWith(
+                                color: AppColors.ink.withValues(alpha: .6),
+                                fontSize:
+                                    12 * AppTypographySettings.instance.scale,
+                              ),
+                            ),
+                          if (note.isArchived)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: AppSpacings.s),
+                              child: Text(strings.Archive,
+                                  style: AppTypography.description.copyWith(
+                                      color: AppColors.ink
+                                          .withValues(alpha: .65))),
+                            ),
+                          if (currentReminder != null)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: AppSpacings.s),
+                              child: Row(children: [
+                                Icon(Icons.alarm_rounded,
+                                    size: 14,
+                                    color:
+                                        AppColors.ink.withValues(alpha: .65)),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(currentReminder.timeString,
+                                      style: AppTypography.description.copyWith(
+                                        color: AppColors.ink
+                                            .withValues(alpha: .65),
+                                      )),
+                                ),
+                              ]),
+                            ),
                         ],
                         if (note.hasVoiceMemos) ...[
                           const SizedBox(height: AppSpacings.m),
@@ -346,6 +420,22 @@ class NoteCardState extends State<NoteCard> {
                                             .withValues(alpha: 0.7)))),
                           ]),
                         ],
+                        if (scanPaths.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Text(
+                              strings.Card_Scanned_Pages_Count(
+                                  scanPaths.length),
+                              key: const ValueKey('card-scan-count'),
+                              style: AppTypography.description.copyWith(
+                                  color: AppColors.ink.withValues(alpha: .7))),
+                        ],
+                        if (linkedCount > 0) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Text(strings.Card_Linked_Notes_Count(linkedCount),
+                              key: const ValueKey('card-linked-count'),
+                              style: AppTypography.description.copyWith(
+                                  color: AppColors.ink.withValues(alpha: .7))),
+                        ],
                         if (note.tags.isNotEmpty) ...[
                           const SizedBox(height: AppSpacings.m),
                           Semantics(
@@ -353,7 +443,7 @@ class NoteCardState extends State<NoteCard> {
                                 '${S.of(context).Tags}: ${note.tags.join(', ')}',
                             excludeSemantics: true,
                             child: SearchHighlight(
-                              '${note.tags.take(2).map((tag) => '#$tag').join('  ')}'
+                              '${displayTags.map((tag) => '#$tag').join('  ')}'
                               '${note.tags.length > 2 ? '  +${note.tags.length - 2}' : ''}',
                               query: widget.searchQuery,
                               style: AppTypography.description.copyWith(
@@ -383,13 +473,25 @@ class NoteCardState extends State<NoteCard> {
                         : widget.selectionMode
                             ? widget.onTap
                             : _shareNoteAsImage,
-                    icon: Icon(
-                      widget.selectionMode
-                          ? widget.selected
-                              ? Icons.check_rounded
-                              : Icons.check_circle_outline_rounded
-                          : Icons.ios_share_rounded,
-                      size: 18,
+                    icon: ExcludeSemantics(
+                      child: AnimatedSwitcher(
+                        duration: reduceMotion || _exportingImage
+                            ? Duration.zero
+                            : const Duration(milliseconds: 160),
+                        child: Icon(
+                          widget.selectionMode
+                              ? widget.selected
+                                  ? Icons.check_rounded
+                                  : Icons.check_circle_outline_rounded
+                              : Icons.ios_share_rounded,
+                          key: ValueKey(widget.selectionMode
+                              ? widget.selected
+                                  ? 'selected'
+                                  : 'unselected'
+                              : 'share'),
+                          size: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -404,64 +506,88 @@ class NoteCardState extends State<NoteCard> {
 
 /// Keep the match near the start so a narrow card's three lines reveal it.
 String _photoSearchExcerpt(String text, String query) {
-  final match = searchPattern(query)?.firstMatch(text);
-  if (match == null || match.start == 0) return text;
-  return '…${text.substring(match.start)}';
+  return searchExcerpt(text, query, leadingContext: 0);
 }
 
 class _PolaroidThumb extends StatelessWidget {
-  const _PolaroidThumb({required this.path, required this.extraCount});
+  const _PolaroidThumb({
+    required this.path,
+    required this.extraCount,
+    required this.semanticLabel,
+    required this.documentPages,
+    this.builder,
+  });
 
   final String path;
   final int extraCount;
+  final String semanticLabel;
+  final Set<String> documentPages;
+  final Widget Function(BuildContext context, String path)? builder;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      image: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.82),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 3,
-              offset: const Offset(0.5, 1),
+  Widget build(BuildContext context) =>
+      LayoutBuilder(builder: (context, constraints) {
+        final width = math.min(64.0, math.max(0.0, constraints.maxWidth - 8));
+        final isDocument = documentPages.contains(path);
+        final height = width * (isDocument ? 1.3 : 52 / 64);
+        return Semantics(
+          container: true,
+          image: true,
+          label: semanticLabel,
+          excludeSemantics: true,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.82),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 3,
+                  offset: const Offset(0.5, 1),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
-          child: Stack(
-            children: [
-              NoteImage(path: path, width: 64, height: 52),
-              if (extraCount > 0)
-                Positioned(
-                  right: 2,
-                  bottom: 2,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.ink.withValues(alpha: 0.62),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 1),
-                      child: Text(
-                        '+$extraCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child: builder?.call(context, path) ??
+                        NoteImage(
+                          path: path,
+                          width: width,
+                          height: height,
+                          fit: isDocument ? BoxFit.contain : BoxFit.cover,
+                        ),
+                  ),
+                  if (extraCount > 0)
+                    Positioned(
+                      right: 2,
+                      bottom: 2,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.ink.withValues(alpha: 0.62),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          child: Text(
+                            '+$extraCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
-  }
+        );
+      });
 }

@@ -23,39 +23,43 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(notes, folders, photos) =>
       "${notes} 則筆記 · ${folders} 個資料夾 · ${photos} 張照片";
 
-  static String m1(count) => "已完成（${count}）";
+  static String m1(count) => "${count} 篇關聯筆記";
 
-  static String m2(completed, total) => "已完成 ${completed} / ${total} 項";
+  static String m2(count) => "${count} 頁掃描文件";
 
-  static String m3(heading) => "收起${heading}";
+  static String m3(count) => "已完成（${count}）";
 
-  static String m4(heading) => "展開${heading}";
+  static String m4(completed, total) => "已完成 ${completed} / ${total} 項";
 
-  static String m5(count) => "已取代 ${count} 處";
+  static String m5(heading) => "收起${heading}";
 
-  static String m6(count) => "${count} 則備忘錄";
+  static String m6(heading) => "展開${heading}";
 
-  static String m7(count) => "${count} 張照片";
+  static String m7(count) => "已取代 ${count} 處";
 
-  static String m8(count) => "${count} 段錄音";
+  static String m8(count) => "${count} 則備忘錄";
 
-  static String m9(date) => "儲存於 ${date}";
+  static String m9(count) => "${count} 張照片";
 
-  static String m10(number) => "筆記顏色 ${number}";
+  static String m10(count) => "${count} 段錄音";
 
-  static String m11(minutes) => "${minutes} 分鐘";
+  static String m11(date) => "儲存於 ${date}";
 
-  static String m12(number) => "照片 ${number}";
+  static String m12(number) => "筆記顏色 ${number}";
 
-  static String m13(time) => "下次提醒：${time}";
+  static String m13(minutes) => "${minutes} 分鐘";
 
-  static String m14(date) => "提醒我：${date}";
+  static String m14(number) => "照片 ${number}";
 
-  static String m15(price) => "支付 ${price} 永久移除廣告。";
+  static String m15(time) => "下次提醒：${time}";
 
-  static String m16(count) => "已加入 ${count} 項清單";
+  static String m16(date) => "提醒我：${date}";
 
-  static String m17(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m17(price) => "支付 ${price} 永久移除廣告。";
+
+  static String m18(count) => "已加入 ${count} 項清單";
+
+  static String m19(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -111,22 +115,24 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Title": MessageLookupByLibrary.simpleMessage("備份與還原"),
     "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
+    "Card_Linked_Notes_Count": m1,
+    "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("全部完成"),
-    "Checklist_Completed": m1,
+    "Checklist_Completed": m3,
     "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage("項目已完成"),
     "Checklist_Item_Reopened": MessageLookupByLibrary.simpleMessage("項目已重新開啟"),
     "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
       "此清單項目已無法使用。",
     ),
-    "Checklist_Progress": m2,
+    "Checklist_Progress": m4,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("重設清單"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage("清單已重設"),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage("從相冊選擇"),
     "Choose_Linked_Notes": MessageLookupByLibrary.simpleMessage("選擇連結筆記"),
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音樂盒"),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("清除篩選"),
-    "Collapse_Section": m3,
+    "Collapse_Section": m5,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "選擇筆記，加入所選文字。",
     ),
@@ -209,7 +215,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Edit": MessageLookupByLibrary.simpleMessage("編輯"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("編輯標籤"),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
-    "Expand_Section": m4,
+    "Expand_Section": m6,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("飛速掃描"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage("更新備忘錄失敗, 請重試"),
@@ -257,12 +263,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "取代後標題或清單項目會太長。",
     ),
     "Find_Replace_With": MessageLookupByLibrary.simpleMessage("取代為"),
-    "Find_Replaced": m5,
+    "Find_Replaced": m7,
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已建立資料夾"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已刪除資料夾"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("請輸入資料夾名稱。"),
-    "Folder_Notes_Count": m6,
+    "Folder_Notes_Count": m8,
     "Folders": MessageLookupByLibrary.simpleMessage("資料夾"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage("留一點空間，記錄下一個好想法。"),
     "Font_Size": MessageLookupByLibrary.simpleMessage("字體大小"),
@@ -278,9 +284,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Format_Text": MessageLookupByLibrary.simpleMessage("文字樣式"),
     "History_Current": MessageLookupByLibrary.simpleMessage("已與此版本相同"),
     "History_Empty": MessageLookupByLibrary.simpleMessage("儲存的修改會顯示在這裡。"),
-    "History_Photos": m7,
+    "History_Photos": m9,
     "History_Preview": MessageLookupByLibrary.simpleMessage("版本預覽"),
-    "History_Recordings": m8,
+    "History_Recordings": m10,
     "History_Restore": MessageLookupByLibrary.simpleMessage("還原此版本"),
     "History_Restore_Failed": MessageLookupByLibrary.simpleMessage(
       "無法還原此版本，請重試。",
@@ -290,7 +296,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Unavailable": MessageLookupByLibrary.simpleMessage(
       "此備忘錄或版本已無法使用。",
     ),
-    "History_Version": m9,
+    "History_Version": m11,
     "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("將照片放在這裡"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("咕嚕濾鏡"),
     "Image_Move": MessageLookupByLibrary.simpleMessage("移動照片"),
@@ -335,7 +341,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加備忘錄"),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("筆記已封存"),
-    "Note_Color": m10,
+    "Note_Color": m12,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("已刪除備忘錄"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "已成功複製備忘錄",
@@ -350,7 +356,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "不到 1 分鐘",
     ),
-    "Note_Info_Reading_Minutes": m11,
+    "Note_Info_Reading_Minutes": m13,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage("預計閱讀時間"),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("字數"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("已移動備忘錄"),
@@ -436,7 +442,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "未找到文字。請嘗試文字更大、更清晰的照片。",
     ),
-    "Photo_Text_Photo": m12,
+    "Photo_Text_Photo": m14,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage("照片中的文字"),
     "Photo_Text_Review_Hint": MessageLookupByLibrary.simpleMessage(
       "加入備忘錄前，請檢查並編輯文字。",
@@ -473,7 +479,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "請選擇將來的時間來設定提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小時後"),
-    "Reminder_Next_Time": m13,
+    "Reminder_Next_Time": m15,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一星期後"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重複"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
@@ -486,7 +492,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "10 分鐘後提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
-    "Reminder_Suggestion": m14,
+    "Reminder_Suggestion": m16,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "使用建議時間",
     ),
@@ -516,7 +522,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m15,
+    "Remove_Ads_Price": m17,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重新命名檢視"),
@@ -539,7 +545,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m16,
+    "Selection_Checklist_Added": m18,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
@@ -614,7 +620,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m17,
+    "Template_Details": m19,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

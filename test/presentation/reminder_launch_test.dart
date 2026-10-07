@@ -215,6 +215,20 @@ void main() {
       NoteDetailRoute.name,
     ]);
     expect(find.text('Detail first'), findsOneWidget);
+    // Repeated cross-note taps must replace just the reminder reader. Finding
+    // the older detail beneath a draft would bypass the editor's save gate.
+    for (final id in ['second', 'first', 'second']) {
+      launch.handleNotificationResponse(_tap(payload: id));
+      await tester.pumpAndSettle();
+      expect(_stack(router), [
+        HomeRoute.name,
+        NoteDetailRoute.name,
+        AddUpdateNoteRoute.name,
+        NoteDetailRoute.name,
+      ]);
+      expect(find.text('Detail $id'), findsOneWidget);
+      expect(activeEditor.mounted, isTrue);
+    }
     await router.maybePop();
     await tester.pumpAndSettle();
     expect(_stack(router),

@@ -23,41 +23,49 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(notes, folders, photos) =>
       "${notes} notes · ${folders} folders · ${photos} photos";
 
-  static String m1(count) => "Completed (${count})";
+  static String m1(count) =>
+      "${Intl.plural(count, one: '1 linked note', other: '${count} linked notes')}";
 
-  static String m2(completed, total) => "${completed} of ${total} complete";
+  static String m2(count) =>
+      "${Intl.plural(count, one: '1 scanned page', other: '${count} scanned pages')}";
 
-  static String m3(heading) => "Collapse ${heading}";
+  static String m3(count) => "Completed (${count})";
 
-  static String m4(heading) => "Expand ${heading}";
+  static String m4(completed, total) => "${completed} of ${total} complete";
 
-  static String m5(count) =>
+  static String m5(heading) => "Collapse ${heading}";
+
+  static String m6(heading) => "Expand ${heading}";
+
+  static String m7(count) =>
       "Replaced ${Intl.plural(count, one: '1 match', other: '${count} matches')}";
 
-  static String m6(count) => "${count} notes";
+  static String m8(count) => "${count} notes";
 
-  static String m7(count) => "${count} photos";
+  static String m9(count) =>
+      "${Intl.plural(count, one: '1 photo', other: '${count} photos')}";
 
-  static String m8(count) => "${count} recordings";
+  static String m10(count) =>
+      "${Intl.plural(count, one: '1 recording', other: '${count} recordings')}";
 
-  static String m9(date) => "Saved ${date}";
+  static String m11(date) => "Saved ${date}";
 
-  static String m10(number) => "Note color ${number}";
+  static String m12(number) => "Note color ${number}";
 
-  static String m11(minutes) => "${minutes} min";
+  static String m13(minutes) => "${minutes} min";
 
-  static String m12(number) => "Photo ${number}";
+  static String m14(number) => "Photo ${number}";
 
-  static String m13(time) => "Next reminder: ${time}";
+  static String m15(time) => "Next reminder: ${time}";
 
-  static String m14(date) => "Remind me: ${date}";
+  static String m16(date) => "Remind me: ${date}";
 
-  static String m15(price) => "Remove ads permanently for ${price}.";
+  static String m17(price) => "Remove ads permanently for ${price}.";
 
-  static String m16(count) =>
+  static String m18(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m17(items, photos) =>
+  static String m19(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -128,9 +136,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Title": MessageLookupByLibrary.simpleMessage("Backup & Restore"),
     "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "Card_Linked_Notes_Count": m1,
+    "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("All done"),
-    "Checklist_Completed": m1,
+    "Checklist_Completed": m3,
     "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage(
       "Item completed",
     ),
@@ -140,7 +150,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This checklist item is no longer available.",
     ),
-    "Checklist_Progress": m2,
+    "Checklist_Progress": m4,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("Reset checklist"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage(
       "Checklist reset",
@@ -155,7 +165,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Classical Music Box",
     ),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("Clear filters"),
-    "Collapse_Section": m3,
+    "Collapse_Section": m5,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "Choose a note to add the selected text.",
     ),
@@ -250,7 +260,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("Edit tags"),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
-    "Expand_Section": m4,
+    "Expand_Section": m6,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage(
@@ -312,14 +322,14 @@ class MessageLookup extends MessageLookupByLibrary {
       "That replacement would make a title or checklist item too long.",
     ),
     "Find_Replace_With": MessageLookupByLibrary.simpleMessage("Replace with"),
-    "Find_Replaced": m5,
+    "Find_Replaced": m7,
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m6,
+    "Folder_Notes_Count": m8,
     "Folders": MessageLookupByLibrary.simpleMessage("Folders"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage(
       "A little space for your next big idea.",
@@ -343,9 +353,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Empty": MessageLookupByLibrary.simpleMessage(
       "Saved changes will appear here.",
     ),
-    "History_Photos": m7,
+    "History_Photos": m9,
     "History_Preview": MessageLookupByLibrary.simpleMessage("Version preview"),
-    "History_Recordings": m8,
+    "History_Recordings": m10,
     "History_Restore": MessageLookupByLibrary.simpleMessage(
       "Restore this version",
     ),
@@ -359,7 +369,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This note or version is no longer available.",
     ),
-    "History_Version": m9,
+    "History_Version": m11,
     "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("Drop photo here"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
     "Image_Move": MessageLookupByLibrary.simpleMessage("Move photo"),
@@ -418,7 +428,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Added Successfully",
     ),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("Note archived"),
-    "Note_Color": m10,
+    "Note_Color": m12,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -433,7 +443,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "Less than 1 min",
     ),
-    "Note_Info_Reading_Minutes": m11,
+    "Note_Info_Reading_Minutes": m13,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage(
       "Estimated reading time",
     ),
@@ -553,7 +563,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m12,
+    "Photo_Text_Photo": m14,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -608,7 +618,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m13,
+    "Reminder_Next_Time": m15,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -625,7 +635,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m14,
+    "Reminder_Suggestion": m16,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -663,7 +673,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m15,
+    "Remove_Ads_Price": m17,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -702,7 +712,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m16,
+    "Selection_Checklist_Added": m18,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -791,7 +801,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m17,
+    "Template_Details": m19,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

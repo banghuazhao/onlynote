@@ -313,8 +313,8 @@
   "History_Unavailable": "This note or version is no longer available.",
   "History_Current": "Already matches this version",
   "History_Preview": "Version preview",
-  "History_Photos": "{count} photos",
-  "History_Recordings": "{count} recordings",
+  "History_Photos": "{count, plural, one{1 photo} other{{count} photos}}",
+  "History_Recordings": "{count, plural, one{1 recording} other{{count} recordings}}",
   "Voice_Memo": "Voice memo",
   "Voice_Record": "Record",
   "Voice_Stop": "Stop recording",
@@ -515,5 +515,9 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Card_Linked_Notes_Count": "{count, plural, one{1 linked note} other{{count} linked notes}}",
+  "@Card_Linked_Notes_Count": {"placeholders": {"count": {"type": "int"}}},
+  "Card_Scanned_Pages_Count": "{count, plural, one{1 scanned page} other{{count} scanned pages}}",
+  "@Card_Scanned_Pages_Count": {"placeholders": {"count": {"type": "int"}}}
 }

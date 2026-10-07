@@ -164,8 +164,14 @@ class NotePhotoRecovery {
         await complete(active.token);
         return;
       }
-      final latest = await _latestNote(active);
-      if (latest == null || latest.isDeleted) {
+      // A new editor may have autosaved since the camera was opened. Once its
+      // owner exists, later deletion must not turn it back into a new note.
+      if (!active.existed &&
+          notes.getAllNotes().any((note) => note.id == active.note.id)) {
+        active = active.copyWith(existed: true);
+      }
+      final beforeCopy = await _latestNote(active);
+      if (beforeCopy == null || beforeCopy.isDeleted) {
         // Never resurrect a trashed or permanently removed existing note.
         await complete(active.token);
         return;
@@ -183,6 +189,13 @@ class NotePhotoRecovery {
         );
         await _write(active, key: key);
       }
+      // A copy can outlive changes in another route. Resolve the content and
+      // deletion state again after file I/O before creating the recovery draft.
+      final latest = await _latestNote(active);
+      if (latest == null || latest.isDeleted) {
+        await complete(active.token);
+        return;
+      }
       final merged = latest.copyWith(
         imagePaths: {...latest.imagePaths, ...active.saved}.toList(),
         dateTime: DateTime.now(),
@@ -191,7 +204,15 @@ class NotePhotoRecovery {
       // recoverable by the app's existing autosave recovery path.
       await drafts.put(merged.id!, NoteDto.fromNote(merged));
       await drafts.flush();
-      await notes.addUpdateNote(NoteDto.fromNote(merged));
+      // Writing the journal is another suspension point. A removed note must
+      // stay removed, including when its draft just reached the disk.
+      final beforeSave = await _latestNote(active);
+      if (beforeSave == null || beforeSave.isDeleted) {
+        await drafts.delete(merged.id!);
+        await complete(active.token);
+        return;
+      }
+      await notes.addUpdateNote(NoteDto.fromNote(beforeSave));
       await drafts.delete(merged.id!);
       await complete(active.token);
     } catch (error) {
@@ -213,12 +234,17 @@ class NotePhotoRecovery {
     final content = draft is NoteDto && draft.id == record.note.id
         ? draft
         : stored ?? record.note;
+    final note = content.toDomain();
+    // Recovery owns pending writing content. Library visibility, placement,
+    // and daily identity belong to the latest persisted note.
     return (stored == null
-            ? content
-            : content.copyWith(
-                dailyNoteDateKey: stored.dailyNoteDateKey,
-                clearDailyNoteDateKey: stored.dailyNoteDateKey == null))
-        .toDomain();
+        ? note
+        : note.copyWith(
+            isArchived: stored.isArchived,
+            isPinned: stored.isPinned ?? false,
+            folderId: stored.folderId,
+            dailyNoteDateKey: stored.dailyNoteDateKey,
+            sortOrder: stored.sortOrder));
   }
 
   static bool _validSource(String path) =>
@@ -295,13 +321,14 @@ class _PhotoRecord {
       };
 
   _PhotoRecord copyWith(
-          {List<String>? sources,
+          {bool? existed,
+          List<String>? sources,
           List<String>? saved,
           List<String>? copiedSources}) =>
       _PhotoRecord(
         token: token,
         note: note,
-        existed: existed,
+        existed: existed ?? this.existed,
         sources: sources ?? this.sources,
         saved: saved ?? this.saved,
         copiedSources: copiedSources ?? this.copiedSources,

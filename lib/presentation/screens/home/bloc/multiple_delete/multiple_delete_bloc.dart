@@ -14,6 +14,7 @@ class MultipleDeleteBloc
   MultipleDeleteBloc(this._usecase)
       : super(const MultipleDeleteState.initial()) {
     on<_ToggleSelect>((event, emit) {
+      if (state is _Deleting) return;
       if (state is _Selected) {
         final state = this.state as _Selected;
         final selectedIds = List<String>.from(state.selectedIds);
@@ -21,7 +22,10 @@ class MultipleDeleteBloc
         if (selectedIds.contains(event.id)) {
           selectedIds.remove(event.id);
           if (selectedIds.isEmpty) {
-            add(const _ClearAll());
+            // Finish this toggle now. A queued clear could erase the next
+            // selection when two cards are tapped in quick succession.
+            emit(const MultipleDeleteState.initial());
+            return;
           }
         } else {
           selectedIds.add(event.id);
@@ -32,7 +36,10 @@ class MultipleDeleteBloc
       }
     });
 
-    on<_ClearAll>((event, emit) => emit(const MultipleDeleteState.initial()));
+    on<_ClearAll>((event, emit) {
+      if (state is _Deleting) return;
+      emit(const MultipleDeleteState.initial());
+    });
 
     on<_Delete>((event, emit) async {
       if (state is _Selected) {
