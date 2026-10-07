@@ -183,6 +183,11 @@ class _WritingPreviewState extends State<_WritingPreview> {
                         decoration: const InputDecoration(
                           filled: false,
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -202,6 +207,11 @@ class _WritingPreviewState extends State<_WritingPreview> {
                           decoration: const InputDecoration(
                             filled: false,
                             border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
                             contentPadding: EdgeInsets.zero,
                           ),
                         ),

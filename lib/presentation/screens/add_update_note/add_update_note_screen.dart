@@ -2104,7 +2104,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   Future<void> _finish() async {
-    if (_leaving ||
+    final route = ModalRoute.of(context);
+    if (route?.isCurrent != true ||
+        _allowPop ||
+        _leaving ||
         _retryingSave ||
         _replayingHistory ||
         _addingPhoto ||
@@ -2121,7 +2124,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       await _scanDocument(retry: true);
       if (!mounted || _documentScanCapture.canRetry) return;
     }
-    _leaving = true;
+    setState(() => _leaving = true);
     await _voiceWrites;
     // Allow queued form events to apply before flushing the final snapshot.
     await Future<void>.delayed(Duration.zero);
@@ -2130,8 +2133,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     await _rememberWritingPosition();
     final saved = await _autosave.flush();
     if (!mounted) return;
-    _leaving = false;
     if (!saved) {
+      setState(() => _leaving = false);
       showTransientSnackBar(
           context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
       return;
@@ -2151,7 +2154,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     if (!mounted) return;
     setState(() => _allowPop = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.router.maybePop();
+      // The state stays mounted during the exit animation. A later callback
+      // must never pop the route underneath an editor that already closed.
+      if (mounted && route?.isCurrent == true) context.router.maybePop();
     });
   }
 
@@ -2234,7 +2239,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             value: _form,
             child: PopScope(
               canPop: _allowPop ||
-                  (!_autosave.dirty &&
+                  (!_leaving &&
+                      !_autosave.dirty &&
                       _captureTimer?.isActive != true &&
                       !_replayingHistory &&
                       !_photoCapture.canRetry &&
@@ -2254,7 +2260,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               },
               child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
                 builder: (context, state) => AbsorbPointer(
-                  absorbing: _replayingHistory,
+                  absorbing: _replayingHistory || _leaving,
                   child: _BuildForm(
                     widget: widget,
                     state: state,

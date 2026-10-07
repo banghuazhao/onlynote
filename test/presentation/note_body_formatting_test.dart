@@ -139,6 +139,69 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
 
+  for (final dark in [false, true]) {
+    testWidgets(
+        'photo text segments keep the first cursor clear in ${dark ? 'dark' : 'light'} theme',
+        (tester) async {
+      final body = SimpleFormattingController(text: 'After');
+      final formatting = NoteBodyFormattingController();
+      addTearDown(body.dispose);
+      addTearDown(formatting.dispose);
+      await _pump(
+        tester,
+        _Host(body: body, formatting: formatting, layouts: const [
+          NoteImageLayout(path: 'a', textOffset: 0),
+        ]),
+        dark: dark,
+      );
+
+      for (final key in ['before:a', 'end']) {
+        final segment = _segment(key);
+        expect(
+            Theme.of(tester.element(segment))
+                .inputDecorationTheme
+                .focusedBorder,
+            isA<OutlineInputBorder>());
+        await _tap(tester, segment);
+        final field = tester.widget<TextField>(segment);
+        const selection = TextSelection.collapsed(offset: 0);
+        field.controller!.selection = selection;
+        await tester.pumpAndSettle();
+
+        // Inspect the themed decoration used for rendering, not the field input.
+        final decorator = tester.widget<InputDecorator>(find.descendant(
+            of: segment, matching: find.byType(InputDecorator)));
+        expect(decorator.isFocused, isTrue);
+        final decoration = decorator.decoration;
+        for (final border in [
+          decoration.border,
+          decoration.enabledBorder,
+          decoration.focusedBorder,
+          decoration.disabledBorder,
+          decoration.errorBorder,
+          decoration.focusedErrorBorder,
+        ]) {
+          expect(border, InputBorder.none);
+        }
+
+        final editable = tester.state<EditableTextState>(
+            find.descendant(of: segment, matching: find.byType(EditableText)));
+        final render = editable.renderEditable;
+        final cursor = render
+            .getLocalRectForCaret(const TextPosition(offset: 0))
+            .shift(render.localToGlobal(Offset.zero));
+        final frame = tester.getRect(segment).inflate(1);
+        expect(frame.contains(cursor.topLeft), isTrue);
+        expect(frame.contains(cursor.bottomRight), isTrue);
+        expect(field.focusNode!.hasFocus, isTrue);
+        expect(field.controller!.selection, selection);
+        expect(formatting.activeFocusNode, same(field.focusNode));
+        expect(tester.testTextInput.isVisible, isTrue);
+        expect(tester.takeException(), isNull);
+      }
+    });
+  }
+
   testWidgets('external toolbar tracks plain body focus and retains selection',
       (tester) async {
     final body = SimpleFormattingController(text: 'Pack snacks');

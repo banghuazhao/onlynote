@@ -45,6 +45,11 @@ class _BuildTitleField extends StatelessWidget {
           decoration: const InputDecoration(
             filled: false,
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            focusedErrorBorder: InputBorder.none,
             contentPadding: EdgeInsets.zero,
             counterText: '',
           ),

@@ -64,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _savedViews = SavedNoteViewStore.instance;
   bool _viewsUnavailable = false;
   bool _openingDailyNote = false;
+  bool _openingTemplate = false;
   bool _presentingDailyCalendar = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
@@ -440,27 +441,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openTemplates({String? folderId}) async {
-    final selection = await showNoteTemplatePickerSheet(context);
-    if (!mounted || selection == null) return;
-    if (selection.builtIn != null) {
-      context.router.push(
-        AddUpdateNoteRoute(folderId: folderId, template: selection.builtIn),
-      );
-      return;
-    }
+    if (_openingTemplate) return;
+    _openingTemplate = true;
     try {
+      final selection = await showNoteTemplatePickerSheet(context);
+      if (!mounted || selection == null) return;
+      if (selection.builtIn != null) {
+        await context.router.push(
+          AddUpdateNoteRoute(folderId: folderId, template: selection.builtIn),
+        );
+        return;
+      }
       final note = await CustomNoteTemplateStore.instance
           .createNote(selection.custom!.id, folderId: folderId);
       if (!mounted) {
         await ImageStorage.deleteImages(note.imagePaths);
         return;
       }
-      context.router.push(AddUpdateNoteRoute(customTemplateNote: note));
+      await context.router.push(AddUpdateNoteRoute(customTemplateNote: note));
     } catch (_) {
       if (mounted) {
         showTransientSnackBar(context,
             SnackBar(content: Text(S.of(context).Template_Copy_Failed)));
       }
+    } finally {
+      _openingTemplate = false;
     }
   }
 

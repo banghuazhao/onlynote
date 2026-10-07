@@ -30,6 +30,7 @@ Future<void> _openPicker(
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),
   double textScale = 1,
+  bool disableAnimations = true,
 }) async {
   final templates = store ??
       CustomNoteTemplateStore(
@@ -52,7 +53,7 @@ Future<void> _openPicker(
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: TextScaler.linear(textScale),
-        disableAnimations: true,
+        disableAnimations: disableAnimations,
       ),
       child: child!,
     ),
@@ -75,6 +76,37 @@ Future<void> _openPicker(
 
 void main() {
   setUpAll(() => initializeDateFormatting());
+  testWidgets('selection returns only after the picker overlay is removed',
+      (tester) async {
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, disableAnimations: false);
+    await tester.tap(find.byKey(const ValueKey('template-packing')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 30));
+    expect(results, isEmpty);
+    expect(find.byType(NoteTemplatePickerSheet), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(results.single!.builtIn, NoteTemplate.packing);
+    expect(find.byType(NoteTemplatePickerSheet), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('repeated template selections cannot pop the underlying page',
+      (tester) async {
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, disableAnimations: false);
+    final select = tester
+        .widget<ListTile>(find.byKey(const ValueKey('template-packing')))
+        .onTap!;
+    select();
+    select();
+    await tester.pumpAndSettle();
+    expect(results, hasLength(1));
+    expect(results.single!.builtIn, NoteTemplate.packing);
+    expect(find.text('Open templates'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('picker previews each template and returns the chosen type',
       (tester) async {
     final results = <NoteTemplateSelection?>[];

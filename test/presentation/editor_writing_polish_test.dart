@@ -53,7 +53,8 @@ void main() {
       {Note? note,
       Size size = const Size(390, 844),
       double textScale = 1,
-      bool chinese = false}) async {
+      bool chinese = false,
+      bool dark = false}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -67,7 +68,7 @@ void main() {
       await bloc.close();
     });
     await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
+      theme: dark ? AppTheme.dark : AppTheme.light,
       locale: chinese ? const Locale('zh', 'HK') : const Locale('en'),
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [
@@ -89,6 +90,41 @@ void main() {
     ));
     await tester.pumpAndSettle();
     return store;
+  }
+
+  for (final dark in [false, true]) {
+    testWidgets('empty note cursor has no inherited text frame, dark=$dark',
+        (tester) async {
+      await open(tester, dark: dark, textScale: 2);
+      for (final target in [
+        find.byKey(const ValueKey('note-title-input')),
+        _body(),
+      ]) {
+        final field = tester.widget<TextField>(target);
+        field.controller!.selection = const TextSelection.collapsed(offset: 0);
+        field.focusNode!.requestFocus();
+        await tester.pumpAndSettle();
+        final decorator = tester.widget<InputDecorator>(
+            find.descendant(of: target, matching: find.byType(InputDecorator)));
+        expect(decorator.isFocused, isTrue);
+        // Inspect the effective decoration after the app's theme defaults
+        // have been applied, including the border used while focused.
+        for (final border in [
+          decorator.decoration.border,
+          decorator.decoration.enabledBorder,
+          decorator.decoration.focusedBorder,
+          decorator.decoration.disabledBorder,
+          decorator.decoration.errorBorder,
+          decorator.decoration.focusedErrorBorder,
+        ]) {
+          expect(border, InputBorder.none);
+        }
+        expect(field.controller!.selection,
+            const TextSelection.collapsed(offset: 0));
+        expect(tester.testTextInput.isVisible, isTrue);
+      }
+      expect(tester.takeException(), isNull);
+    });
   }
 
   testWidgets(

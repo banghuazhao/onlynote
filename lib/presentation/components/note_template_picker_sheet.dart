@@ -10,11 +10,20 @@ import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_templates.dart';
 
 Future<NoteTemplateSelection?> showNoteTemplatePickerSheet(BuildContext context,
-        {CustomNoteTemplateStore? store}) =>
-    showAppSheet<NoteTemplateSelection>(
-      context: context,
-      builder: (_) => NoteTemplatePickerSheet(store: store),
-    );
+    {CustomNoteTemplateStore? store}) async {
+  ModalRoute<NoteTemplateSelection>? pickerRoute;
+  final selection = await showAppSheet<NoteTemplateSelection>(
+    context: context,
+    builder: (sheetContext) {
+      pickerRoute ??= ModalRoute.of<NoteTemplateSelection>(sheetContext);
+      return NoteTemplatePickerSheet(store: store);
+    },
+  );
+  // A pop result arrives before the reverse animation removes the overlay.
+  // Finish removing the picker before its caller pushes the note editor.
+  await pickerRoute?.completed;
+  return selection;
+}
 
 class NoteTemplatePickerSheet extends StatefulWidget {
   const NoteTemplatePickerSheet({super.key, this.store});
@@ -30,7 +39,14 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   bool _loading = true;
   bool _loadFailed = false;
   bool _busy = false;
+  bool _closing = false;
   bool _changeFailed = false;
+
+  void _select(NoteTemplateSelection selection) {
+    if (_busy || _closing || ModalRoute.of(context)?.isCurrent != true) return;
+    setState(() => _closing = true);
+    Navigator.pop(context, selection);
+  }
 
   @override
   void initState() {
@@ -183,13 +199,13 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   trailing: IconButton(
                     key: ValueKey('manage-template-${template.id}'),
                     tooltip: strings.Template_Manage,
-                    onPressed: _busy ? null : () => _manage(template),
+                    onPressed:
+                        _busy || _closing ? null : () => _manage(template),
                     icon: const Icon(Icons.more_horiz_rounded),
                   ),
-                  onTap: _busy
+                  onTap: _busy || _closing
                       ? null
-                      : () => Navigator.pop(
-                          context, NoteTemplateSelection.custom(template)),
+                      : () => _select(NoteTemplateSelection.custom(template)),
                 ),
               ),
           ],
@@ -219,8 +235,9 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                 title: Text(template.content(strings).title),
                 subtitle: Text(template.content(strings).summary),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.pop(
-                    context, NoteTemplateSelection.builtIn(template)),
+                onTap: _busy || _closing
+                    ? null
+                    : () => _select(NoteTemplateSelection.builtIn(template)),
               ),
             ),
         ],
