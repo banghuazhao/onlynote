@@ -8,6 +8,7 @@ import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,8 +43,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this._deleteFolderUsecase,
     this._moveNoteToFolderUsecase,
     this._getNoteUsecase,
-    this._updateNoteUsecase,
-  ) : super(const HomeState.initial()) {
+    this._updateNoteUsecase, {
+    @ignoreParam PremiumAccess? premiumAccess,
+  })  : premiumAccess = premiumAccess ?? PremiumAccess.instance,
+        super(const HomeState.initial()) {
     // Refreshes and mutations share one queue. A second checklist tap reads
     // the first saved result; pin/folder changes cannot race that write.
     on<HomeEvent>(_handleEvent,
@@ -64,6 +67,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final MoveNoteToFolderUsecase _moveNoteToFolderUsecase;
   final GetNoteUsecase _getNoteUsecase;
   final UpdateNoteUsecase _updateNoteUsecase;
+  final PremiumAccess premiumAccess;
   late final PhotoSearchIndex? _photoSearchIndex;
 
   void _photoSearchUpdated() {
@@ -93,6 +97,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Set<String> _selectedTags = {};
   List<SavedNoteView> _savedViews = [];
   String? _selectedViewId;
+
+  Future<String?> createFolder(String name) {
+    if (isClosed) return Future.value(_i10n.Failed_to_save_folder);
+    final completion = Completer<String?>();
+    add(HomeEvent.createFolder(name, completion: completion));
+    return completion.future;
+  }
 
   Future<HomeArchiveResult> setArchived(String noteId, bool archived) {
     if (isClosed) {
@@ -317,6 +328,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _DuplicateNote event,
     Emitter<HomeState> emit,
   ) async {
+    final current = await _showNotesUsecase();
+    final bundle = current.fold<NotesBundle?>((_) => null, (bundle) => bundle);
+    if (bundle == null) {
+      final context = getIt<AppRouter>().context;
+      if (context.mounted) {
+        context.showToast(_i10n.Failed_to_load_notes_please_try_again,
+            isError: true);
+      }
+      return;
+    }
+    try {
+      premiumAccess.require(PremiumFeature.notes,
+          currentCount:
+              bundle.activeNotes.length + bundle.archivedNotes.length);
+    } on PremiumRequired {
+      final context = getIt<AppRouter>().context;
+      if (context.mounted) {
+        context.showToast(_i10n.Premium_Note_Limit(PremiumAccess.freeNoteLimit),
+            isError: true);
+      }
+      return;
+    }
     List<VoiceMemo> audio;
     try {
       audio = await AudioStorage.instance.copyToNote(event.note.voiceMemos);
@@ -455,20 +488,65 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _CreateFolder event,
     Emitter<HomeState> emit,
   ) async {
+    // Read persisted folders inside the mutation queue. Rapid submissions and
+    // folders imported while Home is open must both count toward new additions.
+    final current = await _showNotesUsecase();
+    final loadError =
+        current.fold<String?>((error) => error.message, (_) => null);
+    if (current.isLeft()) {
+      final message = loadError ?? _i10n.Failed_to_save_folder;
+      if (event.completion != null) {
+        event.completion!.complete(message);
+      } else {
+        final context = getIt<AppRouter>().context;
+        if (context.mounted) {
+          context.showToast(message, isError: true);
+        }
+      }
+      return;
+    }
+    _folders = current.fold((_) => _folders, (bundle) => bundle.folders);
+    try {
+      premiumAccess.require(PremiumFeature.folders,
+          currentCount: _folders.length);
+    } on PremiumRequired catch (error, stack) {
+      if (event.completion != null) {
+        event.completion!.completeError(error, stack);
+      } else {
+        final context = getIt<AppRouter>().context;
+        if (context.mounted) {
+          context.showToast(
+              _i10n.Premium_Folder_Limit(PremiumAccess.freeFolderLimit),
+              isError: true);
+        }
+      }
+      return;
+    }
     final failureOrSuccess = await _createFolderUsecase(event.name);
     failureOrSuccess.fold(
-      (error) => getIt<AppRouter>()
-          .context
-          .showToast('${error.message}', isError: true),
+      (error) {
+        final message = error.message ?? _i10n.Failed_to_save_folder;
+        if (event.completion != null) {
+          event.completion!.complete(message);
+        } else {
+          getIt<AppRouter>().context.showToast(message, isError: true);
+        }
+      },
       (id) {
         _selectedFolderId = id;
         _showTrash = false;
         _showArchive = false;
         _includeArchived = false;
         _selectedViewId = null;
-        getIt<AppRouter>().context.showToast(_i10n.Folder_Created);
+        if (event.completion == null) {
+          getIt<AppRouter>().context.showToast(_i10n.Folder_Created);
+        }
       },
     );
+    if (failureOrSuccess.isRight()) {
+      await _onGetAllNotes(const _GetAllNotes(), emit);
+      event.completion?.complete(null);
+    }
   }
 
   Future<void> _onRenameFolder(
@@ -692,6 +770,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (note == null || note.isDeleted) {
         throw StateError('Note is unavailable');
       }
+      if (event.style != note.cardStyle && !event.style.isDefault) {
+        premiumAccess.require(PremiumFeature.individualCardStyle);
+      }
       final updated = note.copyWith(cardStyle: event.style);
       final saved = await _updateNoteUsecase(updated);
       final error =
@@ -701,6 +782,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(_buildLoaded());
       }
       event.completion?.complete(error);
+    } on PremiumRequired catch (error) {
+      event.completion?.completeError(error);
     } catch (_) {
       event.completion?.complete(_i10n.Card_Style_Save_Failed);
     }

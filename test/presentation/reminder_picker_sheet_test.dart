@@ -5,6 +5,11 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
+import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
+import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/presentation/theme/spacing.dart';
+
+import '../support/premium_test_fakes.dart';
 
 Future<void> _openPicker(
   WidgetTester tester,
@@ -14,6 +19,7 @@ Future<void> _openPicker(
   Size size = const Size(390, 844),
   double textScale = 1,
   bool allowDelete = true,
+  PremiumAccess? premiumAccess,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -28,7 +34,7 @@ Future<void> _openPicker(
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    theme: ThemeData(useMaterial3: true),
+    theme: ThemeData(useMaterial3: true, extensions: const [AppTokens()]),
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
         alwaysUse24HourFormat: true,
@@ -44,7 +50,9 @@ Future<void> _openPicker(
               results.add(await showAppSheet<ReminderPickerResult>(
                 context: context,
                 builder: (_) => ReminderPickerSheet(
-                    current: current, allowDelete: allowDelete),
+                    current: current,
+                    allowDelete: allowDelete,
+                    premiumAccess: premiumAccess),
               ));
             },
             child: const Text('Open picker'),
@@ -77,6 +85,87 @@ DateTime _nextScheduledTime(ReminderPickerResult result) => Reminder(
     ).nextOccurrence(DateTime.now());
 
 void main() {
+  testWidgets(
+      'free repeating option explains Premium and cancel keeps selection',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final results = <ReminderPickerResult?>[];
+    await _openPicker(tester, results,
+        premiumAccess: fixture.access,
+        size: const Size(320, 640),
+        textScale: 2);
+    expect(find.byIcon(Icons.workspace_premium_outlined), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+    await _tapVisible(tester, find.text('Daily'));
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(results, isEmpty);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(_repeatControl(tester).selected, {ReminderRepeat.none});
+    await _tapVisible(tester, find.text('In 1 hour'));
+    expect(results.single!.repeat, ReminderRepeat.none);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('purchase returns to the requested repeat with its selected time',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final results = <ReminderPickerResult?>[];
+    await _openPicker(tester, results,
+        premiumAccess: fixture.access,
+        current: Reminder(
+            noteId: 'note',
+            reminderId: 42,
+            reminderDate: DateTime(2024, 1, 1, 9, 30)));
+    await _tapVisible(tester, find.text('Daily'));
+    await _tapVisible(tester, find.byKey(const ValueKey('premium-buy')));
+    expect(fixture.access.isPremium, isTrue);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(_repeatControl(tester).selected, {ReminderRepeat.daily});
+    expect(find.text('09:30'), findsOneWidget);
+    await _tapVisible(tester, find.text('Set reminder'));
+    expect(results.single!.repeat, ReminderRepeat.daily);
+    expect(results.single!.date!.hour, 9);
+    expect(fixture.store.buyCalls, 1);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('existing recurrence stays usable and can be turned off for free',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final results = <ReminderPickerResult?>[];
+    final current = Reminder(
+        noteId: 'note',
+        reminderId: 42,
+        reminderDate: DateTime(2024, 1, 1, 9, 30),
+        repeat: ReminderRepeat.daily);
+    await _openPicker(tester, results,
+        premiumAccess: fixture.access, current: current);
+    await _tapVisible(tester, find.text('Set reminder'));
+    expect(results.single!.repeat, ReminderRepeat.daily);
+    await tester.tap(find.text('Open picker'));
+    await tester.pumpAndSettle();
+    await _tapVisible(tester, find.text('Weekly'));
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(_repeatControl(tester).selected, {ReminderRepeat.daily});
+    await _tapVisible(tester, find.text('Never'));
+    await _tapVisible(tester, find.text('In 1 hour'));
+    expect(results.last!.repeat, ReminderRepeat.none);
+    expect(fixture.access.isPremium, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('reschedule picker can omit reminder deletion', (tester) async {
     final results = <ReminderPickerResult?>[];
     await _openPicker(tester, results,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:onlynote/services/premium_access.dart';
 
 enum VoiceMemoPhase { idle, recording, playing, paused, transcribing }
 
@@ -61,8 +62,10 @@ class MethodChannelVoiceMemoPlatform implements VoiceMemoPlatform {
 /// One media session for the app. Native code also stops when interrupted or
 /// backgrounded; events update any composer/player sharing this service.
 class VoiceMemoService {
-  VoiceMemoService({required VoiceMemoPlatform platform})
-      : _platform = platform {
+  VoiceMemoService(
+      {required VoiceMemoPlatform platform, PremiumAccess? premiumAccess})
+      : _platform = platform,
+        _premiumAccess = premiumAccess ?? PremiumAccess.instance {
     _subscription = platform.states.listen((value) {
       if (!_disposed) state.value = VoiceMemoState.decode(value);
     });
@@ -71,6 +74,7 @@ class VoiceMemoService {
   static VoiceMemoService get instance => _instance ??=
       VoiceMemoService(platform: MethodChannelVoiceMemoPlatform());
   final VoiceMemoPlatform _platform;
+  final PremiumAccess _premiumAccess;
   final state = ValueNotifier(const VoiceMemoState());
   late final StreamSubscription<Object?> _subscription;
   Future<void> _operations = Future.value();
@@ -113,6 +117,7 @@ class VoiceMemoService {
   Future<void> startRecording(String absolutePath) {
     validatePath(absolutePath, recording: true);
     return _serialize(() async {
+      _premiumAccess.require(PremiumFeature.voiceMemos);
       if (_transcription != null) throw StateError('Transcription is active');
       _accept(await _platform.invoke(
           'startRecording', {'path': absolutePath, 'maxDurationMs': 300000}));

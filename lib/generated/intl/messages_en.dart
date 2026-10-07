@@ -56,16 +56,27 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m14(number) => "Photo ${number}";
 
-  static String m15(time) => "Next reminder: ${time}";
+  static String m15(limit) =>
+      "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
 
-  static String m16(date) => "Remind me: ${date}";
+  static String m16(limit) =>
+      "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
 
-  static String m17(price) => "Remove ads permanently for ${price}.";
+  static String m17(price) => "Unlock forever for ${price}";
 
-  static String m18(count) =>
+  static String m18(limit) =>
+      "The free plan includes ${limit} saved templates. Upgrade for unlimited templates.";
+
+  static String m19(time) => "Next reminder: ${time}";
+
+  static String m20(date) => "Remind me: ${date}";
+
+  static String m21(price) => "Remove ads permanently for ${price}.";
+
+  static String m22(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m19(items, photos) =>
+  static String m23(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -636,6 +647,45 @@ class MessageLookup extends MessageLookupByLibrary {
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
       "A calmer look without texture, ruled lines, or tilted cards.",
     ),
+    "Premium": MessageLookupByLibrary.simpleMessage("Premium"),
+    "Premium_Active": MessageLookupByLibrary.simpleMessage("Premium unlocked"),
+    "Premium_Card_Style": MessageLookupByLibrary.simpleMessage(
+      "Individual card styles",
+    ),
+    "Premium_Description": MessageLookupByLibrary.simpleMessage(
+      "All Premium features are unlocked, with no ads.",
+    ),
+    "Premium_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "Already removed ads? Your purchase includes Premium. Restore it below.",
+    ),
+    "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
+      "Unlock this feature with Premium.",
+    ),
+    "Premium_Folder_Limit": m15,
+    "Premium_Folders": MessageLookupByLibrary.simpleMessage(
+      "Unlimited folders",
+    ),
+    "Premium_Free_Core": MessageLookupByLibrary.simpleMessage(
+      "Create up to 10 notes, with checklists and basic reminders for free.",
+    ),
+    "Premium_Free_Limits": MessageLookupByLibrary.simpleMessage(
+      "Free includes 3 folders and 3 saved templates.",
+    ),
+    "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("No ads"),
+    "Premium_Note_Limit": m16,
+    "Premium_Notes": MessageLookupByLibrary.simpleMessage("Unlimited notes"),
+    "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
+      "One-time purchase. No subscription.",
+    ),
+    "Premium_One_Time_Price": m17,
+    "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage(
+      "Repeating reminders",
+    ),
+    "Premium_Template_Limit": m18,
+    "Premium_Templates": MessageLookupByLibrary.simpleMessage(
+      "Unlimited saved templates",
+    ),
+    "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("Voice memos"),
     "Privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
@@ -660,7 +710,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Your purchase is pending approval.",
     ),
     "Purchase_Success": MessageLookupByLibrary.simpleMessage(
-      "Ads have been removed.",
+      "Premium is unlocked.",
     ),
     "Purchase_Unavailable": MessageLookupByLibrary.simpleMessage(
       "Remove Ads is currently unavailable.",
@@ -676,7 +726,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m15,
+    "Reminder_Next_Time": m19,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -693,7 +743,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m16,
+    "Reminder_Suggestion": m20,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -731,14 +781,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m17,
+    "Remove_Ads_Price": m21,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage(
-      "No previous Remove Ads purchase was found.",
+      "No previous Premium purchase was found.",
     ),
     "Restore_Purchases": MessageLookupByLibrary.simpleMessage(
       "Restore Purchases",
@@ -747,7 +797,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Notes restored. Some reminders could not be scheduled. Open those notes to set their reminders again.",
     ),
     "Restore_Success": MessageLookupByLibrary.simpleMessage(
-      "Your Remove Ads purchase was restored.",
+      "Your Premium purchase was restored.",
     ),
     "Retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "Save_As_Template": MessageLookupByLibrary.simpleMessage(
@@ -771,7 +821,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m18,
+    "Selection_Checklist_Added": m22,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -860,7 +910,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m19,
+    "Template_Details": m23,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -926,6 +976,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Unarchive_Note": MessageLookupByLibrary.simpleMessage("Unarchive note"),
     "Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
+    "Upgrade_To_Premium": MessageLookupByLibrary.simpleMessage(
+      "Upgrade to Premium",
+    ),
     "Use_Template": MessageLookupByLibrary.simpleMessage("Use a template"),
     "View_Saved": MessageLookupByLibrary.simpleMessage("View saved"),
     "Voice_Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),

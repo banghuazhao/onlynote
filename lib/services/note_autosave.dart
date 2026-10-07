@@ -5,6 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
+import 'package:onlynote/services/premium_access.dart';
 
 const draftDatabaseBox = 'note_recovery_drafts';
 
@@ -15,9 +17,10 @@ abstract interface class NoteAutosaveStore {
 }
 
 class HiveNoteAutosaveStore implements NoteAutosaveStore {
-  HiveNoteAutosaveStore(this.repository, this.drafts);
+  HiveNoteAutosaveStore(this.repository, this.drafts, {this.premiumAccess});
   final NoteRepository repository;
   final Box drafts;
+  final PremiumAccess? premiumAccess;
 
   @override
   Future<void> writeDraft(Note note) async {
@@ -30,7 +33,8 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
 
   @override
   Future<void> saveNote(Note note) async {
-    await repository.addUpdateNote(NoteDto.fromNote(note));
+    await NoteCreationLimit.save(repository, NoteDto.fromNote(note),
+        access: premiumAccess);
   }
 
   /// Replay interrupted saves before image cleanup or the first library read.

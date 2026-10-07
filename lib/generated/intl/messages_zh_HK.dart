@@ -51,15 +51,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m14(number) => "照片 ${number}";
 
-  static String m15(time) => "下次提醒：${time}";
+  static String m15(limit) => "免費版包含 ${limit} 個資料夾。升級即可建立無限資料夾。";
 
-  static String m16(date) => "提醒我：${date}";
+  static String m16(limit) => "免費版包含 ${limit} 則筆記。升級即可建立無限筆記。";
 
-  static String m17(price) => "支付 ${price} 永久移除廣告。";
+  static String m17(price) => "支付 ${price} 永久解鎖";
 
-  static String m18(count) => "已加入 ${count} 項清單";
+  static String m18(limit) => "免費版包含 ${limit} 個自訂範本。升級即可儲存無限範本。";
 
-  static String m19(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m19(time) => "下次提醒：${time}";
+
+  static String m20(date) => "提醒我：${date}";
+
+  static String m21(price) => "支付 ${price} 永久移除廣告。";
+
+  static String m22(count) => "已加入 ${count} 項清單";
+
+  static String m23(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -497,6 +505,37 @@ class MessageLookup extends MessageLookupByLibrary {
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
       "移除紋理、橫線和卡片傾斜，讓介面更簡潔。",
     ),
+    "Premium": MessageLookupByLibrary.simpleMessage("進階版"),
+    "Premium_Active": MessageLookupByLibrary.simpleMessage("進階版已解鎖"),
+    "Premium_Card_Style": MessageLookupByLibrary.simpleMessage("獨立設定卡片樣式"),
+    "Premium_Description": MessageLookupByLibrary.simpleMessage(
+      "所有進階功能已解鎖，並且無廣告。",
+    ),
+    "Premium_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "已購買移除廣告？您的購買已包含進階版。可在下方恢復購買。",
+    ),
+    "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
+      "升級至進階版即可解鎖此功能。",
+    ),
+    "Premium_Folder_Limit": m15,
+    "Premium_Folders": MessageLookupByLibrary.simpleMessage("無限資料夾"),
+    "Premium_Free_Core": MessageLookupByLibrary.simpleMessage(
+      "免費建立最多 10 則筆記，使用清單和基本提醒。",
+    ),
+    "Premium_Free_Limits": MessageLookupByLibrary.simpleMessage(
+      "免費版包含 3 個資料夾和 3 個自訂範本。",
+    ),
+    "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("無廣告"),
+    "Premium_Note_Limit": m16,
+    "Premium_Notes": MessageLookupByLibrary.simpleMessage("無限筆記"),
+    "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
+      "一次性購買，無需訂閱。",
+    ),
+    "Premium_One_Time_Price": m17,
+    "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage("重複提醒"),
+    "Premium_Template_Limit": m18,
+    "Premium_Templates": MessageLookupByLibrary.simpleMessage("無限自訂範本"),
+    "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("語音備忘錄"),
     "Privacy": MessageLookupByLibrary.simpleMessage("私隱"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("私隱政策"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
@@ -510,7 +549,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Purchase_Failed": MessageLookupByLibrary.simpleMessage("無法完成購買，請重試。"),
     "Purchase_Loading": MessageLookupByLibrary.simpleMessage("正在連接 App Store…"),
     "Purchase_Pending": MessageLookupByLibrary.simpleMessage("購買正在等待批准。"),
-    "Purchase_Success": MessageLookupByLibrary.simpleMessage("廣告已移除。"),
+    "Purchase_Success": MessageLookupByLibrary.simpleMessage("進階版已解鎖。"),
     "Purchase_Unavailable": MessageLookupByLibrary.simpleMessage("移除廣告目前無法使用。"),
     "Purchases": MessageLookupByLibrary.simpleMessage("購買項目"),
     "Relaxing_Up": MessageLookupByLibrary.simpleMessage("冥想Up"),
@@ -521,7 +560,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "請選擇將來的時間來設定提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小時後"),
-    "Reminder_Next_Time": m15,
+    "Reminder_Next_Time": m19,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一星期後"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重複"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
@@ -534,7 +573,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "10 分鐘後提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
-    "Reminder_Suggestion": m16,
+    "Reminder_Suggestion": m20,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "使用建議時間",
     ),
@@ -564,18 +603,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m17,
+    "Remove_Ads_Price": m21,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重新命名檢視"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
     "Restore": MessageLookupByLibrary.simpleMessage("還原"),
-    "Restore_Nothing": MessageLookupByLibrary.simpleMessage("未找到以前的移除廣告購買。"),
+    "Restore_Nothing": MessageLookupByLibrary.simpleMessage("未找到之前購買的進階版。"),
     "Restore_Purchases": MessageLookupByLibrary.simpleMessage("恢復購買"),
     "Restore_Reminder_Warning": MessageLookupByLibrary.simpleMessage(
       "筆記已復原，但部分提醒未能安排。請開啟相關筆記重新設定提醒。",
     ),
-    "Restore_Success": MessageLookupByLibrary.simpleMessage("已恢復您的移除廣告購買。"),
+    "Restore_Success": MessageLookupByLibrary.simpleMessage("已恢復您的進階版購買。"),
     "Retry": MessageLookupByLibrary.simpleMessage("重試"),
     "Save_As_Template": MessageLookupByLibrary.simpleMessage("儲存為範本"),
     "Save_Current_View": MessageLookupByLibrary.simpleMessage("儲存目前檢視"),
@@ -588,7 +627,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m18,
+    "Selection_Checklist_Added": m22,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
@@ -663,7 +702,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m19,
+    "Template_Details": m23,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -721,6 +760,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Unarchive_Note": MessageLookupByLibrary.simpleMessage("取消封存"),
     "Undo": MessageLookupByLibrary.simpleMessage("復原"),
     "Unpin": MessageLookupByLibrary.simpleMessage("取消置頂"),
+    "Upgrade_To_Premium": MessageLookupByLibrary.simpleMessage("升級至進階版"),
     "Use_Template": MessageLookupByLibrary.simpleMessage("使用範本"),
     "View_Saved": MessageLookupByLibrary.simpleMessage("檢視已儲存"),
     "Voice_Cancel": MessageLookupByLibrary.simpleMessage("取消"),

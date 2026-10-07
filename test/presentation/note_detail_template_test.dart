@@ -7,6 +7,7 @@ import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/get_note_usecase.dart';
 import 'package:onlynote/domain/usecase/update_note_usecase.dart';
@@ -16,9 +17,11 @@ import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detai
 import 'package:onlynote/presentation/screens/note_detail/note_detail_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
 
 import '../support/memory_preferences.dart';
 import '../support/template_images.dart';
+import '../support/premium_test_fakes.dart';
 
 class _Notes implements NoteRepository {
   _Notes(this.note);
@@ -168,4 +171,85 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('template limit offers Premium and preserves the pending save',
+      (tester) async {
+    final entitlement = PremiumTestFixture();
+    await entitlement.init();
+    final source = Note(id: 'source', title: 'Weekend trip');
+    final repository = _Notes(NoteDto.fromNote(source));
+    final templates = CustomNoteTemplateStore(
+        preferences: MemoryPreferences(),
+        images: MemoryTemplateImages(),
+        premiumAccess: entitlement.access);
+    await templates.importTemplates([
+      for (var i = 0; i < 3; i++)
+        CustomNoteTemplate(
+            id: 'saved-$i', name: 'Saved $i', createdAt: DateTime(2026)),
+    ]);
+    final detail = NoteDetailBloc(
+        GetNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final router = _DetailRouter(templates);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+      await detail.close();
+      templates.dispose();
+      await entitlement.dispose();
+    });
+    await tester.pumpWidget(BlocProvider.value(
+      value: detail,
+      child: MaterialApp.router(
+        routerConfig: router.config(),
+        theme: AppTheme.light,
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+      ),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('More options'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save as template'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('template-name')), findsNothing);
+    expect(templates.templates, hasLength(3));
+    expect(find.text(S.current.Template_Save_Failed), findsNothing);
+
+    // Dismissing the upgrade leaves the source and existing templates intact.
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(templates.templates, hasLength(3));
+    expect(find.text('Weekend trip'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('More options'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save as template'));
+    await tester.pumpAndSettle();
+    final buy = find.byKey(const ValueKey('premium-buy'));
+    await tester.ensureVisible(buy);
+    await tester.tap(buy);
+    await tester.pumpAndSettle();
+    expect(entitlement.access.isPremium, isTrue);
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    final name = find.byKey(const ValueKey('template-name'));
+    expect(name, findsOneWidget);
+    expect(tester.widget<TextField>(name).controller!.text, 'Weekend trip');
+    await tester.enterText(name, 'Fourth template');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(templates.templates, hasLength(4));
+    expect(templates.templates.last.name, 'Fourth template');
+    expect(repository.note.toDomain().title, 'Weekend trip');
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 }

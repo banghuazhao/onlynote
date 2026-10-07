@@ -40,7 +40,8 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.togglePin(String noteId) = _TogglePin;
   const factory HomeEvent.restoreNotes(List<String> ids) = _RestoreNotes;
   const factory HomeEvent.permanentDelete(List<String> ids) = _PermanentDelete;
-  const factory HomeEvent.createFolder(String name) = _CreateFolder;
+  const factory HomeEvent.createFolder(String name,
+      {Completer<String?>? completion}) = _CreateFolder;
   const factory HomeEvent.renameFolder(String id, String name) = _RenameFolder;
   const factory HomeEvent.deleteFolder(String id) = _DeleteFolder;
   const factory HomeEvent.moveNoteToFolder({

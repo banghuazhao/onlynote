@@ -45,7 +45,8 @@ mixin _$HomeEvent {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -80,7 +81,8 @@ mixin _$HomeEvent {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -115,7 +117,7 @@ mixin _$HomeEvent {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -349,7 +351,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -387,7 +390,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -425,7 +429,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -613,7 +617,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -651,7 +656,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -689,7 +695,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -901,7 +907,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -939,7 +946,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -977,7 +985,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1190,7 +1198,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -1228,7 +1237,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1266,7 +1276,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1473,7 +1483,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -1511,7 +1522,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1549,7 +1561,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1764,7 +1776,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -1802,7 +1815,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -1840,7 +1854,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2049,7 +2063,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -2087,7 +2102,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2125,7 +2141,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2332,7 +2348,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -2370,7 +2387,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2408,7 +2426,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2615,7 +2633,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -2653,7 +2672,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2691,7 +2711,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2899,7 +2919,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -2937,7 +2958,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -2975,7 +2997,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3188,7 +3210,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -3226,7 +3249,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3264,7 +3288,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3479,7 +3503,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -3517,7 +3542,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3555,7 +3581,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3764,7 +3790,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -3802,7 +3829,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -3840,7 +3868,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4068,7 +4096,8 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -4106,7 +4135,8 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4144,7 +4174,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4382,7 +4412,8 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -4420,7 +4451,8 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4458,7 +4490,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4689,7 +4721,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -4727,7 +4760,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4765,7 +4799,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -4977,7 +5011,8 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -5015,7 +5050,8 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5053,7 +5089,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5266,7 +5302,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -5304,7 +5341,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5342,7 +5380,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5556,7 +5594,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -5594,7 +5633,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5632,7 +5672,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -5755,7 +5795,7 @@ abstract class _$$CreateFolderImplCopyWith<$Res> {
           _$CreateFolderImpl value, $Res Function(_$CreateFolderImpl) then) =
       __$$CreateFolderImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String name});
+  $Res call({String name, Completer<String?>? completion});
 }
 
 /// @nodoc
@@ -5770,12 +5810,17 @@ class __$$CreateFolderImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
+    Object? completion = freezed,
   }) {
     return _then(_$CreateFolderImpl(
       null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<String?>?,
     ));
   }
 }
@@ -5783,14 +5828,16 @@ class __$$CreateFolderImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$CreateFolderImpl implements _CreateFolder {
-  const _$CreateFolderImpl(this.name);
+  const _$CreateFolderImpl(this.name, {this.completion});
 
   @override
   final String name;
+  @override
+  final Completer<String?>? completion;
 
   @override
   String toString() {
-    return 'HomeEvent.createFolder(name: $name)';
+    return 'HomeEvent.createFolder(name: $name, completion: $completion)';
   }
 
   @override
@@ -5798,11 +5845,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreateFolderImpl &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, name);
+  int get hashCode => Object.hash(runtimeType, name, completion);
 
   @JsonKey(ignore: true)
   @override
@@ -5840,12 +5889,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
   }) {
-    return createFolder(name);
+    return createFolder(name, completion);
   }
 
   @override
@@ -5878,12 +5928,13 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
   }) {
-    return createFolder?.call(name);
+    return createFolder?.call(name, completion);
   }
 
   @override
@@ -5916,14 +5967,14 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
     required TResult orElse(),
   }) {
     if (createFolder != null) {
-      return createFolder(name);
+      return createFolder(name, completion);
     }
     return orElse();
   }
@@ -6024,9 +6075,11 @@ class _$CreateFolderImpl implements _CreateFolder {
 }
 
 abstract class _CreateFolder implements HomeEvent {
-  const factory _CreateFolder(final String name) = _$CreateFolderImpl;
+  const factory _CreateFolder(final String name,
+      {final Completer<String?>? completion}) = _$CreateFolderImpl;
 
   String get name;
+  Completer<String?>? get completion;
   @JsonKey(ignore: true)
   _$$CreateFolderImplCopyWith<_$CreateFolderImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -6131,7 +6184,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -6169,7 +6223,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -6207,7 +6262,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -6416,7 +6471,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -6454,7 +6510,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -6492,7 +6549,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -6709,7 +6766,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
-    required TResult Function(String name) createFolder,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
@@ -6747,7 +6805,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
-    TResult? Function(String name)? createFolder,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
@@ -6785,7 +6844,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
-    TResult Function(String name)? createFolder,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,

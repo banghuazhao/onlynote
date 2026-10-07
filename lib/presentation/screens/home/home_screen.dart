@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/photo_search_status.dart';
 import 'package:onlynote/services/photo_search_index.dart';
@@ -28,15 +30,19 @@ import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
+import 'package:onlynote/domain/repository/folder_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/presentation/theme/note_grid_layout.dart';
 import 'package:onlynote/services/purchase_service.dart';
+import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
@@ -457,14 +463,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _promptFolderName({
     required String title,
     String? initial,
-    required ValueChanged<String> onSubmit,
+    required FutureOr<void> Function(String) onSubmit,
   }) async {
     final name = await showDialog<String>(
       context: context,
       builder: (_) => FolderNameDialog(title: title, initial: initial),
     );
     if (mounted && name != null && name.trim().isNotEmpty) {
-      onSubmit(name.trim());
+      await onSubmit(name.trim());
+    }
+  }
+
+  Future<void> _createFolder(HomeBloc bloc, String name) async {
+    try {
+      final error = await bloc.createFolder(name);
+      if (mounted) {
+        context.showToast(error ?? S.of(context).Folder_Created,
+            isError: error != null);
+      }
+    } on PremiumRequired {
+      if (!mounted ||
+          !await ensurePremiumAccess(context, PremiumFeature.folders,
+              currentCount: getIt<FolderRepository>().getAllFolders().length,
+              access: bloc.premiumAccess)) {
+        return;
+      }
+      if (mounted) await _createFolder(bloc, name);
     }
   }
 
@@ -474,9 +498,14 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final selection = await showNoteTemplatePickerSheet(context);
       if (!mounted || selection == null) return;
+      final access = context.read<HomeBloc>().premiumAccess;
+      if (!await _ensureNoteCreation(access) || !mounted) return;
       if (selection.builtIn != null) {
         await context.router.push(
-          AddUpdateNoteRoute(folderId: folderId, template: selection.builtIn),
+          AddUpdateNoteRoute(
+              folderId: folderId,
+              template: selection.builtIn,
+              premiumAccess: access),
         );
         return;
       }
@@ -486,7 +515,8 @@ class _HomeScreenState extends State<HomeScreen> {
         await ImageStorage.deleteImages(note.imagePaths);
         return;
       }
-      await context.router.push(AddUpdateNoteRoute(customTemplateNote: note));
+      await context.router.push(
+          AddUpdateNoteRoute(customTemplateNote: note, premiumAccess: access));
     } catch (_) {
       if (mounted) {
         showTransientSnackBar(context,
@@ -504,11 +534,21 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _openingDailyNote = true);
     try {
       final locale = Localizations.localeOf(context).toString();
-      final note = await DailyNoteService(getIt<NoteRepository>()).openToday(
-        titleForDay: (date) => DateFormat.yMMMMd(locale).format(date),
-      );
+      final access = context.read<HomeBloc>().premiumAccess;
+      final service =
+          DailyNoteService(getIt<NoteRepository>(), premiumAccess: access);
+      Future<Note> openToday() => service.openToday(
+          titleForDay: (date) => DateFormat.yMMMMd(locale).format(date));
+      Note note;
+      try {
+        note = await openToday();
+      } on PremiumRequired {
+        if (!mounted || !await _ensureNoteCreation(access) || !mounted) return;
+        note = await openToday();
+      }
       if (!mounted) return;
-      await context.router.push(AddUpdateNoteRoute(note: note));
+      await context.router
+          .push(AddUpdateNoteRoute(note: note, premiumAccess: access));
     } catch (_) {
       if (mounted) {
         context.showToast(S.of(context).Today_Note_Open_Failed, isError: true);
@@ -624,9 +664,15 @@ class _HomeScreenState extends State<HomeScreen> {
       case _SelectArchive():
         bloc.add(const HomeEvent.showArchive(true));
       case _CreateFolder():
+        if (!await ensurePremiumAccess(context, PremiumFeature.folders,
+                currentCount: getIt<FolderRepository>().getAllFolders().length,
+                access: bloc.premiumAccess) ||
+            !mounted) {
+          return;
+        }
         await _promptFolderName(
           title: S.of(context).New_Folder,
-          onSubmit: (name) => bloc.add(HomeEvent.createFolder(name)),
+          onSubmit: (name) => _createFolder(bloc, name),
         );
       case _RenameFolder(:final folder):
         await _promptFolderName(
@@ -906,8 +952,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showTemplates() => _openTemplates(folderId: _creationFolder());
 
-  void _addNote() =>
-      context.router.push(AddUpdateNoteRoute(folderId: _creationFolder()));
+  Future<bool> _ensureNoteCreation(PremiumAccess access) =>
+      ensurePremiumAccess(context, PremiumFeature.notes,
+          currentCount: NoteCreationLimit.count(getIt<NoteRepository>()),
+          access: access);
+
+  Future<void> _addNote() async {
+    final access = context.read<HomeBloc>().premiumAccess;
+    if (!await _ensureNoteCreation(access) || !mounted) return;
+    await context.router.push(
+        AddUpdateNoteRoute(folderId: _creationFolder(), premiumAccess: access));
+  }
 
   void _openCurrentFolderPicker() {
     context.read<HomeBloc>().state.mapOrNull(loaded: (data) {
@@ -1206,20 +1261,16 @@ class _HomeScreenState extends State<HomeScreen> {
             AppButton(
               primary: true,
               tooltip: S.of(context).Add_Note,
+              onPressed: _addNote,
               child: const Icon(Icons.add),
-              onPressed: () {
-                context.router.push(AddUpdateNoteRoute());
-              },
             ),
           ],
           failed: (_) => [
             AppButton(
               primary: true,
               tooltip: S.of(context).Add_Note,
+              onPressed: _addNote,
               child: const Icon(Icons.add),
-              onPressed: () {
-                context.router.push(AddUpdateNoteRoute());
-              },
             ),
           ],
         );
@@ -1479,6 +1530,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       await Navigator.of(context).push<void>(MaterialPageRoute(
         builder: (_) => CardAppearanceScreen(
           note: note,
+          premiumAccess: bloc.premiumAccess,
           onSave: (style) async {
             final error = await bloc.setCardStyle(noteId, style);
             if (error != null) throw StateError(error);
@@ -1643,9 +1695,23 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         AppSheetAction(
           leading: const Icon(Icons.copy_outlined),
           title: Text(S.of(context).Duplicate),
-          onPressed: (sheetContext) {
+          onPressed: (sheetContext) async {
+            final route = ModalRoute.of(sheetContext);
+            final bloc = context.read<HomeBloc>();
             Navigator.pop(sheetContext);
-            context.read<HomeBloc>().add(HomeEvent.duplicateNote(note));
+            if (route != null) await route.completed;
+            if (!mounted ||
+                !context.mounted ||
+                !await ensurePremiumAccess(context, PremiumFeature.notes,
+                    currentCount: getIt<NoteRepository>()
+                        .getAllNotes()
+                        .where((note) => !note.isDeleted)
+                        .length,
+                    access: bloc.premiumAccess) ||
+                !mounted) {
+              return;
+            }
+            bloc.add(HomeEvent.duplicateNote(note));
           },
         ),
         AppSheetAction(

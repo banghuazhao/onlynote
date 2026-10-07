@@ -7,14 +7,17 @@ import 'package:onlynote/domain/model/error.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:uuid/uuid.dart';
 
 final S _i10n = locator<S>();
 
 @injectable
 class AddNoteUsecase {
-  AddNoteUsecase(this._repository);
+  AddNoteUsecase(this._repository, {@ignoreParam this.premiumAccess});
   final NoteRepository _repository;
+  final PremiumAccess? premiumAccess;
   final _uuid = const Uuid();
 
   Future<Either<NoteError, Unit>> call(Note note) async {
@@ -24,7 +27,8 @@ class AddNoteUsecase {
       // New notes sort to the top: more negative than any existing sortOrder
       // and than any note added later (since -now() keeps decreasing).
       final noteDto = NoteDto.fromNote(
-        note.copyWith(todo: todo, sortOrder: -DateTime.now().millisecondsSinceEpoch),
+        note.copyWith(
+            todo: todo, sortOrder: -DateTime.now().millisecondsSinceEpoch),
       );
 
       if (!noteDto.validNote) {
@@ -33,10 +37,16 @@ class AddNoteUsecase {
         );
       }
 
-      await _repository.addUpdateNote(noteDto.copyWith(id: _uuid.v4()));
+      await NoteCreationLimit.save(
+          _repository, noteDto.copyWith(id: _uuid.v4()),
+          access: premiumAccess);
       return right(unit);
+    } on PremiumRequired {
+      return left(NoteError(
+          message: _i10n.Premium_Note_Limit(PremiumAccess.freeNoteLimit)));
     } catch (_) {
-      return left(NoteError(message: _i10n.Failed_to_add_note_please_try_again));
+      return left(
+          NoteError(message: _i10n.Failed_to_add_note_please_try_again));
     }
   }
 }

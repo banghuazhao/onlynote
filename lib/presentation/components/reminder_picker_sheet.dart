@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/reminder_shortcuts.dart';
+import 'package:onlynote/services/premium_access.dart';
 
 import 'app_sheet.dart';
 import 'reminder_labels.dart';
+import 'premium_feature_gate.dart';
 import 'toast.dart';
 
 export 'reminder_labels.dart';
@@ -30,10 +32,12 @@ class ReminderPickerSheet extends StatefulWidget {
     this.current,
     this.allowDelete = true,
     this.suggestedDate,
+    this.premiumAccess,
   });
   final Reminder? current;
   final bool allowDelete;
   final DateTime? suggestedDate;
+  final PremiumAccess? premiumAccess;
 
   @override
   State<ReminderPickerSheet> createState() => _ReminderPickerSheetState();
@@ -43,6 +47,29 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
   late ReminderRepeat _repeat;
   late TimeOfDay _time;
   late int _weekday;
+  bool _choosingRepeat = false;
+
+  PremiumAccess get _access => widget.premiumAccess ?? PremiumAccess.instance;
+
+  bool _requiresPremium(ReminderRepeat repeat) =>
+      repeat != ReminderRepeat.none &&
+      repeat != widget.current?.repeat &&
+      !_access.allows(PremiumFeature.repeatingReminders);
+
+  Future<void> _chooseRepeat(ReminderRepeat repeat) async {
+    if (_choosingRepeat || repeat == _repeat) return;
+    _choosingRepeat = true;
+    try {
+      if (_requiresPremium(repeat) &&
+          !await ensurePremiumAccess(context, PremiumFeature.repeatingReminders,
+              access: _access)) {
+        return;
+      }
+      if (mounted) setState(() => _repeat = repeat);
+    } finally {
+      _choosingRepeat = false;
+    }
+  }
 
   @override
   void initState() {
@@ -132,12 +159,19 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
                       ButtonSegment(
                         value: repeat,
                         label: Text(reminderRepeatLabel(context, repeat)),
+                        icon: _requiresPremium(repeat)
+                            ? Tooltip(
+                                message: l10n.Premium,
+                                child: const Icon(
+                                    Icons.workspace_premium_outlined,
+                                    size: 14),
+                              )
+                            : null,
                       ),
                   ],
                   selected: {_repeat},
                   showSelectedIcon: false,
-                  onSelectionChanged: (values) =>
-                      setState(() => _repeat = values.single),
+                  onSelectionChanged: (values) => _chooseRepeat(values.single),
                 ),
               ],
             ),

@@ -8,6 +8,8 @@ import 'package:uuid/uuid.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
+import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_edit_history.dart';
 import 'package:onlynote/services/note_outline.dart';
@@ -77,6 +79,8 @@ import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/components/reminder_suggestion_chip.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -110,6 +114,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.widgetCommands,
       this.positionStore,
       this.editorTips,
+      this.premiumAccess,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
@@ -128,6 +133,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final WidgetCommands? widgetCommands;
   final NotePositionStore? positionStore;
   final NoteEditorTips? editorTips;
+  final PremiumAccess? premiumAccess;
   final NoteEditorStart start;
 
   @override
@@ -189,6 +195,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   bool _refreshingFromLibrary = false;
   bool _recordedReviewSave = false;
   bool _statusRefreshQueued = false;
+  bool _seedSaveDeferred = false;
   NoteSearchController? _findController;
   bool _writingFocused = false;
   bool _findInputComposing = false;
@@ -204,6 +211,20 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   List<String> _lastChecklistIds = const [];
   NotePositionStore get _positions =>
       widget.positionStore ?? NotePositionStore.instance;
+
+  PremiumAccess get _creationAccess =>
+      widget.premiumAccess ?? PremiumAccess.instance;
+
+  bool get _newNoteBlocked {
+    if (widget.note != null ||
+        !_creationAccess.limitsApply ||
+        !getIt.isRegistered<NoteRepository>()) {
+      return false;
+    }
+    return !NoteCreationLimit.canSave(
+        getIt<NoteRepository>(), _autosave.note.id,
+        access: _creationAccess);
+  }
 
   @override
   void initState() {
@@ -252,7 +273,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _autosave = NoteAutosave(
       store: widget.autosaveStore ??
           HiveNoteAutosaveStore(
-              getIt<NoteRepository>(), Hive.box(draftDatabaseBox)),
+              getIt<NoteRepository>(), Hive.box(draftDatabaseBox),
+              premiumAccess: _creationAccess),
       initial: initial,
       exists: widget.note != null,
     )..addListener(_refreshStatus);
@@ -314,7 +336,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
     if (widget.note == null &&
         (widget.template != null || widget.customTemplateNote != null)) {
-      _autosave.saveInitial();
+      if (_newNoteBlocked) {
+        _seedSaveDeferred = true;
+      } else {
+        _autosave.saveInitial();
+      }
     }
     if (widget.note != null) unawaited(_restoreWritingPosition());
     unawaited(_loadTips());
@@ -522,6 +548,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _prepareCapture();
+  }
+
+  void _prepareCapture() {
+    if (_newNoteBlocked) return;
     if ((widget.start != NoteEditorStart.photo &&
             widget.start != NoteEditorStart.voice) ||
         widget.note != null ||
@@ -549,6 +580,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   void _startCapture() {
+    if (_newNoteBlocked) {
+      _captureStarted = false;
+      return;
+    }
     if (widget.start == NoteEditorStart.voice) {
       unawaited(_recordVoiceMemo());
     } else {
@@ -879,6 +914,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       );
 
   void _capture(AddUpdateFormState state) {
+    if (_newNoteBlocked) return;
     if (_replayingHistory) return;
     final next = _currentDraft(state);
     final previous = _editHistory.current.note;
@@ -1406,6 +1442,11 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     setState(() => _presentingMedia = true);
     FocusManager.instance.primaryFocus?.unfocus();
     try {
+      if (!await ensurePremiumAccess(context, PremiumFeature.voiceMemos,
+              access: widget.premiumAccess) ||
+          !mounted) {
+        return;
+      }
       await Future<void>.delayed(Duration.zero);
       _capture(_form.state);
       if (!await _autosave.flush()) throw StateError('Draft save failed');
@@ -2218,6 +2259,28 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _creationAccess.purchases,
+      builder: (context, _) {
+        if (_newNoteBlocked) {
+          return PremiumScreen(
+              purchases: _creationAccess.purchases,
+              feature: PremiumFeature.notes);
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _newNoteBlocked) return;
+          if (_seedSaveDeferred) {
+            _seedSaveDeferred = false;
+            _autosave.saveInitial();
+          }
+          _prepareCapture();
+        });
+        return _buildEditor(context);
+      },
+    );
+  }
+
+  Widget _buildEditor(BuildContext context) {
     final selection = _descriptionController.selection;
     final formattingTip = _formattingTipAvailable &&
         _formattingController.hasFocus &&

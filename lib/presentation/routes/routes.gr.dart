@@ -29,6 +29,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     WidgetCommands? widgetCommands,
     NotePositionStore? positionStore,
     NoteEditorTips? editorTips,
+    PremiumAccess? premiumAccess,
     NoteEditorStart start = NoteEditorStart.standard,
     List<PageRouteInfo>? children,
   }) : super(
@@ -50,6 +51,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             widgetCommands: widgetCommands,
             positionStore: positionStore,
             editorTips: editorTips,
+            premiumAccess: premiumAccess,
             start: start,
           ),
           initialChildren: children,
@@ -79,6 +81,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         widgetCommands: args.widgetCommands,
         positionStore: args.positionStore,
         editorTips: args.editorTips,
+        premiumAccess: args.premiumAccess,
         start: args.start,
       );
     },
@@ -103,6 +106,7 @@ class AddUpdateNoteRouteArgs {
     this.widgetCommands,
     this.positionStore,
     this.editorTips,
+    this.premiumAccess,
     this.start = NoteEditorStart.standard,
   });
 
@@ -138,11 +142,13 @@ class AddUpdateNoteRouteArgs {
 
   final NoteEditorTips? editorTips;
 
+  final PremiumAccess? premiumAccess;
+
   final NoteEditorStart start;
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, positionStore: $positionStore, editorTips: $editorTips, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, positionStore: $positionStore, editorTips: $editorTips, premiumAccess: $premiumAccess, start: $start}';
   }
 }
 

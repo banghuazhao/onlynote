@@ -37,7 +37,9 @@ import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/components/note_checklist.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_archive.dart';
@@ -90,6 +92,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   bool _savingReminder = false;
   bool _exportingImage = false;
   bool _savingTemplate = false;
+  bool _templateActionOpen = false;
   bool _changingLibrary = false;
   Note? _lastSavedNote;
   int _reviewGeneration = 0;
@@ -419,22 +422,44 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   Future<void> _saveAsTemplate(Note note) async {
-    if (_savingTemplate) return;
+    if (_templateActionOpen) return;
     final strings = S.of(context);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) => TemplateNameDialog(
-        title: strings.Save_As_Template,
-        initial: note.title?.trim().isNotEmpty == true
-            ? note.title
-            : strings.Template_Default_Name,
-      ),
-    );
-    if (!mounted || name == null) return;
-    setState(() => _savingTemplate = true);
+    final store = widget.templateStore ?? CustomNoteTemplateStore.instance;
+    _templateActionOpen = true;
     try {
-      await (widget.templateStore ?? CustomNoteTemplateStore.instance)
-          .saveFromNote(note, name: name);
+      await store.load();
+      if (!mounted ||
+          !await ensurePremiumAccess(context, PremiumFeature.templates,
+              currentCount: store.templates.length,
+              access: store.premiumAccess)) {
+        return;
+      }
+      if (!mounted) return;
+      final name = await showDialog<String>(
+        context: context,
+        builder: (_) => TemplateNameDialog(
+          title: strings.Save_As_Template,
+          initial: note.title?.trim().isNotEmpty == true
+              ? note.title
+              : strings.Template_Default_Name,
+        ),
+      );
+      if (!mounted || name == null) return;
+      setState(() => _savingTemplate = true);
+      try {
+        await store.saveFromNote(note, name: name);
+      } on PremiumRequired {
+        if (mounted) setState(() => _savingTemplate = false);
+        if (!mounted ||
+            !await ensurePremiumAccess(context, PremiumFeature.templates,
+                currentCount: store.templates.length,
+                access: store.premiumAccess)) {
+          return;
+        }
+        if (!mounted) return;
+        setState(() => _savingTemplate = true);
+        await store.saveFromNote(note, name: name);
+      }
       if (mounted) {
         showTransientSnackBar(
             context, SnackBar(content: Text(strings.Template_Saved)));
@@ -445,7 +470,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
             context, SnackBar(content: Text(strings.Template_Save_Failed)));
       }
     } finally {
-      if (mounted) setState(() => _savingTemplate = false);
+      _templateActionOpen = false;
+      if (mounted && _savingTemplate) setState(() => _savingTemplate = false);
     }
   }
 

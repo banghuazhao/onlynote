@@ -12,6 +12,9 @@ import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/premium_access.dart';
+
+import '../support/premium_test_fakes.dart';
 
 class _Notes implements NoteRepository {
   final notes = <String, NoteDto>{};
@@ -88,6 +91,51 @@ void main() {
     await _turn();
   });
   tearDown(() => bloc.close());
+
+  test(
+      'free card saves preserve overrides, allow reset, and unlock after purchase',
+      () async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final folders = _Folders();
+    final restricted = HomeBloc(
+      ShowAllNotesUsecase(repository, folders),
+      AddNoteUsecase(repository),
+      ReorderNotesUsecase(repository),
+      TogglePinUsecase(repository),
+      RestoreNotesUsecase(repository),
+      PermanentDeleteNotesUsecase(repository),
+      CreateFolderUsecase(folders),
+      RenameFolderUsecase(folders),
+      DeleteFolderUsecase(folders, repository),
+      MoveNoteToFolderUsecase(repository),
+      GetNoteUsecase(repository),
+      UpdateNoteUsecase(repository),
+      premiumAccess: fixture.access,
+    );
+    addTearDown(restricted.close);
+    const existing = NoteCardStyle(fontSize: AppFontSize.small);
+    repository.notes['note'] = NoteDto.fromNote(
+        repository.notes['note']!.toDomain().copyWith(cardStyle: existing));
+    restricted.add(const HomeEvent.getAllNotes());
+    await _turn();
+    expect(await restricted.setCardStyle('note', existing), isNull);
+    const changed = NoteCardStyle(fontSize: AppFontSize.large);
+    await expectLater(restricted.setCardStyle('note', changed),
+        throwsA(isA<PremiumRequired>()));
+    expect(repository.notes['note']!.toDomain().cardStyle, existing);
+    expect(
+        await restricted.setCardStyle('note', const NoteCardStyle()), isNull);
+    expect(repository.notes['note']!.toDomain().cardStyle.isDefault, isTrue);
+    await fixture.purchases.buyPremium();
+    await pumpEventQueue();
+    expect(await restricted.setCardStyle('note', changed), isNull);
+    final saved = repository.notes['note']!.toDomain();
+    expect(saved.cardStyle, changed);
+    expect(saved.title, 'Shopping');
+    expect(saved.todo.map((todo) => todo.title), ['Milk', 'Eggs']);
+  });
 
   test(
       'rapid Home taps persist every item and return accurate completion milestones',

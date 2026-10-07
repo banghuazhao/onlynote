@@ -22,11 +22,16 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
 import 'package:onlynote/presentation/screens/add_update_note/add_update_note_screen.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
+import 'package:onlynote/presentation/components/voice_memo_composer.dart';
+import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/note_photo_transform.dart';
+import 'package:onlynote/services/premium_access.dart';
+
+import '../support/premium_test_fakes.dart';
 
 class _Notes implements NoteRepository {
   final values = <String, NoteDto>{};
@@ -98,6 +103,8 @@ Future<(_Notes, _Store)> _openEditor(
   Note? note,
   List<Note> library = const [],
   NotePhotoEditService? photoEditService,
+  PremiumAccess? premiumAccess,
+  NoteEditorStart start = NoteEditorStart.standard,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(390, 844);
@@ -139,6 +146,8 @@ Future<(_Notes, _Store)> _openEditor(
         autosaveStore: store,
         voiceMemoService: service,
         photoEditService: photoEditService,
+        premiumAccess: premiumAccess,
+        start: start,
       ),
     ),
   ));
@@ -174,6 +183,52 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
+
+  testWidgets(
+      'free voice insertion shows Premium before recording and preserves note',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final original = Note(
+        id: 'keep',
+        title: 'Keep my note',
+        description: 'Keep the text when I cancel the upgrade.');
+    final (notes, store) = await _openEditor(tester,
+        note: original, premiumAccess: fixture.access);
+    await _tap(tester, find.byKey(const ValueKey('editor-insert')));
+    await _tap(tester, find.byKey(const ValueKey('editor-record-voice')));
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(find.byType(VoiceMemoComposer), findsNothing);
+    expect(store.saved, isEmpty);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    expect(notes.values['keep']!.toDomain(), original);
+    expect(store.saved, isEmpty);
+    expect(fixture.store.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('free voice shortcut waits for Premium before opening composer',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final (notes, store) = await _openEditor(tester,
+        premiumAccess: fixture.access, start: NoteEditorStart.voice);
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(find.byType(VoiceMemoComposer), findsNothing);
+    expect(store.saved, isEmpty);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    expect(notes.values, isEmpty);
+    expect(store.saved, isEmpty);
+    expect(fixture.store.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
       'reopening a stale draft keeps current daily identity and card style',

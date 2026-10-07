@@ -15,6 +15,21 @@ A minimalist notes & checklist app built with Flutter.
 - Localized in English, Simplified Chinese, and Traditional Chinese
 - Local-first storage (no account or sign-in required)
 
+## Premium
+
+On iOS, the free plan includes up to 10 notes, checklists, one-time reminders,
+default card styling, up to 3 folders, and up to 3 saved templates. Premium
+unlocks unlimited notes, folders and saved templates, repeating reminders,
+voice recording, individual card styling, and removes ads with a one-time purchase.
+
+Existing Remove Ads purchases also unlock Premium. Existing folders, templates,
+card styles, voice memos, and recurring reminders remain usable; backup restores are never
+blocked by plan limits. Platforms without purchase support remain unrestricted.
+
+Before release, update the App Store display name and description for the existing
+`com.appsbay.onlynote.remove_ads` product to describe Premium and its benefits.
+Keep the product ID unchanged so existing customers can restore their purchase.
+
 ## Tech Stack
 
 - [Flutter](https://flutter.dev) / Dart

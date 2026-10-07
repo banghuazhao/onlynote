@@ -1105,30 +1105,30 @@ class S {
     );
   }
 
-  /// `Ads have been removed.`
+  /// `Premium is unlocked.`
   String get Purchase_Success {
     return Intl.message(
-      'Ads have been removed.',
+      'Premium is unlocked.',
       name: 'Purchase_Success',
       desc: '',
       args: [],
     );
   }
 
-  /// `Your Remove Ads purchase was restored.`
+  /// `Your Premium purchase was restored.`
   String get Restore_Success {
     return Intl.message(
-      'Your Remove Ads purchase was restored.',
+      'Your Premium purchase was restored.',
       name: 'Restore_Success',
       desc: '',
       args: [],
     );
   }
 
-  /// `No previous Remove Ads purchase was found.`
+  /// `No previous Premium purchase was found.`
   String get Restore_Nothing {
     return Intl.message(
-      'No previous Remove Ads purchase was found.',
+      'No previous Premium purchase was found.',
       name: 'Restore_Nothing',
       desc: '',
       args: [],
@@ -4338,6 +4338,196 @@ class S {
     return Intl.message(
       'Hide date',
       name: 'Card_Style_Hide_Date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium`
+  String get Premium {
+    return Intl.message('Premium', name: 'Premium', desc: '', args: []);
+  }
+
+  /// `Upgrade to Premium`
+  String get Upgrade_To_Premium {
+    return Intl.message(
+      'Upgrade to Premium',
+      name: 'Upgrade_To_Premium',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium unlocked`
+  String get Premium_Active {
+    return Intl.message(
+      'Premium unlocked',
+      name: 'Premium_Active',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All Premium features are unlocked, with no ads.`
+  String get Premium_Description {
+    return Intl.message(
+      'All Premium features are unlocked, with no ads.',
+      name: 'Premium_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create up to 10 notes, with checklists and basic reminders for free.`
+  String get Premium_Free_Core {
+    return Intl.message(
+      'Create up to 10 notes, with checklists and basic reminders for free.',
+      name: 'Premium_Free_Core',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlimited folders`
+  String get Premium_Folders {
+    return Intl.message(
+      'Unlimited folders',
+      name: 'Premium_Folders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlimited saved templates`
+  String get Premium_Templates {
+    return Intl.message(
+      'Unlimited saved templates',
+      name: 'Premium_Templates',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Repeating reminders`
+  String get Premium_Repeating_Reminders {
+    return Intl.message(
+      'Repeating reminders',
+      name: 'Premium_Repeating_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Individual card styles`
+  String get Premium_Card_Style {
+    return Intl.message(
+      'Individual card styles',
+      name: 'Premium_Card_Style',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No ads`
+  String get Premium_No_Ads {
+    return Intl.message('No ads', name: 'Premium_No_Ads', desc: '', args: []);
+  }
+
+  /// `Unlock forever for {price}`
+  String Premium_One_Time_Price(Object price) {
+    return Intl.message(
+      'Unlock forever for $price',
+      name: 'Premium_One_Time_Price',
+      desc: '',
+      args: [price],
+    );
+  }
+
+  /// `One-time purchase. No subscription.`
+  String get Premium_One_Time_Description {
+    return Intl.message(
+      'One-time purchase. No subscription.',
+      name: 'Premium_One_Time_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The free plan includes {limit} folders. Upgrade for unlimited folders.`
+  String Premium_Folder_Limit(Object limit) {
+    return Intl.message(
+      'The free plan includes $limit folders. Upgrade for unlimited folders.',
+      name: 'Premium_Folder_Limit',
+      desc: '',
+      args: [limit],
+    );
+  }
+
+  /// `The free plan includes {limit} saved templates. Upgrade for unlimited templates.`
+  String Premium_Template_Limit(Object limit) {
+    return Intl.message(
+      'The free plan includes $limit saved templates. Upgrade for unlimited templates.',
+      name: 'Premium_Template_Limit',
+      desc: '',
+      args: [limit],
+    );
+  }
+
+  /// `Unlock this feature with Premium.`
+  String get Premium_Feature_Required {
+    return Intl.message(
+      'Unlock this feature with Premium.',
+      name: 'Premium_Feature_Required',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Free includes 3 folders and 3 saved templates.`
+  String get Premium_Free_Limits {
+    return Intl.message(
+      'Free includes 3 folders and 3 saved templates.',
+      name: 'Premium_Free_Limits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already removed ads? Your purchase includes Premium. Restore it below.`
+  String get Premium_Existing_Purchase {
+    return Intl.message(
+      'Already removed ads? Your purchase includes Premium. Restore it below.',
+      name: 'Premium_Existing_Purchase',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlimited notes`
+  String get Premium_Notes {
+    return Intl.message(
+      'Unlimited notes',
+      name: 'Premium_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The free plan includes {limit} notes. Upgrade for unlimited notes.`
+  String Premium_Note_Limit(Object limit) {
+    return Intl.message(
+      'The free plan includes $limit notes. Upgrade for unlimited notes.',
+      name: 'Premium_Note_Limit',
+      desc: '',
+      args: [limit],
+    );
+  }
+
+  /// `Voice memos`
+  String get Premium_Voice_Memos {
+    return Intl.message(
+      'Voice memos',
+      name: 'Premium_Voice_Memos',
       desc: '',
       args: [],
     );

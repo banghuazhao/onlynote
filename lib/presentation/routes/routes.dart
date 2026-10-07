@@ -1,4 +1,5 @@
 import 'package:onlynote/services/note_templates.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_editor_tips.dart';

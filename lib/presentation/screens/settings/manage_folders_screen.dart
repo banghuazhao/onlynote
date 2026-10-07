@@ -7,8 +7,10 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
+import 'package:onlynote/services/premium_access.dart';
 
 class ManageFoldersScreen extends StatelessWidget {
   const ManageFoldersScreen({super.key});
@@ -148,6 +150,15 @@ class ManageFoldersScreen extends StatelessWidget {
     BuildContext context, {
     Folder? folder,
   }) async {
+    final bloc = context.read<HomeBloc>();
+    int folderCount() =>
+        Hive.box(folderDatabaseBox).values.whereType<FolderDto>().length;
+    if (folder == null &&
+        !await ensurePremiumAccess(context, PremiumFeature.folders,
+            currentCount: folderCount(), access: bloc.premiumAccess)) {
+      return;
+    }
+    if (!context.mounted) return;
     final name = await showDialog<String>(
       context: context,
       builder: (_) => FolderNameDialog(
@@ -160,12 +171,25 @@ class ManageFoldersScreen extends StatelessWidget {
     final trimmedName = name?.trim();
     if (trimmedName == null || trimmedName.isEmpty || !context.mounted) return;
 
-    final bloc = context.read<HomeBloc>();
-    bloc.add(
-      folder == null
-          ? HomeEvent.createFolder(trimmedName)
-          : HomeEvent.renameFolder(folder.id, trimmedName),
-    );
+    if (folder != null) {
+      bloc.add(HomeEvent.renameFolder(folder.id, trimmedName));
+      return;
+    }
+    String? error;
+    try {
+      error = await bloc.createFolder(trimmedName);
+    } on PremiumRequired {
+      if (!context.mounted ||
+          !await ensurePremiumAccess(context, PremiumFeature.folders,
+              currentCount: folderCount(), access: bloc.premiumAccess)) {
+        return;
+      }
+      error = await bloc.createFolder(trimmedName);
+    }
+    if (context.mounted) {
+      context.showToast(error ?? S.of(context).Folder_Created,
+          isError: error != null);
+    }
   }
 
   static Future<void> _deleteFolder(

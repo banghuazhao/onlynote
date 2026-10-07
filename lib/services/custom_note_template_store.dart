@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_template_images.dart';
 import 'custom_template_images_factory.dart';
 import 'audio_storage.dart';
+import 'premium_access.dart';
 
 class CustomNoteTemplateStore extends ChangeNotifier {
   CustomNoteTemplateStore({
@@ -16,16 +17,19 @@ class CustomNoteTemplateStore extends ChangeNotifier {
     CustomTemplateImages? images,
     AudioStorage? audio,
     String? documentsPath,
+    PremiumAccess? premiumAccess,
   })  : _preferences = preferences ?? SharedPreferencesAsync(),
         _images =
             images ?? createDeviceTemplateImages(documentsPath: documentsPath),
-        _audio = audio ?? AudioStorage(documentsPath: documentsPath);
+        _audio = audio ?? AudioStorage(documentsPath: documentsPath),
+        premiumAccess = premiumAccess ?? PremiumAccess.instance;
 
   static final instance = CustomNoteTemplateStore();
   static const storageKey = 'custom_note_templates_v1';
   final SharedPreferencesAsync _preferences;
   final CustomTemplateImages _images;
   final AudioStorage _audio;
+  final PremiumAccess premiumAccess;
   List<CustomNoteTemplate> _templates = [];
   bool _loaded = false;
   Future<void> _tail = Future.value();
@@ -107,6 +111,9 @@ class CustomNoteTemplateStore extends ChangeNotifier {
       _serial(() async {
         await _load();
         validatedTemplateName(name);
+        // Check inside the queue, before making any photo or audio copies.
+        premiumAccess.require(PremiumFeature.templates,
+            currentCount: _templates.length);
         final voices = await _audio.copyToTemplate(note.voiceMemos);
         var photos = <String>[];
         try {

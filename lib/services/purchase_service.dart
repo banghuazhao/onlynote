@@ -71,7 +71,8 @@ class SharedPreferencesEntitlementStorage implements EntitlementStorage {
       (await SharedPreferences.getInstance()).setBool(_key, value);
 }
 
-/// Owns the app's single ad-removal entitlement.
+/// Owns Premium and ad removal through the original non-consumable purchase.
+/// Existing Remove Ads customers receive Premium without buying again.
 ///
 /// Purchase verification is isolated in [_isVerified] so receipt/server
 /// verification can replace the current App Store transaction check later.
@@ -97,8 +98,10 @@ class PurchaseService extends ChangeNotifier {
   PurchaseState _state = PurchaseState.idle;
 
   bool get isAdsRemoved => _isAdsRemoved;
+  bool get isPremium => _isAdsRemoved;
   bool get shouldShowAds => !_isAdsRemoved;
   ProductDetails? get removeAdsProduct => _removeAdsProduct;
+  ProductDetails? get premiumProduct => _removeAdsProduct;
   String? get localizedPrice => _removeAdsProduct?.price;
   PurchaseState get state => _state;
 
@@ -144,22 +147,37 @@ class PurchaseService extends ChangeNotifier {
   }
 
   Future<void> buyRemoveAds() async {
+    if (_isAdsRemoved ||
+        _state == PurchaseState.loading ||
+        _state == PurchaseState.pending) {
+      return;
+    }
     final product = _removeAdsProduct;
-    if (!isSupported || product == null || _isAdsRemoved) {
+    if (!isSupported || product == null) {
       _setState(PurchaseState.unavailable);
       return;
     }
+    _setState(PurchaseState.loading);
     try {
       final started =
           await _store.buyNonConsumable(PurchaseParam(productDetails: product));
-      if (!started) _setState(PurchaseState.failed);
+      // The purchase stream may have already delivered a terminal result.
+      if (_state == PurchaseState.loading) {
+        _setState(started ? PurchaseState.pending : PurchaseState.failed);
+      }
     } catch (_) {
       _setState(PurchaseState.failed);
     }
   }
 
+  Future<void> buyPremium() => buyRemoveAds();
+
   Future<void> restorePurchases() async {
-    if (!isSupported) return;
+    if (!isSupported ||
+        _state == PurchaseState.loading ||
+        _state == PurchaseState.pending) {
+      return;
+    }
     _restoreInProgress = true;
     _restoreFoundPurchase = false;
     _setState(PurchaseState.loading);

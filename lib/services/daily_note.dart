@@ -5,16 +5,21 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
+import 'package:onlynote/services/premium_access.dart';
 import 'package:uuid/uuid.dart';
 
 /// Resolves one durable note per local calendar day, even across title edits.
 class DailyNoteService {
   DailyNoteService(this.repository,
-      {DateTime Function()? now, String Function()? createId})
+      {DateTime Function()? now,
+      String Function()? createId,
+      this.premiumAccess})
       : _now = now ?? DateTime.now,
         _createId = createId ?? const Uuid().v4;
 
   final NoteRepository repository;
+  final PremiumAccess? premiumAccess;
   final DateTime Function() _now;
   final String Function() _createId;
 
@@ -61,7 +66,8 @@ class DailyNoteService {
       sortOrder: -now.millisecondsSinceEpoch,
       dailyNoteDateKey: dayKey,
     );
-    await repository.addUpdateNote(NoteDto.fromNote(note));
+    await NoteCreationLimit.save(repository, NoteDto.fromNote(note),
+        access: premiumAccess);
     return note;
   }
 }

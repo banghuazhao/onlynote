@@ -20,8 +20,11 @@ import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_previews.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
+import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../support/premium_test_fakes.dart';
 
 const _captureUi = bool.fromEnvironment('CAPTURE_UI');
 
@@ -153,6 +156,102 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('free users preview custom styles, cancel upgrade, then reset',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    NoteCardStyle? saved;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+            premiumAccess: fixture.access,
+            note:
+                _note(style: const NoteCardStyle(fontSize: AppFontSize.small)),
+            thumbnailBuilder: _thumbnail,
+            onSave: (style) async => saved = style));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    expect(saved, isNull);
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(saved, isNull);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(tester.widget<NoteCard>(find.byType(NoteCard)).cardStyle!.fontSize,
+        AppFontSize.large);
+    expect(find.text(S.current.Card_Style_Save_Failed), findsNothing);
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-reset')));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(saved!.isDefault, isTrue);
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    expect(fixture.store.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('buying Premium resumes staged custom card save', (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    NoteCardStyle? saved;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+            premiumAccess: fixture.access,
+            note: _note(),
+            thumbnailBuilder: _thumbnail,
+            onSave: (style) async => saved = style));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    final buy = find.byKey(const ValueKey('premium-buy'));
+    await tester.ensureVisible(buy);
+    await tester.tap(buy);
+    await tester.pumpAndSettle();
+    expect(fixture.access.isPremium, isTrue);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(saved!.fontSize, AppFontSize.large);
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('existing custom cards and default style stay usable for free',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    var saves = 0;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+            premiumAccess: fixture.access,
+            note:
+                _note(style: const NoteCardStyle(fontSize: AppFontSize.small)),
+            thumbnailBuilder: _thumbnail,
+            onSave: (_) async => saves++));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(saves, 0);
+    await _open(
+        tester,
+        CardAppearanceScreen(
+            premiumAccess: fixture.access,
+            thumbnailBuilder: _thumbnail,
+            onSave: (_) async => saves++));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(saves, 1);
+    expect(fixture.store.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
       'current card previews every option without publishing before save',

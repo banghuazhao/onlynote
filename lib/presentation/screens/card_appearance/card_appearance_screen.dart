@@ -9,6 +9,7 @@ import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/components/settings_choice.dart';
 import 'package:onlynote/presentation/components/toast.dart';
@@ -16,6 +17,7 @@ import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
 import 'package:onlynote/presentation/theme/note_grid_layout.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
+import 'package:onlynote/services/premium_access.dart';
 
 /// One appearance editor for saved cards and the library's default style.
 class CardAppearanceScreen extends StatefulWidget {
@@ -25,12 +27,14 @@ class CardAppearanceScreen extends StatefulWidget {
     this.onSave,
     this.initialStyle,
     this.thumbnailBuilder,
+    this.premiumAccess,
   }) : assert(note == null || onSave != null);
 
   final Note? note;
   final Future<void> Function(NoteCardStyle style)? onSave;
   final NoteCardStyle? initialStyle;
   final Widget Function(BuildContext context, String path)? thumbnailBuilder;
+  final PremiumAccess? premiumAccess;
 
   @override
   State<CardAppearanceScreen> createState() => _CardAppearanceScreenState();
@@ -124,6 +128,15 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
       _failed = false;
     });
     try {
+      if (!_defaults &&
+          !_style.isDefault &&
+          !await ensurePremiumAccess(
+              context, PremiumFeature.individualCardStyle,
+              access: widget.premiumAccess)) {
+        if (mounted) setState(() => _saving = false);
+        return;
+      }
+      if (!mounted) return;
       if (widget.onSave != null) {
         await widget.onSave!(_style);
       } else {
@@ -202,7 +215,20 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(s.save),
+                  : Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (!_defaults &&
+                          _dirty &&
+                          !_style.isDefault &&
+                          !(widget.premiumAccess ?? PremiumAccess.instance)
+                              .allows(PremiumFeature.individualCardStyle)) ...[
+                        Tooltip(
+                            message: s.Premium,
+                            child: const Icon(Icons.workspace_premium_outlined,
+                                size: 16)),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(s.save),
+                    ]),
             ),
           ],
         ),

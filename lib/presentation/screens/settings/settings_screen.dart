@@ -12,10 +12,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'manage_folders_screen.dart';
 import 'backup_screen.dart';
+import 'premium_screen.dart';
 import 'widget_guide_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, this.purchases});
+
+  final PurchaseService? purchases;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -26,9 +29,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _purchaseActionStarted = false;
   bool _restoringPurchase = false;
 
+  PurchaseService get _purchases =>
+      widget.purchases ?? PurchaseService.instance;
+
   @override
   Widget build(BuildContext context) {
-    final purchase = PurchaseService.instance;
+    final purchase = _purchases;
     final tokens = context.tokens;
 
     return Scaffold(
@@ -110,6 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: tokens.space4),
                               Card(
                                 child: ListTile(
                                   leading:
@@ -124,45 +131,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               const BackupScreen())),
                                 ),
                               ),
-                              const SizedBox(height: 16),
                               if (purchase.isSupported) ...[
                                 SizedBox(height: tokens.space4),
                                 SectionCard(
-                                  title: S.of(context).Purchases,
+                                  title: S.of(context).Premium,
                                   icon: Icons.workspace_premium_outlined,
                                   children: [
                                     ListTile(
                                       contentPadding: EdgeInsets.zero,
-                                      leading: Icon(
-                                        purchase.isAdsRemoved
-                                            ? Icons.verified_rounded
-                                            : Icons.block_outlined,
+                                      leading: Icon(purchase.isPremium
+                                          ? Icons.verified_rounded
+                                          : Icons.workspace_premium_outlined),
+                                      title: Text(purchase.isPremium
+                                          ? S.of(context).Premium_Active
+                                          : S.of(context).Upgrade_To_Premium),
+                                      subtitle: Text(purchase.isPremium
+                                          ? S.of(context).Premium_Description
+                                          : S.of(context).Premium_Free_Core),
+                                      trailing: const Icon(
+                                          Icons.chevron_right_rounded),
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (_) => PremiumScreen(
+                                              purchases: purchase),
+                                        ),
                                       ),
-                                      title: Text(purchase.isAdsRemoved
-                                          ? S.of(context).Ads_Removed
-                                          : S.of(context).Remove_Ads),
-                                      subtitle:
-                                          Text(_purchaseSubtitle(context)),
-                                      trailing: purchase.state ==
-                                                  PurchaseState.loading &&
-                                              !_restoringPurchase
-                                          ? const SizedBox.square(
-                                              dimension: 20,
-                                              child: CircularProgressIndicator(
-                                                  strokeWidth: 2))
-                                          : purchase.isAdsRemoved
-                                              ? Icon(Icons.check_circle_rounded,
-                                                  color: context.colors.primary)
-                                              : const Icon(
-                                                  Icons.chevron_right_rounded),
-                                      enabled: !purchase.isAdsRemoved &&
-                                          purchase.removeAdsProduct != null &&
-                                          purchase.state !=
-                                              PurchaseState.loading &&
-                                          purchase.state !=
-                                              PurchaseState.pending,
-                                      onTap: () => _runPurchaseAction(
-                                          purchase.buyRemoveAds),
                                     ),
                                     const Divider(),
                                     ListTile(
@@ -266,24 +260,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  String _purchaseSubtitle(BuildContext context) {
-    final service = PurchaseService.instance;
-    if (service.isAdsRemoved) return S.of(context).Ads_Removed_Description;
-    if (service.state == PurchaseState.loading) {
-      return S.of(context).Purchase_Loading;
-    }
-    if (service.state == PurchaseState.pending) {
-      return S.of(context).Purchase_Pending;
-    }
-    final price = service.localizedPrice;
-    return price == null
-        ? S.of(context).Purchase_Unavailable
-        : S.of(context).Remove_Ads_Price(price);
-  }
-
   void _showPurchaseFeedback(BuildContext context) {
     if (!_purchaseActionStarted) return;
-    final state = PurchaseService.instance.state;
+    final state = _purchases.state;
     if (state == _shownState ||
         state == PurchaseState.idle ||
         state == PurchaseState.loading) {
@@ -315,7 +294,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       {bool restoring = false}) async {
     _restoringPurchase = restoring;
     _purchaseActionStarted = true;
-    _shownState = PurchaseService.instance.state;
+    _shownState = null;
     await action();
   }
 }
