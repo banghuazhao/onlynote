@@ -155,7 +155,6 @@ class _NoteCardsPreviewState extends State<_NoteCardsPreview> {
                     key: ValueKey(_notes[index].id),
                     note: _notes[index],
                     // The entire fixture stays in memory on the web previewer.
-                    onShare: () {},
                     onTap: () {},
                     thumbnailBuilder: (_, path) => ColoredBox(
                       color: path.contains('recipe')

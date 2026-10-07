@@ -50,6 +50,7 @@ import 'package:onlynote/presentation/components/note_link_picker_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:screenshot/screenshot.dart';
@@ -1485,6 +1486,11 @@ class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
   @override
   Widget build(BuildContext context) {
     final hasMultiple = widget.imagePaths.length > 1;
+    const viewerColors = ColorScheme.dark(
+      onSurface: Colors.white,
+      surfaceContainerHigh: Color(0xFF242424),
+      outlineVariant: Color(0xFF454545),
+    );
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -1492,6 +1498,7 @@ class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: CloseButton(style: AppButtonStyles.icon(viewerColors)),
         title: hasMultiple
             ? Text('${_index + 1} / ${widget.imagePaths.length}')
             : null,

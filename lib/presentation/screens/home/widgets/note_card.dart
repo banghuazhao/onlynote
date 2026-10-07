@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
-import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_image.dart';
@@ -32,7 +31,6 @@ class NoteCard extends StatefulWidget {
     this.onTodoToggle,
     this.onLongPress,
     this.onTap,
-    this.onShare,
     this.thumbnailBuilder,
     this.screenshotController,
   });
@@ -52,9 +50,7 @@ class NoteCard extends StatefulWidget {
   final Function()? onLongPress;
   final Function()? onTap;
 
-  /// Preview collaborators can stay in memory without opening native sharing
-  /// or loading files. The ordinary home card keeps its native defaults.
-  final VoidCallback? onShare;
+  /// Lets previews render thumbnails without loading files.
   final Widget Function(BuildContext context, String path)? thumbnailBuilder;
 
   /// Lets a parent capture the same rendered content for its own actions
@@ -69,7 +65,6 @@ class NoteCard extends StatefulWidget {
 class NoteCardState extends State<NoteCard> {
   late final ScreenshotController _screenshotController =
       widget.screenshotController ?? ScreenshotController();
-  final GlobalKey _shareButtonKey = GlobalKey();
   bool _pressed = false;
   bool _exportingImage = false;
 
@@ -92,20 +87,6 @@ class NoteCardState extends State<NoteCard> {
   void _setPressed(bool value) {
     if (_exportingImage) return;
     if (_pressed != value) setState(() => _pressed = value);
-  }
-
-  Future<void> _shareNoteAsImage() {
-    if (widget.onShare != null) {
-      widget.onShare!();
-      return Future.value();
-    }
-    return ShareHelper.shareNote(
-      context,
-      widget.note,
-      _screenshotController,
-      sharePositionOrigin: ShareHelper.shareOriginFromKey(_shareButtonKey),
-      captureImage: captureImage,
-    );
   }
 
   Iterable<Todo> _visibleTodos(Note note) {
@@ -226,7 +207,8 @@ class NoteCardState extends State<NoteCard> {
                   selected: widget.selected,
                   pressed: _pressed,
                   exportMode: _exportingImage,
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 56),
+                  padding: EdgeInsets.fromLTRB(
+                      14, 14, 14, widget.selectionMode ? 56 : 14),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 88),
                     child: Column(
@@ -459,44 +441,33 @@ class NoteCardState extends State<NoteCard> {
                   ),
                 ),
               ),
-              Positioned(
-                right: 2,
-                bottom: 2,
-                child: Tooltip(
-                  message: widget.selectionMode
-                      ? S.of(context).Select
-                      : S.of(context).Share,
-                  child: IconButton(
-                    key: widget.selectionMode ? null : _shareButtonKey,
-                    style: AppButtonStyles.paper(selected: widget.selected),
-                    onPressed: _exportingImage
-                        ? null
-                        : widget.selectionMode
-                            ? widget.onTap
-                            : _shareNoteAsImage,
-                    icon: ExcludeSemantics(
-                      child: AnimatedSwitcher(
-                        duration: reduceMotion || _exportingImage
-                            ? Duration.zero
-                            : const Duration(milliseconds: 160),
-                        child: Icon(
-                          widget.selectionMode
-                              ? widget.selected
-                                  ? Icons.check_rounded
-                                  : Icons.check_circle_outline_rounded
-                              : Icons.ios_share_rounded,
-                          key: ValueKey(widget.selectionMode
-                              ? widget.selected
-                                  ? 'selected'
-                                  : 'unselected'
-                              : 'share'),
-                          size: 18,
+              if (widget.selectionMode)
+                Positioned(
+                  right: 2,
+                  bottom: 2,
+                  child: Tooltip(
+                    message: S.of(context).Select,
+                    child: IconButton(
+                      style: AppButtonStyles.paper(selected: widget.selected),
+                      onPressed: _exportingImage ? null : widget.onTap,
+                      icon: ExcludeSemantics(
+                        child: AnimatedSwitcher(
+                          duration: reduceMotion || _exportingImage
+                              ? Duration.zero
+                              : const Duration(milliseconds: 160),
+                          child: Icon(
+                            widget.selected
+                                ? Icons.check_rounded
+                                : Icons.check_circle_outline_rounded,
+                            key: ValueKey(
+                                widget.selected ? 'selected' : 'unselected'),
+                            size: 18,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

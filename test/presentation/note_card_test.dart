@@ -154,7 +154,6 @@ void main() {
     await tester.pumpWidget(_host(NoteCard(
       note: note,
       onTap: () => tapped = true,
-      onShare: () {},
     )));
     await tester.pumpAndSettle();
 
@@ -175,7 +174,6 @@ void main() {
       await tester.pumpWidget(_host(NoteCard(
         note: _mixedNote(),
         onTap: () {},
-        onShare: () {},
         thumbnailBuilder: _thumbnail,
       )));
       await tester.pumpAndSettle();
@@ -205,7 +203,7 @@ void main() {
         Todo(id: 'done-$index', title: 'Completed $index', completed: true),
       Todo(id: 'pending', title: 'The remaining action'),
     ]);
-    await tester.pumpWidget(_host(NoteCard(note: note, onShare: () {})));
+    await tester.pumpWidget(_host(NoteCard(note: note)));
     await tester.pumpAndSettle();
     final rows =
         tester.widgetList<PaperChecklistRow>(find.byType(PaperChecklistRow));
@@ -215,7 +213,6 @@ void main() {
 
     await tester.pumpWidget(_host(NoteCard(
       note: Note(todo: [Todo.empty(), Todo(title: '\n\t')]),
-      onShare: () {},
     )));
     await tester.pumpAndSettle();
     expect(find.byType(PaperChecklistRow), findsNothing);
@@ -233,7 +230,6 @@ void main() {
     await tester.pumpWidget(_host(NoteCard(
       note: note,
       searchQuery: 'travel',
-      onShare: () {},
       thumbnailBuilder: _thumbnail,
     )));
     await tester.pumpAndSettle();
@@ -247,9 +243,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('card share is independent and selection respects reduced motion',
+  testWidgets('card opens and selection respects reduced motion',
       (tester) async {
-    var shares = 0;
     var opens = 0;
     var selected = false;
     var selectionMode = false;
@@ -261,7 +256,6 @@ void main() {
           note: Note(id: 'select', title: 'A note'),
           selectionMode: selectionMode,
           selected: selected,
-          onShare: () => shares++,
           onTap: () {
             opens++;
             if (selectionMode) setState(() => selected = !selected);
@@ -270,18 +264,18 @@ void main() {
       },
     ), reduceMotion: true));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip(S.current.Share));
+    await tester.tap(find.text('A note'));
     await tester.pump();
-    expect(shares, 1);
-    expect(opens, 0);
+    expect(opens, 1);
 
     update(() => selectionMode = true);
     await tester.pump();
     await tester.tap(find.byTooltip(S.current.Select));
     await tester.pump();
     expect(selected, isTrue);
-    expect(opens, 1);
-    expect(shares, 1);
+    expect(opens, 2);
+    expect(tester.getSize(find.byType(IconButton)).shortestSide,
+        greaterThanOrEqualTo(48));
     expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     expect(find.byIcon(Icons.check_circle_outline_rounded), findsNothing);
     final switcher = find.descendant(
@@ -309,7 +303,6 @@ void main() {
         photoSearchText: 'An earlier label $grapheme detail',
         photoSearchImagePath: note.imagePaths.single,
         thumbnailBuilder: _thumbnail,
-        onShare: () {},
       )));
       await tester.pumpAndSettle();
       final excerpt = tester.widget<SearchHighlight>(
@@ -331,7 +324,6 @@ void main() {
         NoteCard(
           note: _mixedNote()
               .copyWith(title: '週末的點子', description: '沿海邊散步，看看春天的風景。'),
-          onShare: () {},
           onTap: () {},
           onTodoToggle: (_) {},
           thumbnailBuilder: _thumbnail,
@@ -345,10 +337,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(DateFormat.yMMMd('zh_HK').format(DateTime(2026, 10, 7))),
           findsOneWidget);
-      await tester.ensureVisible(find.byTooltip(S.current.Share));
-      await tester.pumpAndSettle();
-      expect(tester.getSize(find.byType(IconButton)).shortestSide,
-          greaterThanOrEqualTo(48));
       expect(tester.takeException(), isNull);
     }
   });
