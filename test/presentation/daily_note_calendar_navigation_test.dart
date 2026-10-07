@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -17,6 +18,7 @@ import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/folder_repository.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
@@ -543,6 +545,70 @@ void main() {
         expect(find.byKey(const ValueKey('today-reminders-shortcut')),
             findsNothing);
         expect(tester.takeException(), isNull);
+      }
+
+      // Match the small library in the crash report: filtering removes only
+      // the short middle note between two checklist cards, one with media.
+      final photoPath = await tester.runAsync(() async {
+        final asset = await rootBundle.load('assets/empty_notes.png');
+        final photo = File('${directory.path}/masonry-photo.png');
+        await photo.writeAsBytes(
+            asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes));
+        return photo.path;
+      });
+      final threeNotes = [
+        Note(id: 'packing', title: 'Packing list', sortOrder: 0, todo: [
+          for (final (index, title) in [
+            'Travel documents',
+            'Phone & charger',
+            'Clothes',
+            'Toiletries',
+            'Medication',
+          ].indexed)
+            Todo(id: 'packing-$index', title: title),
+        ]),
+        Note(id: 'daily', title: 'October 7, 2026', sortOrder: 1),
+        Note(
+            id: 'mixed',
+            description: 'Checklist with a photo and a recording',
+            sortOrder: 2,
+            todo: [
+              Todo(id: 'mixed-open', title: 'Add'),
+              Todo(id: 'mixed-done-1', title: 'Diff', completed: true),
+              Todo(id: 'mixed-done-2', title: 'Dfs', completed: true),
+            ],
+            imagePaths: [
+              photoPath!
+            ],
+            voiceMemos: [
+              VoiceMemo(
+                  id: 'memo',
+                  path: 'note_audio/masonry-regression.m4a',
+                  durationMs: 1000,
+                  createdAt: DateTime(2026, 10, 7)),
+            ]),
+      ];
+      notes.values
+        ..clear()
+        ..addAll({
+          for (final note in threeNotes) note.id!: NoteDto.fromNote(note),
+        });
+      home.add(const HomeEvent.filtersChanged({}));
+      home.add(const HomeEvent.getAllNotes());
+      await _pumpAnimationFrames(tester);
+      for (var cycle = 0; cycle < 3; cycle++) {
+        for (final filtered in [true, false]) {
+          await _tap(tester, 'home-library-filters');
+          await _tapWithHeldPointer(
+              tester, find.byKey(const ValueKey('library-filter-checklists')));
+          await _applyFiltersAfterSheetDismisses(tester, home);
+          expect(
+              home.state.mapOrNull(
+                  loaded: (state) => state.notes.map((note) => note.id)),
+              filtered ? ['packing', 'mixed'] : ['packing', 'daily', 'mixed']);
+          expect(tester.takeException(), isNull,
+              reason: 'Three-note Home filtering cycle $cycle');
+        }
       }
     } finally {
       semantics?.dispose();

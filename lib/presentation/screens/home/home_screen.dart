@@ -4,11 +4,11 @@ import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
+import 'package:onlynote/presentation/components/note_card_entrance.dart';
 import 'package:onlynote/presentation/components/note_tags_sheet.dart';
 import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -1701,9 +1701,6 @@ class __BuildNotesListState extends State<_BuildNotesList> {
       orElse: () => false,
     );
 
-    final noteIndices = <String, int>{
-      for (var i = 0; i < widget.notes.length; i++) widget.notes[i].id!: i,
-    };
     return CustomScrollView(
       semanticChildCount: widget.notes.length,
       slivers: [
@@ -1762,20 +1759,15 @@ class __BuildNotesListState extends State<_BuildNotesList> {
                   },
                 );
                 return KeyedSubtree(
-                  key: ValueKey(noteId),
+                  // Masonry placement belongs to the slot. The card's
+                  // GlobalKey carries note identity when its position changes.
+                  key: ValueKey(index),
                   child: MediaQuery.disableAnimationsOf(context)
                       ? card
-                      : FadeInUp(
-                          from: 12,
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                          child: card,
-                        ),
+                      : NoteCardEntrance(child: card),
                 );
               },
               childCount: widget.notes.length,
-              findChildIndexCallback: (key) =>
-                  key is ValueKey<String> ? noteIndices[key.value] : null,
             ),
             mainAxisSpacing: AppSpacings.xl,
             crossAxisSpacing: AppSpacings.l,

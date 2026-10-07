@@ -188,6 +188,7 @@ class NoteCardState extends State<NoteCard> {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
     return Semantics(
+      container: true,
       button: widget.onTap != null,
       selected: widget.selectionMode ? widget.selected : null,
       child: AnimatedScale(
