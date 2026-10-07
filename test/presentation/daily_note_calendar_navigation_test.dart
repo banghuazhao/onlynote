@@ -20,6 +20,7 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
+import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart';
@@ -31,6 +32,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // The production preference plugin exposes its test platform separately.
 // ignore: depend_on_referenced_packages
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+// Home's FocusDetector uses VisibilityDetector internally.
+// ignore: depend_on_referenced_packages
+import 'package:visibility_detector/visibility_detector.dart';
 
 final class _PreferencesPlatform extends SharedPreferencesAsyncPlatform {
   @override
@@ -109,12 +113,18 @@ class _Router extends RootStackRouter {
             return Scaffold(body: Text('Editing ${openedNote?.id}'));
           }),
         ),
+        AutoRoute(
+          page: PageInfo(RemindersRoute.name,
+              builder: (_) =>
+                  const Scaffold(body: Text('Reminder list test page'))),
+        ),
       ];
 }
 
 Future<(_Notes, HomeBloc, _Router)> _openHome(
-    WidgetTester tester, Iterable<Note> initial) async {
-  tester.view.physicalSize = const Size(390, 844);
+    WidgetTester tester, Iterable<Note> initial,
+    {double width = 390}) async {
+  tester.view.physicalSize = Size(width, 844);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
@@ -172,6 +182,12 @@ Future<(_Notes, HomeBloc, _Router)> _openHome(
     ),
   ));
   await tester.pumpAndSettle();
+  expect(find.byKey(const ValueKey('daily-note-shortcut')), findsNothing);
+  expect(
+      find.byKey(const ValueKey('daily-note-calendar-shortcut')), findsNothing);
+  expect(find.byKey(const ValueKey('unfinished-quick-filter')), findsNothing);
+  expect(find.byKey(const ValueKey('today-reminders-shortcut')), findsNothing);
+  expect(find.byKey(const ValueKey('library-filters-shortcut')), findsNothing);
   return (notes, home, router);
 }
 
@@ -183,14 +199,25 @@ Future<void> _tap(WidgetTester tester, String key) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _openCalendar(WidgetTester tester) async {
+  await _tap(tester, 'home-more');
+  expect(
+      find.byKey(const ValueKey('daily-note-calendar-menu')), findsOneWidget);
+  await _tap(tester, 'daily-note-calendar-menu');
+  expect(find.byType(DailyNoteCalendarSheet), findsOneWidget);
+}
+
 void main() {
   final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
   late Directory directory;
   late Box noteBox;
   late Box folderBox;
   final preferencesPlatform = SharedPreferencesAsyncPlatform.instance;
+  final visibilityInterval =
+      VisibilityDetectorController.instance.updateInterval;
 
   setUpAll(() async {
+    VisibilityDetectorController.instance.updateInterval = Duration.zero;
     await initializeDateFormatting();
     if (!locator.isRegistered<S>()) locator.registerSingleton(S());
     SharedPreferencesAsyncPlatform.instance = _PreferencesPlatform();
@@ -204,6 +231,7 @@ void main() {
     await PurchaseService.instance.init();
   });
   tearDownAll(() async {
+    VisibilityDetectorController.instance.updateInterval = visibilityInterval;
     SharedPreferencesAsyncPlatform.instance = preferencesPlatform;
     await noteBox.close();
     await folderBox.close();
@@ -221,6 +249,70 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('Home nav filters and menu reminders/calendar work at 320/390px',
+      (tester) async {
+    final (notes, home, router) = await _openHome(
+        tester,
+        [
+          Note(id: 'ordinary', title: 'An ordinary note'),
+          Note(id: 'unfinished', title: 'Open tasks', todo: [
+            Todo(id: 'task', title: 'Finish the release'),
+          ]),
+        ],
+        width: 320);
+    // Exercise both widths within the shared saved-view store's fake clock.
+    for (final width in [320.0, 390.0]) {
+      tester.view.physicalSize = Size(width, 844);
+      home.add(const HomeEvent.filtersChanged({}));
+      await tester.pumpAndSettle();
+      final filters = find.byKey(const ValueKey('home-library-filters'));
+      expect(find.descendant(of: find.byType(AppBar), matching: filters),
+          findsOneWidget);
+      await _tap(tester, 'home-library-filters');
+      expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+      await _tap(tester, 'library-filter-unfinished');
+      expect(
+          tester
+              .widget<FilterChip>(
+                  find.byKey(const ValueKey('library-filter-unfinished')))
+              .selected,
+          isTrue);
+      await _tap(tester, 'library-apply-filters');
+      expect(find.byType(LibraryFiltersSheet), findsNothing);
+      expect(home.state.mapOrNull(loaded: (state) => state.filters),
+          {NoteSearchFilter.unfinished});
+      expect(
+          home.state.mapOrNull(loaded: (state) => state.notes.map((n) => n.id)),
+          ['unfinished']);
+
+      await _tap(tester, 'home-more');
+      await _tap(tester, 'home-reminders-menu');
+      expect(find.text('Reminder list test page'), findsOneWidget);
+      expect(router.stackData.map((route) => route.name),
+          [HomeRoute.name, RemindersRoute.name]);
+      await router.maybePop();
+      await tester.pumpAndSettle();
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+
+      await _openCalendar(tester);
+      expect(notes.writes, 0);
+      expect(router.openedNote, isNull);
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DailyNoteCalendarSheet), findsNothing);
+      expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+      expect(find.byKey(const ValueKey('daily-note-shortcut')), findsNothing);
+      expect(find.byKey(const ValueKey('daily-note-calendar-shortcut')),
+          findsNothing);
+      expect(
+          find.byKey(const ValueKey('unfinished-quick-filter')), findsNothing);
+      expect(
+          find.byKey(const ValueKey('today-reminders-shortcut')), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+  });
 
   testWidgets(
       'calendar ignores library filters and opens fresh archived content',
@@ -241,7 +333,7 @@ void main() {
     home.add(const HomeEvent.searchChanged('No matching content'));
     await tester.pumpAndSettle();
     expect(home.state.mapOrNull(loaded: (state) => state.notes), isEmpty);
-    await _tap(tester, 'daily-note-calendar-shortcut');
+    await _openCalendar(tester);
     expect(find.byKey(ValueKey('daily-calendar-marker-$key')), findsOneWidget);
     // Editing elsewhere after the calendar snapshot must not supply stale
     // content to the editor route or remove the archive/folder association.
@@ -267,7 +359,7 @@ void main() {
       isArchived: true,
     );
     final (notes, _, router) = await _openHome(tester, [original]);
-    await _tap(tester, 'daily-note-calendar-shortcut');
+    await _openCalendar(tester);
     await _tap(tester, 'daily-calendar-previous-month');
     final emptyDay = dailyNoteDateKey(DateTime(now.year, now.month - 1, 1));
     await _tap(tester, 'daily-calendar-day-$emptyDay');
@@ -278,7 +370,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(notes.writes, 0);
     expect(router.openedNote, isNull);
-    await _tap(tester, 'daily-note-calendar-shortcut');
+    await _openCalendar(tester);
     final deleted = original.copyWith(deletedAt: now);
     notes.values['daily'] = NoteDto.fromNote(deleted);
     await _tap(tester, 'daily-calendar-day-$key');
@@ -299,7 +391,7 @@ void main() {
   testWidgets('explicit calendar Today action creates once and then reuses',
       (tester) async {
     final (notes, _, router) = await _openHome(tester, []);
-    await _tap(tester, 'daily-note-calendar-shortcut');
+    await _openCalendar(tester);
     expect(notes.writes, 0);
     await _tap(tester, 'daily-calendar-open-today');
     final daily = router.openedNote!;
@@ -308,7 +400,7 @@ void main() {
     expect(notes.writes, 1);
     await router.maybePop();
     await tester.pumpAndSettle();
-    await _tap(tester, 'daily-note-calendar-shortcut');
+    await _openCalendar(tester);
     await _tap(tester, 'daily-calendar-open-today');
     expect(router.openedNote, daily);
     expect(notes.writes, 1);

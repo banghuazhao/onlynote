@@ -36,6 +36,8 @@
   "Permanent_Delete_Confirm_Title": "永久刪除？",
   "Permanent_Delete_Confirm_Message": "這些備忘錄及其照片、提醒將被永久刪除，且無法復原。",
   "Search_Notes": "搜尋備忘錄",
+  "Cancel_Searching": "取消搜尋",
+  "Search_Active": "正在搜尋",
   "Photo_Search_Text_In_Photo": "照片中的文字",
   "Photo_Search_Indexing": "正在辨識照片文字以便搜尋…",
   "No_Search_Results": "沒有符合的備忘錄。",

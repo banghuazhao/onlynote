@@ -1,56 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/services/note_search.dart';
 
 class NoteSearchFilters extends StatelessWidget {
   const NoteSearchFilters(
-      {super.key,
-      required this.selected,
-      required this.onChanged,
-      this.leadingAction,
-      this.onOpenLibrary});
+      {super.key, required this.selected, required this.onChanged});
   final Set<NoteSearchFilter> selected;
   final ValueChanged<Set<NoteSearchFilter>> onChanged;
-  final VoidCallback? onOpenLibrary;
-  final Widget? leadingAction;
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
+    // Keep search controls to one row when the keyboard reduces Home's height.
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(children: [
-        if (leadingAction != null)
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: leadingAction,
-          ),
-        if (onOpenLibrary != null)
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ActionChip(
-              key: const ValueKey('search-library-filters'),
-              avatar: const Icon(Icons.tune_rounded, size: 18),
-              label: Text(s.Library_Filters),
-              onPressed: onOpenLibrary,
-            ),
-          ),
+      child: Row(spacing: 8, children: [
         for (final filter in NoteSearchFilter.values)
-          Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: FilterChip(
-                label: Text(switch (filter) {
-                  NoteSearchFilter.checklists => s.Filter_Checklists,
-                  NoteSearchFilter.photos => s.Filter_Photos,
-                  NoteSearchFilter.reminders => s.Filter_Reminders,
-                  NoteSearchFilter.pinned => s.Filter_Pinned,
-                  NoteSearchFilter.unfinished => s.Filter_Unfinished,
-                }),
-                selected: selected.contains(filter),
-                onSelected: (value) =>
-                    onChanged({...selected}..toggle(filter, value)),
-              )),
+          FilterChip(
+            label: Text(switch (filter) {
+              NoteSearchFilter.checklists => s.Filter_Checklists,
+              NoteSearchFilter.photos => s.Filter_Photos,
+              NoteSearchFilter.reminders => s.Filter_Reminders,
+              NoteSearchFilter.pinned => s.Filter_Pinned,
+              NoteSearchFilter.unfinished => s.Filter_Unfinished,
+            }),
+            selected: selected.contains(filter),
+            materialTapTargetSize: MaterialTapTargetSize.padded,
+            onSelected: (value) =>
+                onChanged({...selected}..toggle(filter, value)),
+          ),
         if (selected.isNotEmpty)
           TextButton(
               onPressed: () => onChanged({}), child: Text(s.Clear_Filters)),
@@ -69,64 +48,39 @@ extension on Set<NoteSearchFilter> {
   }
 }
 
-/// A visible shortcut for the common checklist workflow without opening search.
-class UnfinishedNotesFilter extends StatelessWidget {
-  const UnfinishedNotesFilter(
-      {super.key,
-      required this.selected,
-      required this.onChanged,
-      this.onOpenReminders,
-      this.onOpenLibrary,
-      this.leadingAction,
-      this.libraryFilterCount = 0});
-  final bool selected;
-  final ValueChanged<bool> onChanged;
-  final VoidCallback? onOpenReminders;
-  final VoidCallback? onOpenLibrary;
-  final int libraryFilterCount;
-  final Widget? leadingAction;
+class LibraryFiltersButton extends StatelessWidget {
+  const LibraryFiltersButton(
+      {super.key, required this.onPressed, this.count = 0});
+
+  final VoidCallback onPressed;
+  final int count;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(children: [
-            if (leadingAction != null) ...[
-              leadingAction!,
-              const SizedBox(width: 8),
-            ],
-            FilterChip(
-              key: const ValueKey('unfinished-quick-filter'),
-              avatar: const Icon(Icons.check_box_outlined, size: 18),
-              label: Text(S.of(context).Filter_Unfinished),
-              selected: selected,
-              onSelected: onChanged,
+  Widget build(BuildContext context) {
+    final label = S.of(context).Library_Filters;
+    final description = count > 0 ? '$label ($count)' : label;
+    return MergeSemantics(
+      child: Semantics(
+        label: description,
+        child: Tooltip(
+          message: description,
+          excludeFromSemantics: true,
+          child: IconButton(
+            style: AppButtonStyles.icon(Theme.of(context).colorScheme),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            onPressed: onPressed,
+            icon: ExcludeSemantics(
+              child: Badge(
+                isLabelVisible: count > 0,
+                label: Text('$count',
+                    textScaler: MediaQuery.textScalerOf(context)
+                        .clamp(maxScaleFactor: 1.3)),
+                child: const Icon(Icons.tune_rounded, size: 20),
+              ),
             ),
-            if (onOpenReminders != null) ...[
-              const SizedBox(width: 8),
-              Tooltip(
-                message: S.of(context).Reminders_Title,
-                child: ActionChip(
-                  key: const ValueKey('today-reminders-shortcut'),
-                  avatar: const Icon(Icons.today_outlined, size: 18),
-                  label: Text(S.of(context).Reminders_Entry),
-                  onPressed: onOpenReminders,
-                ),
-              ),
-            ],
-            if (onOpenLibrary != null) ...[
-              const SizedBox(width: 8),
-              ActionChip(
-                key: const ValueKey('library-filters-shortcut'),
-                avatar: const Icon(Icons.tune_rounded, size: 18),
-                label: Text(libraryFilterCount == 0
-                    ? S.of(context).Library_Filters
-                    : '${S.of(context).Library_Filters} ($libraryFilterCount)'),
-                onPressed: onOpenLibrary,
-              ),
-            ],
-          ]),
+          ),
         ),
-      );
+      ),
+    );
+  }
 }

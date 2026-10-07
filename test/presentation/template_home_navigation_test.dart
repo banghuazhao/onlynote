@@ -236,14 +236,10 @@ Future<(_Router, _AutosaveStore, Future<void> Function())> _openHome(
   return (router, store, close);
 }
 
-Future<void> _openTemplates(WidgetTester tester, double width) async {
-  if (width < 360) {
-    await tester.tap(find.byKey(const ValueKey('home-more')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(S.current.Templates));
-  } else {
-    await tester.tap(find.byTooltip(S.current.Templates));
-  }
+Future<void> _openTemplates(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('home-more')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(S.current.Templates));
   await tester.pump();
   // The singleton's serialized queue originated outside the widget test's
   // fake clock. Drain the picker's queued read on the real async event loop.
@@ -323,7 +319,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(grid.pixels, greaterThan(0));
 
-      await _openTemplates(tester, width);
+      await _openTemplates(tester);
       final choice = find.byKey(ValueKey('template-${template.name}'));
       await tester.ensureVisible(choice);
       await tester.pumpAndSettle();
@@ -413,7 +409,7 @@ void main() {
 
     // Cancelling a later picker must leave Home active, without creating an
     // editor or retaining a pageless route for the next visit.
-    await _openTemplates(tester, width);
+    await _openTemplates(tester);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.byType(NoteTemplatePickerSheet), findsNothing);

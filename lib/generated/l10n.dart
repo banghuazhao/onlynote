@@ -360,6 +360,21 @@ class S {
     );
   }
 
+  /// `Cancel searching`
+  String get Cancel_Searching {
+    return Intl.message(
+      'Cancel searching',
+      name: 'Cancel_Searching',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Searching`
+  String get Search_Active {
+    return Intl.message('Searching', name: 'Search_Active', desc: '', args: []);
+  }
+
   /// `Text in photo`
   String get Photo_Search_Text_In_Photo {
     return Intl.message(

@@ -50,7 +50,7 @@ import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'widgets/note_card.dart';
 import 'widgets/note_reorder_card.dart';
 import 'widgets/widget_discovery_prompt.dart';
-import 'widgets/daily_note_shortcut.dart';
+import 'widgets/home_menu_item_label.dart';
 
 @RoutePage(name: 'HomeRoute')
 class HomeScreen extends StatefulWidget {
@@ -551,12 +551,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _dailyNoteShortcut() => DailyNoteShortcut(
-        onPressed: _openDailyNote,
-        onOpenCalendar: _openDailyNoteCalendar,
-        isOpening: _openingDailyNote || _presentingDailyCalendar,
-      );
-
   /// What the app bar title reads: the scope the note list is currently
   /// showing.
   String _scopeLabel(BuildContext context, _FolderScope scope) {
@@ -658,14 +652,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: DeskSurface.colorOf(context),
         appBar: NoteAppBar(
           autoImplementLeading: false,
-          leading: IconButton(
-            tooltip: S.of(context).Settings,
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
-            ),
-          ),
+          leading: _buildHomeLeading(context),
           titleWidget: BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) => state.maybeMap(
               orElse: () => Text(S.of(context).notes),
@@ -702,63 +689,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildSearchField(context),
                   BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) => NoteSearchFilters(
-                            leadingAction: _isReorderMode
-                                ? null
-                                : context
-                                    .watch<MultipleDeleteBloc>()
-                                    .state
-                                    .mapOrNull(
-                                      initial: (_) => state.mapOrNull(
-                                        loaded: (s) => s.showTrash
-                                            ? null
-                                            : _dailyNoteShortcut(),
-                                      ),
-                                    ),
-                            onOpenLibrary: _openLibraryFilters,
                             selected:
                                 state.mapOrNull(loaded: (s) => s.filters) ?? {},
                             onChanged: _changeSearchFilters,
                           )),
                 ],
-                if (!_isSearchVisible && !_isReorderMode)
-                  BlocBuilder<MultipleDeleteBloc, MultipleDeleteState>(
-                    builder: (context, selection) => selection.maybeMap(
-                      selected: (_) => const SizedBox.shrink(),
-                      orElse: () => BlocBuilder<HomeBloc, HomeState>(
-                        builder: (context, state) => state.maybeMap(
-                          loaded: (data) => data.showTrash
-                              ? const SizedBox.shrink()
-                              : UnfinishedNotesFilter(
-                                  leadingAction: _dailyNoteShortcut(),
-                                  onOpenReminders: () {
-                                    _cancelChecklistReview();
-                                    context.router.push(RemindersRoute());
-                                  },
-                                  onOpenLibrary: _openLibraryFilters,
-                                  libraryFilterCount: data.filters.length +
-                                      data.selectedTags.length +
-                                      (data.includeArchived ? 1 : 0),
-                                  selected: data.filters
-                                      .contains(NoteSearchFilter.unfinished),
-                                  onChanged: (selected) {
-                                    final filters =
-                                        Set<NoteSearchFilter>.of(data.filters);
-                                    if (selected) {
-                                      filters.add(NoteSearchFilter.unfinished);
-                                    } else {
-                                      filters
-                                          .remove(NoteSearchFilter.unfinished);
-                                    }
-                                    context
-                                        .read<HomeBloc>()
-                                        .add(HomeEvent.filtersChanged(filters));
-                                  },
-                                ),
-                          orElse: () => const SizedBox.shrink(),
-                        ),
-                      ),
-                    ),
-                  ),
                 Expanded(
                   child: ValueListenableBuilder(
                     valueListenable: getIt<Database>().box.listenable(),
@@ -933,14 +868,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _isSearchVisible = !_isSearchVisible;
       if (!_isSearchVisible) {
         _searchController.clear();
-        final filters = context.read<HomeBloc>().state.mapOrNull(
-                  loaded: (data) => data.filters,
-                ) ??
-            <NoteSearchFilter>{};
-        context.read<HomeBloc>().add(HomeEvent.filtersChanged({
-              if (filters.contains(NoteSearchFilter.unfinished))
-                NoteSearchFilter.unfinished,
-            }));
         context.read<HomeBloc>().add(const HomeEvent.searchChanged(''));
       }
     });
@@ -1004,6 +931,41 @@ class _HomeScreenState extends State<HomeScreen> {
         .add(const MultipleDeleteEvent.clearAll());
   }
 
+  void _openSettings() => Navigator.push(
+        context,
+        MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+      );
+
+  Widget _libraryFiltersButton() => BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) => LibraryFiltersButton(
+          key: const ValueKey('home-library-filters'),
+          count: state.mapOrNull(
+                loaded: (data) =>
+                    data.filters.length +
+                    data.selectedTags.length +
+                    (data.includeArchived ? 1 : 0),
+              ) ??
+              0,
+          onPressed: _openLibraryFilters,
+        ),
+      );
+
+  Widget _buildHomeLeading(BuildContext context) {
+    final browsing = !_isReorderMode &&
+        context.watch<MultipleDeleteBloc>().state.maybeMap(
+              initial: (_) => true,
+              orElse: () => false,
+            );
+    if (MediaQuery.sizeOf(context).width < 240 && browsing) {
+      return _libraryFiltersButton();
+    }
+    return IconButton(
+      tooltip: S.of(context).Settings,
+      icon: const Icon(Icons.settings_outlined),
+      onPressed: _openSettings,
+    );
+  }
+
   List<Widget>? _buildAppBarActions(BuildContext context) {
     if (_isReorderMode) {
       return [
@@ -1018,46 +980,93 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return context.watch<MultipleDeleteBloc>().state.mapOrNull(
           initial: (_) => [
-            if (MediaQuery.sizeOf(context).width < 360)
-              PopupMenuButton<String>(
-                key: const ValueKey('home-more'),
-                tooltip: S.of(context).More_Options,
-                style: AppButtonStyles.icon(Theme.of(context).colorScheme),
-                onSelected: (action) {
-                  switch (action) {
-                    case 'search':
-                      _toggleSearch();
-                    case 'templates':
-                      _showTemplates();
-                    case 'folders':
-                      _openCurrentFolderPicker();
-                  }
-                },
-                itemBuilder: (context) => [
-                  if (MediaQuery.sizeOf(context).width < 280)
-                    PopupMenuItem(
-                        value: 'folders', child: Text(S.of(context).Folders)),
-                  PopupMenuItem(
-                      value: 'search', child: Text(S.of(context).Search_Notes)),
-                  PopupMenuItem(
-                      value: 'templates', child: Text(S.of(context).Templates)),
-                ],
-                icon: const Icon(Icons.more_horiz_rounded),
-              )
-            else ...[
+            if (MediaQuery.sizeOf(context).width >= 240)
+              _libraryFiltersButton(),
+            if (MediaQuery.sizeOf(context).width >= 440)
               AppButton(
-                tooltip: S.of(context).Search_Notes,
+                tooltip: _isSearchVisible
+                    ? S.of(context).Cancel_Searching
+                    : S.of(context).Search_Notes,
                 onPressed: _toggleSearch,
-                child: Icon(
-                  _isSearchVisible ? Icons.search_off : Icons.search,
+                child: HomeSearchStatusIcon(
+                  icon: _isSearchVisible ? Icons.search_off : Icons.search,
+                  active: _isSearchVisible,
+                  badgeKey: const ValueKey('home-direct-search-active-dot'),
                 ),
               ),
-              AppButton(
-                tooltip: S.of(context).Templates,
-                onPressed: _showTemplates,
-                child: const Icon(Icons.dashboard_customize_outlined),
+            PopupMenuButton<String>(
+              key: const ValueKey('home-more'),
+              tooltip: _isSearchVisible &&
+                      MediaQuery.sizeOf(context).width < 440
+                  ? '${S.of(context).More_Options}, ${S.of(context).Search_Active}'
+                  : S.of(context).More_Options,
+              style: AppButtonStyles.icon(Theme.of(context).colorScheme),
+              onSelected: (action) {
+                switch (action) {
+                  case 'search':
+                    _toggleSearch();
+                  case 'templates':
+                    _showTemplates();
+                  case 'folders':
+                    _openCurrentFolderPicker();
+                  case 'daily-calendar':
+                    _openDailyNoteCalendar();
+                  case 'reminders':
+                    _cancelChecklistReview();
+                    context.router.push(RemindersRoute());
+                  case 'settings':
+                    _openSettings();
+                }
+              },
+              itemBuilder: (context) => [
+                if (MediaQuery.sizeOf(context).width < 280)
+                  PopupMenuItem(
+                      value: 'folders',
+                      child: HomeMenuItemLabel(S.of(context).Folders,
+                          icon: Icons.folder_outlined)),
+                if (MediaQuery.sizeOf(context).width < 440)
+                  PopupMenuItem(
+                    key: const ValueKey('home-search-menu'),
+                    value: 'search',
+                    child: HomeMenuItemLabel(
+                      _isSearchVisible
+                          ? S.of(context).Cancel_Searching
+                          : S.of(context).Search_Notes,
+                      icon: _isSearchVisible ? Icons.search_off : Icons.search,
+                      activeSearch: _isSearchVisible,
+                      searchDotKey: const ValueKey('home-search-menu-dot'),
+                    ),
+                  ),
+                PopupMenuItem(
+                  key: const ValueKey('home-reminders-menu'),
+                  value: 'reminders',
+                  child: HomeMenuItemLabel(S.of(context).Reminders_Title,
+                      icon: Icons.alarm_outlined),
+                ),
+                PopupMenuItem(
+                    value: 'templates',
+                    child: HomeMenuItemLabel(S.of(context).Templates,
+                        icon: Icons.dashboard_customize_outlined)),
+                PopupMenuItem(
+                  key: const ValueKey('daily-note-calendar-menu'),
+                  value: 'daily-calendar',
+                  enabled: !_openingDailyNote && !_presentingDailyCalendar,
+                  child: HomeMenuItemLabel(S.of(context).Daily_Note_Calendar,
+                      icon: Icons.calendar_month_outlined),
+                ),
+                if (MediaQuery.sizeOf(context).width < 240)
+                  PopupMenuItem(
+                      value: 'settings',
+                      child: HomeMenuItemLabel(S.of(context).Settings,
+                          icon: Icons.settings_outlined)),
+              ],
+              icon: HomeSearchStatusIcon(
+                icon: Icons.more_horiz_rounded,
+                active:
+                    _isSearchVisible && MediaQuery.sizeOf(context).width < 440,
+                badgeKey: const ValueKey('home-search-active-dot'),
               ),
-            ],
+            ),
             AppButton(
               primary: true,
               tooltip: S.of(context).Add_Note,
@@ -1100,13 +1109,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context) => [
                     if (!showTrash)
                       PopupMenuItem(
-                          value: 'archive', child: Text(archiveLabel)),
+                          value: 'archive',
+                          child: HomeMenuItemLabel(archiveLabel,
+                              icon: showArchive
+                                  ? Icons.unarchive_outlined
+                                  : Icons.archive_outlined)),
                     PopupMenuItem(
                         value: 'delete',
-                        child: Text('$deleteLabel (${ids.length})')),
+                        child: HomeMenuItemLabel('$deleteLabel (${ids.length})',
+                            icon: showTrash
+                                ? Icons.delete_forever_outlined
+                                : Icons.delete_outline)),
                     if (showTrash)
                       PopupMenuItem(
-                          value: 'restore', child: Text(S.of(context).Restore)),
+                          value: 'restore',
+                          child: HomeMenuItemLabel(S.of(context).Restore,
+                              icon: Icons.restore_outlined)),
                   ],
                 )
               else ...[

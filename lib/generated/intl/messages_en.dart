@@ -136,6 +136,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Title": MessageLookupByLibrary.simpleMessage("Backup & Restore"),
     "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "Cancel_Searching": MessageLookupByLibrary.simpleMessage(
+      "Cancel searching",
+    ),
     "Card_Linked_Notes_Count": m1,
     "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
@@ -717,6 +720,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
+    "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
     "Selection_Checklist_Added": m18,

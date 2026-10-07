@@ -217,6 +217,18 @@ Future<void> _dismissMenu(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+void _expectMenuIcons(WidgetTester tester) {
+  final items = tester
+      .widgetList<PopupMenuItem<String>>(find.byType(PopupMenuItem<String>));
+  expect(items, isNotEmpty);
+  for (final item in items) {
+    expect(
+        find.descendant(of: find.byWidget(item), matching: find.byType(Icon)),
+        findsOneWidget,
+        reason: 'Home menu action ${item.value} should have a readable icon');
+  }
+}
+
 void main() {
   final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
   late Directory directory;
@@ -267,6 +279,9 @@ void main() {
       expect(find.text(S.current.Search_Notes), findsOneWidget);
       expect(find.text(S.current.Templates), findsOneWidget);
       if (width < 280) expect(find.text(S.current.Folders), findsOneWidget);
+      if (width < 240) expect(find.text(S.current.Settings), findsOneWidget);
+      expect(find.byKey(const ValueKey('home-search-menu')), findsOneWidget);
+      _expectMenuIcons(tester);
       await _dismissMenu(tester);
 
       home.selection.add(const MultipleDeleteEvent.toggleSelect('first'));
@@ -299,7 +314,14 @@ void main() {
       (tester) async {
     final home = await _openHome(tester, width: 320);
     await _tap(tester, find.byKey(const ValueKey('home-more')));
-    await _tap(tester, find.text(S.current.Search_Notes));
+    _expectMenuIcons(tester);
+    await _tap(tester, find.byKey(const ValueKey('home-search-menu')));
+    expect(find.byType(TextField), findsOneWidget);
+    expect(
+        tester
+            .widget<Badge>(find.byKey(const ValueKey('home-search-active-dot')))
+            .isLabelVisible,
+        isTrue);
     home.selection.add(const MultipleDeleteEvent.toggleSelect('first'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Travel');
@@ -320,6 +342,43 @@ void main() {
     expect(home.selection.state, const MultipleDeleteState.initial());
     expect(home.bloc.state.mapOrNull(loaded: (state) => state.filters),
         {NoteSearchFilter.checklists});
+    expect(
+        home.bloc.state
+            .mapOrNull(loaded: (state) => state.notes.map((n) => n.id)),
+        ['first']);
+
+    // Cancel search through the same menu after entering a query, while the
+    // checklist filter continues to describe the desired library scope.
+    await tester.enterText(find.byType(TextField), 'release');
+    await tester.pumpAndSettle();
+    expect(home.bloc.state.mapOrNull(loaded: (state) => state.searchQuery),
+        'release');
+    await _tap(tester, find.byKey(const ValueKey('home-more')));
+    final searchAction = find.byKey(const ValueKey('home-search-menu'));
+    expect(
+        find.descendant(
+            of: searchAction, matching: find.text(S.current.Cancel_Searching)),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: searchAction, matching: find.text(S.current.Search_Notes)),
+        findsNothing);
+    expect(
+        tester
+            .widget<Badge>(find.byKey(const ValueKey('home-search-menu-dot')))
+            .isLabelVisible,
+        isTrue);
+    _expectMenuIcons(tester);
+    await _tap(tester, find.byKey(const ValueKey('home-search-menu')));
+    expect(find.byType(TextField), findsNothing);
+    expect(home.bloc.state.mapOrNull(loaded: (state) => state.searchQuery), '');
+    expect(home.bloc.state.mapOrNull(loaded: (state) => state.filters),
+        {NoteSearchFilter.checklists});
+    expect(
+        tester
+            .widget<Badge>(find.byKey(const ValueKey('home-search-active-dot')))
+            .isLabelVisible,
+        isFalse);
     expect(
         home.bloc.state
             .mapOrNull(loaded: (state) => state.notes.map((n) => n.id)),
