@@ -172,17 +172,24 @@ void main() {
   }
 
   Future<void> scan(WidgetTester tester, {bool settle = true}) async {
-    final add = find.byKey(const ValueKey('editor-add-photo'));
+    final add = find.byKey(const ValueKey('editor-insert'));
     await tester.ensureVisible(add);
     await tester.pumpAndSettle();
     await tester.tap(add);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(S.current.Document_Scan));
+    await tester.tap(find.byKey(const ValueKey('editor-scan-document')));
     if (settle) {
       await tester.pumpAndSettle();
     } else {
       await tester.pump(const Duration(milliseconds: 400));
     }
+  }
+
+  VoidCallback? insertAction(WidgetTester tester) {
+    final control = tester.widget(find.byKey(const ValueKey('editor-insert')));
+    return control is IconButton
+        ? control.onPressed
+        : (control as TextButton).onPressed;
   }
 
   testWidgets('reviewed pages are saved in order before acknowledgement',
@@ -216,9 +223,7 @@ void main() {
     expect(capture.acknowledged, 0);
     expect(store.saved, isEmpty);
     expect(find.text(S.current.Document_Scan_Failed), findsNothing);
-    final add = tester
-        .widget<TextButton>(find.byKey(const ValueKey('editor-add-photo')));
-    expect(add.onPressed, isNotNull);
+    expect(insertAction(tester), isNotNull);
     expect(tester.takeException(), isNull);
   });
 
@@ -315,22 +320,17 @@ void main() {
     final native = Completer<DocumentScanCaptureResult>();
     capture.action = () => native.future;
     await scan(tester, settle: false);
-    expect(
-        tester
-            .widget<TextButton>(find.byKey(const ValueKey('editor-add-photo')))
-            .onPressed,
-        isNull);
+    expect(insertAction(tester), isNull);
+    await tester.tap(find.byKey(const ValueKey('editor-insert')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('editor-scan-document')), findsNothing);
     await tester.tap(find.text(S.current.Done));
     await tester.pump();
     expect(router.current.name, AddUpdateNoteRoute.name);
     native.complete(
         const DocumentScanCaptureResult(status: DocumentScanStatus.cancelled));
     await tester.pumpAndSettle();
-    expect(
-        tester
-            .widget<TextButton>(find.byKey(const ValueKey('editor-add-photo')))
-            .onPressed,
-        isNotNull);
+    expect(insertAction(tester), isNotNull);
   });
 
   testWidgets('Chinese scanner discovery fits narrow screens with large text',
@@ -340,7 +340,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await open(tester, locale: const Locale('zh'), textScale: 1.5);
-    final add = find.byKey(const ValueKey('editor-add-photo'));
+    final add = find.byKey(const ValueKey('editor-insert'));
     await tester.ensureVisible(add);
     await tester.pumpAndSettle();
     await tester.tap(add);

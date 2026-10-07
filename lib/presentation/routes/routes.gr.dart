@@ -28,6 +28,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
     NoteReminderScheduler? reminderScheduler,
     WidgetCommands? widgetCommands,
     NotePositionStore? positionStore,
+    NoteEditorTips? editorTips,
     NoteEditorStart start = NoteEditorStart.standard,
     List<PageRouteInfo>? children,
   }) : super(
@@ -48,6 +49,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
             reminderScheduler: reminderScheduler,
             widgetCommands: widgetCommands,
             positionStore: positionStore,
+            editorTips: editorTips,
             start: start,
           ),
           initialChildren: children,
@@ -76,6 +78,7 @@ class AddUpdateNoteRoute extends PageRouteInfo<AddUpdateNoteRouteArgs> {
         reminderScheduler: args.reminderScheduler,
         widgetCommands: args.widgetCommands,
         positionStore: args.positionStore,
+        editorTips: args.editorTips,
         start: args.start,
       );
     },
@@ -99,6 +102,7 @@ class AddUpdateNoteRouteArgs {
     this.reminderScheduler,
     this.widgetCommands,
     this.positionStore,
+    this.editorTips,
     this.start = NoteEditorStart.standard,
   });
 
@@ -132,11 +136,13 @@ class AddUpdateNoteRouteArgs {
 
   final NotePositionStore? positionStore;
 
+  final NoteEditorTips? editorTips;
+
   final NoteEditorStart start;
 
   @override
   String toString() {
-    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, positionStore: $positionStore, start: $start}';
+    return 'AddUpdateNoteRouteArgs{key: $key, note: $note, folderId: $folderId, template: $template, customTemplateNote: $customTemplateNote, autosaveStore: $autosaveStore, photoCapture: $photoCapture, documentScanCapture: $documentScanCapture, photoEditService: $photoEditService, photoTextExtraction: $photoTextExtraction, voiceMemoService: $voiceMemoService, voiceMemoDrafts: $voiceMemoDrafts, reminderScheduler: $reminderScheduler, widgetCommands: $widgetCommands, positionStore: $positionStore, editorTips: $editorTips, start: $start}';
   }
 }
 
@@ -191,13 +197,14 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
       final args = data.argsAs<NoteDetailRouteArgs>(
           orElse: () =>
               NoteDetailRouteArgs(noteId: pathParams.getString('noteId')));
-      return NoteDetailScreen(
+      return WrappedRoute(
+          child: NoteDetailScreen(
         key: args.key,
         noteId: args.noteId,
         templateStore: args.templateStore,
         positionStore: args.positionStore,
         selectionTransfer: args.selectionTransfer,
-      );
+      ));
     },
   );
 }

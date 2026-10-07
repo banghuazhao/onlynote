@@ -851,7 +851,7 @@ void main() {
         field.controller!.value.composing, const TextRange(start: 1, end: 2));
     expect(field.focusNode!.hasFocus, isTrue);
     expect(tester.testTextInput.isVisible, isTrue);
-    expect(find.byKey(const ValueKey('editor-record-voice')), findsNothing);
+    expect(find.byKey(const ValueKey('editor-insert')), findsNothing);
     expect(find.byKey(const ValueKey('editor-edit-tags')), findsNothing);
     expect(find.text(S.current.Add_todo), findsNothing);
     expect(find.byKey(const ValueKey('todo-field-task')), findsOneWidget);
@@ -873,10 +873,17 @@ void main() {
     expect(todo.controller!.selection,
         const TextSelection(baseOffset: 6, extentOffset: 9));
     expect(todo.focusNode!.hasFocus, isTrue);
-    expect(find.byKey(const ValueKey('editor-record-voice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-insert')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-record-voice')), findsNothing);
     await _tap(tester, _undo());
     expect(editor.latest('focus').description, '茶');
     expect(tester.widget<IconButton>(_undo()).onPressed, isNull);
+    await _tap(tester, find.byKey(const ValueKey('editor-insert')));
+    expect(find.byKey(const ValueKey('editor-record-voice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-add-photo')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-add-checklist')), findsOneWidget);
+    editor.router.maybePop();
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 
@@ -1833,8 +1840,12 @@ void main() {
     tester.widget<TextField>(_body()).controller!.selection =
         const TextSelection(baseOffset: 0, extentOffset: 3);
     await tester.pump();
-    await _tap(tester, find.byKey(const ValueKey('format-bold')));
-    await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    // Apply both styles while the transient checklist Undo action is visible.
+    // Settling each tap advances tooltip/timer frames beyond that action's life.
+    await tester.tap(find.byKey(const ValueKey('format-bold')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('format-bold')));
+    await tester.pump();
     expect(
         tester
             .widget<NoteBodyEditor>(find.byType(NoteBodyEditor))

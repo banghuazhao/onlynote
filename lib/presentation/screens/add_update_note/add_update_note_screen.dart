@@ -16,6 +16,12 @@ import 'package:onlynote/presentation/components/note_outline_navigation_control
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
 import 'package:onlynote/presentation/components/simple_formatting_controller.dart';
 import 'package:onlynote/presentation/components/note_body_editor.dart';
+import 'package:onlynote/presentation/components/note_body_formatting_controller.dart';
+import 'package:onlynote/presentation/components/note_writing_toolbar.dart';
+import 'package:onlynote/presentation/components/note_insert_sheet.dart';
+import 'package:onlynote/presentation/components/note_save_status.dart';
+import 'package:onlynote/presentation/components/note_editor_tip.dart';
+import 'package:onlynote/services/note_editor_tips.dart';
 import 'package:onlynote/presentation/components/note_photo_editor.dart';
 import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_find_preview.dart';
@@ -79,7 +85,6 @@ import 'bloc/add_update_bloc.dart';
 import 'bloc/add_update_form/add_update_form_bloc.dart';
 
 part 'widgets/colors_bar.dart';
-part 'widgets/image_section.dart';
 part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
@@ -104,6 +109,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
       this.reminderScheduler,
       this.widgetCommands,
       this.positionStore,
+      this.editorTips,
       this.start = NoteEditorStart.standard});
   final Note? note;
   final String? folderId;
@@ -121,6 +127,7 @@ class AddUpdateNoteScreen extends StatefulWidget {
   final NoteReminderScheduler? reminderScheduler;
   final WidgetCommands? widgetCommands;
   final NotePositionStore? positionStore;
+  final NoteEditorTips? editorTips;
   final NoteEditorStart start;
 
   @override
@@ -135,6 +142,14 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   final FocusNode _bodyFocus = FocusNode();
   final _editorFocusScope = FocusScopeNode();
   final _outlineController = NoteOutlineNavigationController();
+  final _formattingController = NoteBodyFormattingController();
+  bool _retryingSave = false;
+  bool _formattingTipAvailable = false;
+  bool _imageTipAvailable = false;
+  bool _imageTipRelevant = false;
+  Set<String> _knownImagePaths = {};
+  final Set<NoteEditorTipKind> _seenTips = {};
+  NoteEditorTips get _tips => widget.editorTips ?? NoteEditorTips.instance;
   late final NoteEditHistory _editHistory;
   Timer? _captureTimer;
   bool _replayingHistory = false;
@@ -255,6 +270,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           linkedNoteIds: initial.linkedNoteIds,
           dailyNoteDateKey: initial.dailyNoteDateKey,
         ));
+    _knownImagePaths = initial.imagePaths.toSet();
+    _formattingController.addListener(_refreshStatus);
     _changes = _form.stream.listen((state) {
       if (_refreshingFromLibrary || _replayingHistory) return;
       _currentImageLayouts = normalizeNoteImageLayouts(
@@ -262,6 +279,10 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       final todoIds = state.todos.map((todo) => todo.id).toSet();
       _composingTodoIds.retainWhere(todoIds.contains);
       _todoSelections.removeWhere((id, _) => !todoIds.contains(id));
+      if (state.imagePaths.any((path) => !_knownImagePaths.contains(path))) {
+        _imageTipRelevant = true;
+      }
+      _knownImagePaths = state.imagePaths.toSet();
       _hadUserChange = true;
       // A body edit can emit text and rebased photo anchors separately. Capture
       // their settled form together so one keystroke has one undo step.
@@ -294,6 +315,60 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _autosave.saveInitial();
     }
     if (widget.note != null) unawaited(_restoreWritingPosition());
+    unawaited(_loadTips());
+  }
+
+  Future<void> _loadTips() async {
+    final available = await Future.wait([
+      _tips.shouldShow(NoteEditorTipKind.formatting),
+      _tips.shouldShow(NoteEditorTipKind.imageLayout),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      _formattingTipAvailable = available[0];
+      _imageTipAvailable = available[1];
+    });
+  }
+
+  // Record a tip only after its relevant UI has been displayed. It stays
+  // dismissible in this editor and is not offered again on later visits.
+  void _recordTipSeen(NoteEditorTipKind kind) {
+    if (!_seenTips.add(kind)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_tips.dismiss(kind));
+    });
+  }
+
+  void _dismissTip(NoteEditorTipKind kind) {
+    setState(() {
+      if (kind == NoteEditorTipKind.formatting) {
+        _formattingTipAvailable = false;
+      } else {
+        _imageTipAvailable = false;
+      }
+    });
+    unawaited(_tips.dismiss(kind));
+  }
+
+  Future<void> _insert() async {
+    if (_mediaBlocked || _findController != null) return;
+    final action = await showAppSheet<NoteInsertAction>(
+      context: context,
+      builder: (_) => const NoteInsertSheet(),
+    );
+    if (!mounted || _mediaBlocked || action == null) return;
+    switch (action) {
+      case NoteInsertAction.checklist:
+        _todoNavigationKey.currentState?.addItem();
+      case NoteInsertAction.gallery:
+        await _addPhoto(ImageSource.gallery);
+      case NoteInsertAction.camera:
+        await _addPhoto(ImageSource.camera);
+      case NoteInsertAction.scan:
+        await _scanDocument();
+      case NoteInsertAction.voice:
+        await _recordVoiceMemo();
+    }
   }
 
   void _writingGesture(PointerDownEvent _) => _writingInteraction++;
@@ -1176,7 +1251,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _addingPhoto ||
       _savingReminder ||
       _presentingReminder ||
-      _leaving;
+      _leaving ||
+      _retryingSave;
 
   Future<void> _extractPhotoText() async {
     if (_mediaBlocked || _form.state.imagePaths.isEmpty) return;
@@ -2007,8 +2083,29 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  Future<void> _retrySave() async {
+    if (_retryingSave || _mediaBlocked) return;
+    setState(() => _retryingSave = true);
+    try {
+      await _voiceWrites;
+      // Include any field events queued in the frame of the retry tap.
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _captureTimer?.cancel();
+      _capture(_form.state);
+      final saved = await _autosave.flush();
+      if (mounted && !saved) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _retryingSave = false);
+    }
+  }
+
   Future<void> _finish() async {
     if (_leaving ||
+        _retryingSave ||
         _replayingHistory ||
         _addingPhoto ||
         _presentingMedia ||
@@ -2099,118 +2196,146 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _titleFocus.dispose();
     _editorFocusScope.dispose();
     _outlineController.dispose();
+    _formattingController.removeListener(_refreshStatus);
+    _formattingController.dispose();
     _findController?.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Listener(
-        onPointerDown: _writingGesture,
-        onPointerSignal: (_) => _writingInteraction++,
-        child: NotificationListener<UserScrollNotification>(
-          onNotification: (_) {
-            _writingInteraction++;
-            return false;
-          },
-          child: FocusScope(
-            node: _editorFocusScope,
-            child: BlocProvider.value(
-              value: _form,
-              child: PopScope(
-                canPop: _allowPop ||
-                    (!_autosave.dirty &&
-                        _captureTimer?.isActive != true &&
-                        !_replayingHistory &&
-                        !_photoCapture.canRetry &&
-                        !_documentScanCapture.canRetry &&
-                        !_addingPhoto &&
-                        !_presentingMedia &&
-                        _voiceMutations == 0 &&
-                        !_savingReminder &&
-                        !_presentingReminder),
-                onPopInvokedWithResult: (didPop, _) {
-                  if (!didPop) {
-                    _finish();
-                  } else {
-                    unawaited(_recordReviewOnExit());
-                  }
-                },
-                child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
-                  builder: (context, state) => AbsorbPointer(
-                    absorbing: _replayingHistory,
-                    child: _BuildForm(
-                      widget: widget,
-                      state: state,
-                      titleController: _titleController,
-                      descriptionController: _descriptionController,
-                      bodyFocus: _bodyFocus,
-                      titleFocus: _titleFocus,
-                      outlineController: _outlineController,
-                      titleNavigationKey: _titleNavigationKey,
-                      todoNavigationKey: _todoNavigationKey,
-                      writingFocused: _writingFocused,
-                      onToggleFocus: _mediaBlocked ? null : _toggleWritingFocus,
-                      onEditFindMatch: _editFindMatch,
-                      onReplaceFind: (match, replacement) =>
-                          _replaceFind(replacement, match: match),
-                      onReplaceAllFind: _replaceFind,
-                      findActionsEnabled: !_editBlocked && !_findInputComposing,
-                      onFindCompositionChanged: _findCompositionChanged,
-                      onOutline: !_historyBlocked &&
-                              shouldShowNoteOutline(
-                                  _descriptionController.text,
-                                  buildNoteOutline(_descriptionController.text,
-                                      _descriptionController.styles))
-                          ? _openOutline
-                          : null,
-                      onUndo: !_historyBlocked && _editHistory.canUndo
-                          ? () => _restoreHistory(redo: false)
-                          : null,
-                      onRedo: !_historyBlocked && _editHistory.canRedo
-                          ? () => _restoreHistory(redo: true)
-                          : null,
-                      restoredEdit: _restoredEdit,
-                      restoreRevision: _restoreRevision,
-                      onTodoInputChanged: _todoInputChanged,
-                      onCopySelection: _copySelection,
-                      onAddSelectionToChecklist: _addSelectionToChecklist,
-                      onMore: _showEditorMore,
-                      onImageLayoutsChanged: _imageLayoutsChanged,
-                      onRemoveImage: _removeInlineImage,
-                      onEditImage: _editPhoto,
-                      onFind: _openFind,
-                      onCloseFind: _closeFind,
-                      findController: _findController,
-                      findNote:
-                          _findController == null ? null : _currentDraft(state),
-                      status: _autosave.status,
-                      onDone: _finish,
-                      onAddPhoto: _addPhoto,
-                      onScanDocument: _scanDocument,
-                      addingPhoto: _addingPhoto,
-                      mediaBusy: _presentingMedia,
-                      extractingText: _extractingPhotoText,
-                      onExtractText: _extractPhotoText,
-                      onRecordVoice: _recordVoiceMemo,
-                      onRemoveVoice: _removeVoiceMemo,
-                      onTranscriptChanged: _editVoiceTranscript,
-                      resolveAudioPath: _audio.resolvePath,
-                      libraryNotes: _libraryNotes,
-                      onEditTags: _editTags,
-                      onEditLinks: _editLinks,
-                      onOpenLinkedNote: _openLinkedNote,
-                      reminderSuggestion: _reminderSuggestion,
-                      savingReminder: _savingReminder,
-                      onReminderSuggestion: _confirmReminderSuggestion,
-                      onDismissReminderSuggestion: _dismissReminderSuggestion,
-                    ),
+  Widget build(BuildContext context) {
+    final selection = _descriptionController.selection;
+    final formattingTip = _formattingTipAvailable &&
+        _formattingController.hasFocus &&
+        selection.isValid &&
+        !selection.isCollapsed &&
+        _findController == null &&
+        !_mediaBlocked;
+    final imageTip = _imageTipAvailable &&
+        _imageTipRelevant &&
+        _form.state.imagePaths.isNotEmpty &&
+        !_writingFocused &&
+        _findController == null &&
+        !_mediaBlocked &&
+        !formattingTip;
+    if (formattingTip) _recordTipSeen(NoteEditorTipKind.formatting);
+    if (imageTip) _recordTipSeen(NoteEditorTipKind.imageLayout);
+    return Listener(
+      onPointerDown: _writingGesture,
+      onPointerSignal: (_) => _writingInteraction++,
+      child: NotificationListener<UserScrollNotification>(
+        onNotification: (_) {
+          _writingInteraction++;
+          return false;
+        },
+        child: FocusScope(
+          node: _editorFocusScope,
+          child: BlocProvider.value(
+            value: _form,
+            child: PopScope(
+              canPop: _allowPop ||
+                  (!_autosave.dirty &&
+                      _captureTimer?.isActive != true &&
+                      !_replayingHistory &&
+                      !_photoCapture.canRetry &&
+                      !_documentScanCapture.canRetry &&
+                      !_addingPhoto &&
+                      !_presentingMedia &&
+                      _voiceMutations == 0 &&
+                      !_savingReminder &&
+                      !_presentingReminder &&
+                      !_retryingSave),
+              onPopInvokedWithResult: (didPop, _) {
+                if (!didPop) {
+                  _finish();
+                } else {
+                  unawaited(_recordReviewOnExit());
+                }
+              },
+              child: BlocBuilder<AddUpdateFormBloc, AddUpdateFormState>(
+                builder: (context, state) => AbsorbPointer(
+                  absorbing: _replayingHistory,
+                  child: _BuildForm(
+                    widget: widget,
+                    state: state,
+                    titleController: _titleController,
+                    descriptionController: _descriptionController,
+                    bodyFocus: _bodyFocus,
+                    titleFocus: _titleFocus,
+                    outlineController: _outlineController,
+                    formattingController: _formattingController,
+                    showFormattingTip: formattingTip,
+                    showImageTip: imageTip,
+                    onDismissFormattingTip: () =>
+                        _dismissTip(NoteEditorTipKind.formatting),
+                    onDismissImageTip: () =>
+                        _dismissTip(NoteEditorTipKind.imageLayout),
+                    onInsert: _insert,
+                    titleNavigationKey: _titleNavigationKey,
+                    todoNavigationKey: _todoNavigationKey,
+                    writingFocused: _writingFocused,
+                    onToggleFocus: _mediaBlocked ? null : _toggleWritingFocus,
+                    onEditFindMatch: _editFindMatch,
+                    onReplaceFind: (match, replacement) =>
+                        _replaceFind(replacement, match: match),
+                    onReplaceAllFind: _replaceFind,
+                    findActionsEnabled: !_editBlocked && !_findInputComposing,
+                    onFindCompositionChanged: _findCompositionChanged,
+                    onOutline: !_historyBlocked &&
+                            shouldShowNoteOutline(
+                                _descriptionController.text,
+                                buildNoteOutline(_descriptionController.text,
+                                    _descriptionController.styles))
+                        ? _openOutline
+                        : null,
+                    onUndo: !_historyBlocked && _editHistory.canUndo
+                        ? () => _restoreHistory(redo: false)
+                        : null,
+                    onRedo: !_historyBlocked && _editHistory.canRedo
+                        ? () => _restoreHistory(redo: true)
+                        : null,
+                    restoredEdit: _restoredEdit,
+                    restoreRevision: _restoreRevision,
+                    onTodoInputChanged: _todoInputChanged,
+                    onCopySelection: _copySelection,
+                    onAddSelectionToChecklist: _addSelectionToChecklist,
+                    onMore: _showEditorMore,
+                    onImageLayoutsChanged: _imageLayoutsChanged,
+                    onRemoveImage: _removeInlineImage,
+                    onEditImage: _editPhoto,
+                    onFind: _openFind,
+                    onCloseFind: _closeFind,
+                    findController: _findController,
+                    findNote:
+                        _findController == null ? null : _currentDraft(state),
+                    status: _autosave.status,
+                    onDone: _finish,
+                    onRetrySave: _mediaBlocked ? null : _retrySave,
+                    retryingSave: _retryingSave,
+                    addingPhoto: _addingPhoto,
+                    mediaBusy: _presentingMedia,
+                    extractingText: _extractingPhotoText,
+                    onExtractText: _extractPhotoText,
+                    onRemoveVoice: _removeVoiceMemo,
+                    onTranscriptChanged: _editVoiceTranscript,
+                    resolveAudioPath: _audio.resolvePath,
+                    libraryNotes: _libraryNotes,
+                    onEditTags: _editTags,
+                    onEditLinks: _editLinks,
+                    onOpenLinkedNote: _openLinkedNote,
+                    reminderSuggestion: _reminderSuggestion,
+                    savingReminder: _savingReminder,
+                    onReminderSuggestion: _confirmReminderSuggestion,
+                    onDismissReminderSuggestion: _dismissReminderSuggestion,
                   ),
                 ),
               ),
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _BuildForm extends StatelessWidget {
@@ -2221,6 +2346,12 @@ class _BuildForm extends StatelessWidget {
     required this.bodyFocus,
     required this.titleFocus,
     required this.outlineController,
+    required this.formattingController,
+    required this.showFormattingTip,
+    required this.showImageTip,
+    required this.onDismissFormattingTip,
+    required this.onDismissImageTip,
+    required this.onInsert,
     required this.titleNavigationKey,
     required this.todoNavigationKey,
     required this.writingFocused,
@@ -2249,13 +2380,12 @@ class _BuildForm extends StatelessWidget {
     required this.state,
     required this.status,
     required this.onDone,
-    required this.onAddPhoto,
-    required this.onScanDocument,
+    required this.onRetrySave,
+    required this.retryingSave,
     required this.addingPhoto,
     required this.mediaBusy,
     required this.extractingText,
     required this.onExtractText,
-    required this.onRecordVoice,
     required this.onRemoveVoice,
     required this.onTranscriptChanged,
     required this.resolveAudioPath,
@@ -2276,6 +2406,12 @@ class _BuildForm extends StatelessWidget {
   final FocusNode bodyFocus;
   final FocusNode titleFocus;
   final NoteOutlineNavigationController outlineController;
+  final NoteBodyFormattingController formattingController;
+  final bool showFormattingTip;
+  final bool showImageTip;
+  final VoidCallback onDismissFormattingTip;
+  final VoidCallback onDismissImageTip;
+  final VoidCallback onInsert;
   final GlobalKey titleNavigationKey;
   final GlobalKey<_BuildTodoListFieldState> todoNavigationKey;
   final bool writingFocused;
@@ -2304,13 +2440,12 @@ class _BuildForm extends StatelessWidget {
   final AddUpdateFormState state;
   final AutosaveStatus status;
   final VoidCallback onDone;
-  final ValueChanged<ImageSource> onAddPhoto;
-  final VoidCallback onScanDocument;
+  final VoidCallback? onRetrySave;
+  final bool retryingSave;
   final bool addingPhoto;
   final bool mediaBusy;
   final bool extractingText;
   final VoidCallback onExtractText;
-  final VoidCallback onRecordVoice;
   final Future<void> Function(VoiceMemo) onRemoveVoice;
   final Future<void> Function(VoiceMemo, String?) onTranscriptChanged;
   final Future<String> Function(String) resolveAudioPath;
@@ -2367,16 +2502,31 @@ class _BuildForm extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: DeskSurface.colorOf(context),
-        bottomNavigationBar: finder != null || writingFocused
+        bottomNavigationBar: finder != null
             ? null
-            : ColorsBar(
-                selectedColor: state.selectedColor,
-                onChanged: (Color color) {
-                  context
-                      .read<AddUpdateFormBloc>()
-                      .add(AddUpdateFormEvent.colorChanged(color));
-                },
-              ),
+            : formattingController.hasFocus
+                ? NoteWritingToolbar(
+                    controller: _descriptionController,
+                    focusNode:
+                        formattingController.activeFocusNode ?? bodyFocus,
+                    beforeApply:
+                        formattingController.prepareFormattingSelection,
+                    enabled: !mediaBusy && !addingPhoto && !retryingSave,
+                    tip: showFormattingTip
+                        ? strings.Editor_Tip_Formatting
+                        : null,
+                    onDismissTip: onDismissFormattingTip,
+                  )
+                : writingFocused || MediaQuery.viewInsetsOf(context).bottom > 0
+                    ? null
+                    : ColorsBar(
+                        selectedColor: state.selectedColor,
+                        onChanged: (Color color) {
+                          context
+                              .read<AddUpdateFormBloc>()
+                              .add(AddUpdateFormEvent.colorChanged(color));
+                        },
+                      ),
         appBar: NoteAppBar(
           leading: Center(
             child: IconButton(
@@ -2389,19 +2539,10 @@ class _BuildForm extends StatelessWidget {
           ),
           titleWidget: Padding(
             padding: const EdgeInsetsDirectional.only(start: 12),
-            child: Text(
-              switch (status) {
-                AutosaveStatus.saved => S.of(context).Autosave_Saved,
-                AutosaveStatus.failed => S.of(context).Autosave_Retry,
-                _ => S.of(context).Autosave_Saving,
-              },
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: status == AutosaveStatus.failed
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+            child: NoteSaveStatus(
+              status: status,
+              onRetry: onRetrySave,
+              retrying: retryingSave,
             ),
           ),
           actions: [
@@ -2430,12 +2571,36 @@ class _BuildForm extends StatelessWidget {
           builder: (context, viewport) => Column(
             children: [
               if (finder == null)
-                NoteEditingActions(
-                    onUndo: onUndo,
-                    onRedo: onRedo,
-                    onOutline: onOutline,
-                    onToggleFocus: onToggleFocus,
-                    writingFocused: writingFocused),
+                ConstrainedBox(
+                  constraints:
+                      BoxConstraints(maxHeight: viewport.maxHeight * .35),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: NoteEditingActions(
+                        onUndo: onUndo,
+                        onRedo: onRedo,
+                        onOutline: onOutline,
+                        onToggleFocus: onToggleFocus,
+                        writingFocused: writingFocused,
+                        onInsert: writingFocused ? null : onInsert,
+                        insertEnabled:
+                            !mediaBusy && !addingPhoto && !retryingSave),
+                  ),
+                ),
+              if (showImageTip && finder == null)
+                ConstrainedBox(
+                  constraints:
+                      BoxConstraints(maxHeight: viewport.maxHeight * .22),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: NoteEditorTip(
+                      key: const ValueKey('editor-image-tip'),
+                      message: strings.Editor_Tip_Image_Layout,
+                      onDismiss: onDismissImageTip,
+                    ),
+                  ),
+                ),
               if (finder != null)
                 ConstrainedBox(
                   constraints:
@@ -2510,7 +2675,8 @@ class _BuildForm extends StatelessWidget {
                                       const SizedBox(height: AppSpacings.l),
                                       _BuildTodoListField(
                                         key: todoNavigationKey,
-                                        showAddButton: !writingFocused,
+                                        showAddButton: !writingFocused &&
+                                            state.todos.isNotEmpty,
                                         state: state,
                                         restoredEdit: restoredEdit,
                                         restoreRevision: restoreRevision,
@@ -2525,68 +2691,6 @@ class _BuildForm extends StatelessWidget {
                                                 widget.template ==
                                                     NoteTemplate.packing),
                                       ),
-                                      if (!writingFocused) ...[
-                                        SizedBox(
-                                            height: state.imagePaths.isEmpty
-                                                ? AppSpacings.m
-                                                : AppSpacings.xl),
-                                        _BuildImageSection(
-                                          state: state,
-                                          onAddPhoto: onAddPhoto,
-                                          onScanDocument: onScanDocument,
-                                          addingPhoto: addingPhoto || mediaBusy,
-                                        ),
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 4,
-                                          children: [
-                                            if (state.imagePaths.isNotEmpty)
-                                              TextButton.icon(
-                                                key: const ValueKey(
-                                                    'editor-extract-text'),
-                                                style: AppButtonStyles
-                                                    .paperAction(),
-                                                onPressed:
-                                                    mediaBusy || addingPhoto
-                                                        ? null
-                                                        : onExtractText,
-                                                icon: extractingText
-                                                    ? const SizedBox(
-                                                        width: 20,
-                                                        height: 20,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                                strokeWidth: 2))
-                                                    : const Icon(
-                                                        Icons
-                                                            .document_scanner_outlined,
-                                                        size: 20),
-                                                label: Text(extractingText
-                                                    ? S
-                                                        .of(context)
-                                                        .Photo_Text_Extracting
-                                                    : S
-                                                        .of(context)
-                                                        .Photo_Text_Extract),
-                                              ),
-                                            TextButton.icon(
-                                              key: const ValueKey(
-                                                  'editor-record-voice'),
-                                              style:
-                                                  AppButtonStyles.paperAction(),
-                                              onPressed:
-                                                  mediaBusy || addingPhoto
-                                                      ? null
-                                                      : onRecordVoice,
-                                              icon: const Icon(
-                                                  Icons.mic_none_rounded,
-                                                  size: 20),
-                                              label: Text(
-                                                  S.of(context).Voice_Memo),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
                                       for (final memo in state.voiceMemos)
                                         VoiceMemoPlayer(
                                           key: ValueKey(memo.id),
@@ -2597,13 +2701,15 @@ class _BuildForm extends StatelessWidget {
                                           onTranscriptChanged: (text) =>
                                               onTranscriptChanged(memo, text),
                                         ),
-                                      if (!writingFocused ||
+                                      if (state.todos.isNotEmpty ||
                                           state.voiceMemos.isNotEmpty)
                                         const SizedBox(height: AppSpacings.xml),
                                       _BuildDescriptionField(
                                         key: const ValueKey(
                                             'note-description-section'),
                                         outlineController: outlineController,
+                                        formattingController:
+                                            formattingController,
                                         onCopySelection: onCopySelection,
                                         onAddSelectionToChecklist:
                                             onAddSelectionToChecklist,
@@ -2619,6 +2725,30 @@ class _BuildForm extends StatelessWidget {
                                             widget.start ==
                                                 NoteEditorStart.quickNote,
                                       ),
+                                      if (!writingFocused &&
+                                          state.imagePaths.isNotEmpty)
+                                        TextButton.icon(
+                                          key: const ValueKey(
+                                              'editor-extract-text'),
+                                          style: AppButtonStyles.paperAction(),
+                                          onPressed: mediaBusy || addingPhoto
+                                              ? null
+                                              : onExtractText,
+                                          icon: extractingText
+                                              ? const SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                          strokeWidth: 2))
+                                              : const Icon(
+                                                  Icons
+                                                      .document_scanner_outlined,
+                                                  size: 20),
+                                          label: Text(extractingText
+                                              ? strings.Photo_Text_Extracting
+                                              : strings.Photo_Text_Extract),
+                                        ),
                                       if (!writingFocused) ...[
                                         const SizedBox(height: AppSpacings.l),
                                         Wrap(

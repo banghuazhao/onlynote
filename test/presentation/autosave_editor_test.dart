@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -51,6 +53,22 @@ class EditorAutosaveStore implements NoteAutosaveStore {
   }
 }
 
+class RetryEditorAutosaveStore extends EditorAutosaveStore {
+  RetryEditorAutosaveStore(super.repository);
+
+  bool failSaves = true;
+  int saveAttempts = 0;
+  Completer<void>? nextSave;
+
+  @override
+  Future<void> saveNote(Note note) async {
+    saveAttempts++;
+    if (failSaves) throw StateError('Save temporarily unavailable');
+    await nextSave?.future;
+    await super.saveNote(note);
+  }
+}
+
 Widget app(Widget home) => MaterialApp(
       theme: AppTheme.light,
       localizationsDelegates: const [
@@ -63,6 +81,74 @@ Widget app(Widget home) => MaterialApp(
     );
 
 void main() {
+  testWidgets('retry saves the latest text and stays in the focused editor',
+      (tester) async {
+    final repository = EditorRepository();
+    final store = RetryEditorAutosaveStore(repository);
+    final bloc = AddUpdateBloc(
+        AddNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
+    for (final family in fonts.keys) {
+      kAppFontFamilies[family] = (
+              {textStyle, color, fontSize, fontWeight, fontStyle}) =>
+          (textStyle ?? const TextStyle()).copyWith(
+              color: color,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle);
+    }
+    addTearDown(() async {
+      kAppFontFamilies.addAll(fonts);
+      await bloc.close();
+    });
+    await tester.pumpWidget(app(BlocProvider.value(
+        value: bloc, child: AddUpdateNoteScreen(autosaveStore: store))));
+    await tester.pumpAndSettle();
+    final title = find.byType(TextField).first;
+    await tester.enterText(title, 'Earlier text');
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Not saved'), findsOneWidget);
+    expect(repository.notes, isEmpty);
+    expect(store.saveAttempts, 1);
+
+    await tester.enterText(title, 'Latest text');
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saveAttempts, 2);
+    final field = tester.widget<TextField>(title);
+    final selection = field.controller!.selection;
+    expect(field.focusNode!.hasFocus, isTrue);
+    store.failSaves = false;
+    final inFlight = Completer<void>();
+    store.nextSave = inFlight;
+    final retry = find.byKey(const ValueKey('editor-retry-save'));
+    await tester.tap(retry);
+    await tester.pump();
+    // Retry waits for queued form and recording writes through a zero-delay
+    // timer. Advance fake time to run it while the save stays gated below.
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(find.text('Saving…'), findsOneWidget);
+    expect(store.saveAttempts, 3);
+    await tester.tap(retry);
+    await tester.pump();
+    expect(store.saveAttempts, 3);
+
+    inFlight.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Saved'), findsOneWidget);
+    expect(repository.notes.values.single.title, 'Latest text');
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    expect(field.focusNode!.hasFocus, isTrue);
+    expect(field.controller!.selection, selection);
+    expect(tester.testTextInput.isVisible, isTrue);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
   testWidgets(
       'typing saves without leaving the editor, then updates the same note',
       (tester) async {

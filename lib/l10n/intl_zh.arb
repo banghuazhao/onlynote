@@ -163,7 +163,7 @@
  "Autosave_Saved": "已保存",
  "Autosave_Saving": "正在保存…",
  "Autosave_Retry": "尚未保存",
- "Autosave_Failed": "无法保存更改。请保持笔记打开，点击“完成”重试。",
+ "Autosave_Failed": "无法保存更改。请保持笔记打开，点击“尚未保存”重试。",
  "Backup_Title": "备份与恢复",
  "Backup_Export": "创建备份",
  "Backup_Export_Description": "将笔记、标签、已保存视图、文件夹、照片、录音、历史记录、模板和提醒日期保存在一个Onlynote文件中。包含封存笔记和废纸篓。可从分享菜单保存到文件或存储应用。文件最大256 MB。",
@@ -517,5 +517,8 @@
     }
   },
   "Card_Linked_Notes_Count": "{count} 篇关联笔记",
-  "Card_Scanned_Pages_Count": "{count} 页扫描文档"
+  "Card_Scanned_Pages_Count": "{count} 页扫描文档",
+  "Editor_Insert": "插入",
+  "Editor_Tip_Formatting": "使用下方按钮为选中的文字设置格式。",
+  "Editor_Tip_Image_Layout": "点按照片可调整大小，长按可移动位置。"
 }

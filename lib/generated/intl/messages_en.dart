@@ -92,7 +92,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Archive_Note": MessageLookupByLibrary.simpleMessage("Archive note"),
     "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
-      "Could not save your changes. Keep this note open and tap Done to retry.",
+      "Could not save your changes. Keep this note open and tap Not saved to retry.",
     ),
     "Autosave_Retry": MessageLookupByLibrary.simpleMessage("Not saved"),
     "Autosave_Saved": MessageLookupByLibrary.simpleMessage("Saved"),
@@ -259,6 +259,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Duplicate": MessageLookupByLibrary.simpleMessage("Duplicate"),
     "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("Edit tags"),
+    "Editor_Insert": MessageLookupByLibrary.simpleMessage("Insert"),
+    "Editor_Tip_Formatting": MessageLookupByLibrary.simpleMessage(
+      "Use the buttons below to format selected text.",
+    ),
+    "Editor_Tip_Image_Layout": MessageLookupByLibrary.simpleMessage(
+      "Tap a photo to resize it. Press and hold to move it.",
+    ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
     "Expand_Section": m6,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),

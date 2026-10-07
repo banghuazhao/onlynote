@@ -69,6 +69,7 @@ class _BuildDescriptionField extends StatelessWidget {
     required SimpleFormattingController descriptionController,
     required this.focusNode,
     required this.outlineController,
+    required this.formattingController,
     required this.onImageLayoutsChanged,
     required this.onRemoveImage,
     required this.onEditImage,
@@ -81,6 +82,7 @@ class _BuildDescriptionField extends StatelessWidget {
   final SimpleFormattingController _descriptionController;
   final FocusNode focusNode;
   final NoteOutlineNavigationController outlineController;
+  final NoteBodyFormattingController formattingController;
   final ValueChanged<List<NoteImageLayout>> onImageLayoutsChanged;
   final ValueChanged<String> onRemoveImage;
   final ValueChanged<String> onEditImage;
@@ -93,6 +95,8 @@ class _BuildDescriptionField extends StatelessWidget {
         controller: _descriptionController,
         focusNode: focusNode,
         outlineController: outlineController,
+        formattingController: formattingController,
+        showFormattingToolbar: false,
         imagePaths: state.imagePaths,
         imageLayouts: state.imageLayouts,
         onImageLayoutsChanged: onImageLayoutsChanged,

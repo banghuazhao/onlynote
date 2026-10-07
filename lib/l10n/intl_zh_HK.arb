@@ -163,7 +163,7 @@
  "Autosave_Saved": "已儲存",
  "Autosave_Saving": "正在儲存…",
  "Autosave_Retry": "尚未儲存",
- "Autosave_Failed": "無法儲存變更。請保持筆記開啟，點按「完成」重試。",
+ "Autosave_Failed": "無法儲存變更。請保持筆記開啟，點按「尚未儲存」重試。",
  "Backup_Title": "備份與還原",
  "Backup_Export": "建立備份",
  "Backup_Export_Description": "將筆記、標籤、已儲存檢視、資料夾、照片、錄音、歷史記錄、範本和提醒日期儲存在一個Onlynote檔案中。包含封存筆記和垃圾桶。可從分享選單儲存至檔案或儲存空間App。檔案最大256 MB。",
@@ -517,5 +517,8 @@
     }
   },
   "Card_Linked_Notes_Count": "{count} 篇關聯筆記",
-  "Card_Scanned_Pages_Count": "{count} 頁掃描文件"
+  "Card_Scanned_Pages_Count": "{count} 頁掃描文件",
+  "Editor_Insert": "插入",
+  "Editor_Tip_Formatting": "使用下方按鈕為選取的文字設定格式。",
+  "Editor_Tip_Image_Layout": "點按照片可調整大小，長按可移動位置。"
 }

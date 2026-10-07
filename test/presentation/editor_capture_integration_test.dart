@@ -326,10 +326,14 @@ void main() {
     extraction.action = () async => await recognition.future;
     final extract = find.byKey(const ValueKey('editor-extract-text'));
     await tester.ensureVisible(extract);
+    // Apply the scroll before tapping the button, now below the body.
+    await tester.pumpAndSettle();
+    expect(extract.hitTestable(), findsOneWidget);
     await tester.tap(extract);
     // Recognition is intentionally pending; its progress animation cannot
     // settle until the test completes the native result below.
     await tester.pump(const Duration(milliseconds: 100));
+    expect(extraction.calls, ['note_images/photo.png']);
     // An edit that arrives while native recognition is pending stays intact.
     await tester.enterText(_body(), 'Existing body with my newest edit');
     await tester.pump();
@@ -408,6 +412,7 @@ void main() {
       'audio-only note is durably saved before recording acknowledgement',
       (tester) async {
     final (store, _, drafts, platform) = await open(tester);
+    await tap(tester, find.byKey(const ValueKey('editor-insert')));
     await tap(tester, find.byKey(const ValueKey('editor-record-voice')));
     expect(drafts.prepared, 0);
     expect(platform.calls, isNot(contains('startRecording')));
@@ -486,7 +491,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('voice-record')), findsNothing);
-    expect(find.byKey(const ValueKey('editor-record-voice')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-insert')), findsOneWidget);
     expect(store.saved, isEmpty);
     expect(drafts.prepared, 0);
     expect(tester.takeException(), isNull);

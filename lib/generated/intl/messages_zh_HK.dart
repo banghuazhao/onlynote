@@ -79,7 +79,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Archive_Empty": MessageLookupByLibrary.simpleMessage("封存的筆記會顯示在這裡。"),
     "Archive_Note": MessageLookupByLibrary.simpleMessage("封存筆記"),
     "Autosave_Failed": MessageLookupByLibrary.simpleMessage(
-      "無法儲存變更。請保持筆記開啟，點按「完成」重試。",
+      "無法儲存變更。請保持筆記開啟，點按「尚未儲存」重試。",
     ),
     "Autosave_Retry": MessageLookupByLibrary.simpleMessage("尚未儲存"),
     "Autosave_Saved": MessageLookupByLibrary.simpleMessage("已儲存"),
@@ -214,6 +214,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Duplicate": MessageLookupByLibrary.simpleMessage("複製"),
     "Edit": MessageLookupByLibrary.simpleMessage("編輯"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("編輯標籤"),
+    "Editor_Insert": MessageLookupByLibrary.simpleMessage("插入"),
+    "Editor_Tip_Formatting": MessageLookupByLibrary.simpleMessage(
+      "使用下方按鈕為選取的文字設定格式。",
+    ),
+    "Editor_Tip_Image_Layout": MessageLookupByLibrary.simpleMessage(
+      "點按照片可調整大小，長按可移動位置。",
+    ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
     "Expand_Section": m6,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("飛速掃描"),

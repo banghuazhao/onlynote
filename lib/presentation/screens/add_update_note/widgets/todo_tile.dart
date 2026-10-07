@@ -304,6 +304,13 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
   FocusNode _focusNodeFor(String todoId) => _focusNodes.putIfAbsent(
       todoId, () => FocusNode(debugLabel: 'note-todo:$todoId'));
 
+  void addItem() {
+    _focusNextTodo = true;
+    context
+        .read<AddUpdateFormBloc>()
+        .add(const AddUpdateFormEvent.addEmptyTodo());
+  }
+
   @override
   void didUpdateWidget(covariant _BuildTodoListField oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -505,12 +512,7 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
         ),
         if (widget.showAddButton)
           _AddTodoTile(
-            onAdd: () {
-              _focusNextTodo = true;
-              context
-                  .read<AddUpdateFormBloc>()
-                  .add(const AddUpdateFormEvent.addEmptyTodo());
-            },
+            onAdd: addItem,
           ),
       ],
     );

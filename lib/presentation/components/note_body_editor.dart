@@ -11,6 +11,7 @@ import 'package:onlynote/services/note_selection.dart';
 import 'note_selection_menu.dart';
 import 'formatted_note_text.dart';
 import 'note_document_view.dart';
+import 'note_body_formatting_controller.dart';
 import 'note_formatting_toolbar.dart';
 import 'note_image_block.dart';
 import 'note_outline_navigation_controller.dart';
@@ -35,6 +36,8 @@ class NoteBodyEditor extends StatefulWidget {
     this.outlineController,
     this.onCopySelection,
     this.onAddSelectionToChecklist,
+    this.formattingController,
+    this.showFormattingToolbar = true,
   });
 
   final SimpleFormattingController controller;
@@ -50,6 +53,8 @@ class NoteBodyEditor extends StatefulWidget {
   final NoteOutlineNavigationController? outlineController;
   final ValueChanged<NoteTextSelection>? onCopySelection;
   final ValueChanged<NoteTextSelection>? onAddSelectionToChecklist;
+  final NoteBodyFormattingController? formattingController;
+  final bool showFormattingToolbar;
 
   @override
   State<NoteBodyEditor> createState() => _NoteBodyEditorState();
@@ -68,6 +73,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   Offset? _dragPosition;
   final _plainTextKey = GlobalKey();
   VoidCallback? _detachOutline;
+  VoidCallback? _detachFormatting;
 
   @override
   void initState() {
@@ -79,6 +85,27 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     widget.controller.addListener(_masterChanged);
     _syncSegments();
     _attachOutline();
+    _attachFormatting();
+  }
+
+  FocusNode get _activeFormattingFocus => _layouts.isEmpty
+      ? widget.focusNode
+      : _segments[_activeKey]?.focus ?? widget.focusNode;
+
+  void _attachFormatting() {
+    _detachFormatting?.call();
+    _detachFormatting = widget.formattingController?.attach(
+      owner: this,
+      activeFocusNode: _activeFormattingFocus,
+      prepareSelection: _prepareFormattingSelection,
+    );
+  }
+
+  void _publishFormattingFocus() {
+    widget.formattingController?.updateActiveFocusNode(
+      owner: this,
+      activeFocusNode: _activeFormattingFocus,
+    );
   }
 
   void _attachOutline() {
@@ -150,6 +177,9 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.outlineController != widget.outlineController) {
       _attachOutline();
+    }
+    if (oldWidget.formattingController != widget.formattingController) {
+      _attachFormatting();
     }
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_masterChanged);
@@ -253,6 +283,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
           if (!focus.hasFocus || _syncing || !mounted) return;
           _activeKey = created.key;
           _forwardSelection(created);
+          _publishFormattingFocus();
           if (_selectedImage != null) setState(() => _selectedImage = null);
         });
         return created;
@@ -310,6 +341,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
       if (_activeKey == key) _activeKey = parts.firstOrNull?.key;
     }
     _syncing = false;
+    _publishFormattingFocus();
   }
 
   void _forwardSelection(_TextSegment segment) {
@@ -447,8 +479,11 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   }
 
   void _prepareFormattingSelection() {
+    if (_layouts.isEmpty) return;
     final segment = _segments[_activeKey];
-    if (segment == null || segment.controller.text.isNotEmpty) return;
+    if (segment == null) return;
+    _forwardSelection(segment);
+    if (segment.controller.text.isNotEmpty) return;
     final body = widget.controller.text;
     final start = segment.start;
     final needsPreviousSeparator =
@@ -506,6 +541,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
           textInputAction: TextInputAction.newline,
           onTap: () {
             _activeKey = segment.key;
+            _publishFormattingFocus();
             if (_selectedImage != null) setState(() => _selectedImage = null);
           },
           onTapOutside: (_) => FocusScope.of(context).unfocus(),
@@ -662,9 +698,11 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     final active = _segments[_activeKey];
     if (_layouts.isEmpty) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        NoteFormattingToolbar(
-            controller: widget.controller, focusNode: widget.focusNode),
-        const SizedBox(height: 8),
+        if (widget.showFormattingToolbar) ...[
+          NoteFormattingToolbar(
+              controller: widget.controller, focusNode: widget.focusNode),
+          const SizedBox(height: 8),
+        ],
         RuledWritingArea(
           key: _plainTextKey,
           paperColor: widget.paperColor ?? AppColors.parchment,
@@ -727,11 +765,13 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         }
       },
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        NoteFormattingToolbar(
-            controller: widget.controller,
-            focusNode: active?.focus ?? widget.focusNode,
-            beforeApply: _prepareFormattingSelection),
-        const SizedBox(height: 8),
+        if (widget.showFormattingToolbar) ...[
+          NoteFormattingToolbar(
+              controller: widget.controller,
+              focusNode: active?.focus ?? widget.focusNode,
+              beforeApply: _prepareFormattingSelection),
+          const SizedBox(height: 8),
+        ],
         ...children,
       ]),
     );
@@ -740,6 +780,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   @override
   void dispose() {
     _detachOutline?.call();
+    _detachFormatting?.call();
     _autoScrollTimer?.cancel();
     widget.controller.removeListener(_masterChanged);
     for (final segment in _segments.values) {

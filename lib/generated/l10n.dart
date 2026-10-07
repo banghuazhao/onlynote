@@ -1370,10 +1370,10 @@ class S {
     );
   }
 
-  /// `Could not save your changes. Keep this note open and tap Done to retry.`
+  /// `Could not save your changes. Keep this note open and tap Not saved to retry.`
   String get Autosave_Failed {
     return Intl.message(
-      'Could not save your changes. Keep this note open and tap Done to retry.',
+      'Could not save your changes. Keep this note open and tap Not saved to retry.',
       name: 'Autosave_Failed',
       desc: '',
       args: [],
@@ -4090,6 +4090,31 @@ class S {
       name: 'Card_Scanned_Pages_Count',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `Insert`
+  String get Editor_Insert {
+    return Intl.message('Insert', name: 'Editor_Insert', desc: '', args: []);
+  }
+
+  /// `Use the buttons below to format selected text.`
+  String get Editor_Tip_Formatting {
+    return Intl.message(
+      'Use the buttons below to format selected text.',
+      name: 'Editor_Tip_Formatting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap a photo to resize it. Press and hold to move it.`
+  String get Editor_Tip_Image_Layout {
+    return Intl.message(
+      'Tap a photo to resize it. Press and hold to move it.',
+      name: 'Editor_Tip_Image_Layout',
+      desc: '',
+      args: [],
     );
   }
 }

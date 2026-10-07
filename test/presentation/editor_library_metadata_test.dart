@@ -502,7 +502,11 @@ void main() {
 
   testWidgets('bold before typing does not save an empty note', (tester) async {
     final (notes, store) = await _openEditor(tester);
+    final body = find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 100);
+    await _tap(tester, body);
     await _tap(tester, find.byKey(const ValueKey('format-bold')));
+    expect(tester.widget<TextField>(body).focusNode!.hasFocus, isTrue);
     await _waitForAutosave(tester);
     expect(notes.values, isEmpty);
     expect(store.saved, isEmpty);

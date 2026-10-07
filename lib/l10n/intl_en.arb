@@ -163,7 +163,7 @@
  "Autosave_Saved": "Saved",
  "Autosave_Saving": "Saving…",
  "Autosave_Retry": "Not saved",
- "Autosave_Failed": "Could not save your changes. Keep this note open and tap Done to retry.",
+ "Autosave_Failed": "Could not save your changes. Keep this note open and tap Not saved to retry.",
  "Backup_Title": "Backup & Restore",
  "Backup_Export": "Create backup",
  "Backup_Export_Description": "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
@@ -519,5 +519,8 @@
   "Card_Linked_Notes_Count": "{count, plural, one{1 linked note} other{{count} linked notes}}",
   "@Card_Linked_Notes_Count": {"placeholders": {"count": {"type": "int"}}},
   "Card_Scanned_Pages_Count": "{count, plural, one{1 scanned page} other{{count} scanned pages}}",
-  "@Card_Scanned_Pages_Count": {"placeholders": {"count": {"type": "int"}}}
+  "@Card_Scanned_Pages_Count": {"placeholders": {"count": {"type": "int"}}},
+  "Editor_Insert": "Insert",
+  "Editor_Tip_Formatting": "Use the buttons below to format selected text.",
+  "Editor_Tip_Image_Layout": "Tap a photo to resize it. Press and hold to move it."
 }

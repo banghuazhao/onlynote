@@ -8,6 +8,8 @@ class NoteEditingActions extends StatelessWidget {
     required this.onUndo,
     required this.onRedo,
     this.onOutline,
+    this.onInsert,
+    this.insertEnabled = true,
     this.onToggleFocus,
     this.writingFocused = false,
   });
@@ -15,6 +17,8 @@ class NoteEditingActions extends StatelessWidget {
   final VoidCallback? onUndo;
   final VoidCallback? onRedo;
   final VoidCallback? onOutline;
+  final VoidCallback? onInsert;
+  final bool insertEnabled;
   final VoidCallback? onToggleFocus;
   final bool writingFocused;
 
@@ -95,15 +99,46 @@ class NoteEditingActions extends StatelessWidget {
     return Padding(
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 16),
       child: LayoutBuilder(builder: (context, constraints) {
+        final compactInsert = constraints.maxWidth < 280;
+        final insert = onInsert == null
+            ? null
+            : TextFieldTapRegion(
+                child: ExcludeFocus(
+                  child: compactInsert
+                      ? IconButton(
+                          key: const ValueKey('editor-insert'),
+                          tooltip: strings.Editor_Insert,
+                          onPressed: insertEnabled ? onInsert : null,
+                          style: actionStyle,
+                          icon: const Icon(Icons.add_circle_outline_rounded),
+                        )
+                      : TextButton.icon(
+                          key: const ValueKey('editor-insert'),
+                          onPressed: insertEnabled ? onInsert : null,
+                          style: actionStyle,
+                          icon: const Icon(Icons.add_rounded, size: 20),
+                          label: Text(strings.Editor_Insert,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                ),
+              );
+        final trailingActions = [
+          if (insert != null && compactInsert) insert,
+          ...iconActions,
+        ];
+        final leadingActions = [
+          if (insert != null && !compactInsert) insert,
+          if (outline != null) outline,
+        ];
         // Reserve the icon targets plus room for Outline's icon and padding.
         final minimumRowWidth =
-            iconActions.length * 48 + (outline == null ? 0 : 64);
+            trailingActions.length * 48 + (leadingActions.isEmpty ? 0 : 64);
         if (constraints.maxWidth < minimumRowWidth) {
           return Wrap(
             key: const ValueKey('note-editing-actions-wrap'),
             runSpacing: 4,
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: [if (outline != null) outline, ...iconActions],
+            children: [...leadingActions, ...trailingActions],
           );
         }
         return Row(
@@ -111,10 +146,10 @@ class NoteEditingActions extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: outline ?? const SizedBox.shrink(),
+                child: Wrap(children: leadingActions),
               ),
             ),
-            ...iconActions,
+            ...trailingActions,
           ],
         );
       }),

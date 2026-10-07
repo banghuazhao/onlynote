@@ -126,7 +126,7 @@ void main() {
     );
     expect(picks, 1);
     expect(store.saved, isEmpty);
-    expect(find.byKey(const ValueKey('editor-add-photo')), findsOneWidget);
+    expect(find.byKey(const ValueKey('editor-insert')), findsOneWidget);
     await tester.enterText(_bodyField(), 'Camera canceled; keep this note');
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
@@ -230,9 +230,9 @@ void main() {
         },
       ),
     );
-    await tester.tap(find.byKey(const ValueKey('editor-add-photo')));
+    await tester.tap(find.byKey(const ValueKey('editor-insert')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(S.current.Choose_From_Gallery));
+    await tester.tap(find.byKey(const ValueKey('editor-add-photo')));
     await tester.pumpAndSettle();
     expect(store.saved.last.imagePaths, ['note_images/first.png']);
     expect(find.text('Retry'), findsOneWidget);
