@@ -32,6 +32,11 @@ class HomeEvent with _$HomeEvent {
     required List<String> tags,
     Completer<String?>? completion,
   }) = _SetTags;
+  const factory HomeEvent.setCardStyle({
+    required String noteId,
+    required NoteCardStyle style,
+    Completer<String?>? completion,
+  }) = _SetCardStyle;
   const factory HomeEvent.togglePin(String noteId) = _TogglePin;
   const factory HomeEvent.restoreNotes(List<String> ids) = _RestoreNotes;
   const factory HomeEvent.permanentDelete(List<String> ids) = _PermanentDelete;

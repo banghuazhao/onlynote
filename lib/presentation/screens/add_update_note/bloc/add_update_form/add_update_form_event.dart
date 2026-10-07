@@ -14,6 +14,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     List<String>? tags,
     List<String>? linkedNoteIds,
     String? dailyNoteDateKey,
+    @Default(NoteCardStyle()) NoteCardStyle cardStyle,
   }) = _Initialize;
 
   const factory AddUpdateFormEvent.titleChanged(String value) = _TitleChanged;

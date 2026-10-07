@@ -8,6 +8,7 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
@@ -90,18 +91,27 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  test('v7 daily association survives Hive reopen and portable restore',
+  test(
+      'daily association and card style survive Hive reopen and portable restore',
       () async {
+    const style = NoteCardStyle(
+        fontFamily: 'Kalam',
+        fontSize: AppFontSize.large,
+        cardSize: NoteCardSize.large,
+        paperStyle: NoteCardPaperStyle.plain,
+        showDate: false);
     final source = NoteDto(
         id: 'daily',
         title: 'Renamed daily note',
         description: 'Keep my thoughts',
+        cardStyle: style.toMap(),
         dailyNoteDateKey: '2026-10-06');
     await notes.put('daily', source);
     await notes.flush();
     await notes.close();
     notes = await Hive.openBox('notes');
     expect((notes.get('daily') as NoteDto).dailyNoteDateKey, '2026-10-06');
+    expect((notes.get('daily') as NoteDto).toDomain().cardStyle, style);
     final contents = BackupContents(
         createdAt: DateTime(2026, 10, 6),
         notes: [(notes.get('daily') as NoteDto)],
@@ -109,8 +119,9 @@ void main() {
         photos: {},
         reminders: []);
     final portable = decodeBackup(encodeBackup(contents));
-    expect(portable.toJson()['version'], 7);
+    expect(portable.toJson()['version'], 8);
     expect(portable.notes.single.dailyNoteDateKey, '2026-10-06');
+    expect(portable.notes.single.toDomain().cardStyle, style);
     await notes.clear();
     final restoredService = BackupService(
         notes: notes,
@@ -125,6 +136,7 @@ void main() {
     expect(restored.dailyNoteDateKey, '2026-10-06');
     expect(restored.title, 'Renamed daily note');
     expect(restored.description, 'Keep my thoughts');
+    expect(restored.toDomain().cardStyle, style);
   });
 
   test('highlight survives Hive reopen and portable note restore', () async {
@@ -260,7 +272,7 @@ void main() {
         folderId: 'folder',
         archiveScope: NoteArchiveScope.all);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 7);
+    expect(backup.toJson()['version'], 8);
     await service.restore(backup);
     final imported = notes.values
         .cast<NoteDto>()
@@ -327,7 +339,7 @@ void main() {
         await templates.saveFromNote(before.toDomain(), name: 'Photo');
     expect(template.imageLayouts.single.path, template.imagePaths.single);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 7);
+    expect(backup.toJson()['version'], 8);
     final archivedLayout = backup.notes.single.toDomain().imageLayouts.single;
     expect(archivedLayout.path, backup.notes.single.imagePaths!.single);
     expect(archivedLayout.textOffset, 0);
@@ -421,7 +433,7 @@ void main() {
     final template =
         await templates.saveFromNote(before.toDomain(), name: 'Formatted');
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 7);
+    expect(backup.toJson()['version'], 8);
     expect(backup.notes.single.toDomain().textStyles, isEmpty);
     expect(backup.histories['formatted']!.single.note.toDomain().textStyles,
         styles);
@@ -855,7 +867,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 7);
+    expect(backup.toJson()['version'], 8);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

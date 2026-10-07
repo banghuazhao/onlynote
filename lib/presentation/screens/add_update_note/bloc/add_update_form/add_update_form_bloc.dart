@@ -7,6 +7,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart'
     show AddUpdateBloc, AddUpdateEvent;
@@ -38,6 +39,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           tags: event.tags ?? [],
           linkedNoteIds: event.linkedNoteIds ?? [],
           dailyNoteDateKey: event.dailyNoteDateKey,
+          cardStyle: event.cardStyle,
         ),
       );
     });
@@ -91,6 +93,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
           dailyNoteDateKey: state.dailyNoteDateKey,
+          cardStyle: state.cardStyle,
           isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,
@@ -112,6 +115,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
           dailyNoteDateKey: state.dailyNoteDateKey,
+          cardStyle: state.cardStyle,
           isArchived: event.isArchived,
           folderId: event.folderId,
           isPinned: event.isPinned,

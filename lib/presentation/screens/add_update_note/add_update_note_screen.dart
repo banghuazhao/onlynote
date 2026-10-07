@@ -233,6 +233,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               : const [],
         );
     final initial = seed.copyWith(
+        cardStyle: widget.note?.cardStyle ?? seed.cardStyle,
         dailyNoteDateKey: widget.note != null
             ? widget.note!.dailyNoteDateKey
             : seed.dailyNoteDateKey,
@@ -269,6 +270,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           tags: initial.tags,
           linkedNoteIds: initial.linkedNoteIds,
           dailyNoteDateKey: initial.dailyNoteDateKey,
+          cardStyle: initial.cardStyle,
         ));
     _knownImagePaths = initial.imagePaths.toSet();
     _formattingController.addListener(_refreshStatus);
@@ -662,6 +664,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           tags: updated.tags,
           linkedNoteIds: updated.linkedNoteIds,
           dailyNoteDateKey: updated.dailyNoteDateKey,
+          cardStyle: updated.cardStyle,
         ));
         await adopted;
         if (!mounted) return;
@@ -872,6 +875,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         voiceMemos: state.voiceMemos,
         tags: state.tags,
         linkedNoteIds: state.linkedNoteIds,
+        cardStyle: state.cardStyle,
       );
 
   void _capture(AddUpdateFormState state) {
@@ -1057,7 +1061,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         voiceMemos: next.voiceMemos,
         tags: next.tags,
         linkedNoteIds: next.linkedNoteIds,
-        dailyNoteDateKey: next.dailyNoteDateKey);
+        dailyNoteDateKey: next.dailyNoteDateKey,
+        cardStyle: next.cardStyle);
     if (_form.state != state) {
       final applied = _form.stream.firstWhere((value) => value == state);
       _form.add(AddUpdateFormEvent.initialize(
@@ -1071,7 +1076,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           voiceMemos: next.voiceMemos,
           tags: next.tags,
           linkedNoteIds: next.linkedNoteIds,
-          dailyNoteDateKey: next.dailyNoteDateKey));
+          dailyNoteDateKey: next.dailyNoteDateKey,
+          cardStyle: next.cardStyle));
       await applied;
     }
     if (!mounted) return;
@@ -1717,6 +1723,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             isArchived: latest.isArchived,
             folderId: latest.folderId,
             dailyNoteDateKey: latest.dailyNoteDateKey,
+            cardStyle: latest.cardStyle,
             sortOrder: latest.sortOrder,
             deletedAt: latest.deletedAt);
     if (_suspendedForLinkedNote) {
@@ -1921,7 +1928,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             voiceMemos: refreshed.voiceMemos,
             tags: refreshed.tags,
             linkedNoteIds: refreshed.linkedNoteIds,
-            dailyNoteDateKey: refreshed.dailyNoteDateKey);
+            dailyNoteDateKey: refreshed.dailyNoteDateKey,
+            cardStyle: refreshed.cardStyle);
         if (_form.state != state) {
           final applied = _form.stream.firstWhere((value) => value == state);
           _form.add(AddUpdateFormEvent.initialize(
@@ -1935,7 +1943,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               voiceMemos: refreshed.voiceMemos,
               tags: refreshed.tags,
               linkedNoteIds: refreshed.linkedNoteIds,
-              dailyNoteDateKey: refreshed.dailyNoteDateKey));
+              dailyNoteDateKey: refreshed.dailyNoteDateKey,
+              cardStyle: refreshed.cardStyle));
           await applied;
         }
       } finally {

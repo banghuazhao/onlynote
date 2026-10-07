@@ -39,6 +39,9 @@ mixin _$HomeEvent {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -71,6 +74,9 @@ mixin _$HomeEvent {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -103,6 +109,9 @@ mixin _$HomeEvent {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -130,6 +139,7 @@ mixin _$HomeEvent {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -156,6 +166,7 @@ mixin _$HomeEvent {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -182,6 +193,7 @@ mixin _$HomeEvent {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -331,6 +343,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -366,6 +381,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -401,6 +419,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -434,6 +455,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -463,6 +485,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -492,6 +515,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -583,6 +607,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -618,6 +645,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -653,6 +683,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -686,6 +719,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -715,6 +749,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -744,6 +779,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -859,6 +895,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -894,6 +933,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -929,6 +971,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -962,6 +1007,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -991,6 +1037,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1020,6 +1067,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1136,6 +1184,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1171,6 +1222,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1206,6 +1260,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1239,6 +1296,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1268,6 +1326,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1297,6 +1356,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1407,6 +1467,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1442,6 +1505,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1477,6 +1543,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1510,6 +1579,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1539,6 +1609,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1568,6 +1639,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1686,6 +1758,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1721,6 +1796,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -1756,6 +1834,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -1789,6 +1870,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -1818,6 +1900,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -1847,6 +1930,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -1959,6 +2043,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -1994,6 +2081,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2029,6 +2119,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2062,6 +2155,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2091,6 +2185,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2120,6 +2215,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2230,6 +2326,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2265,6 +2364,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2300,6 +2402,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2333,6 +2438,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2362,6 +2468,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2391,6 +2498,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2501,6 +2609,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2536,6 +2647,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2571,6 +2685,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2604,6 +2721,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2633,6 +2751,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2662,6 +2781,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -2773,6 +2893,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -2808,6 +2931,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -2843,6 +2969,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -2876,6 +3005,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -2905,6 +3035,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -2934,6 +3065,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3050,6 +3182,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3085,6 +3220,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3120,6 +3258,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3153,6 +3294,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -3182,6 +3324,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3211,6 +3354,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3329,6 +3473,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3364,6 +3511,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3399,6 +3549,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3432,6 +3585,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -3461,6 +3615,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3490,6 +3645,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3602,6 +3758,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3637,6 +3796,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3672,6 +3834,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3705,6 +3870,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -3734,6 +3900,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -3763,6 +3930,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -3894,6 +4062,9 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -3929,6 +4100,9 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -3964,6 +4138,9 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -3997,6 +4174,7 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -4026,6 +4204,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -4055,6 +4234,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -4196,6 +4376,9 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -4231,6 +4414,9 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -4266,6 +4452,9 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -4299,6 +4488,7 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -4328,6 +4518,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -4357,6 +4548,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -4384,6 +4576,313 @@ abstract class _SetTags implements HomeEvent {
   Completer<String?>? get completion;
   @JsonKey(ignore: true)
   _$$SetTagsImplCopyWith<_$SetTagsImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SetCardStyleImplCopyWith<$Res> {
+  factory _$$SetCardStyleImplCopyWith(
+          _$SetCardStyleImpl value, $Res Function(_$SetCardStyleImpl) then) =
+      __$$SetCardStyleImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {String noteId, NoteCardStyle style, Completer<String?>? completion});
+}
+
+/// @nodoc
+class __$$SetCardStyleImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SetCardStyleImpl>
+    implements _$$SetCardStyleImplCopyWith<$Res> {
+  __$$SetCardStyleImplCopyWithImpl(
+      _$SetCardStyleImpl _value, $Res Function(_$SetCardStyleImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteId = null,
+    Object? style = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$SetCardStyleImpl(
+      noteId: null == noteId
+          ? _value.noteId
+          : noteId // ignore: cast_nullable_to_non_nullable
+              as String,
+      style: null == style
+          ? _value.style
+          : style // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<String?>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SetCardStyleImpl implements _SetCardStyle {
+  const _$SetCardStyleImpl(
+      {required this.noteId, required this.style, this.completion});
+
+  @override
+  final String noteId;
+  @override
+  final NoteCardStyle style;
+  @override
+  final Completer<String?>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.setCardStyle(noteId: $noteId, style: $style, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SetCardStyleImpl &&
+            (identical(other.noteId, noteId) || other.noteId == noteId) &&
+            (identical(other.style, style) || other.style == style) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, noteId, style, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SetCardStyleImplCopyWith<_$SetCardStyleImpl> get copyWith =>
+      __$$SetCardStyleImplCopyWithImpl<_$SetCardStyleImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name) createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return setCardStyle(noteId, style, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name)? createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return setCardStyle?.call(noteId, style, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(String? folderId)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setCardStyle != null) {
+      return setCardStyle(noteId, style, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return setCardStyle(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return setCardStyle?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (setCardStyle != null) {
+      return setCardStyle(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SetCardStyle implements HomeEvent {
+  const factory _SetCardStyle(
+      {required final String noteId,
+      required final NoteCardStyle style,
+      final Completer<String?>? completion}) = _$SetCardStyleImpl;
+
+  String get noteId;
+  NoteCardStyle get style;
+  Completer<String?>? get completion;
+  @JsonKey(ignore: true)
+  _$$SetCardStyleImplCopyWith<_$SetCardStyleImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4472,6 +4971,9 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -4507,6 +5009,9 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -4542,6 +5047,9 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -4575,6 +5083,7 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -4604,6 +5113,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -4633,6 +5143,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -4749,6 +5260,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -4784,6 +5298,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -4819,6 +5336,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -4852,6 +5372,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -4881,6 +5402,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -4910,6 +5432,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -5027,6 +5550,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -5062,6 +5588,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -5097,6 +5626,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -5130,6 +5662,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -5159,6 +5692,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -5188,6 +5722,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -5299,6 +5834,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -5334,6 +5872,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -5369,6 +5910,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -5402,6 +5946,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -5431,6 +5976,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -5460,6 +6006,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -5578,6 +6125,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -5613,6 +6163,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -5648,6 +6201,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -5681,6 +6237,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -5710,6 +6267,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -5739,6 +6297,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -5851,6 +6410,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -5886,6 +6448,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -5921,6 +6486,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -5954,6 +6522,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -5983,6 +6552,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -6012,6 +6582,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,
@@ -6132,6 +6703,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
+    required TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)
+        setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
     required TResult Function(List<String> ids) permanentDelete,
@@ -6167,6 +6741,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult? Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
     TResult? Function(List<String> ids)? permanentDelete,
@@ -6202,6 +6779,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
+    TResult Function(
+            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+        setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
     TResult Function(List<String> ids)? permanentDelete,
@@ -6235,6 +6815,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
     required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
     required TResult Function(_TogglePin value) togglePin,
     required TResult Function(_RestoreNotes value) restoreNotes,
     required TResult Function(_PermanentDelete value) permanentDelete,
@@ -6264,6 +6845,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
     TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
     TResult? Function(_TogglePin value)? togglePin,
     TResult? Function(_RestoreNotes value)? restoreNotes,
     TResult? Function(_PermanentDelete value)? permanentDelete,
@@ -6293,6 +6875,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
     TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
     TResult Function(_TogglePin value)? togglePin,
     TResult Function(_RestoreNotes value)? restoreNotes,
     TResult Function(_PermanentDelete value)? permanentDelete,

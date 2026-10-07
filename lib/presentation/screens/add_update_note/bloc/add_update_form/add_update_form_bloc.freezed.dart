@@ -29,7 +29,8 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -71,7 +72,8 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -112,7 +114,8 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -251,7 +254,8 @@ abstract class _$$InitializeImplCopyWith<$Res> {
       List<VoiceMemo>? voiceMemos,
       List<String>? tags,
       List<String>? linkedNoteIds,
-      String? dailyNoteDateKey});
+      String? dailyNoteDateKey,
+      NoteCardStyle cardStyle});
 }
 
 /// @nodoc
@@ -276,6 +280,7 @@ class __$$InitializeImplCopyWithImpl<$Res>
     Object? tags = freezed,
     Object? linkedNoteIds = freezed,
     Object? dailyNoteDateKey = freezed,
+    Object? cardStyle = null,
   }) {
     return _then(_$InitializeImpl(
       title: freezed == title
@@ -322,6 +327,10 @@ class __$$InitializeImplCopyWithImpl<$Res>
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
               as String?,
+      cardStyle: null == cardStyle
+          ? _value.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
     ));
   }
 }
@@ -340,7 +349,8 @@ class _$InitializeImpl implements _Initialize {
       final List<VoiceMemo>? voiceMemos,
       final List<String>? tags,
       final List<String>? linkedNoteIds,
-      this.dailyNoteDateKey})
+      this.dailyNoteDateKey,
+      this.cardStyle = const NoteCardStyle()})
       : _textStyles = textStyles,
         _todos = todos,
         _imagePaths = imagePaths,
@@ -427,10 +437,13 @@ class _$InitializeImpl implements _Initialize {
 
   @override
   final String? dailyNoteDateKey;
+  @override
+  @JsonKey()
+  final NoteCardStyle cardStyle;
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, textStyles: $textStyles, color: $color, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey)';
+    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, textStyles: $textStyles, color: $color, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
   }
 
   @override
@@ -455,7 +468,9 @@ class _$InitializeImpl implements _Initialize {
             const DeepCollectionEquality()
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
             (identical(other.dailyNoteDateKey, dailyNoteDateKey) ||
-                other.dailyNoteDateKey == dailyNoteDateKey));
+                other.dailyNoteDateKey == dailyNoteDateKey) &&
+            (identical(other.cardStyle, cardStyle) ||
+                other.cardStyle == cardStyle));
   }
 
   @override
@@ -471,7 +486,8 @@ class _$InitializeImpl implements _Initialize {
       const DeepCollectionEquality().hash(_voiceMemos),
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_linkedNoteIds),
-      dailyNoteDateKey);
+      dailyNoteDateKey,
+      cardStyle);
 
   @JsonKey(ignore: true)
   @override
@@ -493,7 +509,8 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -521,8 +538,19 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
   }) {
-    return initialize(title, description, textStyles, color, todos, imagePaths,
-        imageLayouts, voiceMemos, tags, linkedNoteIds, dailyNoteDateKey);
+    return initialize(
+        title,
+        description,
+        textStyles,
+        color,
+        todos,
+        imagePaths,
+        imageLayouts,
+        voiceMemos,
+        tags,
+        linkedNoteIds,
+        dailyNoteDateKey,
+        cardStyle);
   }
 
   @override
@@ -539,7 +567,8 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -577,7 +606,8 @@ class _$InitializeImpl implements _Initialize {
         voiceMemos,
         tags,
         linkedNoteIds,
-        dailyNoteDateKey);
+        dailyNoteDateKey,
+        cardStyle);
   }
 
   @override
@@ -594,7 +624,8 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -634,7 +665,8 @@ class _$InitializeImpl implements _Initialize {
           voiceMemos,
           tags,
           linkedNoteIds,
-          dailyNoteDateKey);
+          dailyNoteDateKey,
+          cardStyle);
     }
     return orElse();
   }
@@ -737,7 +769,8 @@ abstract class _Initialize implements AddUpdateFormEvent {
       final List<VoiceMemo>? voiceMemos,
       final List<String>? tags,
       final List<String>? linkedNoteIds,
-      final String? dailyNoteDateKey}) = _$InitializeImpl;
+      final String? dailyNoteDateKey,
+      final NoteCardStyle cardStyle}) = _$InitializeImpl;
 
   String? get title;
   String? get description;
@@ -750,6 +783,7 @@ abstract class _Initialize implements AddUpdateFormEvent {
   List<String>? get tags;
   List<String>? get linkedNoteIds;
   String? get dailyNoteDateKey;
+  NoteCardStyle get cardStyle;
   @JsonKey(ignore: true)
   _$$InitializeImplCopyWith<_$InitializeImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -830,7 +864,8 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -875,7 +910,8 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -919,7 +955,8 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -1124,7 +1161,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -1169,7 +1207,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -1213,7 +1252,8 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -1455,7 +1495,8 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -1500,7 +1541,8 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -1544,7 +1586,8 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -1761,7 +1804,8 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -1806,7 +1850,8 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -1850,7 +1895,8 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -2055,7 +2101,8 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -2100,7 +2147,8 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -2144,7 +2192,8 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -2409,7 +2458,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -2455,7 +2505,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -2500,7 +2551,8 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -2716,7 +2768,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -2761,7 +2814,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -2805,7 +2859,8 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -3009,7 +3064,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -3054,7 +3110,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -3098,7 +3155,8 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -3311,7 +3369,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -3356,7 +3415,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -3400,7 +3460,8 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -3608,7 +3669,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -3653,7 +3715,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -3697,7 +3760,8 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -3911,7 +3975,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -3956,7 +4021,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -4000,7 +4066,8 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -4224,7 +4291,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -4269,7 +4337,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -4313,7 +4382,8 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -4530,7 +4600,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -4575,7 +4646,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -4619,7 +4691,8 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -4835,7 +4908,8 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -4880,7 +4954,8 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -4924,7 +4999,8 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -5130,7 +5206,8 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -5175,7 +5252,8 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -5219,7 +5297,8 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -5443,7 +5522,8 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -5488,7 +5568,8 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -5532,7 +5613,8 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -5748,7 +5830,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -5793,7 +5876,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -5837,7 +5921,8 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -6048,7 +6133,8 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -6093,7 +6179,8 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -6137,7 +6224,8 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -6347,7 +6435,8 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
         initialize,
     required TResult Function(String value) titleChanged,
     required TResult Function(String value) descriptionChanged,
@@ -6392,7 +6481,8 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult? Function(String value)? titleChanged,
     TResult? Function(String value)? descriptionChanged,
@@ -6436,7 +6526,8 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
-            String? dailyNoteDateKey)?
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
         initialize,
     TResult Function(String value)? titleChanged,
     TResult Function(String value)? descriptionChanged,
@@ -6578,6 +6669,7 @@ mixin _$AddUpdateFormState {
   List<String> get tags => throw _privateConstructorUsedError;
   List<String> get linkedNoteIds => throw _privateConstructorUsedError;
   String? get dailyNoteDateKey => throw _privateConstructorUsedError;
+  NoteCardStyle get cardStyle => throw _privateConstructorUsedError;
   DateTime? get reminderDate => throw _privateConstructorUsedError;
   int? get reminderId => throw _privateConstructorUsedError;
 
@@ -6604,6 +6696,7 @@ abstract class $AddUpdateFormStateCopyWith<$Res> {
       List<String> tags,
       List<String> linkedNoteIds,
       String? dailyNoteDateKey,
+      NoteCardStyle cardStyle,
       DateTime? reminderDate,
       int? reminderId});
 }
@@ -6632,6 +6725,7 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
     Object? tags = null,
     Object? linkedNoteIds = null,
     Object? dailyNoteDateKey = freezed,
+    Object? cardStyle = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
@@ -6680,6 +6774,10 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
               as String?,
+      cardStyle: null == cardStyle
+          ? _value.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
       reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
@@ -6712,6 +6810,7 @@ abstract class _$$AddUpdateFormStateImplCopyWith<$Res>
       List<String> tags,
       List<String> linkedNoteIds,
       String? dailyNoteDateKey,
+      NoteCardStyle cardStyle,
       DateTime? reminderDate,
       int? reminderId});
 }
@@ -6738,6 +6837,7 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
     Object? tags = null,
     Object? linkedNoteIds = null,
     Object? dailyNoteDateKey = freezed,
+    Object? cardStyle = null,
     Object? reminderDate = freezed,
     Object? reminderId = freezed,
   }) {
@@ -6786,6 +6886,10 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
               as String?,
+      cardStyle: null == cardStyle
+          ? _value.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
       reminderDate: freezed == reminderDate
           ? _value.reminderDate
           : reminderDate // ignore: cast_nullable_to_non_nullable
@@ -6813,6 +6917,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       final List<String> tags = const [],
       final List<String> linkedNoteIds = const [],
       this.dailyNoteDateKey,
+      this.cardStyle = const NoteCardStyle(),
       this.reminderDate,
       this.reminderId})
       : _textStyles = textStyles,
@@ -6896,13 +7001,16 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
   @override
   final String? dailyNoteDateKey;
   @override
+  @JsonKey()
+  final NoteCardStyle cardStyle;
+  @override
   final DateTime? reminderDate;
   @override
   final int? reminderId;
 
   @override
   String toString() {
-    return 'AddUpdateFormState(title: $title, description: $description, textStyles: $textStyles, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey, reminderDate: $reminderDate, reminderId: $reminderId)';
+    return 'AddUpdateFormState(title: $title, description: $description, textStyles: $textStyles, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle, reminderDate: $reminderDate, reminderId: $reminderId)';
   }
 
   @override
@@ -6929,6 +7037,8 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
             (identical(other.dailyNoteDateKey, dailyNoteDateKey) ||
                 other.dailyNoteDateKey == dailyNoteDateKey) &&
+            (identical(other.cardStyle, cardStyle) ||
+                other.cardStyle == cardStyle) &&
             (identical(other.reminderDate, reminderDate) ||
                 other.reminderDate == reminderDate) &&
             (identical(other.reminderId, reminderId) ||
@@ -6949,6 +7059,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_linkedNoteIds),
       dailyNoteDateKey,
+      cardStyle,
       reminderDate,
       reminderId);
 
@@ -6973,6 +7084,7 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
       final List<String> tags,
       final List<String> linkedNoteIds,
       final String? dailyNoteDateKey,
+      final NoteCardStyle cardStyle,
       final DateTime? reminderDate,
       final int? reminderId}) = _$AddUpdateFormStateImpl;
   _AddUpdateFormState._() : super._();
@@ -6999,6 +7111,8 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
   List<String> get linkedNoteIds;
   @override
   String? get dailyNoteDateKey;
+  @override
+  NoteCardStyle get cardStyle;
   @override
   DateTime? get reminderDate;
   @override

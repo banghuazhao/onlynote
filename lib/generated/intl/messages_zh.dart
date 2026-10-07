@@ -119,6 +119,36 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Linked_Notes_Count": m1,
     "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
+    "Card_Style": MessageLookupByLibrary.simpleMessage("卡片样式"),
+    "Card_Style_Default_Hint": MessageLookupByLibrary.simpleMessage(
+      "未自定义样式的笔记会使用这些默认设置。",
+    ),
+    "Card_Style_Discard": MessageLookupByLibrary.simpleMessage("放弃"),
+    "Card_Style_Discard_Message": MessageLookupByLibrary.simpleMessage(
+      "你的卡片样式更改尚未保存。",
+    ),
+    "Card_Style_Discard_Title": MessageLookupByLibrary.simpleMessage("放弃样式更改？"),
+    "Card_Style_Follow_App": MessageLookupByLibrary.simpleMessage("跟随应用外观"),
+    "Card_Style_Hide_Date": MessageLookupByLibrary.simpleMessage("隐藏日期"),
+    "Card_Style_Note_Hint": MessageLookupByLibrary.simpleMessage("更改仅应用于此卡片。"),
+    "Card_Style_Paper": MessageLookupByLibrary.simpleMessage("纸张样式"),
+    "Card_Style_Plain": MessageLookupByLibrary.simpleMessage("纯色"),
+    "Card_Style_Preview": MessageLookupByLibrary.simpleMessage("即时预览"),
+    "Card_Style_Preview_Body": MessageLookupByLibrary.simpleMessage(
+      "记录你的想法、计划和日常时刻。",
+    ),
+    "Card_Style_Preview_Task": MessageLookupByLibrary.simpleMessage("尝试新事物"),
+    "Card_Style_Preview_Title": MessageLookupByLibrary.simpleMessage("一点灵感"),
+    "Card_Style_Reset": MessageLookupByLibrary.simpleMessage("重置样式"),
+    "Card_Style_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法保存卡片样式，请重试。",
+    ),
+    "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("显示日期"),
+    "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("纹理"),
+    "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage("使用默认"),
+    "Card_Style_Use_Default_All": MessageLookupByLibrary.simpleMessage(
+      "使用默认样式",
+    ),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("全部完成"),
     "Checklist_Completed": m3,
     "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage("事项已完成"),
@@ -177,6 +207,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "上个月",
     ),
     "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("今天"),
+    "Default_Card_Style": MessageLookupByLibrary.simpleMessage("默认卡片样式"),
+    "Default_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
+      "设置笔记在列表中的显示样式",
+    ),
     "Delete": MessageLookupByLibrary.simpleMessage("删除"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("删除文件夹"),
     "Delete_Folder_Confirm_Message": MessageLookupByLibrary.simpleMessage(

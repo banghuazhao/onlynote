@@ -142,6 +142,48 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Linked_Notes_Count": m1,
     "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
+    "Card_Style": MessageLookupByLibrary.simpleMessage("Card style"),
+    "Card_Style_Default_Hint": MessageLookupByLibrary.simpleMessage(
+      "Notes without a custom style use these defaults.",
+    ),
+    "Card_Style_Discard": MessageLookupByLibrary.simpleMessage("Discard"),
+    "Card_Style_Discard_Message": MessageLookupByLibrary.simpleMessage(
+      "Your card style changes have not been saved.",
+    ),
+    "Card_Style_Discard_Title": MessageLookupByLibrary.simpleMessage(
+      "Discard style changes?",
+    ),
+    "Card_Style_Follow_App": MessageLookupByLibrary.simpleMessage(
+      "Follow app appearance",
+    ),
+    "Card_Style_Hide_Date": MessageLookupByLibrary.simpleMessage("Hide date"),
+    "Card_Style_Note_Hint": MessageLookupByLibrary.simpleMessage(
+      "Changes apply to this card only.",
+    ),
+    "Card_Style_Paper": MessageLookupByLibrary.simpleMessage("Paper style"),
+    "Card_Style_Plain": MessageLookupByLibrary.simpleMessage("Plain"),
+    "Card_Style_Preview": MessageLookupByLibrary.simpleMessage("Live preview"),
+    "Card_Style_Preview_Body": MessageLookupByLibrary.simpleMessage(
+      "Collect your ideas, plans, and everyday moments.",
+    ),
+    "Card_Style_Preview_Task": MessageLookupByLibrary.simpleMessage(
+      "Try something new",
+    ),
+    "Card_Style_Preview_Title": MessageLookupByLibrary.simpleMessage(
+      "A little inspiration",
+    ),
+    "Card_Style_Reset": MessageLookupByLibrary.simpleMessage("Reset style"),
+    "Card_Style_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save card style. Please try again.",
+    ),
+    "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("Show date"),
+    "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("Textured"),
+    "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage(
+      "Use default",
+    ),
+    "Card_Style_Use_Default_All": MessageLookupByLibrary.simpleMessage(
+      "Use default style",
+    ),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("All done"),
     "Checklist_Completed": m3,
     "Checklist_Item_Completed": MessageLookupByLibrary.simpleMessage(
@@ -222,6 +264,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Previous month",
     ),
     "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("Today"),
+    "Default_Card_Style": MessageLookupByLibrary.simpleMessage(
+      "Default card style",
+    ),
+    "Default_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
+      "Choose how your notes look in the library",
+    ),
     "Delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "Delete_Folder": MessageLookupByLibrary.simpleMessage("Delete Folder"),
     "Delete_Folder_Confirm_Message": MessageLookupByLibrary.simpleMessage(

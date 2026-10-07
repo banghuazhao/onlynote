@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import 'voice_memo.dart';
 import 'note_text_style.dart';
 import 'note_image_layout.dart';
+import 'note_card_style.dart';
 
 part 'note.freezed.dart';
 
@@ -32,6 +33,7 @@ class Note with _$Note {
     @Default([]) List<NoteTextStyleRange> textStyles,
     @Default([]) List<NoteImageLayout> imageLayouts,
     String? dailyNoteDateKey,
+    @Default(NoteCardStyle()) NoteCardStyle cardStyle,
   }) = _Note;
 
   final DateFormat _formatter = DateFormat('MMMM dd, yyyy');

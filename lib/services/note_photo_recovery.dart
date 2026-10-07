@@ -242,6 +242,7 @@ class NotePhotoRecovery {
         : note.copyWith(
             isArchived: stored.isArchived,
             isPinned: stored.isPinned ?? false,
+            cardStyle: stored.toDomain().cardStyle,
             folderId: stored.folderId,
             dailyNoteDateKey: stored.dailyNoteDateKey,
             sortOrder: stored.sortOrder));

@@ -5,6 +5,7 @@ import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/repository/folder_repository.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
@@ -216,5 +217,49 @@ void main() {
     await _turn();
     await _turn();
     expect(repository.notes['note']!.toDomain().todo.first.completed, isTrue);
+  });
+
+  test(
+      'card style waits for checklist and pin writes and preserves current content',
+      () async {
+    repository.notes['note'] = NoteDto.fromNote(repository.notes['note']!
+        .toDomain()
+        .copyWith(title: 'Updated shopping', folderId: 'groceries'));
+    repository.writeGate = Completer<void>();
+    final checklist = bloc.toggleTodo(noteId: 'note', todoId: 'a');
+    bloc.add(const HomeEvent.togglePin('note'));
+    const style = NoteCardStyle(
+        cardSize: NoteCardSize.large, fontSize: AppFontSize.large);
+    final appearance = bloc.setCardStyle('note', style);
+    await _turn();
+    expect(repository.writes, 1);
+    repository.writeGate!.complete();
+    expect((await checklist).error, isNull);
+    expect(await appearance, isNull);
+    final saved = repository.notes['note']!.toDomain();
+    expect(saved.cardStyle, style);
+    expect(saved.todo.map((item) => item.completed), [true, false]);
+    expect(saved.isPinned, isTrue);
+    expect(saved.title, 'Updated shopping');
+    expect(saved.folderId, 'groceries');
+    expect(_visible(bloc).single.cardStyle, style);
+    expect(repository.writes, 3);
+  });
+
+  test('card style rejects deleted and missing notes and reports failed saves',
+      () async {
+    const style = NoteCardStyle(cardSize: NoteCardSize.large);
+    repository.notes['note'] = NoteDto.fromNote(repository.notes['note']!
+        .toDomain()
+        .copyWith(deletedAt: DateTime(2026, 10, 7)));
+    expect(await bloc.setCardStyle('note', style), isNotNull);
+    expect(await bloc.setCardStyle('missing', style), isNotNull);
+    expect(repository.writes, 0);
+    repository.notes['note'] =
+        NoteDto.fromNote(Note(id: 'note', title: 'Shopping'));
+    repository.failWrites = true;
+    expect(await bloc.setCardStyle('note', style), isNotNull);
+    expect(repository.notes['note']!.toDomain().cardStyle.isDefault, isTrue);
+    expect(_visible(bloc).single.cardStyle.isDefault, isTrue);
   });
 }

@@ -12,6 +12,7 @@ import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 
 part 'note_dto.g.dart';
 
@@ -68,11 +69,13 @@ class NoteDto implements Comparable {
     this.textStyles = const [],
     this.imageLayouts = const [],
     this.dailyNoteDateKey,
+    this.cardStyle,
   });
 
   factory NoteDto.fromNote(Note note) {
     return NoteDto(
       id: note.id,
+      cardStyle: note.cardStyle.isDefault ? null : note.cardStyle.toMap(),
       dailyNoteDateKey: isValidDailyNoteDateKey(note.dailyNoteDateKey)
           ? note.dailyNoteDateKey
           : null,
@@ -107,6 +110,7 @@ class NoteDto implements Comparable {
   Note toDomain() {
     return Note(
       id: id,
+      cardStyle: NoteCardStyle.fromMap(cardStyle),
       dailyNoteDateKey:
           isValidDailyNoteDateKey(dailyNoteDateKey) ? dailyNoteDateKey : null,
       title: title,
@@ -169,11 +173,13 @@ class NoteDto implements Comparable {
     List<Map<dynamic, dynamic>>? textStyles,
     List<Map<dynamic, dynamic>>? imageLayouts,
     String? dailyNoteDateKey,
+    Map<dynamic, dynamic>? cardStyle,
     String? deletedAt,
     String? folderId,
     bool clearDeletedAt = false,
     bool clearFolderId = false,
     bool clearDailyNoteDateKey = false,
+    bool clearCardStyle = false,
   }) {
     return NoteDto(
       id: id ?? this.id,
@@ -190,6 +196,7 @@ class NoteDto implements Comparable {
       linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
       textStyles: textStyles ?? this.textStyles,
       imageLayouts: imageLayouts ?? this.imageLayouts,
+      cardStyle: clearCardStyle ? null : (cardStyle ?? this.cardStyle),
       dailyNoteDateKey: clearDailyNoteDateKey
           ? null
           : (dailyNoteDateKey ?? this.dailyNoteDateKey),
@@ -235,6 +242,8 @@ class NoteDto implements Comparable {
   final List<Map<dynamic, dynamic>>? imageLayouts;
   @HiveField(17)
   final String? dailyNoteDateKey;
+  @HiveField(18)
+  final Map<dynamic, dynamic>? cardStyle;
 
   @override
   int compareTo(other) {

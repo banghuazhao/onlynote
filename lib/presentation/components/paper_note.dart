@@ -27,6 +27,7 @@ class PaperNote extends StatelessWidget {
     this.pressed = false,
     this.exportMode = false,
     this.tilt = true,
+    this.plainPaper,
     this.padding,
   });
 
@@ -39,6 +40,7 @@ class PaperNote extends StatelessWidget {
   final bool pressed;
   final bool exportMode;
   final bool tilt;
+  final bool? plainPaper;
   final EdgeInsetsGeometry? padding;
 
   static const _scrapRadius = 5.0;
@@ -51,7 +53,7 @@ class PaperNote extends StatelessWidget {
       );
 
   Widget _buildSurface(BuildContext context) {
-    final plain = AppAppearanceSettings.instance.plainPaper;
+    final plain = plainPaper ?? AppAppearanceSettings.instance.plainPaper;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final isSheet = kind == PaperNoteKind.sheet;
     final radius = isSheet ? _sheetRadius : _scrapRadius;
@@ -237,6 +239,7 @@ class PaperChecklistRow extends StatelessWidget {
     this.maxLines = 2,
     this.dense = false,
     this.searchQuery = '',
+    this.textStyle,
   });
 
   final String label;
@@ -248,6 +251,7 @@ class PaperChecklistRow extends StatelessWidget {
   final int maxLines;
   final bool dense;
   final String searchQuery;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +276,8 @@ class PaperChecklistRow extends StatelessWidget {
             duration: exportMode || MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
                 : const Duration(milliseconds: 200),
-            style: (dense ? AppTypography.cardBody : AppTypography.formText)
+            style: (textStyle ??
+                    (dense ? AppTypography.cardBody : AppTypography.formText))
                 .copyWith(
               color: AppColors.ink.withValues(alpha: completed ? 0.45 : 0.88),
               decoration: completed ? TextDecoration.lineThrough : null,

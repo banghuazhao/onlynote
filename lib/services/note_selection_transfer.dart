@@ -77,6 +77,7 @@ class NoteSelectionTransfer {
           : draft.copyWith(
               isArchived: latest.isArchived,
               isPinned: latest.isPinned,
+              cardStyle: latest.cardStyle,
               folderId: latest.folderId,
               dailyNoteDateKey: latest.dailyNoteDateKey,
               sortOrder: latest.sortOrder,
@@ -141,6 +142,7 @@ class NoteSelectionTransfer {
         : draft.copyWith(
             isArchived: latest.isArchived,
             isPinned: latest.isPinned,
+            cardStyle: latest.cardStyle,
             folderId: latest.folderId,
             dailyNoteDateKey: latest.dailyNoteDateKey,
             sortOrder: latest.sortOrder,

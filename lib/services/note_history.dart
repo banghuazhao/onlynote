@@ -162,6 +162,9 @@ class NoteHistory extends ChangeNotifier {
           deletedAt: current.deletedAt,
           isArchived: current.isArchived,
           dailyNoteDateKey: current.dailyNoteDateKey,
+          cardStyle: current.cardStyle == null
+              ? null
+              : Map.unmodifiable(current.cardStyle!),
           tags: List.of(current.tags ?? []),
           linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
           textStyles: _cloneMemos(snapshot.textStyles),
@@ -451,6 +454,8 @@ class NoteHistory extends ChangeNotifier {
         folderId: note.folderId,
         isArchived: note.isArchived,
         dailyNoteDateKey: note.dailyNoteDateKey,
+        cardStyle:
+            note.cardStyle == null ? null : Map.unmodifiable(note.cardStyle!),
         tags: List.unmodifiable(note.tags ?? const <String>[]),
         linkedNoteIds:
             List.unmodifiable(note.linkedNoteIds ?? const <String>[]),

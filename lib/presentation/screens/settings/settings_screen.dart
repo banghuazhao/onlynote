@@ -1,14 +1,12 @@
 import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:flutter/material.dart';
-import 'package:onlynote/Tools/app_layout_settings.dart';
-import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/more_apps_page.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/services/purchase_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,8 +28,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final typography = AppTypographySettings.instance;
-    final layout = AppLayoutSettings.instance;
     final purchase = PurchaseService.instance;
     final tokens = context.tokens;
 
@@ -42,8 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: SafeArea(
               top: false,
               child: ListenableBuilder(
-                listenable: Listenable.merge(
-                    [typography, layout, purchase, ConsentGate.instance]),
+                listenable: Listenable.merge([purchase, ConsentGate.instance]),
                 builder: (context, _) {
                   _showPurchaseFeedback(context);
                   return ListView(
@@ -64,69 +59,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             children: [
                               const AppearanceSection(),
                               SizedBox(height: tokens.space4),
-                              SectionCard(
-                                title: S.of(context).Font_Style,
-                                icon: Icons.text_fields_rounded,
-                                children: [
-                                  ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                    tileColor: context.colors.surfaceContainer,
-                                    title: Text(typography.fontFamily),
-                                    trailing:
-                                        const Icon(Icons.unfold_more_rounded),
-                                    onTap: () => _chooseFont(context),
-                                  ),
-                                  SizedBox(height: tokens.space3),
-                                  PaperNote(
-                                    color: AppColors.parchment,
-                                    tilt: false,
-                                    padding: const EdgeInsets.all(20),
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      child: Text(
-                                        S.of(context).Font_Preview,
-                                        style: typography
-                                            .fontBuilder(
-                                              color: AppColors.ink,
-                                              fontSize: 18 * typography.scale,
-                                            )
-                                            .copyWith(height: 1.5),
-                                      ),
+                              Card(
+                                child: ListTile(
+                                  leading: const Icon(Icons.style_outlined),
+                                  title: Text(S.of(context).Default_Card_Style),
+                                  subtitle: Text(S
+                                      .of(context)
+                                      .Default_Card_Style_Description),
+                                  trailing:
+                                      const Icon(Icons.chevron_right_rounded),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (_) =>
+                                          const CardAppearanceScreen(),
                                     ),
                                   ),
-                                  SizedBox(height: tokens.space4),
-                                  Text(S.of(context).Font_Size,
-                                      style: context.textStyles.titleMedium),
-                                  SizedBox(height: tokens.space2),
-                                  SettingsChoice<AppFontSize>(
-                                    values: AppFontSize.values,
-                                    selected: typography.fontSize,
-                                    label: (value) =>
-                                        _sizeLabel(context, value.index),
-                                    onSelected: typography.setFontSize,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: tokens.space4),
-                              SectionCard(
-                                title: S.of(context).Card_Size,
-                                icon: Icons.grid_view_rounded,
-                                children: [
-                                  SettingsChoice<NoteCardSize>(
-                                    values: const [
-                                      NoteCardSize.small,
-                                      NoteCardSize.medium,
-                                      NoteCardSize.large
-                                    ],
-                                    selected: layout.cardSize,
-                                    label: (value) =>
-                                        _sizeLabel(context, 2 - value.index),
-                                    onSelected: layout.setCardSize,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _CardSizePreview(size: layout.cardSize),
-                                ],
+                                ),
                               ),
                               SizedBox(height: tokens.space4),
                               Card(
@@ -304,30 +253,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _sizeLabel(BuildContext context, int index) => [
-        S.of(context).Small,
-        S.of(context).Medium,
-        S.of(context).Large,
-      ][index];
-
-  Future<void> _chooseFont(BuildContext context) => showAppActionSheet(
-        context: context,
-        title: S.of(context).Font_Style,
-        actions: [
-          for (final family in kAppFontFamilies.keys)
-            AppSheetAction(
-              leading: const Icon(Icons.text_fields_rounded),
-              title:
-                  Text(family, style: kAppFontFamilies[family]!(fontSize: 18)),
-              selected: AppTypographySettings.instance.fontFamily == family,
-              onPressed: (sheetContext) {
-                Navigator.pop(sheetContext);
-                AppTypographySettings.instance.setFontFamily(family);
-              },
-            ),
-        ],
-      );
-
   Future<void> _openPrivacyPolicy() async {
     final opened = await launchUrl(
       Uri.parse(kPrivacyPolicyUrl),
@@ -392,68 +317,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _purchaseActionStarted = true;
     _shownState = PurchaseService.instance.state;
     await action();
-  }
-}
-
-class _CardSizePreview extends StatelessWidget {
-  const _CardSizePreview({required this.size});
-  final NoteCardSize size;
-
-  @override
-  Widget build(BuildContext context) {
-    final count = switch (size) {
-      NoteCardSize.small => 3,
-      NoteCardSize.medium => 2,
-      NoteCardSize.large => 1,
-    };
-    return Semantics(
-      label: S.of(context).Card_Size,
-      image: true,
-      child: ExcludeSemantics(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: DeskSurface(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var i = 0; i < count; i++) ...[
-                    if (i > 0) const SizedBox(width: 10),
-                    Expanded(
-                      child: PaperNote(
-                        color: const [
-                          Color(0xFFFFF4C2),
-                          Color(0xFFDDEACB),
-                          Color(0xFFF3D9CB)
-                        ][i],
-                        tilt: false,
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                height: 5,
-                                width: 36,
-                                color: AppColors.ink.withValues(alpha: .5)),
-                            const SizedBox(height: 12),
-                            for (var line = 0; line < 3; line++) ...[
-                              Container(
-                                  height: 3,
-                                  color: AppColors.ink.withValues(alpha: .15)),
-                              const SizedBox(height: 8),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

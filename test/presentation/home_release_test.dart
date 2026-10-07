@@ -14,11 +14,14 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/database/database.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/repository/folder_repository.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
+import 'package:onlynote/presentation/components/settings_choice.dart';
+import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'package:onlynote/presentation/screens/home/home_screen.dart';
@@ -418,6 +421,99 @@ void main() {
     for (final card in tester.widgetList<NoteCard>(find.byType(NoteCard))) {
       expect(tester.element(find.byWidget(card)), same(before[card.note.id]));
     }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'Home card style saves current content and supports mixed sizes, cancel and defaults',
+      (tester) async {
+    final home = await _openHome(tester);
+    Finder card(String id) => find.byWidgetPredicate(
+        (widget) => widget is NoteCard && widget.note.id == id);
+    final firstState = tester.state<NoteCardState>(card('first'));
+    final secondState = tester.state<NoteCardState>(card('second'));
+
+    Future<void> openStyle() async {
+      await tester.longPress(card('first'));
+      await tester.pumpAndSettle();
+      await _tap(tester, find.text(S.current.Card_Style));
+      expect(find.byType(CardAppearanceScreen), findsOneWidget);
+      expect(
+          tester
+              .widget<CardAppearanceScreen>(find.byType(CardAppearanceScreen))
+              .note!
+              .id,
+          'first');
+    }
+
+    Finder cardSize(String label) => find.descendant(
+          of: find.byType(SettingsChoice<NoteCardSize?>),
+          matching: find.widgetWithText(ChoiceChip, label),
+        );
+
+    await openStyle();
+    await _tap(tester, cardSize(S.current.Large));
+    expect(
+        tester
+            .getSize(find.byKey(const ValueKey('card-style-preview-width')))
+            .width,
+        358);
+    // Content may change while the appearance screen displays its snapshot.
+    home.notes.values['first'] = NoteDto.fromNote(home.notes.values['first']!
+        .toDomain()
+        .copyWith(title: 'Updated project ideas', isPinned: true, todo: [
+      Todo(id: 'first-task', title: 'Reviewed release', completed: true),
+    ]));
+    await _tap(tester, find.byKey(const ValueKey('card-style-save')));
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    final saved = home.notes.values['first']!.toDomain();
+    expect(saved.cardStyle.cardSize, NoteCardSize.large);
+    expect(saved.title, 'Updated project ideas');
+    expect(saved.isPinned, isTrue);
+    expect(saved.todo.single.title, 'Reviewed release');
+    expect(saved.todo.single.completed, isTrue);
+    expect(home.notes.values['second']!.toDomain().cardStyle.isDefault, isTrue);
+    expect(tester.getSize(card('first')).width, 358);
+    expect(tester.getSize(card('second')).width, 173);
+    expect(tester.state<NoteCardState>(card('first')), same(firstState));
+    expect(tester.state<NoteCardState>(card('second')), same(secondState));
+
+    for (var cycle = 0; cycle < 3; cycle++) {
+      home.bloc
+          .add(const HomeEvent.filtersChanged({NoteSearchFilter.checklists}));
+      await tester.pumpAndSettle();
+      expect(card('second'), findsNothing);
+      expect(tester.state<NoteCardState>(card('first')), same(firstState));
+      home.bloc.add(const HomeEvent.filtersChanged({}));
+      await tester.pumpAndSettle();
+      expect(card('second'), findsOneWidget);
+      expect(tester.getSize(card('first')).width, 358);
+      expect(tester.getSize(card('second')).width, 173);
+      expect(tester.state<NoteCardState>(card('first')), same(firstState));
+      expect(tester.takeException(), isNull);
+    }
+
+    await openStyle();
+    final reset = find.byKey(const ValueKey('card-style-reset'));
+    await tester.scrollUntilVisible(reset, 250,
+        scrollable: find.descendant(
+            of: find.byKey(const ValueKey('card-style-controls')),
+            matching: find.byType(Scrollable)));
+    await _tap(tester, reset);
+    await _tap(tester, find.byKey(const ValueKey('card-style-save')));
+    expect(home.notes.values['first']!.toDomain().cardStyle.isDefault, isTrue);
+    expect(tester.getSize(card('first')).width, 173);
+    expect(tester.state<NoteCardState>(card('first')), same(firstState));
+
+    await openStyle();
+    await _tap(tester, cardSize(S.current.Large));
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.Card_Style_Discard_Title), findsOneWidget);
+    await _tap(tester, find.text(S.current.Card_Style_Discard));
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    expect(home.notes.values['first']!.toDomain().cardStyle.isDefault, isTrue);
+    expect(tester.getSize(card('first')).width, 173);
     expect(tester.takeException(), isNull);
   });
 }

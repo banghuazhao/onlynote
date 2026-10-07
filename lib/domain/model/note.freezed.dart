@@ -34,6 +34,7 @@ mixin _$Note {
   List<NoteTextStyleRange> get textStyles => throw _privateConstructorUsedError;
   List<NoteImageLayout> get imageLayouts => throw _privateConstructorUsedError;
   String? get dailyNoteDateKey => throw _privateConstructorUsedError;
+  NoteCardStyle get cardStyle => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
@@ -62,7 +63,8 @@ abstract class $NoteCopyWith<$Res> {
       List<String> linkedNoteIds,
       List<NoteTextStyleRange> textStyles,
       List<NoteImageLayout> imageLayouts,
-      String? dailyNoteDateKey});
+      String? dailyNoteDateKey,
+      NoteCardStyle cardStyle});
 }
 
 /// @nodoc
@@ -96,6 +98,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? textStyles = null,
     Object? imageLayouts = null,
     Object? dailyNoteDateKey = freezed,
+    Object? cardStyle = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -170,6 +173,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
               as String?,
+      cardStyle: null == cardStyle
+          ? _value.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
     ) as $Val);
   }
 }
@@ -199,7 +206,8 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       List<String> linkedNoteIds,
       List<NoteTextStyleRange> textStyles,
       List<NoteImageLayout> imageLayouts,
-      String? dailyNoteDateKey});
+      String? dailyNoteDateKey,
+      NoteCardStyle cardStyle});
 }
 
 /// @nodoc
@@ -230,6 +238,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? textStyles = null,
     Object? imageLayouts = null,
     Object? dailyNoteDateKey = freezed,
+    Object? cardStyle = null,
   }) {
     return _then(_$NoteImpl(
       id: freezed == id
@@ -304,6 +313,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
               as String?,
+      cardStyle: null == cardStyle
+          ? _value.cardStyle
+          : cardStyle // ignore: cast_nullable_to_non_nullable
+              as NoteCardStyle,
     ));
   }
 }
@@ -329,7 +342,8 @@ class _$NoteImpl extends _Note {
       final List<String> linkedNoteIds = const [],
       final List<NoteTextStyleRange> textStyles = const [],
       final List<NoteImageLayout> imageLayouts = const [],
-      this.dailyNoteDateKey})
+      this.dailyNoteDateKey,
+      this.cardStyle = const NoteCardStyle()})
       : _todo = todo,
         _imagePaths = imagePaths,
         _voiceMemos = voiceMemos,
@@ -426,10 +440,13 @@ class _$NoteImpl extends _Note {
 
   @override
   final String? dailyNoteDateKey;
+  @override
+  @JsonKey()
+  final NoteCardStyle cardStyle;
 
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, textStyles: $textStyles, imageLayouts: $imageLayouts, dailyNoteDateKey: $dailyNoteDateKey)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, textStyles: $textStyles, imageLayouts: $imageLayouts, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
   }
 
   @override
@@ -467,30 +484,34 @@ class _$NoteImpl extends _Note {
             const DeepCollectionEquality()
                 .equals(other._imageLayouts, _imageLayouts) &&
             (identical(other.dailyNoteDateKey, dailyNoteDateKey) ||
-                other.dailyNoteDateKey == dailyNoteDateKey));
+                other.dailyNoteDateKey == dailyNoteDateKey) &&
+            (identical(other.cardStyle, cardStyle) ||
+                other.cardStyle == cardStyle));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      title,
-      description,
-      color,
-      dateTime,
-      const DeepCollectionEquality().hash(_todo),
-      const DeepCollectionEquality().hash(_imagePaths),
-      const DeepCollectionEquality().hash(_voiceMemos),
-      sortOrder,
-      isPinned,
-      deletedAt,
-      folderId,
-      isArchived,
-      const DeepCollectionEquality().hash(_tags),
-      const DeepCollectionEquality().hash(_linkedNoteIds),
-      const DeepCollectionEquality().hash(_textStyles),
-      const DeepCollectionEquality().hash(_imageLayouts),
-      dailyNoteDateKey);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        title,
+        description,
+        color,
+        dateTime,
+        const DeepCollectionEquality().hash(_todo),
+        const DeepCollectionEquality().hash(_imagePaths),
+        const DeepCollectionEquality().hash(_voiceMemos),
+        sortOrder,
+        isPinned,
+        deletedAt,
+        folderId,
+        isArchived,
+        const DeepCollectionEquality().hash(_tags),
+        const DeepCollectionEquality().hash(_linkedNoteIds),
+        const DeepCollectionEquality().hash(_textStyles),
+        const DeepCollectionEquality().hash(_imageLayouts),
+        dailyNoteDateKey,
+        cardStyle
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -518,7 +539,8 @@ abstract class _Note extends Note {
       final List<String> linkedNoteIds,
       final List<NoteTextStyleRange> textStyles,
       final List<NoteImageLayout> imageLayouts,
-      final String? dailyNoteDateKey}) = _$NoteImpl;
+      final String? dailyNoteDateKey,
+      final NoteCardStyle cardStyle}) = _$NoteImpl;
   _Note._() : super._();
 
   @override
@@ -557,6 +579,8 @@ abstract class _Note extends Note {
   List<NoteImageLayout> get imageLayouts;
   @override
   String? get dailyNoteDateKey;
+  @override
+  NoteCardStyle get cardStyle;
   @override
   @JsonKey(ignore: true)
   _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>

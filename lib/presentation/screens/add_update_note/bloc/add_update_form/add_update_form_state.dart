@@ -15,6 +15,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
       @Default([]) List<String> tags,
       @Default([]) List<String> linkedNoteIds,
       String? dailyNoteDateKey,
+      @Default(NoteCardStyle()) NoteCardStyle cardStyle,
       DateTime? reminderDate,
       int? reminderId}) = _AddUpdateFormState;
 

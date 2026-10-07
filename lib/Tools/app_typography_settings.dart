@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
+
+export 'package:onlynote/domain/model/note_card_style.dart' show AppFontSize;
 
 typedef GoogleFontBuilder = TextStyle Function({
   TextStyle? textStyle,
@@ -24,15 +27,6 @@ final Map<String, GoogleFontBuilder> kAppFontFamilies = {
   'Patrick Hand': GoogleFonts.patrickHand,
 };
 
-enum AppFontSize {
-  small(0.85),
-  medium(1.0),
-  large(1.2);
-
-  const AppFontSize(this.scale);
-  final double scale;
-}
-
 /// App-wide font family/size preference, applied everywhere note text is
 /// shown (editor, detail screen, home cards). Persisted via SharedPreferences.
 class AppTypographySettings extends ChangeNotifier {
@@ -52,28 +46,36 @@ class AppTypographySettings extends ChangeNotifier {
       kAppFontFamilies[_fontFamily] ?? GoogleFonts.montserrat;
   double get scale => _fontSize.scale;
 
-  Future<void> load() async {
+  Future<void> load({bool notify = false}) async {
     final prefs = await SharedPreferences.getInstance();
-    _fontFamily = prefs.getString(_fontFamilyKey) ?? _fontFamily;
+    final storedFamily = prefs.getString(_fontFamilyKey);
+    _fontFamily = kAppFontFamilies.containsKey(storedFamily)
+        ? storedFamily!
+        : 'Montserrat';
     final storedSize = prefs.getString(_fontSizeKey);
     _fontSize = AppFontSize.values.firstWhere(
       (size) => size.name == storedSize,
       orElse: () => AppFontSize.medium,
     );
+    if (notify) notifyListeners();
   }
 
   Future<void> setFontFamily(String fontFamily) async {
     if (!kAppFontFamilies.containsKey(fontFamily)) return;
+    final prefs = await SharedPreferences.getInstance();
+    if (!await prefs.setString(_fontFamilyKey, fontFamily)) {
+      throw StateError('Could not save typography');
+    }
     _fontFamily = fontFamily;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_fontFamilyKey, fontFamily);
   }
 
   Future<void> setFontSize(AppFontSize fontSize) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!await prefs.setString(_fontSizeKey, fontSize.name)) {
+      throw StateError('Could not save typography');
+    }
     _fontSize = fontSize;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_fontSizeKey, fontSize.name);
   }
 }

@@ -5,17 +5,18 @@ import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart'
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/presentation/components/note_card_entrance.dart';
+import 'package:onlynote/presentation/components/sliver_note_card_layout.dart';
 import 'package:onlynote/presentation/components/note_tags_sheet.dart';
 import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:focus_detector/focus_detector.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/ads_manager.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
@@ -45,6 +46,7 @@ import 'package:onlynote/services/daily_note.dart';
 
 import '../settings/manage_folders_screen.dart';
 import '../settings/settings_screen.dart';
+import '../card_appearance/card_appearance_screen.dart';
 import 'bloc/home_bloc.dart';
 import 'bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'widgets/note_card.dart';
@@ -1431,6 +1433,7 @@ class _BuildNotesList extends StatefulWidget {
 class __BuildNotesListState extends State<_BuildNotesList> {
   final Map<String, ScreenshotController> _screenshotControllers = {};
   final Map<String, GlobalKey<NoteCardState>> _cardKeys = {};
+  bool _openingCardAppearance = false;
 
   ScreenshotController _screenshotControllerFor(String noteId) =>
       _screenshotControllers.putIfAbsent(noteId, () => ScreenshotController());
@@ -1464,6 +1467,31 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     final result = await bloc.toggleTodo(noteId: noteId, todoId: todoId);
     // The Home screen owns feedback, even if Unfinished removes this list.
     onResult(result);
+  }
+
+  Future<void> _openCardAppearance(String noteId) async {
+    if (_openingCardAppearance || !mounted) return;
+    _openingCardAppearance = true;
+    final bloc = context.read<HomeBloc>();
+    try {
+      final note = (await getIt<NoteRepository>().getNote(noteId)).toDomain();
+      if (!mounted || note.isDeleted) return;
+      await Navigator.of(context).push<void>(MaterialPageRoute(
+        builder: (_) => CardAppearanceScreen(
+          note: note,
+          onSave: (style) async {
+            final error = await bloc.setCardStyle(noteId, style);
+            if (error != null) throw StateError(error);
+          },
+        ),
+      ));
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Card_Style_Save_Failed, isError: true);
+      }
+    } finally {
+      _openingCardAppearance = false;
+    }
   }
 
   void _showMoveToFolderSheet(BuildContext context, Note note) {
@@ -1556,6 +1584,16 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           ? note.title!
           : S.of(context).Onlynote,
       actions: <AppSheetAction>[
+        AppSheetAction(
+          leading: const Icon(Icons.palette_outlined),
+          title: Text(S.of(context).Card_Style),
+          onPressed: (sheetContext) async {
+            final route = ModalRoute.of(sheetContext);
+            Navigator.pop(sheetContext);
+            if (route != null) await route.completed;
+            if (mounted) await _openCardAppearance(noteId);
+          },
+        ),
         AppSheetAction(
           leading: Icon(note.isArchived
               ? Icons.unarchive_outlined
@@ -1653,6 +1691,19 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           preferredColumns: AppLayoutSettings.instance.cardSize.columns,
           appFontScale: AppTypographySettings.instance.scale,
         );
+        final cardColumns = [
+          for (final note in widget.notes)
+            noteGridColumns(
+              width: constraints.maxWidth,
+              textScaler: MediaQuery.textScalerOf(context),
+              preferredColumns: (note.cardStyle.cardSize ??
+                      AppCardStyleSettings.instance.defaults.cardSize!)
+                  .columns,
+              appFontScale: (note.cardStyle.fontSize ??
+                      AppCardStyleSettings.instance.defaults.fontSize!)
+                  .scale,
+            ),
+        ];
         return FocusDetector(
           onFocusGained: () {
             if (mounted) setState(() {});
@@ -1682,7 +1733,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
                   : _buildMasonryGrid(
                       context,
                       multipleDeleteBloc,
-                      crossAxisCount,
+                      cardColumns,
                     ),
             ),
           ),
@@ -1694,7 +1745,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   Widget _buildMasonryGrid(
     BuildContext context,
     MultipleDeleteBloc multipleDeleteBloc,
-    int crossAxisCount,
+    List<int> cardColumns,
   ) {
     final isSelectionMode = multipleDeleteBloc.state.maybeMap(
       selected: (_) => true,
@@ -1714,61 +1765,52 @@ class __BuildNotesListState extends State<_BuildNotesList> {
             horizontal: AppSpacings.xl,
             vertical: AppSpacings.xl,
           ),
-          sliver: SliverMasonryGrid(
-            gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final note = widget.notes[index];
-                final noteId = note.id!;
-                final card = NoteCard(
-                  key: _cardKeyFor(noteId),
-                  note: note,
-                  searchQuery: widget.searchQuery,
-                  photoSearchText: PhotoSearchIndex.initializedInstance
-                      ?.matchingText(note, widget.searchQuery),
-                  photoSearchImagePath: PhotoSearchIndex.initializedInstance
-                      ?.matchingPhotoPath(note, widget.searchQuery),
-                  selected: multipleDeleteBloc.isSelected(noteId),
-                  selectionMode: isSelectionMode,
-                  unfinishedOnly: widget.unfinishedOnly,
-                  onTodoToggle: isSelectionMode || widget.showTrash
-                      ? null
-                      : (todoId) => _toggleTodo(noteId, todoId),
-                  screenshotController: _screenshotControllerFor(noteId),
-                  onTap: () {
-                    multipleDeleteBloc.state.maybeMap(
-                      orElse: () {
-                        context.router.push(NoteDetailRoute(noteId: noteId));
-                      },
-                      selected: (_) {
-                        multipleDeleteBloc
-                            .add(MultipleDeleteEvent.toggleSelect(noteId));
-                      },
-                    );
-                  },
-                  onLongPress: () {
-                    multipleDeleteBloc.state.maybeMap(
-                      orElse: () => _showNoteContextMenu(
-                          context, note, multipleDeleteBloc, noteId),
-                      selected: (_) {
-                        multipleDeleteBloc
-                            .add(MultipleDeleteEvent.toggleSelect(noteId));
-                      },
-                    );
-                  },
-                );
-                return KeyedSubtree(
-                  // Masonry placement belongs to the slot. The card's
-                  // GlobalKey carries note identity when its position changes.
-                  key: ValueKey(index),
-                  child: MediaQuery.disableAnimationsOf(context)
-                      ? card
-                      : NoteCardEntrance(child: card),
-                );
-              },
-              childCount: widget.notes.length,
-            ),
+          sliver: SliverNoteCardLayout(
+            columns: cardColumns,
+            itemBuilder: (BuildContext context, int index) {
+              final note = widget.notes[index];
+              final noteId = note.id!;
+              final card = NoteCard(
+                key: _cardKeyFor(noteId),
+                note: note,
+                searchQuery: widget.searchQuery,
+                photoSearchText: PhotoSearchIndex.initializedInstance
+                    ?.matchingText(note, widget.searchQuery),
+                photoSearchImagePath: PhotoSearchIndex.initializedInstance
+                    ?.matchingPhotoPath(note, widget.searchQuery),
+                selected: multipleDeleteBloc.isSelected(noteId),
+                selectionMode: isSelectionMode,
+                unfinishedOnly: widget.unfinishedOnly,
+                onTodoToggle: isSelectionMode || widget.showTrash
+                    ? null
+                    : (todoId) => _toggleTodo(noteId, todoId),
+                screenshotController: _screenshotControllerFor(noteId),
+                onTap: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () {
+                      context.router.push(NoteDetailRoute(noteId: noteId));
+                    },
+                    selected: (_) {
+                      multipleDeleteBloc
+                          .add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
+                onLongPress: () {
+                  multipleDeleteBloc.state.maybeMap(
+                    orElse: () => _showNoteContextMenu(
+                        context, note, multipleDeleteBloc, noteId),
+                    selected: (_) {
+                      multipleDeleteBloc
+                          .add(MultipleDeleteEvent.toggleSelect(noteId));
+                    },
+                  );
+                },
+              );
+              return MediaQuery.disableAnimationsOf(context)
+                  ? card
+                  : NoteCardEntrance(child: card);
+            },
             mainAxisSpacing: AppSpacings.xl,
             crossAxisSpacing: AppSpacings.l,
           ),

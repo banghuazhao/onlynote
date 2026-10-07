@@ -6,7 +6,7 @@ import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -15,13 +15,14 @@ import 'package:onlynote/presentation/components/note_image.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/presentation/theme/note_card_typography.dart';
 import 'package:screenshot/screenshot.dart';
 
 class NoteCard extends StatefulWidget {
   const NoteCard({
     super.key,
     required this.note,
+    this.cardStyle,
     this.selected = false,
     this.searchQuery = '',
     this.photoSearchText,
@@ -36,6 +37,9 @@ class NoteCard extends StatefulWidget {
   });
 
   final Note note;
+
+  /// A staged style for the live preview; saved cards use note.cardStyle.
+  final NoteCardStyle? cardStyle;
   final String searchQuery;
 
   /// Derived text that explains a photo search result without changing the note.
@@ -89,7 +93,7 @@ class NoteCardState extends State<NoteCard> {
     if (_pressed != value) setState(() => _pressed = value);
   }
 
-  Iterable<Todo> _visibleTodos(Note note) {
+  Iterable<Todo> _visibleTodos(Note note, NoteCardSize cardSize) {
     final todos = note.todo.where((todo) =>
         todo.title?.trim().isNotEmpty == true &&
         (!widget.unfinishedOnly || !todo.completed));
@@ -101,7 +105,11 @@ class NoteCardState extends State<NoteCard> {
           !todo.completed && !(pattern?.hasMatch(todo.title!) ?? false)),
       ...todos.where((todo) =>
           todo.completed && !(pattern?.hasMatch(todo.title!) ?? false)),
-    ].take(3);
+    ].take(switch (cardSize) {
+      NoteCardSize.small => 2,
+      NoteCardSize.medium => 3,
+      NoteCardSize.large => 5,
+    });
   }
 
   @override
@@ -109,6 +117,9 @@ class NoteCardState extends State<NoteCard> {
     final Reminder? currentReminder =
         ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
+    final style = resolveNoteCardStyle(widget.cardStyle ?? note.cardStyle);
+    final typography = NoteCardTypography(style);
+    final cardSize = style.cardSize!;
     final strings = S.of(context);
     final title = note.title?.trim() ?? '';
     final body = note.description?.trim() ?? '';
@@ -131,7 +142,7 @@ class NoteCardState extends State<NoteCard> {
         .where((id) => id.trim().isNotEmpty && id != note.id)
         .toSet()
         .length;
-    final date = note.dateTime == null
+    final date = note.dateTime == null || style.showDate == false
         ? null
         : DateFormat.yMMMd(Localizations.localeOf(context).toString())
             .format(note.dateTime!);
@@ -203,6 +214,7 @@ class NoteCardState extends State<NoteCard> {
                 child: PaperNote(
                   color: paperColor,
                   seed: seed,
+                  plainPaper: style.paperStyle == NoteCardPaperStyle.plain,
                   pinned: note.isPinned,
                   selected: widget.selected,
                   pressed: _pressed,
@@ -219,9 +231,15 @@ class NoteCardState extends State<NoteCard> {
                           SearchHighlight(
                             searchExcerpt(title, widget.searchQuery),
                             query: widget.searchQuery,
-                            style: AppTypography.cardTitle,
+                            style: typography.title,
                             overflow: TextOverflow.ellipsis,
-                            maxLines: hasDescription ? 3 : 5,
+                            maxLines: cardSize == NoteCardSize.small
+                                ? 2
+                                : cardSize == NoteCardSize.large
+                                    ? 5
+                                    : hasDescription
+                                        ? 3
+                                        : 5,
                           ),
                         if (hasTitle && hasDescription)
                           const SizedBox(height: AppSpacings.m),
@@ -232,7 +250,7 @@ class NoteCardState extends State<NoteCard> {
                             child: Text(
                               strings.Voice_Memo,
                               key: const ValueKey('card-transcript-source'),
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                   color: AppColors.ink.withValues(alpha: .65)),
                             ),
                           ),
@@ -240,11 +258,16 @@ class NoteCardState extends State<NoteCard> {
                           SearchHighlight(
                             searchExcerpt(excerpt, widget.searchQuery),
                             query: widget.searchQuery,
-                            style: hasTitle
-                                ? AppTypography.cardBody
-                                : AppTypography.cardTitle,
+                            style:
+                                hasTitle ? typography.body : typography.title,
                             overflow: TextOverflow.ellipsis,
-                            maxLines: hasTitle ? 4 : 6,
+                            maxLines: cardSize == NoteCardSize.small
+                                ? 2
+                                : cardSize == NoteCardSize.large
+                                    ? 8
+                                    : hasTitle
+                                        ? 4
+                                        : 6,
                           ),
                         if (hasPhotoMatch) ...[
                           if (hasTitle || hasDescription)
@@ -265,12 +288,10 @@ class NoteCardState extends State<NoteCard> {
                                   Expanded(
                                     child: Text(
                                       S.of(context).Photo_Search_Text_In_Photo,
-                                      style: AppTypography.description.copyWith(
+                                      style: typography.description.copyWith(
                                         color: AppColors.ink
                                             .withValues(alpha: 0.65),
-                                        fontSize: 12 *
-                                            AppTypographySettings
-                                                .instance.scale,
+                                        fontSize: 12 * typography.scale,
                                       ),
                                     ),
                                   ),
@@ -282,7 +303,7 @@ class NoteCardState extends State<NoteCard> {
                                     photoSearchText, widget.searchQuery),
                                 key: const ValueKey('photo-search-excerpt'),
                                 query: widget.searchQuery,
-                                style: AppTypography.cardBody,
+                                style: typography.body,
                                 maxLines: 3,
                               ),
                             ],
@@ -298,14 +319,13 @@ class NoteCardState extends State<NoteCard> {
                                   todos.where((todo) => todo.completed).length,
                                   todos.length),
                               key: const ValueKey('card-checklist-progress'),
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                 color: AppColors.ink.withValues(alpha: .65),
-                                fontSize:
-                                    12 * AppTypographySettings.instance.scale,
+                                fontSize: 12 * typography.scale,
                               ),
                             ),
                           ),
-                          for (final todo in _visibleTodos(note))
+                          for (final todo in _visibleTodos(note, cardSize))
                             Padding(
                               padding:
                                   const EdgeInsets.only(bottom: AppSpacings.s),
@@ -327,6 +347,7 @@ class NoteCardState extends State<NoteCard> {
                                 searchQuery: widget.searchQuery,
                                 completed: todo.completed,
                                 dense: true,
+                                textStyle: typography.body,
                                 maxLines: 2,
                               ),
                             ),
@@ -353,10 +374,9 @@ class NoteCardState extends State<NoteCard> {
                             Text(
                               date,
                               key: const ValueKey('card-date'),
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                 color: AppColors.ink.withValues(alpha: .6),
-                                fontSize:
-                                    12 * AppTypographySettings.instance.scale,
+                                fontSize: 12 * typography.scale,
                               ),
                             ),
                           if (note.isArchived)
@@ -364,7 +384,7 @@ class NoteCardState extends State<NoteCard> {
                               padding:
                                   const EdgeInsets.only(top: AppSpacings.s),
                               child: Text(strings.Archive,
-                                  style: AppTypography.description.copyWith(
+                                  style: typography.description.copyWith(
                                       color: AppColors.ink
                                           .withValues(alpha: .65))),
                             ),
@@ -380,7 +400,7 @@ class NoteCardState extends State<NoteCard> {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(currentReminder.timeString,
-                                      style: AppTypography.description.copyWith(
+                                      style: typography.description.copyWith(
                                         color: AppColors.ink
                                             .withValues(alpha: .65),
                                       )),
@@ -398,7 +418,7 @@ class NoteCardState extends State<NoteCard> {
                                 child: Text(
                                     S.of(context).History_Recordings(
                                         note.voiceMemos.length),
-                                    style: AppTypography.description.copyWith(
+                                    style: typography.description.copyWith(
                                         color: AppColors.ink
                                             .withValues(alpha: 0.7)))),
                           ]),
@@ -409,14 +429,14 @@ class NoteCardState extends State<NoteCard> {
                               strings.Card_Scanned_Pages_Count(
                                   scanPaths.length),
                               key: const ValueKey('card-scan-count'),
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                   color: AppColors.ink.withValues(alpha: .7))),
                         ],
                         if (linkedCount > 0) ...[
                           const SizedBox(height: AppSpacings.m),
                           Text(strings.Card_Linked_Notes_Count(linkedCount),
                               key: const ValueKey('card-linked-count'),
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                   color: AppColors.ink.withValues(alpha: .7))),
                         ],
                         if (note.tags.isNotEmpty) ...[
@@ -429,7 +449,7 @@ class NoteCardState extends State<NoteCard> {
                               '${displayTags.map((tag) => '#$tag').join('  ')}'
                               '${note.tags.length > 2 ? '  +${note.tags.length - 2}' : ''}',
                               query: widget.searchQuery,
-                              style: AppTypography.description.copyWith(
+                              style: typography.description.copyWith(
                                   color: AppColors.ink.withValues(alpha: 0.65)),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

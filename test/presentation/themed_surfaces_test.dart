@@ -12,6 +12,8 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/confirm_dialog.dart';
 import 'package:onlynote/presentation/components/folder_name_dialog.dart';
+import 'package:onlynote/presentation/components/section_card.dart';
+import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/settings/settings_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -203,11 +205,32 @@ void main() {
         expect(tester.takeException(), isNull);
         await capture(tester,
             'settings-${dark ? 'dark' : 'light'}-${size.width.toInt()}');
-        final small = find.widgetWithText(ChoiceChip, 'Small').last;
-        await tester.scrollUntilVisible(small, 200);
+        await tester.scrollUntilVisible(find.text('Default card style'), 200);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Default card style'));
+        await tester.pumpAndSettle();
+        expect(find.byType(CardAppearanceScreen), findsOneWidget);
+        final controls = find.descendant(
+          of: find.byKey(const ValueKey('card-style-controls')),
+          matching: find.byType(Scrollable),
+        );
+        await tester.scrollUntilVisible(find.text('Card Size'), 200,
+            scrollable: controls);
+        await tester.pumpAndSettle();
+        final small = find.descendant(
+          of: find.ancestor(
+              of: find.text('Card Size'), matching: find.byType(SectionCard)),
+          matching: find.widgetWithText(ChoiceChip, 'Small'),
+        );
+        await tester.scrollUntilVisible(small, 200, scrollable: controls);
         await tester.pumpAndSettle();
         await tester.tap(small);
         await tester.pumpAndSettle();
+        // Customization stays in the preview until the user saves it.
+        expect(AppLayoutSettings.instance.cardSize, NoteCardSize.medium);
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+        expect(find.byType(CardAppearanceScreen), findsNothing);
         expect(AppLayoutSettings.instance.cardSize, NoteCardSize.small);
         expect(
             (await SharedPreferences.getInstance())

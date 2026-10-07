@@ -17,6 +17,7 @@ import 'package:onlynote/Tools/image_storage.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/toast.dart';
@@ -114,6 +115,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return completion.future;
   }
 
+  Future<String?> setCardStyle(String noteId, NoteCardStyle style) {
+    if (isClosed) {
+      return Future.value(_i10n.Card_Style_Save_Failed);
+    }
+    final completion = Completer<String?>();
+    add(HomeEvent.setCardStyle(
+        noteId: noteId, style: style, completion: completion));
+    return completion.future;
+  }
+
   Future<HomeChecklistResult> toggleTodo({
     required String noteId,
     required String todoId,
@@ -202,6 +213,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await _onSetArchived(event, emit);
     } else if (event is _SetTags) {
       await _onSetTags(event, emit);
+    } else if (event is _SetCardStyle) {
+      await _onSetCardStyle(event, emit);
     } else if (event is _TogglePin) {
       await _onTogglePin(event, emit);
     } else if (event is _RestoreNotes) {
@@ -667,6 +680,29 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       event.completion?.complete(error);
     } catch (_) {
       event.completion?.complete(_i10n.Failed_to_Update_note_please_try_again);
+    }
+  }
+
+  Future<void> _onSetCardStyle(
+      _SetCardStyle event, Emitter<HomeState> emit) async {
+    try {
+      await WidgetCommands.initializedInstance?.importPending();
+      final fetched = await _getNoteUsecase(event.noteId);
+      final note = fetched.fold<Note?>((_) => null, (note) => note);
+      if (note == null || note.isDeleted) {
+        throw StateError('Note is unavailable');
+      }
+      final updated = note.copyWith(cardStyle: event.style);
+      final saved = await _updateNoteUsecase(updated);
+      final error =
+          saved.fold<String?>((_) => _i10n.Card_Style_Save_Failed, (_) => null);
+      if (error == null && !emit.isDone) {
+        _replaceSavedNote(updated);
+        emit(_buildLoaded());
+      }
+      event.completion?.complete(error);
+    } catch (_) {
+      event.completion?.complete(_i10n.Card_Style_Save_Failed);
     }
   }
 }

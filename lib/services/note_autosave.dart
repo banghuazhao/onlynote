@@ -54,6 +54,8 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
             : draft.copyWith(
                 isArchived: current.isArchived,
                 isPinned: current.isPinned,
+                cardStyle: current.cardStyle,
+                clearCardStyle: current.cardStyle == null,
                 folderId: current.folderId,
                 clearFolderId: current.folderId == null,
                 dailyNoteDateKey: current.dailyNoteDateKey,

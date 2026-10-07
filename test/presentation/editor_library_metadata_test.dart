@@ -11,6 +11,7 @@ import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
@@ -174,8 +175,10 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
 
-  testWidgets('reopening a stale draft keeps the current daily identity',
+  testWidgets(
+      'reopening a stale draft keeps current daily identity and card style',
       (tester) async {
+    const currentStyle = NoteCardStyle(fontFamily: 'Kalam', showDate: false);
     final directory = (await tester.runAsync(() =>
         Directory.systemTemp.createTemp('onlynote-editor-daily-recovery-')))!;
     final drafts = (await tester.runAsync(() async {
@@ -189,6 +192,8 @@ void main() {
               id: 'restored',
               title: 'Unsaved draft',
               description: 'Retain my typing',
+              cardStyle:
+                  const NoteCardStyle(fontFamily: 'Roboto', showDate: true),
               dailyNoteDateKey: '2026-10-06')));
       return box;
     }))!;
@@ -197,12 +202,14 @@ void main() {
       await directory.delete(recursive: true);
     });
     final (notes, _) = await _openEditor(tester,
-        note: Note(id: 'restored', title: 'Restored note'),
+        note: Note(
+            id: 'restored', title: 'Restored note', cardStyle: currentStyle),
         library: [Note(id: 'today', dailyNoteDateKey: '2026-10-06')]);
     await _waitForAutosave(tester);
     expect(notes.values['restored']!.title, 'Unsaved draft');
     expect(notes.values['restored']!.description, 'Retain my typing');
     expect(notes.values['restored']!.dailyNoteDateKey, isNull);
+    expect(notes.values['restored']!.toDomain().cardStyle, currentStyle);
     expect(notes.values['today']!.dailyNoteDateKey, '2026-10-06');
     expect(tester.takeException(), isNull);
   });
@@ -220,6 +227,12 @@ void main() {
       tags: const ['Personal'],
       linkedNoteIds: const ['packing'],
       dailyNoteDateKey: '2026-10-06',
+      cardStyle: const NoteCardStyle(
+          fontFamily: 'Kalam',
+          fontSize: AppFontSize.large,
+          cardSize: NoteCardSize.large,
+          paperStyle: NoteCardPaperStyle.plain,
+          showDate: false),
       imagePaths: const [path],
       imageLayouts: const [
         NoteImageLayout(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
-import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/presentation/theme/note_card_typography.dart';
 
 /// Compact identity for dragging. Media-only notes keep a useful headline.
 class NoteReorderCard extends StatelessWidget {
@@ -16,6 +16,8 @@ class NoteReorderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = S.of(context);
+    final style = resolveNoteCardStyle(note.cardStyle);
+    final typography = NoteCardTypography(style);
     final content = [
       note.title ?? '',
       note.description ?? '',
@@ -28,7 +30,7 @@ class NoteReorderCard extends StatelessWidget {
             : note.hasImages
                 ? strings.History_Photos(note.imagePaths.length)
                 : strings.notes);
-    final date = note.dateTime == null
+    final date = note.dateTime == null || style.showDate == false
         ? ''
         : DateFormat.yMMMd(Localizations.localeOf(context).toString())
             .format(note.dateTime!);
@@ -37,13 +39,14 @@ class NoteReorderCard extends StatelessWidget {
       seed: note.id?.hashCode ?? 0,
       pinned: note.isPinned,
       tilt: false,
+      plainPaper: style.paperStyle == NoteCardPaperStyle.plain,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Flexible(
             child: Text(headline,
-                style: AppTypography.cardTitle,
+                style: typography.title,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 3),
           ),
@@ -52,8 +55,8 @@ class NoteReorderCard extends StatelessWidget {
             Text(date,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: AppTypography.description.copyWith(
-                    fontSize: 12 * AppTypographySettings.instance.scale,
+                style: typography.description.copyWith(
+                    fontSize: 12 * typography.scale,
                     height: 1.4,
                     color: AppColors.ink.withValues(alpha: 0.7))),
           ],

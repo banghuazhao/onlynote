@@ -4132,6 +4132,216 @@ class S {
       args: [],
     );
   }
+
+  /// `Card style`
+  String get Card_Style {
+    return Intl.message('Card style', name: 'Card_Style', desc: '', args: []);
+  }
+
+  /// `Default card style`
+  String get Default_Card_Style {
+    return Intl.message(
+      'Default card style',
+      name: 'Default_Card_Style',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose how your notes look in the library`
+  String get Default_Card_Style_Description {
+    return Intl.message(
+      'Choose how your notes look in the library',
+      name: 'Default_Card_Style_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Live preview`
+  String get Card_Style_Preview {
+    return Intl.message(
+      'Live preview',
+      name: 'Card_Style_Preview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use default`
+  String get Card_Style_Use_Default {
+    return Intl.message(
+      'Use default',
+      name: 'Card_Style_Use_Default',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use default style`
+  String get Card_Style_Use_Default_All {
+    return Intl.message(
+      'Use default style',
+      name: 'Card_Style_Use_Default_All',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes without a custom style use these defaults.`
+  String get Card_Style_Default_Hint {
+    return Intl.message(
+      'Notes without a custom style use these defaults.',
+      name: 'Card_Style_Default_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changes apply to this card only.`
+  String get Card_Style_Note_Hint {
+    return Intl.message(
+      'Changes apply to this card only.',
+      name: 'Card_Style_Note_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paper style`
+  String get Card_Style_Paper {
+    return Intl.message(
+      'Paper style',
+      name: 'Card_Style_Paper',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Textured`
+  String get Card_Style_Textured {
+    return Intl.message(
+      'Textured',
+      name: 'Card_Style_Textured',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Plain`
+  String get Card_Style_Plain {
+    return Intl.message('Plain', name: 'Card_Style_Plain', desc: '', args: []);
+  }
+
+  /// `Follow app appearance`
+  String get Card_Style_Follow_App {
+    return Intl.message(
+      'Follow app appearance',
+      name: 'Card_Style_Follow_App',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show date`
+  String get Card_Style_Show_Date {
+    return Intl.message(
+      'Show date',
+      name: 'Card_Style_Show_Date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reset style`
+  String get Card_Style_Reset {
+    return Intl.message(
+      'Reset style',
+      name: 'Card_Style_Reset',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save card style. Please try again.`
+  String get Card_Style_Save_Failed {
+    return Intl.message(
+      'Could not save card style. Please try again.',
+      name: 'Card_Style_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Discard style changes?`
+  String get Card_Style_Discard_Title {
+    return Intl.message(
+      'Discard style changes?',
+      name: 'Card_Style_Discard_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your card style changes have not been saved.`
+  String get Card_Style_Discard_Message {
+    return Intl.message(
+      'Your card style changes have not been saved.',
+      name: 'Card_Style_Discard_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Discard`
+  String get Card_Style_Discard {
+    return Intl.message(
+      'Discard',
+      name: 'Card_Style_Discard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A little inspiration`
+  String get Card_Style_Preview_Title {
+    return Intl.message(
+      'A little inspiration',
+      name: 'Card_Style_Preview_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Collect your ideas, plans, and everyday moments.`
+  String get Card_Style_Preview_Body {
+    return Intl.message(
+      'Collect your ideas, plans, and everyday moments.',
+      name: 'Card_Style_Preview_Body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Try something new`
+  String get Card_Style_Preview_Task {
+    return Intl.message(
+      'Try something new',
+      name: 'Card_Style_Preview_Task',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide date`
+  String get Card_Style_Hide_Date {
+    return Intl.message(
+      'Hide date',
+      name: 'Card_Style_Hide_Date',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -3,6 +3,7 @@ import 'dart:ui' show Color;
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
@@ -28,6 +29,7 @@ class CustomNoteTemplate {
     List<String> linkedNoteIds = const [],
     List<NoteTextStyleRange> textStyles = const [],
     List<NoteImageLayout> imageLayouts = const [],
+    this.cardStyle = const NoteCardStyle(),
     required this.createdAt,
   })  : items = List.unmodifiable(items),
         imagePaths = List.unmodifiable(imagePaths),
@@ -51,6 +53,7 @@ class CustomNoteTemplate {
   final List<String> linkedNoteIds;
   final List<NoteTextStyleRange> textStyles;
   final List<NoteImageLayout> imageLayouts;
+  final NoteCardStyle cardStyle;
 
   factory CustomNoteTemplate.fromNote(Note note,
           {required String name,
@@ -63,6 +66,7 @@ class CustomNoteTemplate {
         body: note.description ?? '',
         items: note.todo.map((item) => item.title ?? '').toList(),
         color: note.color?.toARGB32(),
+        cardStyle: note.cardStyle,
         imagePaths: imageCopies,
         voiceMemos: voiceCopies,
         tags: note.tags,
@@ -87,6 +91,7 @@ class CustomNoteTemplate {
       description: body,
       todo: [for (final item in items) Todo(id: uuid.v4(), title: item)],
       color: color == null ? null : Color(color!),
+      cardStyle: cardStyle,
       imagePaths: imageCopies,
       voiceMemos: voiceCopies,
       tags: tags,
@@ -108,6 +113,7 @@ class CustomNoteTemplate {
     List<String>? linkedNoteIds,
     List<NoteTextStyleRange>? textStyles,
     List<NoteImageLayout>? imageLayouts,
+    NoteCardStyle? cardStyle,
   }) =>
       CustomNoteTemplate(
         id: id ?? this.id,
@@ -116,6 +122,7 @@ class CustomNoteTemplate {
         body: body,
         items: items,
         color: color,
+        cardStyle: cardStyle ?? this.cardStyle,
         imagePaths: imagePaths ?? this.imagePaths,
         voiceMemos: voiceMemos ?? this.voiceMemos,
         tags: tags ?? this.tags,
@@ -143,6 +150,7 @@ class CustomNoteTemplate {
         'linkedNoteIds': linkedNoteIds,
         'textStyles': [for (final style in textStyles) style.toMap()],
         'imageLayouts': [for (final layout in imageLayouts) layout.toMap()],
+        if (!cardStyle.isDefault) 'cardStyle': cardStyle.toMap(),
       };
 
   factory CustomNoteTemplate.fromJson(Map<String, dynamic> json) {
@@ -227,6 +235,7 @@ class CustomNoteTemplate {
       body: body,
       textStyles: textStyles,
       imageLayouts: imageLayouts,
+      cardStyle: NoteCardStyle.fromMap(json['cardStyle']),
       items: list('items'),
       color: color as int?,
       imagePaths: imagePaths,

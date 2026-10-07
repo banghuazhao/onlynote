@@ -1,4 +1,5 @@
 import 'package:onlynote/Tools/app_appearance_settings.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'dart:async';
 import 'package:onlynote/Tools/app_shortcut_launch.dart';
 import 'package:flutter/material.dart';
@@ -123,6 +124,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         AppTypographySettings.instance,
         AppLayoutSettings.instance,
         AppAppearanceSettings.instance,
+        AppCardStyleSettings.instance,
       ]),
       builder: (context, _) => _buildMaterialApp(),
     );

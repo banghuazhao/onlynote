@@ -531,6 +531,8 @@ class DocumentScanCapture {
             : content.copyWith(
                 isArchived: stored.isArchived,
                 isPinned: stored.isPinned,
+                cardStyle: stored.cardStyle,
+                clearCardStyle: stored.cardStyle == null,
                 folderId: stored.folderId,
                 clearFolderId: stored.folderId == null,
                 sortOrder: stored.sortOrder,

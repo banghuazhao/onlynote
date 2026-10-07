@@ -216,6 +216,7 @@ class VoiceMemoDrafts {
           : NoteDto.fromNote(content.toDomain().copyWith(
                 isArchived: existing.isArchived,
                 isPinned: existing.isPinned ?? false,
+                cardStyle: existing.toDomain().cardStyle,
                 folderId: existing.folderId,
                 dailyNoteDateKey: existing.dailyNoteDateKey,
                 sortOrder: existing.sortOrder,

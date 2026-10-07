@@ -6,6 +6,7 @@ import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
@@ -66,7 +67,7 @@ class BackupContents {
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 7,
+        'version': 8,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -130,6 +131,7 @@ class BackupContents {
         'textStyles': note.textStyles ?? [],
         'imageLayouts': note.imageLayouts ?? [],
         'dailyNoteDateKey': note.dailyNoteDateKey,
+        'cardStyle': note.cardStyle,
         'photos': note.imagePaths ?? [],
         'voiceMemos': note.voiceMemos ?? [],
         'todos': [
@@ -151,7 +153,8 @@ class BackupContents {
             version != 4 &&
             version != 5 &&
             version != 6 &&
-            version != 7)) {
+            version != 7 &&
+            version != 8)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -252,6 +255,9 @@ class BackupContents {
         textStyles: [for (final style in textStyles) style.toMap()],
         imageLayouts: [for (final layout in imageLayouts) layout.toMap()],
         dailyNoteDateKey: dailyKey as String?,
+        cardStyle: version >= 8
+            ? NoteCardStyle.fromMap(map['cardStyle']).toMap()
+            : null,
         colorValue: color,
         dateTime: _date(map['dateTime']),
         sortOrder: map['sortOrder'] as int?,
@@ -313,6 +319,7 @@ class BackupContents {
         'voiceMemos': [],
         if (version < 5) 'textStyles': [],
         if (version < 6) 'imageLayouts': [],
+        if (version < 8) 'cardStyle': null,
       }).copyWith(voiceMemos: memos);
       _id(template.id);
       if (!templateIds.add(template.id)) {
