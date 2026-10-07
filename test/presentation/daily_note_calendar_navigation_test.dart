@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -25,6 +27,7 @@ import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'package:onlynote/presentation/screens/home/home_screen.dart';
+import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -123,11 +126,15 @@ class _Router extends RootStackRouter {
 
 Future<(_Notes, HomeBloc, _Router)> _openHome(
     WidgetTester tester, Iterable<Note> initial,
-    {double width = 390}) async {
-  tester.view.physicalSize = Size(width, 844);
-  tester.view.devicePixelRatio = 1;
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
+    {double width = 390,
+    bool disableAnimations = true,
+    TargetPlatform? platform}) async {
+  if (tester.binding is AutomatedTestWidgetsFlutterBinding) {
+    tester.view.physicalSize = Size(width, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
   final notes = _Notes();
   for (final note in initial) {
     notes.values[note.id!] = NoteDto.fromNote(note);
@@ -167,7 +174,7 @@ Future<(_Notes, HomeBloc, _Router)> _openHome(
     ],
     child: MaterialApp.router(
       routerConfig: router.config(),
-      theme: AppTheme.light,
+      theme: AppTheme.light.copyWith(platform: platform),
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [
         S.delegate,
@@ -176,7 +183,8 @@ Future<(_Notes, HomeBloc, _Router)> _openHome(
         GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(disableAnimations: true),
+        data: MediaQuery.of(context)
+            .copyWith(disableAnimations: disableAnimations),
         child: child!,
       ),
     ),
@@ -207,6 +215,78 @@ Future<void> _openCalendar(WidgetTester tester) async {
   expect(find.byType(DailyNoteCalendarSheet), findsOneWidget);
 }
 
+Future<void> _pumpAnimationFrames(WidgetTester tester) async {
+  await tester.pump();
+  expect(tester.takeException(), isNull, reason: 'First transition frame');
+  for (var frame = 0; frame < 24; frame++) {
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(tester.takeException(), isNull,
+        reason: 'Animation frame $frame while updating accessible note cards');
+  }
+  await tester.pumpAndSettle();
+  expect(tester.takeException(), isNull, reason: 'Settled transition');
+}
+
+Future<void> _tapWithHeldPointer(WidgetTester tester, Finder target) async {
+  await tester.ensureVisible(target);
+  await tester.pumpAndSettle();
+  final gesture = await tester.startGesture(tester.getCenter(target));
+  try {
+    await tester.pump(const Duration(milliseconds: 48));
+    expect(tester.takeException(), isNull,
+        reason: 'Pressed control with semantics enabled');
+  } finally {
+    await gesture.up();
+  }
+  await _pumpAnimationFrames(tester);
+}
+
+Future<void> _applyFiltersAfterSheetDismisses(
+    WidgetTester tester, HomeBloc home) async {
+  final sheet = find.byType(LibraryFiltersSheet);
+  final route = ModalRoute.of<LibraryFilterResult>(tester.element(sheet))!;
+  final previousFilters = Set<NoteSearchFilter>.of(
+      home.state.mapOrNull(loaded: (state) => state.filters)!);
+  final previousIds = home.state
+      .mapOrNull(loaded: (state) => state.notes.map((note) => note.id).toSet());
+  final previousCards = tester
+      .widgetList<NoteCard>(find.byType(NoteCard))
+      .map((card) => card.note.id)
+      .toSet();
+  final done = find.byKey(const ValueKey('library-apply-filters'));
+  await tester.ensureVisible(done);
+  await tester.tap(done);
+  await tester.pump();
+  expect(tester.takeException(), isNull);
+  await tester.pump(const Duration(milliseconds: 16));
+  expect(tester.takeException(), isNull);
+
+  final stillExiting = route.animation!.value > 0;
+  if (tester.binding is AutomatedTestWidgetsFlutterBinding) {
+    expect(stillExiting, isTrue,
+        reason: 'The animated filter sheet is still dismissing');
+  }
+  // Native frames may arrive late; use the route's actual animation rather
+  // than assume a wall-clock deadline when verifying the intermediate state.
+  if (stillExiting) {
+    expect(sheet, findsOneWidget);
+    expect(
+        home.state.mapOrNull(loaded: (state) => state.filters), previousFilters,
+        reason: 'Filtering must wait for the modal to finish dismissing');
+    expect(
+        home.state.mapOrNull(
+            loaded: (state) => state.notes.map((note) => note.id).toSet()),
+        previousIds);
+    expect(
+        tester
+            .widgetList<NoteCard>(find.byType(NoteCard))
+            .map((card) => card.note.id)
+            .toSet(),
+        previousCards);
+  }
+  await _pumpAnimationFrames(tester);
+}
+
 void main() {
   final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
   late Directory directory;
@@ -228,7 +308,14 @@ void main() {
     // The actual Home screen may load ads. A cached purchase disables that
     // unrelated native dependency without changing the screen under test.
     SharedPreferences.setMockInitialValues({'remove_ads_entitlement': true});
-    await PurchaseService.instance.init();
+    final platform = debugDefaultTargetPlatformOverride;
+    try {
+      // Ads are already removed; this fixture does not exercise StoreKit.
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      await PurchaseService.instance.init();
+    } finally {
+      debugDefaultTargetPlatformOverride = platform;
+    }
   });
   tearDownAll(() async {
     VisibilityDetectorController.instance.updateInterval = visibilityInterval;
@@ -250,67 +337,216 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
 
-  testWidgets('Home nav filters and menu reminders/calendar work at 320/390px',
+  testWidgets(
+      'accessible Home repeats checklist filtering and keeps nav actions at 320/390px',
       (tester) async {
-    final (notes, home, router) = await _openHome(
-        tester,
-        [
-          Note(id: 'ordinary', title: 'An ordinary note'),
-          Note(id: 'unfinished', title: 'Open tasks', todo: [
-            Todo(id: 'task', title: 'Finish the release'),
-          ]),
-        ],
-        width: 320);
-    // Exercise both widths within the shared saved-view store's fake clock.
-    for (final width in [320.0, 390.0]) {
-      tester.view.physicalSize = Size(width, 844);
-      home.add(const HomeEvent.filtersChanged({}));
-      await tester.pumpAndSettle();
-      final filters = find.byKey(const ValueKey('home-library-filters'));
-      expect(find.descendant(of: find.byType(AppBar), matching: filters),
-          findsOneWidget);
+    final originalPlatform = debugDefaultTargetPlatformOverride;
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    SemanticsHandle? semantics;
+    try {
+      semantics = tester.ensureSemantics();
+      final initial = [
+        Note(id: 'ordinary', title: 'An ordinary note'),
+        Note(id: 'unfinished', title: 'Open tasks', todo: [
+          Todo(id: 'task', title: 'Finish the release'),
+        ]),
+        for (var index = 0; index < 32; index++)
+          Note(
+            id: 'mixed-$index',
+            title: index % 3 == 0
+                ? 'Mixed note $index with a longer title wrapping across lines'
+                : 'Mixed note $index',
+            description: List.generate(index % 5 + 1,
+                    (line) => 'Line $line of this varied height note $index.')
+                .join('\n'),
+            todo: index.isEven
+                ? [
+                    for (var item = 0; item < index % 4 + 1; item++)
+                      Todo(
+                        id: 'mixed-$index-task-$item',
+                        title: 'Completed checklist item $item for note $index',
+                        completed: true,
+                      ),
+                  ]
+                : [],
+            dateTime: DateTime(2026, 10, index % 20 + 1),
+            sortOrder: index + 2,
+          ),
+      ];
+      final (notes, home, router) = await _openHome(tester, initial,
+          width: 320, disableAnimations: false, platform: TargetPlatform.iOS);
+      final allIds = initial.map((note) => note.id).toSet();
+      final checklistIds = initial
+          .where((note) => note.todo.isNotEmpty)
+          .map((note) => note.id)
+          .toSet();
+
+      // Match the reported repeated workflow with real sheet transitions and
+      // semantics updates while the masonry grid retains a nonzero offset.
+      for (var cycle = 0; cycle < 4; cycle++) {
+        final grid =
+            Scrollable.of(tester.element(find.byType(SliverMasonryGrid)))
+                .position;
+        expect(grid.maxScrollExtent, greaterThan(0));
+        grid.jumpTo(cycle == 0 ? 0 : grid.maxScrollExtent * .55);
+        await _pumpAnimationFrames(tester);
+        expect(grid.pixels, cycle == 0 ? equals(0) : greaterThan(0));
+        for (final enabled in [true, false]) {
+          await _tap(tester, 'home-library-filters');
+          expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+          final checklists =
+              find.byKey(const ValueKey('library-filter-checklists'));
+          await tester.ensureVisible(checklists);
+          await tester.tap(checklists);
+          await _pumpAnimationFrames(tester);
+          expect(tester.widget<FilterChip>(checklists).selected, enabled);
+          await _applyFiltersAfterSheetDismisses(tester, home);
+          expect(find.byType(LibraryFiltersSheet), findsNothing);
+          expect(home.state.mapOrNull(loaded: (state) => state.filters),
+              enabled ? {NoteSearchFilter.checklists} : <NoteSearchFilter>{});
+          final expectedIds = enabled ? checklistIds : allIds;
+          expect(
+              home.state.mapOrNull(
+                  loaded: (state) =>
+                      state.notes.map((note) => note.id).toSet()),
+              expectedIds);
+          final cards = tester.widgetList<NoteCard>(find.byType(NoteCard));
+          expect(cards, isNotEmpty);
+          expect(cards.every((card) => expectedIds.contains(card.note.id)),
+              isTrue);
+          expect(tester.takeException(), isNull,
+              reason: 'Checklist filtering cycle $cycle, enabled=$enabled');
+        }
+      }
+
+      // No seeded note has a photo, so these cycles remove and recreate the
+      // masonry viewport while the filter sheet's dismiss animation runs.
+      for (var cycle = 0; cycle < 2; cycle++) {
+        for (final enabled in [true, false]) {
+          await _tap(tester, 'home-library-filters');
+          expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+          final photos = find.byKey(const ValueKey('library-filter-photos'));
+          await _tapWithHeldPointer(tester, photos);
+          expect(tester.widget<FilterChip>(photos).selected, enabled);
+          await _tapWithHeldPointer(
+              tester, find.byKey(const ValueKey('library-apply-filters')));
+          expect(find.byType(LibraryFiltersSheet), findsNothing);
+          expect(home.state.mapOrNull(loaded: (state) => state.filters),
+              enabled ? {NoteSearchFilter.photos} : <NoteSearchFilter>{});
+          expect(
+              home.state.mapOrNull(
+                  loaded: (state) =>
+                      state.notes.map((note) => note.id).toSet()),
+              enabled ? <String?>{} : allIds);
+          expect(find.byType(NoteCard), enabled ? findsNothing : findsWidgets);
+          expect(tester.takeException(), isNull,
+              reason: 'Empty photo filtering cycle $cycle, enabled=$enabled');
+        }
+      }
+
+      // Accessibility may become active while a modal route already exists.
+      // Rebuild that semantics tree before repeating a real press/release.
+      semantics.dispose();
+      semantics = null;
+      await tester.pump();
+      expect(tester.takeException(), isNull);
       await _tap(tester, 'home-library-filters');
       expect(find.byType(LibraryFiltersSheet), findsOneWidget);
-      await _tap(tester, 'library-filter-unfinished');
-      expect(
-          tester
-              .widget<FilterChip>(
-                  find.byKey(const ValueKey('library-filter-unfinished')))
-              .selected,
-          isTrue);
-      await _tap(tester, 'library-apply-filters');
-      expect(find.byType(LibraryFiltersSheet), findsNothing);
-      expect(home.state.mapOrNull(loaded: (state) => state.filters),
-          {NoteSearchFilter.unfinished});
-      expect(
-          home.state.mapOrNull(loaded: (state) => state.notes.map((n) => n.id)),
-          ['unfinished']);
+      semantics = tester.ensureSemantics();
+      await _pumpAnimationFrames(tester);
+      for (final enabled in [true, false]) {
+        if (!enabled) {
+          await _tap(tester, 'home-library-filters');
+          expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+        }
+        final checklists =
+            find.byKey(const ValueKey('library-filter-checklists'));
+        await _tapWithHeldPointer(tester, checklists);
+        expect(tester.widget<FilterChip>(checklists).selected, enabled);
+        await _tapWithHeldPointer(
+            tester, find.byKey(const ValueKey('library-apply-filters')));
+        expect(find.byType(LibraryFiltersSheet), findsNothing);
+        expect(home.state.mapOrNull(loaded: (state) => state.filters),
+            enabled ? {NoteSearchFilter.checklists} : <NoteSearchFilter>{});
+        expect(
+            home.state.mapOrNull(
+                loaded: (state) => state.notes.map((note) => note.id).toSet()),
+            enabled ? checklistIds : allIds);
+        expect(tester.takeException(), isNull,
+            reason: 'Late semantics activation, checklists enabled=$enabled');
+      }
 
-      await _tap(tester, 'home-more');
-      await _tap(tester, 'home-reminders-menu');
-      expect(find.text('Reminder list test page'), findsOneWidget);
-      expect(router.stackData.map((route) => route.name),
-          [HomeRoute.name, RemindersRoute.name]);
-      await router.maybePop();
-      await tester.pumpAndSettle();
-      expect(find.byType(HomeScreen), findsOneWidget);
-      expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+      // Two invocations before the saved-view read resolves should represent
+      // one filter request and create one modal route.
+      final filterButton = tester.widget<IconButton>(find.descendant(
+          of: find.byKey(const ValueKey('home-library-filters')),
+          matching: find.byType(IconButton)));
+      filterButton.onPressed!();
+      filterButton.onPressed!();
+      await _pumpAnimationFrames(tester);
+      expect(find.byType(LibraryFiltersSheet, skipOffstage: false),
+          findsOneWidget);
+      await _tapWithHeldPointer(tester, find.byTooltip('Close'));
+      expect(
+          find.byType(LibraryFiltersSheet, skipOffstage: false), findsNothing);
 
-      await _openCalendar(tester);
-      expect(notes.writes, 0);
-      expect(router.openedNote, isNull);
-      await tester.tap(find.byTooltip('Close'));
-      await tester.pumpAndSettle();
-      expect(find.byType(DailyNoteCalendarSheet), findsNothing);
-      expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
-      expect(find.byKey(const ValueKey('daily-note-shortcut')), findsNothing);
-      expect(find.byKey(const ValueKey('daily-note-calendar-shortcut')),
-          findsNothing);
-      expect(
-          find.byKey(const ValueKey('unfinished-quick-filter')), findsNothing);
-      expect(
-          find.byKey(const ValueKey('today-reminders-shortcut')), findsNothing);
-      expect(tester.takeException(), isNull);
+      // Exercise both widths within the shared saved-view store's fake clock.
+      for (final width in [320.0, 390.0]) {
+        if (tester.binding is AutomatedTestWidgetsFlutterBinding) {
+          tester.view.physicalSize = Size(width, 844);
+        }
+        home.add(const HomeEvent.filtersChanged({}));
+        await tester.pumpAndSettle();
+        final filters = find.byKey(const ValueKey('home-library-filters'));
+        expect(find.descendant(of: find.byType(AppBar), matching: filters),
+            findsOneWidget);
+        await _tap(tester, 'home-library-filters');
+        expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+        await _tap(tester, 'library-filter-unfinished');
+        expect(
+            tester
+                .widget<FilterChip>(
+                    find.byKey(const ValueKey('library-filter-unfinished')))
+                .selected,
+            isTrue);
+        await _tap(tester, 'library-apply-filters');
+        expect(find.byType(LibraryFiltersSheet), findsNothing);
+        expect(home.state.mapOrNull(loaded: (state) => state.filters),
+            {NoteSearchFilter.unfinished});
+        expect(
+            home.state
+                .mapOrNull(loaded: (state) => state.notes.map((n) => n.id)),
+            ['unfinished']);
+
+        await _tap(tester, 'home-more');
+        await _tap(tester, 'home-reminders-menu');
+        expect(find.text('Reminder list test page'), findsOneWidget);
+        expect(router.stackData.map((route) => route.name),
+            [HomeRoute.name, RemindersRoute.name]);
+        await router.maybePop();
+        await tester.pumpAndSettle();
+        expect(find.byType(HomeScreen), findsOneWidget);
+        expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+
+        await _openCalendar(tester);
+        expect(notes.writes, 0);
+        expect(router.openedNote, isNull);
+        await tester.tap(find.byTooltip('Close'));
+        await tester.pumpAndSettle();
+        expect(find.byType(DailyNoteCalendarSheet), findsNothing);
+        expect(router.stackData.map((route) => route.name), [HomeRoute.name]);
+        expect(find.byKey(const ValueKey('daily-note-shortcut')), findsNothing);
+        expect(find.byKey(const ValueKey('daily-note-calendar-shortcut')),
+            findsNothing);
+        expect(find.byKey(const ValueKey('unfinished-quick-filter')),
+            findsNothing);
+        expect(find.byKey(const ValueKey('today-reminders-shortcut')),
+            findsNothing);
+        expect(tester.takeException(), isNull);
+      }
+    } finally {
+      semantics?.dispose();
+      debugDefaultTargetPlatformOverride = originalPlatform;
     }
   });
 

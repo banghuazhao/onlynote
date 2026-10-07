@@ -66,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _openingDailyNote = false;
   bool _openingTemplate = false;
   bool _presentingDailyCalendar = false;
+  bool _presentingLibraryFilters = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -244,8 +245,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openLibraryFilters() async {
+    if (_presentingLibraryFilters ||
+        !mounted ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _presentingLibraryFilters = true;
+    try {
+      await _presentLibraryFilters();
+    } finally {
+      _presentingLibraryFilters = false;
+    }
+  }
+
+  Future<void> _presentLibraryFilters() async {
     await _loadSavedViews();
-    if (!mounted) return;
+    if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
     final bloc = context.read<HomeBloc>();
     final data = bloc.state.mapOrNull(
         loaded: (state) => (
@@ -264,20 +279,31 @@ class _HomeScreenState extends State<HomeScreen> {
               selectedViewId: state.selectedViewId,
             ));
     if (data == null) return;
+    ModalRoute<LibraryFilterResult>? filtersRoute;
     final result = await showAppSheet<LibraryFilterResult>(
       context: context,
-      builder: (_) => LibraryFiltersSheet(
-        filters: data.filters,
-        selectedTags: data.tags,
-        availableTags: data.availableTags,
-        scope: data.scope,
-        showTrash: data.showTrash,
-        savedViews: data.views,
-        selectedViewId: data.selectedViewId,
-        viewsUnavailable: _viewsUnavailable,
-      ),
+      builder: (sheetContext) {
+        filtersRoute ??= ModalRoute.of<LibraryFilterResult>(sheetContext);
+        return LibraryFiltersSheet(
+          filters: data.filters,
+          selectedTags: data.tags,
+          availableTags: data.availableTags,
+          scope: data.scope,
+          showTrash: data.showTrash,
+          savedViews: data.views,
+          selectedViewId: data.selectedViewId,
+          viewsUnavailable: _viewsUnavailable,
+        );
+      },
     );
-    if (!mounted || result == null) return;
+    // Popping returns before the modal barrier finishes its exit animation.
+    // Remove it before changing the grid and revealing its semantics tree.
+    await filtersRoute?.completed;
+    if (!mounted ||
+        result == null ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     _setReorderMode(false);
     context
         .read<MultipleDeleteBloc>()
