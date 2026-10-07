@@ -20,12 +20,12 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
-import 'package:onlynote/presentation/components/settings_choice.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/screens/home/bloc/multiple_delete/multiple_delete_bloc.dart';
 import 'package:onlynote/presentation/screens/home/home_screen.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
+import 'package:onlynote/presentation/screens/home/widgets/note_reorder_card.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -425,6 +425,128 @@ void main() {
   });
 
   testWidgets(
+      'Home Reorder menu drags persist through Done, filters and todo changes',
+      (tester) async {
+    final home = await _openHome(tester);
+    final semantics = tester.ensureSemantics();
+    Finder card(String id) => find.byWidgetPredicate(
+        (widget) => widget is NoteCard && widget.note.id == id);
+    Finder reorderCard(String id) => find.byWidgetPredicate(
+        (widget) => widget is NoteReorderCard && widget.note.id == id);
+    List<String?> visibleIds() => home.bloc.state.mapOrNull(
+        loaded: (state) => state.notes.map((note) => note.id).toList())!;
+
+    Future<void> openReorder() async {
+      await tester.longPress(card('first'));
+      await tester.pumpAndSettle();
+      await _tap(tester, find.text(S.current.Reorder));
+      // This package forwards its key to the underlying GridView too.
+      expect(find.byKey(const ValueKey('home-reorder-grid')).first,
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('home-reorder-instructions')),
+          findsOneWidget);
+      expect(find.text(S.current.Reorder_Hint), findsOneWidget);
+      expect(find.byType(NoteCard), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+
+    await openReorder();
+    final first = tester.widget<NoteReorderCard>(reorderCard('first'));
+    expect(first.onMoveEarlier, isNull);
+    expect(first.onMoveLater, isNotNull);
+    expect(
+        tester
+            .getSemantics(reorderCard('first'))
+            .getSemanticsData()
+            .customSemanticsActionIds,
+        isNotEmpty);
+    semantics.dispose();
+
+    final from = tester.getCenter(reorderCard('first')) - const Offset(0, 20);
+    final to = tester.getCenter(reorderCard('second')) - const Offset(0, 20);
+    final gesture = await tester.startGesture(from);
+    await tester.pump(const Duration(milliseconds: 600));
+    await gesture.moveTo(to);
+    await tester.pump(const Duration(milliseconds: 300));
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(visibleIds(), ['second', 'first']);
+    expect(home.notes.values['second']!.sortOrder,
+        lessThan(home.notes.values['first']!.sortOrder!));
+    await _tap(tester, find.text(S.current.Done));
+    expect(find.byType(NoteReorderCard), findsNothing);
+    expect(visibleIds(), ['second', 'first']);
+
+    home.bloc
+        .add(const HomeEvent.filtersChanged({NoteSearchFilter.checklists}));
+    await tester.pumpAndSettle();
+    expect(visibleIds(), ['first']);
+    home.bloc.add(const HomeEvent.filtersChanged({}));
+    await tester.pumpAndSettle();
+    expect(visibleIds(), ['second', 'first']);
+    await home.bloc.toggleTodo(noteId: 'first', todoId: 'first-task');
+    await tester.pumpAndSettle();
+    expect(visibleIds(), ['second', 'first']);
+    await openReorder();
+    expect(tester.widget<NoteReorderCard>(reorderCard('second')).onMoveEarlier,
+        isNull);
+    // The menu is also a tap and keyboard alternative to dragging.
+    await _tap(tester, find.byKey(const ValueKey('reorder-move-first')));
+    await _tap(tester, find.text(S.current.Reorder_Move_Earlier));
+    expect(visibleIds(), ['first', 'second']);
+    await _tap(tester, find.text(S.current.Done));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'Home dragging respects pinned groups and exposes accessible moves',
+      (tester) async {
+    final home = await _openHome(tester);
+    home.notes.values['first'] =
+        home.notes.values['first']!.copyWith(isPinned: true);
+    home.notes.values['third'] =
+        NoteDto.fromNote(Note(id: 'third', title: 'Third note', sortOrder: 3));
+    home.bloc.add(const HomeEvent.getAllNotes());
+    await tester.pumpAndSettle();
+    await tester.longPress(find.byWidgetPredicate(
+        (widget) => widget is NoteCard && widget.note.id == 'first'));
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Reorder));
+    expect(
+        find.text(
+            '${S.current.Reorder_Hint}\n${S.current.Reorder_Pinned_Hint}'),
+        findsOneWidget);
+    Finder reorderCard(String id) => find.byWidgetPredicate(
+        (widget) => widget is NoteReorderCard && widget.note.id == id);
+    final pinned = tester.widget<NoteReorderCard>(reorderCard('first'));
+    expect(pinned.onMoveEarlier, isNull);
+    expect(pinned.onMoveLater, isNull);
+    final gesture = await tester.startGesture(
+        tester.getCenter(reorderCard('third')) - const Offset(0, 20));
+    await tester.pump(const Duration(milliseconds: 600));
+    await gesture
+        .moveTo(tester.getCenter(reorderCard('first')) - const Offset(0, 20));
+    await tester.pump(const Duration(milliseconds: 300));
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(
+        home.bloc.state
+            .mapOrNull(loaded: (state) => state.notes.map((note) => note.id)),
+        ['first', 'third', 'second']);
+    expect(home.notes.values['first']!.isPinned, isTrue);
+    expect(tester.widget<NoteReorderCard>(reorderCard('third')).onMoveEarlier,
+        isNull);
+    await _tap(tester, find.text(S.current.Done));
+    home.bloc.add(const HomeEvent.getAllNotes());
+    await tester.pumpAndSettle();
+    expect(
+        home.bloc.state
+            .mapOrNull(loaded: (state) => state.notes.map((note) => note.id)),
+        ['first', 'third', 'second']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
       'Home card style saves current content and supports mixed sizes, cancel and defaults',
       (tester) async {
     final home = await _openHome(tester);
@@ -446,13 +568,20 @@ void main() {
           'first');
     }
 
-    Finder cardSize(String label) => find.descendant(
-          of: find.byType(SettingsChoice<NoteCardSize?>),
-          matching: find.widgetWithText(ChoiceChip, label),
-        );
+    Finder cardSize(NoteCardSize size) =>
+        find.byKey(ValueKey('card-style-card-${size.name}'));
+
+    Future<void> chooseSize(NoteCardSize size) async {
+      final target = cardSize(size);
+      await tester.scrollUntilVisible(target, 150,
+          scrollable: find.descendant(
+              of: find.byKey(const ValueKey('card-style-controls')),
+              matching: find.byType(Scrollable)));
+      await _tap(tester, target);
+    }
 
     await openStyle();
-    await _tap(tester, cardSize(S.current.Large));
+    await chooseSize(NoteCardSize.large);
     expect(
         tester
             .getSize(find.byKey(const ValueKey('card-style-preview-width')))
@@ -506,7 +635,7 @@ void main() {
     expect(tester.state<NoteCardState>(card('first')), same(firstState));
 
     await openStyle();
-    await _tap(tester, cardSize(S.current.Large));
+    await chooseSize(NoteCardSize.large);
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text(S.current.Card_Style_Discard_Title), findsOneWidget);

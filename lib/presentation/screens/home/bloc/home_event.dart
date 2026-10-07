@@ -10,7 +10,8 @@ class HomeEvent with _$HomeEvent {
   }) = _UpdateTodo;
   const factory HomeEvent.getAllNotes() = _GetAllNotes;
   const factory HomeEvent.duplicateNote(Note note) = _DuplicateNote;
-  const factory HomeEvent.reorderNotes(List<Note> notes) = _ReorderNotes;
+  const factory HomeEvent.reorderNotes(List<Note> notes,
+      {Completer<String?>? completion}) = _ReorderNotes;
   const factory HomeEvent.searchChanged(String query) = _SearchChanged;
   const factory HomeEvent.filtersChanged(Set<NoteSearchFilter> filters) =
       _FiltersChanged;
@@ -35,6 +36,8 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.setCardStyle({
     required String noteId,
     required NoteCardStyle style,
+    Color? color,
+    @Default(false) bool updateColor,
     Completer<String?>? completion,
   }) = _SetCardStyle;
   const factory HomeEvent.togglePin(String noteId) = _TogglePin;

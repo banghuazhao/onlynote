@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show Color;
 import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
@@ -133,6 +134,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final completion = Completer<String?>();
     add(HomeEvent.setCardStyle(
         noteId: noteId, style: style, completion: completion));
+    return completion.future;
+  }
+
+  Future<String?> setCardAppearance(
+      String noteId, NoteCardStyle style, Color? color) {
+    if (isClosed) return Future.value(_i10n.Card_Style_Save_Failed);
+    final completion = Completer<String?>();
+    add(HomeEvent.setCardStyle(
+        noteId: noteId,
+        style: style,
+        color: color,
+        updateColor: true,
+        completion: completion));
+    return completion.future;
+  }
+
+  Future<String?> reorderNotes(List<Note> notes) {
+    if (isClosed) return Future.value(_i10n.Reorder_Save_Failed);
+    final completion = Completer<String?>();
+    add(HomeEvent.reorderNotes(List.of(notes), completion: completion));
     return completion.future;
   }
 
@@ -397,25 +418,33 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     final latest = <Note>[];
+    final seen = <String>{};
     for (final snapshot in event.notes) {
-      if (snapshot.id == null) continue;
+      if (snapshot.id == null || !seen.add(snapshot.id!)) continue;
       final fetched = await _getNoteUsecase(snapshot.id!);
       final note = fetched.fold<Note?>((_) => null, (note) => note);
-      if (note == null || note.isDeleted) continue;
+      if (note == null || note.isDeleted || note.isArchived) continue;
       latest.add(note);
     }
-    emit(_buildLoaded(overrideVisible: latest));
+    final ordered = [
+      ...latest.where((note) => note.isPinned),
+      ...latest.where((note) => !note.isPinned),
+    ];
+    emit(_buildLoaded(overrideVisible: ordered));
 
     // A drag snapshot can predate a queued checkbox change. Apply ordering to
     // freshly read notes so the drag never restores an old completion value.
-    final failureOrSuccess = await _reorderNotesUsecase(latest);
-
-    failureOrSuccess.fold(
-      (error) => getIt<AppRouter>()
-          .context
-          .showToast('${error.message}', isError: true),
-      (_) => null,
-    );
+    final failureOrSuccess = await _reorderNotesUsecase(ordered);
+    // Replace the cached notes with their saved sort order. Otherwise a later
+    // filter or checkbox event sorts the pre-drag snapshot back into place.
+    await _onGetAllNotes(const _GetAllNotes(), emit);
+    final error = failureOrSuccess.fold<String?>(
+        (_) => _i10n.Reorder_Save_Failed, (_) => null);
+    event.completion?.complete(error);
+    if (error != null && event.completion == null) {
+      final context = getIt<AppRouter>().context;
+      if (context.mounted) context.showToast(error, isError: true);
+    }
   }
 
   void _onSearchChanged(_SearchChanged event, Emitter<HomeState> emit) {
@@ -773,7 +802,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (event.style != note.cardStyle && !event.style.isDefault) {
         premiumAccess.require(PremiumFeature.individualCardStyle);
       }
-      final updated = note.copyWith(cardStyle: event.style);
+      final updated = note.copyWith(
+          cardStyle: event.style,
+          color: event.updateColor ? event.color : note.color);
       final saved = await _updateNoteUsecase(updated);
       final error =
           saved.fold<String?>((_) => _i10n.Card_Style_Save_Failed, (_) => null);

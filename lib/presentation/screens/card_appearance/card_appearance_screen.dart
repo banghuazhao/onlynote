@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -11,9 +12,9 @@ import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/presentation/components/section_card.dart';
-import 'package:onlynote/presentation/components/settings_choice.dart';
 import 'package:onlynote/presentation/components/toast.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
+import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
 import 'package:onlynote/presentation/theme/note_grid_layout.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -25,13 +26,16 @@ class CardAppearanceScreen extends StatefulWidget {
     super.key,
     this.note,
     this.onSave,
+    this.onSaveAppearance,
     this.initialStyle,
     this.thumbnailBuilder,
     this.premiumAccess,
-  }) : assert(note == null || onSave != null);
+  }) : assert(note == null || onSave != null || onSaveAppearance != null);
 
   final Note? note;
   final Future<void> Function(NoteCardStyle style)? onSave;
+  final Future<void> Function(NoteCardStyle style, Color? color)?
+      onSaveAppearance;
   final NoteCardStyle? initialStyle;
   final Widget Function(BuildContext context, String path)? thumbnailBuilder;
   final PremiumAccess? premiumAccess;
@@ -46,6 +50,8 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
       AppCardStyleSettings.instance.defaults.copyWith(
           clearPaperStyle: AppCardStyleSettings.instance.paperStyle == null);
   late NoteCardStyle _style = _initial;
+  late final Color? _initialColor = widget.note?.color;
+  late Color? _color = _initialColor;
   final _previewScroll = ScrollController();
   bool _saving = false;
   bool _failed = false;
@@ -54,7 +60,9 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
   bool _popping = false;
 
   bool get _defaults => widget.note == null;
-  bool get _dirty => _style != _initial;
+  bool get _hasColor => !_defaults && widget.onSaveAppearance != null;
+  bool get _styleChanged => _style != _initial;
+  bool get _dirty => _styleChanged || (_hasColor && _color != _initialColor);
   NoteCardStyle get _resolved {
     final style = resolveNoteCardStyle(_style);
     if (!_defaults || _style.paperStyle != null) return style;
@@ -74,6 +82,14 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
     if (_saving || _popping) return;
     setState(() {
       _style = style;
+      _failed = false;
+    });
+  }
+
+  void _changeColor(Color? color) {
+    if (_saving || _popping) return;
+    setState(() {
+      _color = color;
       _failed = false;
     });
   }
@@ -129,6 +145,7 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
     });
     try {
       if (!_defaults &&
+          _styleChanged &&
           !_style.isDefault &&
           !await ensurePremiumAccess(
               context, PremiumFeature.individualCardStyle,
@@ -137,7 +154,9 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
         return;
       }
       if (!mounted) return;
-      if (widget.onSave != null) {
+      if (widget.onSaveAppearance != null) {
+        await widget.onSaveAppearance!(_style, _color);
+      } else if (widget.onSave != null) {
         await widget.onSave!(_style);
       } else {
         await AppCardStyleSettings.instance.saveDefaults(_style);
@@ -217,7 +236,7 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2))
                   : Row(mainAxisSize: MainAxisSize.min, children: [
                       if (!_defaults &&
-                          _dirty &&
+                          _styleChanged &&
                           !_style.isDefault &&
                           !(widget.premiumAccess ?? PremiumAccess.instance)
                               .allows(PremiumFeature.individualCardStyle)) ...[
@@ -286,7 +305,9 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
                                     curve: Curves.easeOutCubic,
                                     child: NoteCard(
                                       key: const ValueKey('card-style-preview'),
-                                      note: example,
+                                      note: _hasColor
+                                          ? example.copyWith(color: _color)
+                                          : example,
                                       cardStyle: resolved,
                                       thumbnailBuilder: widget.thumbnailBuilder,
                                     ),
@@ -306,92 +327,176 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
                     key: const ValueKey('card-style-controls'),
                     padding: const EdgeInsets.all(16),
                     children: [
-                      Text(_defaults
-                          ? s.Card_Style_Default_Hint
-                          : s.Card_Style_Note_Hint),
-                      const SizedBox(height: 16),
-                      SectionCard(title: s.Font_Style, children: [
-                        ListTile(
-                          key: const ValueKey('card-style-font'),
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(_style.fontFamily ??
-                              '${s.Card_Style_Use_Default} · ${resolved.fontFamily}'),
-                          trailing: const Icon(Icons.expand_more_rounded),
-                          onTap: _saving ? null : _chooseFont,
-                        ),
-                      ]),
-                      const SizedBox(height: 16),
-                      SectionCard(title: s.Font_Size, children: [
-                        SettingsChoice<AppFontSize?>(
-                          values: [if (!_defaults) null, ...AppFontSize.values],
-                          selected: _style.fontSize,
-                          label: (value) => value == null
-                              ? s.Card_Style_Use_Default
-                              : _sizeLabel(value.index),
-                          onSelected: (value) => _change(_style.copyWith(
-                              fontSize: value, clearFontSize: value == null)),
-                        ),
-                      ]),
-                      const SizedBox(height: 16),
-                      SectionCard(title: s.Card_Size, children: [
-                        SettingsChoice<NoteCardSize?>(
-                          values: [
-                            if (!_defaults) null,
-                            NoteCardSize.small,
-                            NoteCardSize.medium,
-                            NoteCardSize.large,
+                      if (_defaults) ...[
+                        Text(s.Card_Style_Default_Hint),
+                        const SizedBox(height: 16),
+                      ],
+                      if (_hasColor) ...[
+                        SectionCard(
+                          key: const ValueKey('card-style-color-group'),
+                          title: s.Card_Style_Color,
+                          children: [
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _ColorChoice(
+                                  key: const ValueKey(
+                                      'card-style-color-default'),
+                                  color: AppColors.parchment,
+                                  label: s.Card_Style_Default_Color,
+                                  selected: _color == null,
+                                  onPressed: _saving || _popping
+                                      ? null
+                                      : () => _changeColor(null),
+                                ),
+                                if (_initialColor != null &&
+                                    !colors.contains(_initialColor))
+                                  _ColorChoice(
+                                    key: ValueKey(
+                                        'card-style-color-${_initialColor.toARGB32()}'),
+                                    color: _initialColor,
+                                    label: s.Card_Style_Original_Color,
+                                    selected: _color == _initialColor,
+                                    onPressed: _saving || _popping
+                                        ? null
+                                        : () => _changeColor(_initialColor),
+                                  ),
+                                for (var index = 0;
+                                    index < colors.length;
+                                    index++)
+                                  _ColorChoice(
+                                    key: ValueKey(
+                                        'card-style-color-${colors[index].toARGB32()}'),
+                                    color: colors[index],
+                                    label: s.Note_Color(index + 1),
+                                    selected: _color == colors[index],
+                                    onPressed: _saving || _popping
+                                        ? null
+                                        : () => _changeColor(colors[index]),
+                                  ),
+                              ],
+                            ),
                           ],
-                          selected: _style.cardSize,
-                          label: (value) => value == null
-                              ? s.Card_Style_Use_Default
-                              : _sizeLabel(2 - value.index),
-                          onSelected: (value) => _change(_style.copyWith(
-                              cardSize: value, clearCardSize: value == null)),
                         ),
-                      ]),
+                        const SizedBox(height: 16),
+                      ],
+                      SectionCard(
+                        key: const ValueKey('card-style-text'),
+                        title: s.Card_Style_Text,
+                        children: [
+                          ListTile(
+                            key: const ValueKey('card-style-font'),
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(s.Font_Style),
+                            subtitle: Text(_style.fontFamily ??
+                                '${s.Card_Style_Use_Default} · ${resolved.fontFamily}'),
+                            trailing: const Icon(Icons.expand_more_rounded),
+                            onTap: _saving || _popping ? null : _chooseFont,
+                          ),
+                          const Divider(),
+                          _ChoiceGroup(
+                            key: const ValueKey('card-style-font-size'),
+                            label: s.Font_Size,
+                            child: _StyleChoices<AppFontSize?>(
+                              keyFor: (value) => ValueKey(
+                                  'card-style-text-${value?.name ?? "default"}'),
+                              enabled: !_saving && !_popping,
+                              values: [
+                                if (!_defaults) null,
+                                ...AppFontSize.values
+                              ],
+                              selected: _style.fontSize,
+                              label: (value) => value == null
+                                  ? s.Card_Style_Use_Default
+                                  : _sizeLabel(value.index),
+                              onSelected: (value) => _change(_style.copyWith(
+                                  fontSize: value,
+                                  clearFontSize: value == null)),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
-                      SectionCard(title: s.Card_Style_Paper, children: [
-                        SettingsChoice<NoteCardPaperStyle?>(
-                          values: const [null, ...NoteCardPaperStyle.values],
-                          selected: _style.paperStyle,
-                          label: (value) => switch (value) {
-                            null => _defaults
-                                ? s.Card_Style_Follow_App
-                                : s.Card_Style_Use_Default,
-                            NoteCardPaperStyle.textured =>
-                              s.Card_Style_Textured,
-                            NoteCardPaperStyle.plain => s.Card_Style_Plain,
-                          },
-                          onSelected: (value) => _change(_style.copyWith(
-                              paperStyle: value,
-                              clearPaperStyle: value == null)),
-                        ),
-                      ]),
-                      const SizedBox(height: 16),
-                      SectionCard(title: s.Card_Style_Show_Date, children: [
-                        if (_defaults)
+                      SectionCard(
+                        key: const ValueKey('card-style-layout'),
+                        title: s.Card_Style_Layout,
+                        children: [
+                          _ChoiceGroup(
+                            key: const ValueKey('card-style-size'),
+                            label: s.Card_Size,
+                            child: _StyleChoices<NoteCardSize?>(
+                              keyFor: (value) => ValueKey(
+                                  'card-style-card-${value?.name ?? "default"}'),
+                              enabled: !_saving && !_popping,
+                              values: [
+                                if (!_defaults) null,
+                                NoteCardSize.small,
+                                NoteCardSize.medium,
+                                NoteCardSize.large,
+                              ],
+                              selected: _style.cardSize,
+                              label: (value) => value == null
+                                  ? s.Card_Style_Use_Default
+                                  : _sizeLabel(2 - value.index),
+                              onSelected: (value) => _change(_style.copyWith(
+                                  cardSize: value,
+                                  clearCardSize: value == null)),
+                            ),
+                          ),
+                          const Divider(height: 32),
+                          _ChoiceGroup(
+                            key: const ValueKey('card-style-paper'),
+                            label: s.Card_Style_Paper,
+                            child: _StyleChoices<NoteCardPaperStyle?>(
+                              keyFor: (value) => ValueKey(
+                                  'card-style-paper-${value?.name ?? "default"}'),
+                              enabled: !_saving && !_popping,
+                              values: const [
+                                null,
+                                ...NoteCardPaperStyle.values
+                              ],
+                              selected: _style.paperStyle,
+                              label: (value) => switch (value) {
+                                null => _defaults
+                                    ? s.Card_Style_Follow_App
+                                    : s.Card_Style_Use_Default,
+                                NoteCardPaperStyle.textured =>
+                                  s.Card_Style_Textured,
+                                NoteCardPaperStyle.plain => s.Card_Style_Plain,
+                              },
+                              onSelected: (value) => _change(_style.copyWith(
+                                  paperStyle: value,
+                                  clearPaperStyle: value == null)),
+                            ),
+                          ),
+                          const Divider(height: 32),
                           SwitchListTile(
+                            key: const ValueKey('card-style-date'),
                             contentPadding: EdgeInsets.zero,
                             title: Text(s.Card_Style_Show_Date),
+                            subtitle: !_defaults && _style.showDate == null
+                                ? Text(s.Card_Style_Use_Default)
+                                : null,
                             value: resolved.showDate!,
-                            onChanged: _saving
+                            onChanged: _saving || _popping
                                 ? null
                                 : (value) =>
                                     _change(_style.copyWith(showDate: value)),
-                          )
-                        else
-                          SettingsChoice<bool?>(
-                            values: const [null, true, false],
-                            selected: _style.showDate,
-                            label: (value) => switch (value) {
-                              null => s.Card_Style_Use_Default,
-                              true => s.Card_Style_Show_Date,
-                              false => s.Card_Style_Hide_Date,
-                            },
-                            onSelected: (value) => _change(_style.copyWith(
-                                showDate: value, clearShowDate: value == null)),
                           ),
-                      ]),
+                          if (!_defaults && _style.showDate != null)
+                            TextButton.icon(
+                              key: const ValueKey('card-style-date-default'),
+                              onPressed: _saving || _popping
+                                  ? null
+                                  : () => _change(
+                                      _style.copyWith(clearShowDate: true)),
+                              icon: const Icon(Icons.restart_alt_rounded,
+                                  size: 18),
+                              label: Text(s.Card_Style_Use_Default),
+                            ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       OutlinedButton.icon(
                         key: const ValueKey('card-style-reset'),
@@ -427,4 +532,104 @@ class _CardAppearanceScreenState extends State<CardAppearanceScreen> {
       ),
     );
   }
+}
+
+class _ChoiceGroup extends StatelessWidget {
+  const _ChoiceGroup({super.key, required this.label, required this.child});
+
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: context.textStyles.labelLarge),
+          const SizedBox(height: 8),
+          child,
+        ],
+      );
+}
+
+class _ColorChoice extends StatelessWidget {
+  const _ColorChoice({
+    super.key,
+    required this.color,
+    required this.label,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  final Color color;
+  final String label;
+  final bool selected;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => SizedBox.square(
+        dimension: 48,
+        child: IconButton(
+          tooltip: label,
+          isSelected: selected,
+          onPressed: onPressed,
+          style: IconButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor:
+                ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+                    ? Colors.white
+                    : AppColors.ink,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            side: BorderSide(
+              color: (ThemeData.estimateBrightnessForColor(color) ==
+                          Brightness.dark
+                      ? Colors.white
+                      : AppColors.ink)
+                  .withValues(alpha: selected ? .85 : .25),
+              width: selected ? 2 : 1,
+            ),
+          ).copyWith(
+            animationDuration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 160),
+          ),
+          icon: const SizedBox.square(dimension: 20),
+          selectedIcon: const Icon(Icons.check_rounded, size: 20),
+        ),
+      );
+}
+
+class _StyleChoices<T> extends StatelessWidget {
+  const _StyleChoices({
+    required this.values,
+    required this.selected,
+    required this.label,
+    required this.keyFor,
+    required this.onSelected,
+    required this.enabled,
+  });
+
+  final List<T> values;
+  final T selected;
+  final String Function(T) label;
+  final Key Function(T) keyFor;
+  final ValueChanged<T> onSelected;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final value in values)
+            ChoiceChip(
+              key: keyFor(value),
+              label: Text(label(value)),
+              selected: value == selected,
+              showCheckmark: true,
+              materialTapTargetSize: MaterialTapTargetSize.padded,
+              onSelected: enabled ? (_) => onSelected(value) : null,
+            ),
+        ],
+      );
 }

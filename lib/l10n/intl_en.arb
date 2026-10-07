@@ -566,5 +566,17 @@
   "Premium_Existing_Purchase": "Already removed ads? Your purchase includes Premium. Restore it below.",
   "Premium_Notes": "Unlimited notes",
   "Premium_Note_Limit": "The free plan includes {limit} notes. Upgrade for unlimited notes.",
-  "Premium_Voice_Memos": "Voice memos"
+  "Premium_Voice_Memos": "Voice memos",
+  "Card_Style_Color": "Color",
+  "Card_Style_Text": "Text",
+  "Card_Style_Layout": "Layout",
+  "Card_Style_Default_Color": "Default paper color",
+  "Card_Style_Original_Color": "Original color",
+  "Move_Up": "Move up",
+  "Move_Down": "Move down",
+  "Reorder_Hint": "Touch and hold a card, then drag it.",
+  "Reorder_Pinned_Hint": "Pinned notes stay at the top.",
+  "Reorder_Move_Earlier": "Move earlier",
+  "Reorder_Move_Later": "Move later",
+  "Reorder_Save_Failed": "Could not save this order. Please try again."
 }

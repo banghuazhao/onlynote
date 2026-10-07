@@ -66,6 +66,10 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       if (event is _ColorChanged) {
         emit(state.copyWith(selectedColor: event.value));
       }
+      if (event is _AppearanceChanged) {
+        emit(
+            state.copyWith(cardStyle: event.style, selectedColor: event.color));
+      }
       if (event is _TagsChanged) {
         emit(state.copyWith(tags: event.value));
       }

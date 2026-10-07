@@ -564,5 +564,17 @@
   "Premium_Existing_Purchase": "已購買移除廣告？您的購買已包含進階版。可在下方恢復購買。",
   "Premium_Notes": "無限筆記",
   "Premium_Note_Limit": "免費版包含 {limit} 則筆記。升級即可建立無限筆記。",
-  "Premium_Voice_Memos": "語音備忘錄"
+  "Premium_Voice_Memos": "語音備忘錄",
+  "Card_Style_Color": "顏色",
+  "Card_Style_Text": "文字",
+  "Card_Style_Layout": "版面",
+  "Card_Style_Default_Color": "預設紙張顏色",
+  "Card_Style_Original_Color": "原始顏色",
+  "Move_Up": "上移",
+  "Move_Down": "下移",
+  "Reorder_Hint": "長按卡片，然後拖曳。",
+  "Reorder_Pinned_Hint": "置頂筆記始終顯示在最上方。",
+  "Reorder_Move_Earlier": "往前移",
+  "Reorder_Move_Later": "往後移",
+  "Reorder_Save_Failed": "無法儲存此順序，請重試。"
 }

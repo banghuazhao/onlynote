@@ -54,6 +54,7 @@ class _CardStylePreviewState extends State<_CardStylePreview> {
         ? '沿海邊走走，記下新的想法，為下週留一點期待。'
         : 'Follow the coast, collect new ideas, and make a little time to write.',
     dateTime: DateTime(2026, 10, 7),
+    color: const Color(0xFFD3EDE4),
     todo: [
       Todo(id: 'walk', title: widget.chinese ? '去海邊散步' : 'Walk by the sea'),
       Todo(
@@ -81,10 +82,15 @@ class _CardStylePreviewState extends State<_CardStylePreview> {
     _note.value = _note.value.copyWith(cardStyle: style);
   }
 
+  Future<void> _saveAppearance(NoteCardStyle style, Color? color) async {
+    _note.value = _note.value.copyWith(cardStyle: style, color: color);
+  }
+
   Widget _editor(BuildContext context) => CardAppearanceScreen(
         note: widget.defaults ? null : _note.value,
         initialStyle: widget.defaults ? _note.value.cardStyle : null,
-        onSave: _save,
+        onSave: widget.defaults ? _save : null,
+        onSaveAppearance: widget.defaults ? null : _saveAppearance,
       );
 
   Widget _entry(BuildContext context) => Scaffold(

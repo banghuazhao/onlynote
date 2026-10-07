@@ -564,5 +564,17 @@
   "Premium_Existing_Purchase": "已购买移除广告？您的购买已包含高级版。可在下方恢复购买。",
   "Premium_Notes": "无限笔记",
   "Premium_Note_Limit": "免费版包含 {limit} 条笔记。升级即可创建无限笔记。",
-  "Premium_Voice_Memos": "语音备忘录"
+  "Premium_Voice_Memos": "语音备忘录",
+  "Card_Style_Color": "颜色",
+  "Card_Style_Text": "文字",
+  "Card_Style_Layout": "布局",
+  "Card_Style_Default_Color": "默认纸张颜色",
+  "Card_Style_Original_Color": "原始颜色",
+  "Move_Up": "上移",
+  "Move_Down": "下移",
+  "Reorder_Hint": "长按卡片，然后拖动。",
+  "Reorder_Pinned_Hint": "置顶笔记始终显示在最上方。",
+  "Reorder_Move_Earlier": "往前移",
+  "Reorder_Move_Later": "往后移",
+  "Reorder_Save_Failed": "无法保存此顺序，请重试。"
 }

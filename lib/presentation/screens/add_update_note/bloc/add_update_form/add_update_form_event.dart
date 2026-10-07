@@ -32,6 +32,9 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
 
   const factory AddUpdateFormEvent.colorChanged(Color value) = _ColorChanged;
 
+  const factory AddUpdateFormEvent.appearanceChanged(
+      NoteCardStyle style, Color? color) = _AppearanceChanged;
+
   const factory AddUpdateFormEvent.addOrUpdateNote({
     String? id,
     String? folderId,

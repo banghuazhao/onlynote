@@ -11,12 +11,12 @@ import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/Tools/app_layout_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
-import 'package:onlynote/presentation/components/section_card.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_previews.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
@@ -93,12 +93,30 @@ Finder _controls() => find.descendant(
     of: find.byKey(const ValueKey('card-style-controls')),
     matching: find.byType(Scrollable));
 
-Finder _choice(String title, String label) => find.descendant(
-    of: find.widgetWithText(SectionCard, title),
-    matching: find.widgetWithText(ChoiceChip, label));
+Finder _choice(String title, String label) {
+  final group = title == S.current.Font_Size
+      ? 'card-style-font-size'
+      : title == S.current.Card_Size
+          ? 'card-style-size'
+          : 'card-style-paper';
+  return find.descendant(
+      of: find.byKey(ValueKey(group)),
+      matching: find.widgetWithText(ChoiceChip, label));
+}
+
+Finder _color(Color color) =>
+    find.byKey(ValueKey('card-style-color-${color.toARGB32()}'));
 
 Future<void> _tapControl(WidgetTester tester, Finder target) async {
-  await tester.scrollUntilVisible(target, 150, scrollable: _controls());
+  if (target.evaluate().isEmpty) {
+    tester.state<ScrollableState>(_controls()).position.jumpTo(0);
+    await tester.pump();
+  }
+  if (target.evaluate().isNotEmpty) {
+    await tester.ensureVisible(target);
+  } else {
+    await tester.scrollUntilVisible(target, 150, scrollable: _controls());
+  }
   await tester.pumpAndSettle();
   await tester.tap(target);
   await tester.pumpAndSettle();
@@ -156,6 +174,208 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('color-only save stays free and keeps an existing custom style',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    const originalColor = Color(0xFF14283C);
+    const style = NoteCardStyle(fontSize: AppFontSize.small);
+    NoteCardStyle? savedStyle;
+    Color? savedColor;
+    var legacySaves = 0;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          premiumAccess: fixture.access,
+          note: _note(style: style).copyWith(color: originalColor),
+          thumbnailBuilder: _thumbnail,
+          onSave: (_) async => legacySaves++,
+          onSaveAppearance: (style, color) async {
+            savedStyle = style;
+            savedColor = color;
+          },
+        ));
+    final swatch = tester.widget<IconButton>(find.descendant(
+        of: _color(originalColor), matching: find.byType(IconButton)));
+    expect(swatch.isSelected, isTrue);
+    expect(swatch.style!.foregroundColor!.resolve({}), Colors.white);
+    expect(tester.getSize(_color(originalColor)), const Size(48, 48));
+    await _tapControl(tester, _color(colors[7]));
+    expect(
+        tester.widget<NoteCard>(find.byType(NoteCard)).note.color, colors[7]);
+    await _capture(tester, 'color-light');
+    expect(savedStyle, isNull);
+    expect(savedColor, isNull);
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(savedStyle, style);
+    expect(savedColor, colors[7]);
+    expect(legacySaves, 0);
+    expect(fixture.store.buyCalls, 0);
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('color is staged until Save and discard never publishes it',
+      (tester) async {
+    var saves = 0;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          note: _note().copyWith(color: colors[2]),
+          thumbnailBuilder: _thumbnail,
+          onSaveAppearance: (_, color) async => saves++,
+        ));
+    await _tapControl(tester, _color(colors[8]));
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.Card_Style_Discard_Title), findsOneWidget);
+    await tester.tap(find.text(S.current.Cancel));
+    await tester.pumpAndSettle();
+    expect(
+        tester.widget<NoteCard>(find.byType(NoteCard)).note.color, colors[8]);
+    expect(saves, 0);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Card_Style_Discard));
+    await tester.pumpAndSettle();
+    expect(saves, 0);
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+  });
+
+  testWidgets('default color saves null and style reset preserves staged color',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    NoteCardStyle? savedStyle;
+    Color? savedColor = colors.first;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          premiumAccess: fixture.access,
+          note: _note(style: const NoteCardStyle(showDate: false))
+              .copyWith(color: colors[1]),
+          thumbnailBuilder: _thumbnail,
+          onSaveAppearance: (style, color) async {
+            savedStyle = style;
+            savedColor = color;
+          },
+        ));
+    await _tapControl(tester, _color(colors[8]));
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-reset')));
+    expect(
+        tester.widget<NoteCard>(find.byType(NoteCard)).note.color, colors[8]);
+    expect(tester.widget<NoteCard>(find.byType(NoteCard)).cardStyle!.showDate,
+        isTrue);
+    await _tapControl(
+        tester, find.byKey(const ValueKey('card-style-color-default')));
+    expect(tester.widget<NoteCard>(find.byType(NoteCard)).note.color, isNull);
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(savedStyle!.isDefault, isTrue);
+    expect(savedColor, isNull);
+    expect(find.byType(PremiumScreen), findsNothing);
+  });
+
+  testWidgets('color remains staged when a custom style upgrade is cancelled',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    var saves = 0;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          premiumAccess: fixture.access,
+          note: _note(),
+          thumbnailBuilder: _thumbnail,
+          onSaveAppearance: (_, color) async => saves++,
+        ));
+    await _tapControl(tester, _color(colors[3]));
+    await _tapControl(
+        tester, find.byKey(const ValueKey('card-style-text-large')));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(saves, 0);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    final preview = tester.widget<NoteCard>(find.byType(NoteCard));
+    expect(preview.note.color, colors[3]);
+    expect(preview.cardStyle!.fontSize, AppFontSize.large);
+    expect(saves, 0);
+    expect(find.text(S.current.Card_Style_Save_Failed), findsNothing);
+  });
+
+  testWidgets('grouped controls keep date inheritance explicit',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    NoteCardStyle? saved;
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          premiumAccess: fixture.access,
+          note: _note(),
+          thumbnailBuilder: _thumbnail,
+          onSaveAppearance: (style, color) async => saved = style,
+        ));
+    expect(find.text(S.current.Card_Style_Color), findsOneWidget);
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-font')));
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('card-style-text')), findsOneWidget);
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
+    expect(
+        tester
+            .widget<SwitchListTile>(
+                find.byKey(const ValueKey('card-style-date')))
+            .value,
+        isFalse);
+    expect(find.byKey(const ValueKey('card-date')), findsNothing);
+    await _tapControl(
+        tester, find.byKey(const ValueKey('card-style-date-default')));
+    expect(
+        tester
+            .widget<SwitchListTile>(
+                find.byKey(const ValueKey('card-style-date')))
+            .value,
+        isTrue);
+    expect(find.byKey(const ValueKey('card-style-date-default')), findsNothing);
+    // Change only the color so the inherited date choice is persisted for free.
+    await _tapControl(tester, _color(colors[5]));
+    await tester.tap(find.byKey(const ValueKey('card-style-save')));
+    await tester.pumpAndSettle();
+    expect(saved!.showDate, isNull);
+    expect(saved!.isDefault, isTrue);
+  });
+
+  testWidgets('default and legacy style screens hide unsavable color controls',
+      (tester) async {
+    await _open(
+        tester,
+        CardAppearanceScreen(
+          note: _note().copyWith(color: colors[2]),
+          thumbnailBuilder: _thumbnail,
+          onSave: (_) async {},
+        ));
+    expect(find.byKey(const ValueKey('card-style-color-group')), findsNothing);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await _open(tester, CardAppearanceScreen(onSave: (_) async {}));
+    expect(find.byKey(const ValueKey('card-style-color-group')), findsNothing);
+    expect(find.byKey(const ValueKey('card-style-text')), findsOneWidget);
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
+    expect(find.byKey(const ValueKey('card-style-layout')), findsOneWidget);
+    expect(find.byKey(const ValueKey('card-style-date-default')), findsNothing);
+  });
 
   testWidgets('free users preview custom styles, cancel upgrade, then reset',
       (tester) async {
@@ -295,10 +515,7 @@ void main() {
     await _tapControl(tester,
         _choice(S.current.Card_Style_Paper, S.current.Card_Style_Plain));
     expect(tester.widget<PaperNote>(find.byType(PaperNote)).plainPaper, isTrue);
-    await _tapControl(
-        tester,
-        _choice(
-            S.current.Card_Style_Show_Date, S.current.Card_Style_Hide_Date));
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
     expect(find.byKey(const ValueKey('card-date')), findsNothing);
     expect(saved, isNull);
     expect(AppTypographySettings.instance.fontFamily, 'Montserrat');
@@ -442,7 +659,7 @@ void main() {
             CardAppearanceScreen(
                 note: _note(),
                 thumbnailBuilder: _thumbnail,
-                onSave: (_) async => saved = true),
+                onSaveAppearance: (_, color) async => saved = true),
             dark: dark,
             scale: 2.4,
             locale: locale);

@@ -1531,8 +1531,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
         builder: (_) => CardAppearanceScreen(
           note: note,
           premiumAccess: bloc.premiumAccess,
-          onSave: (style) async {
-            final error = await bloc.setCardStyle(noteId, style);
+          onSaveAppearance: (style, color) async {
+            final error = await bloc.setCardAppearance(noteId, style, color);
             if (error != null) throw StateError(error);
           },
         ),
@@ -1726,9 +1726,11 @@ class __BuildNotesListState extends State<_BuildNotesList> {
           AppSheetAction(
             leading: const Icon(Icons.swap_vert),
             title: Text(S.of(context).Reorder),
-            onPressed: (sheetContext) {
+            onPressed: (sheetContext) async {
+              final route = ModalRoute.of(sheetContext);
               Navigator.pop(sheetContext);
-              widget.onEnterReorderMode();
+              if (route != null) await route.completed;
+              if (mounted) widget.onEnterReorderMode();
             },
           ),
         AppSheetAction(
@@ -1888,32 +1890,82 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   Widget _buildReorderableGrid(
       BuildContext context, int crossAxisCount, double width) {
     final notes = List<Note>.from(widget.notes);
-
-    return ReorderableGridView.count(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacings.xl,
-        vertical: AppSpacings.xl,
-      ),
-      crossAxisCount: crossAxisCount,
-      childAspectRatio: noteReorderAspectRatio(
-        width: width,
-        columns: crossAxisCount,
-        textScaler: MediaQuery.textScalerOf(context),
-        appFontScale: AppTypographySettings.instance.scale,
-      ),
-      mainAxisSpacing: AppSpacings.xl,
-      crossAxisSpacing: AppSpacings.l,
-      onReorder: (oldIndex, newIndex) {
-        final reordered = List<Note>.from(notes);
-        final moved = reordered.removeAt(oldIndex);
-        reordered.insert(newIndex, moved);
-        context.read<HomeBloc>().add(HomeEvent.reorderNotes(reordered));
-      },
-      children: [
-        for (final note in notes)
-          NoteReorderCard(key: ValueKey(note.id), note: note),
-      ],
+    final pinnedCount = notes.where((note) => note.isPinned).length;
+    final strings = S.of(context);
+    final cardWidth =
+        (width - 2 * AppSpacings.xl - (crossAxisCount - 1) * AppSpacings.l) /
+            crossAxisCount;
+    final baseAspectRatio = noteReorderAspectRatio(
+      width: width,
+      columns: crossAxisCount,
+      textScaler: MediaQuery.textScalerOf(context),
+      appFontScale: AppTypographySettings.instance.scale,
     );
+
+    Future<void> move(int oldIndex, int newIndex) async {
+      final pinned = notes[oldIndex].isPinned;
+      final first = pinned ? 0 : pinnedCount;
+      final last = pinned ? pinnedCount - 1 : notes.length - 1;
+      final target = newIndex.clamp(first, last);
+      if (target == oldIndex) return;
+      final reordered = List<Note>.from(notes);
+      final moved = reordered.removeAt(oldIndex);
+      reordered.insert(target, moved);
+      final error = await context.read<HomeBloc>().reorderNotes(reordered);
+      if (context.mounted && error != null) {
+        context.showToast(error, isError: true);
+      }
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        key: const ValueKey('home-reorder-instructions'),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+              padding: EdgeInsets.only(top: 2),
+              child: Icon(Icons.drag_indicator_rounded, size: 20)),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text(
+                  pinnedCount > 0
+                      ? '${strings.Reorder_Hint}\n${strings.Reorder_Pinned_Hint}'
+                      : strings.Reorder_Hint,
+                  style: context.textStyles.bodyMedium)),
+        ]),
+      ),
+      Expanded(
+        child: ReorderableGridView.count(
+          key: const ValueKey('home-reorder-grid'),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacings.xl,
+            vertical: AppSpacings.xl,
+          ),
+          crossAxisCount: crossAxisCount,
+          // Preserve the headline/date space while adding a 48px move control.
+          childAspectRatio: cardWidth / (cardWidth / baseAspectRatio + 52),
+          mainAxisSpacing: AppSpacings.xl,
+          crossAxisSpacing: AppSpacings.l,
+          onReorder: (oldIndex, newIndex) {
+            move(oldIndex, newIndex);
+          },
+          children: [
+            for (final (index, note) in notes.indexed)
+              NoteReorderCard(
+                  key: ValueKey(note.id),
+                  note: note,
+                  showReorderControls: true,
+                  onMoveEarlier: index > (note.isPinned ? 0 : pinnedCount)
+                      ? () => move(index, index - 1)
+                      : null,
+                  onMoveLater: index <
+                          (note.isPinned ? pinnedCount - 1 : notes.length - 1)
+                      ? () => move(index, index + 1)
+                      : null),
+          ],
+        ),
+      ),
+    ]);
   }
 }
 

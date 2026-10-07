@@ -23,7 +23,8 @@ mixin _$HomeEvent {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -39,8 +40,8 @@ mixin _$HomeEvent {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -59,7 +60,8 @@ mixin _$HomeEvent {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -75,8 +77,8 @@ mixin _$HomeEvent {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -95,7 +97,8 @@ mixin _$HomeEvent {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -111,8 +114,8 @@ mixin _$HomeEvent {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -329,7 +332,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -345,8 +349,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -368,7 +372,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -384,8 +389,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -407,7 +412,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -423,8 +429,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -595,7 +601,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -611,8 +618,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -634,7 +641,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -650,8 +658,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -673,7 +681,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -689,8 +698,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -885,7 +894,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -901,8 +911,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -924,7 +934,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -940,8 +951,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -963,7 +974,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -979,8 +991,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -1107,7 +1119,7 @@ abstract class _$$ReorderNotesImplCopyWith<$Res> {
           _$ReorderNotesImpl value, $Res Function(_$ReorderNotesImpl) then) =
       __$$ReorderNotesImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<Note> notes});
+  $Res call({List<Note> notes, Completer<String?>? completion});
 }
 
 /// @nodoc
@@ -1122,12 +1134,17 @@ class __$$ReorderNotesImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? notes = null,
+    Object? completion = freezed,
   }) {
     return _then(_$ReorderNotesImpl(
       null == notes
           ? _value._notes
           : notes // ignore: cast_nullable_to_non_nullable
               as List<Note>,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<String?>?,
     ));
   }
 }
@@ -1135,7 +1152,8 @@ class __$$ReorderNotesImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$ReorderNotesImpl implements _ReorderNotes {
-  const _$ReorderNotesImpl(final List<Note> notes) : _notes = notes;
+  const _$ReorderNotesImpl(final List<Note> notes, {this.completion})
+      : _notes = notes;
 
   final List<Note> _notes;
   @override
@@ -1146,8 +1164,11 @@ class _$ReorderNotesImpl implements _ReorderNotes {
   }
 
   @override
+  final Completer<String?>? completion;
+
+  @override
   String toString() {
-    return 'HomeEvent.reorderNotes(notes: $notes)';
+    return 'HomeEvent.reorderNotes(notes: $notes, completion: $completion)';
   }
 
   @override
@@ -1155,12 +1176,14 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ReorderNotesImpl &&
-            const DeepCollectionEquality().equals(other._notes, _notes));
+            const DeepCollectionEquality().equals(other._notes, _notes) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_notes));
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_notes), completion);
 
   @JsonKey(ignore: true)
   @override
@@ -1176,7 +1199,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -1192,8 +1216,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -1204,7 +1228,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
   }) {
-    return reorderNotes(notes);
+    return reorderNotes(notes, completion);
   }
 
   @override
@@ -1215,7 +1239,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -1231,8 +1256,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -1243,7 +1268,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
   }) {
-    return reorderNotes?.call(notes);
+    return reorderNotes?.call(notes, completion);
   }
 
   @override
@@ -1254,7 +1279,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -1270,8 +1296,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -1283,7 +1309,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult orElse(),
   }) {
     if (reorderNotes != null) {
-      return reorderNotes(notes);
+      return reorderNotes(notes, completion);
     }
     return orElse();
   }
@@ -1384,9 +1410,11 @@ class _$ReorderNotesImpl implements _ReorderNotes {
 }
 
 abstract class _ReorderNotes implements HomeEvent {
-  const factory _ReorderNotes(final List<Note> notes) = _$ReorderNotesImpl;
+  const factory _ReorderNotes(final List<Note> notes,
+      {final Completer<String?>? completion}) = _$ReorderNotesImpl;
 
   List<Note> get notes;
+  Completer<String?>? get completion;
   @JsonKey(ignore: true)
   _$$ReorderNotesImplCopyWith<_$ReorderNotesImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -1461,7 +1489,8 @@ class _$SearchChangedImpl implements _SearchChanged {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -1477,8 +1506,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -1500,7 +1529,8 @@ class _$SearchChangedImpl implements _SearchChanged {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -1516,8 +1546,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -1539,7 +1569,8 @@ class _$SearchChangedImpl implements _SearchChanged {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -1555,8 +1586,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -1754,7 +1785,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -1770,8 +1802,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -1793,7 +1825,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -1809,8 +1842,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -1832,7 +1865,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -1848,8 +1882,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -2041,7 +2075,8 @@ class _$SelectFolderImpl implements _SelectFolder {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -2057,8 +2092,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -2080,7 +2115,8 @@ class _$SelectFolderImpl implements _SelectFolder {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -2096,8 +2132,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -2119,7 +2155,8 @@ class _$SelectFolderImpl implements _SelectFolder {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -2135,8 +2172,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -2326,7 +2363,8 @@ class _$ShowTrashImpl implements _ShowTrash {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -2342,8 +2380,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -2365,7 +2403,8 @@ class _$ShowTrashImpl implements _ShowTrash {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -2381,8 +2420,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -2404,7 +2443,8 @@ class _$ShowTrashImpl implements _ShowTrash {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -2420,8 +2460,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -2611,7 +2651,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -2627,8 +2668,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -2650,7 +2691,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -2666,8 +2708,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -2689,7 +2731,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -2705,8 +2748,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -2897,7 +2940,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -2913,8 +2957,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -2936,7 +2980,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -2952,8 +2997,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -2975,7 +3020,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -2991,8 +3037,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -3188,7 +3234,8 @@ class _$TagsChangedImpl implements _TagsChanged {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -3204,8 +3251,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -3227,7 +3274,8 @@ class _$TagsChangedImpl implements _TagsChanged {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -3243,8 +3291,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -3266,7 +3314,8 @@ class _$TagsChangedImpl implements _TagsChanged {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -3282,8 +3331,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -3481,7 +3530,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -3497,8 +3547,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -3520,7 +3570,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -3536,8 +3587,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -3559,7 +3610,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -3575,8 +3627,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -3768,7 +3820,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -3784,8 +3837,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -3807,7 +3860,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -3823,8 +3877,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -3846,7 +3900,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -3862,8 +3917,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -4074,7 +4129,8 @@ class _$SetArchivedImpl implements _SetArchived {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -4090,8 +4146,8 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -4113,7 +4169,8 @@ class _$SetArchivedImpl implements _SetArchived {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -4129,8 +4186,8 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -4152,7 +4209,8 @@ class _$SetArchivedImpl implements _SetArchived {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -4168,8 +4226,8 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -4390,7 +4448,8 @@ class _$SetTagsImpl implements _SetTags {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -4406,8 +4465,8 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -4429,7 +4488,8 @@ class _$SetTagsImpl implements _SetTags {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -4445,8 +4505,8 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -4468,7 +4528,8 @@ class _$SetTagsImpl implements _SetTags {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -4484,8 +4545,8 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -4618,7 +4679,11 @@ abstract class _$$SetCardStyleImplCopyWith<$Res> {
       __$$SetCardStyleImplCopyWithImpl<$Res>;
   @useResult
   $Res call(
-      {String noteId, NoteCardStyle style, Completer<String?>? completion});
+      {String noteId,
+      NoteCardStyle style,
+      Color? color,
+      bool updateColor,
+      Completer<String?>? completion});
 }
 
 /// @nodoc
@@ -4634,6 +4699,8 @@ class __$$SetCardStyleImplCopyWithImpl<$Res>
   $Res call({
     Object? noteId = null,
     Object? style = null,
+    Object? color = freezed,
+    Object? updateColor = null,
     Object? completion = freezed,
   }) {
     return _then(_$SetCardStyleImpl(
@@ -4645,6 +4712,14 @@ class __$$SetCardStyleImplCopyWithImpl<$Res>
           ? _value.style
           : style // ignore: cast_nullable_to_non_nullable
               as NoteCardStyle,
+      color: freezed == color
+          ? _value.color
+          : color // ignore: cast_nullable_to_non_nullable
+              as Color?,
+      updateColor: null == updateColor
+          ? _value.updateColor
+          : updateColor // ignore: cast_nullable_to_non_nullable
+              as bool,
       completion: freezed == completion
           ? _value.completion
           : completion // ignore: cast_nullable_to_non_nullable
@@ -4657,18 +4732,27 @@ class __$$SetCardStyleImplCopyWithImpl<$Res>
 
 class _$SetCardStyleImpl implements _SetCardStyle {
   const _$SetCardStyleImpl(
-      {required this.noteId, required this.style, this.completion});
+      {required this.noteId,
+      required this.style,
+      this.color,
+      this.updateColor = false,
+      this.completion});
 
   @override
   final String noteId;
   @override
   final NoteCardStyle style;
   @override
+  final Color? color;
+  @override
+  @JsonKey()
+  final bool updateColor;
+  @override
   final Completer<String?>? completion;
 
   @override
   String toString() {
-    return 'HomeEvent.setCardStyle(noteId: $noteId, style: $style, completion: $completion)';
+    return 'HomeEvent.setCardStyle(noteId: $noteId, style: $style, color: $color, updateColor: $updateColor, completion: $completion)';
   }
 
   @override
@@ -4678,12 +4762,16 @@ class _$SetCardStyleImpl implements _SetCardStyle {
             other is _$SetCardStyleImpl &&
             (identical(other.noteId, noteId) || other.noteId == noteId) &&
             (identical(other.style, style) || other.style == style) &&
+            (identical(other.color, color) || other.color == color) &&
+            (identical(other.updateColor, updateColor) ||
+                other.updateColor == updateColor) &&
             (identical(other.completion, completion) ||
                 other.completion == completion));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, noteId, style, completion);
+  int get hashCode =>
+      Object.hash(runtimeType, noteId, style, color, updateColor, completion);
 
   @JsonKey(ignore: true)
   @override
@@ -4699,7 +4787,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -4715,8 +4804,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -4727,7 +4816,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
   }) {
-    return setCardStyle(noteId, style, completion);
+    return setCardStyle(noteId, style, color, updateColor, completion);
   }
 
   @override
@@ -4738,7 +4827,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -4754,8 +4844,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -4766,7 +4856,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
   }) {
-    return setCardStyle?.call(noteId, style, completion);
+    return setCardStyle?.call(noteId, style, color, updateColor, completion);
   }
 
   @override
@@ -4777,7 +4867,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -4793,8 +4884,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -4806,7 +4897,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult orElse(),
   }) {
     if (setCardStyle != null) {
-      return setCardStyle(noteId, style, completion);
+      return setCardStyle(noteId, style, color, updateColor, completion);
     }
     return orElse();
   }
@@ -4910,10 +5001,14 @@ abstract class _SetCardStyle implements HomeEvent {
   const factory _SetCardStyle(
       {required final String noteId,
       required final NoteCardStyle style,
+      final Color? color,
+      final bool updateColor,
       final Completer<String?>? completion}) = _$SetCardStyleImpl;
 
   String get noteId;
   NoteCardStyle get style;
+  Color? get color;
+  bool get updateColor;
   Completer<String?>? get completion;
   @JsonKey(ignore: true)
   _$$SetCardStyleImplCopyWith<_$SetCardStyleImpl> get copyWith =>
@@ -4989,7 +5084,8 @@ class _$TogglePinImpl implements _TogglePin {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -5005,8 +5101,8 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -5028,7 +5124,8 @@ class _$TogglePinImpl implements _TogglePin {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -5044,8 +5141,8 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -5067,7 +5164,8 @@ class _$TogglePinImpl implements _TogglePin {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -5083,8 +5181,8 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -5280,7 +5378,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -5296,8 +5395,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -5319,7 +5418,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -5335,8 +5435,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -5358,7 +5458,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -5374,8 +5475,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -5572,7 +5673,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -5588,8 +5690,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -5611,7 +5713,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -5627,8 +5730,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -5650,7 +5753,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -5666,8 +5770,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -5867,7 +5971,8 @@ class _$CreateFolderImpl implements _CreateFolder {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -5883,8 +5988,8 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -5906,7 +6011,8 @@ class _$CreateFolderImpl implements _CreateFolder {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -5922,8 +6028,8 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -5945,7 +6051,8 @@ class _$CreateFolderImpl implements _CreateFolder {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -5961,8 +6068,8 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -6162,7 +6269,8 @@ class _$RenameFolderImpl implements _RenameFolder {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -6178,8 +6286,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -6201,7 +6309,8 @@ class _$RenameFolderImpl implements _RenameFolder {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -6217,8 +6326,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -6240,7 +6349,8 @@ class _$RenameFolderImpl implements _RenameFolder {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -6256,8 +6366,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -6449,7 +6559,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -6465,8 +6576,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -6488,7 +6599,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -6504,8 +6616,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -6527,7 +6639,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -6543,8 +6656,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,
@@ -6744,7 +6857,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
         updateTodo,
     required TResult Function() getAllNotes,
     required TResult Function(Note note) duplicateNote,
-    required TResult Function(List<Note> notes) reorderNotes,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(String? folderId) selectFolder,
@@ -6760,8 +6874,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)
         setTags,
-    required TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
         setCardStyle,
     required TResult Function(String noteId) togglePin,
     required TResult Function(List<String> ids) restoreNotes,
@@ -6783,7 +6897,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
         updateTodo,
     TResult? Function()? getAllNotes,
     TResult? Function(Note note)? duplicateNote,
-    TResult? Function(List<Note> notes)? reorderNotes,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(String? folderId)? selectFolder,
@@ -6799,8 +6914,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult? Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult? Function(String noteId)? togglePin,
     TResult? Function(List<String> ids)? restoreNotes,
@@ -6822,7 +6937,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
         updateTodo,
     TResult Function()? getAllNotes,
     TResult Function(Note note)? duplicateNote,
-    TResult Function(List<Note> notes)? reorderNotes,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(String? folderId)? selectFolder,
@@ -6838,8 +6954,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(
             String noteId, List<String> tags, Completer<String?>? completion)?
         setTags,
-    TResult Function(
-            String noteId, NoteCardStyle style, Completer<String?>? completion)?
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
         setCardStyle,
     TResult Function(String noteId)? togglePin,
     TResult Function(List<String> ids)? restoreNotes,

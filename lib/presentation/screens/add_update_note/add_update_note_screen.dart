@@ -1,7 +1,6 @@
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:animate_do/animate_do.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -10,6 +9,7 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
+import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_edit_history.dart';
 import 'package:onlynote/services/note_outline.dart';
@@ -40,6 +40,7 @@ import 'package:onlynote/presentation/components/note_copy_destination_sheet.dar
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/note_photo_transform.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/presentation/components/note_links_section.dart';
@@ -88,7 +89,6 @@ import 'package:onlynote/presentation/theme/typography.dart';
 import 'bloc/add_update_bloc.dart';
 import 'bloc/add_update_form/add_update_form_bloc.dart';
 
-part 'widgets/colors_bar.dart';
 part 'widgets/text_forms.dart';
 part 'widgets/todo_tile.dart';
 
@@ -512,10 +512,22 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   void _showEditorMore() {
+    var openingStyle = false;
     showAppActionSheet(
         context: context,
         title: S.of(context).More_Options,
         actions: [
+          AppSheetAction(
+              leading: const Icon(Icons.palette_outlined),
+              title: Text(S.of(context).Card_Style),
+              onPressed: (sheetContext) async {
+                if (openingStyle) return;
+                openingStyle = true;
+                final route = ModalRoute.of(sheetContext);
+                Navigator.pop(sheetContext);
+                await route?.completed;
+                if (mounted) await _openCardStyle();
+              }),
           if (MediaQuery.sizeOf(context).width < 260)
             AppSheetAction(
                 leading: const Icon(Icons.search_rounded),
@@ -543,6 +555,68 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                   _finish();
                 }),
         ]);
+  }
+
+  Future<void> _openCardStyle() async {
+    if (_mediaBlocked) return;
+    setState(() => _presentingMedia = true);
+    FocusManager.instance.primaryFocus?.unfocus();
+    try {
+      await _voiceWrites;
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      final pendingChanges = _captureTimer?.isActive == true ||
+          _hadUserChange || _autosave.dirty;
+      _captureTimer?.cancel();
+      if (pendingChanges) _capture(_form.state);
+      final route = MaterialPageRoute<void>(
+        builder: (_) => CardAppearanceScreen(
+          note: _currentDraft(_form.state),
+          premiumAccess: _creationAccess,
+          onSaveAppearance: (style, color) async {
+            if (!mounted) throw StateError('The editor is no longer available');
+            final previousStyle = _form.state.cardStyle;
+            final previousColor = _form.state.selectedColor;
+            try {
+              await _applyCardAppearance(style, color);
+              if (!await _autosave.flush()) {
+                throw StateError('Could not save the card appearance');
+              }
+              if (mounted) _capture(_form.state);
+            } catch (_) {
+              // Failed staged edits must not enter a later typing save or
+              // recovery draft if the user discards the appearance screen.
+              if (mounted) {
+                await _applyCardAppearance(previousStyle, previousColor);
+                await _autosave.flush();
+              }
+              rethrow;
+            }
+          },
+        ),
+      );
+      await Navigator.of(context).push(route);
+      await route.completed;
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  Future<void> _applyCardAppearance(NoteCardStyle style, Color? color) async {
+    if (_form.state.cardStyle != style || _form.state.selectedColor != color) {
+      final updated = _form.stream.firstWhere(
+          (state) => state.cardStyle == style && state.selectedColor == color);
+      _form.add(AddUpdateFormEvent.appearanceChanged(style, color));
+      await updated;
+    }
+    if (!mounted) throw StateError('The editor is no longer available');
+    _captureTimer?.cancel();
+    // Record the undo step only once persistence succeeds. Discarding a failed
+    // save must not leave the staged color in the editor's undo history.
+    final next = _currentDraft(_form.state);
+    if (next != _autosave.note) {
+      _autosave.update(next.copyWith(dateTime: DateTime.now()));
+    }
   }
 
   @override
@@ -2595,16 +2669,7 @@ class _BuildForm extends StatelessWidget {
                         : null,
                     onDismissTip: onDismissFormattingTip,
                   )
-                : writingFocused || MediaQuery.viewInsetsOf(context).bottom > 0
-                    ? null
-                    : ColorsBar(
-                        selectedColor: state.selectedColor,
-                        onChanged: (Color color) {
-                          context
-                              .read<AddUpdateFormBloc>()
-                              .add(AddUpdateFormEvent.colorChanged(color));
-                        },
-                      ),
+                : null,
         appBar: NoteAppBar(
           leading: Center(
             child: IconButton(

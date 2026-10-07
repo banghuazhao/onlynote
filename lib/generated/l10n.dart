@@ -4532,6 +4532,106 @@ class S {
       args: [],
     );
   }
+
+  /// `Color`
+  String get Card_Style_Color {
+    return Intl.message('Color', name: 'Card_Style_Color', desc: '', args: []);
+  }
+
+  /// `Text`
+  String get Card_Style_Text {
+    return Intl.message('Text', name: 'Card_Style_Text', desc: '', args: []);
+  }
+
+  /// `Layout`
+  String get Card_Style_Layout {
+    return Intl.message(
+      'Layout',
+      name: 'Card_Style_Layout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default paper color`
+  String get Card_Style_Default_Color {
+    return Intl.message(
+      'Default paper color',
+      name: 'Card_Style_Default_Color',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Original color`
+  String get Card_Style_Original_Color {
+    return Intl.message(
+      'Original color',
+      name: 'Card_Style_Original_Color',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Move up`
+  String get Move_Up {
+    return Intl.message('Move up', name: 'Move_Up', desc: '', args: []);
+  }
+
+  /// `Move down`
+  String get Move_Down {
+    return Intl.message('Move down', name: 'Move_Down', desc: '', args: []);
+  }
+
+  /// `Touch and hold a card, then drag it.`
+  String get Reorder_Hint {
+    return Intl.message(
+      'Touch and hold a card, then drag it.',
+      name: 'Reorder_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pinned notes stay at the top.`
+  String get Reorder_Pinned_Hint {
+    return Intl.message(
+      'Pinned notes stay at the top.',
+      name: 'Reorder_Pinned_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Move earlier`
+  String get Reorder_Move_Earlier {
+    return Intl.message(
+      'Move earlier',
+      name: 'Reorder_Move_Earlier',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Move later`
+  String get Reorder_Move_Later {
+    return Intl.message(
+      'Move later',
+      name: 'Reorder_Move_Later',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save this order. Please try again.`
+  String get Reorder_Save_Failed {
+    return Intl.message(
+      'Could not save this order. Please try again.',
+      name: 'Reorder_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/common/constants.dart' show colors;
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -24,6 +25,8 @@ import 'package:onlynote/presentation/screens/add_update_note/add_update_note_sc
 import 'package:onlynote/presentation/screens/add_update_note/bloc/add_update_bloc.dart';
 import 'package:onlynote/presentation/components/voice_memo_composer.dart';
 import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
+import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
+import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
@@ -54,12 +57,14 @@ class _Store implements NoteAutosaveStore {
   final _Notes notes;
   final drafts = <String, Note>{};
   final saved = <Note>[];
+  bool failSaves = false;
   @override
   Future<void> writeDraft(Note note) async => drafts[note.id!] = note;
   @override
   Future<void> removeDraft(String id) async => drafts.remove(id);
   @override
   Future<void> saveNote(Note note) async {
+    if (failSaves) throw StateError('Storage is temporarily unavailable');
     saved.add(note);
     await notes.addUpdateNote(NoteDto.fromNote(note));
   }
@@ -168,6 +173,14 @@ Future<void> _waitForAutosave(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _tapAppearance(WidgetTester tester, Finder target) async {
+  await tester.scrollUntilVisible(target, 150,
+      scrollable: find.descendant(
+          of: find.byKey(const ValueKey('card-style-controls')),
+          matching: find.byType(Scrollable)));
+  await _tap(tester, target);
+}
+
 void main() {
   final originalFonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
   setUpAll(() => initializeDateFormatting());
@@ -183,6 +196,128 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
+
+  testWidgets('card styling saves the current draft and survives more typing',
+      (tester) async {
+    final fixture = PremiumTestFixture(premium: true);
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    final initial = Note(
+        id: 'style-edit',
+        title: 'Draft preview',
+        description: 'Keep this body',
+        color: colors.first,
+        folderId: 'keep-folder',
+        isPinned: true,
+        isArchived: true,
+        dailyNoteDateKey: '2026-10-07',
+        todo: [Todo(id: 'task', title: 'Keep this task', completed: true)]);
+    final (notes, _) =
+        await _openEditor(tester, note: initial, premiumAccess: fixture.access);
+    await tester.enterText(find.byType(TextField).first, 'Latest draft title');
+    await tester.pump();
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    await _tap(tester, find.text(S.current.Card_Style));
+    expect(find.byType(CardAppearanceScreen), findsOneWidget);
+    expect(tester.widget<NoteCard>(find.byType(NoteCard)).note.title,
+        'Latest draft title');
+    await _tap(tester,
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
+    await _tapAppearance(tester,
+        find.byKey(const ValueKey('card-style-card-large')));
+    await _tap(tester, find.byKey(const ValueKey('card-style-save')));
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    final body = find.byWidgetPredicate(
+        (widget) => widget is TextField && widget.maxLines == 100);
+    await tester.ensureVisible(body);
+    await tester.pumpAndSettle();
+    await tester.enterText(body, 'Continue after styling');
+    await _waitForAutosave(tester);
+    final saved = notes.values[initial.id!]!.toDomain();
+    expect(saved.title, 'Latest draft title');
+    expect(saved.description, 'Continue after styling');
+    expect(saved.color, colors[8]);
+    expect(saved.cardStyle.cardSize, NoteCardSize.large);
+    expect(saved.folderId, initial.folderId);
+    expect(saved.isPinned, isTrue);
+    expect(saved.isArchived, isTrue);
+    expect(saved.dailyNoteDateKey, initial.dailyNoteDateKey);
+    expect(saved.todo, initial.todo);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('free color changes keep an existing custom style unlocked',
+      (tester) async {
+    final fixture = PremiumTestFixture();
+    await fixture.init();
+    addTearDown(fixture.dispose);
+    const style = NoteCardStyle(cardSize: NoteCardSize.large);
+    final initial = Note(
+        id: 'free-color',
+        title: 'Existing custom card',
+        color: colors.first,
+        cardStyle: style);
+    final (notes, _) =
+        await _openEditor(tester, note: initial, premiumAccess: fixture.access);
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    await _tap(tester, find.text(S.current.Card_Style));
+    await _tap(tester,
+        find.byKey(ValueKey('card-style-color-${colors[4].toARGB32()}')));
+    await _tap(tester, find.byKey(const ValueKey('card-style-save')));
+    expect(find.byType(PremiumScreen), findsNothing);
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    expect(notes.values[initial.id!]!.toDomain().color, colors[4]);
+    expect(notes.values[initial.id!]!.toDomain().cardStyle, style);
+    expect(fixture.store.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('discarding staged color preserves the note and its style',
+      (tester) async {
+    final initial =
+        Note(id: 'cancel-style', title: 'Keep the original', color: colors[2]);
+    final (notes, store) = await _openEditor(tester, note: initial);
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    await _tap(tester, find.text(S.current.Card_Style));
+    await _tap(tester,
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Card_Style_Discard));
+    expect(find.byType(CardAppearanceScreen), findsNothing);
+    expect(notes.values[initial.id!]!.toDomain(), initial);
+    expect(store.saved, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('failed card styling rolls back before discard and later typing',
+      (tester) async {
+    final initial = Note(
+        id: 'failed-style', title: 'Keep the saved color', color: colors[2]);
+    final (notes, store) = await _openEditor(tester, note: initial);
+    store.failSaves = true;
+    await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
+    await _tap(tester, find.text(S.current.Card_Style));
+    await _tap(tester,
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
+    await _tap(tester, find.byKey(const ValueKey('card-style-save')));
+    expect(find.byType(CardAppearanceScreen), findsOneWidget);
+    expect(notes.values[initial.id!]!.toDomain().color, initial.color);
+    expect(store.drafts[initial.id!]!.color, initial.color);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text(S.current.Card_Style_Discard));
+    store.failSaves = false;
+    await tester.enterText(find.byType(TextField).first, 'Keep typing');
+    await _waitForAutosave(tester);
+    final saved = notes.values[initial.id!]!.toDomain();
+    expect(saved.title, 'Keep typing');
+    expect(saved.color, initial.color);
+    expect(saved.cardStyle, initial.cardStyle);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
       'free voice insertion shows Premium before recording and preserves note',

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show Color;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/locator.dart';
@@ -121,6 +122,9 @@ void main() {
     restricted.add(const HomeEvent.getAllNotes());
     await _turn();
     expect(await restricted.setCardStyle('note', existing), isNull);
+    const color = Color(0xffd3ede4);
+    expect(await restricted.setCardAppearance('note', existing, color), isNull);
+    expect(repository.notes['note']!.toDomain().color, color);
     const changed = NoteCardStyle(fontSize: AppFontSize.large);
     await expectLater(restricted.setCardStyle('note', changed),
         throwsA(isA<PremiumRequired>()));
@@ -258,13 +262,75 @@ void main() {
     final oldSnapshot = _visible(bloc);
     repository.writeGate = Completer<void>();
     final toggled = bloc.toggleTodo(noteId: 'note', todoId: 'a');
-    bloc.add(HomeEvent.reorderNotes(oldSnapshot));
+    final reordered = bloc.reorderNotes(oldSnapshot);
     await _turn();
     repository.writeGate!.complete();
     await toggled;
-    await _turn();
-    await _turn();
+    expect(await reordered, isNull);
     expect(repository.notes['note']!.toDomain().todo.first.completed, isTrue);
+  });
+
+  test('saved order survives refresh, filters and later checklist changes',
+      () async {
+    repository.notes['note'] = NoteDto.fromNote(
+        repository.notes['note']!.toDomain().copyWith(sortOrder: 0));
+    repository.notes['second'] = NoteDto.fromNote(Note(
+        id: 'second',
+        title: 'Second',
+        sortOrder: 1,
+        todo: [Todo(id: 'c', title: 'Task')]));
+    bloc.add(const HomeEvent.getAllNotes());
+    await pumpEventQueue();
+    expect(await bloc.reorderNotes(_visible(bloc).reversed.toList()), isNull);
+    expect(_visible(bloc).map((note) => note.id), ['second', 'note']);
+    bloc.add(const HomeEvent.filtersChanged({NoteSearchFilter.checklists}));
+    bloc.add(const HomeEvent.filtersChanged({}));
+    await pumpEventQueue();
+    expect(_visible(bloc).map((note) => note.id), ['second', 'note']);
+    await bloc.toggleTodo(noteId: 'note', todoId: 'a');
+    expect(_visible(bloc).map((note) => note.id), ['second', 'note']);
+    bloc.add(const HomeEvent.getAllNotes());
+    await pumpEventQueue();
+    expect(_visible(bloc).map((note) => note.id), ['second', 'note']);
+  });
+
+  test('failed reorder restores the previous visible order', () async {
+    repository.notes['note'] = NoteDto.fromNote(
+        repository.notes['note']!.toDomain().copyWith(sortOrder: 0));
+    repository.notes['second'] =
+        NoteDto.fromNote(Note(id: 'second', title: 'Second', sortOrder: 1));
+    bloc.add(const HomeEvent.getAllNotes());
+    await pumpEventQueue();
+    repository.failWrites = true;
+    expect(await bloc.reorderNotes(_visible(bloc).reversed.toList()),
+        locator<S>().Reorder_Save_Failed);
+    expect(_visible(bloc).map((note) => note.id), ['note', 'second']);
+  });
+
+  test('combined card appearance saves fresh content and supports color reset',
+      () async {
+    const style = NoteCardStyle(cardSize: NoteCardSize.large);
+    const color = Color(0xffd3ede4);
+    repository.notes['note'] = NoteDto.fromNote(repository.notes['note']!
+        .toDomain()
+        .copyWith(title: 'Latest title', isPinned: true, todo: [
+      Todo(id: 'a', title: 'Latest task', completed: true),
+    ]));
+    expect(await bloc.setCardAppearance('note', style, color), isNull);
+    final saved = repository.notes['note']!.toDomain();
+    expect(saved.cardStyle, style);
+    expect(saved.color, color);
+    expect(saved.title, 'Latest title');
+    expect(saved.isPinned, isTrue);
+    expect(saved.todo.single.completed, isTrue);
+    expect(await bloc.setCardAppearance('note', style, null), isNull);
+    expect(repository.notes['note']!.toDomain().color, isNull);
+    expect(repository.notes['note']!.toDomain().cardStyle, style);
+    repository.failWrites = true;
+    expect(await bloc.setCardAppearance('note', const NoteCardStyle(), color),
+        locator<S>().Card_Style_Save_Failed);
+    expect(repository.notes['note']!.toDomain().color, isNull);
+    expect(repository.notes['note']!.toDomain().cardStyle, style);
   });
 
   test(

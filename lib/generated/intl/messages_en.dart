@@ -154,6 +154,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Scanned_Pages_Count": m2,
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
     "Card_Style": MessageLookupByLibrary.simpleMessage("Card style"),
+    "Card_Style_Color": MessageLookupByLibrary.simpleMessage("Color"),
+    "Card_Style_Default_Color": MessageLookupByLibrary.simpleMessage(
+      "Default paper color",
+    ),
     "Card_Style_Default_Hint": MessageLookupByLibrary.simpleMessage(
       "Notes without a custom style use these defaults.",
     ),
@@ -168,8 +172,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Follow app appearance",
     ),
     "Card_Style_Hide_Date": MessageLookupByLibrary.simpleMessage("Hide date"),
+    "Card_Style_Layout": MessageLookupByLibrary.simpleMessage("Layout"),
     "Card_Style_Note_Hint": MessageLookupByLibrary.simpleMessage(
       "Changes apply to this card only.",
+    ),
+    "Card_Style_Original_Color": MessageLookupByLibrary.simpleMessage(
+      "Original color",
     ),
     "Card_Style_Paper": MessageLookupByLibrary.simpleMessage("Paper style"),
     "Card_Style_Plain": MessageLookupByLibrary.simpleMessage("Plain"),
@@ -188,6 +196,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Could not save card style. Please try again.",
     ),
     "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("Show date"),
+    "Card_Style_Text": MessageLookupByLibrary.simpleMessage("Text"),
     "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("Textured"),
     "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage(
       "Use default",
@@ -477,7 +486,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Money_Tracker": MessageLookupByLibrary.simpleMessage("Money Tracker"),
     "More_Apps": MessageLookupByLibrary.simpleMessage("More Apps"),
     "More_Options": MessageLookupByLibrary.simpleMessage("More options"),
+    "Move_Down": MessageLookupByLibrary.simpleMessage("Move down"),
     "Move_To_Folder": MessageLookupByLibrary.simpleMessage("Move to Folder"),
+    "Move_Up": MessageLookupByLibrary.simpleMessage("Move up"),
     "My_Templates": MessageLookupByLibrary.simpleMessage("My templates"),
     "New_Folder": MessageLookupByLibrary.simpleMessage("New Folder"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("No Folder"),
@@ -786,6 +797,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
+    "Reorder_Hint": MessageLookupByLibrary.simpleMessage(
+      "Touch and hold a card, then drag it.",
+    ),
+    "Reorder_Move_Earlier": MessageLookupByLibrary.simpleMessage(
+      "Move earlier",
+    ),
+    "Reorder_Move_Later": MessageLookupByLibrary.simpleMessage("Move later"),
+    "Reorder_Pinned_Hint": MessageLookupByLibrary.simpleMessage(
+      "Pinned notes stay at the top.",
+    ),
+    "Reorder_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save this order. Please try again.",
+    ),
     "Restore": MessageLookupByLibrary.simpleMessage("Restore"),
     "Restore_Nothing": MessageLookupByLibrary.simpleMessage(
       "No previous Premium purchase was found.",

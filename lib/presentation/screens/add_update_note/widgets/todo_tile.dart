@@ -48,6 +48,8 @@ class _TodoFieldTile extends StatefulWidget {
     required this.onRemoved,
     required this.onInputChanged,
     required this.onCopySelection,
+    this.onMoveUp,
+    this.onMoveDown,
     this.restoredSelection,
     this.restoreRevision = 0,
   });
@@ -65,6 +67,8 @@ class _TodoFieldTile extends StatefulWidget {
   final VoidCallback onRemoved;
   final ValueChanged<TextEditingValue> onInputChanged;
   final ValueChanged<NoteTextSelection> onCopySelection;
+  final VoidCallback? onMoveUp;
+  final VoidCallback? onMoveDown;
   final TextSelection? restoredSelection;
   final int restoreRevision;
 
@@ -74,6 +78,63 @@ class _TodoFieldTile extends StatefulWidget {
 
 class _TodoFieldTileState extends State<_TodoFieldTile> {
   late TextEditingController todoController;
+  bool _showingMoveActions = false;
+
+  Future<void> _showMoveActions() async {
+    if (_showingMoveActions) return;
+    _showingMoveActions = true;
+    try {
+      final strings = S.of(context);
+      final direction = await showAppSheet<int>(
+        context: context,
+        builder: (context) => AppSheet(
+          title: strings.Reorder,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.value?.trim().isNotEmpty == true)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: Text(widget.value!,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium),
+                ),
+              ListTile(
+                key: const ValueKey('todo-move-up'),
+                enabled: widget.onMoveUp != null,
+                leading: const Icon(Icons.arrow_upward_rounded),
+                title: Text(strings.Move_Up),
+                onTap: widget.onMoveUp == null
+                    ? null
+                    : () => Navigator.pop(context, -1),
+              ),
+              ListTile(
+                key: const ValueKey('todo-move-down'),
+                enabled: widget.onMoveDown != null,
+                leading: const Icon(Icons.arrow_downward_rounded),
+                title: Text(strings.Move_Down),
+                onTap: widget.onMoveDown == null
+                    ? null
+                    : () => Navigator.pop(context, 1),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(strings.Cancel),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (!mounted) return;
+      if (direction == -1) widget.onMoveUp?.call();
+      if (direction == 1) widget.onMoveDown?.call();
+    } finally {
+      _showingMoveActions = false;
+    }
+  }
 
   @override
   void initState() {
@@ -250,18 +311,18 @@ class _TodoFieldTileState extends State<_TodoFieldTile> {
             padding: EdgeInsets.only(top: controlTopInset),
             child: ReorderableDragStartListener(
               index: widget.index,
-              child: Semantics(
-                label: S.of(context).Reorder,
-                child: Tooltip(
-                  message: S.of(context).Reorder,
-                  child: SizedBox(
-                    width: 44,
-                    height: 48,
-                    child: Icon(
-                      Icons.drag_handle,
-                      size: 18,
-                      color: AppColors.ink.withValues(alpha: 0.4),
-                    ),
+              child: Tooltip(
+                message: S.of(context).Reorder,
+                // A long-press tooltip must not win the handle's drag gesture.
+                triggerMode: TooltipTriggerMode.manual,
+                child: Semantics(
+                  label: S.of(context).Reorder,
+                  child: IconButton(
+                    key: ValueKey('todo-reorder-${widget.id}'),
+                    style: _todoControlStyle(),
+                    onPressed: _showMoveActions,
+                    icon: Icon(Icons.drag_handle,
+                        size: 18, color: AppColors.ink.withValues(alpha: 0.4)),
                   ),
                 ),
               ),
@@ -303,6 +364,17 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
 
   FocusNode _focusNodeFor(String todoId) => _focusNodes.putIfAbsent(
       todoId, () => FocusNode(debugLabel: 'note-todo:$todoId'));
+
+  void _moveItem(String id, int direction) {
+    final bloc = context.read<AddUpdateFormBloc>();
+    final todos = bloc.state.todos;
+    final oldIndex = todos.indexWhere((todo) => todo.id == id);
+    final newIndex = oldIndex + direction;
+    if (oldIndex < 0 || newIndex < 0 || newIndex >= todos.length) return;
+    HapticFeedback.selectionClick();
+    bloc.add(
+        AddUpdateFormEvent.reorderTodo(oldIndex: oldIndex, newIndex: newIndex));
+  }
 
   void addItem() {
     _focusNextTodo = true;
@@ -454,6 +526,10 @@ class _BuildTodoListFieldState extends State<_BuildTodoListField> {
               ),
               child: _TodoFieldTile(
                 onCopySelection: widget.onCopySelection,
+                onMoveUp: index > 0 ? () => _moveItem(todo.id!, -1) : null,
+                onMoveDown: index < widget.state.todos.length - 1
+                    ? () => _moveItem(todo.id!, 1)
+                    : null,
                 key: _fieldKeys.putIfAbsent(
                     todo.id!, () => GlobalKey<_TodoFieldTileState>()),
                 index: index,

@@ -90,6 +90,170 @@ void main() {
     return store;
   }
 
+  Future<void> openMoveActions(WidgetTester tester, String id) async {
+    final handle = find.byKey(ValueKey('todo-reorder-$id'));
+    await tester.ensureVisible(handle);
+    await tester.pumpAndSettle();
+    await tester.tap(handle);
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('tapping a checklist handle moves its row up or down and saves',
+      (tester) async {
+    final store = await editor(tester, [
+      Todo(id: 'a', title: 'Milk'),
+      Todo(id: 'b', title: 'Eggs', completed: true),
+      Todo(id: 'c', title: 'Bread'),
+    ]);
+    await openMoveActions(tester, 'b');
+    expect(find.text(S.current.Move_Up), findsOneWidget);
+    expect(find.text(S.current.Move_Down), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('todo-move-up')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saved!.todo.map((todo) => todo.id), ['b', 'a', 'c']);
+    expect(store.saved!.todo.first.completed, isTrue);
+    expect(
+        tester
+            .widgetList<TextField>(_todoFields())
+            .map((field) => field.controller!.text),
+        ['Eggs', 'Milk', 'Bread']);
+
+    await openMoveActions(tester, 'b');
+    await tester.tap(find.byKey(const ValueKey('todo-move-down')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saved!.todo.map((todo) => todo.id), ['a', 'b', 'c']);
+    expect(store.saved!.todo[1].completed, isTrue);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('checklist move actions disable the first and last boundaries',
+      (tester) async {
+    await editor(tester, [
+      Todo(id: 'a', title: 'Milk'),
+      Todo(id: 'b', title: 'Eggs'),
+    ]);
+    await openMoveActions(tester, 'a');
+    expect(
+        tester
+            .widget<ListTile>(find.byKey(const ValueKey('todo-move-up')))
+            .enabled,
+        isFalse);
+    expect(
+        tester
+            .widget<ListTile>(find.byKey(const ValueKey('todo-move-down')))
+            .enabled,
+        isTrue);
+    await tester.tap(find.byKey(const ValueKey('todo-move-up')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('todo-move-up')), findsOneWidget);
+    await tester.tap(find.text(S.current.Cancel));
+    await tester.pumpAndSettle();
+    await openMoveActions(tester, 'b');
+    expect(
+        tester
+            .widget<ListTile>(find.byKey(const ValueKey('todo-move-up')))
+            .enabled,
+        isTrue);
+    expect(
+        tester
+            .widget<ListTile>(find.byKey(const ValueKey('todo-move-down')))
+            .enabled,
+        isFalse);
+    await tester.tap(find.text(S.current.Cancel));
+    await tester.pumpAndSettle();
+    expect(
+        tester
+            .widgetList<TextField>(_todoFields())
+            .map((field) => field.controller!.text),
+        ['Milk', 'Eggs']);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('holding and dragging a checklist handle still reorders rows',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 1000);
+    addTearDown(tester.view.reset);
+    final store = await editor(tester, [
+      Todo(id: 'a', title: 'Milk'),
+      Todo(id: 'b', title: 'Eggs'),
+      Todo(id: 'c', title: 'Bread'),
+    ]);
+    final firstHandle = find.byKey(const ValueKey('todo-reorder-a'));
+    final lastHandle = find.byKey(const ValueKey('todo-reorder-c'));
+    await tester.ensureVisible(lastHandle);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(firstHandle);
+    await tester.pumpAndSettle();
+    final start = tester.getCenter(firstHandle);
+    final lastRow = tester.getRect(lastHandle);
+    final drag = await tester.startGesture(start);
+    await tester.pump(const Duration(milliseconds: 600));
+    await drag.moveBy(const Offset(0, 20));
+    await tester.pump(const Duration(milliseconds: 300));
+    // Start recognition consumes the first movement. Move the whole row past
+    // the last row, rather than stopping the pointer near its handle center.
+    await drag.moveTo(Offset(start.dx, lastRow.bottom + lastRow.height));
+    await tester.pump(const Duration(milliseconds: 500));
+    await drag.up();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('todo-move-up')), findsNothing);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saved!.todo.map((todo) => todo.id), ['b', 'c', 'a']);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
+  testWidgets('moving a newly added row preserves its text selection and focus',
+      (tester) async {
+    final store = await editor(tester, [
+      Todo(id: 'a', title: 'Milk'),
+      Todo(id: 'b', title: 'Eggs'),
+    ]);
+    await tester.tap(find.byKey(const ValueKey('todo-field-b')));
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    final newField = tester.widget<TextField>(_todoFields().last);
+    final newId = (newField.key as ValueKey<String>)
+        .value
+        .substring('todo-field-'.length);
+    expect(newField.focusNode!.hasFocus, isTrue);
+    await tester.enterText(_todoFields().last, 'Bread');
+    newField.controller!.selection = const TextSelection.collapsed(offset: 2);
+    await openMoveActions(tester, newId);
+    await tester.tap(find.byKey(const ValueKey('todo-move-up')));
+    await tester.pumpAndSettle();
+    final moved =
+        tester.widget<TextField>(find.byKey(ValueKey('todo-field-$newId')));
+    expect(moved.controller!.text, 'Bread');
+    expect(
+        moved.controller!.selection, const TextSelection.collapsed(offset: 2));
+    expect(moved.focusNode!.hasFocus, isTrue);
+    expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('todo-field-a')))
+            .focusNode!
+            .hasFocus,
+        isFalse);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(
+        store.saved!.todo.map((todo) => todo.title), ['Milk', 'Bread', 'Eggs']);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
   testWidgets(
       'editor checkboxes save completion and Return inserts and focuses the next row',
       (tester) async {
