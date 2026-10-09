@@ -1,0 +1,4 @@
+- Schreiben mit einfacher Formatierung, Fokusmodus, Rückgängig-Funktion und Notizverlauf.
+- Dokumente scannen, Text aus Fotos extrahieren und Sprachmemos aufnehmen.
+- Mit Vorlagen, verbesserten Checklisten und der Schlummerfunktion für Erinnerungen starten.
+- Kartenstile anpassen. Premium schaltet unbegrenzt viele Notizen und mehr frei.

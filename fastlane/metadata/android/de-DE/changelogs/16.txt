@@ -1,0 +1,4 @@
+- Schreiben Sie mit einfacher Formatierung, Fokusmodus, Rückgängig-Funktion und Notizverlauf.
+- Scannen Sie Dokumente, erkennen Sie Text auf Fotos und nehmen Sie Sprachnotizen auf.
+- Nutzen Sie Vorlagen, verbesserte Checklisten und die Schlummerfunktion für Erinnerungen.
+- Gestalten Sie Karten, organisieren Sie mit Tags und finden Sie Notizen schneller.

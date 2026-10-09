@@ -1,0 +1,4 @@
+- Escreva com formatação simples, modo de foco, desfazer e histórico de notas.
+- Digitalize documentos, extraia texto de fotos e grave notas de voz.
+- Comece com modelos, listas de tarefas aprimoradas e adiamento de lembretes.
+- Personalize o estilo dos cartões, organize com tags e encontre notas mais rápido.

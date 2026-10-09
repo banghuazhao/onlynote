@@ -1,0 +1,4 @@
+- Escribe con formato sencillo, modo de concentración, deshacer e historial de notas.
+- Escanea documentos, extrae texto de fotos y graba notas de voz.
+- Empieza con plantillas, listas de tareas mejoradas y recordatorios que puedes posponer.
+- Personaliza las tarjetas, organiza con etiquetas y encuentra notas más rápido.

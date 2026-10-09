@@ -1,0 +1,4 @@
+- Skriv med enkel formatering, fokusläge, ångra och anteckningshistorik.
+- Skanna dokument, hämta text ur foton och spela in röstmemon.
+- Kom igång med mallar, bättre checklistor och påminnelser som kan skjutas upp.
+- Anpassa kortens stil, ordna med taggar och hitta anteckningar snabbare.

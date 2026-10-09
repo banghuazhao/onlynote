@@ -1,0 +1,4 @@
+- Skriv med enkel formatering, fokustilstand, fortryd og notehistorik.
+- Scan dokumenter, udtræk tekst fra fotos, og optag stemmememoer.
+- Start med skabeloner, bedre tjeklister og udsættelse af påmindelser.
+- Tilpas kortenes udseende, organiser med tags, og find noter hurtigere.
