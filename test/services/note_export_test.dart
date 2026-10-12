@@ -319,6 +319,7 @@ void main() {
   test(
       'PDF preserves styled body, Unicode glyphs, and separate plain transcripts',
       () async {
+    TestWidgetsFlutterBinding.ensureInitialized();
     const body = '旅行摘要\n• 香港的早晨 😊\nRemember 买茶\n';
     final bytes = await buildNotePdf(NotePdfData(
       title: '',
@@ -338,7 +339,8 @@ void main() {
       todos: const [],
       photos: const [],
       glyphs: {
-        '😊': await File('assets/app_icon.png').readAsBytes(),
+        // Match the renderer's 48px glyphs; this image repeats 100 times.
+        '😊': await _documentImage(48, 48, 0xff336699),
       },
       regular: await File('assets/fonts/Roboto-Regular.ttf').readAsBytes(),
       bold: await File('assets/fonts/Roboto-Bold.ttf').readAsBytes(),

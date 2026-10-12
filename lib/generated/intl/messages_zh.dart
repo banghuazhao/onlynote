@@ -65,9 +65,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m21(price) => "支付 ${price} 永久移除广告。";
 
-  static String m22(count) => "已添加 ${count} 项清单";
+  static String m22(count) => "${count} 条笔记";
 
-  static String m23(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m23(count) => "已添加 ${count} 项清单";
+
+  static String m24(items, photos) => "${items} 项 · ${photos} 张照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -176,6 +178,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Choose_Linked_Notes": MessageLookupByLibrary.simpleMessage("选择关联笔记"),
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音乐盒"),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("清除筛选"),
+    "Clear_Search": MessageLookupByLibrary.simpleMessage("清除搜索"),
     "Collapse_Section": m5,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "选择笔记，添加所选文字。",
@@ -407,12 +410,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "包含标题、正文、清单和语音转写。中日韩文字按字计数。",
     ),
+    "Note_Info_Photos": MessageLookupByLibrary.simpleMessage("照片"),
     "Note_Info_Reading_Empty": MessageLookupByLibrary.simpleMessage("0 分钟"),
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "不到 1 分钟",
     ),
     "Note_Info_Reading_Minutes": m13,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage("预计阅读时间"),
+    "Note_Info_Recording_Duration": MessageLookupByLibrary.simpleMessage(
+      "录音总时长",
+    ),
+    "Note_Info_Recordings": MessageLookupByLibrary.simpleMessage("录音"),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("字数"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("已移动备忘录"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("大纲"),
@@ -640,8 +648,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜索"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜索备忘录"),
+    "Search_Results_Count": m22,
     "Select": MessageLookupByLibrary.simpleMessage("选择"),
-    "Selection_Checklist_Added": m22,
+    "Selection_Checklist_Added": m23,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "无法保存清单项。",
     ),
@@ -716,7 +725,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m23,
+    "Template_Details": m24,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

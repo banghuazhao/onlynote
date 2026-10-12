@@ -56,6 +56,21 @@ class NoteInfoSheet extends StatelessWidget {
               label: strings.Note_Info_Reading_Time,
               value: readingTime,
             ),
+            _StatisticRow(
+              id: 'photos',
+              label: strings.Note_Info_Photos,
+              value: numbers.format(statistics.photoCount),
+            ),
+            _StatisticRow(
+              id: 'recordings',
+              label: strings.Note_Info_Recordings,
+              value: numbers.format(statistics.recordingCount),
+            ),
+            _StatisticRow(
+              id: 'recording-duration',
+              label: strings.Note_Info_Recording_Duration,
+              value: _formatRecordingDuration(statistics.recordingDurationMs),
+            ),
             const SizedBox(height: 12),
             Text(
               strings.Note_Info_Counting_Hint,
@@ -68,6 +83,12 @@ class NoteInfoSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Matches the player's minutes:seconds display without capping combined time.
+String _formatRecordingDuration(int milliseconds) {
+  final seconds = milliseconds ~/ 1000;
+  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 }
 
 class _StatisticRow extends StatelessWidget {

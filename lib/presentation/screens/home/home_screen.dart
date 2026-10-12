@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/note_search_feedback.dart';
 import 'package:onlynote/presentation/components/photo_search_status.dart';
 import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
@@ -808,6 +809,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ?.isIndexing ??
                                                   false),
                                         ),
+                                        if (data.searchQuery
+                                                .trim()
+                                                .isNotEmpty ||
+                                            data.filters.isNotEmpty ||
+                                            data.selectedTags.isNotEmpty)
+                                          NoteSearchResultCount(
+                                              count: data.notes.length),
                                         Expanded(
                                           child: data.notes.isEmpty
                                               ? _EmptyNotes(
@@ -822,6 +830,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   hasFolder:
                                                       data.selectedFolderId !=
                                                           null,
+                                                  onClearSearch: data
+                                                          .searchQuery
+                                                          .trim()
+                                                          .isNotEmpty
+                                                      ? _clearSearch
+                                                      : null,
+                                                  onClearFilters:
+                                                      data.filters.isNotEmpty ||
+                                                              data.selectedTags
+                                                                  .isNotEmpty
+                                                          ? _clearLibraryFilters
+                                                          : null,
                                                   onAdd: () {
                                                     context.router.push(
                                                       AddUpdateNoteRoute(
@@ -1290,6 +1310,21 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<HomeBloc>().add(HomeEvent.filtersChanged(filters));
   }
 
+  void _clearSearch() {
+    _searchController.clear();
+    _changeSearchQuery('');
+    setState(() {});
+  }
+
+  void _clearLibraryFilters() {
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    final bloc = context.read<HomeBloc>();
+    bloc.add(const HomeEvent.filtersChanged({}));
+    bloc.add(const HomeEvent.tagsChanged({}));
+  }
+
   Widget _buildSearchField(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -1313,14 +1348,9 @@ class _HomeScreenState extends State<HomeScreen> {
             suffixIcon: _searchController.text.isEmpty
                 ? null
                 : IconButton(
-                    tooltip:
-                        MaterialLocalizations.of(context).deleteButtonTooltip,
+                    tooltip: S.of(context).Clear_Search,
                     icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _searchController.clear();
-                      _changeSearchQuery('');
-                      setState(() {});
-                    },
+                    onPressed: _clearSearch,
                   ),
             filled: false,
             border: InputBorder.none,
@@ -1347,6 +1377,8 @@ class _EmptyNotes extends StatelessWidget {
     required this.hasTags,
     required this.hasSearch,
     required this.hasFolder,
+    this.onClearSearch,
+    this.onClearFilters,
   });
 
   final VoidCallback onAdd;
@@ -1356,6 +1388,8 @@ class _EmptyNotes extends StatelessWidget {
   final bool hasTags;
   final bool hasSearch;
   final bool hasFolder;
+  final VoidCallback? onClearSearch;
+  final VoidCallback? onClearFilters;
 
   @override
   Widget build(BuildContext context) {
@@ -1389,6 +1423,13 @@ class _EmptyNotes extends StatelessWidget {
               textAlign: TextAlign.center,
               style: context.textStyles.titleLarge,
             ),
+            if (onClearSearch != null || onClearFilters != null) ...[
+              SizedBox(height: context.tokens.space4),
+              NoteSearchRecovery(
+                onClearSearch: onClearSearch,
+                onClearFilters: onClearFilters,
+              ),
+            ],
             if (!showTrash && !showArchive && !hasSearch && !hasTags) ...[
               SizedBox(height: context.tokens.space4),
               FilledButton.icon(

@@ -576,5 +576,17 @@
   "Reorder_Pinned_Hint": "置顶笔记始终显示在最上方。",
   "Reorder_Move_Earlier": "往前移",
   "Reorder_Move_Later": "往后移",
-  "Reorder_Save_Failed": "无法保存此顺序，请重试。"
+  "Reorder_Save_Failed": "无法保存此顺序，请重试。",
+  "Clear_Search": "清除搜索",
+  "Search_Results_Count": "{count} 条笔记",
+  "@Search_Results_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Note_Info_Photos": "照片",
+  "Note_Info_Recordings": "录音",
+  "Note_Info_Recording_Duration": "录音总时长"
 }

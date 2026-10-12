@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_info_previews.dart';
 import 'package:onlynote/presentation/components/note_info_sheet.dart';
@@ -17,6 +19,13 @@ Widget _host(Widget child) => MaterialApp(
         GlobalCupertinoLocalizations.delegate,
       ],
       home: Scaffold(body: child),
+    );
+
+VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
+      id: id,
+      path: 'note_audio/$id.m4a',
+      durationMs: durationMs,
+      createdAt: DateTime(2026, 10, 7),
     );
 
 void main() {
@@ -50,6 +59,14 @@ void main() {
       expect(find.bySemanticsLabel('Characters: 21'), findsOneWidget);
       expect(find.bySemanticsLabel('Estimated reading time: Less than 1 min'),
           findsOneWidget);
+      expect(find.text('Photos'), findsOneWidget);
+      expect(find.text('Recordings'), findsOneWidget);
+      expect(find.text('Total recording time'), findsOneWidget);
+      await tester.ensureVisible(
+          find.byKey(const ValueKey('note-info-recording-duration-value')));
+      await tester.pumpAndSettle();
+      expect(
+          find.bySemanticsLabel('Total recording time: 0:00'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.byTooltip('Close'));
@@ -66,8 +83,9 @@ void main() {
       NoteInfoSheet(statistics: NoteStatistics.fromNote(Note())),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('0'), findsNWidgets(2));
+    expect(find.text('0'), findsNWidgets(4));
     expect(find.text('0 min'), findsOneWidget);
+    expect(find.text('0:00'), findsOneWidget);
 
     await tester.pumpWidget(_host(NoteInfoSheet(
       statistics: NoteStatistics.fromNote(Note(description: 'word ' * 201)),
@@ -75,6 +93,78 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('2 min'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('attachment counts and total duration have descriptive semantics',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note(
+          imagePaths: [
+            'note_images/missing.jpg',
+            'note_images/second.jpg',
+            'note_images/scan.jpg',
+          ],
+          imageLayouts: const [
+            NoteImageLayout(
+              path: 'note_images/scan.jpg',
+              textOffset: 0,
+              isDocumentPage: true,
+            ),
+          ],
+          voiceMemos: [
+            _memo('long', 3660500),
+            _memo('short', 60500),
+            _memo('zero', 0),
+          ],
+        )),
+      )));
+      await tester.pumpAndSettle();
+
+      for (final (id, value, label) in [
+        ('photos', '2', 'Photos'),
+        ('recordings', '3', 'Recordings'),
+        ('recording-duration', '62:01', 'Total recording time'),
+      ]) {
+        final valueFinder = find.byKey(ValueKey('note-info-$id-value'));
+        await tester.ensureVisible(valueFinder);
+        await tester.pumpAndSettle();
+        expect(tester.widget<Text>(valueFinder).data, value);
+        expect(find.bySemanticsLabel('$label: $value'), findsOneWidget);
+      }
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets(
+      'total duration preserves minute totals and floors summed fractions',
+      (tester) async {
+    for (final (durations, expected) in [
+      ([600, 600, -1000], '0:01'),
+      ([3600000], '60:00'),
+      ([86400000, 3661000], '1501:01'),
+    ]) {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note(
+          voiceMemos: [
+            for (final (index, duration) in durations.indexed)
+              _memo('memo-$index', duration),
+          ],
+        )),
+      )));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<Text>(find
+                .byKey(const ValueKey('note-info-recording-duration-value')))
+            .data,
+        expected,
+      );
+      expect(tester.takeException(), isNull);
+    }
   });
 
   testWidgets('isolated light, dark and Hong Kong Chinese 2x previews fit',
@@ -95,12 +185,17 @@ void main() {
           find.byKey(const ValueKey('note-info-words-value')), findsOneWidget);
       expect(find.byKey(const ValueKey('note-info-characters-value')),
           findsOneWidget);
-      final reading =
-          find.byKey(const ValueKey('note-info-reading-time-value'));
-      await tester.ensureVisible(reading);
-      await tester.pumpAndSettle();
-      expect(reading, findsOneWidget);
-      expect(tester.takeException(), isNull);
+      for (final (id, value) in [
+        ('photos', '2'),
+        ('recordings', '2'),
+        ('recording-duration', '61:08'),
+      ]) {
+        final valueFinder = find.byKey(ValueKey('note-info-$id-value'));
+        await tester.ensureVisible(valueFinder);
+        await tester.pumpAndSettle();
+        expect(tester.widget<Text>(valueFinder).data, value);
+        expect(tester.takeException(), isNull);
+      }
     }
   });
 }

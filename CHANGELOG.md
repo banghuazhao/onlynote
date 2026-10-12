@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added Clear search and Clear filters actions when no notes match, preserving the current folder, Archive, or Trash view and saved views.
+- Added a localized count of notes matching the current search, filters, and tags.
+- Expanded Note info with photo and recording counts plus total recording time, using attachment metadata without loading media files.
+
 ## 1.4.0+14
 
 - Added a Home Screen widget on iOS and Android showing pinned and recent notes, with a quick-add shortcut and deep links into a note.

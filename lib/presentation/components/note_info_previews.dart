@@ -54,6 +54,10 @@ class _NoteInfoPreview extends StatelessWidget {
           completed: true,
         ),
       ],
+      imagePaths: const [
+        'note_images/preview-coast.jpg',
+        'note_images/preview-tea.jpg',
+      ],
       voiceMemos: [
         VoiceMemo(
           id: 'preview',
@@ -61,6 +65,12 @@ class _NoteInfoPreview extends StatelessWidget {
           durationMs: 8000,
           createdAt: DateTime(2026, 10, 7),
           transcript: chinese ? '如果下雨，就改去喝茶。' : 'If it rains, stop for tea.',
+        ),
+        VoiceMemo(
+          id: 'preview-long',
+          path: 'note_audio/preview-long.m4a',
+          durationMs: 3660000,
+          createdAt: DateTime(2026, 10, 7),
         ),
       ],
     );
@@ -77,6 +87,7 @@ class _NoteInfoPreview extends StatelessWidget {
       theme: ThemeData(
         brightness: dark ? Brightness.dark : Brightness.light,
         colorSchemeSeed: const Color(0xFF685947),
+        fontFamilyFallback: const ['DroidSansFallback'],
       ),
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(

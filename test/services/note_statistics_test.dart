@@ -1,19 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_statistics.dart';
 
-VoiceMemo _memo(String id, {String? transcript}) => VoiceMemo(
+VoiceMemo _memo(String id, {String? transcript, int durationMs = 42000}) =>
+    VoiceMemo(
       id: id,
       path: 'note_audio/$id.m4a',
-      durationMs: 42000,
+      durationMs: durationMs,
       createdAt: DateTime(2026, 10, 7),
       transcript: transcript,
     );
 
 void main() {
-  test('empty and entirely blank content has no statistics', () {
+  test('empty and entirely blank content has no text statistics', () {
     for (final note in [
       Note(),
       Note(
@@ -29,6 +31,103 @@ void main() {
       expect(stats.estimatedReadingSeconds, 0);
       expect(stats.estimatedReadingMinutes, 0);
     }
+  });
+
+  test('notes without attachments have zero attachment statistics', () {
+    final stats = NoteStatistics.fromNote(Note(description: 'A plain note'));
+    expect(stats.photoCount, 0);
+    expect(stats.recordingCount, 0);
+    expect(stats.recordingDurationMs, 0);
+  });
+
+  test('attachment statistics use metadata even when files are unavailable',
+      () {
+    final note = Note(
+      imagePaths: ['note_images/missing.jpg', 'not-a-real-photo'],
+      voiceMemos: [
+        _memo('missing', durationMs: 3660500),
+        _memo('blank', transcript: ' ', durationMs: 60500),
+        _memo('silent', durationMs: 0),
+      ],
+    );
+    final stats = NoteStatistics.fromNote(note);
+    expect(stats.photoCount, 2);
+    expect(stats.recordingCount, 3);
+    expect(stats.recordingDurationMs, 3721000);
+    expect(stats.wordCount, 0);
+    expect(stats.characterCount, 0);
+    expect(stats.estimatedReadingSeconds, 0);
+    expect(note.voiceMemos.first.durationMs, 3660500);
+    expect(note.imagePaths, ['note_images/missing.jpg', 'not-a-real-photo']);
+  });
+
+  test('negative recording durations cannot subtract from valid recordings',
+      () {
+    final stats = NoteStatistics.fromNote(Note(voiceMemos: [
+      _memo('valid', durationMs: 600),
+      _memo('invalid', durationMs: -42000),
+      _memo('valid-again', durationMs: 600),
+    ]));
+    expect(stats.recordingCount, 3);
+    expect(stats.recordingDurationMs, 1200);
+    expect(
+      NoteStatistics.fromNote(
+        Note(voiceMemos: [_memo('invalid-only', durationMs: -1)]),
+      ).recordingDurationMs,
+      0,
+    );
+  });
+
+  test('scanned document pages do not count as photos', () {
+    final stats = NoteStatistics.fromNote(Note(
+      imagePaths: ['note_images/scan.jpg'],
+      imageLayouts: const [
+        NoteImageLayout(
+          path: 'note_images/scan.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+      ],
+    ));
+    expect(stats.photoCount, 0);
+  });
+
+  test('mixed photos and scans ignore duplicate and detached scan layouts', () {
+    final stats = NoteStatistics.fromNote(Note(
+      imagePaths: [
+        'note_images/photo.jpg',
+        'note_images/scan.jpg',
+        'note_images/legacy-photo.jpg',
+      ],
+      imageLayouts: const [
+        NoteImageLayout(path: 'note_images/photo.jpg', textOffset: 0),
+        NoteImageLayout(
+          path: 'note_images/scan.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/scan.jpg',
+          textOffset: 1,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/detached-scan.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+      ],
+    ));
+    expect(stats.photoCount, 2);
+  });
+
+  test('combined recording time is not capped at one hour or one day', () {
+    final stats = NoteStatistics.fromNote(Note(voiceMemos: [
+      _memo('first-day', durationMs: 86400000),
+      _memo('second-day', durationMs: 86400000),
+      _memo('extra', durationMs: 1234),
+    ]));
+    expect(stats.recordingDurationMs, 172801234);
   });
 
   test('attachment filenames, tags and linked IDs do not count as text', () {

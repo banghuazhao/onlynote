@@ -576,5 +576,17 @@
   "Reorder_Pinned_Hint": "置頂筆記始終顯示在最上方。",
   "Reorder_Move_Earlier": "往前移",
   "Reorder_Move_Later": "往後移",
-  "Reorder_Save_Failed": "無法儲存此順序，請重試。"
+  "Reorder_Save_Failed": "無法儲存此順序，請重試。",
+  "Clear_Search": "清除搜尋",
+  "Search_Results_Count": "{count} 則筆記",
+  "@Search_Results_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Note_Info_Photos": "照片",
+  "Note_Info_Recordings": "錄音",
+  "Note_Info_Recording_Duration": "錄音總時長"
 }

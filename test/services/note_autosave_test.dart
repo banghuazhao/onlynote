@@ -198,17 +198,24 @@ void main() {
     expect(store.notes['one']!.title, '');
   });
 
-  test('debounce saves typing automatically', () async {
+  testWidgets('debounce saves typing automatically', (tester) async {
     final automatic = NoteAutosave(
         store: store,
         initial: initial,
         exists: false,
         delay: const Duration(milliseconds: 10));
+    addTearDown(automatic.dispose);
     automatic.update(initial.copyWith(title: 'A'));
+    await tester.pump(const Duration(milliseconds: 9));
+    expect(store.saves, isEmpty);
     automatic.update(initial.copyWith(title: 'AB'));
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    expect(store.notes['one']!.title, 'AB');
+    await tester.pump(const Duration(milliseconds: 9));
+    expect(store.saves, isEmpty);
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(store.notes['one']?.title, 'AB');
     expect(store.saves, hasLength(1));
-    automatic.dispose();
+    expect(store.drafts, isEmpty);
+    expect(automatic.status, AutosaveStatus.saved);
   });
 }

@@ -4632,6 +4632,54 @@ class S {
       args: [],
     );
   }
+
+  /// `Clear search`
+  String get Clear_Search {
+    return Intl.message(
+      'Clear search',
+      name: 'Clear_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, =0{0 notes found} one{1 note found} other{{count} notes found}}`
+  String Search_Results_Count(int count) {
+    return Intl.plural(
+      count,
+      zero: '0 notes found',
+      one: '1 note found',
+      other: '$count notes found',
+      name: 'Search_Results_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Photos`
+  String get Note_Info_Photos {
+    return Intl.message('Photos', name: 'Note_Info_Photos', desc: '', args: []);
+  }
+
+  /// `Recordings`
+  String get Note_Info_Recordings {
+    return Intl.message(
+      'Recordings',
+      name: 'Note_Info_Recordings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total recording time`
+  String get Note_Info_Recording_Duration {
+    return Intl.message(
+      'Total recording time',
+      name: 'Note_Info_Recording_Duration',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

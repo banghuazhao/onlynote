@@ -74,9 +74,12 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m21(price) => "Remove ads permanently for ${price}.";
 
   static String m22(count) =>
+      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
+
+  static String m23(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m23(items, photos) =>
+  static String m24(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -230,6 +233,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Classical Music Box",
     ),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("Clear filters"),
+    "Clear_Search": MessageLookupByLibrary.simpleMessage("Clear search"),
     "Collapse_Section": m5,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "Choose a note to add the selected text.",
@@ -519,6 +523,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
     ),
+    "Note_Info_Photos": MessageLookupByLibrary.simpleMessage("Photos"),
     "Note_Info_Reading_Empty": MessageLookupByLibrary.simpleMessage("0 min"),
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "Less than 1 min",
@@ -527,6 +532,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage(
       "Estimated reading time",
     ),
+    "Note_Info_Recording_Duration": MessageLookupByLibrary.simpleMessage(
+      "Total recording time",
+    ),
+    "Note_Info_Recordings": MessageLookupByLibrary.simpleMessage("Recordings"),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("Words"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("Outline"),
@@ -844,8 +853,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
+    "Search_Results_Count": m22,
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m22,
+    "Selection_Checklist_Added": m23,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -934,7 +944,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m23,
+    "Template_Details": m24,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

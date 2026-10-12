@@ -1,14 +1,17 @@
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
 
-/// Counts only content a reader sees: title, body, nonempty checklist items,
-/// and voice transcripts. Formatting, tags, attachment paths, IDs, and other
-/// metadata never contribute to these totals.
+/// Summarizes visible text and attachment metadata without opening media files.
+/// Text totals include title, body, nonempty checklist items, and transcripts;
+/// formatting, tags, attachment paths, and IDs never contribute to text counts.
 class NoteStatistics {
   const NoteStatistics._({
     required this.wordCount,
     required this.characterCount,
     required this.estimatedReadingSeconds,
+    required this.photoCount,
+    required this.recordingCount,
+    required this.recordingDurationMs,
   });
 
   factory NoteStatistics.fromNote(Note note) {
@@ -51,10 +54,22 @@ class NoteStatistics {
     // Approximate reading pace: 200 separated words or 300 CJK characters
     // per minute. Integer arithmetic keeps exact minute boundaries stable.
     final seconds = (separatedWords * 3 + cjkCharacters * 2 + 9) ~/ 10;
+    final recordingDurationMs = note.voiceMemos.fold<int>(
+      0,
+      (total, memo) => total + (memo.durationMs < 0 ? 0 : memo.durationMs),
+    );
+    final scanPaths = note.imageLayouts
+        .where((layout) =>
+            layout.isDocumentPage && note.imagePaths.contains(layout.path))
+        .map((layout) => layout.path)
+        .toSet();
     return NoteStatistics._(
       wordCount: separatedWords + cjkCharacters,
       characterCount: characterCount,
       estimatedReadingSeconds: seconds == 0 && characterCount > 0 ? 1 : seconds,
+      photoCount: note.imagePaths.length - scanPaths.length,
+      recordingCount: note.voiceMemos.length,
+      recordingDurationMs: recordingDurationMs,
     );
   }
 
@@ -70,6 +85,16 @@ class NoteStatistics {
   final int characterCount;
 
   final int estimatedReadingSeconds;
+
+  /// Declared photos, excluding scanned document pages. Unavailable media
+  /// still contributes because only attachment metadata is needed.
+  final int photoCount;
+
+  /// Declared recordings, including media that is temporarily unavailable.
+  final int recordingCount;
+
+  /// Sum of stored recording durations; invalid negative durations add zero.
+  final int recordingDurationMs;
 
   /// Rounded up for the displayed estimate; zero means there is no content.
   int get estimatedReadingMinutes => (estimatedReadingSeconds + 59) ~/ 60;

@@ -578,5 +578,17 @@
   "Reorder_Pinned_Hint": "Pinned notes stay at the top.",
   "Reorder_Move_Earlier": "Move earlier",
   "Reorder_Move_Later": "Move later",
-  "Reorder_Save_Failed": "Could not save this order. Please try again."
+  "Reorder_Save_Failed": "Could not save this order. Please try again.",
+  "Clear_Search": "Clear search",
+  "Search_Results_Count": "{count, plural, =0{0 notes found} one{1 note found} other{{count} notes found}}",
+  "@Search_Results_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Note_Info_Photos": "Photos",
+  "Note_Info_Recordings": "Recordings",
+  "Note_Info_Recording_Duration": "Total recording time"
 }
