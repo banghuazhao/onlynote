@@ -10,8 +10,11 @@ class NoteStatistics {
     required this.characterCount,
     required this.estimatedReadingSeconds,
     required this.photoCount,
+    required this.scannedPageCount,
     required this.recordingCount,
     required this.recordingDurationMs,
+    required this.checklistTotalCount,
+    required this.checklistCompletedCount,
   });
 
   factory NoteStatistics.fromNote(Note note) {
@@ -58,18 +61,30 @@ class NoteStatistics {
       0,
       (total, memo) => total + (memo.durationMs < 0 ? 0 : memo.durationMs),
     );
+    final attachedPaths = note.imagePaths.toSet();
     final scanPaths = note.imageLayouts
         .where((layout) =>
-            layout.isDocumentPage && note.imagePaths.contains(layout.path))
+            layout.isDocumentPage && attachedPaths.contains(layout.path))
         .map((layout) => layout.path)
         .toSet();
+    var checklistTotalCount = 0;
+    var checklistCompletedCount = 0;
+    for (final item in note.todo) {
+      if (item.title?.trim().isNotEmpty != true) continue;
+      checklistTotalCount++;
+      if (item.completed) checklistCompletedCount++;
+    }
     return NoteStatistics._(
       wordCount: separatedWords + cjkCharacters,
       characterCount: characterCount,
       estimatedReadingSeconds: seconds == 0 && characterCount > 0 ? 1 : seconds,
-      photoCount: note.imagePaths.length - scanPaths.length,
+      photoCount:
+          note.imagePaths.where((path) => !scanPaths.contains(path)).length,
+      scannedPageCount: scanPaths.length,
       recordingCount: note.voiceMemos.length,
       recordingDurationMs: recordingDurationMs,
+      checklistTotalCount: checklistTotalCount,
+      checklistCompletedCount: checklistCompletedCount,
     );
   }
 
@@ -90,11 +105,21 @@ class NoteStatistics {
   /// still contributes because only attachment metadata is needed.
   final int photoCount;
 
+  /// Unique attached paths marked as document pages. Detached layout metadata
+  /// is ignored, and file availability does not affect the count.
+  final int scannedPageCount;
+
   /// Declared recordings, including media that is temporarily unavailable.
   final int recordingCount;
 
   /// Sum of stored recording durations; invalid negative durations add zero.
   final int recordingDurationMs;
+
+  /// Checklist items with nonblank labels; editor placeholders do not count.
+  final int checklistTotalCount;
+  final int checklistCompletedCount;
+  int get checklistRemainingCount =>
+      checklistTotalCount - checklistCompletedCount;
 
   /// Rounded up for the displayed estimate; zero means there is no content.
   int get estimatedReadingMinutes => (estimatedReadingSeconds + 59) ~/ 60;

@@ -15,6 +15,8 @@ Future<Completer<LibraryFilterResult?>> open(
   Set<String> selectedTags = const {},
   List<String> tags = const [],
   List<SavedNoteView> views = const [],
+  Map<String, String> folderNames = const {},
+  String? selectedViewId,
   NoteArchiveScope scope = NoteArchiveScope.active,
   bool trash = false,
   bool unavailable = false,
@@ -48,6 +50,8 @@ Future<Completer<LibraryFilterResult?>> open(
                         selectedTags: selectedTags,
                         availableTags: tags,
                         savedViews: views,
+                        folderNames: folderNames,
+                        selectedViewId: selectedViewId,
                         scope: scope,
                         showTrash: trash,
                         viewsUnavailable: unavailable),
@@ -93,6 +97,43 @@ void main() {
     expect(await result.future, isNull);
   });
 
+  testWidgets('recording and scanned document filters apply and clear together',
+      (tester) async {
+    final original = <NoteSearchFilter>{NoteSearchFilter.photos};
+    final result = await open(tester, filters: original);
+    for (final filter in ['recordings', 'scans']) {
+      await tester.ensureVisible(key('library-filter-$filter'));
+      await tester.tap(key('library-filter-$filter'));
+      await tester.pump();
+      expect(tester.widget<FilterChip>(key('library-filter-$filter')).selected,
+          isTrue);
+    }
+    expect(original, {NoteSearchFilter.photos});
+    expect(result.isCompleted, isFalse);
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    expect(((await result.future) as ApplyLibraryFilters).filters, {
+      NoteSearchFilter.photos,
+      NoteSearchFilter.recordings,
+      NoteSearchFilter.scans,
+    });
+
+    final clearResult = await open(tester,
+        filters: {NoteSearchFilter.recordings, NoteSearchFilter.scans});
+    await tester.ensureVisible(key('library-clear-filters'));
+    await tester.tap(key('library-clear-filters'));
+    await tester.pump();
+    expect(tester.widget<FilterChip>(key('library-filter-recordings')).selected,
+        isFalse);
+    expect(tester.widget<FilterChip>(key('library-filter-scans')).selected,
+        isFalse);
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    expect(
+        ((await clearResult.future) as ApplyLibraryFilters).filters, isEmpty);
+  });
+
   testWidgets('saved view selection returns its complete criteria',
       (tester) async {
     final view = SavedNoteView(
@@ -106,6 +147,72 @@ void main() {
     await tester.tap(key('saved-view-view'));
     await tester.pumpAndSettle();
     expect(((await result.future) as ApplySavedNoteView).view, same(view));
+  });
+
+  testWidgets('saved view subtitle describes criteria without changing actions',
+      (tester) async {
+    final view = SavedNoteView(
+      id: 'media',
+      name: 'Research meeting',
+      query: '  call  ',
+      folderId: 'projects',
+      filters: {
+        NoteSearchFilter.scans,
+        NoteSearchFilter.pinned,
+        NoteSearchFilter.recordings,
+      },
+      tags: ['Work', 'Important'],
+      archiveScope: NoteArchiveScope.all,
+    );
+    final before = view.toJson();
+    final result = await open(tester,
+        views: [view],
+        folderNames: {'projects': 'Project notes'},
+        selectedViewId: view.id);
+    final description = key('saved-view-media-description');
+    final strings = S.of(tester.element(description));
+    expect(
+        tester.widget<Text>(description).data,
+        [
+          'Project notes',
+          strings.Saved_View_Search('call'),
+          strings.Filter_Pinned,
+          strings.Filter_Recordings,
+          strings.Filter_Scans,
+          strings.Saved_View_Tags('Work, Important'),
+          strings.Include_Archived,
+        ].join(' · '));
+    expect(tester.widget<ListTile>(key('saved-view-media')).selected, isTrue);
+    expect(
+        find.descendant(
+            of: key('saved-view-media'),
+            matching: find.byType(PopupMenuButton<String>)),
+        findsOneWidget);
+    await tester.ensureVisible(key('saved-view-media'));
+    await tester.tap(key('saved-view-media'));
+    await tester.pumpAndSettle();
+    expect(((await result.future) as ApplySavedNoteView).view, same(view));
+    expect(view.toJson(), before);
+  });
+
+  testWidgets('missing folders describe the same fallback as saved-view apply',
+      (tester) async {
+    final view = SavedNoteView(
+      id: 'deleted-folder',
+      name: 'Past scans',
+      query: '   ',
+      folderId: 'deleted-id',
+      filters: {NoteSearchFilter.scans},
+      archiveScope: NoteArchiveScope.archived,
+    );
+    await open(tester, views: [view], folderNames: {'other-id': 'Other notes'});
+    final description = key('saved-view-deleted-folder-description');
+    final strings = S.of(tester.element(description));
+    expect(tester.widget<Text>(description).data,
+        '${strings.All_Notes} · ${strings.Filter_Scans} · ${strings.Archive}');
+    expect(view.folderId, 'deleted-id');
+    expect(view.withAvailableFolders({'other-id'}).folderId, isNull);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Save view captures changed filters without editing stored views',
@@ -150,19 +257,50 @@ void main() {
     expect(key('library-save-view'), findsNothing);
   });
 
-  testWidgets('large Chinese text and long tags remain scrollable',
-      (tester) async {
-    tester.view.physicalSize = const Size(320, 700);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    await open(tester,
-        tags: ['個人工作計劃' * 6],
-        views: [SavedNoteView(id: 'long', name: '本週重要項目及未完成工作清單')],
-        locale: const Locale('zh'),
-        textScale: 2);
-    await tester.ensureVisible(key('library-save-view'));
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-  });
+  for (final locale in [const Locale('zh'), const Locale('zh', 'HK')]) {
+    testWidgets('large Chinese text and long tags remain scrollable in $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await open(tester,
+          tags: ['個人工作計劃' * 6],
+          filters: {NoteSearchFilter.recordings, NoteSearchFilter.scans},
+          folderNames: {'work': '本週重要工作項目及會議記錄'},
+          views: [
+            SavedNoteView(
+              id: 'long',
+              name: '本週重要項目及未完成工作清單',
+              folderId: 'work',
+              query: '長查詢內容' * 20,
+              filters: {NoteSearchFilter.recordings, NoteSearchFilter.scans},
+              tags: ['個人工作計劃' * 6],
+              archiveScope: NoteArchiveScope.all,
+            )
+          ],
+          locale: locale,
+          textScale: 2);
+      for (final filter in ['recordings', 'scans']) {
+        final chip = key('library-filter-$filter');
+        await tester.ensureVisible(chip);
+        await tester.pumpAndSettle();
+        expect(tester.widget<FilterChip>(chip).selected, isTrue);
+        expect(tester.takeException(), isNull);
+      }
+      final description = key('saved-view-long-description');
+      await tester.ensureVisible(description);
+      await tester.pumpAndSettle();
+      final text = tester.widget<Text>(description).data!;
+      final strings = S.of(tester.element(description));
+      expect(text, contains('本週重要工作項目及會議記錄'));
+      expect(text, contains(strings.Filter_Recordings));
+      expect(text, contains(strings.Filter_Scans));
+      expect(text, contains(strings.Include_Archived));
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(key('library-save-view'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

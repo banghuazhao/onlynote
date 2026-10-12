@@ -588,5 +588,36 @@
   },
   "Note_Info_Photos": "照片",
   "Note_Info_Recordings": "录音",
-  "Note_Info_Recording_Duration": "录音总时长"
+  "Note_Info_Recording_Duration": "录音总时长",
+  "Note_Info_Scanned_Pages": "扫描页数",
+  "Note_Info_Checklist_Progress": "清单进度",
+  "Note_Info_Checklist_Remaining": "待完成事项",
+  "Checklist_Copy_Unfinished": "复制未完成事项",
+  "Checklist_Copy_Success": "已复制 {count} 项待办事项",
+  "@Checklist_Copy_Success": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Checklist_Copy_Failed": "无法复制待办事项，请重试。",
+  "Filter_Recordings": "录音",
+  "Filter_Scans": "扫描文档",
+  "Saved_View_Search": "搜索：{query}",
+  "@Saved_View_Search": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "Saved_View_Tags": "标签：{tags}",
+  "@Saved_View_Tags": {
+    "placeholders": {
+      "tags": {
+        "type": "String"
+      }
+    }
+  }
 }

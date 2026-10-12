@@ -588,5 +588,36 @@
   },
   "Note_Info_Photos": "照片",
   "Note_Info_Recordings": "錄音",
-  "Note_Info_Recording_Duration": "錄音總時長"
+  "Note_Info_Recording_Duration": "錄音總時長",
+  "Note_Info_Scanned_Pages": "掃描頁數",
+  "Note_Info_Checklist_Progress": "清單進度",
+  "Note_Info_Checklist_Remaining": "待完成項目",
+  "Checklist_Copy_Unfinished": "複製未完成項目",
+  "Checklist_Copy_Success": "已複製 {count} 項待辦事項",
+  "@Checklist_Copy_Success": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Checklist_Copy_Failed": "無法複製待辦事項，請重試。",
+  "Filter_Recordings": "錄音",
+  "Filter_Scans": "掃描文件",
+  "Saved_View_Search": "搜尋：{query}",
+  "@Saved_View_Search": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "Saved_View_Tags": "標籤：{tags}",
+  "@Saved_View_Tags": {
+    "placeholders": {
+      "tags": {
+        "type": "String"
+      }
+    }
+  }
 }

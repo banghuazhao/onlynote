@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_statistics.dart';
@@ -53,10 +54,27 @@ class _NoteInfoPreview extends StatelessWidget {
           title: chinese ? '邀請朋友' : 'Invite a friend',
           completed: true,
         ),
+        Todo(title: chinese ? '查看天氣' : 'Check the forecast'),
+        Todo(title: '  ', completed: true),
+        Todo(),
       ],
       imagePaths: const [
         'note_images/preview-coast.jpg',
         'note_images/preview-tea.jpg',
+        'note_images/preview-scan-one.jpg',
+        'note_images/preview-scan-two.jpg',
+      ],
+      imageLayouts: const [
+        NoteImageLayout(
+          path: 'note_images/preview-scan-one.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/preview-scan-two.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
       ],
       voiceMemos: [
         VoiceMemo(

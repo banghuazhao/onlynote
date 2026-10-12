@@ -1,7 +1,15 @@
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
 
-enum NoteSearchFilter { checklists, photos, reminders, pinned, unfinished }
+enum NoteSearchFilter {
+  checklists,
+  photos,
+  reminders,
+  pinned,
+  unfinished,
+  recordings,
+  scans,
+}
 
 bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
     {required bool hasReminder, Iterable<String> photoText = const []}) {
@@ -19,6 +27,15 @@ bool matchesNoteSearch(Note note, String query, Set<NoteSearchFilter> filters,
   if (filters.contains(NoteSearchFilter.unfinished) &&
       !note.todo.any(
           (todo) => !todo.completed && todo.title?.trim().isNotEmpty == true)) {
+    return false;
+  }
+  if (filters.contains(NoteSearchFilter.recordings) &&
+      note.voiceMemos.isEmpty) {
+    return false;
+  }
+  if (filters.contains(NoteSearchFilter.scans) &&
+      !note.imageLayouts.any((layout) =>
+          layout.isDocumentPage && note.imagePaths.contains(layout.path))) {
     return false;
   }
   final pattern = searchPattern(query);

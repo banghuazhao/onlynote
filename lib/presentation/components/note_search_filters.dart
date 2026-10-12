@@ -3,6 +3,8 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/services/note_search.dart';
 
+import 'library_filter_labels.dart';
+
 class NoteSearchFilters extends StatelessWidget {
   const NoteSearchFilters(
       {super.key, required this.selected, required this.onChanged});
@@ -18,13 +20,7 @@ class NoteSearchFilters extends StatelessWidget {
       child: Row(spacing: 8, children: [
         for (final filter in NoteSearchFilter.values)
           FilterChip(
-            label: Text(switch (filter) {
-              NoteSearchFilter.checklists => s.Filter_Checklists,
-              NoteSearchFilter.photos => s.Filter_Photos,
-              NoteSearchFilter.reminders => s.Filter_Reminders,
-              NoteSearchFilter.pinned => s.Filter_Pinned,
-              NoteSearchFilter.unfinished => s.Filter_Unfinished,
-            }),
+            label: Text(noteSearchFilterLabel(filter, s)),
             selected: selected.contains(filter),
             materialTapTargetSize: MaterialTapTargetSize.padded,
             onSelected: (value) =>

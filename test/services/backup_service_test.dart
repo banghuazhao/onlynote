@@ -18,6 +18,7 @@ import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 import '../support/memory_preferences.dart';
@@ -310,6 +311,117 @@ void main() {
     expect(savedViews.views.map((view) => view.name), ['Existing']);
     expect(notes.values, isEmpty);
     expect(journal.get('pending'), isNull);
+  });
+
+  test(
+      'saved-view media and legacy filters survive export restore and re-export',
+      () async {
+    await folders.put('folder', FolderDto(id: 'folder', name: 'Research'));
+    const mediaFilters = {
+      NoteSearchFilter.photos,
+      NoteSearchFilter.recordings,
+      NoteSearchFilter.scans,
+    };
+    const legacyFilters = {
+      NoteSearchFilter.checklists,
+      NoteSearchFilter.photos,
+      NoteSearchFilter.reminders,
+      NoteSearchFilter.pinned,
+      NoteSearchFilter.unfinished,
+    };
+    final mediaView = await savedViews.create(
+      name: 'Research media',
+      query: 'meeting',
+      filters: mediaFilters,
+      tags: ['Work'],
+      folderId: 'folder',
+      archiveScope: NoteArchiveScope.all,
+    );
+    final legacyView = await savedViews.create(
+      name: 'Legacy criteria',
+      filters: legacyFilters,
+      archiveScope: NoteArchiveScope.archived,
+    );
+    final backup = decodeBackup(await service.export());
+    expect(backup.toJson()['version'], 8);
+    expect(backup.savedViews.singleWhere((v) => v.id == mediaView.id).filters,
+        mediaFilters);
+    expect(backup.savedViews.singleWhere((v) => v.id == legacyView.id).filters,
+        legacyFilters);
+
+    await service.restore(backup);
+
+    final importedMedia = savedViews.views.singleWhere(
+        (view) => view.name == mediaView.name && view.id != mediaView.id);
+    expect(importedMedia.query, 'meeting');
+    expect(importedMedia.filters, mediaFilters);
+    expect(importedMedia.tags, ['Work']);
+    expect(importedMedia.archiveScope, NoteArchiveScope.all);
+    expect(importedMedia.folderId, isNot('folder'));
+    expect(importedMedia.folderId, isNotNull);
+    expect((folders.get(importedMedia.folderId) as FolderDto).name, 'Research');
+    final importedLegacy = savedViews.views.singleWhere(
+        (view) => view.name == legacyView.name && view.id != legacyView.id);
+    expect(importedLegacy.filters, legacyFilters);
+    expect(importedLegacy.archiveScope, NoteArchiveScope.archived);
+    expect(importedLegacy.folderId, isNull);
+    expect(
+        savedViews.views.singleWhere((view) => view.id == mediaView.id).filters,
+        mediaFilters);
+    expect(
+        savedViews.views
+            .singleWhere((view) => view.id == mediaView.id)
+            .folderId,
+        'folder');
+
+    final exportedAgain = decodeBackup(await service.export());
+    expect(exportedAgain.savedViews, hasLength(4));
+    expect(
+        exportedAgain.savedViews
+            .singleWhere((view) => view.id == importedMedia.id)
+            .filters,
+        mediaFilters);
+    expect(
+        exportedAgain.savedViews
+            .singleWhere((view) => view.id == importedLegacy.id)
+            .filters,
+        legacyFilters);
+    expect(journal.get('pending'), isNull);
+  });
+
+  test('unknown saved-view filter rejects import before any storage writes',
+      () async {
+    await notes.put('existing', NoteDto(id: 'existing', title: 'Keep me'));
+    final existingView = await savedViews
+        .create(name: 'Existing', filters: {NoteSearchFilter.recordings});
+    final json = BackupContents(
+      createdAt: DateTime(2026, 10, 12),
+      notes: [NoteDto(id: 'incoming', title: 'Incoming')],
+      folders: [FolderDto(id: 'incoming-folder', name: 'Imported')],
+      photos: {},
+      reminders: [],
+      savedViews: [
+        SavedNoteView(id: 'incoming-view', name: 'Imported', filters: {
+          NoteSearchFilter.recordings,
+          NoteSearchFilter.scans,
+        }),
+      ],
+    ).toJson();
+    ((json['savedViews'] as List).single['filters'] as List)
+        .add('future_filter');
+
+    await expectLater(() async {
+      final backup =
+          decodeBackup(Uint8List.fromList(utf8.encode(jsonEncode(json))));
+      await service.restore(backup);
+    }, throwsFormatException);
+
+    expect(notes.keys, ['existing']);
+    expect((notes.get('existing') as NoteDto).title, 'Keep me');
+    expect(folders.isEmpty, isTrue);
+    expect(savedViews.views.single.id, existingView.id);
+    expect(savedViews.views.single.filters, {NoteSearchFilter.recordings});
+    expect(journal.isEmpty, isTrue);
   });
 
   test('v6 preserves and remaps photo layout in notes history and templates',

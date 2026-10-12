@@ -83,9 +83,10 @@ void main() {
       NoteInfoSheet(statistics: NoteStatistics.fromNote(Note())),
     ));
     await tester.pumpAndSettle();
-    expect(find.text('0'), findsNWidgets(4));
+    expect(find.text('0'), findsNWidgets(6));
     expect(find.text('0 min'), findsOneWidget);
     expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('0 of 0 complete'), findsOneWidget);
 
     await tester.pumpWidget(_host(NoteInfoSheet(
       statistics: NoteStatistics.fromNote(Note(description: 'word ' * 201)),
@@ -124,6 +125,7 @@ void main() {
 
       for (final (id, value, label) in [
         ('photos', '2', 'Photos'),
+        ('scanned-pages', '1', S.current.Note_Info_Scanned_Pages),
         ('recordings', '3', 'Recordings'),
         ('recording-duration', '62:01', 'Total recording time'),
       ]) {
@@ -136,6 +138,73 @@ void main() {
       expect(tester.takeException(), isNull);
     } finally {
       semantics.dispose();
+    }
+  });
+
+  testWidgets(
+      'checklist summary describes real tasks and excludes placeholders',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note(todo: [
+          Todo(title: 'Buy tea'),
+          Todo(title: 'Buy bread', completed: true),
+          Todo(title: 'Pick a time'),
+          Todo(),
+          Todo(completed: true),
+          Todo(title: ' \t\n '),
+          Todo(title: ' ', completed: true),
+        ])),
+      )));
+      await tester.pumpAndSettle();
+
+      for (final (id, value, label) in [
+        (
+          'checklist-progress',
+          '1 of 3 complete',
+          S.current.Note_Info_Checklist_Progress
+        ),
+        ('checklist-remaining', '2', S.current.Note_Info_Checklist_Remaining),
+      ]) {
+        final valueFinder = find.byKey(ValueKey('note-info-$id-value'));
+        await tester.ensureVisible(valueFinder);
+        await tester.pumpAndSettle();
+        expect(tester.widget<Text>(valueFinder).data, value);
+        expect(find.bySemanticsLabel('$label: $value'), findsOneWidget);
+      }
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets(
+      'placeholder-only and all-complete checklists display zero remaining',
+      (tester) async {
+    for (final (todos, progress) in [
+      ([Todo(), Todo(title: ' ', completed: true)], '0 of 0 complete'),
+      ([Todo(title: 'Done', completed: true)], '1 of 1 complete'),
+    ]) {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note(todo: todos)),
+      )));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<Text>(find
+                .byKey(const ValueKey('note-info-checklist-progress-value')))
+            .data,
+        progress,
+      );
+      expect(
+        tester
+            .widget<Text>(find
+                .byKey(const ValueKey('note-info-checklist-remaining-value')))
+            .data,
+        '0',
+      );
+      expect(tester.takeException(), isNull);
     }
   });
 
@@ -187,6 +256,9 @@ void main() {
           findsOneWidget);
       for (final (id, value) in [
         ('photos', '2'),
+        ('scanned-pages', '2'),
+        ('checklist-progress', S.current.Checklist_Progress(1, 3)),
+        ('checklist-remaining', '2'),
         ('recordings', '2'),
         ('recording-duration', '61:08'),
       ]) {

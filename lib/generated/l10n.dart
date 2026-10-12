@@ -4680,6 +4680,108 @@ class S {
       args: [],
     );
   }
+
+  /// `Scanned pages`
+  String get Note_Info_Scanned_Pages {
+    return Intl.message(
+      'Scanned pages',
+      name: 'Note_Info_Scanned_Pages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Checklist progress`
+  String get Note_Info_Checklist_Progress {
+    return Intl.message(
+      'Checklist progress',
+      name: 'Note_Info_Checklist_Progress',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tasks remaining`
+  String get Note_Info_Checklist_Remaining {
+    return Intl.message(
+      'Tasks remaining',
+      name: 'Note_Info_Checklist_Remaining',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy unfinished`
+  String get Checklist_Copy_Unfinished {
+    return Intl.message(
+      'Copy unfinished',
+      name: 'Checklist_Copy_Unfinished',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 task copied} other{{count} tasks copied}}`
+  String Checklist_Copy_Success(int count) {
+    return Intl.plural(
+      count,
+      one: '1 task copied',
+      other: '$count tasks copied',
+      name: 'Checklist_Copy_Success',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Could not copy tasks. Please try again.`
+  String get Checklist_Copy_Failed {
+    return Intl.message(
+      'Could not copy tasks. Please try again.',
+      name: 'Checklist_Copy_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recordings`
+  String get Filter_Recordings {
+    return Intl.message(
+      'Recordings',
+      name: 'Filter_Recordings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scanned documents`
+  String get Filter_Scans {
+    return Intl.message(
+      'Scanned documents',
+      name: 'Filter_Scans',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search: {query}`
+  String Saved_View_Search(String query) {
+    return Intl.message(
+      'Search: $query',
+      name: 'Saved_View_Search',
+      desc: '',
+      args: [query],
+    );
+  }
+
+  /// `Tags: {tags}`
+  String Saved_View_Tags(String tags) {
+    return Intl.message(
+      'Tags: $tags',
+      name: 'Saved_View_Tags',
+      desc: '',
+      args: [tags],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

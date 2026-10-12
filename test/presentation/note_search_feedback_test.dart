@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/library_previews.dart';
+import 'package:onlynote/presentation/components/note_checklist_previews.dart';
 import 'package:onlynote/presentation/components/note_info_previews.dart';
 import 'package:onlynote/presentation/components/note_search_feedback.dart';
 import 'package:onlynote/presentation/components/note_search_feedback_previews.dart';
@@ -106,11 +109,88 @@ void main() {
         child: KeyedSubtree(key: ValueKey(name), child: preview()),
       ));
       await tester.pumpAndSettle();
+      await _capture(tester, '$name-top');
       await tester.ensureVisible(
           find.byKey(const ValueKey('note-info-recording-duration-value')));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       await _capture(tester, name);
+    }
+  });
+
+  testWidgets('new checklist and library previews remain usable when narrow',
+      (tester) async {
+    final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
+    for (final family in fonts.keys) {
+      kAppFontFamilies[family] = (
+              {textStyle, color, fontSize, fontWeight, fontStyle}) =>
+          (textStyle ?? const TextStyle()).copyWith(
+            fontFamily: 'Roboto',
+            fontFamilyFallback: const ['DroidSansFallback'],
+            color: color,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            fontStyle: fontStyle,
+          );
+    }
+    addTearDown(() => kAppFontFamilies.addAll(fonts));
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    for (final (name, preview, size, action) in [
+      (
+        'copy-light',
+        checklistCopyPreview,
+        const Size(390, 700),
+        'checklist-copy-unfinished'
+      ),
+      (
+        'copy-dark',
+        checklistCopyDarkPreview,
+        const Size(390, 700),
+        'checklist-copy-unfinished'
+      ),
+      (
+        'copy-chinese',
+        checklistCopyChinesePreview,
+        const Size(280, 700),
+        'checklist-copy-unfinished'
+      ),
+      (
+        'library-light',
+        libraryFiltersPreview,
+        const Size(390, 700),
+        'library-filter-scans'
+      ),
+      (
+        'library-chinese',
+        libraryFiltersLargeChinesePreview,
+        const Size(320, 700),
+        'library-filter-recordings'
+      ),
+    ]) {
+      tester.view.physicalSize = size;
+      await tester.pumpWidget(RepaintBoundary(
+        key: const ValueKey('feedback-capture'),
+        child: KeyedSubtree(key: ValueKey(name), child: preview()),
+      ));
+      await tester.pumpAndSettle();
+      final button = find.byKey(ValueKey(action));
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await _capture(tester, name);
+      if (name.startsWith('copy')) {
+        expect(find.text(S.current.Checklist_Copy_Success(2)), findsOneWidget);
+      } else {
+        final viewId = name == 'library-light' ? 'follow-ups' : 'research';
+        final description =
+            find.byKey(ValueKey('saved-view-$viewId-description'));
+        await tester.ensureVisible(description);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        await _capture(tester, '$name-views');
+      }
     }
   });
 }

@@ -7,6 +7,8 @@ import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
+import 'library_filter_labels.dart';
+
 sealed class LibraryFilterResult {
   const LibraryFilterResult();
 }
@@ -48,6 +50,7 @@ class LibraryFiltersSheet extends StatefulWidget {
     this.scope = NoteArchiveScope.active,
     this.savedViews = const [],
     this.selectedViewId,
+    this.folderNames = const {},
     this.showTrash = false,
     this.viewsUnavailable = false,
   });
@@ -57,6 +60,7 @@ class LibraryFiltersSheet extends StatefulWidget {
   final NoteArchiveScope scope;
   final List<SavedNoteView> savedViews;
   final String? selectedViewId;
+  final Map<String, String> folderNames;
   final bool showTrash;
   final bool viewsUnavailable;
 
@@ -109,17 +113,7 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                           key: ValueKey('library-filter-${filter.name}'),
                           avatarBoxConstraints: const BoxConstraints.tightFor(
                               width: 24, height: 24),
-                          label: _chipLabel(
-                              switch (filter) {
-                                NoteSearchFilter.checklists =>
-                                  s.Filter_Checklists,
-                                NoteSearchFilter.photos => s.Filter_Photos,
-                                NoteSearchFilter.reminders =>
-                                  s.Filter_Reminders,
-                                NoteSearchFilter.pinned => s.Filter_Pinned,
-                                NoteSearchFilter.unfinished =>
-                                  s.Filter_Unfinished,
-                              },
+                          label: _chipLabel(noteSearchFilterLabel(filter, s),
                               constraints.maxWidth),
                           selected: _filters.contains(filter),
                           onSelected: (selected) => setState(() {
@@ -204,7 +198,15 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             ListTile(
               key: ValueKey('saved-view-${view.id}'),
               leading: const Icon(Icons.bookmark_border_rounded),
-              title: Text(view.name),
+              title:
+                  Text(view.name, maxLines: 2, overflow: TextOverflow.ellipsis),
+              subtitle: Text(
+                savedNoteViewDescription(view,
+                    strings: s, folderNames: widget.folderNames),
+                key: ValueKey('saved-view-${view.id}-description'),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
               selected: widget.selectedViewId == view.id,
               onTap: () => Navigator.pop(context, ApplySavedNoteView(view)),
               trailing: PopupMenuButton<String>(

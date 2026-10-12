@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_search.dart';
 
 void main() {
@@ -27,8 +29,24 @@ void main() {
       title: 'Trip [ideas]',
       description: 'Visit Hong Kong',
       isPinned: true,
-      imagePaths: ['photo.png'],
-      todo: [Todo(title: 'Buy 茶')]);
+      imagePaths: [
+        'photo.png',
+        'scan.png'
+      ],
+      imageLayouts: const [
+        NoteImageLayout(path: 'scan.png', textOffset: 0, isDocumentPage: true),
+      ],
+      voiceMemos: [
+        VoiceMemo(
+          id: 'recording',
+          path: 'note_audio/recording.m4a',
+          durationMs: 0,
+          createdAt: DateTime(2026, 10, 12),
+        ),
+      ],
+      todo: [
+        Todo(title: 'Buy 茶')
+      ]);
   test('search matches title, body, and checklist, treating symbols literally',
       () {
     for (final query in ['TRIP', '[ideas]', '  hong kong ', '茶', '']) {
@@ -82,6 +100,101 @@ void main() {
             {NoteSearchFilter.checklists},
             hasReminder: false),
         isTrue);
+  });
+  test('recording filter uses declared metadata and composes with query', () {
+    final recording = Note(
+      title: 'Meeting',
+      voiceMemos: [
+        VoiceMemo(
+          id: 'unavailable',
+          path: 'note_audio/unavailable.m4a',
+          durationMs: 0,
+          createdAt: DateTime(2026, 10, 12),
+          transcript: 'Release discussion',
+        ),
+      ],
+    );
+    for (final query in ['', 'meeting', 'release']) {
+      expect(
+        matchesNoteSearch(recording, query, {NoteSearchFilter.recordings},
+            hasReminder: false),
+        isTrue,
+      );
+    }
+    expect(
+      matchesNoteSearch(
+          recording.copyWith(voiceMemos: []), '', {NoteSearchFilter.recordings},
+          hasReminder: false),
+      isFalse,
+    );
+    expect(
+      matchesNoteSearch(recording, 'missing', {NoteSearchFilter.recordings},
+          hasReminder: false),
+      isFalse,
+    );
+    expect(
+      matchesNoteSearch(
+          recording, '', {NoteSearchFilter.recordings, NoteSearchFilter.photos},
+          hasReminder: false),
+      isFalse,
+    );
+  });
+  test('scanned documents require attached document-page metadata', () {
+    const scan = NoteImageLayout(
+      path: 'note_images/unavailable-scan.jpg',
+      textOffset: 0,
+      isDocumentPage: true,
+    );
+    final scanned =
+        Note(title: 'Receipt', imagePaths: [scan.path], imageLayouts: [scan]);
+    expect(
+      matchesNoteSearch(scanned, 'receipt', {NoteSearchFilter.scans},
+          hasReminder: false),
+      isTrue,
+    );
+    // Photos keeps its existing meaning of any attached image.
+    expect(
+      matchesNoteSearch(
+          scanned, '', {NoteSearchFilter.scans, NoteSearchFilter.photos},
+          hasReminder: false),
+      isTrue,
+    );
+    for (final note in [
+      scanned.copyWith(imagePaths: []),
+      scanned.copyWith(imagePaths: ['note_images/other.jpg']),
+      scanned.copyWith(imageLayouts: []),
+      scanned.copyWith(imageLayouts: [scan.copyWith(isDocumentPage: false)]),
+    ]) {
+      expect(
+        matchesNoteSearch(note, '', {NoteSearchFilter.scans},
+            hasReminder: false),
+        isFalse,
+      );
+    }
+    expect(
+      matchesNoteSearch(scanned.copyWith(imageLayouts: [scan, scan]), '',
+          {NoteSearchFilter.scans},
+          hasReminder: false),
+      isTrue,
+    );
+    expect(
+      matchesNoteSearch(scanned, 'missing', {NoteSearchFilter.scans},
+          hasReminder: false),
+      isFalse,
+    );
+  });
+  test('new media filters combine with each other and existing criteria', () {
+    final filters = NoteSearchFilter.values.toSet();
+    expect(matchesNoteSearch(note, 'Trip', filters, hasReminder: true), isTrue);
+    for (final changed in [
+      note.copyWith(voiceMemos: []),
+      note.copyWith(imageLayouts: []),
+      note.copyWith(isPinned: false),
+      note.copyWith(todo: [Todo(title: 'Buy 茶', completed: true)]),
+    ]) {
+      expect(
+          matchesNoteSearch(changed, '', filters, hasReminder: true), isFalse);
+    }
   });
   test('Unfinished requires a nonempty unchecked item and composes with search',
       () {

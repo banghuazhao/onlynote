@@ -590,5 +590,36 @@
   },
   "Note_Info_Photos": "Photos",
   "Note_Info_Recordings": "Recordings",
-  "Note_Info_Recording_Duration": "Total recording time"
+  "Note_Info_Recording_Duration": "Total recording time",
+  "Note_Info_Scanned_Pages": "Scanned pages",
+  "Note_Info_Checklist_Progress": "Checklist progress",
+  "Note_Info_Checklist_Remaining": "Tasks remaining",
+  "Checklist_Copy_Unfinished": "Copy unfinished",
+  "Checklist_Copy_Success": "{count, plural, one{1 task copied} other{{count} tasks copied}}",
+  "@Checklist_Copy_Success": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Checklist_Copy_Failed": "Could not copy tasks. Please try again.",
+  "Filter_Recordings": "Recordings",
+  "Filter_Scans": "Scanned documents",
+  "Saved_View_Search": "Search: {query}",
+  "@Saved_View_Search": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "Saved_View_Tags": "Tags: {tags}",
+  "@Saved_View_Tags": {
+    "placeholders": {
+      "tags": {
+        "type": "String"
+      }
+    }
+  }
 }

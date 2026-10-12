@@ -25,7 +25,12 @@ void main() {
     final view = await store.create(
       name: '  Work follow-ups  ',
       query: '会议',
-      filters: {NoteSearchFilter.unfinished, NoteSearchFilter.pinned},
+      filters: {
+        NoteSearchFilter.unfinished,
+        NoteSearchFilter.pinned,
+        NoteSearchFilter.recordings,
+        NoteSearchFilter.scans,
+      },
       tags: [' Work ', 'work', 'Important'],
       folderId: 'projects',
       archiveScope: NoteArchiveScope.all,
@@ -37,11 +42,68 @@ void main() {
     expect(saved.id, view.id);
     expect(saved.name, 'Work follow-ups');
     expect(saved.query, '会议');
-    expect(
-        saved.filters, {NoteSearchFilter.unfinished, NoteSearchFilter.pinned});
+    expect(saved.filters, {
+      NoteSearchFilter.unfinished,
+      NoteSearchFilter.pinned,
+      NoteSearchFilter.recordings,
+      NoteSearchFilter.scans,
+    });
     expect(saved.tags, ['Work', 'Important']);
     expect(saved.folderId, 'projects');
     expect(saved.archiveScope, NoteArchiveScope.all);
+    final json =
+        jsonDecode(preferences.values[SavedNoteViewStore.storageKey]! as String)
+            as Map;
+    expect(json['version'], 1);
+    expect((json['views'] as List).single['filters'],
+        ['unfinished', 'pinned', 'recordings', 'scans']);
+  });
+
+  test('legacy filter names load and persist without changing their meanings',
+      () async {
+    const legacyNames = [
+      'checklists',
+      'photos',
+      'reminders',
+      'pinned',
+      'unfinished',
+    ];
+    final preferences = MemoryPreferences();
+    await preferences.setString(
+        SavedNoteViewStore.storageKey,
+        jsonEncode({
+          'version': 1,
+          'views': [
+            {
+              'id': 'legacy',
+              'name': 'Legacy',
+              'query': 'call',
+              'filters': legacyNames,
+              'tags': ['Work'],
+              'folderId': null,
+              'archiveScope': 'active',
+            }
+          ],
+        }));
+    final store = SavedNoteViewStore(preferences: preferences);
+    addTearDown(store.dispose);
+    await store.load();
+    expect(store.views.single.filters, {
+      NoteSearchFilter.checklists,
+      NoteSearchFilter.photos,
+      NoteSearchFilter.reminders,
+      NoteSearchFilter.pinned,
+      NoteSearchFilter.unfinished,
+    });
+    expect(NoteSearchFilter.values.take(5).map((filter) => filter.name),
+        legacyNames);
+    await store.rename('legacy', 'Renamed legacy');
+    final reopened = SavedNoteViewStore(preferences: preferences);
+    addTearDown(reopened.dispose);
+    await reopened.load();
+    expect(reopened.views.single.toJson()['filters'], legacyNames);
+    expect(reopened.views.single.query, 'call');
+    expect(reopened.views.single.tags, ['Work']);
   });
 
   test('deleted folder fallback preserves all other view criteria', () {
@@ -97,6 +159,19 @@ void main() {
         'views': [
           {'id': 'broken'}
         ]
+      }),
+      jsonEncode({
+        'version': 1,
+        'views': [
+          {
+            'id': 'unknown-filter',
+            'name': 'Unsupported',
+            'query': '',
+            'filters': ['recordings', 'scans', 'future-filter'],
+            'tags': [],
+            'archiveScope': 'active',
+          }
+        ],
       }),
       '{',
     ]) {

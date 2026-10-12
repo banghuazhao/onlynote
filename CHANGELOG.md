@@ -5,6 +5,10 @@
 - Added Clear search and Clear filters actions when no notes match, preserving the current folder, Archive, or Trash view and saved views.
 - Added a localized count of notes matching the current search, filters, and tags.
 - Expanded Note info with photo and recording counts plus total recording time, using attachment metadata without loading media files.
+- Added scanned-page counts, checklist completion progress, and remaining-task totals to Note info.
+- Added copying unfinished checklist tasks in their original order, including from the note reader.
+- Added saved-view descriptions showing the folder, search, filters, tags, and archive scope.
+- Added Recordings and Scanned documents filters, including support in saved views and backups.
 
 ## 1.4.0+14
 

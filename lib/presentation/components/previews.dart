@@ -636,17 +636,22 @@ Widget checklistProgressPreview() => MaterialApp(
         child: PaperNote(
           kind: PaperNoteKind.sheet,
           color: AppColors.parchment,
-          child: NoteChecklist(todos: [
-            Todo(id: 'one', title: 'Pick up fresh bread'),
-            Todo(id: 'two', title: 'Bring a reusable bag', completed: true),
-            Todo(id: 'three', title: 'Plan dinner'),
-          ], onToggle: previewChecklistToggle, onReset: previewChecklistReset),
+          child: NoteChecklist(
+              todos: [
+                Todo(id: 'one', title: 'Pick up fresh bread'),
+                Todo(id: 'two', title: 'Bring a reusable bag', completed: true),
+                Todo(id: 'three', title: 'Plan dinner'),
+              ],
+              onToggle: previewChecklistToggle,
+              onReset: previewChecklistReset,
+              clipboardWriter: previewChecklistCopy),
         ),
       )),
     );
 
 void previewChecklistToggle(String id) {}
 Future<void> previewChecklistReset() async {}
+Future<void> previewChecklistCopy(String text) async {}
 
 @Preview(name: 'Suggested reminder', size: Size(390, 240))
 Widget reminderSuggestionPreview() => MaterialApp(

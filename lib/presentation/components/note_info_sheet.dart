@@ -57,9 +57,27 @@ class NoteInfoSheet extends StatelessWidget {
               value: readingTime,
             ),
             _StatisticRow(
+              id: 'checklist-progress',
+              label: strings.Note_Info_Checklist_Progress,
+              value: strings.Checklist_Progress(
+                statistics.checklistCompletedCount,
+                statistics.checklistTotalCount,
+              ),
+            ),
+            _StatisticRow(
+              id: 'checklist-remaining',
+              label: strings.Note_Info_Checklist_Remaining,
+              value: numbers.format(statistics.checklistRemainingCount),
+            ),
+            _StatisticRow(
               id: 'photos',
               label: strings.Note_Info_Photos,
               value: numbers.format(statistics.photoCount),
+            ),
+            _StatisticRow(
+              id: 'scanned-pages',
+              label: strings.Note_Info_Scanned_Pages,
+              value: numbers.format(statistics.scannedPageCount),
             ),
             _StatisticRow(
               id: 'recordings',

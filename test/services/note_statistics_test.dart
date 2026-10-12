@@ -36,6 +36,7 @@ void main() {
   test('notes without attachments have zero attachment statistics', () {
     final stats = NoteStatistics.fromNote(Note(description: 'A plain note'));
     expect(stats.photoCount, 0);
+    expect(stats.scannedPageCount, 0);
     expect(stats.recordingCount, 0);
     expect(stats.recordingDurationMs, 0);
   });
@@ -90,6 +91,7 @@ void main() {
       ],
     ));
     expect(stats.photoCount, 0);
+    expect(stats.scannedPageCount, 1);
   });
 
   test('mixed photos and scans ignore duplicate and detached scan layouts', () {
@@ -119,6 +121,104 @@ void main() {
       ],
     ));
     expect(stats.photoCount, 2);
+    expect(stats.scannedPageCount, 1);
+  });
+
+  test(
+      'scan counts deduplicate attached paths without reading unavailable files',
+      () {
+    final note = Note(
+      imagePaths: [
+        'note_images/missing-scan-one.jpg',
+        'note_images/missing-scan-one.jpg',
+        'note_images/missing-scan-two.jpg',
+        'note_images/legacy-photo.jpg',
+      ],
+      imageLayouts: const [
+        NoteImageLayout(
+          path: 'note_images/missing-scan-one.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/missing-scan-one.jpg',
+          textOffset: 5,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/missing-scan-two.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+        NoteImageLayout(
+          path: 'note_images/orphan.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+      ],
+    );
+    final original = note.copyWith();
+    final stats = NoteStatistics.fromNote(note);
+    expect(stats.scannedPageCount, 2);
+    expect(stats.photoCount, 1);
+    expect(note, original);
+    expect(note.imagePaths, hasLength(4));
+    expect(note.imageLayouts, hasLength(4));
+  });
+
+  test('unattached scan metadata does not give legacy photos a page count', () {
+    final stats = NoteStatistics.fromNote(Note(
+      imagePaths: ['note_images/legacy.jpg'],
+      imageLayouts: const [
+        NoteImageLayout(
+          path: 'note_images/unattached.jpg',
+          textOffset: 0,
+          isDocumentPage: true,
+        ),
+      ],
+    ));
+    expect(stats.scannedPageCount, 0);
+    expect(stats.photoCount, 1);
+  });
+
+  test(
+      'checklist summary excludes every blank placeholder without changing items',
+      () {
+    final note = Note(todo: [
+      Todo(id: 'pending', title: '  Buy tea  '),
+      Todo(id: 'done', title: '買麵包', completed: true),
+      Todo(id: 'duplicate-label', title: '買麵包'),
+      Todo(),
+      Todo(completed: true),
+      Todo(title: ' \t\n\u00a0'),
+      Todo(title: '\n ', completed: true),
+    ]);
+    final original = note.copyWith();
+    final stats = NoteStatistics.fromNote(note);
+    expect(stats.checklistTotalCount, 3);
+    expect(stats.checklistCompletedCount, 1);
+    expect(stats.checklistRemainingCount, 2);
+    expect(note, original);
+    expect(note.todo.first.title, '  Buy tea  ');
+    expect(note.todo.map((item) => item.completed),
+        [false, true, false, false, true, false, true]);
+  });
+
+  test(
+      'empty, placeholder-only and completed checklists have no remaining items',
+      () {
+    for (final todos in [
+      <Todo>[],
+      [Todo(), Todo(title: ' ', completed: true)],
+      [
+        Todo(title: 'Done', completed: true),
+        Todo(title: '完成', completed: true)
+      ],
+    ]) {
+      final stats = NoteStatistics.fromNote(Note(todo: todos));
+      expect(stats.checklistRemainingCount, 0);
+      expect(stats.checklistCompletedCount, stats.checklistTotalCount);
+    }
   });
 
   test('combined recording time is not capped at one hour or one day', () {
@@ -163,6 +263,9 @@ void main() {
     expect(stats.wordCount, 10);
     expect(stats.characterCount, 45);
     expect(stats.estimatedReadingSeconds, 3);
+    expect(stats.checklistTotalCount, 2);
+    expect(stats.checklistCompletedCount, 1);
+    expect(stats.checklistRemainingCount, 1);
   });
 
   test('Chinese characters and mixed English count without requiring spaces',

@@ -286,6 +286,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       : NoteArchiveScope.active,
               views: state.savedViews,
               selectedViewId: state.selectedViewId,
+              folderNames: {
+                for (final folder in state.folders) folder.id: folder.name,
+              },
             ));
     if (data == null) return;
     ModalRoute<LibraryFilterResult>? filtersRoute;
@@ -301,6 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
           showTrash: data.showTrash,
           savedViews: data.views,
           selectedViewId: data.selectedViewId,
+          folderNames: data.folderNames,
           viewsUnavailable: _viewsUnavailable,
         );
       },
