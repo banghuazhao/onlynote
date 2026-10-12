@@ -4887,6 +4887,86 @@ class S {
       args: [],
     );
   }
+
+  /// `Copy text`
+  String get Share_Copy_Text {
+    return Intl.message(
+      'Copy text',
+      name: 'Share_Copy_Text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy the title, body, transcripts, checklist, and reminder to the clipboard.`
+  String get Share_Copy_Text_Description {
+    return Intl.message(
+      'Copy the title, body, transcripts, checklist, and reminder to the clipboard.',
+      name: 'Share_Copy_Text_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note text copied.`
+  String get Share_Text_Copied {
+    return Intl.message(
+      'Note text copied.',
+      name: 'Share_Text_Copied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not copy the note text. Try again.`
+  String get Share_Text_Copy_Failed {
+    return Intl.message(
+      'Could not copy the note text. Try again.',
+      name: 'Share_Text_Copy_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Moved to Trash on {date}`
+  String Card_Moved_To_Trash_On(String date) {
+    return Intl.message(
+      'Moved to Trash on $date',
+      name: 'Card_Moved_To_Trash_On',
+      desc: '',
+      args: [date],
+    );
+  }
+
+  /// `Moved to Trash`
+  String get Note_Info_Moved_To_Trash {
+    return Intl.message(
+      'Moved to Trash',
+      name: 'Note_Info_Moved_To_Trash',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open {name} in library`
+  String Open_Folder_In_Library(String name) {
+    return Intl.message(
+      'Open $name in library',
+      name: 'Open_Folder_In_Library',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `This folder is no longer available.`
+  String get Folder_Unavailable {
+    return Intl.message(
+      'This folder is no longer available.',
+      name: 'Folder_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

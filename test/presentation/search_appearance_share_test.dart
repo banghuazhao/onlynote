@@ -253,6 +253,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(selected, NoteShareFormat.pdf);
       expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Share'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(S.current.Share_Copy_Text));
+      await tester.tap(find.text(S.current.Share_Copy_Text));
+      await tester.pumpAndSettle();
+      expect(selected, NoteShareFormat.copyText);
+      expect(tester.takeException(), isNull);
     });
   }
 }

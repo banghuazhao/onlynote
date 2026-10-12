@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
@@ -29,6 +30,91 @@ VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
     );
 
 void main() {
+  testWidgets('stored deletion timestamp is labeled in note info and semantics',
+      (tester) async {
+    final deleted = DateTime.utc(2026, 10, 11, 23, 30);
+    final note = Note(
+      title: 'Old plan',
+      dateTime: DateTime(2020, 1, 2),
+      deletedAt: deleted,
+      sortOrder: 17,
+    );
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(_host(Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showNoteInfoSheet(
+            context: context,
+            statistics: NoteStatistics.fromNote(note),
+            deletedAt: note.deletedAt,
+          ),
+          child: const Text('Info'),
+        ),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Info'));
+      await tester.pumpAndSettle();
+      final expected =
+          DateFormat.yMMMd('en').add_jm().format(deleted.toLocal());
+      final date = find.byKey(const ValueKey('note-info-moved-to-trash-value'));
+      expect(tester.widget<Text>(date).data, expected);
+      expect(
+          find.bySemanticsLabel(
+              '${S.current.Note_Info_Moved_To_Trash}: $expected'),
+          findsOneWidget);
+      expect(note.deletedAt, deleted);
+      expect(note.dateTime, DateTime(2020, 1, 2));
+      expect(note.sortOrder, 17);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(find.byType(NoteInfoSheet), findsNothing);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('missing deletion metadata never displays a Trash date',
+      (tester) async {
+    await tester.pumpWidget(_host(NoteInfoSheet(
+      statistics: NoteStatistics.fromNote(
+          Note(title: 'Old plan', dateTime: DateTime(2020, 1, 2))),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('note-info-moved-to-trash-value')),
+        findsNothing);
+    expect(find.text(S.current.Note_Info_Moved_To_Trash), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('isolated Trash info previews fit light, dark and Chinese 2×',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    for (final (preview, size, locale) in [
+      (trashNoteInfoLightPreview, const Size(390, 620), 'en'),
+      (trashNoteInfoDarkPreview, const Size(390, 620), 'en'),
+      (trashNoteInfoChinesePreview, const Size(280, 700), 'zh_HK'),
+    ]) {
+      tester.view.physicalSize = size;
+      await tester.pumpWidget(preview());
+      await tester.pumpAndSettle();
+      final date = find.byKey(const ValueKey('note-info-moved-to-trash-value'));
+      await tester.ensureVisible(date);
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<Text>(date).data,
+          DateFormat.yMMMd(locale)
+              .add_jm()
+              .format(DateTime(2026, 10, 11, 14, 30)));
+      expect(find.text(S.current.Note_Info_Moved_To_Trash), findsOneWidget);
+      await tester.ensureVisible(
+          find.byKey(const ValueKey('note-info-recording-duration-value')));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets(
       'shows counts with an explicitly estimated reading time and closes',
       (tester) async {

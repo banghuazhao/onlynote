@@ -639,5 +639,27 @@
         "type": "String"
       }
     }
+  },
+  "Share_Copy_Text": "Copy text",
+  "Share_Copy_Text_Description": "Copy the title, body, transcripts, checklist, and reminder to the clipboard.",
+  "Share_Text_Copied": "Note text copied.",
+  "Share_Text_Copy_Failed": "Could not copy the note text. Try again.",
+  "Card_Moved_To_Trash_On": "Moved to Trash on {date}",
+  "Note_Info_Moved_To_Trash": "Moved to Trash",
+  "Open_Folder_In_Library": "Open {name} in library",
+  "Folder_Unavailable": "This folder is no longer available.",
+  "@Card_Moved_To_Trash_On": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@Open_Folder_In_Library": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

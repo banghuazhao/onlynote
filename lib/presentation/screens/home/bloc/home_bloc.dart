@@ -209,7 +209,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(_buildLoaded());
       }
     } else if (event is _SelectFolder) {
-      _onSelectFolder(event, emit);
+      await _onSelectFolder(event, emit);
     } else if (event is _ShowTrash) {
       _onShowTrash(event, emit);
     } else if (event is _ShowArchive) {
@@ -475,11 +475,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(_buildLoaded());
   }
 
-  void _onSelectFolder(_SelectFolder event, Emitter<HomeState> emit) {
+  Future<void> _onSelectFolder(
+      _SelectFolder event, Emitter<HomeState> emit) async {
+    if (event.preserveScope && event.folderId != null) {
+      // A managed folder can be deleted while the navigation result waits in
+      // this queue. Read the current repository before changing library scope.
+      final result = await _showNotesUsecase();
+      final bundle = result.fold<NotesBundle?>((_) => null, (value) => value);
+      if (bundle == null ||
+          !bundle.folders.any((folder) => folder.id == event.folderId)) {
+        return;
+      }
+      _folders = bundle.folders;
+    }
     _selectedFolderId = event.folderId;
-    _showTrash = false;
-    _showArchive = false;
-    _includeArchived = false;
+    if (!event.preserveScope) {
+      _showTrash = false;
+      _showArchive = false;
+      _includeArchived = false;
+    }
     _selectedViewId = null;
     emit(_buildLoaded());
   }
@@ -690,7 +704,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                 ? [..._activeNotes, ..._archivedNotes]
                 : _activeNotes;
 
-    if (!_showTrash && _selectedFolderId != null) {
+    if (_selectedFolderId != null) {
       notes = notes.where((n) => n.folderId == _selectedFolderId);
     }
 

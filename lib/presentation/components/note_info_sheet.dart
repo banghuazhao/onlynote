@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/note_dates.dart';
 import 'package:onlynote/services/note_statistics.dart';
 
 import 'app_sheet.dart';
@@ -8,17 +9,26 @@ import 'app_sheet.dart';
 Future<void> showNoteInfoSheet({
   required BuildContext context,
   required NoteStatistics statistics,
+  DateTime? deletedAt,
 }) =>
     showAppSheet<void>(
       context: context,
-      builder: (_) => NoteInfoSheet(statistics: statistics),
+      builder: (_) =>
+          NoteInfoSheet(statistics: statistics, deletedAt: deletedAt),
     );
 
 /// A compact, read-only summary of the saved note or current editor draft.
 class NoteInfoSheet extends StatelessWidget {
-  const NoteInfoSheet({super.key, required this.statistics});
+  const NoteInfoSheet({
+    super.key,
+    required this.statistics,
+    this.deletedAt,
+  });
 
   final NoteStatistics statistics;
+
+  /// Stored deletion metadata only; absent values never infer a Trash date.
+  final DateTime? deletedAt;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +51,13 @@ class NoteInfoSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (deletedAt != null)
+              _StatisticRow(
+                id: 'moved-to-trash',
+                label: strings.Note_Info_Moved_To_Trash,
+                value: noteTrashDateTimeLabel(
+                    deletedAt!, Localizations.localeOf(context).toString()),
+              ),
             _StatisticRow(
               id: 'words',
               label: strings.Note_Info_Words,

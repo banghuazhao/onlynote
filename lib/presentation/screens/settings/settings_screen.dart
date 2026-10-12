@@ -16,9 +16,14 @@ import 'premium_screen.dart';
 import 'widget_guide_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key, this.purchases});
+  const SettingsScreen({
+    super.key,
+    this.purchases,
+    this.returnFolderSelection = false,
+  });
 
   final PurchaseService? purchases;
+  final bool returnFolderSelection;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -28,6 +33,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   PurchaseState? _shownState;
   bool _purchaseActionStarted = false;
   bool _restoringPurchase = false;
+  bool _openingFolders = false;
+
+  Future<void> _openManageFolders() async {
+    if (!mounted ||
+        _openingFolders ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingFolders = true;
+    try {
+      final folderId = await Navigator.push<String>(
+        context,
+        MaterialPageRoute<String>(builder: (_) => const ManageFoldersScreen()),
+      );
+      if (!mounted ||
+          folderId == null ||
+          !widget.returnFolderSelection ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) await navigator.maybePop<String>(folderId);
+    } finally {
+      if (mounted) _openingFolders = false;
+    }
+  }
 
   PurchaseService get _purchases =>
       widget.purchases ?? PurchaseService.instance;
@@ -103,17 +134,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SizedBox(height: tokens.space4),
                               Card(
                                 child: ListTile(
+                                  key:
+                                      const ValueKey('settings-manage-folders'),
                                   leading: const Icon(Icons.folder_outlined),
                                   title: Text(S.of(context).Manage_Folders),
                                   trailing:
                                       const Icon(Icons.chevron_right_rounded),
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) =>
-                                          const ManageFoldersScreen(),
-                                    ),
-                                  ),
+                                  onTap: _openManageFolders,
                                 ),
                               ),
                               SizedBox(height: tokens.space4),

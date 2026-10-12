@@ -5,7 +5,6 @@ import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
@@ -16,6 +15,7 @@ import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
+import 'package:onlynote/services/note_dates.dart';
 import 'package:screenshot/screenshot.dart';
 
 class NoteCard extends StatefulWidget {
@@ -142,10 +142,13 @@ class NoteCardState extends State<NoteCard> {
         .where((id) => id.trim().isNotEmpty && id != note.id)
         .toSet()
         .length;
-    final date = note.dateTime == null || style.showDate == false
-        ? null
-        : DateFormat.yMMMd(Localizations.localeOf(context).toString())
-            .format(note.dateTime!);
+    final date = noteCardDateLabel(
+      locale: Localizations.localeOf(context).toString(),
+      showDate: style.showDate != false,
+      movedToTrashLabel: strings.Card_Moved_To_Trash_On,
+      dateTime: note.dateTime,
+      deletedAt: note.deletedAt,
+    );
     final transcripts = note.voiceMemos
         .map((memo) => memo.transcript?.trim() ?? '')
         .where((text) => text.isNotEmpty)

@@ -26,6 +26,7 @@ class ShareHelper {
       {Rect? sharePositionOrigin,
       Future<Uint8List?> Function()? captureImage,
       Future<String> Function(String)? resolveAudioPath,
+      Future<void> Function(String)? clipboardWriter,
       Future<ShareResult> Function(ShareParams)? share}) async {
     if (_sharing) return;
     _sharing = true;
@@ -38,6 +39,26 @@ class ShareHelper {
       final reminder = ReminderData.shared.getCurrentReminder(note);
       final reminderText =
           reminder == null ? null : '${s.Reminder}: ${reminder.timeString}';
+      if (format == NoteShareFormat.copyText) {
+        final text = NoteExport.plainText(note, reminder: reminderText);
+        if (text.trim().isEmpty) {
+          context.showToast(s.Share_No_Text);
+          return;
+        }
+        try {
+          if (clipboardWriter == null) {
+            await Clipboard.setData(ClipboardData(text: text));
+          } else {
+            await clipboardWriter(text);
+          }
+          if (context.mounted) context.showToast(s.Share_Text_Copied);
+        } catch (_) {
+          if (context.mounted) {
+            context.showToast(s.Share_Text_Copy_Failed, isError: true);
+          }
+        }
+        return;
+      }
       final stem = NoteExport.fileStem(note);
       if (format == NoteShareFormat.plainText) {
         final text = NoteExport.plainText(note, reminder: reminderText);

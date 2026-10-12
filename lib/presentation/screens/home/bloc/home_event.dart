@@ -16,7 +16,8 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.filtersChanged(Set<NoteSearchFilter> filters) =
       _FiltersChanged;
   const factory HomeEvent.removeFilter(NoteSearchFilter filter) = _RemoveFilter;
-  const factory HomeEvent.selectFolder(String? folderId) = _SelectFolder;
+  const factory HomeEvent.selectFolder(String? folderId,
+      {@Default(false) bool preserveScope}) = _SelectFolder;
   const factory HomeEvent.showTrash(bool show) = _ShowTrash;
   const factory HomeEvent.showArchive(bool show) = _ShowArchive;
   const factory HomeEvent.includeArchived(bool include) = _IncludeArchived;

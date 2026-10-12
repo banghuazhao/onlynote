@@ -28,7 +28,8 @@ mixin _$HomeEvent {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -68,7 +69,7 @@ mixin _$HomeEvent {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -108,7 +109,7 @@ mixin _$HomeEvent {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -356,7 +357,8 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -399,7 +401,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -442,7 +444,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -644,7 +646,8 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -687,7 +690,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -730,7 +733,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -956,7 +959,8 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -999,7 +1003,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -1042,7 +1046,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -1280,7 +1284,8 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -1323,7 +1328,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -1366,7 +1371,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -1589,7 +1594,8 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -1632,7 +1638,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -1675,7 +1681,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -1904,7 +1910,8 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -1947,7 +1954,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -1990,7 +1997,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -2212,7 +2219,8 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -2255,7 +2263,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -2298,7 +2306,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -2452,7 +2460,7 @@ abstract class _$$SelectFolderImplCopyWith<$Res> {
           _$SelectFolderImpl value, $Res Function(_$SelectFolderImpl) then) =
       __$$SelectFolderImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String? folderId});
+  $Res call({String? folderId, bool preserveScope});
 }
 
 /// @nodoc
@@ -2467,12 +2475,17 @@ class __$$SelectFolderImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? folderId = freezed,
+    Object? preserveScope = null,
   }) {
     return _then(_$SelectFolderImpl(
       freezed == folderId
           ? _value.folderId
           : folderId // ignore: cast_nullable_to_non_nullable
               as String?,
+      preserveScope: null == preserveScope
+          ? _value.preserveScope
+          : preserveScope // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -2480,14 +2493,17 @@ class __$$SelectFolderImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SelectFolderImpl implements _SelectFolder {
-  const _$SelectFolderImpl(this.folderId);
+  const _$SelectFolderImpl(this.folderId, {this.preserveScope = false});
 
   @override
   final String? folderId;
+  @override
+  @JsonKey()
+  final bool preserveScope;
 
   @override
   String toString() {
-    return 'HomeEvent.selectFolder(folderId: $folderId)';
+    return 'HomeEvent.selectFolder(folderId: $folderId, preserveScope: $preserveScope)';
   }
 
   @override
@@ -2496,11 +2512,13 @@ class _$SelectFolderImpl implements _SelectFolder {
         (other.runtimeType == runtimeType &&
             other is _$SelectFolderImpl &&
             (identical(other.folderId, folderId) ||
-                other.folderId == folderId));
+                other.folderId == folderId) &&
+            (identical(other.preserveScope, preserveScope) ||
+                other.preserveScope == preserveScope));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, folderId);
+  int get hashCode => Object.hash(runtimeType, folderId, preserveScope);
 
   @JsonKey(ignore: true)
   @override
@@ -2521,7 +2539,8 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -2548,7 +2567,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
   }) {
-    return selectFolder(folderId);
+    return selectFolder(folderId, preserveScope);
   }
 
   @override
@@ -2564,7 +2583,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -2591,7 +2610,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
   }) {
-    return selectFolder?.call(folderId);
+    return selectFolder?.call(folderId, preserveScope);
   }
 
   @override
@@ -2607,7 +2626,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -2635,7 +2654,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult orElse(),
   }) {
     if (selectFolder != null) {
-      return selectFolder(folderId);
+      return selectFolder(folderId, preserveScope);
     }
     return orElse();
   }
@@ -2746,9 +2765,11 @@ class _$SelectFolderImpl implements _SelectFolder {
 }
 
 abstract class _SelectFolder implements HomeEvent {
-  const factory _SelectFolder(final String? folderId) = _$SelectFolderImpl;
+  const factory _SelectFolder(final String? folderId,
+      {final bool preserveScope}) = _$SelectFolderImpl;
 
   String? get folderId;
+  bool get preserveScope;
   @JsonKey(ignore: true)
   _$$SelectFolderImplCopyWith<_$SelectFolderImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -2828,7 +2849,8 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -2871,7 +2893,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -2914,7 +2936,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -3135,7 +3157,8 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -3178,7 +3201,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -3221,7 +3244,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -3443,7 +3466,8 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -3486,7 +3510,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -3529,7 +3553,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -3726,7 +3750,8 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -3769,7 +3794,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -3812,7 +3837,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -4034,7 +4059,8 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -4077,7 +4103,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -4120,7 +4146,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -4341,7 +4367,8 @@ class _$RemoveTagImpl implements _RemoveTag {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -4384,7 +4411,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -4427,7 +4454,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -4656,7 +4683,8 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -4699,7 +4727,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -4742,7 +4770,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -4965,7 +4993,8 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -5008,7 +5037,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -5051,7 +5080,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -5293,7 +5322,8 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -5336,7 +5366,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -5379,7 +5409,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -5631,7 +5661,8 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -5674,7 +5705,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -5717,7 +5748,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -5989,7 +6020,8 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -6032,7 +6064,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -6075,7 +6107,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -6305,7 +6337,8 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -6348,7 +6381,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -6391,7 +6424,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -6618,7 +6651,8 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -6661,7 +6695,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -6704,7 +6738,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -6932,7 +6966,8 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -6975,7 +7010,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -7018,7 +7053,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -7249,7 +7284,8 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -7292,7 +7328,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -7335,7 +7371,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -7566,7 +7602,8 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -7609,7 +7646,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -7652,7 +7689,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -7875,7 +7912,8 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -7918,7 +7956,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -7961,7 +7999,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,
@@ -8192,7 +8230,8 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(String query) searchChanged,
     required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
     required TResult Function(NoteSearchFilter filter) removeFilter,
-    required TResult Function(String? folderId) selectFolder,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
     required TResult Function(bool show) showTrash,
     required TResult Function(bool show) showArchive,
     required TResult Function(bool include) includeArchived,
@@ -8235,7 +8274,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(String query)? searchChanged,
     TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult? Function(NoteSearchFilter filter)? removeFilter,
-    TResult? Function(String? folderId)? selectFolder,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
     TResult? Function(bool show)? showTrash,
     TResult? Function(bool show)? showArchive,
     TResult? Function(bool include)? includeArchived,
@@ -8278,7 +8317,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(String query)? searchChanged,
     TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
     TResult Function(NoteSearchFilter filter)? removeFilter,
-    TResult Function(String? folderId)? selectFolder,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
     TResult Function(bool show)? showTrash,
     TResult Function(bool show)? showArchive,
     TResult Function(bool include)? includeArchived,

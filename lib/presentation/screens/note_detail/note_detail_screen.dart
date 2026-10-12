@@ -530,7 +530,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
             showNoteInfoSheet(
-                context: context, statistics: NoteStatistics.fromNote(note));
+              context: context,
+              statistics: NoteStatistics.fromNote(note),
+              deletedAt: note.isDeleted ? note.deletedAt : null,
+            );
           },
         ),
         AppSheetAction(

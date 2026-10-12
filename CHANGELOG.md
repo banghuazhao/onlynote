@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added copying full note text, including transcripts, checklist tasks, and reminder text, from the share panel.
+- Added localized "Moved to Trash" dates to note cards and note information when deletion metadata is available.
+- Added opening folders from Manage folders while preserving the current search, filters, and library scope.
 - Added Clear search and Clear filters actions when no notes match, preserving the current folder, Archive, or Trash view and saved views.
 - Added a localized count of notes matching the current search, filters, and tags.
 - Expanded Note info with photo and recording counts plus total recording time, using attachment metadata without loading media files.

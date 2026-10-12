@@ -10,7 +10,7 @@ import 'package:onlynote/services/note_document.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-enum NoteShareFormat { image, plainText, markdown, pdf, audio }
+enum NoteShareFormat { image, plainText, markdown, pdf, audio, copyText }
 
 class NoteExport {
   static String fileStem(Note note) {

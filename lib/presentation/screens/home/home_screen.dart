@@ -77,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _openingTemplate = false;
   bool _presentingDailyCalendar = false;
   bool _presentingLibraryFilters = false;
+  bool _presentingSettings = false;
+  bool _presentingManagedFolders = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -628,9 +630,19 @@ class _HomeScreenState extends State<HomeScreen> {
   /// What the app bar title reads: the scope the note list is currently
   /// showing.
   String _scopeLabel(BuildContext context, _FolderScope scope) {
-    if (scope.showTrash) return S.of(context).Trash;
+    if (scope.showTrash) {
+      final folder = scope.selectedFolder;
+      return folder == null
+          ? S.of(context).Trash
+          : '${S.of(context).Trash} · ${folder.name}';
+    }
     if (scope.selectedViewName != null) return scope.selectedViewName!;
-    if (scope.showArchive) return S.of(context).Archive;
+    if (scope.showArchive) {
+      final folder = scope.selectedFolder;
+      return folder == null
+          ? S.of(context).Archive
+          : '${S.of(context).Archive} · ${folder.name}';
+    }
     return scope.selectedFolder?.name ?? S.of(context).All_Notes;
   }
 
@@ -694,10 +706,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         if (confirmed) bloc.add(HomeEvent.deleteFolder(folder.id));
       case _ManageFolders():
-        await Navigator.push(
-          context,
-          MaterialPageRoute<void>(builder: (_) => const ManageFoldersScreen()),
-        );
+        await _openManageFolders();
     }
   }
 
@@ -1043,10 +1052,50 @@ class _HomeScreenState extends State<HomeScreen> {
         .add(const MultipleDeleteEvent.clearAll());
   }
 
-  void _openSettings() => Navigator.push(
+  void _selectManagedFolder(String? folderId) {
+    if (!mounted || folderId == null) return;
+    _setReorderMode(false);
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    context
+        .read<HomeBloc>()
+        .add(HomeEvent.selectFolder(folderId, preserveScope: true));
+  }
+
+  Future<void> _openManageFolders() async {
+    if (_presentingManagedFolders ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _presentingManagedFolders = true;
+    try {
+      final folderId = await Navigator.push<String>(
         context,
-        MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+        MaterialPageRoute<String>(builder: (_) => const ManageFoldersScreen()),
       );
+      _selectManagedFolder(folderId);
+    } finally {
+      if (mounted) _presentingManagedFolders = false;
+    }
+  }
+
+  Future<void> _openSettings() async {
+    if (_presentingSettings || ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _presentingSettings = true;
+    try {
+      final folderId = await Navigator.push<String>(
+        context,
+        MaterialPageRoute<String>(
+            builder: (_) => const SettingsScreen(returnFolderSelection: true)),
+      );
+      _selectManagedFolder(folderId);
+    } finally {
+      if (mounted) _presentingSettings = false;
+    }
+  }
 
   Widget _libraryFiltersButton() => BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) => LibraryFiltersButton(
@@ -1072,6 +1121,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return _libraryFiltersButton();
     }
     return IconButton(
+      key: const ValueKey('home-settings'),
       tooltip: S.of(context).Settings,
       icon: const Icon(Icons.settings_outlined),
       onPressed: _openSettings,
@@ -2171,6 +2221,7 @@ class _FolderPickerTitle extends StatelessWidget {
           // reader user this is also how you switch folders.
           hint: S.of(context).Folders,
           child: TextButton(
+            key: const ValueKey('home-folder-picker'),
             onPressed: onTap,
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
             child: Padding(
@@ -2317,6 +2368,7 @@ class _FolderPickerSheet extends StatelessWidget {
           ),
           if (scope.folders.isNotEmpty)
             ListTile(
+              key: const ValueKey('home-manage-folders'),
               leading: const Icon(Icons.tune_rounded),
               title: Text(l10n.Manage_Folders),
               onTap: () => Navigator.pop(context, const _ManageFolders()),

@@ -637,5 +637,27 @@
         "type": "String"
       }
     }
+  },
+  "Share_Copy_Text": "复制文字",
+  "Share_Copy_Text_Description": "将标题、正文、录音文字、清单和提醒复制到剪贴板。",
+  "Share_Text_Copied": "笔记文字已复制。",
+  "Share_Text_Copy_Failed": "无法复制笔记文字，请重试。",
+  "Card_Moved_To_Trash_On": "于 {date}移至回收站",
+  "Note_Info_Moved_To_Trash": "移至回收站",
+  "Open_Folder_In_Library": "在笔记库中打开{name}",
+  "Folder_Unavailable": "此文件夹已不存在。",
+  "@Card_Moved_To_Trash_On": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@Open_Folder_In_Library": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -28,21 +28,44 @@ Widget noteInfoDarkPreview() => const _NoteInfoPreview(dark: true);
 Widget noteInfoChinesePreview() =>
     const _NoteInfoPreview(chinese: true, textScale: 2);
 
+@Preview(name: 'Trash note info — light', group: 'Note', size: Size(390, 620))
+Widget trashNoteInfoLightPreview() => const _NoteInfoPreview(trashed: true);
+
+@Preview(
+  name: 'Trash note info — dark',
+  group: 'Note',
+  size: Size(390, 620),
+  brightness: Brightness.dark,
+)
+Widget trashNoteInfoDarkPreview() =>
+    const _NoteInfoPreview(trashed: true, dark: true);
+
+@Preview(
+  name: 'Trash note info — Chinese 2× narrow',
+  group: 'Note',
+  size: Size(280, 700),
+)
+Widget trashNoteInfoChinesePreview() =>
+    const _NoteInfoPreview(trashed: true, chinese: true, textScale: 2);
+
 /// Content and themes are local fixtures; no native plugins or saved state.
 class _NoteInfoPreview extends StatelessWidget {
   const _NoteInfoPreview({
     this.chinese = false,
     this.dark = false,
     this.textScale = 1,
+    this.trashed = false,
   });
 
   final bool chinese;
   final bool dark;
   final double textScale;
+  final bool trashed;
 
   @override
   Widget build(BuildContext context) {
     final note = Note(
+      deletedAt: trashed ? DateTime(2026, 10, 11, 14, 30) : null,
       title: chinese ? '週末散步' : 'Weekend walk',
       description: chinese
           ? '沿海邊散步，看看春天的風景。\n記得留點時間給自己。 🌿'
@@ -117,7 +140,10 @@ class _NoteInfoPreview extends StatelessWidget {
       home: Scaffold(
         body: Align(
           alignment: Alignment.bottomCenter,
-          child: NoteInfoSheet(statistics: NoteStatistics.fromNote(note)),
+          child: NoteInfoSheet(
+            statistics: NoteStatistics.fromNote(note),
+            deletedAt: note.deletedAt,
+          ),
         ),
       ),
     );
