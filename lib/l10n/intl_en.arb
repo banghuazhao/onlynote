@@ -661,5 +661,15 @@
         "type": "String"
       }
     }
+  },
+  "Search_Folders": "Search folders",
+  "Folder_Search_Empty": "No matching folders.",
+  "Saved_View_Limit_Reached": "You can save up to {limit} views. Delete a saved view to add another.",
+  "@Saved_View_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
   }
 }

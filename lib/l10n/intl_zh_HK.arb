@@ -659,5 +659,15 @@
         "type": "String"
       }
     }
+  },
+  "Search_Folders": "搜尋資料夾",
+  "Folder_Search_Empty": "沒有符合搜尋條件的資料夾。",
+  "Saved_View_Limit_Reached": "最多可儲存 {limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。",
+  "@Saved_View_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -8,6 +8,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/services/note_history.dart';
 
 NoteHistoryVersion _version({String id = 'version'}) => NoteHistoryVersion(
@@ -73,6 +74,212 @@ Future<void> _open(WidgetTester tester,
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets(
+      'recording-only summaries skip blank and malformed transcripts without writes',
+      (tester) async {
+    const storedTranscript = ' \n第一行 茶😀\nSecond line 📝\n ';
+    const expectedSnippet = '第一行 茶😀\nSecond line 📝';
+    final memos = <Map<dynamic, dynamic>>[
+      {'id': 'missing'},
+      {'id': 'null', 'transcript': null},
+      {'id': 'number', 'transcript': 42},
+      {
+        'id': 'list',
+        'transcript': ['not text']
+      },
+      {'id': 'blank', 'transcript': ' \n\t '},
+      {
+        'id': 'first',
+        'path': 'note_audio/unavailable.m4a',
+        'durationMs': 62000,
+        'transcript': storedTranscript,
+      },
+      {'id': 'later', 'transcript': 'Later recorded thought'},
+    ];
+    final originalMemos = [for (final memo in memos) Map.of(memo)];
+    final version = NoteHistoryVersion(
+      id: 'transcript',
+      savedAt: DateTime.utc(2026, 10, 10),
+      note: NoteDto(
+        id: 'note',
+        title: ' \n ',
+        description: '\t ',
+        todoList: [TodoDto(title: null), TodoDto(title: ' \n ')],
+        voiceMemos: memos,
+      ),
+    );
+    var restores = 0;
+    await _open(tester, versions: [version], restore: (_) async {
+      restores++;
+      return NoteHistoryRestoreResult.restored;
+    });
+    final row = find.byKey(const ValueKey('history-version-transcript'));
+    final summary = tester.widget<NoteHistoryVersionTile>(row);
+    expect(summary.title, '第一行 茶😀');
+    expect(summary.snippet, expectedSnippet);
+    expect(find.text('Later recorded thought'), findsNothing);
+    expect(version.note.voiceMemos, originalMemos);
+    expect(version.note.title, ' \n ');
+    expect(version.note.description, '\t ');
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(restores, 0);
+    expect(find.text(storedTranscript), findsOneWidget);
+    expect(find.text('Later recorded thought'), findsOneWidget);
+    for (final editable
+        in tester.widgetList<EditableText>(find.byType(EditableText))) {
+      expect(editable.readOnly, isTrue);
+    }
+    await tester.tap(find.widgetWithText(TextButton, S.current.History_Title));
+    await tester.pumpAndSettle();
+    expect(tester.widget<NoteHistoryVersionTile>(row).snippet, expectedSnippet);
+    expect(restores, 0);
+    expect(version.note.voiceMemos, originalMemos);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final scenario in [
+    (
+      name: 'stored title',
+      title: '  Named recording  ',
+      body: null,
+      tasks: <TodoDto>[],
+      expectedTitle: '  Named recording  ',
+      expectedSnippet: 'Recorded fallback\nAnother line',
+    ),
+    (
+      name: 'body text',
+      title: null,
+      body: ' \nBody first line\nBody second line ',
+      tasks: [TodoDto(title: 'Checklist text')],
+      expectedTitle: 'Body first line',
+      expectedSnippet: 'Body first line\nBody second line',
+    ),
+    (
+      name: 'checklist text',
+      title: null,
+      body: ' \n ',
+      tasks: [
+        TodoDto(title: ''),
+        TodoDto(title: ' First task ', completed: true),
+        TodoDto(title: 'Second task'),
+      ],
+      expectedTitle: ' First task , Second task',
+      expectedSnippet: ' First task , Second task',
+    ),
+  ]) {
+    testWidgets('transcript summary preserves ${scenario.name} priority',
+        (tester) async {
+      final version = NoteHistoryVersion(
+        id: 'priority',
+        savedAt: DateTime.utc(2026, 10, 10),
+        note: NoteDto(
+          title: scenario.title,
+          description: scenario.body,
+          todoList: scenario.tasks,
+          voiceMemos: const [
+            {'transcript': 'Recorded fallback\nAnother line'},
+          ],
+        ),
+      );
+      await _open(tester, versions: [version]);
+      final summary = tester.widget<NoteHistoryVersionTile>(
+          find.byKey(const ValueKey('history-version-priority')));
+      expect(summary.title, scenario.expectedTitle);
+      expect(summary.snippet, scenario.expectedSnippet);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('no usable transcript retains the existing generic history title',
+      (tester) async {
+    final version = NoteHistoryVersion(
+      id: 'no-transcript',
+      savedAt: DateTime.utc(2026, 10, 10),
+      note: NoteDto(voiceMemos: const [
+        {'transcript': false},
+        {'transcript': <String>[]},
+        {'transcript': ' \n\t'},
+        {},
+      ]),
+    );
+    await _open(tester, versions: [version]);
+    final summary = tester.widget<NoteHistoryVersionTile>(
+        find.byKey(const ValueKey('history-version-no-transcript')));
+    expect(summary.title, S.current.History_Title);
+    expect(summary.snippet, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('transcript-derived title restores the selected version identity',
+      (tester) async {
+    final selected = NoteHistoryVersion(
+      id: 'recording-chosen',
+      savedAt: DateTime.utc(2026, 10, 10),
+      note: NoteDto(voiceMemos: const [
+        {'transcript': 'Chosen recording 茶😀\nReviewed transcript'},
+      ]),
+    );
+    final restored = <String>[];
+    bool? result;
+    await _open(tester,
+        versions: [_version(id: 'different'), selected],
+        onClosed: (value) => result = value,
+        restore: (id) async {
+          restored.add(id);
+          return NoteHistoryRestoreResult.restored;
+        });
+    final row = find.byKey(const ValueKey('history-version-recording-chosen'));
+    await tester.ensureVisible(row);
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(restored, isEmpty);
+    await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+    await tester.pumpAndSettle();
+    expect(restored, ['recording-chosen']);
+    expect(result, isTrue);
+    expect(find.byType(NoteHistorySheet), findsNothing);
+  });
+
+  testWidgets(
+      'transcript summary fits Chinese 2x and keeps full text semantics',
+      (tester) async {
+    tester.view.physicalSize = const Size(280, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final semantics = tester.ensureSemantics();
+    try {
+      final title = '第一行 茶😀 ${'這是完整的錄音內容 ' * 8}';
+      final transcript = '$title\n第二行記錄。';
+      final version = NoteHistoryVersion(
+        id: 'large-transcript',
+        savedAt: DateTime.utc(2026, 10, 10),
+        note: NoteDto(voiceMemos: [
+          {'transcript': transcript},
+        ]),
+      );
+      await _open(tester,
+          versions: [version], locale: const Locale('zh', 'HK'), textScale: 2);
+      final row =
+          find.byKey(const ValueKey('history-version-large-transcript'));
+      await tester.ensureVisible(row);
+      expect(tester.getSize(row).height, greaterThanOrEqualTo(48));
+      expect(tester.getSemantics(find.text(title)).label, contains(title));
+      expect(tester.getSemantics(find.text(transcript)).label,
+          contains(transcript));
+      expect(tester.takeException(), isNull);
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      expect(find.text(transcript), findsOneWidget);
+      expect(find.byKey(const ValueKey('history-restore-action')).hitTestable(),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
 
   testWidgets('preview is read-only and never restores on selecting a version',
       (tester) async {

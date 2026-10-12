@@ -82,17 +82,20 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m25(criterion) => "Remove ${criterion}";
 
-  static String m26(query) => "Search: ${query}";
+  static String m26(limit) =>
+      "You can save up to ${limit} views. Delete a saved view to add another.";
 
-  static String m27(tags) => "Tags: ${tags}";
+  static String m27(query) => "Search: ${query}";
 
-  static String m28(count) =>
-      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
+  static String m28(tags) => "Tags: ${tags}";
 
   static String m29(count) =>
+      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
+
+  static String m30(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m30(items, photos) =>
+  static String m31(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -455,6 +458,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please enter a folder name.",
     ),
     "Folder_Notes_Count": m10,
+    "Folder_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching folders.",
+    ),
     "Folder_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This folder is no longer available.",
     ),
@@ -908,17 +914,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save this view. Try again.",
     ),
+    "Saved_View_Limit_Reached": m26,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
-    "Saved_View_Search": m26,
-    "Saved_View_Tags": m27,
+    "Saved_View_Search": m27,
+    "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
+    "Search_Folders": MessageLookupByLibrary.simpleMessage("Search folders"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
-    "Search_Results_Count": m28,
+    "Search_Results_Count": m29,
     "Search_Tags": MessageLookupByLibrary.simpleMessage("Search tags"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m29,
+    "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -1020,7 +1028,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m30,
+    "Template_Details": m31,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

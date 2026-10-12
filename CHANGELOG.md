@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Made Note info available from Trash, including the full stored deletion timestamp.
+- Added folder-name search to the folder picker, Manage folders, and Move to folder.
+- Added transcript snippets to recording-only history entries using stored text.
+- Added clear saved-view limit feedback before naming a new view.
 - Added copying full note text, including transcripts, checklist tasks, and reminder text, from the share panel.
 - Added localized "Moved to Trash" dates to note cards and note information when deletion metadata is available.
 - Added opening folders from Manage folders while preserving the current search, filters, and library scope.

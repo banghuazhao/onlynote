@@ -19,6 +19,7 @@ import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detai
 import 'package:onlynote/presentation/screens/note_detail/note_detail_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_position_store.dart';
+import 'package:onlynote/services/note_dates.dart';
 import 'package:onlynote/services/note_statistics.dart';
 
 class _Notes implements NoteRepository {
@@ -65,7 +66,9 @@ class _Router extends RootStackRouter {
 }
 
 Future<_Router> _mount(WidgetTester tester, _Notes notes,
-    {double width = 390}) async {
+    {double width = 390,
+    double textScale = 1,
+    Locale locale = const Locale('en')}) async {
   tester.view.physicalSize = Size(width, 844);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -83,8 +86,10 @@ Future<_Router> _mount(WidgetTester tester, _Notes notes,
     child: MaterialApp.router(
       routerConfig: router.config(),
       theme: AppTheme.light,
+      locale: locale,
       builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(disableAnimations: true),
+        data: MediaQuery.of(context).copyWith(
+            disableAnimations: true, textScaler: TextScaler.linear(textScale)),
         child: child!,
       ),
       localizationsDelegates: const [
@@ -271,6 +276,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(S.current.Reminder), findsOneWidget);
     expect(find.text(S.current.Share), findsOneWidget);
+    expect(find.text(S.current.Note_Info), findsOneWidget);
     expect(find.text(S.current.Edit), findsOneWidget);
     await tester.ensureVisible(find.text(S.current.Edit));
     await tester.tap(find.text(S.current.Edit));
@@ -305,6 +311,97 @@ void main() {
     await tester.tap(find.text(S.current.Cancel));
     await tester.pumpAndSettle();
     expect(_loaded(tester).note.isDeleted, isTrue);
+    expect(notes.writes, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final (width, textScale, locale) in [
+    (180.0, 1.0, const Locale('en')),
+    (240.0, 2.0, const Locale('zh', 'HK')),
+    (280.0, 2.0, const Locale('zh')),
+    (390.0, 1.0, const Locale('en')),
+  ]) {
+    testWidgets('Trash Note info is reachable at $width px in $locale',
+        (tester) async {
+      final deletedAt = DateTime.utc(2026, 10, 7, 14, 30);
+      final note = Note(
+        id: 'trash-info',
+        title: 'Archived research 茶',
+        description: 'Keep this saved text.',
+        dateTime: DateTime(2020, 1, 2),
+        deletedAt: deletedAt,
+        isArchived: true,
+        todo: [Todo(id: 'unfinished', title: 'Preserve the task')],
+      );
+      final notes = _Notes([note]);
+      final before = Map<String, NoteDto>.of(notes.values);
+      final router = await _mount(tester, notes,
+          width: width, textScale: textScale, locale: locale);
+      await _push(tester, router, note.id!, NotePositionStore.memory());
+      if (width < 280) {
+        await tester.tap(find.byTooltip(S.current.More_Options));
+        await tester.pumpAndSettle();
+        expect(find.text(S.current.Share), findsOneWidget);
+        expect(find.text(S.current.Restore), findsOneWidget);
+        expect(find.text(S.current.Delete_Forever), findsOneWidget);
+        final action = find.text(S.current.Note_Info);
+        await tester.ensureVisible(action);
+        await tester.tap(action);
+      } else {
+        expect(find.byTooltip(S.current.Share), findsOneWidget);
+        expect(find.byTooltip(S.current.Restore), findsOneWidget);
+        expect(find.byTooltip(S.current.Delete_Forever), findsOneWidget);
+        await tester.tap(find.byTooltip(S.current.Note_Info));
+      }
+      await tester.pumpAndSettle();
+      final sheet = tester.widget<NoteInfoSheet>(find.byType(NoteInfoSheet));
+      expect(sheet.deletedAt, deletedAt);
+      expect(
+          sheet.statistics.wordCount, NoteStatistics.fromNote(note).wordCount);
+      expect(find.text(S.current.Note_Info_Moved_To_Trash), findsOneWidget);
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('note-info-moved-to-trash-value')))
+              .data,
+          noteTrashDateTimeLabel(deletedAt, locale.toString()));
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byTooltip(
+          MaterialLocalizations.of(tester.element(find.byType(NoteInfoSheet)))
+              .closeButtonTooltip));
+      await tester.pumpAndSettle();
+      expect(find.byType(NoteInfoSheet), findsNothing);
+      expect(_loaded(tester).note, note);
+      expect(notes.values, before);
+      expect(notes.writes, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('repeated Trash info callbacks leave one sheet over the reader',
+      (tester) async {
+    final note = Note(
+        id: 'trash-repeat',
+        title: 'Keep the note',
+        description: 'Saved body',
+        deletedAt: DateTime(2026, 10, 7));
+    final notes = _Notes([note]);
+    final router = await _mount(tester, notes, width: 180);
+    await _push(tester, router, note.id!, NotePositionStore.memory());
+    await tester.tap(find.byTooltip(S.current.More_Options));
+    await tester.pumpAndSettle();
+    final tile = tester.widget<ListTile>(find.ancestor(
+        of: find.text(S.current.Note_Info), matching: find.byType(ListTile)));
+    tile.onTap!();
+    tile.onTap!();
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteInfoSheet), findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    tile.onTap!();
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteInfoSheet), findsNothing);
+    expect(_loaded(tester).note, note);
     expect(notes.writes, isEmpty);
     expect(tester.takeException(), isNull);
   });

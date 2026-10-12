@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
 
@@ -156,28 +157,13 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
                   )
                 : Column(children: [
                     for (final version in versions)
-                      ListTile(
+                      NoteHistoryVersionTile(
                         key: ValueKey('history-version-${version.id}'),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        leading: const Icon(Icons.restore_page_outlined),
-                        title: Text(_title(version.note, s),
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 4),
-                            Text(_date(version.savedAt)),
-                            if (_snippet(version.note).isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(_snippet(version.note),
-                                  maxLines: 2, overflow: TextOverflow.ellipsis),
-                            ],
-                            _MediaCounts(note: version.note),
-                          ],
-                        ),
-                        trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => setState(() {
+                        title: _title(version.note, s),
+                        dateLabel: _date(version.savedAt),
+                        snippet: _snippet(version.note),
+                        mediaCounts: _MediaCounts(note: version.note),
+                        onPressed: () => setState(() {
                           _selected = version;
                           _result = null;
                         }),
@@ -224,10 +210,18 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     if (note.description?.trim().isNotEmpty ?? false) {
       return note.description!.trim();
     }
-    return (note.todoList ?? const <TodoDto>[])
+    final checklist = (note.todoList ?? const <TodoDto>[])
         .map((todo) => todo.title ?? '')
         .where((title) => title.trim().isNotEmpty)
         .join(', ');
+    if (checklist.isNotEmpty) return checklist;
+    for (final memo in note.voiceMemos ?? const <Map>[]) {
+      final transcript = memo['transcript'];
+      if (transcript is String && transcript.trim().isNotEmpty) {
+        return transcript.trim();
+      }
+    }
+    return '';
   }
 }
 

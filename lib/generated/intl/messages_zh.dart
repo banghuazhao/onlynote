@@ -73,15 +73,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m25(criterion) => "移除${criterion}";
 
-  static String m26(query) => "搜索：${query}";
+  static String m26(limit) => "最多可保存 ${limit} 个视图。删除一个已保存的视图后可添加新视图。";
 
-  static String m27(tags) => "标签：${tags}";
+  static String m27(query) => "搜索：${query}";
 
-  static String m28(count) => "${count} 条笔记";
+  static String m28(tags) => "标签：${tags}";
 
-  static String m29(count) => "已添加 ${count} 项清单";
+  static String m29(count) => "${count} 条笔记";
 
-  static String m30(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m30(count) => "已添加 ${count} 项清单";
+
+  static String m31(items, photos) => "${items} 项 · ${photos} 张照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -363,6 +365,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("请输入文件夹名称。"),
     "Folder_Notes_Count": m10,
+    "Folder_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "没有符合搜索条件的文件夹。",
+    ),
     "Folder_Unavailable": MessageLookupByLibrary.simpleMessage("此文件夹已不存在。"),
     "Folders": MessageLookupByLibrary.simpleMessage("文件夹"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage("留一点空间，记录下一个好想法。"),
@@ -690,17 +695,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("删除此视图？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("保存搜索或筛选，下次快速打开。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("无法保存此视图，请重试。"),
+    "Saved_View_Limit_Reached": m26,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("视图名称"),
-    "Saved_View_Search": m26,
-    "Saved_View_Tags": m27,
+    "Saved_View_Search": m27,
+    "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已保存的视图"),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜索"),
+    "Search_Folders": MessageLookupByLibrary.simpleMessage("搜索文件夹"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜索备忘录"),
-    "Search_Results_Count": m28,
+    "Search_Results_Count": m29,
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜索标签"),
     "Select": MessageLookupByLibrary.simpleMessage("选择"),
-    "Selection_Checklist_Added": m29,
+    "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "无法保存清单项。",
     ),
@@ -784,7 +791,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m30,
+    "Template_Details": m31,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

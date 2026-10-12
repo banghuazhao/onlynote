@@ -15,6 +15,7 @@ Future<Completer<LibraryFilterResult?>> open(
   Set<String> selectedTags = const {},
   List<String> tags = const [],
   List<SavedNoteView> views = const [],
+  ValueNotifier<List<SavedNoteView>>? viewUpdates,
   Map<String, String> folderNames = const {},
   String? selectedViewId,
   NoteArchiveScope scope = NoteArchiveScope.active,
@@ -25,6 +26,17 @@ Future<Completer<LibraryFilterResult?>> open(
   double keyboardInset = 0,
 }) async {
   final result = Completer<LibraryFilterResult?>();
+  LibraryFiltersSheet sheet(List<SavedNoteView> currentViews) =>
+      LibraryFiltersSheet(
+          filters: filters,
+          selectedTags: selectedTags,
+          availableTags: tags,
+          savedViews: currentViews,
+          folderNames: folderNames,
+          selectedViewId: selectedViewId,
+          scope: scope,
+          showTrash: trash,
+          viewsUnavailable: unavailable);
   await tester.pumpWidget(MaterialApp(
     locale: locale,
     supportedLocales: S.delegate.supportedLocales,
@@ -48,16 +60,13 @@ Future<Completer<LibraryFilterResult?>> open(
                   onPressed: () async =>
                       result.complete(await showAppSheet<LibraryFilterResult>(
                     context: context,
-                    builder: (_) => LibraryFiltersSheet(
-                        filters: filters,
-                        selectedTags: selectedTags,
-                        availableTags: tags,
-                        savedViews: views,
-                        folderNames: folderNames,
-                        selectedViewId: selectedViewId,
-                        scope: scope,
-                        showTrash: trash,
-                        viewsUnavailable: unavailable),
+                    builder: (_) => viewUpdates == null
+                        ? sheet(views)
+                        : ValueListenableBuilder<List<SavedNoteView>>(
+                            valueListenable: viewUpdates,
+                            builder: (_, currentViews, __) =>
+                                sheet(currentViews),
+                          ),
                   )),
                 ))),
   ));
@@ -69,6 +78,11 @@ Future<Completer<LibraryFilterResult?>> open(
 
 Finder key(String value) => find.byKey(ValueKey(value));
 
+List<SavedNoteView> _savedViews(int count) => [
+      for (var index = 0; index < count; index++)
+        SavedNoteView(id: 'view-$index', name: 'View ${index + 1}'),
+    ];
+
 Future<void> searchTags(WidgetTester tester, String query) async {
   final field = key('library-search-tags');
   await tester.ensureVisible(field);
@@ -78,6 +92,195 @@ Future<void> searchTags(WidgetTester tester, String query) async {
 }
 
 void main() {
+  testWidgets('29 saved views still allows saving the current criteria',
+      (tester) async {
+    final views = _savedViews(29);
+    final result = await open(tester,
+        views: views,
+        filters: {NoteSearchFilter.unfinished},
+        selectedTags: {'Work'},
+        tags: ['Work'],
+        scope: NoteArchiveScope.all);
+    final save = key('library-save-view');
+    expect(key('library-saved-view-limit'), findsNothing);
+    expect(tester.widget<ListTile>(save).enabled, isTrue);
+    expect(tester.widget<ListTile>(save).onTap, isNotNull);
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as CreateSavedNoteView;
+    expect(selected.filters, {NoteSearchFilter.unfinished});
+    expect(selected.tags, {'Work'});
+    expect(selected.scope, NoteArchiveScope.all);
+    expect(views, hasLength(29));
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final count in [30, 31]) {
+    testWidgets('$count saved views blocks creation but still applies filters',
+        (tester) async {
+      final views = _savedViews(count);
+      final result = await open(tester,
+          views: views,
+          filters: {NoteSearchFilter.recordings},
+          selectedTags: {'Work'},
+          tags: ['Work']);
+      final save = key('library-save-view');
+      final strings = S.of(tester.element(save));
+      expect(find.text(strings.Saved_View_Limit_Reached(30)), findsOneWidget);
+      expect(tester.widget<ListTile>(save).enabled, isFalse);
+      expect(tester.widget<ListTile>(save).onTap, isNull);
+      await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(result.isCompleted, isFalse);
+      expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+
+      final photoFilter = key('library-filter-photos');
+      await tester.ensureVisible(photoFilter);
+      await tester.pumpAndSettle();
+      await tester.tap(photoFilter);
+      await tester.pump();
+      await tester.ensureVisible(key('library-apply-filters'));
+      await tester.tap(key('library-apply-filters'));
+      await tester.pumpAndSettle();
+      final selected = (await result.future) as ApplyLibraryFilters;
+      expect(selected, isNot(isA<CreateSavedNoteView>()));
+      expect(selected.filters,
+          {NoteSearchFilter.recordings, NoteSearchFilter.photos});
+      expect(selected.tags, {'Work'});
+      expect(views, hasLength(count));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('applying, renaming and deleting remain available at capacity',
+      (tester) async {
+    final views = _savedViews(30);
+    for (final action in ['apply', 'rename', 'delete']) {
+      final result = await open(tester, views: views);
+      expect(tester.widget<ListTile>(key('library-save-view')).onTap, isNull);
+      final viewTile = key('saved-view-view-0');
+      await tester.ensureVisible(viewTile);
+      await tester.pumpAndSettle();
+      if (action == 'apply') {
+        await tester.tap(viewTile);
+      } else {
+        final menu = find.descendant(
+            of: viewTile, matching: find.byType(PopupMenuButton<String>));
+        await tester.tap(menu);
+        await tester.pumpAndSettle();
+        final strings = S.of(tester.element(menu));
+        await tester.tap(find.text(
+            action == 'rename' ? strings.Rename_View : strings.Delete_View));
+      }
+      await tester.pumpAndSettle();
+      final selected = await result.future;
+      switch (action) {
+        case 'apply':
+          expect((selected as ApplySavedNoteView).view, same(views.first));
+        case 'rename':
+          expect((selected as RenameSavedNoteView).view, same(views.first));
+        case 'delete':
+          expect((selected as DeleteSavedNoteView).view, same(views.first));
+      }
+      expect(views, hasLength(30));
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('updated saved-view props refresh the limit without losing edits',
+      (tester) async {
+    final updates = ValueNotifier(_savedViews(29));
+    addTearDown(updates.dispose);
+    final result = await open(tester, viewUpdates: updates);
+    await tester.tap(key('library-filter-scans'));
+    await tester.pump();
+    expect(tester.widget<FilterChip>(key('library-filter-scans')).selected,
+        isTrue);
+    expect(tester.widget<ListTile>(key('library-save-view')).onTap, isNotNull);
+
+    updates.value = _savedViews(30);
+    await tester.pump();
+    final save = key('library-save-view');
+    expect(tester.widget<ListTile>(save).onTap, isNull);
+    expect(key('library-saved-view-limit'), findsOneWidget);
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pump();
+    expect(result.isCompleted, isFalse);
+
+    updates.value = _savedViews(29);
+    await tester.pump();
+    expect(tester.widget<ListTile>(save).onTap, isNotNull);
+    expect(key('library-saved-view-limit'), findsNothing);
+    expect(tester.widget<FilterChip>(key('library-filter-scans')).selected,
+        isTrue);
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(((await result.future) as CreateSavedNoteView).filters,
+        {NoteSearchFilter.scans});
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Trash and unavailable views retain distinct feedback',
+      (tester) async {
+    final views = _savedViews(30);
+    final trashResult = await open(tester, views: views, trash: true);
+    expect(key('library-save-view'), findsNothing);
+    expect(key('library-saved-view-limit'), findsNothing);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await trashResult.future, isNull);
+
+    await open(tester, views: views, unavailable: true);
+    expect(key('library-save-view'), findsNothing);
+    expect(key('library-saved-view-limit'), findsNothing);
+    final strings = S.of(tester.element(find.byType(LibraryFiltersSheet)));
+    expect(find.text(strings.Saved_View_Failed), findsOneWidget);
+    expect(find.text(strings.Saved_View_Empty), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK'),
+  ]) {
+    testWidgets('saved-view limit fits narrow 2× text in $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final result = await open(tester,
+          views: _savedViews(30), locale: locale, textScale: 2);
+      final save = key('library-save-view');
+      final message = key('library-saved-view-limit');
+      await tester.ensureVisible(message);
+      await tester.pumpAndSettle();
+      final strings = S.of(tester.element(message));
+      expect(tester.widget<Text>(message).data,
+          strings.Saved_View_Limit_Reached(30));
+      expect(tester.widget<Text>(message).maxLines, isNull);
+      expect(tester.widget<ListTile>(save).enabled, isFalse);
+      await tester.tap(save);
+      await tester.pump();
+      expect(result.isCompleted, isFalse);
+      await tester.ensureVisible(key('library-apply-filters'));
+      await tester.pumpAndSettle();
+      await tester.tap(key('library-apply-filters'));
+      await tester.pumpAndSettle();
+      expect(await result.future, isA<ApplyLibraryFilters>());
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('tag search is local, literal, normalized and case insensitive',
       (tester) async {
     final result = await open(tester,

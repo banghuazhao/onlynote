@@ -475,6 +475,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     }
   }
 
+  Future<void> _showNoteInfo(Note note, {BuildContext? sheetContext}) async {
+    if (sheetContext != null) {
+      if (!sheetContext.mounted) return;
+      final route = ModalRoute.of(sheetContext);
+      if (route?.isCurrent != true) return;
+      Navigator.pop(sheetContext);
+      await route?.completed;
+    }
+    if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+    await showNoteInfoSheet(
+      context: context,
+      statistics: NoteStatistics.fromNote(note),
+      deletedAt: note.isDeleted ? note.deletedAt : null,
+    );
+  }
+
   void _showMoreOptions(Note note) {
     showAppActionSheet(
       context: context,
@@ -527,14 +543,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         AppSheetAction(
           leading: const Icon(Icons.info_outline_rounded),
           title: Text(S.of(context).Note_Info),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            showNoteInfoSheet(
-              context: context,
-              statistics: NoteStatistics.fromNote(note),
-              deletedAt: note.isDeleted ? note.deletedAt : null,
-            );
-          },
+          onPressed: (sheetContext) =>
+              _showNoteInfo(note, sheetContext: sheetContext),
         ),
         AppSheetAction(
           leading: Icon(note.isArchived
@@ -947,6 +957,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           },
         ),
         AppSheetAction(
+          leading: const Icon(Icons.info_outline_rounded),
+          title: Text(S.of(context).Note_Info),
+          onPressed: (sheetContext) =>
+              _showNoteInfo(note, sheetContext: sheetContext),
+        ),
+        AppSheetAction(
           leading: const Icon(Icons.restore_outlined),
           title: Text(S.of(context).Restore),
           onPressed: (sheetContext) {
@@ -981,6 +997,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
               tooltip: S.of(context).Share,
               child: const Icon(Icons.share_outlined),
               onPressed: () => _shareNoteAsImage(note)),
+          AppButton(
+              tooltip: S.of(context).Note_Info,
+              child: const Icon(Icons.info_outline_rounded),
+              onPressed: () => _showNoteInfo(note)),
           AppButton(
               tooltip: S.of(context).Restore,
               child: const Icon(Icons.restore_outlined),

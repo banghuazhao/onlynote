@@ -8,6 +8,7 @@ import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 import 'library_filter_labels.dart';
+import 'saved_view_save_action.dart';
 
 sealed class LibraryFilterResult {
   const LibraryFilterResult();
@@ -277,11 +278,10 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
               ),
             ),
           if (!widget.showTrash && !widget.viewsUnavailable)
-            ListTile(
-              key: const ValueKey('library-save-view'),
-              leading: const Icon(Icons.bookmark_add_outlined),
-              title: Text(s.Save_Current_View),
-              onTap: () => Navigator.pop(context,
+            SavedViewSaveAction(
+              viewCount: widget.savedViews.length,
+              maxViews: SavedNoteViewStore.maxViews,
+              onSave: () => Navigator.pop(context,
                   CreateSavedNoteView(Set.of(_filters), Set.of(_tags), _scope)),
             ),
         ],

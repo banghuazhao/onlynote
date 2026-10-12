@@ -659,5 +659,15 @@
         "type": "String"
       }
     }
+  },
+  "Search_Folders": "搜索文件夹",
+  "Folder_Search_Empty": "没有符合搜索条件的文件夹。",
+  "Saved_View_Limit_Reached": "最多可保存 {limit} 个视图。删除一个已保存的视图后可添加新视图。",
+  "@Saved_View_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
   }
 }

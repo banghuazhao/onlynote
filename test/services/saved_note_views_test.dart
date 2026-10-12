@@ -16,7 +16,57 @@ class _FailingPreferences extends MemoryPreferences {
   }
 }
 
+class _CountingPreferences extends MemoryPreferences {
+  final _writtenKeys = <String>[];
+  int get stringWrites => _writtenKeys.length;
+
+  @override
+  Future<void> setString(String key, String value) async {
+    _writtenKeys.add(key);
+    await super.setString(key, value);
+  }
+}
+
 void main() {
+  test('the 30th view saves and the 31st cannot write or mutate saved views',
+      () async {
+    expect(SavedNoteViewStore.maxViews, 30);
+    final preferences = _CountingPreferences();
+    final store = SavedNoteViewStore(preferences: preferences);
+    addTearDown(store.dispose);
+    for (var index = 0; index < SavedNoteViewStore.maxViews - 1; index++) {
+      await store.create(name: 'View ${index + 1}');
+    }
+    expect(store.views, hasLength(29));
+    final finalView = await store.create(
+        name: 'Last available view',
+        query: 'Meeting',
+        filters: {NoteSearchFilter.recordings},
+        tags: ['Work'],
+        folderId: 'work',
+        archiveScope: NoteArchiveScope.all);
+    expect(store.views, hasLength(30));
+    expect(store.views.last, same(finalView));
+    expect(preferences.stringWrites, 30);
+    final saved = store.views;
+    final durableValues = Map<String, Object>.of(preferences.values);
+    var notifications = 0;
+    store.addListener(() => notifications++);
+
+    await expectLater(store.create(name: 'One too many'), throwsStateError);
+    expect(store.views, orderedEquals(saved));
+    expect(preferences.values, durableValues);
+    expect(preferences.stringWrites, 30);
+    expect(notifications, 0);
+
+    final reopened = SavedNoteViewStore(preferences: preferences);
+    addTearDown(reopened.dispose);
+    await reopened.load();
+    expect(reopened.views, hasLength(30));
+    expect(reopened.views.last.toJson(), finalView.toJson());
+    expect(preferences.stringWrites, 30);
+  });
+
   test('saved view round trips its search, filters, tags, folder and scope',
       () async {
     final preferences = MemoryPreferences();

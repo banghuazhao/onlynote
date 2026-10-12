@@ -4967,6 +4967,36 @@ class S {
       args: [],
     );
   }
+
+  /// `Search folders`
+  String get Search_Folders {
+    return Intl.message(
+      'Search folders',
+      name: 'Search_Folders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching folders.`
+  String get Folder_Search_Empty {
+    return Intl.message(
+      'No matching folders.',
+      name: 'Folder_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can save up to {limit} views. Delete a saved view to add another.`
+  String Saved_View_Limit_Reached(int limit) {
+    return Intl.message(
+      'You can save up to $limit views. Delete a saved view to add another.',
+      name: 'Saved_View_Limit_Reached',
+      desc: '',
+      args: [limit],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -73,15 +73,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m25(criterion) => "移除${criterion}";
 
-  static String m26(query) => "搜尋：${query}";
+  static String m26(limit) => "最多可儲存 ${limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。";
 
-  static String m27(tags) => "標籤：${tags}";
+  static String m27(query) => "搜尋：${query}";
 
-  static String m28(count) => "${count} 則筆記";
+  static String m28(tags) => "標籤：${tags}";
 
-  static String m29(count) => "已加入 ${count} 項清單";
+  static String m29(count) => "${count} 則筆記";
 
-  static String m30(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m30(count) => "已加入 ${count} 項清單";
+
+  static String m31(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -363,6 +365,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Folder_Name": MessageLookupByLibrary.simpleMessage("資料夾名稱"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("請輸入資料夾名稱。"),
     "Folder_Notes_Count": m10,
+    "Folder_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有符合搜尋條件的資料夾。",
+    ),
     "Folder_Unavailable": MessageLookupByLibrary.simpleMessage("此資料夾已不存在。"),
     "Folders": MessageLookupByLibrary.simpleMessage("資料夾"),
     "Font_Preview": MessageLookupByLibrary.simpleMessage("留一點空間，記錄下一個好想法。"),
@@ -690,17 +695,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("刪除此檢視？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("儲存搜尋或篩選，下次快速開啟。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("無法儲存此檢視，請再試一次。"),
+    "Saved_View_Limit_Reached": m26,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("檢視名稱"),
-    "Saved_View_Search": m26,
-    "Saved_View_Tags": m27,
+    "Saved_View_Search": m27,
+    "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
+    "Search_Folders": MessageLookupByLibrary.simpleMessage("搜尋資料夾"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
-    "Search_Results_Count": m28,
+    "Search_Results_Count": m29,
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜尋標籤"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m29,
+    "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
@@ -784,7 +791,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m30,
+    "Template_Details": m31,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

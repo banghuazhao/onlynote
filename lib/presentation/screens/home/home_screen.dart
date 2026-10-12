@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/note_search_feedback.dart';
 import 'package:onlynote/presentation/components/note_active_criteria_summary.dart';
 import 'package:onlynote/presentation/components/photo_search_status.dart';
@@ -327,6 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       switch (result) {
         case CreateSavedNoteView():
+          if (!_ensureSavedViewCapacity()) return;
           final name = await showDialog<String>(
               context: context,
               builder: (_) => FolderNameDialog(
@@ -336,6 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     maxLength: 80,
                   ));
           if (!mounted || name == null) return;
+          if (!_ensureSavedViewCapacity()) return;
           final view = await _savedViews.create(
             name: name,
             query: data.query,
@@ -378,9 +381,20 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (_) {
       if (mounted) {
+        if (result is CreateSavedNoteView && !_ensureSavedViewCapacity()) {
+          return;
+        }
         context.showToast(S.of(context).Saved_View_Failed, isError: true);
       }
     }
+  }
+
+  bool _ensureSavedViewCapacity() {
+    if (_savedViews.views.length < SavedNoteViewStore.maxViews) return true;
+    context.showToast(
+        S.of(context).Saved_View_Limit_Reached(SavedNoteViewStore.maxViews),
+        isError: true);
+    return false;
   }
 
   void _applyView(SavedNoteView view) {
@@ -1683,38 +1697,20 @@ class __BuildNotesListState extends State<_BuildNotesList> {
   }
 
   void _showMoveToFolderSheet(BuildContext context, Note note) {
-    showAppActionSheet(
+    showAppSheet<void>(
       context: context,
-      title: S.of(context).Move_To_Folder,
-      actions: <AppSheetAction>[
-        AppSheetAction(
-          leading: const Icon(Icons.notes_outlined),
-          title: Text(S.of(context).No_Folder),
-          selected: note.folderId == null,
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            context.read<HomeBloc>().add(
-                  HomeEvent.moveNoteToFolder(noteId: note.id!, folderId: null),
-                );
-          },
-        ),
-        ...widget.folders.map(
-          (folder) => AppSheetAction(
-            leading: const Icon(Icons.folder_outlined),
-            title: Text(folder.name),
-            selected: note.folderId == folder.id,
-            onPressed: (sheetContext) {
-              Navigator.pop(sheetContext);
-              context.read<HomeBloc>().add(
-                    HomeEvent.moveNoteToFolder(
-                      noteId: note.id!,
-                      folderId: folder.id,
-                    ),
-                  );
-            },
-          ),
-        ),
-      ],
+      builder: (sheetContext) => MoveToFolderSheet(
+        folders: widget.folders,
+        selectedFolderId: note.folderId,
+        onSelected: (folderId) {
+          Navigator.pop(sheetContext);
+          if (!context.mounted) return;
+          context.read<HomeBloc>().add(
+                HomeEvent.moveNoteToFolder(
+                    noteId: note.id!, folderId: folderId),
+              );
+        },
+      ),
     );
   }
 
@@ -2303,19 +2299,42 @@ class _ManageFolders extends _FolderPickerResult {
   const _ManageFolders();
 }
 
-class _FolderPickerSheet extends StatelessWidget {
+class _FolderPickerSheet extends StatefulWidget {
   const _FolderPickerSheet({required this.scope});
 
   final _FolderScope scope;
 
   @override
+  State<_FolderPickerSheet> createState() => _FolderPickerSheetState();
+}
+
+class _FolderPickerSheetState extends State<_FolderPickerSheet> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
+    final scope = widget.scope;
+    final folders = filterFoldersByName(scope.folders, _searchController.text);
     return AppSheet(
       title: l10n.Folders,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: FolderNameSearchField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              keyPrefix: 'folder-picker',
+            ),
+          ),
           _PickerTile(
             icon: Icons.notes_rounded,
             label: l10n.All_Notes,
@@ -2325,8 +2344,11 @@ class _FolderPickerSheet extends StatelessWidget {
                 scope.selectedFolderId == null,
             onTap: () => Navigator.pop(context, const _SelectAll()),
           ),
-          for (final folder in scope.folders)
+          if (folders.isEmpty && _searchController.text.trim().isNotEmpty)
+            const FolderNameSearchEmpty(keyPrefix: 'folder-picker'),
+          for (final folder in folders)
             _PickerTile(
+              key: ValueKey('folder-picker-folder-${folder.id}'),
               icon: Icons.folder_rounded,
               label: folder.name,
               count: scope.folderCounts[folder.id] ?? 0,
@@ -2381,6 +2403,7 @@ class _FolderPickerSheet extends StatelessWidget {
 
 class _PickerTile extends StatelessWidget {
   const _PickerTile({
+    super.key,
     required this.icon,
     required this.label,
     required this.count,

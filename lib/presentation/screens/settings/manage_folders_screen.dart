@@ -7,6 +7,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -21,6 +22,13 @@ class ManageFoldersScreen extends StatefulWidget {
 
 class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
   bool _openingFolder = false;
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _openFolder(Folder folder) async {
     if (!mounted ||
@@ -64,28 +72,19 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                         animation: Listenable.merge(
                             [foldersListenable, notesListenable]),
                         builder: (context, _) {
-                          final folders = foldersListenable.value.values
+                          final allFolders = foldersListenable.value.values
                               .whereType<FolderDto>()
                               .map((folder) => folder.toDomain())
                               .toList()
                             ..sort(_compareFolders);
+                          final folders = filterFoldersByName(
+                              allFolders, _searchController.text);
                           final noteCounts =
                               _noteCountsByFolder(notesListenable.value);
 
-                          if (folders.isEmpty) {
-                            return Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(context.tokens.space5),
-                                child: Text(
-                                  S.of(context).No_Folders,
-                                  textAlign: TextAlign.center,
-                                  style: context.textStyles.bodyLarge,
-                                ),
-                              ),
-                            );
-                          }
-
-                          return ListView.separated(
+                          return ListView.builder(
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             padding: EdgeInsets.fromLTRB(
                               context.tokens.space4,
                               context.tokens.space2,
@@ -93,72 +92,103 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                               // Clears the extended FAB so it can't sit on the last folder.
                               context.tokens.space6 * 3,
                             ),
-                            itemCount: folders.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 8),
+                            itemCount: folders.isEmpty ? 2 : folders.length + 1,
                             itemBuilder: (context, index) {
-                              final folder = folders[index];
+                              if (index == 0) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: FolderNameSearchField(
+                                    controller: _searchController,
+                                    onChanged: (_) => setState(() {}),
+                                    keyPrefix: 'managed-folders',
+                                  ),
+                                );
+                              }
+                              if (folders.isEmpty) {
+                                return _searchController.text.trim().isNotEmpty
+                                    ? const FolderNameSearchEmpty(
+                                        keyPrefix: 'managed-folders')
+                                    : Padding(
+                                        padding: EdgeInsets.all(
+                                            context.tokens.space5),
+                                        child: Text(S.of(context).No_Folders,
+                                            textAlign: TextAlign.center,
+                                            style:
+                                                context.textStyles.bodyLarge),
+                                      );
+                              }
+                              final folder = folders[index - 1];
                               final noteCount = noteCounts[folder.id] ?? 0;
-                              return Card(
-                                  child: Semantics(
-                                      hint: S
-                                          .of(context)
-                                          .Open_Folder_In_Library(folder.name),
-                                      child: ListTile(
-                                        key: ValueKey(
-                                            'managed-folder-${folder.id}'),
-                                        onTap: () => _openFolder(folder),
-                                        leading:
-                                            const Icon(Icons.folder_outlined),
-                                        title: Text(folder.name),
-                                        subtitle: Text(S
-                                            .of(context)
-                                            .Folder_Notes_Count(noteCount)),
-                                        trailing:
-                                            PopupMenuButton<_FolderAction>(
-                                          key: ValueKey(
-                                              'managed-folder-${folder.id}-menu'),
-                                          tooltip: S.of(context).Edit,
-                                          onSelected: (action) {
-                                            switch (action) {
-                                              case _FolderAction.rename:
-                                                _showFolderNameDialog(context,
-                                                    folder: folder);
-                                              case _FolderAction.delete:
-                                                _deleteFolder(context, folder);
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                              value: _FolderAction.rename,
-                                              child: ListTile(
-                                                contentPadding: EdgeInsets.zero,
-                                                leading: const Icon(Icons
-                                                    .drive_file_rename_outline),
-                                                title: Text(S
-                                                    .of(context)
-                                                    .Rename_Folder),
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: _FolderAction.delete,
-                                              child: ListTile(
-                                                contentPadding: EdgeInsets.zero,
-                                                leading: Icon(
-                                                    Icons.delete_outline,
-                                                    color:
-                                                        context.colors.error),
-                                                title: Text(
-                                                  S.of(context).Delete_Folder,
-                                                  style: TextStyle(
-                                                      color:
-                                                          context.colors.error),
+                              return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Card(
+                                      child: Semantics(
+                                          hint: S
+                                              .of(context)
+                                              .Open_Folder_In_Library(
+                                                  folder.name),
+                                          child: ListTile(
+                                            key: ValueKey(
+                                                'managed-folder-${folder.id}'),
+                                            onTap: () => _openFolder(folder),
+                                            leading: const Icon(
+                                                Icons.folder_outlined),
+                                            title: Text(folder.name),
+                                            subtitle: Text(S
+                                                .of(context)
+                                                .Folder_Notes_Count(noteCount)),
+                                            trailing:
+                                                PopupMenuButton<_FolderAction>(
+                                              key: ValueKey(
+                                                  'managed-folder-${folder.id}-menu'),
+                                              tooltip: S.of(context).Edit,
+                                              onSelected: (action) {
+                                                switch (action) {
+                                                  case _FolderAction.rename:
+                                                    _showFolderNameDialog(
+                                                        context,
+                                                        folder: folder);
+                                                  case _FolderAction.delete:
+                                                    _deleteFolder(
+                                                        context, folder);
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                PopupMenuItem(
+                                                  value: _FolderAction.rename,
+                                                  child: ListTile(
+                                                    contentPadding:
+                                                        EdgeInsets.zero,
+                                                    leading: const Icon(Icons
+                                                        .drive_file_rename_outline),
+                                                    title: Text(S
+                                                        .of(context)
+                                                        .Rename_Folder),
+                                                  ),
                                                 ),
-                                              ),
+                                                PopupMenuItem(
+                                                  value: _FolderAction.delete,
+                                                  child: ListTile(
+                                                    contentPadding:
+                                                        EdgeInsets.zero,
+                                                    leading: Icon(
+                                                        Icons.delete_outline,
+                                                        color: context
+                                                            .colors.error),
+                                                    title: Text(
+                                                      S
+                                                          .of(context)
+                                                          .Delete_Folder,
+                                                      style: TextStyle(
+                                                          color: context
+                                                              .colors.error),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      )));
+                                          ))));
                             },
                           );
                         },
