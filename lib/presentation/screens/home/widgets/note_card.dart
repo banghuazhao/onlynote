@@ -12,6 +12,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_image.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
+import 'package:onlynote/presentation/components/reminder_date_label.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
@@ -395,20 +396,13 @@ class NoteCardState extends State<NoteCard> {
                             Padding(
                               padding:
                                   const EdgeInsets.only(top: AppSpacings.s),
-                              child: Row(children: [
-                                Icon(Icons.alarm_rounded,
-                                    size: 14,
-                                    color:
-                                        AppColors.ink.withValues(alpha: .65)),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(currentReminder.timeString,
-                                      style: typography.description.copyWith(
-                                        color: AppColors.ink
-                                            .withValues(alpha: .65),
-                                      )),
+                              child: ReminderDateLabel(
+                                date: currentReminder
+                                    .nextOccurrence(DateTime.now()),
+                                style: typography.description.copyWith(
+                                  color: AppColors.ink.withValues(alpha: .65),
                                 ),
-                              ]),
+                              ),
                             ),
                         ],
                         if (note.hasVoiceMemos) ...[

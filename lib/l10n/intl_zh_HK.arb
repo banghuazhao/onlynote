@@ -669,5 +669,33 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Tags_Selected_Count": "已選取 {count} 個標籤",
+  "@Tags_Selected_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Hidden_By_Search_Count": "搜尋隱藏了 {count} 個已選標籤",
+  "@Tags_Hidden_By_Search_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Selection_Limit_Reached": "最多可選取 {limit} 個標籤。取消選取一個標籤後可選取其他標籤。",
+  "@Tags_Selection_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "Search_Saved_Views": "搜尋已儲存的檢視",
+  "Saved_Views_Search_Empty": "沒有符合搜尋條件的已儲存檢視。",
+  "Search_Templates": "搜尋範本",
+  "Templates_Search_Empty": "沒有符合搜尋條件的範本。"
 }

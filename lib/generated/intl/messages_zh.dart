@@ -83,7 +83,13 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m30(count) => "已添加 ${count} 项清单";
 
-  static String m31(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m31(count) => "搜索隐藏了 ${count} 个已选标签";
+
+  static String m32(count) => "已选 ${count} 个标签";
+
+  static String m33(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+
+  static String m34(items, photos) => "${items} 项 · ${photos} 张照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -700,12 +706,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Search": m27,
     "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已保存的视图"),
+    "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "没有符合搜索条件的已保存视图。",
+    ),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜索"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜索文件夹"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜索备忘录"),
     "Search_Results_Count": m29,
+    "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜索已保存的视图"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜索标签"),
+    "Search_Templates": MessageLookupByLibrary.simpleMessage("搜索模板"),
     "Select": MessageLookupByLibrary.simpleMessage("选择"),
     "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
@@ -766,7 +777,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "最多添加20个标签，每个标签不超过40个字符。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("标签"),
+    "Tags_Hidden_By_Search_Count": m31,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("没有符合搜索条件的标签"),
+    "Tags_Selected_Count": m32,
+    "Tags_Selection_Limit_Reached": m33,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "无法更新模板，请重试。",
@@ -791,7 +805,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m31,
+    "Template_Details": m34,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -829,6 +843,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Templates_Description": MessageLookupByLibrary.simpleMessage(
       "从实用的大纲开始，再按需要编辑。",
+    ),
+    "Templates_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "没有符合搜索条件的模板。",
     ),
     "Theme_Dark": MessageLookupByLibrary.simpleMessage("深色"),
     "Theme_Light": MessageLookupByLibrary.simpleMessage("浅色"),

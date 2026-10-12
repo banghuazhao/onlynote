@@ -83,7 +83,13 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m30(count) => "已加入 ${count} 項清單";
 
-  static String m31(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m31(count) => "搜尋隱藏了 ${count} 個已選標籤";
+
+  static String m32(count) => "已選取 ${count} 個標籤";
+
+  static String m33(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+
+  static String m34(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -700,12 +706,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Search": m27,
     "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
+    "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有符合搜尋條件的已儲存檢視。",
+    ),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜尋資料夾"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
     "Search_Results_Count": m29,
+    "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜尋已儲存的檢視"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜尋標籤"),
+    "Search_Templates": MessageLookupByLibrary.simpleMessage("搜尋範本"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
     "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
@@ -766,7 +777,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "最多新增20個標籤，每個標籤不超過40個字元。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("標籤"),
+    "Tags_Hidden_By_Search_Count": m31,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("沒有符合搜尋條件的標籤"),
+    "Tags_Selected_Count": m32,
+    "Tags_Selection_Limit_Reached": m33,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "無法更新範本，請重試。",
@@ -791,7 +805,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m31,
+    "Template_Details": m34,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -829,6 +843,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Templates_Description": MessageLookupByLibrary.simpleMessage(
       "從實用的大綱開始，再按需要編輯。",
+    ),
+    "Templates_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有符合搜尋條件的範本。",
     ),
     "Theme_Dark": MessageLookupByLibrary.simpleMessage("深色"),
     "Theme_Light": MessageLookupByLibrary.simpleMessage("淺色"),

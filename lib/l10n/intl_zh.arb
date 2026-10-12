@@ -669,5 +669,33 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Tags_Selected_Count": "已选 {count} 个标签",
+  "@Tags_Selected_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Hidden_By_Search_Count": "搜索隐藏了 {count} 个已选标签",
+  "@Tags_Hidden_By_Search_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Selection_Limit_Reached": "最多可选择 {limit} 个标签。取消选择一个标签后可选择其他标签。",
+  "@Tags_Selection_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "Search_Saved_Views": "搜索已保存的视图",
+  "Saved_Views_Search_Empty": "没有符合搜索条件的已保存视图。",
+  "Search_Templates": "搜索模板",
+  "Templates_Search_Empty": "没有符合搜索条件的模板。"
 }

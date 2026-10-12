@@ -95,7 +95,16 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m30(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m31(items, photos) =>
+  static String m31(count) =>
+      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+
+  static String m32(count) =>
+      "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
+
+  static String m33(limit) =>
+      "You can select up to ${limit} tags. Deselect a tag to choose another.";
+
+  static String m34(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -919,12 +928,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Search": m27,
     "Saved_View_Tags": m28,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
+    "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching saved views.",
+    ),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("Search folders"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
     "Search_Results_Count": m29,
+    "Search_Saved_Views": MessageLookupByLibrary.simpleMessage(
+      "Search saved views",
+    ),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("Search tags"),
+    "Search_Templates": MessageLookupByLibrary.simpleMessage(
+      "Search templates",
+    ),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
     "Selection_Checklist_Added": m30,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
@@ -997,9 +1015,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Use up to 20 tags, with 40 characters per tag.",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
+    "Tags_Hidden_By_Search_Count": m31,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No tags match your search",
     ),
+    "Tags_Selected_Count": m32,
+    "Tags_Selection_Limit_Reached": m33,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -1028,7 +1049,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m31,
+    "Template_Details": m34,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -1074,6 +1095,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Templates_Description": MessageLookupByLibrary.simpleMessage(
       "Start with a useful outline, then make it yours.",
+    ),
+    "Templates_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching templates.",
     ),
     "Theme_Dark": MessageLookupByLibrary.simpleMessage("Dark"),
     "Theme_Light": MessageLookupByLibrary.simpleMessage("Light"),

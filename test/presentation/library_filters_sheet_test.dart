@@ -91,7 +91,399 @@ Future<void> searchTags(WidgetTester tester, String query) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> searchViews(WidgetTester tester, String query) async {
+  final field = key('library-search-saved-views');
+  await tester.ensureVisible(field);
+  await tester.pumpAndSettle();
+  await tester.enterText(field, query);
+  await tester.pumpAndSettle();
+}
+
+void expectTagCounts(WidgetTester tester, int selected, int hidden) {
+  final count = key('library-tags-selected-count');
+  final strings = S.of(tester.element(count));
+  expect(
+      tester.widget<Text>(count).data, strings.Tags_Selected_Count(selected));
+  if (hidden == 0) {
+    expect(key('library-tags-hidden-count'), findsNothing);
+  } else {
+    expect(tester.widget<Text>(key('library-tags-hidden-count')).data,
+        strings.Tags_Hidden_By_Search_Count(hidden));
+  }
+  if (selected >= 20) {
+    expect(tester.widget<Text>(key('library-tags-selection-limit')).data,
+        strings.Tags_Selection_Limit_Reached(20));
+  } else {
+    expect(key('library-tags-selection-limit'), findsNothing);
+  }
+}
+
 void main() {
+  for (final count in [19, 20]) {
+    testWidgets('tag feedback counts all $count selections hidden by search',
+        (tester) async {
+      final original = {for (var i = 0; i < count; i++) 'Tag $i'};
+      final result = await open(tester,
+          selectedTags: original, tags: [...original, 'New tag']);
+      expectTagCounts(tester, count, 0);
+      await searchTags(tester, 'New');
+      expectTagCounts(tester, count, count);
+      final newTag = key('library-tag-new tag');
+      expect(tester.widget<FilterChip>(newTag).onSelected,
+          count == 20 ? isNull : isNotNull);
+      await tester.ensureVisible(newTag);
+      await tester.tap(newTag);
+      await tester.pump();
+      expectTagCounts(tester, 20, count);
+
+      final clear = key('library-clear-tag-search');
+      await tester.ensureVisible(clear);
+      await tester.tap(clear);
+      await tester.pumpAndSettle();
+      expectTagCounts(tester, 20, 0);
+      final firstTag = key('library-tag-tag 0');
+      await tester.ensureVisible(firstTag);
+      expect(tester.widget<FilterChip>(firstTag).onSelected, isNotNull);
+      await tester.tap(firstTag);
+      await tester.pump();
+      expectTagCounts(tester, 19, 0);
+      await tester.ensureVisible(key('library-apply-filters'));
+      await tester.tap(key('library-apply-filters'));
+      await tester.pumpAndSettle();
+      final selected = (await result.future) as ApplyLibraryFilters;
+      expect(selected.tags, hasLength(19));
+      expect(selected.tags, isNot(contains('Tag 0')));
+      expect(selected.tags.contains('New tag'), count == 19);
+      expect(original, hasLength(count));
+      expect(original, contains('Tag 0'));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('saved-view search matches names literally and preserves order',
+      (tester) async {
+    final views = [
+      SavedNoteView(id: 'z', name: 'Work', query: 'only-search-query'),
+      SavedNoteView(id: 'a', name: 'WORK meetings'),
+      SavedNoteView(id: 'literal', name: 'C++ [2026]'),
+      SavedNoteView(id: 'chinese', name: '項目閱讀與研究'),
+      SavedNoteView(id: 'unicode', name: 'Ångström'),
+    ];
+    final result = await open(tester, views: views, selectedViewId: 'z');
+    expect(tester.testTextInput.hasAnyClients, isFalse);
+    await searchViews(tester, '  wOrK  ');
+    expect(key('saved-view-z'), findsOneWidget);
+    expect(key('saved-view-a'), findsOneWidget);
+    expect(key('saved-view-literal'), findsNothing);
+    expect(tester.getTopLeft(key('saved-view-z')).dy,
+        lessThan(tester.getTopLeft(key('saved-view-a')).dy));
+    expect(tester.widget<ListTile>(key('saved-view-z')).selected, isTrue);
+
+    for (final (query, id) in [
+      ('++', 'literal'),
+      ('[2026]', 'literal'),
+      ('  研究  ', 'chinese'),
+      ('ångström', 'unicode'),
+    ]) {
+      await searchViews(tester, query);
+      expect(key('saved-view-$id'), findsOneWidget);
+      expect(key('library-saved-views-search-empty'), findsNothing);
+    }
+    await searchViews(tester, '.*');
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    expect(key('saved-view-literal'), findsNothing);
+    await searchViews(tester, 'only-search-query');
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    expect(key('saved-view-z'), findsNothing);
+    expect(result.isCompleted, isFalse);
+
+    final clear = key('library-clear-saved-view-search');
+    expect(tester.widget<IconButton>(clear).tooltip, S.current.Clear_Search);
+    await tester.tap(clear);
+    await tester.pumpAndSettle();
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(key('library-clear-saved-view-search'), findsNothing);
+    for (final view in views) {
+      expect(key('saved-view-${view.id}'), findsOneWidget);
+    }
+    expect(tester.widget<ListTile>(key('saved-view-z')).selected, isTrue);
+    expect(views.map((view) => view.id),
+        ['z', 'a', 'literal', 'chinese', 'unicode']);
+    await searchViews(tester, ' \t ');
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(key('saved-view-z'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('searched saved views retain original apply, rename and delete',
+      (tester) async {
+    final target = SavedNoteView(
+        id: 'literal',
+        name: 'C++ [2026]',
+        query: 'Keep query',
+        filters: {NoteSearchFilter.recordings},
+        tags: ['Research'],
+        folderId: 'work',
+        archiveScope: NoteArchiveScope.all);
+    final views = [SavedNoteView(id: 'other', name: 'Other'), target];
+    for (final action in ['apply', 'rename', 'delete']) {
+      final result = await open(tester, views: views);
+      await searchViews(tester, '[2026]');
+      final row = key('saved-view-literal');
+      expect(key('saved-view-other'), findsNothing);
+      await tester.ensureVisible(row);
+      await tester.pumpAndSettle();
+      if (action == 'apply') {
+        await tester.tap(row);
+      } else {
+        final menu = find.descendant(
+            of: row, matching: find.byType(PopupMenuButton<String>));
+        await tester.tap(menu);
+        await tester.pumpAndSettle();
+        final strings = S.of(tester.element(menu));
+        await tester.tap(find.text(
+            action == 'rename' ? strings.Rename_View : strings.Delete_View));
+      }
+      await tester.pumpAndSettle();
+      final selected = await result.future;
+      switch (action) {
+        case 'apply':
+          expect((selected as ApplySavedNoteView).view, same(target));
+        case 'rename':
+          expect((selected as RenameSavedNoteView).view, same(target));
+        case 'delete':
+          expect((selected as DeleteSavedNoteView).view, same(target));
+      }
+      expect(target.query, 'Keep query');
+      expect(target.tags, ['Research']);
+      expect(target.filters, {NoteSearchFilter.recordings});
+      expect(target.folderId, 'work');
+      expect(target.archiveScope, NoteArchiveScope.all);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('all 30 query-hidden views still disable saving', (tester) async {
+    final views = _savedViews(30);
+    final result = await open(tester, views: views);
+    await searchViews(tester, 'missing');
+    expect(key('saved-view-view-0'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    expect(find.text(S.current.Saved_View_Empty), findsNothing);
+    final save = key('library-save-view');
+    expect(tester.widget<ListTile>(save).enabled, isFalse);
+    expect(tester.widget<ListTile>(save).onTap, isNull);
+    expect(key('library-saved-view-limit'), findsOneWidget);
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pump();
+    expect(result.isCompleted, isFalse);
+    expect(views, hasLength(30));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('saved-view updates retain the query and refresh visible matches',
+      (tester) async {
+    final target = SavedNoteView(id: 'target', name: 'Work meetings');
+    final updates = ValueNotifier([target]);
+    addTearDown(updates.dispose);
+    await open(tester, viewUpdates: updates, selectedViewId: target.id);
+    await searchViews(tester, 'Work');
+    expect(key('saved-view-target'), findsOneWidget);
+    updates.value = [SavedNoteView(id: 'target', name: 'Personal')];
+    await tester.pump();
+    expect(key('saved-view-target'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    updates.value = [target, SavedNoteView(id: 'new', name: 'Work archive')];
+    await tester.pump();
+    expect(key('saved-view-target'), findsOneWidget);
+    expect(key('saved-view-new'), findsOneWidget);
+    expect(tester.widget<ListTile>(key('saved-view-target')).selected, isTrue);
+    expect(
+        tester
+            .widget<TextField>(key('library-search-saved-views'))
+            .controller!
+            .text,
+        'Work');
+    updates.value = [];
+    await tester.pump();
+    expect(key('library-search-saved-views'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(find.text(S.current.Saved_View_Empty), findsOneWidget);
+    updates.value = [target];
+    await tester.pump();
+    expect(key('saved-view-target'), findsOneWidget);
+    expect(
+        tester
+            .widget<TextField>(key('library-search-saved-views'))
+            .controller!
+            .text,
+        'Work');
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final saveView in [false, true]) {
+    testWidgets(
+        'view search leaves ${saveView ? 'Save' : 'Done'} criteria intact',
+        (tester) async {
+      final result = await open(tester,
+          views: [SavedNoteView(id: 'view', name: 'Reference')],
+          selectedTags: {'Work'},
+          tags: ['Work', 'Personal'],
+          filters: {NoteSearchFilter.scans},
+          scope: NoteArchiveScope.all);
+      await searchTags(tester, 'Personal');
+      expectTagCounts(tester, 1, 1);
+      await searchViews(tester, 'missing');
+      final action =
+          key(saveView ? 'library-save-view' : 'library-apply-filters');
+      await tester.ensureVisible(action);
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+      final selected = (await result.future) as ApplyLibraryFilters;
+      expect(selected.tags, {'Work'});
+      expect(selected.filters, {NoteSearchFilter.scans});
+      expect(selected.scope, NoteArchiveScope.all);
+      expect(
+          selected,
+          saveView
+              ? isA<CreateSavedNoteView>()
+              : isNot(isA<CreateSavedNoteView>()));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('clear criteria resets tag feedback but retains view name search',
+      (tester) async {
+    final result = await open(tester,
+        views: [SavedNoteView(id: 'view', name: 'Reference')],
+        selectedTags: {'Work'},
+        tags: ['Work'],
+        filters: {NoteSearchFilter.scans},
+        scope: NoteArchiveScope.all);
+    await searchTags(tester, 'missing');
+    await searchViews(tester, 'missing');
+    await tester.ensureVisible(key('library-clear-filters'));
+    await tester.tap(key('library-clear-filters'));
+    await tester.pumpAndSettle();
+    expectTagCounts(tester, 0, 0);
+    expect(
+        tester.widget<TextField>(key('library-search-tags')).controller!.text,
+        isEmpty);
+    expect(
+        tester
+            .widget<TextField>(key('library-search-saved-views'))
+            .controller!
+            .text,
+        'missing');
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags, isEmpty);
+    expect(selected.filters, isEmpty);
+    expect(selected.scope, NoteArchiveScope.active);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('closing both searches discards edits and reopens empty searches',
+      (tester) async {
+    final originalTags = {'Work'};
+    final views = [SavedNoteView(id: 'view', name: 'Reference')];
+    final result = await open(tester,
+        views: views, selectedTags: originalTags, tags: ['Work', 'Personal']);
+    await searchTags(tester, 'Personal');
+    await tester.ensureVisible(key('library-tag-personal'));
+    await tester.tap(key('library-tag-personal'));
+    await tester.pump();
+    await searchViews(tester, 'missing');
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await result.future, isNull);
+    expect(originalTags, {'Work'});
+    expect(views, hasLength(1));
+    await open(tester,
+        views: views, selectedTags: originalTags, tags: ['Work', 'Personal']);
+    expectTagCounts(tester, 1, 0);
+    for (final field in ['library-search-tags', 'library-search-saved-views']) {
+      expect(tester.widget<TextField>(key(field)).controller!.text, isEmpty);
+    }
+    expect(key('saved-view-view'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('empty, unavailable and Trash preserve their search distinctions',
+      (tester) async {
+    final empty = await open(tester);
+    expect(key('library-search-saved-views'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(find.text(S.current.Saved_View_Empty), findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await empty.future, isNull);
+
+    final views = [SavedNoteView(id: 'view', name: 'Reference')];
+    final unavailable = await open(tester, views: views, unavailable: true);
+    expect(key('library-search-saved-views'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(find.text(S.current.Saved_View_Failed), findsOneWidget);
+    expect(key('library-save-view'), findsNothing);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await unavailable.future, isNull);
+
+    final trash = await open(tester, views: views, trash: true);
+    expect(key('library-search-saved-views'), findsOneWidget);
+    await searchViews(tester, 'reference');
+    expect(key('saved-view-view'), findsOneWidget);
+    expect(key('library-save-view'), findsNothing);
+    await tester.ensureVisible(key('saved-view-view'));
+    await tester.tap(key('saved-view-view'));
+    await tester.pumpAndSettle();
+    expect((await trash.future as ApplySavedNoteView).view, same(views.single));
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK')
+  ]) {
+    testWidgets('both library searches and tag counts fit narrow 2× $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await open(tester,
+          selectedTags: {'Work'},
+          tags: ['Work', 'Personal'],
+          views: [SavedNoteView(id: 'view', name: '項目研究與會議記錄')],
+          locale: locale,
+          textScale: 2);
+      await searchTags(tester, 'Personal');
+      expectTagCounts(tester, 1, 1);
+      await searchViews(tester, '[.*');
+      final empty = key('library-saved-views-search-empty');
+      await tester.ensureVisible(empty);
+      await tester.pumpAndSettle();
+      final strings = S.of(tester.element(empty));
+      expect(tester.widget<Text>(empty).data, strings.Saved_Views_Search_Empty);
+      final field = key('library-search-saved-views');
+      expect(tester.widget<TextField>(field).decoration!.labelText,
+          strings.Search_Saved_Views);
+      final clear = key('library-clear-saved-view-search');
+      await tester.ensureVisible(clear);
+      await tester.pumpAndSettle();
+      expect(tester.getSize(clear).shortestSide, greaterThanOrEqualTo(48));
+      await tester.tap(clear);
+      await tester.pumpAndSettle();
+      expect(key('saved-view-view'), findsOneWidget);
+      expectTagCounts(tester, 1, 1);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('29 saved views still allows saving the current criteria',
       (tester) async {
     final views = _savedViews(29);
@@ -588,8 +980,12 @@ void main() {
     expect(result.isCompleted, isFalse);
     expect(original, {NoteSearchFilter.photos});
     expect(key('library-tag-work'), findsOneWidget);
-    await tester.tap(key('library-apply-filters'));
+    final done = key('library-apply-filters');
+    await tester.ensureVisible(done);
     await tester.pumpAndSettle();
+    await tester.tap(done.hitTestable());
+    await tester.pumpAndSettle();
+    expect(result.isCompleted, isTrue);
     final selection = (await result.future) as ApplyLibraryFilters;
     expect(selection.filters,
         {NoteSearchFilter.photos, NoteSearchFilter.checklists});

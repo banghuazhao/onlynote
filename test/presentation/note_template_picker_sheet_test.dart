@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -23,6 +28,83 @@ class _WriteCheckedPreferences extends MemoryPreferences {
   }
 }
 
+class _SearchPreferenceControls {
+  Future<void>? readGate;
+  Future<void>? writeGate;
+  int reads = 0;
+  int writes = 0;
+}
+
+class _SearchPreferences extends MemoryPreferences {
+  final _controls = _SearchPreferenceControls();
+  set readGate(Future<void>? gate) => _controls.readGate = gate;
+  set writeGate(Future<void>? gate) => _controls.writeGate = gate;
+  int get reads => _controls.reads;
+  int get writes => _controls.writes;
+
+  @override
+  Future<String?> getString(String key) async {
+    _controls.reads++;
+    await _controls.readGate;
+    return super.getString(key);
+  }
+
+  @override
+  Future<void> setString(String key, String value) async {
+    await _controls.writeGate;
+    _controls.writes++;
+    await super.setString(key, value);
+  }
+}
+
+CustomNoteTemplate _searchTemplate(String id, String name) =>
+    CustomNoteTemplate(
+      id: id,
+      name: name,
+      title: 'Private content label',
+      body: 'Private content body',
+      items: const ['Private content task'],
+      imagePaths: const ['template_images/unavailable.jpg'],
+      voiceMemos: [
+        VoiceMemo(
+          id: 'memo',
+          path: 'template_audio/unavailable.m4a',
+          durationMs: 1000,
+          createdAt: DateTime.utc(2026, 10, 13),
+          transcript: 'Private content transcript',
+        ),
+      ],
+      createdAt: DateTime.utc(2026, 10, 13),
+    );
+
+CustomNoteTemplateStore _searchStore(
+    _SearchPreferences preferences, List<CustomNoteTemplate> templates) {
+  preferences.values[CustomNoteTemplateStore.storageKey] = jsonEncode({
+    'version': 1,
+    'templates': [for (final template in templates) template.toJson()],
+  });
+  return CustomNoteTemplateStore(
+      preferences: preferences, images: MemoryTemplateImages());
+}
+
+Finder get _search => find.byKey(const ValueKey('template-name-search'));
+Finder get _clearSearch =>
+    find.byKey(const ValueKey('template-name-clear-search'));
+Finder get _searchEmpty =>
+    find.byKey(const ValueKey('template-name-search-empty'));
+
+Future<void> _query(WidgetTester tester, String value,
+    {bool settle = true}) async {
+  await tester.ensureVisible(_search);
+  await tester.enterText(_search, value);
+  await tester.testTextInput.receiveAction(TextInputAction.search);
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
+}
+
 Future<void> _openPicker(
   WidgetTester tester,
   List<NoteTemplateSelection?> results, {
@@ -31,6 +113,7 @@ Future<void> _openPicker(
   Size size = const Size(390, 844),
   double textScale = 1,
   bool disableAnimations = true,
+  bool settleLoading = true,
 }) async {
   final templates = store ??
       CustomNoteTemplateStore(
@@ -71,11 +154,338 @@ Future<void> _openPicker(
   ));
   await tester.pumpAndSettle();
   await tester.tap(find.text('Open templates'));
-  await tester.pumpAndSettle();
+  if (settleLoading) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 }
 
 void main() {
   setUpAll(() => initializeDateFormatting());
+
+  testWidgets('name search is literal, ordered and never searches note content',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('z-work', 'Work routine'),
+      _searchTemplate('a-work', 'WORK projects'),
+      _searchTemplate('literal', 'C++ [2026]'),
+      _searchTemplate('cjk', '閱讀與研究茶😀'),
+    ]);
+    final saved = preferences.values[CustomNoteTemplateStore.storageKey];
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store);
+    final originals = store.templates;
+    final reads = preferences.reads;
+    for (final (query, ids) in [
+      ('  wOrK  ', ['z-work', 'a-work']),
+      ('C++', ['literal']),
+      ('[2026]', ['literal']),
+      ('研究茶😀', ['cjk']),
+      ('.*', <String>[]),
+      ('Private content', <String>[]),
+    ]) {
+      await _query(tester, query);
+      final displayed = tester
+          .widgetList<ListTile>(find.byType(ListTile))
+          .map((tile) => tile.key)
+          .whereType<ValueKey<String>>()
+          .where((key) => key.value.startsWith('custom-template-'))
+          .map((key) => key.value.replaceFirst('custom-template-', ''));
+      expect(displayed, ids);
+      expect(_searchEmpty, ids.isEmpty ? findsOneWidget : findsNothing);
+      expect(find.text(S.current.My_Templates), findsOneWidget);
+      expect(find.text(S.current.Starter_Templates), findsOneWidget);
+      expect(preferences.writes, 0);
+      expect(preferences.reads, reads);
+      expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+      expect(store.templates, originals);
+      expect(results, isEmpty);
+    }
+    await tester.tap(_clearSearch);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(_search).controller!.text, isEmpty);
+    expect(_searchEmpty, findsNothing);
+    for (final template in originals) {
+      expect(find.byKey(ValueKey('custom-template-${template.id}')),
+          findsOneWidget);
+    }
+    expect(find.byKey(const ValueKey('template-shopping')), findsOneWidget);
+    await _query(tester, '\u3000');
+    expect(_searchEmpty, findsNothing);
+    expect(find.byKey(const ValueKey('template-meeting')), findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(results, [null]);
+    expect(preferences.writes, 0);
+    expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('starter search uses its displayed localized title in $locale',
+        (tester) async {
+      final preferences = _SearchPreferences();
+      final store = _searchStore(preferences, []);
+      final results = <NoteTemplateSelection?>[];
+      await _openPicker(tester, results, store: store, locale: locale);
+      await _query(
+          tester, ' ${S.current.Template_Meeting_Title.toUpperCase()} ');
+      expect(find.byKey(const ValueKey('template-shopping')), findsNothing);
+      expect(find.byKey(const ValueKey('template-packing')), findsNothing);
+      expect(find.byKey(const ValueKey('template-dailyPlan')), findsNothing);
+      expect(_searchEmpty, findsNothing);
+      expect(find.text(S.current.Search_Templates), findsOneWidget);
+      final meeting = find.byKey(const ValueKey('template-meeting'));
+      await tester.ensureVisible(meeting);
+      await tester.tap(meeting);
+      await tester.pumpAndSettle();
+      expect(results.single!.builtIn, NoteTemplate.meeting);
+      expect(preferences.writes, 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets(
+      'filtered custom selection keeps its identity and guards stale taps',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('other', 'Work routine'),
+      _searchTemplate('chosen', 'C++ [2026]'),
+    ]);
+    final saved = preferences.values[CustomNoteTemplateStore.storageKey];
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store, disableAnimations: false);
+    await _query(tester, 'C++');
+    final chosen = store.templates.last;
+    final callback = tester
+        .widget<ListTile>(find.byKey(const ValueKey('custom-template-chosen')))
+        .onTap!;
+    callback();
+    callback();
+    await tester.pumpAndSettle();
+    callback();
+    expect(results, hasLength(1));
+    expect(results.single!.custom, same(chosen));
+    expect(results.single!.custom!.id, 'chosen');
+    expect(results.single!.custom!.body, 'Private content body');
+    expect(find.text('Open templates'), findsOneWidget);
+    expect(preferences.writes, 0);
+    expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('cancelled filtered picker rejects captured selection and manage',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [_searchTemplate('chosen', 'C++')]);
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store, disableAnimations: false);
+    await _query(tester, 'C++');
+    final select = tester
+        .widget<ListTile>(find.byKey(const ValueKey('custom-template-chosen')))
+        .onTap!;
+    final manage = tester
+        .widget<IconButton>(
+            find.byKey(const ValueKey('manage-template-chosen')))
+        .onPressed!;
+    await tester.tap(find.byTooltip('Close'));
+    select();
+    manage();
+    await tester.pumpAndSettle();
+    select();
+    manage();
+    expect(results, [null]);
+    expect(find.text('Open templates'), findsOneWidget);
+    expect(find.text(S.current.Rename_Template), findsNothing);
+    expect(preferences.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('search keeps pending-load feedback until stored names arrive',
+      (tester) async {
+    final gate = Completer<void>();
+    final preferences = _SearchPreferences()..readGate = gate.future;
+    final store = _searchStore(preferences, [_searchTemplate('new', 'Later')]);
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store, settleLoading: false);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    await _query(tester, 'missing', settle: false);
+    expect(_searchEmpty, findsNothing);
+    expect(results, isEmpty);
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(_searchEmpty, findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+    await _query(tester, 'Later');
+    expect(find.byKey(const ValueKey('custom-template-new')), findsOneWidget);
+    expect(_searchEmpty, findsNothing);
+    expect(preferences.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'search retains loading errors and retry refreshes the same query',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store =
+        _searchStore(preferences, [_searchTemplate('fixed', 'Fixed')]);
+    final stored = preferences.values[CustomNoteTemplateStore.storageKey];
+    preferences.values[CustomNoteTemplateStore.storageKey] = 'not-json';
+    await _openPicker(tester, [], store: store);
+    await _query(tester, 'Fixed');
+    expect(find.text(S.current.Template_Load_Failed), findsOneWidget);
+    expect(_searchEmpty, findsNothing);
+    expect(find.text(S.current.Retry), findsOneWidget);
+    preferences.values[CustomNoteTemplateStore.storageKey] = stored!;
+    await tester.ensureVisible(find.text(S.current.Retry));
+    await tester.tap(find.text(S.current.Retry));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(_search).controller!.text, 'Fixed');
+    expect(find.byKey(const ValueKey('custom-template-fixed')), findsOneWidget);
+    expect(find.text(S.current.Template_Load_Failed), findsNothing);
+    expect(_searchEmpty, findsNothing);
+    expect(preferences.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('live store updates refresh matches without resetting search',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('first', 'Work routine'),
+      _searchTemplate('second', 'Travel'),
+    ]);
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store);
+    await _query(tester, 'Work');
+    expect(find.byKey(const ValueKey('custom-template-first')), findsOneWidget);
+    expect(find.byKey(const ValueKey('custom-template-second')), findsNothing);
+    expect(preferences.writes, 0);
+    await store.rename('second', 'Work trip');
+    await tester.pumpAndSettle();
+    expect(
+        find.byKey(const ValueKey('custom-template-second')), findsOneWidget);
+    expect(tester.widget<TextField>(_search).controller!.text, 'Work');
+    await store.rename('first', 'Other routine');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('custom-template-first')), findsNothing);
+    expect(
+        find.byKey(const ValueKey('custom-template-second')), findsOneWidget);
+    await store.rename('second', 'Trip');
+    await tester.pumpAndSettle();
+    expect(_searchEmpty, findsOneWidget);
+    expect(tester.widget<TextField>(_search).controller!.text, 'Work');
+    expect(results, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('filtered rename uses original ID and busy guards remain active',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('first', 'Work routine'),
+      _searchTemplate('chosen', 'Work target'),
+    ]);
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store);
+    await _query(tester, 'Work');
+    final capturedSelect = tester
+        .widget<ListTile>(find.byKey(const ValueKey('custom-template-first')))
+        .onTap!;
+    final capturedManage = tester
+        .widget<IconButton>(find.byKey(const ValueKey('manage-template-first')))
+        .onPressed!;
+    final manage = find.byKey(const ValueKey('manage-template-chosen'));
+    await tester.ensureVisible(manage);
+    await tester.tap(manage);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Rename_Template));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+        find.byKey(const ValueKey('template-name')), 'Work renamed');
+    final gate = Completer<void>();
+    preferences.writeGate = gate.future;
+    try {
+      await tester.tap(find.text(S.current.OK));
+      await tester.pump();
+      // The dialog result precedes its reverse animation. Keep the write
+      // pending while finishing that animation without settling the spinner.
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(tester.widget<TextField>(_search).enabled, isFalse);
+      expect(tester.widget<IconButton>(_clearSearch).onPressed, isNull);
+      expect(
+          tester
+              .widget<ListTile>(
+                  find.byKey(const ValueKey('custom-template-first')))
+              .onTap,
+          isNull);
+      capturedSelect();
+      capturedManage();
+      await tester.pump();
+      expect(results, isEmpty);
+      expect(find.byType(NoteTemplatePickerSheet), findsOneWidget);
+      expect(find.text(S.current.Rename_Template), findsNothing);
+      expect(preferences.writes, 0);
+      gate.complete();
+      await tester.pumpAndSettle();
+      expect(
+          store.templates.map((template) => template.id), ['first', 'chosen']);
+      expect(store.templates.first.name, 'Work routine');
+      expect(store.templates.last.name, 'Work renamed');
+      expect(store.templates.last.body, 'Private content body');
+      expect(preferences.writes, 1);
+      expect(tester.widget<TextField>(_search).enabled, isTrue);
+      expect(tester.widget<TextField>(_search).controller!.text, 'Work');
+      expect(results, isEmpty);
+      expect(tester.takeException(), isNull);
+    } finally {
+      if (!gate.isCompleted) gate.complete();
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets(
+      'filtered delete cancellation and confirmation keep the correct ID',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      CustomNoteTemplate(
+          id: 'keep', name: 'Work routine', createdAt: DateTime.utc(2026)),
+      CustomNoteTemplate(
+          id: 'delete', name: 'C++ [2026]', createdAt: DateTime.utc(2026)),
+    ]);
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store);
+    await _query(tester, '[2026]');
+    Future<void> requestDelete() async {
+      final manage = find.byKey(const ValueKey('manage-template-delete'));
+      await tester.ensureVisible(manage);
+      await tester.tap(manage);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(S.current.Delete_Template));
+      await tester.pumpAndSettle();
+    }
+
+    await requestDelete();
+    await tester.tap(find.text(S.current.Cancel));
+    await tester.pumpAndSettle();
+    expect(store.templates.map((template) => template.id), ['keep', 'delete']);
+    expect(preferences.writes, 0);
+    await requestDelete();
+    await tester.tap(find.text(S.current.Delete));
+    await tester.pumpAndSettle();
+    expect(store.templates.single.id, 'keep');
+    expect(store.templates.single.name, 'Work routine');
+    expect(tester.widget<TextField>(_search).controller!.text, '[2026]');
+    expect(_searchEmpty, findsOneWidget);
+    expect(preferences.writes, 1);
+    expect(results, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets('selection returns only after the picker overlay is removed',
       (tester) async {
     final results = <NoteTemplateSelection?>[];

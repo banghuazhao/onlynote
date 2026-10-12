@@ -671,5 +671,33 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Tags_Selected_Count": "{count, plural, one{1 tag selected} other{{count} tags selected}}",
+  "@Tags_Selected_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Hidden_By_Search_Count": "{count, plural, one{1 selected tag hidden by search} other{{count} selected tags hidden by search}}",
+  "@Tags_Hidden_By_Search_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "Tags_Selection_Limit_Reached": "You can select up to {limit} tags. Deselect a tag to choose another.",
+  "@Tags_Selection_Limit_Reached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "Search_Saved_Views": "Search saved views",
+  "Saved_Views_Search_Empty": "No matching saved views.",
+  "Search_Templates": "Search templates",
+  "Templates_Search_Empty": "No matching templates."
 }

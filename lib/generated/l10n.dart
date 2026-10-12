@@ -4997,6 +4997,80 @@ class S {
       args: [limit],
     );
   }
+
+  /// `{count, plural, one{1 tag selected} other{{count} tags selected}}`
+  String Tags_Selected_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 tag selected',
+      other: '$count tags selected',
+      name: 'Tags_Selected_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 selected tag hidden by search} other{{count} selected tags hidden by search}}`
+  String Tags_Hidden_By_Search_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 selected tag hidden by search',
+      other: '$count selected tags hidden by search',
+      name: 'Tags_Hidden_By_Search_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `You can select up to {limit} tags. Deselect a tag to choose another.`
+  String Tags_Selection_Limit_Reached(int limit) {
+    return Intl.message(
+      'You can select up to $limit tags. Deselect a tag to choose another.',
+      name: 'Tags_Selection_Limit_Reached',
+      desc: '',
+      args: [limit],
+    );
+  }
+
+  /// `Search saved views`
+  String get Search_Saved_Views {
+    return Intl.message(
+      'Search saved views',
+      name: 'Search_Saved_Views',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching saved views.`
+  String get Saved_Views_Search_Empty {
+    return Intl.message(
+      'No matching saved views.',
+      name: 'Saved_Views_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search templates`
+  String get Search_Templates {
+    return Intl.message(
+      'Search templates',
+      name: 'Search_Templates',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching templates.`
+  String get Templates_Search_Empty {
+    return Intl.message(
+      'No matching templates.',
+      name: 'Templates_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

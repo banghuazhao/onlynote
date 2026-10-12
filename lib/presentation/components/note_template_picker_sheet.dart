@@ -6,6 +6,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/confirm_dialog.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
+import 'package:onlynote/presentation/components/template_name_search.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_templates.dart';
 
@@ -36,6 +37,7 @@ class NoteTemplatePickerSheet extends StatefulWidget {
 
 class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   late final _store = widget.store ?? CustomNoteTemplateStore.instance;
+  final _searchController = TextEditingController();
   bool _loading = true;
   bool _loadFailed = false;
   bool _busy = false;
@@ -43,7 +45,12 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   bool _changeFailed = false;
 
   void _select(NoteTemplateSelection selection) {
-    if (_busy || _closing || ModalRoute.of(context)?.isCurrent != true) return;
+    if (!mounted ||
+        _busy ||
+        _closing ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     setState(() => _closing = true);
     Navigator.pop(context, selection);
   }
@@ -111,6 +118,12 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   }
 
   void _manage(CustomNoteTemplate template) {
+    if (!mounted ||
+        _busy ||
+        _closing ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     showAppActionSheet(
       context: context,
       title: template.name,
@@ -139,6 +152,7 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   @override
   void dispose() {
     _store.removeListener(_refresh);
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -146,6 +160,17 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
   Widget build(BuildContext context) {
     final strings = S.of(context);
     final theme = Theme.of(context);
+    final templates = _store.templates;
+    final customMatches = filterTemplateNames(templates, _searchController.text,
+        displayName: (template) => template.name);
+    final starterMatches = filterTemplateNames(
+        NoteTemplate.values, _searchController.text,
+        displayName: (template) => template.content(strings).title);
+    final noMatches = !_loading &&
+        !_loadFailed &&
+        _searchController.text.trim().isNotEmpty &&
+        customMatches.isEmpty &&
+        starterMatches.isEmpty;
     return AppSheet(
       title: strings.Templates,
       child: Column(
@@ -157,6 +182,17 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                 style: theme.textTheme.bodyMedium
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: TemplateNameSearchField(
+              controller: _searchController,
+              enabled: !_busy && !_closing,
+              onChanged: (_) {
+                if (mounted && !_busy && !_closing) setState(() {});
+              },
+            ),
+          ),
+          if (noMatches) const TemplateNameSearchEmpty(),
           _heading(strings.My_Templates),
           if (_loading)
             const Padding(
@@ -179,7 +215,7 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                 ],
               ),
             )
-          else if (_store.templates.isEmpty)
+          else if (templates.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
               child: Text(strings.Templates_Create_Hint,
@@ -187,7 +223,7 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                       ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             )
           else ...[
-            for (final template in _store.templates)
+            for (final template in customMatches)
               _card(
                 ListTile(
                   key: ValueKey('custom-template-${template.id}'),
@@ -221,7 +257,7 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   style: TextStyle(color: theme.colorScheme.error)),
             ),
           _heading(strings.Starter_Templates),
-          for (final template in NoteTemplate.values)
+          for (final template in starterMatches)
             _card(
               ListTile(
                 key: ValueKey('template-${template.name}'),

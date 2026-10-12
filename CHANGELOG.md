@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Localized reminder dates on Home cards using the app language and device clock preference.
+- Added selected-tag counts, hidden-selection counts, and tag-limit guidance to the library panel.
+- Added name search to custom and starter templates.
+- Added name search to saved views in the library panel.
 - Made Note info available from Trash, including the full stored deletion timestamp.
 - Added folder-name search to the folder picker, Manage folders, and Move to folder.
 - Added transcript snippets to recording-only history entries using stored text.

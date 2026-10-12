@@ -8,6 +8,8 @@ import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 import 'library_filter_labels.dart';
+import 'library_tag_selection_feedback.dart';
+import 'saved_view_name_search.dart';
 import 'saved_view_save_action.dart';
 
 sealed class LibraryFilterResult {
@@ -74,10 +76,12 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
   late final Set<String> _tags = Set.of(widget.selectedTags);
   late NoteArchiveScope _scope = widget.scope;
   final _tagSearchController = TextEditingController();
+  final _savedViewSearchController = TextEditingController();
 
   @override
   void dispose() {
     _tagSearchController.dispose();
+    _savedViewSearchController.dispose();
     super.dispose();
   }
 
@@ -119,6 +123,13 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
         .where((entry) => entry.key.contains(tagQuery))
         .map((entry) => entry.value)
         .toList();
+    final hiddenSelectedTags =
+        _tags.where((tag) => !tagKey(tag).contains(tagQuery)).length;
+    final visibleSavedViews = widget.viewsUnavailable
+        ? widget.savedViews
+        : filterSavedViewNames(
+            widget.savedViews, _savedViewSearchController.text,
+            nameOf: (view) => view.name);
     return AppSheet(
       title: s.Library_Filters,
       child: Column(
@@ -179,6 +190,11 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                         ),
                 ),
               ),
+            ),
+            LibraryTagSelectionFeedback(
+              selectedCount: _tags.length,
+              hiddenSelectedCount: hiddenSelectedTags,
+              maxTags: maxNoteTags,
             ),
             if (visibleTags.isEmpty)
               Padding(
@@ -249,7 +265,13 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Text(s.Saved_View_Empty),
             ),
-          for (final view in widget.savedViews)
+          if (!widget.viewsUnavailable && widget.savedViews.isNotEmpty)
+            SavedViewNameSearch(
+              controller: _savedViewSearchController,
+              onChanged: (_) => setState(() {}),
+              hasMatches: visibleSavedViews.isNotEmpty,
+            ),
+          for (final view in visibleSavedViews)
             ListTile(
               key: ValueKey('saved-view-${view.id}'),
               leading: const Icon(Icons.bookmark_border_rounded),
