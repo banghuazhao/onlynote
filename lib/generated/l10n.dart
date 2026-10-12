@@ -4782,6 +4782,111 @@ class S {
       args: [tags],
     );
   }
+
+  /// `Backup created`
+  String get Backup_Created {
+    return Intl.message(
+      'Backup created',
+      name: 'Backup_Created',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recording files`
+  String get Backup_Recording_Files {
+    return Intl.message(
+      'Recording files',
+      name: 'Backup_Recording_Files',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `History versions`
+  String get Backup_History_Versions {
+    return Intl.message(
+      'History versions',
+      name: 'Backup_History_Versions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup sharing completed. Check the selected app to confirm it was saved.`
+  String get Backup_Export_Shared {
+    return Intl.message(
+      'Backup sharing completed. Check the selected app to confirm it was saved.',
+      name: 'Backup_Export_Shared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup sharing cancelled.`
+  String get Backup_Export_Cancelled {
+    return Intl.message(
+      'Backup sharing cancelled.',
+      name: 'Backup_Export_Cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup prepared, but sharing failed. Please try again.`
+  String get Backup_Export_Share_Failed {
+    return Intl.message(
+      'Backup prepared, but sharing failed. Please try again.',
+      name: 'Backup_Export_Share_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup prepared. This device could not confirm whether it was shared.`
+  String get Backup_Export_Prepared {
+    return Intl.message(
+      'Backup prepared. This device could not confirm whether it was shared.',
+      name: 'Backup_Export_Prepared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove {criterion}`
+  String Remove_Library_Criterion(String criterion) {
+    return Intl.message(
+      'Remove $criterion',
+      name: 'Remove_Library_Criterion',
+      desc: '',
+      args: [criterion],
+    );
+  }
+
+  /// `Search tags`
+  String get Search_Tags {
+    return Intl.message('Search tags', name: 'Search_Tags', desc: '', args: []);
+  }
+
+  /// `No tags match your search`
+  String get Tags_Search_Empty {
+    return Intl.message(
+      'No tags match your search',
+      name: 'Tags_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Saved views`
+  String get Backup_Saved_Views {
+    return Intl.message(
+      'Saved views',
+      name: 'Backup_Saved_Views',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -60,7 +60,20 @@ Widget _previewApp(Widget child, {bool largeChinese = false}) => MaterialApp(
 Widget libraryFiltersPreview() => _previewApp(LibraryFiltersSheet(
       filters: const {NoteSearchFilter.unfinished, NoteSearchFilter.recordings},
       selectedTags: const {'Work'},
-      availableTags: const ['Work', 'Personal', 'Projects'],
+      availableTags: const [
+        'Work',
+        'Personal',
+        'Projects',
+        'Reading',
+        'Research',
+        'Meetings',
+        'Travel',
+        'Shopping',
+        'Recipes',
+        'C++',
+        'Follow-ups',
+        'Ideas',
+      ],
       folderNames: const {'work': 'Work'},
       savedViews: [
         SavedNoteView(
@@ -84,7 +97,20 @@ Widget libraryFiltersLargeChinesePreview() => _previewApp(
       LibraryFiltersSheet(
         filters: const {NoteSearchFilter.recordings, NoteSearchFilter.scans},
         selectedTags: const {'項目'},
-        availableTags: const ['項目', '個人工作計劃與重要事項'],
+        availableTags: const [
+          '項目',
+          '個人工作計劃與重要事項',
+          '閱讀',
+          '研究',
+          '會議記錄',
+          '旅行',
+          '購物',
+          '食譜',
+          '本週安排',
+          '家庭',
+          '靈感',
+          'C++',
+        ],
         folderNames: const {'work': '工作項目與會議記錄'},
         selectedViewId: 'research',
         savedViews: [

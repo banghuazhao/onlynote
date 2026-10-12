@@ -15,11 +15,14 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.searchChanged(String query) = _SearchChanged;
   const factory HomeEvent.filtersChanged(Set<NoteSearchFilter> filters) =
       _FiltersChanged;
+  const factory HomeEvent.removeFilter(NoteSearchFilter filter) = _RemoveFilter;
   const factory HomeEvent.selectFolder(String? folderId) = _SelectFolder;
   const factory HomeEvent.showTrash(bool show) = _ShowTrash;
   const factory HomeEvent.showArchive(bool show) = _ShowArchive;
   const factory HomeEvent.includeArchived(bool include) = _IncludeArchived;
+  const factory HomeEvent.removeIncludeArchived() = _RemoveIncludeArchived;
   const factory HomeEvent.tagsChanged(Set<String> tags) = _TagsChanged;
+  const factory HomeEvent.removeTag(String tag) = _RemoveTag;
   const factory HomeEvent.savedViewsChanged(List<SavedNoteView> views) =
       _SavedViewsChanged;
   const factory HomeEvent.applySavedView(SavedNoteView view) = _ApplySavedView;

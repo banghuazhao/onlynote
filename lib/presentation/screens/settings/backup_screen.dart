@@ -8,6 +8,7 @@ import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/backup_restore_preview.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
@@ -19,7 +20,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class BackupScreen extends StatefulWidget {
-  const BackupScreen({super.key});
+  const BackupScreen({super.key, this.exportBackup, this.shareBackup});
+
+  final Future<Uint8List> Function()? exportBackup;
+  final Future<ShareResult> Function(ShareParams)? shareBackup;
   @override
   State<BackupScreen> createState() => _BackupScreenState();
 }
@@ -49,25 +53,43 @@ class _BackupScreenState extends State<BackupScreen> {
       _progress = S.of(context).Backup_Preparing;
     });
     final origin = ShareHelper.shareOriginFromKey(_exportKey);
+    var prepared = false;
     try {
-      final bytes = await (await _service()).export();
+      final bytes = widget.exportBackup != null
+          ? await widget.exportBackup!()
+          : await (await _service()).export();
       if (!mounted) return;
+      prepared = true;
       final stamp = DateTime.now()
           .toIso8601String()
           .replaceAll(':', '-')
           .split('.')
           .first;
       final name = 'Onlynote-$stamp.onlynote';
-      await SharePlus.instance.share(ShareParams(
+      final params = ShareParams(
         files: [
           XFile.fromData(bytes,
               mimeType: 'application/octet-stream', name: name)
         ],
         fileNameOverrides: [name],
         sharePositionOrigin: origin,
-      ));
+      );
+      final result = widget.shareBackup != null
+          ? await widget.shareBackup!(params)
+          : await SharePlus.instance.share(params);
+      if (!mounted) return;
+      final strings = S.of(context);
+      _message(switch (result.status) {
+        ShareResultStatus.success => strings.Backup_Export_Shared,
+        ShareResultStatus.dismissed => strings.Backup_Export_Cancelled,
+        ShareResultStatus.unavailable => strings.Backup_Export_Prepared,
+      });
     } catch (_) {
-      if (mounted) _message(S.of(context).Backup_Export_Failed);
+      if (mounted) {
+        _message(prepared
+            ? S.of(context).Backup_Export_Share_Failed
+            : S.of(context).Backup_Export_Failed);
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -104,13 +126,9 @@ class _BackupScreenState extends State<BackupScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(S.of(context).Backup_Contents(
-                            contents.notes.length,
-                            contents.folders.length,
-                            contents.photos.length)),
-                        if (contents.templates.isNotEmpty)
-                          Text(
-                              '${S.of(context).My_Templates}: ${contents.templates.length}'),
+                        BackupRestorePreview(
+                          metadata: backupRestoreMetadata(contents),
+                        ),
                         const SizedBox(height: 16),
                         Text(S.of(context).Backup_Restore_Description),
                         if (contents.reminders
@@ -258,3 +276,17 @@ class _BackupScreenState extends State<BackupScreen> {
         ),
       );
 }
+
+/// Counts validated backup records without reading or modifying their media.
+BackupRestoreMetadata backupRestoreMetadata(BackupContents contents) =>
+    BackupRestoreMetadata(
+      createdAt: contents.createdAt,
+      noteCount: contents.notes.length,
+      folderCount: contents.folders.length,
+      photoCount: contents.photos.length,
+      templateCount: contents.templates.length,
+      recordingFileCount: contents.audio.length,
+      savedViewCount: contents.savedViews.length,
+      historyVersionCount: contents.histories.values
+          .fold(0, (total, versions) => total + versions.length),
+    );

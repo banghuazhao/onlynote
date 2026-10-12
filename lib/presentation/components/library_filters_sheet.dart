@@ -72,8 +72,23 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
   late final Set<NoteSearchFilter> _filters = Set.of(widget.filters);
   late final Set<String> _tags = Set.of(widget.selectedTags);
   late NoteArchiveScope _scope = widget.scope;
+  final _tagSearchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _tagSearchController.dispose();
+    super.dispose();
+  }
+
+  void _clearTagSearch() {
+    _tagSearchController.clear();
+    setState(() {});
+  }
 
   void _selectTag(String tag, bool selected) => setState(() {
+        final alreadySelected =
+            _tags.any((value) => tagKey(value) == tagKey(tag));
+        if (selected && !alreadySelected && _tags.length >= maxNoteTags) return;
         _tags.removeWhere((value) => tagKey(value) == tagKey(tag));
         if (selected) _tags.add(tag);
       });
@@ -98,6 +113,11 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
     for (final tag in [...widget.selectedTags, ...widget.availableTags]) {
       tags.putIfAbsent(tagKey(tag), () => tag);
     }
+    final tagQuery = tagKey(_tagSearchController.text);
+    final visibleTags = tags.entries
+        .where((entry) => entry.key.contains(tagQuery))
+        .map((entry) => entry.value)
+        .toList();
     return AppSheet(
       title: s.Library_Filters,
       child: Column(
@@ -137,11 +157,44 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
           if (tags.isNotEmpty) ...[
             _heading(s.Filter_Tags),
             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: TextField(
+                key: const ValueKey('library-search-tags'),
+                controller: _tagSearchController,
+                textInputAction: TextInputAction.search,
+                onChanged: (_) => setState(() {}),
+                onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                decoration: InputDecoration(
+                  labelText: s.Search_Tags,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  suffixIcon: _tagSearchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          key: const ValueKey('library-clear-tag-search'),
+                          tooltip: s.Clear_Search,
+                          onPressed: _clearTagSearch,
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                ),
+              ),
+            ),
+            if (visibleTags.isEmpty)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Semantics(
+                  liveRegion: true,
+                  child: Text(s.Tags_Search_Empty,
+                      key: const ValueKey('library-tags-search-empty')),
+                ),
+              ),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: LayoutBuilder(
                   builder: (context, constraints) =>
                       Wrap(spacing: 8, runSpacing: 4, children: [
-                        for (final tag in tags.values)
+                        for (final tag in visibleTags)
                           FilterChip(
                             key: ValueKey('library-tag-${tagKey(tag)}'),
                             avatarBoxConstraints: const BoxConstraints.tightFor(
@@ -149,7 +202,7 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                             label: _chipLabel(tag, constraints.maxWidth),
                             selected: _tags
                                 .any((value) => tagKey(value) == tagKey(tag)),
-                            onSelected: _tags.length < 20 ||
+                            onSelected: _tags.length < maxNoteTags ||
                                     _tags.any(
                                         (value) => tagKey(value) == tagKey(tag))
                                 ? (selected) => _selectTag(tag, selected)
@@ -174,6 +227,7 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                 onPressed: () => setState(() {
                   _filters.clear();
                   _tags.clear();
+                  _tagSearchController.clear();
                   if (_scope == NoteArchiveScope.all) {
                     _scope = NoteArchiveScope.active;
                   }

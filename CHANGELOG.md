@@ -9,6 +9,10 @@
 - Added copying unfinished checklist tasks in their original order, including from the note reader.
 - Added saved-view descriptions showing the folder, search, filters, tags, and archive scope.
 - Added Recordings and Scanned documents filters, including support in saved views and backups.
+- Expanded restore previews with the backup date, recording files, saved views, and history-version totals.
+- Added removable active filter and tag summaries to Home, including when search is closed.
+- Added tag search to the library panel, preserving selected tags hidden by the search.
+- Added backup sharing outcome messages for completion, cancellation, failure, and unconfirmed results.
 
 ## 1.4.0+14
 

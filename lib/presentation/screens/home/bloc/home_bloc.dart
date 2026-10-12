@@ -202,6 +202,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _filters = Set.of(event.filters);
       _selectedViewId = null;
       emit(_buildLoaded());
+    } else if (event is _RemoveFilter) {
+      if (_filters.contains(event.filter)) {
+        _filters = Set.of(_filters)..remove(event.filter);
+        _selectedViewId = null;
+        emit(_buildLoaded());
+      }
     } else if (event is _SelectFolder) {
       _onSelectFolder(event, emit);
     } else if (event is _ShowTrash) {
@@ -219,10 +225,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _showTrash = false;
       _selectedViewId = null;
       emit(_buildLoaded());
+    } else if (event is _RemoveIncludeArchived) {
+      // A scope switch may already be queued when a disappearing chip is
+      // pressed. Clearing this criterion must never leave Archive or Trash.
+      if (_includeArchived && !_showArchive && !_showTrash) {
+        _includeArchived = false;
+        _selectedViewId = null;
+        emit(_buildLoaded());
+      }
     } else if (event is _TagsChanged) {
       _selectedTags = normalizeNoteTags(event.tags).toSet();
       _selectedViewId = null;
       emit(_buildLoaded());
+    } else if (event is _RemoveTag) {
+      final remaining = Set.of(_selectedTags)
+        ..removeWhere((tag) => tagKey(tag) == tagKey(event.tag));
+      if (remaining.length != _selectedTags.length) {
+        _selectedTags = remaining;
+        _selectedViewId = null;
+        emit(_buildLoaded());
+      }
     } else if (event is _SavedViewsChanged) {
       _savedViews = List.of(event.views);
       if (!_savedViews.any((view) => view.id == _selectedViewId)) {

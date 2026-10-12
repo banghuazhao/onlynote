@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/note_search_feedback.dart';
+import 'package:onlynote/presentation/components/note_active_criteria_summary.dart';
 import 'package:onlynote/presentation/components/photo_search_status.dart';
 import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
@@ -823,6 +824,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Expanded(
                                           child: data.notes.isEmpty
                                               ? _EmptyNotes(
+                                                  criteriaSummary:
+                                                      _activeCriteriaSummary(),
                                                   showTrash: data.showTrash,
                                                   showArchive: data.showArchive,
                                                   hasSearch: data.searchQuery
@@ -861,6 +864,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ),
                                                 )
                                               : _BuildNotesList(
+                                                  criteriaSummary:
+                                                      _activeCriteriaSummary(),
                                                   onChecklistActionStart:
                                                       _cancelChecklistReview,
                                                   onChecklistResult:
@@ -1329,6 +1334,37 @@ class _HomeScreenState extends State<HomeScreen> {
     bloc.add(const HomeEvent.tagsChanged({}));
   }
 
+  void _removeActiveCriterion(HomeEvent event) {
+    context
+        .read<MultipleDeleteBloc>()
+        .add(const MultipleDeleteEvent.clearAll());
+    context.read<HomeBloc>().add(event);
+  }
+
+  Widget? _activeCriteriaSummary() =>
+      context.read<HomeBloc>().state.mapOrNull(loaded: (data) {
+        final includeArchived =
+            data.includeArchived && !data.showArchive && !data.showTrash;
+        if (data.filters.isEmpty &&
+            data.selectedTags.isEmpty &&
+            !includeArchived) {
+          return null;
+        }
+        return NoteActiveCriteriaSummary(
+          filters: data.filters,
+          tags: data.selectedTags,
+          includeArchived: includeArchived,
+          onRemoveFilter: (filter) =>
+              _removeActiveCriterion(HomeEvent.removeFilter(filter)),
+          onRemoveTag: (tag) =>
+              _removeActiveCriterion(HomeEvent.removeTag(tag)),
+          onRemoveIncludeArchived: includeArchived
+              ? () => _removeActiveCriterion(
+                  const HomeEvent.removeIncludeArchived())
+              : null,
+        );
+      });
+
   Widget _buildSearchField(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -1383,6 +1419,7 @@ class _EmptyNotes extends StatelessWidget {
     required this.hasFolder,
     this.onClearSearch,
     this.onClearFilters,
+    this.criteriaSummary,
   });
 
   final VoidCallback onAdd;
@@ -1394,6 +1431,7 @@ class _EmptyNotes extends StatelessWidget {
   final bool hasFolder;
   final VoidCallback? onClearSearch;
   final VoidCallback? onClearFilters;
+  final Widget? criteriaSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -1414,6 +1452,7 @@ class _EmptyNotes extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (criteriaSummary != null) criteriaSummary!,
             Image.asset(
               'assets/empty_notes.png',
               width: 190,
@@ -1506,9 +1545,11 @@ class _BuildNotesList extends StatefulWidget {
     required this.onChecklistResult,
     required this.onArchive,
     required this.onEditTags,
+    this.criteriaSummary,
   });
 
   final List<Note> notes;
+  final Widget? criteriaSummary;
   final String searchQuery;
   final bool unfinishedOnly;
   final List<Folder> folders;
@@ -1868,6 +1909,8 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     return CustomScrollView(
       semanticChildCount: widget.notes.length,
       slivers: [
+        if (widget.criteriaSummary != null)
+          SliverToBoxAdapter(child: widget.criteriaSummary!),
         SliverToBoxAdapter(
           child: WidgetDiscoveryPrompt(
             eligible: widget.showWidgetDiscovery && !isSelectionMode,

@@ -621,5 +621,23 @@
         "type": "String"
       }
     }
+  },
+  "Backup_Created": "Backup created",
+  "Backup_Recording_Files": "Recording files",
+  "Backup_History_Versions": "History versions",
+  "Backup_Export_Shared": "Backup sharing completed. Check the selected app to confirm it was saved.",
+  "Backup_Export_Cancelled": "Backup sharing cancelled.",
+  "Backup_Export_Share_Failed": "Backup prepared, but sharing failed. Please try again.",
+  "Backup_Export_Prepared": "Backup prepared. This device could not confirm whether it was shared.",
+  "Remove_Library_Criterion": "Remove {criterion}",
+  "Search_Tags": "Search tags",
+  "Tags_Search_Empty": "No tags match your search",
+  "Backup_Saved_Views": "Saved views",
+  "@Remove_Library_Criterion": {
+    "placeholders": {
+      "criterion": {
+        "type": "String"
+      }
+    }
   }
 }

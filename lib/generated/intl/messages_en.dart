@@ -76,17 +76,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m22(price) => "Remove ads permanently for ${price}.";
 
-  static String m23(query) => "Search: ${query}";
+  static String m23(criterion) => "Remove ${criterion}";
 
-  static String m24(tags) => "Tags: ${tags}";
+  static String m24(query) => "Search: ${query}";
 
-  static String m25(count) =>
-      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
+  static String m25(tags) => "Tags: ${tags}";
 
   static String m26(count) =>
+      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
+
+  static String m27(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m27(items, photos) =>
+  static String m28(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -120,12 +122,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Autosave_Saving": MessageLookupByLibrary.simpleMessage("Saving…"),
     "Backup_Choose": MessageLookupByLibrary.simpleMessage("Choose backup file"),
     "Backup_Contents": m0,
+    "Backup_Created": MessageLookupByLibrary.simpleMessage("Backup created"),
     "Backup_Export": MessageLookupByLibrary.simpleMessage("Create backup"),
+    "Backup_Export_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Backup sharing cancelled.",
+    ),
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
       "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
     ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not create the backup. Check available storage and that all photos and recordings are accessible. Backups must fit within 256 MB.",
+    ),
+    "Backup_Export_Prepared": MessageLookupByLibrary.simpleMessage(
+      "Backup prepared. This device could not confirm whether it was shared.",
+    ),
+    "Backup_Export_Share_Failed": MessageLookupByLibrary.simpleMessage(
+      "Backup prepared, but sharing failed. Please try again.",
+    ),
+    "Backup_Export_Shared": MessageLookupByLibrary.simpleMessage(
+      "Backup sharing completed. Check the selected app to confirm it was saved.",
+    ),
+    "Backup_History_Versions": MessageLookupByLibrary.simpleMessage(
+      "History versions",
     ),
     "Backup_Invalid": MessageLookupByLibrary.simpleMessage(
       "This is not a supported Onlynote backup, or the file is damaged or larger than 256 MB. Nothing was imported.",
@@ -135,6 +153,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Backup_Reading": MessageLookupByLibrary.simpleMessage(
       "Checking the backup file…",
+    ),
+    "Backup_Recording_Files": MessageLookupByLibrary.simpleMessage(
+      "Recording files",
     ),
     "Backup_Restore": MessageLookupByLibrary.simpleMessage("Restore backup"),
     "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
@@ -152,6 +173,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Restoring": MessageLookupByLibrary.simpleMessage(
       "Restoring your notes and photos…",
     ),
+    "Backup_Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
       "Schedule future reminder notifications",
     ),
@@ -827,6 +849,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
     "Remove_Ads_Price": m22,
+    "Remove_Library_Criterion": m23,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -874,15 +897,16 @@ class MessageLookup extends MessageLookupByLibrary {
       "Could not save this view. Try again.",
     ),
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
-    "Saved_View_Search": m23,
-    "Saved_View_Tags": m24,
+    "Saved_View_Search": m24,
+    "Saved_View_Tags": m25,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saving": MessageLookupByLibrary.simpleMessage("Saving"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
-    "Search_Results_Count": m25,
+    "Search_Results_Count": m26,
+    "Search_Tags": MessageLookupByLibrary.simpleMessage("Search tags"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m26,
+    "Selection_Checklist_Added": m27,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -943,6 +967,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Use up to 20 tags, with 40 characters per tag.",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
+    "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No tags match your search",
+    ),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -971,7 +998,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m27,
+    "Template_Details": m28,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

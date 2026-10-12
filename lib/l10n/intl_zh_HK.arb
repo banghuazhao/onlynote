@@ -619,5 +619,23 @@
         "type": "String"
       }
     }
+  },
+  "Backup_Created": "備份建立時間",
+  "Backup_Recording_Files": "錄音檔案",
+  "Backup_History_Versions": "歷史版本",
+  "Backup_Export_Shared": "備份分享已完成。請在所選應用程式中確認是否已儲存。",
+  "Backup_Export_Cancelled": "已取消分享備份。",
+  "Backup_Export_Share_Failed": "備份已準備好，但分享失敗。請重試。",
+  "Backup_Export_Prepared": "備份已準備好。此裝置無法確認是否已分享。",
+  "Remove_Library_Criterion": "移除{criterion}",
+  "Search_Tags": "搜尋標籤",
+  "Tags_Search_Empty": "沒有符合搜尋條件的標籤",
+  "Backup_Saved_Views": "已儲存的檢視",
+  "@Remove_Library_Criterion": {
+    "placeholders": {
+      "criterion": {
+        "type": "String"
+      }
+    }
   }
 }

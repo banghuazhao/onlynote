@@ -67,15 +67,17 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m22(price) => "支付 ${price} 永久移除廣告。";
 
-  static String m23(query) => "搜尋：${query}";
+  static String m23(criterion) => "移除${criterion}";
 
-  static String m24(tags) => "標籤：${tags}";
+  static String m24(query) => "搜尋：${query}";
 
-  static String m25(count) => "${count} 則筆記";
+  static String m25(tags) => "標籤：${tags}";
 
-  static String m26(count) => "已加入 ${count} 項清單";
+  static String m26(count) => "${count} 則筆記";
 
-  static String m27(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m27(count) => "已加入 ${count} 項清單";
+
+  static String m28(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -102,18 +104,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "Autosave_Saving": MessageLookupByLibrary.simpleMessage("正在儲存…"),
     "Backup_Choose": MessageLookupByLibrary.simpleMessage("選擇備份檔案"),
     "Backup_Contents": m0,
+    "Backup_Created": MessageLookupByLibrary.simpleMessage("備份建立時間"),
     "Backup_Export": MessageLookupByLibrary.simpleMessage("建立備份"),
+    "Backup_Export_Cancelled": MessageLookupByLibrary.simpleMessage("已取消分享備份。"),
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
       "將筆記、標籤、已儲存檢視、資料夾、照片、錄音、歷史記錄、範本和提醒日期儲存在一個Onlynote檔案中。包含封存筆記和垃圾桶。可從分享選單儲存至檔案或儲存空間App。檔案最大256 MB。",
     ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "無法建立備份。請檢查可用儲存空間，並確認所有照片和錄音可用。備份必須小於256 MB。",
     ),
+    "Backup_Export_Prepared": MessageLookupByLibrary.simpleMessage(
+      "備份已準備好。此裝置無法確認是否已分享。",
+    ),
+    "Backup_Export_Share_Failed": MessageLookupByLibrary.simpleMessage(
+      "備份已準備好，但分享失敗。請重試。",
+    ),
+    "Backup_Export_Shared": MessageLookupByLibrary.simpleMessage(
+      "備份分享已完成。請在所選應用程式中確認是否已儲存。",
+    ),
+    "Backup_History_Versions": MessageLookupByLibrary.simpleMessage("歷史版本"),
     "Backup_Invalid": MessageLookupByLibrary.simpleMessage(
       "這不是支援的 Onlynote 備份，或檔案已損毀或超過 256 MB。未匯入任何內容。",
     ),
     "Backup_Preparing": MessageLookupByLibrary.simpleMessage("正在準備備份…"),
     "Backup_Reading": MessageLookupByLibrary.simpleMessage("正在檢查備份檔案…"),
+    "Backup_Recording_Files": MessageLookupByLibrary.simpleMessage("錄音檔案"),
     "Backup_Restore": MessageLookupByLibrary.simpleMessage("還原備份"),
     "Backup_Restore_Description": MessageLookupByLibrary.simpleMessage(
       "回復會將備份筆記、資料夾、範本和已儲存檢視的副本新增至筆記庫。連結筆記會連接回復後的副本。再次回復同一檔案會新增另一組副本。",
@@ -126,6 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "筆記已還原。部分提醒通知未能排程；請開啟相應筆記重新設定。",
     ),
     "Backup_Restoring": MessageLookupByLibrary.simpleMessage("正在還原筆記與照片…"),
+    "Backup_Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
     "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
       "排程未來的提醒通知",
     ),
@@ -641,6 +657,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
     "Remove_Ads_Price": m22,
+    "Remove_Library_Criterion": m23,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重新命名檢視"),
@@ -666,15 +683,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("儲存搜尋或篩選，下次快速開啟。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("無法儲存此檢視，請再試一次。"),
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("檢視名稱"),
-    "Saved_View_Search": m23,
-    "Saved_View_Tags": m24,
+    "Saved_View_Search": m24,
+    "Saved_View_Tags": m25,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
     "Saving": MessageLookupByLibrary.simpleMessage("保存中"),
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
-    "Search_Results_Count": m25,
+    "Search_Results_Count": m26,
+    "Search_Tags": MessageLookupByLibrary.simpleMessage("搜尋標籤"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m26,
+    "Selection_Checklist_Added": m27,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
@@ -725,6 +743,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "最多新增20個標籤，每個標籤不超過40個字元。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("標籤"),
+    "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("沒有符合搜尋條件的標籤"),
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "無法更新範本，請重試。",
@@ -749,7 +768,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m27,
+    "Template_Details": m28,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

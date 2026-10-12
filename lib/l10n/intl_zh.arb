@@ -619,5 +619,23 @@
         "type": "String"
       }
     }
+  },
+  "Backup_Created": "备份创建时间",
+  "Backup_Recording_Files": "录音文件",
+  "Backup_History_Versions": "历史版本",
+  "Backup_Export_Shared": "备份分享已完成。请在所选应用中确认是否已保存。",
+  "Backup_Export_Cancelled": "已取消分享备份。",
+  "Backup_Export_Share_Failed": "备份已准备好，但分享失败。请重试。",
+  "Backup_Export_Prepared": "备份已准备好。此设备无法确认是否已分享。",
+  "Remove_Library_Criterion": "移除{criterion}",
+  "Search_Tags": "搜索标签",
+  "Tags_Search_Empty": "没有符合搜索条件的标签",
+  "Backup_Saved_Views": "已保存的视图",
+  "@Remove_Library_Criterion": {
+    "placeholders": {
+      "criterion": {
+        "type": "String"
+      }
+    }
   }
 }

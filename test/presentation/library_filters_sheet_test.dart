@@ -22,6 +22,7 @@ Future<Completer<LibraryFilterResult?>> open(
   bool unavailable = false,
   Locale locale = const Locale('en'),
   double textScale = 1,
+  double keyboardInset = 0,
 }) async {
   final result = Completer<LibraryFilterResult?>();
   await tester.pumpWidget(MaterialApp(
@@ -35,7 +36,9 @@ Future<Completer<LibraryFilterResult?>> open(
     ],
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(textScale), disableAnimations: true),
+          textScaler: TextScaler.linear(textScale),
+          viewInsets: EdgeInsets.only(bottom: keyboardInset),
+          disableAnimations: true),
       child: child!,
     ),
     home: Scaffold(
@@ -66,7 +69,310 @@ Future<Completer<LibraryFilterResult?>> open(
 
 Finder key(String value) => find.byKey(ValueKey(value));
 
+Future<void> searchTags(WidgetTester tester, String query) async {
+  final field = key('library-search-tags');
+  await tester.ensureVisible(field);
+  await tester.pumpAndSettle();
+  await tester.enterText(field, query);
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  testWidgets('tag search is local, literal, normalized and case insensitive',
+      (tester) async {
+    final result = await open(tester,
+        tags: ['Work', ' WORK ', 'Work  Meetings', 'Personal', '項目研究', 'C++']);
+    expect(key('library-search-tags'), findsOneWidget);
+    expect(tester.testTextInput.hasAnyClients, isFalse);
+    expect(key('library-tag-work'), findsOneWidget);
+
+    await searchTags(tester, '  wOrK  ');
+    expect(key('library-tag-work'), findsOneWidget);
+    expect(key('library-tag-work meetings'), findsOneWidget);
+    expect(key('library-tag-personal'), findsNothing);
+    expect(key('library-tag-項目研究'), findsNothing);
+    expect(result.isCompleted, isFalse);
+
+    await searchTags(tester, 'WORK \t MEET');
+    expect(key('library-tag-work'), findsNothing);
+    expect(key('library-tag-work meetings'), findsOneWidget);
+
+    await searchTags(tester, '研究');
+    expect(key('library-tag-項目研究'), findsOneWidget);
+    expect(key('library-tag-work meetings'), findsNothing);
+
+    await searchTags(tester, '++');
+    expect(key('library-tag-c++'), findsOneWidget);
+    expect(key('library-tags-search-empty'), findsNothing);
+
+    await searchTags(tester, '[.*');
+    final strings = S.of(tester.element(key('library-search-tags')));
+    expect(find.text(strings.Tags_Search_Empty), findsOneWidget);
+    expect(key('library-tag-c++'), findsNothing);
+    expect(key('library-filter-photos'), findsOneWidget);
+    expect(key('library-include-archived'), findsOneWidget);
+    expect(key('library-save-view'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await searchTags(tester, '  \t ');
+    expect(key('library-tags-search-empty'), findsNothing);
+    expect(key('library-tag-work'), findsOneWidget);
+    expect(key('library-tag-personal'), findsOneWidget);
+  });
+
+  testWidgets('empty tag catalog omits the search field', (tester) async {
+    await open(tester);
+    expect(key('library-search-tags'), findsNothing);
+    expect(key('library-clear-tag-search'), findsNothing);
+    expect(key('library-tags-search-empty'), findsNothing);
+  });
+
+  for (final saveView in [false, true]) {
+    testWidgets(
+        '${saveView ? 'Save view' : 'Done'} retains hidden selected tags',
+        (tester) async {
+      final original = {'Work'};
+      final result = await open(tester,
+          selectedTags: original,
+          tags: ['Work', 'Personal'],
+          filters: {NoteSearchFilter.recordings});
+      await searchTags(tester, 'Personal');
+      expect(key('library-tag-work'), findsNothing);
+      await tester.tap(key('library-tag-personal'));
+      await tester.pump();
+      expect(tester.widget<FilterChip>(key('library-tag-personal')).selected,
+          isTrue);
+      expect(original, {'Work'});
+      expect(result.isCompleted, isFalse);
+      final action =
+          key(saveView ? 'library-save-view' : 'library-apply-filters');
+      await tester.ensureVisible(action);
+      await tester.pumpAndSettle();
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+      final selection = (await result.future) as ApplyLibraryFilters;
+      expect(selection.tags, {'Work', 'Personal'});
+      expect(selection.filters, {NoteSearchFilter.recordings});
+      expect(selection,
+          saveView ? isA<CreateSavedNoteView>() : isA<ApplyLibraryFilters>());
+      expect(original, {'Work'});
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('clear search restores selected tags without clearing filters',
+      (tester) async {
+    final result = await open(tester,
+        selectedTags: {'Work'},
+        tags: ['Work', 'Personal'],
+        filters: {NoteSearchFilter.scans},
+        scope: NoteArchiveScope.all);
+    await searchTags(tester, 'missing');
+    expect(key('library-tags-search-empty'), findsOneWidget);
+    final clear = key('library-clear-tag-search');
+    final strings = S.of(tester.element(clear));
+    expect(find.byTooltip(strings.Clear_Search), findsOneWidget);
+    await tester.tap(clear);
+    await tester.pumpAndSettle();
+    expect(
+        tester.widget<TextField>(key('library-search-tags')).controller!.text,
+        isEmpty);
+    expect(key('library-clear-tag-search'), findsNothing);
+    expect(key('library-tags-search-empty'), findsNothing);
+    expect(tester.widget<FilterChip>(key('library-tag-work')).selected, isTrue);
+    expect(tester.widget<FilterChip>(key('library-tag-personal')).selected,
+        isFalse);
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags, {'Work'});
+    expect(selected.filters, {NoteSearchFilter.scans});
+    expect(selected.scope, NoteArchiveScope.all);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('hidden selected tags count toward the limit and can be removed',
+      (tester) async {
+    final selectedTags = {
+      for (var index = 0; index < 20; index++) 'Tag $index',
+    };
+    final result = await open(tester,
+        selectedTags: selectedTags, tags: [...selectedTags, 'New tag']);
+    await searchTags(tester, 'New');
+    final newTag = key('library-tag-new tag');
+    expect(tester.widget<FilterChip>(newTag).onSelected, isNull);
+    await tester.tap(newTag);
+    await tester.pump();
+    expect(tester.widget<FilterChip>(newTag).selected, isFalse);
+
+    await searchTags(tester, 'Tag 0');
+    final selectedTag = key('library-tag-tag 0');
+    expect(tester.widget<FilterChip>(selectedTag).selected, isTrue);
+    expect(tester.widget<FilterChip>(selectedTag).onSelected, isNotNull);
+    await tester.tap(selectedTag);
+    await tester.pump();
+    await searchTags(tester, 'New');
+    expect(tester.widget<FilterChip>(newTag).onSelected, isNotNull);
+    await tester.tap(newTag);
+    await tester.pump();
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags.length, 20);
+    expect(selected.tags, contains('New tag'));
+    expect(selected.tags, isNot(contains('Tag 0')));
+    expect(selectedTags.length, 20);
+    expect(selectedTags, contains('Tag 0'));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('clear filters resets the query and all hidden tag selections',
+      (tester) async {
+    final result = await open(tester,
+        selectedTags: {'Work', 'Personal'},
+        tags: ['Work', 'Personal'],
+        filters: {NoteSearchFilter.recordings},
+        scope: NoteArchiveScope.all);
+    await searchTags(tester, 'nothing');
+    await tester.ensureVisible(key('library-clear-filters'));
+    await tester.tap(key('library-clear-filters'));
+    await tester.pumpAndSettle();
+    expect(
+        tester.widget<TextField>(key('library-search-tags')).controller!.text,
+        isEmpty);
+    expect(key('library-tags-search-empty'), findsNothing);
+    for (final tag in ['work', 'personal']) {
+      expect(
+          tester.widget<FilterChip>(key('library-tag-$tag')).selected, isFalse);
+    }
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags, isEmpty);
+    expect(selected.filters, isEmpty);
+    expect(selected.scope, NoteArchiveScope.active);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('rapid tag selections cannot pass the limit before a rebuild',
+      (tester) async {
+    final original = {
+      for (var index = 0; index < 19; index++) 'Tag $index',
+    };
+    final result = await open(tester,
+        selectedTags: original,
+        tags: [...original, 'Candidate A', 'Candidate B']);
+    await searchTags(tester, 'Candidate');
+    await tester.tap(key('library-tag-candidate a'));
+    await tester.tap(key('library-tag-candidate b'));
+    await tester.pump();
+    expect(tester.widget<FilterChip>(key('library-tag-candidate a')).selected,
+        isTrue);
+    expect(tester.widget<FilterChip>(key('library-tag-candidate b')).selected,
+        isFalse);
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags.length, 20);
+    expect(selected.tags, contains('Candidate A'));
+    expect(selected.tags, isNot(contains('Candidate B')));
+    expect(original.length, 19);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'closing with a focused search discards selection and disposes it',
+      (tester) async {
+    final original = {'Work'};
+    final result =
+        await open(tester, selectedTags: original, tags: ['Work', 'Personal']);
+    await searchTags(tester, 'Personal');
+    await tester.tap(key('library-tag-personal'));
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await result.future, isNull);
+    expect(original, {'Work'});
+    expect(tester.takeException(), isNull);
+
+    await open(tester, selectedTags: original, tags: ['Work', 'Personal']);
+    expect(
+        tester.widget<TextField>(key('library-search-tags')).controller!.text,
+        isEmpty);
+    expect(tester.widget<FilterChip>(key('library-tag-work')).selected, isTrue);
+    expect(tester.widget<FilterChip>(key('library-tag-personal')).selected,
+        isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK'),
+  ]) {
+    testWidgets(
+        'tag search fits narrow 2× text and preserves controls in $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final semantics = tester.ensureSemantics();
+      try {
+        await open(tester,
+            tags: ['個人工作計劃' * 6, 'Work', 'Personal'],
+            locale: locale,
+            textScale: 2);
+        await searchTags(tester, 'missing');
+        final field = key('library-search-tags');
+        final strings = S.of(tester.element(field));
+        expect(tester.widget<TextField>(field).decoration!.labelText,
+            strings.Search_Tags);
+        expect(key('library-tags-search-empty'), findsOneWidget);
+        final clear = key('library-clear-tag-search');
+        await tester.ensureVisible(clear);
+        await tester.pumpAndSettle();
+        expect(tester.getSize(clear).height, greaterThanOrEqualTo(48));
+        expect(find.byTooltip(strings.Clear_Search), findsOneWidget);
+        await tester.tap(clear);
+        await tester.pumpAndSettle();
+        expect(key('library-tag-work'), findsOneWidget);
+        await tester.ensureVisible(key('library-save-view'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      } finally {
+        semantics.dispose();
+      }
+    });
+  }
+
+  testWidgets('landscape keyboard leaves search and Done reachable',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final result = await open(tester,
+        tags: ['Work', 'Personal', '會議'], keyboardInset: 140);
+    await searchTags(tester, 'work');
+    expect(key('library-tag-work'), findsOneWidget);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(tester.testTextInput.isVisible, isFalse);
+    await tester.ensureVisible(key('library-tag-work'));
+    await tester.pumpAndSettle();
+    await tester.tap(key('library-tag-work'));
+    await tester.pump();
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    expect(((await result.future) as ApplyLibraryFilters).tags, {'Work'});
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('filters tags and archive scope apply only on explicit Done',
       (tester) async {
     final original = <NoteSearchFilter>{NoteSearchFilter.photos};
