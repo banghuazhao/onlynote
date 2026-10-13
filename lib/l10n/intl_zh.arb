@@ -566,6 +566,7 @@
   "Premium_Note_Limit": "免费版包含 {limit} 条笔记。升级即可创建无限笔记。",
   "Premium_Voice_Memos": "语音备忘录",
   "Card_Style_Color": "颜色",
+  "Card_Style_Theme": "主题",
   "Card_Style_Text": "文字",
   "Card_Style_Layout": "布局",
   "Card_Style_Default_Color": "默认纸张颜色",
@@ -697,5 +698,17 @@
   "Search_Saved_Views": "搜索已保存的视图",
   "Saved_Views_Search_Empty": "没有符合搜索条件的已保存视图。",
   "Search_Templates": "搜索模板",
-  "Templates_Search_Empty": "没有符合搜索条件的模板。"
+  "Templates_Search_Empty": "没有符合搜索条件的模板。",
+  "Note_Theme": "笔记主题",
+  "Note_Theme_Description": "为笔记选择纸张风格。",
+  "Note_Theme_Classic": "经典",
+  "Note_Theme_Sticky": "便利贴",
+  "Note_Theme_Legal_Pad": "黄色横线便笺",
+  "Note_Theme_Ruled_Notebook": "横线笔记本",
+  "Note_Theme_Grid_Paper": "方格纸",
+  "Note_Theme_Dotted_Journal": "点阵手帐",
+  "Note_Theme_Kraft_Notebook": "牛皮纸笔记本",
+  "Note_Theme_Parchment": "羊皮纸",
+  "Premium_Note_Themes": "高级笔记主题",
+  "Premium_Note_Themes_Description": "解锁点阵手帐、牛皮纸笔记本和羊皮纸。"
 }

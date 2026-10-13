@@ -1,4 +1,4 @@
-- Schrijf met eenvoudige opmaak, focusmodus, ongedaan maken en notitiegeschiedenis.
-- Scan documenten, haal tekst uit foto’s en neem spraakmemo’s op.
-- Begin met sjablonen, verbeterde checklists en de mogelijkheid om herinneringen uit te stellen.
-- Pas kaartstijlen aan. Premium biedt onbeperkt notities en meer.
+- Nieuwe notitiethema's geïnspireerd op papier en notitieboeken, inclusief Premium-stijlen.
+- Eenvoudigere stijlinstellingen en zoeken naar mappen, sjablonen en opgeslagen weergaven.
+- Kopieer notitietekst en checklistitems, met een duidelijkere notitiegeschiedenis.
+- Duidelijkere zoekresultaten, herinneringsdetails en feedback over back-ups.

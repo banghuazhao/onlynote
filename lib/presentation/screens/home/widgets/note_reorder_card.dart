@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 import 'package:onlynote/domain/model/note_card_style.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
+import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
@@ -24,9 +27,15 @@ class NoteReorderCard extends StatelessWidget {
   final VoidCallback? onMoveLater;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppCardStyleSettings.instance,
+        builder: (context, _) => _buildCard(context),
+      );
+
+  Widget _buildCard(BuildContext context) {
     final strings = S.of(context);
     final style = resolveNoteCardStyle(note.cardStyle);
+    final noteTheme = style.noteTheme ?? NoteTheme.classic;
     final typography = NoteCardTypography(style);
     final content = [
       note.title ?? '',
@@ -59,7 +68,8 @@ class NoteReorderCard extends StatelessWidget {
               onMoveLater!,
       },
       child: PaperNote(
-        color: note.color ?? AppColors.parchment,
+        color: noteThemePaperColor(noteTheme, customColor: note.color),
+        theme: noteTheme,
         seed: note.id?.hashCode ?? 0,
         pinned: note.isPinned,
         tilt: false,

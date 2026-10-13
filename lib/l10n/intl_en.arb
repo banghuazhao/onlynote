@@ -568,6 +568,7 @@
   "Premium_Note_Limit": "The free plan includes {limit} notes. Upgrade for unlimited notes.",
   "Premium_Voice_Memos": "Voice memos",
   "Card_Style_Color": "Color",
+  "Card_Style_Theme": "Theme",
   "Card_Style_Text": "Text",
   "Card_Style_Layout": "Layout",
   "Card_Style_Default_Color": "Default paper color",
@@ -699,5 +700,17 @@
   "Search_Saved_Views": "Search saved views",
   "Saved_Views_Search_Empty": "No matching saved views.",
   "Search_Templates": "Search templates",
-  "Templates_Search_Empty": "No matching templates."
+  "Templates_Search_Empty": "No matching templates.",
+  "Note_Theme": "Note theme",
+  "Note_Theme_Description": "Choose a paper style for your notes.",
+  "Note_Theme_Classic": "Classic",
+  "Note_Theme_Sticky": "Sticky note",
+  "Note_Theme_Legal_Pad": "Legal pad",
+  "Note_Theme_Ruled_Notebook": "Ruled notebook",
+  "Note_Theme_Grid_Paper": "Grid paper",
+  "Note_Theme_Dotted_Journal": "Dotted journal",
+  "Note_Theme_Kraft_Notebook": "Kraft notebook",
+  "Note_Theme_Parchment": "Parchment",
+  "Premium_Note_Themes": "Premium note themes",
+  "Premium_Note_Themes_Description": "Unlock dotted journals, kraft notebooks, and parchment paper."
 }

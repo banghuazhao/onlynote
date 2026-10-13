@@ -35,12 +35,14 @@ import 'package:onlynote/services/note_selection_checklist.dart';
 import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_statistics.dart';
 import 'package:onlynote/presentation/components/note_info_sheet.dart';
+import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/components/note_selection_menu.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
 import 'package:onlynote/services/note_photo_transform.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/presentation/components/note_links_section.dart';
@@ -82,9 +84,12 @@ import 'package:onlynote/presentation/components/reminder_suggestion_chip.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
 import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/services/note_theme_access.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/presentation/theme/note_card_typography.dart';
 
 import 'bloc/add_update_bloc.dart';
 import 'bloc/add_update_form/add_update_form_bloc.dart';
@@ -245,7 +250,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             ?.createNote(S.current, folderId: widget.folderId, now: now) ??
         Note(
           id: const Uuid().v4(),
-          color: colors.randomElement,
+          color: AppCardStyleSettings.instance.noteTheme == NoteTheme.classic
+              ? colors.randomElement
+              : null,
           dateTime: now,
           sortOrder: -now.millisecondsSinceEpoch,
           folderId: widget.folderId,
@@ -565,8 +572,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       await _voiceWrites;
       await Future<void>.delayed(Duration.zero);
       if (!mounted) return;
-      final pendingChanges = _captureTimer?.isActive == true ||
-          _hadUserChange || _autosave.dirty;
+      final pendingChanges =
+          _captureTimer?.isActive == true || _hadUserChange || _autosave.dirty;
       _captureTimer?.cancel();
       if (pendingChanges) _capture(_form.state);
       final route = MaterialPageRoute<void>(
@@ -577,6 +584,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             if (!mounted) throw StateError('The editor is no longer available');
             final previousStyle = _form.state.cardStyle;
             final previousColor = _form.state.selectedColor;
+            final feature = requiredNoteStyleFeature(previousStyle, style);
+            if (feature != null) _creationAccess.require(feature);
             try {
               await _applyCardAppearance(style, color);
               if (!await _autosave.flush()) {
@@ -2611,13 +2620,20 @@ class _BuildForm extends StatelessWidget {
   final VoidCallback onDismissReminderSuggestion;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppCardStyleSettings.instance,
+        builder: (context, _) => _buildForm(context),
+      );
+
+  Widget _buildForm(BuildContext context) {
     final finder = findController;
     if (finder != null && findNote != null) {
       finder.setFields(noteSearchFields(findNote!), notify: false);
     }
     final strings = S.of(context);
     final compactAppBar = MediaQuery.sizeOf(context).width < 260;
+    final noteTheme =
+        resolveNoteCardStyle(state.cardStyle).noteTheme ?? NoteTheme.classic;
     final suggestion = reminderSuggestion == null
         ? const SizedBox(width: double.infinity)
         : Padding(
@@ -2788,7 +2804,9 @@ class _BuildForm extends StatelessWidget {
                         ),
                         children: [
                           PaperNote(
-                            color: state.selectedColor ?? AppColors.parchment,
+                            color: noteThemePaperColor(noteTheme,
+                                customColor: state.selectedColor),
+                            theme: noteTheme,
                             kind: PaperNoteKind.sheet,
                             seed: widget.note?.id?.hashCode ?? 5,
                             tilt: false,

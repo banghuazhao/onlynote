@@ -572,6 +572,10 @@ void main() {
         find.byKey(ValueKey('card-style-card-${size.name}'));
 
     Future<void> chooseSize(NoteCardSize size) async {
+      final section = find.byKey(const ValueKey('card-style-section-layout'));
+      await tester.ensureVisible(section);
+      await tester.pumpAndSettle();
+      await _tap(tester, section.hitTestable());
       final target = cardSize(size);
       await tester.scrollUntilVisible(target, 150,
           scrollable: find.descendant(

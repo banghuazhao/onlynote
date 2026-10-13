@@ -3,7 +3,9 @@ import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 
@@ -29,6 +31,7 @@ class PaperNote extends StatelessWidget {
     this.tilt = true,
     this.plainPaper,
     this.padding,
+    this.theme = NoteTheme.classic,
   });
 
   final Color color;
@@ -42,6 +45,7 @@ class PaperNote extends StatelessWidget {
   final bool tilt;
   final bool? plainPaper;
   final EdgeInsetsGeometry? padding;
+  final NoteTheme theme;
 
   static const _scrapRadius = 5.0;
   static const _sheetRadius = 3.0;
@@ -103,18 +107,26 @@ class PaperNote extends StatelessWidget {
               Positioned.fill(
                 child: IgnorePointer(
                   child: CustomPaint(
-                    painter: _PaperTexturePainter(
-                      color: color,
-                      seed: seed,
-                      kind: kind,
-                      holeColor: desk,
-                    ),
+                    painter: theme == NoteTheme.classic
+                        ? _PaperTexturePainter(
+                            color: color,
+                            seed: seed,
+                            kind: kind,
+                            holeColor: desk,
+                          )
+                        : NoteThemePainter(
+                            theme: theme,
+                            color: color,
+                            seed: seed,
+                            sheet: isSheet,
+                          ),
                   ),
                 ),
               ),
             Padding(
               padding: _resolvePadding(context, isSheet),
-              child: child,
+              child: _PaperNoteThemeScope(
+                  theme: theme, plainPaper: plain, child: child),
             ),
             if (pinned)
               Positioned(
@@ -156,6 +168,24 @@ class PaperNote extends StatelessWidget {
     if (!pinned) return resolved;
     return resolved.copyWith(top: math.max(resolved.top, 30));
   }
+}
+
+class _PaperNoteThemeScope extends InheritedWidget {
+  const _PaperNoteThemeScope({
+    required this.theme,
+    required this.plainPaper,
+    required super.child,
+  });
+
+  final NoteTheme theme;
+  final bool plainPaper;
+
+  static _PaperNoteThemeScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_PaperNoteThemeScope>();
+
+  @override
+  bool updateShouldNotify(_PaperNoteThemeScope oldWidget) =>
+      oldWidget.theme != theme || oldWidget.plainPaper != plainPaper;
 }
 
 /// Warm desk the paper sits on — slightly darker than the sheets so they lift.
@@ -211,7 +241,12 @@ class RuledWritingArea extends StatelessWidget {
       );
 
   Widget _buildSurface(BuildContext context) {
-    if (AppAppearanceSettings.instance.plainPaper) return child;
+    final paper = _PaperNoteThemeScope.maybeOf(context);
+    if (AppAppearanceSettings.instance.plainPaper ||
+        paper?.plainPaper == true ||
+        (paper?.theme ?? NoteTheme.classic) != NoteTheme.classic) {
+      return child;
+    }
     final ink = Color.lerp(
       paperColor ?? AppColors.parchment,
       AppColors.ink,

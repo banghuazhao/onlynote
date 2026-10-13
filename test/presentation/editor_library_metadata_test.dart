@@ -173,7 +173,12 @@ Future<void> _waitForAutosave(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> _tapAppearance(WidgetTester tester, Finder target) async {
+Future<void> _tapAppearance(WidgetTester tester, Finder target,
+    {required String section}) async {
+  final tab = find.byKey(ValueKey('card-style-section-$section'));
+  await tester.ensureVisible(tab);
+  await tester.pumpAndSettle();
+  await _tap(tester, tab.hitTestable());
   await tester.scrollUntilVisible(target, 150,
       scrollable: find.descendant(
           of: find.byKey(const ValueKey('card-style-controls')),
@@ -221,10 +226,12 @@ void main() {
     expect(find.byType(CardAppearanceScreen), findsOneWidget);
     expect(tester.widget<NoteCard>(find.byType(NoteCard)).note.title,
         'Latest draft title');
-    await _tap(tester,
-        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
     await _tapAppearance(tester,
-        find.byKey(const ValueKey('card-style-card-large')));
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')),
+        section: 'color');
+    await _tapAppearance(
+        tester, find.byKey(const ValueKey('card-style-card-large')),
+        section: 'layout');
     await _tap(tester, find.byKey(const ValueKey('card-style-save')));
     expect(find.byType(CardAppearanceScreen), findsNothing);
     final body = find.byWidgetPredicate(
@@ -261,8 +268,9 @@ void main() {
         await _openEditor(tester, note: initial, premiumAccess: fixture.access);
     await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
     await _tap(tester, find.text(S.current.Card_Style));
-    await _tap(tester,
-        find.byKey(ValueKey('card-style-color-${colors[4].toARGB32()}')));
+    await _tapAppearance(tester,
+        find.byKey(ValueKey('card-style-color-${colors[4].toARGB32()}')),
+        section: 'color');
     await _tap(tester, find.byKey(const ValueKey('card-style-save')));
     expect(find.byType(PremiumScreen), findsNothing);
     expect(find.byType(CardAppearanceScreen), findsNothing);
@@ -279,8 +287,9 @@ void main() {
     final (notes, store) = await _openEditor(tester, note: initial);
     await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
     await _tap(tester, find.text(S.current.Card_Style));
-    await _tap(tester,
-        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
+    await _tapAppearance(tester,
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')),
+        section: 'color');
     await tester.pageBack();
     await tester.pumpAndSettle();
     await _tap(tester, find.text(S.current.Card_Style_Discard));
@@ -298,8 +307,9 @@ void main() {
     store.failSaves = true;
     await _tap(tester, find.byKey(const ValueKey('editor-more-note')));
     await _tap(tester, find.text(S.current.Card_Style));
-    await _tap(tester,
-        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')));
+    await _tapAppearance(tester,
+        find.byKey(ValueKey('card-style-color-${colors[8].toARGB32()}')),
+        section: 'color');
     await _tap(tester, find.byKey(const ValueKey('card-style-save')));
     expect(find.byType(CardAppearanceScreen), findsOneWidget);
     expect(notes.values[initial.id!]!.toDomain().color, initial.color);

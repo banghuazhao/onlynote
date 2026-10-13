@@ -7,6 +7,7 @@ enum PremiumFeature {
   repeatingReminders,
   individualCardStyle,
   voiceMemos,
+  noteThemes,
 }
 
 /// Limits apply to new additions; existing notes and imported data stay usable.
@@ -37,7 +38,8 @@ class PremiumAccess {
         currentCount != null && currentCount < freeTemplateLimit,
       PremiumFeature.repeatingReminders ||
       PremiumFeature.individualCardStyle ||
-      PremiumFeature.voiceMemos =>
+      PremiumFeature.voiceMemos ||
+      PremiumFeature.noteThemes =>
         false,
     };
   }

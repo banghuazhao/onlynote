@@ -195,6 +195,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("显示日期"),
     "Card_Style_Text": MessageLookupByLibrary.simpleMessage("文字"),
     "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("纹理"),
+    "Card_Style_Theme": MessageLookupByLibrary.simpleMessage("主题"),
     "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage("使用默认"),
     "Card_Style_Use_Default_All": MessageLookupByLibrary.simpleMessage(
       "使用默认样式",
@@ -484,6 +485,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage("轻点标题，跳转至该部分"),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("重做"),
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage("显示写作工具"),
+    "Note_Theme": MessageLookupByLibrary.simpleMessage("笔记主题"),
+    "Note_Theme_Classic": MessageLookupByLibrary.simpleMessage("经典"),
+    "Note_Theme_Description": MessageLookupByLibrary.simpleMessage(
+      "为笔记选择纸张风格。",
+    ),
+    "Note_Theme_Dotted_Journal": MessageLookupByLibrary.simpleMessage("点阵手帐"),
+    "Note_Theme_Grid_Paper": MessageLookupByLibrary.simpleMessage("方格纸"),
+    "Note_Theme_Kraft_Notebook": MessageLookupByLibrary.simpleMessage("牛皮纸笔记本"),
+    "Note_Theme_Legal_Pad": MessageLookupByLibrary.simpleMessage("黄色横线便笺"),
+    "Note_Theme_Parchment": MessageLookupByLibrary.simpleMessage("羊皮纸"),
+    "Note_Theme_Ruled_Notebook": MessageLookupByLibrary.simpleMessage("横线笔记本"),
+    "Note_Theme_Sticky": MessageLookupByLibrary.simpleMessage("便利贴"),
     "Note_Unarchived": MessageLookupByLibrary.simpleMessage("已取消封存"),
     "Note_Undo": MessageLookupByLibrary.simpleMessage("撤销"),
     "Note_Untitled": MessageLookupByLibrary.simpleMessage("无标题笔记"),
@@ -599,6 +612,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("无广告"),
     "Premium_Note_Limit": m19,
+    "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage("高级笔记主题"),
+    "Premium_Note_Themes_Description": MessageLookupByLibrary.simpleMessage(
+      "解锁点阵手帐、牛皮纸笔记本和羊皮纸。",
+    ),
     "Premium_Notes": MessageLookupByLibrary.simpleMessage("无限笔记"),
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "一次性购买，无需订阅。",

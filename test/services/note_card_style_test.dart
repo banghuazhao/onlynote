@@ -11,6 +11,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/note_autosave.dart';
@@ -70,6 +71,7 @@ void main() {
     cardSize: NoteCardSize.large,
     paperStyle: NoteCardPaperStyle.plain,
     showDate: false,
+    noteTheme: NoteTheme.gridPaper,
   );
   late Directory directory;
   late Box notes;
@@ -108,7 +110,8 @@ void main() {
           'cardSize': -1,
           'paperStyle': 'unknown',
           'showDate': 'false',
-          'fontFamily': ''
+          'fontFamily': '',
+          'noteTheme': 'unknown',
         }).isDefault,
         isTrue);
     final note = Note(id: 'custom', title: 'Keep', cardStyle: partial);
@@ -117,11 +120,78 @@ void main() {
         isTrue);
   });
 
+  test('every note theme roundtrips by name and participates in style identity',
+      () {
+    final distinct = <NoteCardStyle>{};
+    for (final theme in NoteTheme.values) {
+      final themed = style.copyWith(noteTheme: theme);
+      final serialized = themed.toMap();
+      expect(serialized['noteTheme'], theme.name);
+      final reopened = NoteCardStyle.fromMap(serialized);
+      expect(reopened, themed);
+      expect(reopened.hashCode, themed.hashCode);
+      expect(themed.copyWith(showDate: true).noteTheme, theme);
+      distinct.add(themed);
+    }
+    expect(distinct.length, NoteTheme.values.length);
+    const inherited = NoteCardStyle();
+    const explicitClassic = NoteCardStyle(noteTheme: NoteTheme.classic);
+    expect(inherited.isDefault, isTrue);
+    expect(explicitClassic.isDefault, isFalse);
+    expect(explicitClassic, isNot(inherited));
+    expect(explicitClassic.copyWith(clearNoteTheme: true), inherited);
+    final cleared =
+        style.copyWith(noteTheme: NoteTheme.parchment, clearNoteTheme: true);
+    expect(cleared.noteTheme, isNull);
+    expect(cleared.toMap().containsKey('noteTheme'), isFalse);
+    expect(
+        cleared,
+        const NoteCardStyle(
+          fontFamily: 'Kalam',
+          fontSize: AppFontSize.large,
+          cardSize: NoteCardSize.large,
+          paperStyle: NoteCardPaperStyle.plain,
+          showDate: false,
+        ));
+  });
+
+  test('missing and malformed themes inherit without discarding other choices',
+      () {
+    final legacy = style.copyWith(clearNoteTheme: true);
+    expect(NoteCardStyle.fromMap(legacy.toMap()), legacy);
+    for (final value in <Object?>[
+      null,
+      'future-theme',
+      'GridPaper',
+      0,
+      false,
+      <String>['gridPaper'],
+      <String, String>{'name': 'gridPaper'},
+    ]) {
+      final decoded = NoteCardStyle.fromMap({
+        ...legacy.toMap(),
+        'noteTheme': value,
+      });
+      expect(decoded.noteTheme, isNull);
+      expect(decoded, legacy);
+      expect(decoded.hashCode, legacy.hashCode);
+      expect(decoded.toMap().containsKey('noteTheme'), isFalse);
+    }
+  });
+
   test('Hive reopen and library copies preserve style and legacy defaults',
       () async {
     final note = Note(id: 'custom', title: 'Keep', cardStyle: style);
     await notes.put('custom', NoteDto.fromNote(note));
     await notes.put('legacy', NoteDto(id: 'legacy', title: 'Older note'));
+    final legacyAppearance = style.copyWith(clearNoteTheme: true);
+    await notes.put(
+        'legacy-appearance',
+        NoteDto(
+          id: 'legacy-appearance',
+          title: 'Older styled note',
+          cardStyle: legacyAppearance.toMap(),
+        ));
     await notes.flush();
     await notes.close();
     notes = await Hive.openBox('card_style_notes');
@@ -134,6 +204,8 @@ void main() {
         isTrue);
     expect((notes.get('legacy') as NoteDto).toDomain().cardStyle.isDefault,
         isTrue);
+    expect((notes.get('legacy-appearance') as NoteDto).toDomain().cardStyle,
+        legacyAppearance);
   });
 
   test('template storage and new copies preserve the chosen appearance', () {
@@ -185,25 +257,34 @@ void main() {
     expect(older.templates.single.cardStyle.isDefault, isTrue);
   });
 
-  test('restoring note content retains the latest card appearance', () async {
-    final history = NoteHistory(box: histories, repository: repository);
-    repository.history = history;
-    addTearDown(history.dispose);
-    final before =
-        NoteDto.fromNote(Note(id: 'custom', title: 'Before', cardStyle: style));
-    await repository.addUpdateNote(before);
-    await repository.addUpdateNote(before.copyWith(title: 'After'));
-    final version = history.versionsFor('custom').single;
-    expect(version.note.toDomain().cardStyle, style);
-    await repository.addUpdateNote(
-        (await repository.getNote('custom')).copyWith(clearCardStyle: true));
-    expect(history.versionsFor('custom').length, 1);
-    expect(await history.restore('custom', version.id),
-        NoteHistoryRestoreResult.restored);
-    final restored = (await repository.getNote('custom')).toDomain();
-    expect(restored.title, 'Before');
-    expect(restored.cardStyle.isDefault, isTrue);
-  });
+  for (final latestStyle in [
+    style.copyWith(noteTheme: NoteTheme.legalPad),
+    const NoteCardStyle(),
+  ]) {
+    test('restoring note content retains the latest appearance $latestStyle',
+        () async {
+      final history = NoteHistory(box: histories, repository: repository);
+      repository.history = history;
+      addTearDown(history.dispose);
+      final before = NoteDto.fromNote(
+          Note(id: 'custom', title: 'Before', cardStyle: style));
+      await repository.addUpdateNote(before);
+      await repository.addUpdateNote(before.copyWith(title: 'After'));
+      final version = history.versionsFor('custom').single;
+      expect(version.note.toDomain().cardStyle, style);
+      await repository.addUpdateNote(NoteDto.fromNote(
+        (await repository.getNote('custom'))
+            .toDomain()
+            .copyWith(cardStyle: latestStyle),
+      ));
+      expect(history.versionsFor('custom').length, 1);
+      expect(await history.restore('custom', version.id),
+          NoteHistoryRestoreResult.restored);
+      final restored = (await repository.getNote('custom')).toDomain();
+      expect(restored.title, 'Before');
+      expect(restored.cardStyle, latestStyle);
+    });
+  }
 
   for (final latestStyle in [style, const NoteCardStyle()]) {
     test('draft recovery retains latest saved appearance $latestStyle',
@@ -217,7 +298,8 @@ void main() {
           NoteDto.fromNote(Note(
               id: 'custom',
               title: 'Draft',
-              cardStyle: style.copyWith(showDate: true))));
+              cardStyle: style.copyWith(
+                  noteTheme: NoteTheme.sticky, showDate: true))));
       await HiveNoteAutosaveStore(repository, drafts).recover();
       final recovered = (notes.get('custom') as NoteDto).toDomain();
       expect(recovered.title, 'Draft');
@@ -248,7 +330,8 @@ void main() {
             fontSize: AppFontSize.large,
             cardSize: NoteCardSize.small,
             paperStyle: NoteCardPaperStyle.plain,
-            showDate: true));
+            showDate: true,
+            noteTheme: NoteTheme.classic));
     await settings.saveDefaults(style);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString('app_font_family'), 'Kalam');
@@ -265,6 +348,10 @@ void main() {
     await reopened.load();
     expect(reopened.paperStyle, isNull);
     expect(reopened.showDate, isFalse);
+    expect(reopened.noteTheme, NoteTheme.gridPaper);
+    await reopened
+        .saveDefaults(const NoteCardStyle(noteTheme: NoteTheme.classic));
+    expect(reopened.noteTheme, NoteTheme.classic);
   });
 
   test(

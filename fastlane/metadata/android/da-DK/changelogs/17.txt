@@ -1,0 +1,4 @@
+- Nye notetemaer inspireret af papir og notesbøger, også Premium-stile.
+- Enklere stilindstillinger og søgning efter mapper, skabeloner og gemte visninger.
+- Kopiér notetekst og punkter på tjeklister, og få en mere overskuelig notehistorik.
+- Tydeligere søgeresultater, oplysninger om påmindelser og feedback om sikkerhedskopiering.

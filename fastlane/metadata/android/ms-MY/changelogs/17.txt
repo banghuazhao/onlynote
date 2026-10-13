@@ -1,0 +1,4 @@
+- Tema nota baharu yang diinspirasikan oleh alat tulis, termasuk gaya Premium.
+- Kawalan gaya lebih mudah serta carian folder, templat dan paparan yang disimpan.
+- Salin teks nota dan item senarai semak, dengan sejarah nota yang lebih jelas.
+- Hasil carian, butiran peringatan dan maklum balas tentang sandaran yang lebih jelas.

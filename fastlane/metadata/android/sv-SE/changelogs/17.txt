@@ -1,0 +1,4 @@
+- Nya anteckningsteman inspirerade av papper och skrivböcker, även Premium-stilar.
+- Enklare stilinställningar och sökning efter mappar, mallar och sparade vyer.
+- Kopiera anteckningstext och checklistpunkter, med tydligare anteckningshistorik.
+- Tydligare sökresultat, påminnelsedetaljer och återkoppling om säkerhetskopiering.

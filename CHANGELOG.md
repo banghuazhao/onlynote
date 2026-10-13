@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added stationery-inspired note themes with app defaults, per-note overrides, and Premium advanced styles.
+- Grouped card appearance controls into horizontal Theme, Color, Text, and Layout sections.
 - Localized reminder dates on Home cards using the app language and device clock preference.
 - Added selected-tag counts, hidden-selection counts, and tag-limit guidance to the library panel.
 - Added name search to custom and starter templates.

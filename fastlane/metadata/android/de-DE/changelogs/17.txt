@@ -1,0 +1,4 @@
+- Neue, von Schreibwaren inspirierte Notizdesigns, auch Premium-Stile.
+- Einfachere Stiloptionen und Suche nach Ordnern, Vorlagen und gespeicherten Ansichten.
+- Notiztext und Checklistenpunkte kopieren, mit übersichtlicherem Notizverlauf.
+- Übersichtlichere Suchergebnisse, Erinnerungsdetails und Rückmeldungen zu Backups.

@@ -247,6 +247,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("Show date"),
     "Card_Style_Text": MessageLookupByLibrary.simpleMessage("Text"),
     "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("Textured"),
+    "Card_Style_Theme": MessageLookupByLibrary.simpleMessage("Theme"),
     "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage(
       "Use default",
     ),
@@ -622,6 +623,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage(
       "Show writing tools",
     ),
+    "Note_Theme": MessageLookupByLibrary.simpleMessage("Note theme"),
+    "Note_Theme_Classic": MessageLookupByLibrary.simpleMessage("Classic"),
+    "Note_Theme_Description": MessageLookupByLibrary.simpleMessage(
+      "Choose a paper style for your notes.",
+    ),
+    "Note_Theme_Dotted_Journal": MessageLookupByLibrary.simpleMessage(
+      "Dotted journal",
+    ),
+    "Note_Theme_Grid_Paper": MessageLookupByLibrary.simpleMessage("Grid paper"),
+    "Note_Theme_Kraft_Notebook": MessageLookupByLibrary.simpleMessage(
+      "Kraft notebook",
+    ),
+    "Note_Theme_Legal_Pad": MessageLookupByLibrary.simpleMessage("Legal pad"),
+    "Note_Theme_Parchment": MessageLookupByLibrary.simpleMessage("Parchment"),
+    "Note_Theme_Ruled_Notebook": MessageLookupByLibrary.simpleMessage(
+      "Ruled notebook",
+    ),
+    "Note_Theme_Sticky": MessageLookupByLibrary.simpleMessage("Sticky note"),
     "Note_Unarchived": MessageLookupByLibrary.simpleMessage("Note unarchived"),
     "Note_Undo": MessageLookupByLibrary.simpleMessage("Undo"),
     "Note_Untitled": MessageLookupByLibrary.simpleMessage("Untitled note"),
@@ -767,6 +786,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("No ads"),
     "Premium_Note_Limit": m19,
+    "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage(
+      "Premium note themes",
+    ),
+    "Premium_Note_Themes_Description": MessageLookupByLibrary.simpleMessage(
+      "Unlock dotted journals, kraft notebooks, and parchment paper.",
+    ),
     "Premium_Notes": MessageLookupByLibrary.simpleMessage("Unlimited notes"),
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "One-time purchase. No subscription.",

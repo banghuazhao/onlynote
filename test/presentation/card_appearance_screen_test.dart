@@ -107,7 +107,17 @@ Finder _choice(String title, String label) {
 Finder _color(Color color) =>
     find.byKey(ValueKey('card-style-color-${color.toARGB32()}'));
 
-Future<void> _tapControl(WidgetTester tester, Finder target) async {
+Future<void> _selectSection(WidgetTester tester, String section) async {
+  final tab = find.byKey(ValueKey('card-style-section-$section'));
+  await tester.ensureVisible(tab);
+  await tester.pumpAndSettle();
+  await tester.tap(tab.hitTestable());
+  await tester.pumpAndSettle();
+}
+
+Future<void> _revealControl(WidgetTester tester, Finder target,
+    {String? section}) async {
+  if (section != null) await _selectSection(tester, section);
   if (target.evaluate().isEmpty) {
     tester.state<ScrollableState>(_controls()).position.jumpTo(0);
     await tester.pump();
@@ -118,6 +128,11 @@ Future<void> _tapControl(WidgetTester tester, Finder target) async {
     await tester.scrollUntilVisible(target, 150, scrollable: _controls());
   }
   await tester.pumpAndSettle();
+}
+
+Future<void> _tapControl(WidgetTester tester, Finder target,
+    {String? section}) async {
+  await _revealControl(tester, target, section: section);
   await tester.tap(target);
   await tester.pumpAndSettle();
 }
@@ -200,12 +215,13 @@ void main() {
             savedColor = color;
           },
         ));
+    await _revealControl(tester, _color(originalColor), section: 'color');
     final swatch = tester.widget<IconButton>(find.descendant(
         of: _color(originalColor), matching: find.byType(IconButton)));
     expect(swatch.isSelected, isTrue);
     expect(swatch.style!.foregroundColor!.resolve({}), Colors.white);
     expect(tester.getSize(_color(originalColor)), const Size(48, 48));
-    await _tapControl(tester, _color(colors[7]));
+    await _tapControl(tester, _color(colors[7]), section: 'color');
     expect(
         tester.widget<NoteCard>(find.byType(NoteCard)).note.color, colors[7]);
     await _capture(tester, 'color-light');
@@ -231,7 +247,7 @@ void main() {
           thumbnailBuilder: _thumbnail,
           onSaveAppearance: (_, color) async => saves++,
         ));
-    await _tapControl(tester, _color(colors[8]));
+    await _tapControl(tester, _color(colors[8]), section: 'color');
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text(S.current.Card_Style_Discard_Title), findsOneWidget);
@@ -267,14 +283,15 @@ void main() {
             savedColor = color;
           },
         ));
-    await _tapControl(tester, _color(colors[8]));
+    await _tapControl(tester, _color(colors[8]), section: 'color');
     await _tapControl(tester, find.byKey(const ValueKey('card-style-reset')));
     expect(
         tester.widget<NoteCard>(find.byType(NoteCard)).note.color, colors[8]);
     expect(tester.widget<NoteCard>(find.byType(NoteCard)).cardStyle!.showDate,
         isTrue);
     await _tapControl(
-        tester, find.byKey(const ValueKey('card-style-color-default')));
+        tester, find.byKey(const ValueKey('card-style-color-default')),
+        section: 'color');
     expect(tester.widget<NoteCard>(find.byType(NoteCard)).note.color, isNull);
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
@@ -297,9 +314,10 @@ void main() {
           thumbnailBuilder: _thumbnail,
           onSaveAppearance: (_, color) async => saves++,
         ));
-    await _tapControl(tester, _color(colors[3]));
+    await _tapControl(tester, _color(colors[3]), section: 'color');
     await _tapControl(
-        tester, find.byKey(const ValueKey('card-style-text-large')));
+        tester, find.byKey(const ValueKey('card-style-text-large')),
+        section: 'text');
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
     expect(find.byType(PremiumScreen), findsOneWidget);
@@ -327,12 +345,23 @@ void main() {
           thumbnailBuilder: _thumbnail,
           onSaveAppearance: (style, color) async => saved = style,
         ));
-    expect(find.text(S.current.Card_Style_Color), findsOneWidget);
-    await _tapControl(tester, find.byKey(const ValueKey('card-style-font')));
+    await _revealControl(
+        tester, find.byKey(const ValueKey('card-style-color-group')),
+        section: 'color');
+    expect(
+        find.descendant(
+            of: find.byKey(const ValueKey('card-style-color-group')),
+            matching: find.text(S.current.Card_Style_Color)),
+        findsOneWidget);
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-font')),
+        section: 'text');
     await tester.tap(find.byTooltip('Close'));
     await tester.pumpAndSettle();
+    await _revealControl(tester, find.byKey(const ValueKey('card-style-text')),
+        section: 'text');
     expect(find.byKey(const ValueKey('card-style-text')), findsOneWidget);
-    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')),
+        section: 'layout');
     expect(
         tester
             .widget<SwitchListTile>(
@@ -341,7 +370,8 @@ void main() {
         isFalse);
     expect(find.byKey(const ValueKey('card-date')), findsNothing);
     await _tapControl(
-        tester, find.byKey(const ValueKey('card-style-date-default')));
+        tester, find.byKey(const ValueKey('card-style-date-default')),
+        section: 'layout');
     expect(
         tester
             .widget<SwitchListTile>(
@@ -350,7 +380,7 @@ void main() {
         isTrue);
     expect(find.byKey(const ValueKey('card-style-date-default')), findsNothing);
     // Change only the color so the inherited date choice is persisted for free.
-    await _tapControl(tester, _color(colors[5]));
+    await _tapControl(tester, _color(colors[5]), section: 'color');
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
     expect(saved!.showDate, isNull);
@@ -371,8 +401,11 @@ void main() {
     await tester.pumpAndSettle();
     await _open(tester, CardAppearanceScreen(onSave: (_) async {}));
     expect(find.byKey(const ValueKey('card-style-color-group')), findsNothing);
+    await _revealControl(tester, find.byKey(const ValueKey('card-style-text')),
+        section: 'text');
     expect(find.byKey(const ValueKey('card-style-text')), findsOneWidget);
-    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')),
+        section: 'layout');
     expect(find.byKey(const ValueKey('card-style-layout')), findsOneWidget);
     expect(find.byKey(const ValueKey('card-style-date-default')), findsNothing);
   });
@@ -391,7 +424,8 @@ void main() {
                 _note(style: const NoteCardStyle(fontSize: AppFontSize.small)),
             thumbnailBuilder: _thumbnail,
             onSave: (style) async => saved = style));
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large),
+        section: 'text');
     expect(saved, isNull);
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
@@ -423,7 +457,8 @@ void main() {
             note: _note(),
             thumbnailBuilder: _thumbnail,
             onSave: (style) async => saved = style));
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large),
+        section: 'text');
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
     final buy = find.byKey(const ValueKey('premium-buy'));
@@ -464,7 +499,8 @@ void main() {
             premiumAccess: fixture.access,
             thumbnailBuilder: _thumbnail,
             onSave: (_) async => saves++));
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large),
+        section: 'text');
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
     expect(find.byType(PremiumScreen), findsNothing);
@@ -491,14 +527,15 @@ void main() {
     final initialWidth = tester
         .getSize(find.byKey(const ValueKey('card-style-preview-width')))
         .width;
-    await tester.tap(find.byKey(const ValueKey('card-style-font')));
-    await tester.pumpAndSettle();
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-font')),
+        section: 'text');
     await tester.tap(find.text('Kalam'));
     await tester.pumpAndSettle();
     var title = tester.widget<SearchHighlight>(
         find.widgetWithText(SearchHighlight, 'Trip planning'));
     expect(title.style!.fontFamily, _captureUi ? 'Roboto' : 'Kalam');
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large),
+        section: 'text');
     title = tester.widget<SearchHighlight>(
         find.widgetWithText(SearchHighlight, 'Trip planning'));
     expect(title.style!.fontSize, 24);
@@ -506,16 +543,19 @@ void main() {
         tester.widget<PaperChecklistRow>(find.byType(PaperChecklistRow).first);
     expect(row.textStyle!.fontFamily, _captureUi ? 'Roboto' : 'Kalam');
     expect(row.textStyle!.fontSize, 16.8);
-    await _tapControl(tester, _choice(S.current.Card_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Card_Size, S.current.Large),
+        section: 'layout');
     expect(
         tester
             .getSize(find.byKey(const ValueKey('card-style-preview-width')))
             .width,
         greaterThan(initialWidth));
-    await _tapControl(tester,
-        _choice(S.current.Card_Style_Paper, S.current.Card_Style_Plain));
+    await _tapControl(
+        tester, _choice(S.current.Card_Style_Paper, S.current.Card_Style_Plain),
+        section: 'layout');
     expect(tester.widget<PaperNote>(find.byType(PaperNote)).plainPaper, isTrue);
-    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')));
+    await _tapControl(tester, find.byKey(const ValueKey('card-style-date')),
+        section: 'layout');
     expect(find.byKey(const ValueKey('card-date')), findsNothing);
     expect(saved, isNull);
     expect(AppTypographySettings.instance.fontFamily, 'Montserrat');
@@ -543,7 +583,8 @@ void main() {
             note: _note(),
             thumbnailBuilder: _thumbnail,
             onSave: (_) async => saves++));
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Small));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Small),
+        section: 'text');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text(S.current.Card_Style_Discard_Title), findsOneWidget);
@@ -624,7 +665,8 @@ void main() {
             onSave: (_) async {
               if (++attempts == 1) throw StateError('Unavailable');
             }));
-    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large));
+    await _tapControl(tester, _choice(S.current.Font_Size, S.current.Large),
+        section: 'text');
     await tester.tap(find.byKey(const ValueKey('card-style-save')));
     await tester.pumpAndSettle();
     expect(find.text(S.current.Card_Style_Save_Failed), findsWidgets);
@@ -665,7 +707,8 @@ void main() {
             locale: locale);
         await _capture(tester, label);
         await _tapControl(tester,
-            _choice(S.current.Card_Style_Paper, S.current.Card_Style_Plain));
+            _choice(S.current.Card_Style_Paper, S.current.Card_Style_Plain),
+            section: 'layout');
         await tester.tap(find.byKey(const ValueKey('card-style-save')));
         await tester.pumpAndSettle();
         expect(saved, isTrue);
@@ -688,7 +731,8 @@ void main() {
       await tester.pumpWidget(preview());
       await tester.pumpAndSettle();
       expect(find.byType(CardAppearanceScreen), findsOneWidget);
-      await _tapControl(tester, _choice(S.current.Font_Size, S.current.Small));
+      await _tapControl(tester, _choice(S.current.Font_Size, S.current.Small),
+          section: 'text');
       await tester.tap(find.byKey(const ValueKey('card-style-save')));
       await tester.pumpAndSettle();
       expect(find.byType(CardAppearanceScreen), findsNothing);

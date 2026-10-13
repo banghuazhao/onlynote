@@ -520,8 +520,12 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
     await tester.pumpAndSettle();
   }
   if (screen == StoreScreenshotScreen.cardStyle && !device.tablet) {
-    // Show the actual controls after the same scroll a user makes. The color
-    // remains visible in the pinned live preview above the font and size options.
+    // Select Text as a user does, with the color in the pinned live preview.
+    final textSection = find.byKey(const ValueKey('card-style-section-text'));
+    await tester.ensureVisible(textSection);
+    await tester.pumpAndSettle();
+    await tester.tap(textSection.hitTestable());
+    await tester.pumpAndSettle();
     final textControls = find.byKey(const ValueKey('card-style-text'));
     await tester.scrollUntilVisible(textControls, 150,
         scrollable: find.descendant(

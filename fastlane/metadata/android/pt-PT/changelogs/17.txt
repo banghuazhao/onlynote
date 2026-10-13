@@ -1,0 +1,4 @@
+- Novos temas para notas inspirados em papelaria, incluindo estilos Premium.
+- Controlos de estilo mais simples e pesquisa de pastas, modelos e vistas guardadas.
+- Copie o texto das notas e itens de listas de tarefas, com um histórico de notas mais claro.
+- Resultados de pesquisa, detalhes dos lembretes e mensagens das cópias de segurança mais claros.

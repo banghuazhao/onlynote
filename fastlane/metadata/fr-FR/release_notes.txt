@@ -1,4 +1,4 @@
-- Rédigez avec une mise en forme simple, le mode concentration, la fonction Annuler et l’historique des notes.
-- Scannez des documents, extrayez du texte des photos et enregistrez des notes vocales.
-- Commencez avec des modèles, des listes de tâches améliorées et la possibilité de reporter les rappels.
-- Personnalisez le style des cartes. Premium débloque un nombre illimité de notes et bien plus.
+- De nouveaux thèmes de notes inspirés du papier et des carnets, avec des styles Premium.
+- Des réglages de style plus simples et la recherche de dossiers, modèles et vues enregistrées.
+- Copiez le texte des notes et les éléments des listes de tâches, avec un historique de notes plus clair.
+- Des résultats de recherche plus lisibles et des informations plus claires sur les rappels et les sauvegardes.

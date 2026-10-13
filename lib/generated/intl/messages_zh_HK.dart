@@ -195,6 +195,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Card_Style_Show_Date": MessageLookupByLibrary.simpleMessage("顯示日期"),
     "Card_Style_Text": MessageLookupByLibrary.simpleMessage("文字"),
     "Card_Style_Textured": MessageLookupByLibrary.simpleMessage("紋理"),
+    "Card_Style_Theme": MessageLookupByLibrary.simpleMessage("主題"),
     "Card_Style_Use_Default": MessageLookupByLibrary.simpleMessage("使用預設"),
     "Card_Style_Use_Default_All": MessageLookupByLibrary.simpleMessage(
       "使用預設樣式",
@@ -486,6 +487,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage("輕點標題，跳至該部分"),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("重做"),
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage("顯示寫作工具"),
+    "Note_Theme": MessageLookupByLibrary.simpleMessage("筆記主題"),
+    "Note_Theme_Classic": MessageLookupByLibrary.simpleMessage("經典"),
+    "Note_Theme_Description": MessageLookupByLibrary.simpleMessage(
+      "為筆記選擇紙張風格。",
+    ),
+    "Note_Theme_Dotted_Journal": MessageLookupByLibrary.simpleMessage("點陣手帳"),
+    "Note_Theme_Grid_Paper": MessageLookupByLibrary.simpleMessage("方格紙"),
+    "Note_Theme_Kraft_Notebook": MessageLookupByLibrary.simpleMessage("牛皮紙筆記簿"),
+    "Note_Theme_Legal_Pad": MessageLookupByLibrary.simpleMessage("黃色橫線便箋"),
+    "Note_Theme_Parchment": MessageLookupByLibrary.simpleMessage("羊皮紙"),
+    "Note_Theme_Ruled_Notebook": MessageLookupByLibrary.simpleMessage("橫線筆記簿"),
+    "Note_Theme_Sticky": MessageLookupByLibrary.simpleMessage("便利貼"),
     "Note_Unarchived": MessageLookupByLibrary.simpleMessage("已取消封存"),
     "Note_Undo": MessageLookupByLibrary.simpleMessage("復原"),
     "Note_Untitled": MessageLookupByLibrary.simpleMessage("無標題筆記"),
@@ -599,6 +612,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("無廣告"),
     "Premium_Note_Limit": m19,
+    "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage("進階筆記主題"),
+    "Premium_Note_Themes_Description": MessageLookupByLibrary.simpleMessage(
+      "解鎖點陣手帳、牛皮紙筆記簿和羊皮紙。",
+    ),
     "Premium_Notes": MessageLookupByLibrary.simpleMessage("無限筆記"),
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "一次性購買，無需訂閱。",

@@ -32,10 +32,13 @@ import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/Tools/in_app_reviewer_helper.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/review_moment.dart';
 import 'package:onlynote/presentation/components/note_checklist.dart';
+import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/presentation/components/premium_feature_gate.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
@@ -55,6 +58,7 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
+import 'package:onlynote/presentation/theme/note_card_typography.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:uuid/uuid.dart';
 import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
@@ -1202,8 +1206,15 @@ class LoadedView extends StatelessWidget {
   final bool checklistReadOnly;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppCardStyleSettings.instance,
+        builder: (context, _) => _buildNote(context),
+      );
+
+  Widget _buildNote(BuildContext context) {
     Reminder? currentReminder = ReminderData.shared.getCurrentReminder(note);
+    final noteTheme =
+        resolveNoteCardStyle(note.cardStyle).noteTheme ?? NoteTheme.classic;
 
     return Center(
       child: ConstrainedBox(
@@ -1221,7 +1232,8 @@ class LoadedView extends StatelessWidget {
             Screenshot(
               controller: screenshotController,
               child: PaperNote(
-                color: note.color ?? AppColors.parchment,
+                color: noteThemePaperColor(noteTheme, customColor: note.color),
+                theme: noteTheme,
                 kind: PaperNoteKind.sheet,
                 seed: note.id?.hashCode ?? 0,
                 pinned: note.isPinned,

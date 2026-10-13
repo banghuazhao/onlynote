@@ -1,4 +1,4 @@
-- Skriv med enkel formatering och fokusläge. Ångra ändringar och se anteckningshistoriken.
-- Skanna dokument, hämta text från foton och spela in röstmemon.
-- Kom igång med mallar, förbättrade checklistor och snooze för påminnelser.
-- Anpassa kortstilar. Premium ger obegränsat med anteckningar och mer.
+- Nya anteckningsteman inspirerade av papper och anteckningsböcker, inklusive Premium-stilar.
+- Enklare stilinställningar och sökning efter mappar, mallar och sparade vyer.
+- Kopiera anteckningstext och punkter i checklistor, med tydligare anteckningshistorik.
+- Tydligare sökresultat, påminnelsedetaljer och återkoppling om säkerhetskopiering.

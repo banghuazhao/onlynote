@@ -109,6 +109,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         PremiumFeature.voiceMemos ||
         PremiumFeature.individualCardStyle =>
           strings.Premium_Feature_Required,
+        PremiumFeature.noteThemes => strings.Premium_Note_Themes_Description,
         null => null,
       };
 
@@ -181,6 +182,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           selected: widget.feature,
                           icon: Icons.mic_none_rounded,
                           label: strings.Premium_Voice_Memos,
+                        ),
+                        _Benefit(
+                          feature: PremiumFeature.noteThemes,
+                          selected: widget.feature,
+                          icon: Icons.texture_rounded,
+                          label: strings.Premium_Note_Themes,
                         ),
                         _Benefit(
                           icon: Icons.block_outlined,

@@ -10,6 +10,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
@@ -93,14 +94,15 @@ void main() {
   });
 
   test(
-      'daily association and card style survive Hive reopen and portable restore',
+      'daily association and advanced theme survive Hive reopen and export/restore',
       () async {
     const style = NoteCardStyle(
         fontFamily: 'Kalam',
         fontSize: AppFontSize.large,
         cardSize: NoteCardSize.large,
         paperStyle: NoteCardPaperStyle.plain,
-        showDate: false);
+        showDate: false,
+        noteTheme: NoteTheme.parchment);
     final source = NoteDto(
         id: 'daily',
         title: 'Renamed daily note',
@@ -113,17 +115,6 @@ void main() {
     notes = await Hive.openBox('notes');
     expect((notes.get('daily') as NoteDto).dailyNoteDateKey, '2026-10-06');
     expect((notes.get('daily') as NoteDto).toDomain().cardStyle, style);
-    final contents = BackupContents(
-        createdAt: DateTime(2026, 10, 6),
-        notes: [(notes.get('daily') as NoteDto)],
-        folders: [],
-        photos: {},
-        reminders: []);
-    final portable = decodeBackup(encodeBackup(contents));
-    expect(portable.toJson()['version'], 8);
-    expect(portable.notes.single.dailyNoteDateKey, '2026-10-06');
-    expect(portable.notes.single.toDomain().cardStyle, style);
-    await notes.clear();
     final restoredService = BackupService(
         notes: notes,
         folders: folders,
@@ -131,6 +122,11 @@ void main() {
         documents: directory,
         readReminders: () => reminders,
         writeReminders: (values) async => reminders = values);
+    final portable = decodeBackup(await restoredService.export());
+    expect(portable.toJson()['version'], 8);
+    expect(portable.notes.single.dailyNoteDateKey, '2026-10-06');
+    expect(portable.notes.single.toDomain().cardStyle, style);
+    await notes.clear();
     await restoredService.restore(portable);
     final restored = notes.values.cast<NoteDto>().single;
     expect(restored.id, isNot('daily'));

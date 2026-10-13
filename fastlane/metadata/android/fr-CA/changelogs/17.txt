@@ -1,0 +1,4 @@
+- De nouveaux thèmes de notes inspirés de la papeterie, dont des styles Premium.
+- Des réglages de style plus simples et la recherche de dossiers, de modèles et de vues enregistrées.
+- Copiez le texte des notes et les éléments des listes de vérification, avec un historique des notes plus clair.
+- Des résultats de recherche, des détails de rappel et des messages de sauvegarde plus clairs.

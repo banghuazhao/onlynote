@@ -15,6 +15,7 @@ NoteCardStyle resolveNoteCardStyle(NoteCardStyle style) {
     cardSize: style.cardSize ?? defaults.cardSize,
     paperStyle: style.paperStyle ?? defaults.paperStyle,
     showDate: style.showDate ?? defaults.showDate,
+    noteTheme: style.noteTheme ?? defaults.noteTheme,
   );
 }
 

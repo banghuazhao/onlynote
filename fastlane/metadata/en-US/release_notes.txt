@@ -1,4 +1,4 @@
-- Write with simple formatting, focus mode, undo, and note history.
-- Scan documents, extract photo text, and record voice memos.
-- Start with templates, improved checklists, and reminder snooze.
-- Customize card styles. Premium unlocks unlimited notes and more.
+- New stationery-inspired note themes, including Premium styles.
+- Simpler style controls and search for folders, templates and saved views.
+- Copy note text and checklist items, with clearer note history.
+- Clearer search results, reminder details and backup feedback.

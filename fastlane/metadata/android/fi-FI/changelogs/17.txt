@@ -1,0 +1,4 @@
+- Uudet paperitarvikkeista inspiroidut muistiinpanoteemat, myös Premium-tyylit.
+- Helpommat tyyliasetukset ja kansioiden, mallien sekä tallennettujen näkymien haku.
+- Kopioi muistiinpanoteksti ja tarkistuslistan kohdat. Muistiinpanohistoria on selkeämpi.
+- Selkeämmät hakutulokset, muistutustiedot ja varmuuskopioinnin palaute.

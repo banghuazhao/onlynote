@@ -1,4 +1,4 @@
-- Skriv med enkel formatering og fokustilstand. Fortryd ændringer, og se notehistorikken.
-- Scan dokumenter, hent tekst fra billeder, og optag stemmememoer.
-- Kom i gang med skabeloner, forbedrede tjeklister og muligheden for at udsætte påmindelser.
-- Tilpas kortenes stil. Premium giver ubegrænsede noter og meget mere.
+- Nye notetemaer inspireret af papir og notesbøger, også med Premium-stile.
+- Enklere stilindstillinger og søgning efter mapper, skabeloner og gemte visninger.
+- Kopiér notetekst og punkter i tjeklister, med en mere overskuelig notehistorik.
+- Tydeligere søgeresultater, oplysninger om påmindelser og feedback om sikkerhedskopiering.

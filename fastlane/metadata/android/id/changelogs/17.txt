@@ -1,0 +1,4 @@
+- Tema catatan baru yang terinspirasi dari alat tulis, termasuk gaya Premium.
+- Pengaturan gaya lebih sederhana serta pencarian folder, templat, dan tampilan tersimpan.
+- Salin teks catatan dan item daftar periksa, dengan riwayat catatan yang lebih jelas.
+- Hasil pencarian, detail pengingat, dan informasi pencadangan yang lebih jelas.

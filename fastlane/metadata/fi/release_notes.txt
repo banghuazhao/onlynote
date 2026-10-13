@@ -1,4 +1,4 @@
-- Kirjoita helpon muotoilun, keskittymistilan, kumoamistoiminnon ja muistiinpanohistorian avulla.
-- Skannaa asiakirjoja, poimi tekstiä kuvista ja tallenna äänimuistioita.
-- Aloita mallipohjista, käytä parannettuja tehtävälistoja ja torkuta muistutuksia.
-- Mukauta korttien tyylejä. Premium avaa rajattomasti muistiinpanoja ja paljon muuta.
+- Uusia paperista ja muistikirjoista inspiroituneita muistiinpanoteemoja, mukana myös Premium-tyylit.
+- Helpommat tyyliasetukset sekä kansioiden, mallipohjien ja tallennettujen näkymien haku.
+- Kopioi muistiinpanojen tekstiä ja tarkistuslistojen kohtia. Muistiinpanohistoria on nyt selkeämpi.
+- Selkeämmät hakutulokset sekä tiedot muistutuksista ja varmuuskopioinnista.

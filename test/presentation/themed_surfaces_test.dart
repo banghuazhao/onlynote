@@ -210,6 +210,11 @@ void main() {
         await tester.tap(find.text('Default card style'));
         await tester.pumpAndSettle();
         expect(find.byType(CardAppearanceScreen), findsOneWidget);
+        final layout = find.byKey(const ValueKey('card-style-section-layout'));
+        await tester.ensureVisible(layout);
+        await tester.pumpAndSettle();
+        await tester.tap(layout.hitTestable());
+        await tester.pumpAndSettle();
         final controls = find.descendant(
           of: find.byKey(const ValueKey('card-style-controls')),
           matching: find.byType(Scrollable),

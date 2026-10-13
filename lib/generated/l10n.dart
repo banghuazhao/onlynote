@@ -4538,6 +4538,11 @@ class S {
     return Intl.message('Color', name: 'Card_Style_Color', desc: '', args: []);
   }
 
+  /// `Theme`
+  String get Card_Style_Theme {
+    return Intl.message('Theme', name: 'Card_Style_Theme', desc: '', args: []);
+  }
+
   /// `Text`
   String get Card_Style_Text {
     return Intl.message('Text', name: 'Card_Style_Text', desc: '', args: []);
@@ -5067,6 +5072,121 @@ class S {
     return Intl.message(
       'No matching templates.',
       name: 'Templates_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note theme`
+  String get Note_Theme {
+    return Intl.message('Note theme', name: 'Note_Theme', desc: '', args: []);
+  }
+
+  /// `Choose a paper style for your notes.`
+  String get Note_Theme_Description {
+    return Intl.message(
+      'Choose a paper style for your notes.',
+      name: 'Note_Theme_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Classic`
+  String get Note_Theme_Classic {
+    return Intl.message(
+      'Classic',
+      name: 'Note_Theme_Classic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sticky note`
+  String get Note_Theme_Sticky {
+    return Intl.message(
+      'Sticky note',
+      name: 'Note_Theme_Sticky',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Legal pad`
+  String get Note_Theme_Legal_Pad {
+    return Intl.message(
+      'Legal pad',
+      name: 'Note_Theme_Legal_Pad',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ruled notebook`
+  String get Note_Theme_Ruled_Notebook {
+    return Intl.message(
+      'Ruled notebook',
+      name: 'Note_Theme_Ruled_Notebook',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Grid paper`
+  String get Note_Theme_Grid_Paper {
+    return Intl.message(
+      'Grid paper',
+      name: 'Note_Theme_Grid_Paper',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dotted journal`
+  String get Note_Theme_Dotted_Journal {
+    return Intl.message(
+      'Dotted journal',
+      name: 'Note_Theme_Dotted_Journal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Kraft notebook`
+  String get Note_Theme_Kraft_Notebook {
+    return Intl.message(
+      'Kraft notebook',
+      name: 'Note_Theme_Kraft_Notebook',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Parchment`
+  String get Note_Theme_Parchment {
+    return Intl.message(
+      'Parchment',
+      name: 'Note_Theme_Parchment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Premium note themes`
+  String get Premium_Note_Themes {
+    return Intl.message(
+      'Premium note themes',
+      name: 'Premium_Note_Themes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unlock dotted journals, kraft notebooks, and parchment paper.`
+  String get Premium_Note_Themes_Description {
+    return Intl.message(
+      'Unlock dotted journals, kraft notebooks, and parchment paper.',
+      name: 'Premium_Note_Themes_Description',
       desc: '',
       args: [],
     );

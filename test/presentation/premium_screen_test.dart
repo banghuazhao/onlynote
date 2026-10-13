@@ -84,6 +84,32 @@ void main() {
   });
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  for (final locale in [const Locale('en'), const Locale('zh', 'HK')]) {
+    testWidgets('$locale advanced theme upgrade shows its reason and benefit',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 650);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final fixture = PremiumTestFixture();
+      await fixture.init();
+      addTearDown(fixture.dispose);
+      await tester.pumpWidget(_host(
+          PremiumScreen(
+              purchases: fixture.purchases, feature: PremiumFeature.noteThemes),
+          locale: locale,
+          scale: 2));
+      await tester.pumpAndSettle();
+      expect(
+          find.text(S.current.Premium_Note_Themes_Description), findsOneWidget);
+      final benefit = find.text(S.current.Premium_Note_Themes);
+      await tester.ensureVisible(benefit);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(benefit).style?.fontWeight, FontWeight.w600);
+      expect(fixture.store.buyCalls, 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('Settings gives folders and backup the same 16pt spacing',
       (tester) async {
     final fixture = PremiumTestFixture();

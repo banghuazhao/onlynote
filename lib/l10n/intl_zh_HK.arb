@@ -566,6 +566,7 @@
   "Premium_Note_Limit": "免費版包含 {limit} 則筆記。升級即可建立無限筆記。",
   "Premium_Voice_Memos": "語音備忘錄",
   "Card_Style_Color": "顏色",
+  "Card_Style_Theme": "主題",
   "Card_Style_Text": "文字",
   "Card_Style_Layout": "版面",
   "Card_Style_Default_Color": "預設紙張顏色",
@@ -697,5 +698,17 @@
   "Search_Saved_Views": "搜尋已儲存的檢視",
   "Saved_Views_Search_Empty": "沒有符合搜尋條件的已儲存檢視。",
   "Search_Templates": "搜尋範本",
-  "Templates_Search_Empty": "沒有符合搜尋條件的範本。"
+  "Templates_Search_Empty": "沒有符合搜尋條件的範本。",
+  "Note_Theme": "筆記主題",
+  "Note_Theme_Description": "為筆記選擇紙張風格。",
+  "Note_Theme_Classic": "經典",
+  "Note_Theme_Sticky": "便利貼",
+  "Note_Theme_Legal_Pad": "黃色橫線便箋",
+  "Note_Theme_Ruled_Notebook": "橫線筆記簿",
+  "Note_Theme_Grid_Paper": "方格紙",
+  "Note_Theme_Dotted_Journal": "點陣手帳",
+  "Note_Theme_Kraft_Notebook": "牛皮紙筆記簿",
+  "Note_Theme_Parchment": "羊皮紙",
+  "Premium_Note_Themes": "進階筆記主題",
+  "Premium_Note_Themes_Description": "解鎖點陣手帳、牛皮紙筆記簿和羊皮紙。"
 }

@@ -10,6 +10,7 @@ import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/services/note_theme_access.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -835,8 +836,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (note == null || note.isDeleted) {
         throw StateError('Note is unavailable');
       }
-      if (event.style != note.cardStyle && !event.style.isDefault) {
-        premiumAccess.require(PremiumFeature.individualCardStyle);
+      final required = requiredNoteStyleFeature(note.cardStyle, event.style);
+      if (required != null) {
+        premiumAccess.require(required);
       }
       final updated = note.copyWith(
           cardStyle: event.style,

@@ -6,12 +6,15 @@ import 'package:onlynote/services/note_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
+import 'package:onlynote/domain/model/note_theme.dart';
+import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_image.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
+import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/components/reminder_date_label.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -114,7 +117,12 @@ class NoteCardState extends State<NoteCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppCardStyleSettings.instance,
+        builder: (context, _) => _buildCard(context),
+      );
+
+  Widget _buildCard(BuildContext context) {
     final Reminder? currentReminder =
         ReminderData.shared.getCurrentReminder(widget.note);
     final Note note = widget.note;
@@ -179,7 +187,8 @@ class NoteCardState extends State<NoteCard> {
       ...note.tags.where((tag) => !(pattern?.hasMatch(tag) ?? false)),
     ].take(2);
     // Always a light paper: everything drawn on it is ink-coloured.
-    final paperColor = note.color ?? AppColors.parchment;
+    final noteTheme = style.noteTheme ?? NoteTheme.classic;
+    final paperColor = noteThemePaperColor(noteTheme, customColor: note.color);
     final seed = note.id?.hashCode ?? note.date.hashCode;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
@@ -217,6 +226,7 @@ class NoteCardState extends State<NoteCard> {
                 controller: _screenshotController,
                 child: PaperNote(
                   color: paperColor,
+                  theme: noteTheme,
                   seed: seed,
                   plainPaper: style.paperStyle == NoteCardPaperStyle.plain,
                   pinned: note.isPinned,

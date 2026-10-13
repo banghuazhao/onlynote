@@ -1,4 +1,4 @@
-- Escribe con formato sencillo, modo de concentración, deshacer e historial de notas.
-- Escanea documentos, extrae texto de fotos y graba notas de voz.
-- Empieza con plantillas, listas de tareas mejoradas y la opción de posponer recordatorios.
-- Personaliza el estilo de las tarjetas. Premium permite crear notas ilimitadas y mucho más.
+- Nuevos temas para notas inspirados en papel y cuadernos, con estilos Premium.
+- Controles de estilo más sencillos y búsqueda de carpetas, plantillas y vistas guardadas.
+- Copia texto de notas y elementos de listas de tareas, con un historial de notas más claro.
+- Resultados de búsqueda más claros y mejor información sobre recordatorios y copias de seguridad.

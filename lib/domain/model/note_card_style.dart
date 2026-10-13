@@ -1,3 +1,5 @@
+import 'note_theme.dart';
+
 /// The available note type scales, shared by defaults and individual cards.
 enum AppFontSize {
   small(0.85),
@@ -27,6 +29,7 @@ class NoteCardStyle {
     this.cardSize,
     this.paperStyle,
     this.showDate,
+    this.noteTheme,
   });
 
   final String? fontFamily;
@@ -34,13 +37,15 @@ class NoteCardStyle {
   final NoteCardSize? cardSize;
   final NoteCardPaperStyle? paperStyle;
   final bool? showDate;
+  final NoteTheme? noteTheme;
 
   bool get isDefault =>
       fontFamily == null &&
       fontSize == null &&
       cardSize == null &&
       paperStyle == null &&
-      showDate == null;
+      showDate == null &&
+      noteTheme == null;
 
   NoteCardStyle copyWith({
     String? fontFamily,
@@ -48,11 +53,13 @@ class NoteCardStyle {
     NoteCardSize? cardSize,
     NoteCardPaperStyle? paperStyle,
     bool? showDate,
+    NoteTheme? noteTheme,
     bool clearFontFamily = false,
     bool clearFontSize = false,
     bool clearCardSize = false,
     bool clearPaperStyle = false,
     bool clearShowDate = false,
+    bool clearNoteTheme = false,
   }) =>
       NoteCardStyle(
         fontFamily: clearFontFamily ? null : fontFamily ?? this.fontFamily,
@@ -60,6 +67,7 @@ class NoteCardStyle {
         cardSize: clearCardSize ? null : cardSize ?? this.cardSize,
         paperStyle: clearPaperStyle ? null : paperStyle ?? this.paperStyle,
         showDate: clearShowDate ? null : showDate ?? this.showDate,
+        noteTheme: clearNoteTheme ? null : noteTheme ?? this.noteTheme,
       );
 
   Map<String, dynamic> toMap() => {
@@ -68,6 +76,7 @@ class NoteCardStyle {
         if (cardSize != null) 'cardSize': cardSize!.name,
         if (paperStyle != null) 'paperStyle': paperStyle!.name,
         if (showDate != null) 'showDate': showDate,
+        if (noteTheme != null) 'noteTheme': noteTheme!.name,
       };
 
   /// Unknown or malformed choices safely fall back to inherited defaults.
@@ -89,6 +98,9 @@ class NoteCardStyle {
           .where((style) => style.name == value['paperStyle'])
           .firstOrNull,
       showDate: value['showDate'] is bool ? value['showDate'] as bool : null,
+      noteTheme: NoteTheme.values
+          .where((theme) => theme.name == value['noteTheme'])
+          .firstOrNull,
     );
   }
 
@@ -99,13 +111,14 @@ class NoteCardStyle {
       other.fontSize == fontSize &&
       other.cardSize == cardSize &&
       other.paperStyle == paperStyle &&
-      other.showDate == showDate;
+      other.showDate == showDate &&
+      other.noteTheme == noteTheme;
 
   @override
-  int get hashCode =>
-      Object.hash(fontFamily, fontSize, cardSize, paperStyle, showDate);
+  int get hashCode => Object.hash(
+      fontFamily, fontSize, cardSize, paperStyle, showDate, noteTheme);
 
   @override
   String toString() =>
-      'NoteCardStyle($fontFamily, $fontSize, $cardSize, $paperStyle, $showDate)';
+      'NoteCardStyle($fontFamily, $fontSize, $cardSize, $paperStyle, $showDate, $noteTheme)';
 }
