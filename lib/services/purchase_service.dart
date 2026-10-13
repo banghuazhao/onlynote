@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const removeAdsProductId = 'com.appsbay.onlynote.remove_ads';
@@ -83,7 +84,7 @@ class PurchaseService extends ChangeNotifier {
     bool? isIOS,
   })  : _store = store ?? const AppStorePurchaseStore(),
         _storage = storage ?? SharedPreferencesEntitlementStorage(),
-        isSupported = isIOS ?? defaultTargetPlatform == TargetPlatform.iOS;
+        isSupported = isIOS ?? PlatformCapabilities.appStorePurchases;
 
   static final PurchaseService instance = PurchaseService();
 
@@ -99,7 +100,7 @@ class PurchaseService extends ChangeNotifier {
 
   bool get isAdsRemoved => _isAdsRemoved;
   bool get isPremium => _isAdsRemoved;
-  bool get shouldShowAds => !_isAdsRemoved;
+  bool get shouldShowAds => PlatformCapabilities.mobileAds && !_isAdsRemoved;
   ProductDetails? get removeAdsProduct => _removeAdsProduct;
   ProductDetails? get premiumProduct => _removeAdsProduct;
   String? get localizedPrice => _removeAdsProduct?.price;

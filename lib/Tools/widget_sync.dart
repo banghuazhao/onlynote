@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:onlynote/common/constants.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/Tools/widget_commands.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
@@ -50,6 +51,7 @@ class WidgetSync {
 
   /// Call once at startup, after Hive is open and DI is configured.
   Future<void> init() async {
+    if (!PlatformCapabilities.homeWidgets) return;
     await HomeWidget.setAppGroupId(appGroupId);
     WidgetCommands.instance.syncWidgets = sync;
     await sync();
@@ -64,6 +66,7 @@ class WidgetSync {
 
   /// Writes the current notes to shared storage and reloads the widgets.
   Future<void> sync() async {
+    if (!PlatformCapabilities.homeWidgets) return;
     try {
       final payload = buildPayload(getIt<NoteRepository>().getAllNotes());
 

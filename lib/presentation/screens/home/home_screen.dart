@@ -15,6 +15,7 @@ import 'package:onlynote/presentation/components/note_tags_sheet.dart';
 import 'package:onlynote/services/note_archive.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus_detector/focus_detector.dart';
@@ -167,6 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isReorderMode = false;
   bool _isSearchVisible = false;
   final _searchController = TextEditingController();
+  final _searchFocus = FocusNode();
+  final _desktopCommands = <VoidCallback>[];
 
   void _setReorderMode(bool value) => setState(() => _isReorderMode = value);
 
@@ -177,6 +180,15 @@ class _HomeScreenState extends State<HomeScreen> {
     ReminderData.shared.addListener(_remindersChanged);
     _savedViews.addListener(_savedViewsChanged);
     _loadSavedViews();
+    bool currentRoute() => mounted && ModalRoute.of(context)?.isCurrent == true;
+    _desktopCommands.addAll([
+      DesktopCommands.instance.registerCommand(DesktopCommand.newNote,
+          invoke: () => unawaited(_addNote()), isActive: currentRoute),
+      DesktopCommands.instance.registerCommand(DesktopCommand.settings,
+          invoke: () => unawaited(_openSettings()), isActive: currentRoute),
+      DesktopCommands.instance.registerCommand(DesktopCommand.searchNotes,
+          invoke: _focusSearch, isActive: currentRoute),
+    ]);
   }
 
   void _savedViewsChanged() {
@@ -726,10 +738,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    for (final unregister in _desktopCommands) {
+      unregister();
+    }
     PurchaseService.instance.removeListener(_entitlementChanged);
     ReminderData.shared.removeListener(_remindersChanged);
     _savedViews.removeListener(_savedViewsChanged);
     _searchController.dispose();
+    _searchFocus.dispose();
     _ad?.dispose();
     super.dispose();
   }
@@ -995,6 +1011,17 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!_isSearchVisible) {
         _searchController.clear();
         context.read<HomeBloc>().add(const HomeEvent.searchChanged(''));
+      }
+    });
+  }
+
+  void _focusSearch() {
+    if (!_isSearchVisible) setState(() => _isSearchVisible = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _isSearchVisible) {
+        _searchFocus.requestFocus();
+        _searchController.selection = TextSelection(
+            baseOffset: 0, extentOffset: _searchController.text.length);
       }
     });
   }
@@ -1444,6 +1471,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: TextField(
           controller: _searchController,
+          focusNode: _searchFocus,
           autofocus: true,
           style: AppTypography.formText.copyWith(fontSize: 16),
           decoration: InputDecoration(

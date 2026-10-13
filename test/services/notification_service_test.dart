@@ -46,6 +46,8 @@ void _usePlatform(TargetPlatform platform) {
   debugDefaultTargetPlatformOverride = platform;
   if (platform == TargetPlatform.android) {
     AndroidFlutterLocalNotificationsPlugin.registerWith();
+  } else if (platform == TargetPlatform.macOS) {
+    MacOSFlutterLocalNotificationsPlugin.registerWith();
   } else {
     IOSFlutterLocalNotificationsPlugin.registerWith();
   }
@@ -100,6 +102,8 @@ void main() {
       switch (call.method) {
         case 'initialize':
           return true;
+        case 'requestPermissions':
+          return true;
         case 'getNotificationAppLaunchDetails':
           return launchDetails;
         case 'zonedSchedule':
@@ -147,7 +151,33 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+  test('macOS requests alert, badge and sound permission from its plugin',
+      () async {
+    _usePlatform(TargetPlatform.macOS);
+    final service = makeService();
+    await service.init();
+
+    expect(await service.requestMacOSPermissions(), isTrue);
+
+    final request = calls
+        .singleWhere((call) => call.method == 'requestPermissions')
+        .arguments as Map;
+    expect(request['alert'], isTrue);
+    expect(request['badge'], isTrue);
+    expect(request['sound'], isTrue);
+    final initialization = calls
+        .singleWhere((call) => call.method == 'initialize')
+        .arguments as Map;
+    expect(initialization['requestAlertPermission'], isFalse);
+    expect(initialization['requestBadgePermission'], isFalse);
+    expect(initialization['requestSoundPermission'], isFalse);
+  });
+
+  for (final platform in [
+    TargetPlatform.android,
+    TargetPlatform.iOS,
+    TargetPlatform.macOS,
+  ]) {
     test('${platform.name} schedules note identity and native snooze actions',
         () async {
       _usePlatform(platform);

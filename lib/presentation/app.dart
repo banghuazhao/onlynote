@@ -1,6 +1,10 @@
 import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'dart:async';
+import 'dart:ui' show AppExitResponse, AppExitType;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/app_shortcut_launch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -21,6 +25,8 @@ import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:onlynote/presentation/screens/add_update_note/add_update_note_screen.dart';
+import 'package:onlynote/presentation/screens/settings/settings_screen.dart';
 
 import 'routes/routes.dart';
 import 'theme/theme.dart';
@@ -36,11 +42,17 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   AppRouter get _router => getIt<AppRouter>();
   WidgetCommands? _widgetCommands;
   late final DocumentScanner _documentScanner;
+  AppLifecycleListener? _exitListener;
+  bool _openingDesktopNote = false;
+  bool _openingDesktopSettings = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) {
+      _exitListener = AppLifecycleListener(onExitRequested: _prepareToExit);
+    }
     _widgetCommands = WidgetCommands.initializedInstance;
     _widgetCommands?.updates.addListener(_refreshLibrary);
     _documentScanner = DocumentScanner.instance;
@@ -83,6 +95,59 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     if (mounted) context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
   }
 
+  Future<AppExitResponse> _prepareToExit() async {
+    final response = await DesktopCommands.instance.prepareToExit();
+    if (response == AppExitResponse.cancel && mounted) {
+      final navigatorContext = _router.navigatorKey.currentContext;
+      if (navigatorContext != null && navigatorContext.mounted) {
+        showTransientSnackBar(navigatorContext,
+            SnackBar(content: Text(S.of(navigatorContext).Autosave_Failed)));
+      }
+    }
+    return response;
+  }
+
+  void _quitDesktopApp() => unawaited(
+      ServicesBinding.instance.exitApplication(AppExitType.cancelable));
+
+  Future<void> _newDesktopNote() async {
+    if (_openingDesktopNote || _router.hasPagelessTopRoute) return;
+    if (DesktopCommands.instance.invoke(DesktopCommand.newNote)) return;
+    _openingDesktopNote = true;
+    try {
+      final route = AddUpdateNoteRoute(start: NoteEditorStart.quickNote);
+      if (!OnboardingSettings.instance.completed) {
+        await OnboardingSettings.instance.complete();
+        if (!mounted) return;
+        await _router.replaceAll([const HomeRoute(), route]);
+      } else {
+        // Keep the editor underneath alive with its draft and undo history.
+        if (await _prepareToExit() != AppExitResponse.exit || !mounted) return;
+        unawaited(_router
+            .push<void>(route)
+            .then((_) => DesktopCommands.instance.refreshEditors()));
+      }
+    } finally {
+      _openingDesktopNote = false;
+    }
+  }
+
+  Future<void> _desktopSettings() async {
+    if (_openingDesktopSettings || _router.hasPagelessTopRoute) return;
+    if (DesktopCommands.instance.invoke(DesktopCommand.settings)) return;
+    final navigator = _router.navigatorKey.currentState;
+    if (navigator == null) return;
+    _openingDesktopSettings = true;
+    try {
+      if (await _prepareToExit() != AppExitResponse.exit || !mounted) return;
+      await navigator.push<void>(
+          MaterialPageRoute(builder: (_) => const SettingsScreen()));
+      await DesktopCommands.instance.refreshEditors();
+    } finally {
+      _openingDesktopSettings = false;
+    }
+  }
+
   void _recoverDocumentScans() {
     final capture = DocumentScanCapture.initializedInstance;
     if (!mounted || capture == null) return;
@@ -105,6 +170,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _exitListener?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _widgetCommands?.updates.removeListener(_refreshLibrary);
     _documentScanner.removeListener(_recoverDocumentScans);
@@ -159,6 +225,12 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: AppAppearanceSettings.instance.themeMode,
+      builder: (context, child) => DesktopAppMenu(
+        onNewNote: () => unawaited(_newDesktopNote()),
+        onSettings: () => unawaited(_desktopSettings()),
+        onQuit: _quitDesktopApp,
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }

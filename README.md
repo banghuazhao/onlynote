@@ -47,6 +47,13 @@ flutter pub get
 flutter run
 ```
 
+## macOS
+
+The native Mac app uses the same `com.appsbay.onlynote` bundle ID and Premium
+purchase as iOS. Run `flutter run -d macos` for development and
+`flutter build macos --release` for a release build. See
+[macOS setup and release](macos/README.md) for signing, permissions, and testing.
+
 AdMob unit IDs and signing credentials are not committed — see `lib/Tools/ad_ids_release.sample.dart` and `ios/Flutter/Secrets.xcconfig.sample` for the templates used in release builds.
 
 ## Project Structure

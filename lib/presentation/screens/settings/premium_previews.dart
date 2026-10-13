@@ -25,16 +25,25 @@ Widget premiumUnlockedPreview() =>
 Widget premiumChinesePreview() =>
     const _PremiumPreview(chinese: true, scale: 2);
 
+@Preview(name: 'Mac upgrade', group: 'Premium', size: Size(1100, 720))
+Widget premiumDesktopPreview() => const _PremiumPreview(desktop: true);
+
+@Preview(name: 'Mac Premium unlocked', group: 'Premium', size: Size(1100, 720))
+Widget premiumDesktopUnlockedPreview() =>
+    const _PremiumPreview(desktop: true, premium: true);
+
 class _PremiumPreview extends StatefulWidget {
   const _PremiumPreview(
       {this.premium = false,
       this.dark = false,
       this.chinese = false,
+      this.desktop = false,
       this.scale = 1});
 
   final bool premium;
   final bool dark;
   final bool chinese;
+  final bool desktop;
   final double scale;
 
   @override
@@ -54,7 +63,12 @@ class _PremiumPreviewState extends State<_PremiumPreview> {
   @override
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: widget.dark ? AppTheme.dark : AppTheme.light,
+        theme: widget.desktop
+            ? (widget.dark ? AppTheme.dark : AppTheme.light)
+                .copyWith(platform: TargetPlatform.macOS)
+            : widget.dark
+                ? AppTheme.dark
+                : AppTheme.light,
         locale: widget.chinese ? const Locale('zh', 'HK') : const Locale('en'),
         supportedLocales: S.delegate.supportedLocales,
         localizationsDelegates: const [
@@ -70,6 +84,7 @@ class _PremiumPreviewState extends State<_PremiumPreview> {
         ),
         home: PremiumScreen(
             purchases: _purchases,
+            showAdRemovalBenefit: !widget.desktop,
             feature: widget.premium ? null : PremiumFeature.voiceMemos),
       );
 }

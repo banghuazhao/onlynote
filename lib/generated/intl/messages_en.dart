@@ -109,6 +109,45 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
+    ),
+    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Backup save cancelled.",
+    ),
+    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save the backup. Check available storage and try again.",
+    ),
+    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage(
+      "Backup saved.",
+    ),
+    "Backup_Save_As": MessageLookupByLibrary.simpleMessage(
+      "Save backup…",
+    ),
+    "Choose_Image_File": MessageLookupByLibrary.simpleMessage(
+      "Choose an image file",
+    ),
+    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage(
+      "Close Window",
+    ),
+    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage(
+      "File",
+    ),
+    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage(
+      "New Note",
+    ),
+    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage(
+      "Quit Onlynote",
+    ),
+    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage(
+      "Window",
+    ),
+    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "All Premium features are unlocked.",
+    ),
+    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "Already purchased Premium? Restore your purchase below.",
+    ),
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),

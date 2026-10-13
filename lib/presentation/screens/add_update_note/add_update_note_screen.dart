@@ -9,6 +9,7 @@ import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/presentation/screens/settings/premium_screen.dart';
+import 'package:onlynote/presentation/screens/settings/settings_screen.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_edit_history.dart';
@@ -65,6 +66,7 @@ import 'package:onlynote/services/reminder_date_suggestion.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/widget_commands.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -178,6 +180,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   VoidCallback? _unregisterWidgetEditor;
   VoidCallback? _unregisterSelectionEditor;
   VoidCallback? _unregisterChecklistEditor;
+  VoidCallback? _unregisterDesktopEditor;
+  VoidCallback? _unregisterDesktopRefresh;
+  final _desktopCommands = <VoidCallback>[];
   WidgetCommands? _editorWidgetCommands;
   bool _suspendedForLinkedNote = false;
   Timer? _suggestionDebounce;
@@ -339,6 +344,27 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         add: _appendChecklistSelection,
         undo: _undoAddedChecklist);
     ReminderData.shared.addListener(_reminderChanged);
+    _unregisterDesktopEditor =
+        DesktopCommands.instance.registerEditor(_flushForDesktopExit);
+    _unregisterDesktopRefresh = DesktopCommands.instance
+        .registerEditorRefresh(_resumeAfterDesktopRoute);
+    bool currentRoute() => mounted && ModalRoute.of(context)?.isCurrent == true;
+    bool editingNote() =>
+        currentRoute() && _editorFocusScope.hasFocus && _findController == null;
+    _desktopCommands.addAll([
+      DesktopCommands.instance.registerCommand(DesktopCommand.settings,
+          invoke: () => unawaited(_openDesktopSettings()),
+          isActive: currentRoute,
+          isEnabled: () => !_editBlocked),
+      DesktopCommands.instance.registerCommand(DesktopCommand.findInNote,
+          invoke: _openFind,
+          isActive: currentRoute,
+          isEnabled: () => !_editBlocked),
+      DesktopCommands.instance.registerCommand(DesktopCommand.undo,
+          invoke: undo, isActive: editingNote, isEnabled: () => canUndo),
+      DesktopCommands.instance.registerCommand(DesktopCommand.redo,
+          invoke: redo, isActive: editingNote, isEnabled: () => canRedo),
+    ]);
     _queueReminderSuggestion();
     if (recovered != null) _autosave.update(initial.copyWith(dateTime: now));
     if (widget.note == null &&
@@ -944,7 +970,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
   }
 
   void _openFind() {
-    if (_mediaBlocked || _findController != null) return;
+    if (_editBlocked || _findController != null) return;
     FocusManager.instance.primaryFocus?.unfocus();
     final controller = NoteSearchController();
     controller.setFields(noteSearchFields(_currentDraft(_form.state)),
@@ -2014,73 +2040,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       _unregisterWidgetEditor = null;
       await context.router.push(NoteDetailRoute(noteId: target.id!));
       await _editorWidgetCommands?.importPending();
-      if (!mounted || !getIt.isRegistered<NoteRepository>()) return;
-      // The child route can reach this note through a backlink and edit its
-      // content or archive/tags. Adopt the latest saved note before more typing.
-      NoteDto fresh;
-      try {
-        fresh = await getIt<NoteRepository>().getNote(_autosave.note.id!);
-      } catch (_) {
-        if (mounted) {
-          setState(() => _allowPop = true);
-          await context.router.maybePop();
-        }
-        return;
-      }
-      if (!mounted) return;
-      if (fresh.isDeleted) {
-        setState(() => _allowPop = true);
-        await context.router.maybePop();
-        return;
-      }
-      final refreshed = fresh.toDomain();
-      _refreshingFromLibrary = true;
-      try {
-        if (!_autosave.adoptSavedNote(refreshed)) return;
-        _titleController.text = refreshed.title ?? '';
-        _currentImageLayouts = refreshed.imageLayouts;
-        _descriptionController.setDocument(
-            refreshed.description ?? '', refreshed.textStyles);
-        final state = AddUpdateFormState(
-            title: refreshed.title,
-            description: refreshed.description,
-            textStyles: refreshed.textStyles,
-            selectedColor: refreshed.color,
-            todos: refreshed.todo,
-            imagePaths: refreshed.imagePaths,
-            imageLayouts: refreshed.imageLayouts,
-            voiceMemos: refreshed.voiceMemos,
-            tags: refreshed.tags,
-            linkedNoteIds: refreshed.linkedNoteIds,
-            dailyNoteDateKey: refreshed.dailyNoteDateKey,
-            cardStyle: refreshed.cardStyle);
-        if (_form.state != state) {
-          final applied = _form.stream.firstWhere((value) => value == state);
-          _form.add(AddUpdateFormEvent.initialize(
-              title: refreshed.title,
-              description: refreshed.description,
-              textStyles: refreshed.textStyles,
-              color: refreshed.color,
-              todos: refreshed.todo,
-              imagePaths: refreshed.imagePaths,
-              imageLayouts: refreshed.imageLayouts,
-              voiceMemos: refreshed.voiceMemos,
-              tags: refreshed.tags,
-              linkedNoteIds: refreshed.linkedNoteIds,
-              dailyNoteDateKey: refreshed.dailyNoteDateKey,
-              cardStyle: refreshed.cardStyle));
-          await applied;
-        }
-      } finally {
-        _refreshingFromLibrary = false;
-      }
-      final baseline = _editSnapshot(_currentDraft(_form.state));
-      if (_editHistory.current.sameContent(baseline)) {
-        _editHistory.record(baseline);
-      } else {
-        _editHistory.reset(baseline);
-      }
-      _queueReminderSuggestion();
+      await _refreshSavedNoteFromLibrary();
     } finally {
       _suspendedForLinkedNote = false;
       if (mounted) {
@@ -2088,6 +2048,129 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         setState(() => _presentingMedia = false);
       }
     }
+  }
+
+  Future<void> _openDesktopSettings() async {
+    if (_editBlocked || ModalRoute.of(context)?.isCurrent != true) return;
+    _suspendedForLinkedNote = true;
+    setState(() => _presentingMedia = true);
+    try {
+      await _voiceWrites;
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      _captureTimer?.cancel();
+      _capture(_form.state);
+      if (!await _autosave.flush()) {
+        if (mounted) {
+          showTransientSnackBar(
+              context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+        }
+        return;
+      }
+      if (!mounted) return;
+      _unregisterWidgetEditor?.call();
+      _unregisterWidgetEditor = null;
+      await Navigator.of(context).push<void>(
+          MaterialPageRoute(builder: (_) => const SettingsScreen()));
+      await _editorWidgetCommands?.importPending();
+      await _refreshSavedNoteFromLibrary();
+    } finally {
+      _suspendedForLinkedNote = false;
+      if (mounted) {
+        _registerWidgetEditor();
+        setState(() => _presentingMedia = false);
+      }
+    }
+  }
+
+  Future<void> _resumeAfterDesktopRoute() async {
+    if (!mounted ||
+        ModalRoute.of(context)?.isCurrent != true ||
+        _mediaBlocked ||
+        _autosave.dirty ||
+        _captureTimer?.isActive == true) {
+      return;
+    }
+    await _refreshSavedNoteFromLibrary();
+  }
+
+  Future<void> _refreshSavedNoteFromLibrary() async {
+    if (!mounted || !getIt.isRegistered<NoteRepository>()) return;
+    if (widget.note == null && !NoteAutosave.hasContent(_autosave.note)) {
+      return;
+    }
+    // The child route can reach this note through a backlink and edit its
+    // content or archive/tags. Adopt the latest saved note before more typing.
+    NoteDto fresh;
+    try {
+      fresh = await getIt<NoteRepository>().getNote(_autosave.note.id!);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _allowPop = true);
+        await context.router.maybePop();
+      }
+      return;
+    }
+    if (!mounted) return;
+    if (fresh.isDeleted) {
+      setState(() => _allowPop = true);
+      await context.router.maybePop();
+      return;
+    }
+    final refreshed = fresh.toDomain();
+    _refreshingFromLibrary = true;
+    try {
+      if (!_autosave.adoptSavedNote(refreshed)) return;
+      if (_titleController.text != (refreshed.title ?? '')) {
+        _titleController.text = refreshed.title ?? '';
+      }
+      _currentImageLayouts = refreshed.imageLayouts;
+      if (_descriptionController.text != (refreshed.description ?? '') ||
+          !listEquals(_descriptionController.styles, refreshed.textStyles)) {
+        _descriptionController.setDocument(
+            refreshed.description ?? '', refreshed.textStyles);
+      }
+      final state = AddUpdateFormState(
+          title: refreshed.title,
+          description: refreshed.description,
+          textStyles: refreshed.textStyles,
+          selectedColor: refreshed.color,
+          todos: refreshed.todo,
+          imagePaths: refreshed.imagePaths,
+          imageLayouts: refreshed.imageLayouts,
+          voiceMemos: refreshed.voiceMemos,
+          tags: refreshed.tags,
+          linkedNoteIds: refreshed.linkedNoteIds,
+          dailyNoteDateKey: refreshed.dailyNoteDateKey,
+          cardStyle: refreshed.cardStyle);
+      if (_form.state != state) {
+        final applied = _form.stream.firstWhere((value) => value == state);
+        _form.add(AddUpdateFormEvent.initialize(
+            title: refreshed.title,
+            description: refreshed.description,
+            textStyles: refreshed.textStyles,
+            color: refreshed.color,
+            todos: refreshed.todo,
+            imagePaths: refreshed.imagePaths,
+            imageLayouts: refreshed.imageLayouts,
+            voiceMemos: refreshed.voiceMemos,
+            tags: refreshed.tags,
+            linkedNoteIds: refreshed.linkedNoteIds,
+            dailyNoteDateKey: refreshed.dailyNoteDateKey,
+            cardStyle: refreshed.cardStyle));
+        await applied;
+      }
+    } finally {
+      _refreshingFromLibrary = false;
+    }
+    if (!mounted) return;
+    final baseline = _editSnapshot(_currentDraft(_form.state));
+    if (_editHistory.current.sameContent(baseline)) {
+      _editHistory.record(baseline);
+    } else {
+      _editHistory.reset(baseline);
+    }
+    _queueReminderSuggestion();
   }
 
   Future<bool> _applyWidgetCompletion(WidgetTodoCommand command) async {
@@ -2123,6 +2206,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   void _refreshStatus() {
     if (!mounted) return;
+    DesktopCommands.instance.refresh();
     _syncPlatformUndo();
     if (SchedulerBinding.instance.schedulerPhase ==
         SchedulerPhase.persistentCallbacks) {
@@ -2236,6 +2320,27 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     }
   }
 
+  Future<bool> _flushForDesktopExit() async {
+    await _voiceWrites;
+    // Include field and checklist events queued in the same frame as Quit.
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return true;
+    if (_replayingHistory ||
+        _refreshingFromLibrary ||
+        _addingPhoto ||
+        _voiceMutations > 0 ||
+        _savingReminder) {
+      return false;
+    }
+    _captureTimer?.cancel();
+    // Linked-note navigation has already flushed the underlying editor. Its
+    // stale snapshot must not overwrite the newer child editor's content.
+    if (!_suspendedForLinkedNote) _capture(_form.state);
+    final saved = await _autosave.flush();
+    if (saved && mounted) await _rememberWritingPosition();
+    return saved;
+  }
+
   Future<void> _finish() async {
     final route = ModalRoute.of(context);
     if (route?.isCurrent != true ||
@@ -2310,6 +2415,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _unregisterWidgetEditor?.call();
     _unregisterSelectionEditor?.call();
     _unregisterChecklistEditor?.call();
+    for (final unregister in _desktopCommands) {
+      unregister();
+    }
     _entryAnimation?.removeStatusListener(_onCaptureEntryStatus);
     WidgetsBinding.instance.removeObserver(this);
     _autosave.removeListener(_refreshStatus);
@@ -2322,10 +2430,14 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     _changes.cancel();
     _documentScanCapture.release();
     _form.close();
-    unawaited(_autosave.flush().whenComplete(() {
+    final finalSave = _autosave.flush().whenComplete(() {
       _autosave.dispose();
       _editHistory.dispose();
-    }));
+    });
+    DesktopCommands.instance.trackSave(finalSave);
+    _unregisterDesktopEditor?.call();
+    _unregisterDesktopRefresh?.call();
+    unawaited(finalSave);
     _titleController.removeListener(_selectionChanged);
     _titleController.dispose();
     _descriptionController.removeListener(_bodyChanged);

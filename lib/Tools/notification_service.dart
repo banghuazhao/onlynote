@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:app_settings/app_settings.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:onlynote/Tools/reminder.dart';
@@ -244,7 +244,7 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final labels = await _actionLabels();
-    final initializationSettingsIOS = DarwinInitializationSettings(
+    final initializationSettingsDarwin = DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
@@ -258,11 +258,12 @@ class NotificationService {
       ],
     );
 
-    //Initializing settings for both platforms (Android & iOS)
+    // Darwin settings share the reminder action categories on iOS and macOS.
     final InitializationSettings initializationSettings =
         InitializationSettings(
             android: initializationSettingsAndroid,
-            iOS: initializationSettingsIOS);
+            iOS: initializationSettingsDarwin,
+            macOS: initializationSettingsDarwin);
 
     try {
       await NotificationTimezone.initialize();
@@ -320,11 +321,21 @@ class NotificationService {
         ?.requestNotificationsPermission();
   }
 
+  Future<bool?>? requestMacOSPermissions() {
+    return flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            MacOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+  }
+
   Future<bool?> _requestPlatformPermissions() {
-    if (Platform.isIOS) {
-      return requestIOSPermissions() ?? Future.value(true);
-    }
-    return requestAndroidPermissions() ?? Future.value(true);
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.iOS => requestIOSPermissions() ?? Future.value(false),
+      TargetPlatform.macOS => requestMacOSPermissions() ?? Future.value(false),
+      TargetPlatform.android =>
+        requestAndroidPermissions() ?? Future.value(false),
+      _ => Future.value(false),
+    };
   }
 
   Future<void> showNotifications({
@@ -339,8 +350,10 @@ class NotificationService {
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker');
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      macOS: DarwinNotificationDetails(),
+    );
     await flutterLocalNotificationsPlugin.show(
       id: id,
       title: title,
@@ -600,6 +613,11 @@ class NotificationService {
                     ReminderSnooze.oneHour, labels.Reminder_Snooze_1_Hour),
               ]),
           iOS: const DarwinNotificationDetails(
+              categoryIdentifier: _category,
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true),
+          macOS: const DarwinNotificationDetails(
               categoryIdentifier: _category,
               presentAlert: true,
               presentBadge: true,

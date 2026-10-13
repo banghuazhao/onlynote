@@ -5191,6 +5191,136 @@ class S {
       args: [],
     );
   }
+
+  /// `Choose an image file`
+  String get Choose_Image_File {
+    return Intl.message(
+      "Choose an image file",
+      name: 'Choose_Image_File',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save backup…`
+  String get Backup_Save_As {
+    return Intl.message(
+      "Save backup…",
+      name: 'Backup_Save_As',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.`
+  String get Backup_Export_Desktop_Description {
+    return Intl.message(
+      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
+      name: 'Backup_Export_Desktop_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup saved.`
+  String get Backup_Export_Saved {
+    return Intl.message(
+      "Backup saved.",
+      name: 'Backup_Export_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup save cancelled.`
+  String get Backup_Export_Save_Cancelled {
+    return Intl.message(
+      "Backup save cancelled.",
+      name: 'Backup_Export_Save_Cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save the backup. Check available storage and try again.`
+  String get Backup_Export_Save_Failed {
+    return Intl.message(
+      "Could not save the backup. Check available storage and try again.",
+      name: 'Backup_Export_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All Premium features are unlocked.`
+  String get Premium_Desktop_Description {
+    return Intl.message(
+      "All Premium features are unlocked.",
+      name: 'Premium_Desktop_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already purchased Premium? Restore your purchase below.`
+  String get Premium_Desktop_Existing_Purchase {
+    return Intl.message(
+      "Already purchased Premium? Restore your purchase below.",
+      name: 'Premium_Desktop_Existing_Purchase',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `File`
+  String get Desktop_Menu_File {
+    return Intl.message(
+      "File",
+      name: 'Desktop_Menu_File',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Window`
+  String get Desktop_Menu_Window {
+    return Intl.message(
+      "Window",
+      name: 'Desktop_Menu_Window',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quit Onlynote`
+  String get Desktop_Menu_Quit {
+    return Intl.message(
+      "Quit Onlynote",
+      name: 'Desktop_Menu_Quit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Note`
+  String get Desktop_Menu_New_Note {
+    return Intl.message(
+      "New Note",
+      name: 'Desktop_Menu_New_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Close Window`
+  String get Desktop_Menu_Close_Window {
+    return Intl.message(
+      'Close Window',
+      name: 'Desktop_Menu_Close_Window',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' show ImageByteFormat;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -140,6 +141,29 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('right click opens the same actions as long press',
+      (tester) async {
+    var actions = 0;
+    var opens = 0;
+    await tester.pumpWidget(_host(NoteCard(
+      note: Note(id: 'desktop', title: 'Desktop actions'),
+      onLongPress: () => actions++,
+      onTap: () => opens++,
+    )));
+    await tester.pumpAndSettle();
+    final target = find.text('Desktop actions');
+    final click = await tester.startGesture(tester.getCenter(target),
+        kind: PointerDeviceKind.mouse, buttons: kSecondaryMouseButton);
+    await click.up();
+    await tester.pumpAndSettle();
+    expect(actions, 1);
+    expect(opens, 0);
+    await tester.longPress(target);
+    await tester.pumpAndSettle();
+    expect(actions, 2);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('NoteCard shows title, body, and localized date like a note',
       (tester) async {

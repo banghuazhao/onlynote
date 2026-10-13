@@ -31,6 +31,9 @@ Widget mixedNoteCardsDarkPreview() => const _NoteCardsPreview(dark: true);
 Widget mixedNoteCardsChinesePreview() =>
     const _NoteCardsPreview(chinese: true, textScale: 2);
 
+@Preview(name: 'Desktop note cards', group: 'Home', size: Size(1000, 740))
+Widget desktopNoteCardsPreview() => const _NoteCardsPreview();
+
 class _NoteCardsPreview extends StatefulWidget {
   const _NoteCardsPreview({
     this.dark = false,
@@ -156,6 +159,18 @@ class _NoteCardsPreviewState extends State<_NoteCardsPreview> {
                     note: _notes[index],
                     // The entire fixture stays in memory on the web previewer.
                     onTap: () {},
+                    onLongPress: () => showDialog<void>(
+                      context: context,
+                      builder: (context) => SimpleDialog(
+                        title: Text(_notes[index].title ?? S.of(context).Edit),
+                        children: [
+                          SimpleDialogOption(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(S.of(context).Edit),
+                          ),
+                        ],
+                      ),
+                    ),
                     thumbnailBuilder: (_, path) => ColoredBox(
                       color: path.contains('recipe')
                           ? const Color(0xFFF0E4CA)

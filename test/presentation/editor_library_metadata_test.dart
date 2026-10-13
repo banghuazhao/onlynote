@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/common/constants.dart' show colors;
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
@@ -201,6 +202,35 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(originalFonts));
+
+  testWidgets('desktop route return adopts a removed folder before more typing',
+      (tester) async {
+    final initial = Note(
+        id: 'desktop-folder',
+        title: 'Keep this draft',
+        description: 'Original body',
+        folderId: 'removed-folder');
+    final (notes, store) = await _openEditor(tester, note: initial);
+    final title = find.byType(TextField).first;
+    final controller = tester.widget<TextField>(title).controller!;
+    controller.selection = const TextSelection.collapsed(offset: 4);
+    await tester.pump();
+    notes.values[initial.id!] =
+        notes.values[initial.id!]!.copyWith(clearFolderId: true);
+    final refresh = DesktopCommands.instance.refreshEditors();
+    await tester.pumpAndSettle();
+    await refresh;
+    expect(controller.text, initial.title);
+    expect(controller.selection, const TextSelection.collapsed(offset: 4));
+    await tester.enterText(title, 'Continue the draft');
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(store.saved.last.title, 'Continue the draft');
+    expect(store.saved.last.folderId, isNull);
+    expect(notes.values[initial.id!]!.folderId, isNull);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('card styling saves the current draft and survives more typing',
       (tester) async {

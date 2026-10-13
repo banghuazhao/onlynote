@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -7,10 +8,18 @@ import 'package:onlynote/services/purchase_service.dart';
 
 /// Explains the free plan and the app's existing one-time Premium purchase.
 class PremiumScreen extends StatefulWidget {
-  const PremiumScreen({super.key, this.purchases, this.feature});
+  const PremiumScreen({
+    super.key,
+    this.purchases,
+    this.feature,
+    this.showAdRemovalBenefit,
+  });
 
   final PurchaseService? purchases;
   final PremiumFeature? feature;
+
+  /// Controls preview copy; production follows the supported ad platforms.
+  final bool? showAdRemovalBenefit;
 
   @override
   State<PremiumScreen> createState() => _PremiumScreenState();
@@ -121,6 +130,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final explanation = _featureExplanation(strings);
     final price = purchase.localizedPrice;
     final busy = _busy;
+    final showAdRemoval =
+        widget.showAdRemovalBenefit ?? PlatformCapabilities.mobileAds;
     return Scaffold(
       backgroundColor: DeskSurface.colorOf(context),
       appBar: AppBar(title: Text(strings.Premium)),
@@ -144,7 +155,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           ? Icons.verified_rounded
                           : Icons.workspace_premium_outlined,
                       subtitle: purchase.isPremium
-                          ? strings.Premium_Description
+                          ? showAdRemoval
+                              ? strings.Premium_Description
+                              : strings.Premium_Desktop_Description
                           : explanation ?? strings.Premium_One_Time_Description,
                       children: [
                         _Benefit(
@@ -189,10 +202,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           icon: Icons.texture_rounded,
                           label: strings.Premium_Note_Themes,
                         ),
-                        _Benefit(
-                          icon: Icons.block_outlined,
-                          label: strings.Premium_No_Ads,
-                        ),
+                        if (showAdRemoval)
+                          _Benefit(
+                            icon: Icons.block_outlined,
+                            label: strings.Premium_No_Ads,
+                          ),
                       ],
                     ),
                     SizedBox(height: tokens.space4),
@@ -275,7 +289,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       if (!purchase.isPremium) ...[
                         SizedBox(height: tokens.space3),
-                        Text(strings.Premium_Existing_Purchase,
+                        Text(
+                            showAdRemoval
+                                ? strings.Premium_Existing_Purchase
+                                : strings.Premium_Desktop_Existing_Purchase,
                             textAlign: TextAlign.center,
                             style: context.textStyles.bodySmall?.copyWith(
                                 color: context.colors.onSurfaceVariant)),

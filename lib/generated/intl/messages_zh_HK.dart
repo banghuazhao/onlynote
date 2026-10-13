@@ -93,6 +93,45 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "將筆記、標籤、已儲存檢視、資料夾、照片、錄音、歷史記錄、範本和提醒日期儲存在一個 Onlynote 檔案中。包含封存筆記和垃圾桶。在儲存對話框中選擇位置。檔案最大 256 MB。",
+    ),
+    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消儲存備份。",
+    ),
+    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法儲存備份。請檢查可用儲存空間並重試。",
+    ),
+    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage(
+      "備份已儲存。",
+    ),
+    "Backup_Save_As": MessageLookupByLibrary.simpleMessage(
+      "儲存備份…",
+    ),
+    "Choose_Image_File": MessageLookupByLibrary.simpleMessage(
+      "選擇圖片檔案",
+    ),
+    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage(
+      "關閉視窗",
+    ),
+    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage(
+      "檔案",
+    ),
+    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage(
+      "新增筆記",
+    ),
+    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage(
+      "結束 Onlynote",
+    ),
+    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage(
+      "視窗",
+    ),
+    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "所有進階功能已解鎖。",
+    ),
+    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "已購買進階版？可在下方恢復購買。",
+    ),
     "Add_Image": MessageLookupByLibrary.simpleMessage("加入照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("新增備忘錄"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),

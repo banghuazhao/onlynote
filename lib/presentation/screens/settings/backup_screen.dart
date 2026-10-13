@@ -3,12 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/Tools/notification_service.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/backup_restore_preview.dart';
+import 'package:onlynote/presentation/components/backup_export_section.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
@@ -20,10 +22,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class BackupScreen extends StatefulWidget {
-  const BackupScreen({super.key, this.exportBackup, this.shareBackup});
+  const BackupScreen({
+    super.key,
+    this.exportBackup,
+    this.shareBackup,
+    this.saveBackup,
+  });
 
   final Future<Uint8List> Function()? exportBackup;
   final Future<ShareResult> Function(ShareParams)? shareBackup;
+
+  /// Returns true once saved, false when the save dialog was cancelled.
+  final Future<bool> Function(Uint8List bytes, String suggestedName)?
+      saveBackup;
   @override
   State<BackupScreen> createState() => _BackupScreenState();
 }
@@ -32,6 +43,40 @@ class _BackupScreenState extends State<BackupScreen> {
   final _exportKey = GlobalKey();
   bool _busy = false;
   String? _progress;
+  late final VoidCallback _unregisterExitGuard;
+
+  @override
+  void initState() {
+    super.initState();
+    _unregisterExitGuard =
+        DesktopCommands.instance.registerEditor(() async => !_busy);
+  }
+
+  @override
+  void dispose() {
+    _unregisterExitGuard();
+    super.dispose();
+  }
+
+  bool get _saveToFile =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+
+  Future<bool> _saveBackup(Uint8List bytes, String name) async {
+    final location = await getSaveLocation(
+      suggestedName: name,
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: 'Onlynote backup',
+          extensions: ['onlynote'],
+          uniformTypeIdentifiers: ['public.data'],
+        ),
+      ],
+    );
+    if (location == null) return false;
+    await XFile.fromData(bytes, mimeType: 'application/octet-stream')
+        .saveTo(location.path);
+    return true;
+  }
 
   Future<BackupService> _service() async => BackupService(
         notes: Hive.box(databaseBox),
@@ -66,6 +111,14 @@ class _BackupScreenState extends State<BackupScreen> {
           .split('.')
           .first;
       final name = 'Onlynote-$stamp.onlynote';
+      if (_saveToFile) {
+        final saved = await (widget.saveBackup ?? _saveBackup)(bytes, name);
+        if (!mounted) return;
+        _message(saved
+            ? S.of(context).Backup_Export_Saved
+            : S.of(context).Backup_Export_Save_Cancelled);
+        return;
+      }
       final params = ShareParams(
         files: [
           XFile.fromData(bytes,
@@ -86,9 +139,11 @@ class _BackupScreenState extends State<BackupScreen> {
       });
     } catch (_) {
       if (mounted) {
-        _message(prepared
-            ? S.of(context).Backup_Export_Share_Failed
-            : S.of(context).Backup_Export_Failed);
+        _message(!prepared
+            ? S.of(context).Backup_Export_Failed
+            : _saveToFile
+                ? S.of(context).Backup_Export_Save_Failed
+                : S.of(context).Backup_Export_Share_Failed);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -224,23 +279,10 @@ class _BackupScreenState extends State<BackupScreen> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              SectionCard(
-                                title: S.of(context).Backup_Export,
-                                subtitle:
-                                    S.of(context).Backup_Export_Description,
-                                icon: Icons.inventory_2_outlined,
-                                children: [
-                                  SizedBox(
-                                      width: double.infinity,
-                                      child: FilledButton.icon(
-                                        key: _exportKey,
-                                        onPressed: _busy ? null : _export,
-                                        icon:
-                                            const Icon(Icons.ios_share_rounded),
-                                        label:
-                                            Text(S.of(context).Backup_Export),
-                                      ))
-                                ],
+                              BackupExportSection(
+                                saveToFile: _saveToFile,
+                                exportButtonKey: _exportKey,
+                                onExport: _busy ? null : _export,
                               ),
                               const SizedBox(height: 16),
                               SectionCard(

@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 
 import 'ad_ids_release.dart';
 
@@ -8,7 +7,8 @@ class AdsManager {
   static bool disableAllAdsForScreenshot = false;
 
   static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
+    if (!PlatformCapabilities.mobileAds) return '';
+    if (defaultTargetPlatform == TargetPlatform.android) {
       if (kDebugMode) {
         if (disableAllAdsForScreenshot) {
           return "";
@@ -19,7 +19,7 @@ class AdsManager {
         // android banner ID
         return AdIdsRelease.bannerAdUnitIdAndroid;
       }
-    } else if (Platform.isIOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       if (kDebugMode) {
         if (disableAllAdsForScreenshot) {
           return "";
@@ -31,7 +31,7 @@ class AdsManager {
         return AdIdsRelease.bannerAdUnitIdIOS;
       }
     } else {
-      throw UnsupportedError("Unsupported platform");
+      return '';
     }
   }
 
@@ -64,7 +64,7 @@ class AdsManager {
   // }
 
   static void debugPrintID() {
-    if (kDebugMode) {
+    if (kDebugMode && PlatformCapabilities.mobileAds) {
       debugPrint("bannerAdUnitId: ${AdsManager.bannerAdUnitId}");
     }
     // print("openAdUnitID: ${AdsManager.openAdUnitID}");

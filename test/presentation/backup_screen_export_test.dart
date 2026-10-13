@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
-
+import 'dart:ui' show AppExitResponse;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/presentation/screens/settings/backup_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:share_plus/share_plus.dart';
@@ -33,6 +34,129 @@ Future<void> _drainFeedback(WidgetTester tester) async {
 }
 
 void main() {
+  for (final saved in [true, false]) {
+    testWidgets('Mac Save As reports ${saved ? 'saved' : 'cancelled'}',
+        (tester) async {
+      final bytes = Uint8List.fromList([1, 2, 3, 4]);
+      var shares = 0;
+      String? filename;
+      await tester.pumpWidget(_host(BackupScreen(
+        exportBackup: () async => bytes,
+        saveBackup: (content, suggestedName) async {
+          expect(content, bytes);
+          filename = suggestedName;
+          return saved;
+        },
+        shareBackup: (_) async {
+          shares++;
+          return ShareResult.unavailable;
+        },
+      )));
+      await tester.pumpAndSettle();
+      final button =
+          find.widgetWithText(FilledButton, S.current.Backup_Save_As);
+      expect(find.text(S.current.Backup_Export_Desktop_Description),
+          findsOneWidget);
+      expect(find.text(S.current.Backup_Export_Description), findsNothing);
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      expect(shares, 0);
+      expect(filename,
+          matches(r'^Onlynote-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.onlynote$'));
+      expect(
+          find.text(saved
+              ? S.current.Backup_Export_Saved
+              : S.current.Backup_Export_Save_Cancelled),
+          findsOneWidget);
+      expect(find.text(S.current.Backup_Export_Shared), findsNothing);
+      expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+      expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isTrue);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+  }
+
+  testWidgets('Mac save failure can retry without reporting a shared backup',
+      (tester) async {
+    var saves = 0;
+    await tester.pumpWidget(_host(BackupScreen(
+      exportBackup: () async => Uint8List.fromList([1]),
+      saveBackup: (_, __) async {
+        saves++;
+        if (saves == 1) throw StateError('Disk full');
+        return true;
+      },
+    )));
+    await tester.pumpAndSettle();
+    final button = find.widgetWithText(FilledButton, S.current.Backup_Save_As);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.Backup_Export_Save_Failed), findsOneWidget);
+    expect(find.text(S.current.Backup_Export_Share_Failed), findsNothing);
+    expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+    await _drainFeedback(tester);
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(saves, 2);
+    expect(find.text(S.current.Backup_Export_Saved), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await _drainFeedback(tester);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
+  testWidgets('Mac pending save blocks repeated exports and handles disposal',
+      (tester) async {
+    final saved = Completer<bool>();
+    var exports = 0;
+    await tester.pumpWidget(_host(BackupScreen(
+      exportBackup: () async {
+        exports++;
+        return Uint8List.fromList([1]);
+      },
+      saveBackup: (_, __) => saved.future,
+    )));
+    await tester.pumpAndSettle();
+    final button = find.widgetWithText(FilledButton, S.current.Backup_Save_As);
+    final export = tester.widget<FilledButton>(button).onPressed!;
+    export();
+    await tester.pump();
+    export();
+    await tester.pump();
+    expect(exports, 1);
+    expect(tester.widget<FilledButton>(button).onPressed, isNull);
+    expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+    expect(
+        await DesktopCommands.instance.prepareToExit(), AppExitResponse.cancel);
+    await tester.pumpWidget(const SizedBox.shrink());
+    saved.complete(true);
+    await tester.pumpAndSettle();
+    expect(find.byType(SnackBar), findsNothing);
+    expect(
+        await DesktopCommands.instance.prepareToExit(), AppExitResponse.exit);
+    expect(tester.takeException(), isNull);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
+  testWidgets('Mac allows Quit after a pending backup finishes saving',
+      (tester) async {
+    final saved = Completer<bool>();
+    await tester.pumpWidget(_host(BackupScreen(
+      exportBackup: () async => Uint8List.fromList([1]),
+      saveBackup: (_, __) => saved.future,
+    )));
+    await tester.pumpAndSettle();
+    await tester
+        .tap(find.widgetWithText(FilledButton, S.current.Backup_Save_As));
+    await tester.pump();
+    expect(
+        await DesktopCommands.instance.prepareToExit(), AppExitResponse.cancel);
+    saved.complete(true);
+    await tester.pumpAndSettle();
+    expect(
+        await DesktopCommands.instance.prepareToExit(), AppExitResponse.exit);
+    expect(find.text(S.current.Backup_Export_Saved), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await _drainFeedback(tester);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
   for (final (status, message) in [
     (ShareResultStatus.success, (S strings) => strings.Backup_Export_Shared),
     (

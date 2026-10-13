@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -12,7 +11,11 @@ class MoreAppsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = _items(context)
-        .where((item) => Platform.isIOS || item.androidId.isNotEmpty)
+        .where((item) =>
+            !kIsWeb &&
+            (defaultTargetPlatform == TargetPlatform.iOS ||
+                (defaultTargetPlatform == TargetPlatform.android &&
+                    item.androidId.isNotEmpty)))
         .toList();
     final tokens = context.tokens;
     return Scaffold(

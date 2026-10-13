@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:onlynote/services/premium_access.dart';
@@ -12,6 +13,48 @@ void main() {
   setUp(() {
     store = FakePurchaseStore();
     storage = MemoryEntitlementStorage();
+  });
+
+  tearDown(() {
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  test('macOS loads and restores Premium without enabling mobile ads',
+      () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+    final service = PurchaseService(store: store, storage: storage);
+
+    await service.init();
+
+    expect(service.isSupported, isTrue);
+    expect(store.availabilityChecks, 1);
+    expect(store.restoreCalls, 1);
+    expect(service.premiumProduct?.id, removeAdsProductId);
+    expect(service.shouldShowAds, isFalse);
+    expect(PremiumAccess(purchases: service).limitsApply, isTrue);
+
+    store.emit(_purchase(PurchaseStatus.restored));
+    await pumpEventQueue();
+
+    expect(service.isPremium, isTrue);
+    expect(storage.value, isTrue);
+    expect(store.completedPurchases, 1);
+    expect(service.shouldShowAds, isFalse);
+    service.dispose();
+  });
+
+  test('macOS keeps the legacy purchase support override available', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+    final service =
+        PurchaseService(store: store, storage: storage, isIOS: false);
+
+    await service.init();
+
+    expect(service.isSupported, isFalse);
+    expect(store.availabilityChecks, 0);
+    expect(store.restoreCalls, 0);
+    expect(service.shouldShowAds, isFalse);
+    service.dispose();
   });
 
   test('loads persisted entitlement for offline ad gating', () async {

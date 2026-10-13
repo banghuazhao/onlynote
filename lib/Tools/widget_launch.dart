@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:onlynote/Tools/onboarding_settings.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
@@ -33,6 +34,7 @@ class WidgetLaunch {
   /// Call once after the router exists. Handles both a cold launch from the
   /// widget and taps that arrive while the app is already running.
   Future<void> init() async {
+    if (!PlatformCapabilities.homeWidgets) return;
     _subscription ??= HomeWidget.widgetClicked.listen(_handle);
 
     try {

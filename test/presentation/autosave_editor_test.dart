@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:ui' show AppExitResponse;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -81,6 +83,72 @@ Widget app(Widget home) => MaterialApp(
     );
 
 void main() {
+  testWidgets('desktop exit saves the last keystroke before allowing Quit',
+      (tester) async {
+    final repository = EditorRepository();
+    final gate = Completer<void>();
+    final store = RetryEditorAutosaveStore(repository)
+      ..failSaves = false
+      ..nextSave = gate;
+    final bloc = AddUpdateBloc(
+        AddNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
+    for (final family in fonts.keys) {
+      kAppFontFamilies[family] = (
+              {textStyle, color, fontSize, fontWeight, fontStyle}) =>
+          (textStyle ?? const TextStyle()).copyWith(
+              color: color,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle);
+    }
+    addTearDown(() async {
+      kAppFontFamilies.addAll(fonts);
+      await bloc.close();
+    });
+    await tester.pumpWidget(app(BlocProvider.value(
+        value: bloc, child: AddUpdateNoteScreen(autosaveStore: store))));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Last keystroke');
+    var finished = false;
+    final exit = DesktopCommands.instance.prepareToExit().then((response) {
+      finished = true;
+      return response;
+    });
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(finished, isFalse);
+    expect(store.saveAttempts, 1);
+    expect(repository.notes, isEmpty);
+    gate.complete();
+    await tester.pumpAndSettle();
+    expect(await exit, AppExitResponse.exit);
+    expect(repository.notes.values.single.title, 'Last keystroke');
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    store.failSaves = true;
+    store.nextSave = null;
+    await tester.enterText(
+        find.byType(TextField).first, 'Keep the failed draft');
+    final rejectedExit = DesktopCommands.instance.prepareToExit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(await rejectedExit, AppExitResponse.cancel);
+    expect(repository.notes.values.single.title, 'Last keystroke');
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    store.failSaves = false;
+    final retriedExit = DesktopCommands.instance.prepareToExit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(await retriedExit, AppExitResponse.exit);
+    expect(repository.notes.values.single.title, 'Keep the failed draft');
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  });
+
   testWidgets('retry saves the latest text and stays in the focused editor',
       (tester) async {
     final repository = EditorRepository();

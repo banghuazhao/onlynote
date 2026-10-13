@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 
 /// The single source of truth for "may we track / may we serve personalized
 /// ads".
@@ -47,7 +47,7 @@ class ConsentGate extends ChangeNotifier {
   bool get isResolved => _isResolved;
 
   /// Whether an ad request is permitted at all.
-  bool get canRequestAds => _canRequestAds;
+  bool get canRequestAds => PlatformCapabilities.mobileAds && _canRequestAds;
 
   /// The flag every [AdRequest] must carry.
   bool get nonPersonalizedAds => !_allowsPersonalization;
@@ -56,7 +56,8 @@ class ConsentGate extends ChangeNotifier {
   ///
   /// Google reports this as required exactly where the user is legally owed a
   /// way to withdraw, which is where we must offer one.
-  bool get isPrivacyOptionsRequired => _privacyOptionsRequired;
+  bool get isPrivacyOptionsRequired =>
+      PlatformCapabilities.mobileAds && _privacyOptionsRequired;
 
   /// Gathers consent, then initializes the Mobile Ads SDK.
   ///
@@ -67,6 +68,7 @@ class ConsentGate extends ChangeNotifier {
 
   Future<void> _resolve() async {
     try {
+      if (!PlatformCapabilities.mobileAds) return;
       // Read ATT *without* prompting. A denial recorded on an earlier launch
       // must not be followed by a form that asks to track anyway.
       final priorStatus = await _trackingStatus();
@@ -96,8 +98,8 @@ class ConsentGate extends ChangeNotifier {
 
       // On iOS a denial forces non-personalized. Elsewhere there is no ATT and
       // the TCF signals the UMP form wrote govern personalization natively.
-      _allowsPersonalization =
-          !Platform.isIOS || status == TrackingStatus.authorized;
+      _allowsPersonalization = defaultTargetPlatform != TargetPlatform.iOS ||
+          status == TrackingStatus.authorized;
 
       _privacyOptionsRequired = await _safely(
             () => ConsentInformation.instance
@@ -109,6 +111,11 @@ class ConsentGate extends ChangeNotifier {
       if (_canRequestAds) {
         await MobileAds.instance.initialize();
       }
+    } catch (error, stackTrace) {
+      _canRequestAds = false;
+      _allowsPersonalization = false;
+      _privacyOptionsRequired = false;
+      debugPrint('ConsentGate: $error\n$stackTrace');
     } finally {
       _isResolved = true;
       notifyListeners();
@@ -118,6 +125,7 @@ class ConsentGate extends ChangeNotifier {
   /// Reopens the UMP privacy options form so the user can change or withdraw
   /// consent. Withdrawing has to be as easy as giving it.
   Future<void> showPrivacyOptionsForm() async {
+    if (!PlatformCapabilities.mobileAds) return;
     await _safely<void>(
       () => ConsentForm.showPrivacyOptionsForm((error) {
         if (error != null) {
@@ -131,7 +139,8 @@ class ConsentGate extends ChangeNotifier {
     // The user may have just withdrawn consent, so re-read rather than assume
     // the previous answer still holds.
     _privacyOptionsRequired = await _safely(
-          () => ConsentInformation.instance.getPrivacyOptionsRequirementStatus(),
+          () =>
+              ConsentInformation.instance.getPrivacyOptionsRequirementStatus(),
           orElse: PrivacyOptionsRequirementStatus.unknown,
         ) ==
         PrivacyOptionsRequirementStatus.required;
@@ -143,7 +152,9 @@ class ConsentGate extends ChangeNotifier {
   }
 
   Future<TrackingStatus> _trackingStatus() async {
-    if (!Platform.isIOS) return TrackingStatus.notSupported;
+    if (defaultTargetPlatform != TargetPlatform.iOS) {
+      return TrackingStatus.notSupported;
+    }
     return _safely(
       () => AppTrackingTransparency.trackingAuthorizationStatus,
       orElse: TrackingStatus.denied,
@@ -151,7 +162,9 @@ class ConsentGate extends ChangeNotifier {
   }
 
   Future<TrackingStatus> _requestTracking() async {
-    if (!Platform.isIOS) return TrackingStatus.notSupported;
+    if (defaultTargetPlatform != TargetPlatform.iOS) {
+      return TrackingStatus.notSupported;
+    }
     // iOS refuses to show the prompt until the app is actually foregrounded;
     // asking a beat later avoids a silent no-op on a cold launch.
     await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -171,7 +184,9 @@ class ConsentGate extends ChangeNotifier {
   /// Debug only — a release build must never discard a recorded choice.
   Future<void> resetForTesting() async {
     if (!kDebugMode) return;
-    await ConsentInformation.instance.reset();
+    if (PlatformCapabilities.mobileAds) {
+      await ConsentInformation.instance.reset();
+    }
     _resolution = null;
     _isResolved = false;
     _canRequestAds = false;

@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -142,6 +143,11 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('note-find-query')), findsNothing);
+    expect(DesktopCommands.instance.invoke(DesktopCommand.findInNote), isTrue);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('note-find-query')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('note-find-close')));
+    await tester.pumpAndSettle();
     expect(repository.writes, 0);
     expect(tester.widget<LoadedView>(find.byType(LoadedView)).note.description,
         'Tea note body');

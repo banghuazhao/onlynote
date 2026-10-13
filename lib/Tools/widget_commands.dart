@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
@@ -65,12 +66,14 @@ class WidgetCommands {
     required this.writeDraft,
     required this.removeDraft,
     required this.syncWidgets,
+    this.enabled = true,
   });
 
   static const channel = MethodChannel('com.appsbay.onlynote/widget_commands');
   static WidgetCommands? _instance;
   static WidgetCommands? get initializedInstance => _instance;
   static WidgetCommands get instance => _instance ??= WidgetCommands(
+        enabled: PlatformCapabilities.homeWidgets,
         repository: getIt<NoteRepository>(),
         readPending: () async =>
             await channel.invokeListMethod<Object?>('readPending') ?? [],
@@ -90,6 +93,7 @@ class WidgetCommands {
       );
 
   final NoteRepository repository;
+  final bool enabled;
   final Future<List<Object?>> Function() readPending;
   final Future<void> Function(List<String>) acknowledge;
   final NoteDto? Function(String) readDraft;
@@ -115,6 +119,7 @@ class WidgetCommands {
   /// Register after storage is ready. Native delivery is supplemented by an
   /// explicit startup/resume import because the main engine may be suspended.
   Future<void> init() async {
+    if (!enabled) return;
     channel.setMethodCallHandler((call) async {
       if (call.method == 'commandsChanged') await importPending();
     });
@@ -122,6 +127,7 @@ class WidgetCommands {
   }
 
   Future<void> importPending() {
+    if (!enabled) return Future.value();
     _importRequested = true;
     final existing = _inFlight;
     if (existing != null) return existing;

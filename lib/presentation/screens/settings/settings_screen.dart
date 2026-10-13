@@ -2,6 +2,7 @@ import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/common/constants.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
@@ -114,23 +115,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: tokens.space4),
-                              Card(
-                                child: ListTile(
-                                  leading: const Icon(Icons.widgets_outlined),
-                                  title: Text(S.of(context).Widget),
-                                  subtitle:
-                                      Text(S.of(context).Widget_Description),
-                                  trailing:
-                                      const Icon(Icons.chevron_right_rounded),
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => const WidgetGuideScreen(),
+                              if (PlatformCapabilities.homeWidgets) ...[
+                                SizedBox(height: tokens.space4),
+                                Card(
+                                  child: ListTile(
+                                    leading: const Icon(Icons.widgets_outlined),
+                                    title: Text(S.of(context).Widget),
+                                    subtitle:
+                                        Text(S.of(context).Widget_Description),
+                                    trailing:
+                                        const Icon(Icons.chevron_right_rounded),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (_) =>
+                                            const WidgetGuideScreen(),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                               SizedBox(height: tokens.space4),
                               Card(
                                 child: ListTile(
@@ -173,7 +177,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ? S.of(context).Premium_Active
                                           : S.of(context).Upgrade_To_Premium),
                                       subtitle: Text(purchase.isPremium
-                                          ? S.of(context).Premium_Description
+                                          ? PlatformCapabilities.mobileAds
+                                              ? S
+                                                  .of(context)
+                                                  .Premium_Description
+                                              : S
+                                                  .of(context)
+                                                  .Premium_Desktop_Description
                                           : S.of(context).Premium_Free_Core),
                                       trailing: const Icon(
                                           Icons.chevron_right_rounded),
@@ -248,21 +258,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ],
                                 ],
                               ),
-                              SizedBox(height: tokens.space4),
-                              Card(
-                                child: ListTile(
-                                  leading: const Icon(Icons.apps_rounded),
-                                  title: Text(S.of(context).More_Apps),
-                                  trailing:
-                                      const Icon(Icons.chevron_right_rounded),
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => const MoreAppsPage(),
+                              if (PlatformCapabilities.mobileAds) ...[
+                                SizedBox(height: tokens.space4),
+                                Card(
+                                  child: ListTile(
+                                    leading: const Icon(Icons.apps_rounded),
+                                    title: Text(S.of(context).More_Apps),
+                                    trailing:
+                                        const Icon(Icons.chevron_right_rounded),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => const MoreAppsPage(),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),

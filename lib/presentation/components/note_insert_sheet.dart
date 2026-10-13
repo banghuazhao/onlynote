@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'app_sheet.dart';
 
@@ -6,7 +7,10 @@ enum NoteInsertAction { checklist, gallery, camera, scan, voice }
 
 /// All additions share one entry point, leaving an empty note ready to write.
 class NoteInsertSheet extends StatelessWidget {
-  const NoteInsertSheet({super.key});
+  const NoteInsertSheet({super.key, this.mobileCapture});
+
+  /// Lets previews show a phone or desktop menu without opening native APIs.
+  final bool? mobileCapture;
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +28,26 @@ class NoteInsertSheet extends StatelessWidget {
         'editor-add-photo',
         Icons.photo_library_outlined,
         strings.Add_Image,
-        strings.Choose_From_Gallery
+        (mobileCapture ?? PlatformCapabilities.camera)
+            ? strings.Choose_From_Gallery
+            : strings.Choose_Image_File
       ),
-      (
-        NoteInsertAction.camera,
-        'editor-take-photo',
-        Icons.camera_alt_outlined,
-        strings.Take_Photo,
-        null
-      ),
-      (
-        NoteInsertAction.scan,
-        'editor-scan-document',
-        Icons.document_scanner_outlined,
-        strings.Document_Scan,
-        null
-      ),
+      if (mobileCapture ?? PlatformCapabilities.camera)
+        (
+          NoteInsertAction.camera,
+          'editor-take-photo',
+          Icons.camera_alt_outlined,
+          strings.Take_Photo,
+          null
+        ),
+      if (mobileCapture ?? PlatformCapabilities.documentScanner)
+        (
+          NoteInsertAction.scan,
+          'editor-scan-document',
+          Icons.document_scanner_outlined,
+          strings.Document_Scan,
+          null
+        ),
       (
         NoteInsertAction.voice,
         'editor-record-voice',

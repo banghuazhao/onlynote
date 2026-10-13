@@ -213,6 +213,12 @@ class NoteCardState extends State<NoteCard> {
                   HapticFeedback.mediumImpact();
                   widget.onLongPress!();
                 },
+          onSecondaryTap: _exportingImage || widget.onLongPress == null
+              ? null
+              : () {
+                  _setPressed(false);
+                  widget.onLongPress!();
+                },
           onTap: _exportingImage || widget.onTap == null
               ? null
               : () {

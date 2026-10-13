@@ -81,6 +81,31 @@ void main() {
   });
   tearDown(() => commands.updates.dispose());
 
+  test('disabled native widget commands skip both startup and resume imports',
+      () async {
+    var reads = 0;
+    final unsupported = WidgetCommands(
+      enabled: false,
+      repository: repository,
+      readPending: () async {
+        reads++;
+        return [_command('one', true)];
+      },
+      acknowledge: (_) async {},
+      readDraft: (_) => null,
+      writeDraft: (_) async {},
+      removeDraft: (_) async {},
+      syncWidgets: () async {},
+    );
+    addTearDown(unsupported.updates.dispose);
+
+    await unsupported.init();
+    await unsupported.importPending();
+
+    expect(reads, 0);
+    expect(repository.saves, 0);
+  });
+
   test('applies explicit completion and preserves all other fields', () async {
     pending.add(_command('one', true));
     await commands.importPending();

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 
 enum DocumentScanStatus {
   pages,
@@ -82,8 +83,10 @@ class DocumentScanResult {
 /// Opens the platform's reviewed document scanner and observes its durable
 /// inbox. Recognition and document scanning use separate native channels.
 class DocumentScanner extends ChangeNotifier {
-  DocumentScanner({MethodChannel? channel})
-      : _channel = channel ?? const MethodChannel(channelName) {
+  DocumentScanner({MethodChannel? channel, bool? enabled})
+      : _channel = channel ?? const MethodChannel(channelName),
+        _enabled = enabled ??
+            (channel != null || PlatformCapabilities.documentScanner) {
     _channel.setMethodCallHandler(_onNativeCall);
   }
 
@@ -94,6 +97,7 @@ class DocumentScanner extends ChangeNotifier {
   static void configure(DocumentScanner scanner) => _instance = scanner;
 
   final MethodChannel _channel;
+  final bool _enabled;
   DocumentScanResult? _lastReady;
   bool _disposed = false;
   DocumentScanResult? get lastReady => _lastReady;
@@ -116,6 +120,9 @@ class DocumentScanner extends ChangeNotifier {
           id: id,
           status: DocumentScanStatus.failed,
           error: const FormatException('Invalid document scan request'));
+    }
+    if (!_enabled) {
+      return DocumentScanResult(id: id, status: DocumentScanStatus.unsupported);
     }
     try {
       final value = await _channel
@@ -145,7 +152,7 @@ class DocumentScanner extends ChangeNotifier {
   }
 
   Future<List<DocumentScanResult>> pending() async {
-    if (_disposed) return const [];
+    if (_disposed || !_enabled) return const [];
     try {
       final value = await _channel.invokeMethod<Object?>('pending');
       if (value is! List) {
@@ -167,6 +174,7 @@ class DocumentScanner extends ChangeNotifier {
     if (_disposed || !DocumentScanResult.validId(id)) {
       throw const FormatException('Invalid document scan acknowledgement');
     }
+    if (!_enabled) return;
     try {
       await _channel.invokeMethod<Object?>('acknowledge', {'id': id});
     } on MissingPluginException {

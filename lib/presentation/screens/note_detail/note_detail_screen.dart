@@ -27,6 +27,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:onlynote/Tools/notification_service.dart';
 import 'package:onlynote/Tools/widget_commands.dart';
+import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -103,6 +104,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   WidgetCommands? _widgetCommands;
   final NoteSearchController _findController = NoteSearchController();
   bool _findOpen = false;
+  VoidCallback? _unregisterDesktopFind;
   final _outlineController = NoteOutlineNavigationController();
   final _readerPositionController = NoteReaderPositionController();
   final _readerScrollController = ScrollController();
@@ -736,6 +738,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     _widgetCommands = WidgetCommands.initializedInstance;
     _widgetCommands?.updates.addListener(_refreshWidgetCompletion);
     _findController.addListener(_findChanged);
+    _unregisterDesktopFind = DesktopCommands.instance.registerCommand(
+      DesktopCommand.findInNote,
+      invoke: _openFind,
+      isActive: () => mounted && ModalRoute.of(context)?.isCurrent == true,
+      isEnabled: () => !_exportingImage && _positionNote?.isDeleted != true,
+    );
 
     if (mounted) {
       BlocProvider.of<NoteDetailBloc>(context)
@@ -745,6 +753,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   @override
   void dispose() {
+    _unregisterDesktopFind?.call();
     _positionSaveTimer?.cancel();
     unawaited(_saveReadingPosition(capture: false));
     _cancelReadingRestore();
