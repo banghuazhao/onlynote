@@ -9,7 +9,7 @@ import CoreFoundation
 /// Every field is decoded defensively: a single unexpected value in the
 /// payload must not blank out the whole widget, so missing keys fall back to
 /// empty rather than throwing.
-struct WidgetPayload: Decodable {
+struct WidgetPayload: Decodable, Sendable {
     /// Total number of active notes, which can exceed `notes.count` — the app
     /// only serializes the first handful.
     let total: Int
@@ -38,6 +38,13 @@ struct WidgetPayload: Decodable {
     /// Reads the payload the app last wrote. Returns `.empty` when the app has
     /// never run, the App Group isn't reachable, or the JSON is unreadable.
     static func load() -> WidgetPayload {
+        #if os(macOS)
+        guard let store = try? MacWidgetStore(),
+              let data = try? store.readSnapshot(),
+              let payload = try? JSONDecoder().decode(WidgetPayload.self, from: data) else {
+            return .empty
+        }
+        #else
         guard
             let defaults = UserDefaults(suiteName: WidgetConstants.appGroupId),
             let raw = defaults.string(forKey: WidgetConstants.payloadKey),
@@ -46,11 +53,12 @@ struct WidgetPayload: Decodable {
         else {
             return .empty
         }
+        #endif
         return WidgetCommandJournal.overlay(payload)
     }
 }
 
-struct WidgetNote: Decodable, Identifiable {
+struct WidgetNote: Decodable, Identifiable, Sendable {
     let id: String
     let title: String
     let body: String
@@ -130,7 +138,7 @@ struct WidgetNote: Decodable, Identifiable {
     var hasChecklist: Bool { todoTotal > 0 }
 }
 
-struct WidgetTodo: Decodable {
+struct WidgetTodo: Decodable, Sendable {
     let id: String?
     let title: String
     let completed: Bool
@@ -174,8 +182,12 @@ extension Color {
 enum WidgetCommandJournal {
     private static let writeLock = NSLock()
     static var directory: URL? {
+        #if os(macOS)
+        return try? MacWidgetStore().commandDirectory
+        #else
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: WidgetConstants.appGroupId)?
             .appendingPathComponent("widget_commands", isDirectory: true)
+        #endif
     }
 
     static func pending() -> [[String: Any]] {
@@ -238,21 +250,25 @@ enum WidgetCommandJournal {
     }
 }
 
-@available(iOS 17.0, *)
-struct WidgetNoteEntity: AppEntity {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "widget.choose_note"
-    static var defaultQuery = WidgetNoteQuery()
+@available(iOS 17.0, macOS 14.0, *)
+struct WidgetNoteEntity: AppEntity, Sendable {
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "widget.choose_note"
+    static let defaultQuery = WidgetNoteQuery()
     let id: String
     let title: String
     var displayRepresentation: DisplayRepresentation { DisplayRepresentation(title: "\(title)") }
 
     static var all: WidgetNoteEntity {
+        #if os(macOS)
+        WidgetNoteEntity(id: "__all_notes__", title: NSLocalizedString("widget.mac.latest_note", comment: "Automatically show the latest note"))
+        #else
         WidgetNoteEntity(id: "__all_notes__", title: NSLocalizedString("widget.all_notes", comment: "Widget selection"))
+        #endif
     }
 }
 
-@available(iOS 17.0, *)
-struct WidgetNoteQuery: EntityStringQuery {
+@available(iOS 17.0, macOS 14.0, *)
+struct WidgetNoteQuery: EntityStringQuery, Sendable {
     func entities(for identifiers: [String]) async throws -> [WidgetNoteEntity] {
         let notes = WidgetPayload.load().allNotes
         return identifiers.map { id in
@@ -270,17 +286,17 @@ struct WidgetNoteQuery: EntityStringQuery {
     func defaultResult() async -> WidgetNoteEntity? { .all }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 14.0, *)
 struct NoteWidgetConfiguration: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "widget.choose_note"
-    static var description = IntentDescription("widget.selection_description")
+    static let title: LocalizedStringResource = "widget.choose_note"
+    static let description = IntentDescription("widget.selection_description")
     @Parameter(title: "widget.choose_note") var note: WidgetNoteEntity?
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 14.0, *)
 struct CompleteWidgetTodoIntent: AppIntent {
-    static var title: LocalizedStringResource = "widget.complete_item"
-    static var openAppWhenRun: Bool = false
+    static let title: LocalizedStringResource = "widget.complete_item"
+    static let openAppWhenRun: Bool = false
     @Parameter(title: "Note ID") var noteId: String
     @Parameter(title: "Item ID") var todoId: String
     @Parameter(title: "Completed") var completed: Bool
@@ -295,7 +311,11 @@ struct CompleteWidgetTodoIntent: AppIntent {
         let note = WidgetPayload.load().allNotes.first { $0.id == noteId }
         guard let note, note.todos.contains(where: { $0.id == todoId }) else { return .result() }
         try WidgetCommandJournal.enqueue(noteId: noteId, todoId: todoId, completed: completed)
+        #if os(macOS)
+        WidgetCenter.shared.reloadAllTimelines()
+        #else
         WidgetCenter.shared.reloadTimelines(ofKind: WidgetConstants.kind)
+        #endif
         return .result()
     }
 }

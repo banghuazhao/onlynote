@@ -2328,6 +2328,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     if (_replayingHistory ||
         _refreshingFromLibrary ||
         _addingPhoto ||
+        _presentingMedia ||
+        _presentingReminder ||
         _voiceMutations > 0 ||
         _savingReminder) {
       return false;

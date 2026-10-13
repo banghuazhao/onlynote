@@ -1,7 +1,7 @@
 import WidgetKit
 import SwiftUI
 
-struct NotesEntry: TimelineEntry {
+struct NotesEntry: TimelineEntry, Sendable {
     let date: Date
     let payload: WidgetPayload
     var selectedNoteId: String? = nil
@@ -82,7 +82,7 @@ extension WidgetPayload {
 }
 
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 14.0, *)
 struct ConfigurableNotesProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> NotesEntry {
         NotesEntry(date: Date(), payload: .sample)

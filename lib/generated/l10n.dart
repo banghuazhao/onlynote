@@ -5321,6 +5321,126 @@ class S {
       args: [],
     );
   }
+
+  /// `Desktop widgets`
+  String get Widget_macOS_Title {
+    return Intl.message(
+      "Desktop widgets",
+      name: 'Widget_macOS_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.`
+  String get Widget_Description_macOS {
+    return Intl.message(
+      "Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.",
+      name: 'Widget_Description_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Onlynote widgets to your Mac desktop for a quick glance at your notes.`
+  String get Widget_Discovery_Body_macOS {
+    return Intl.message(
+      "Add Onlynote widgets to your Mac desktop for a quick glance at your notes.",
+      name: 'Widget_Discovery_Body_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to Desktop`
+  String get Widget_Add_To_Desktop {
+    return Intl.message(
+      "Add to Desktop",
+      name: 'Widget_Add_To_Desktop',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Right-click an empty area of your desktop and choose Edit Widgets.`
+  String get Widget_Step_macOS_1 {
+    return Intl.message(
+      "Right-click an empty area of your desktop and choose Edit Widgets.",
+      name: 'Widget_Step_macOS_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search for Onlynote in the widget gallery.`
+  String get Widget_Step_macOS_2 {
+    return Intl.message(
+      "Search for Onlynote in the widget gallery.",
+      name: 'Widget_Step_macOS_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose an overview or a note widget, then select a size.`
+  String get Widget_Step_macOS_3 {
+    return Intl.message(
+      "Choose an overview or a note widget, then select a size.",
+      name: 'Widget_Step_macOS_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag the widget onto your desktop, then click Done.`
+  String get Widget_Step_macOS_4 {
+    return Intl.message(
+      "Drag the widget onto your desktop, then click Done.",
+      name: 'Widget_Step_macOS_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.`
+  String get Widget_Choose_Note_macOS {
+    return Intl.message(
+      "Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.",
+      name: 'Widget_Choose_Note_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paper and color`
+  String get Widget_Style_Title {
+    return Intl.message(
+      "Paper and color",
+      name: 'Widget_Style_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.`
+  String get Widget_Style_macOS {
+    return Intl.message(
+      "Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.",
+      name: 'Widget_Style_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Click a note in the widget to open it, or click New to start writing.`
+  String get Widget_Tip_macOS {
+    return Intl.message(
+      "Click a note in the widget to open it, or click New to start writing.",
+      name: 'Widget_Tip_macOS',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

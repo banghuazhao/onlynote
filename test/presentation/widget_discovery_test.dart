@@ -47,6 +47,33 @@ void main() {
     binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, null);
   });
 
+  testWidgets('Mac invitation opens desktop setup without mobile plugin calls',
+      (tester) async {
+    final calls = <String>[];
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+        (call) async {
+      calls.add(call.method);
+      return null;
+    });
+    await tester.pumpWidget(_host(const WidgetDiscoveryPrompt(eligible: true)));
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.Widget_Discovery_Body_macOS), findsOneWidget);
+    expect(find.text(S.current.Widget_Add_To_Home), findsNothing);
+    expect(calls, isEmpty);
+    await tester.tap(find.text(S.current.Widget_Add_To_Desktop));
+    await tester.pumpAndSettle();
+    expect(find.byType(WidgetGuideScreen), findsOneWidget);
+    expect(find.text(S.current.Widget_macOS_Title), findsOneWidget);
+    expect(find.text(S.current.Widget_Step_macOS_1), findsOneWidget);
+    expect(find.text(S.current.Widget_Step_iOS_1), findsNothing);
+    expect(calls, isEmpty);
+    expect(WidgetDiscoverySettings.instance.handled, isTrue);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(WidgetDiscoveryCard), findsNothing);
+    expect(tester.takeException(), isNull);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
   testWidgets('waits for pin eligibility and remembers dismissal',
       (tester) async {
     final eligible = ValueNotifier(false);

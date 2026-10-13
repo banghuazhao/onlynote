@@ -1,5 +1,6 @@
 import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:onlynote/Tools/consent_gate.dart';
 import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/platform_capabilities.dart';
@@ -120,9 +121,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Card(
                                   child: ListTile(
                                     leading: const Icon(Icons.widgets_outlined),
-                                    title: Text(S.of(context).Widget),
-                                    subtitle:
-                                        Text(S.of(context).Widget_Description),
+                                    title: Text(defaultTargetPlatform ==
+                                            TargetPlatform.macOS
+                                        ? S.of(context).Widget_macOS_Title
+                                        : S.of(context).Widget),
+                                    subtitle: Text(defaultTargetPlatform ==
+                                            TargetPlatform.macOS
+                                        ? S.of(context).Widget_Description_macOS
+                                        : S.of(context).Widget_Description),
                                     trailing:
                                         const Icon(Icons.chevron_right_rounded),
                                     onTap: () => Navigator.push(

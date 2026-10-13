@@ -30,6 +30,50 @@
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		CD200000000000000000002A /* MacWidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000C /* MacWidgetConstants.swift */; };
+		CD200000000000000000002B /* OnlynoteWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000D /* OnlynoteWidgetBundle.swift */; };
+		CD200000000000000000002C /* PaperNoteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000E /* PaperNoteWidget.swift */; };
+		CD200000000000000000002D /* PaperNoteWidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000F /* PaperNoteWidgetContent.swift */; };
+		CD200000000000000000002E /* PaperNoteWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000010 /* PaperNoteWidgetView.swift */; };
+		CD200000000000000000002F /* PaperOverviewNoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000011 /* PaperOverviewNoteRow.swift */; };
+		CD2000000000000000000030 /* PaperOverviewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000012 /* PaperOverviewWidget.swift */; };
+		CD2000000000000000000031 /* PaperOverviewWidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000013 /* PaperOverviewWidgetContent.swift */; };
+		CD2000000000000000000032 /* PaperOverviewWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000014 /* PaperOverviewWidgetView.swift */; };
+		CD2000000000000000000033 /* PaperTodoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000015 /* PaperTodoRow.swift */; };
+		CD2000000000000000000034 /* PaperWidgetBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000016 /* PaperWidgetBackground.swift */; };
+		CD2000000000000000000035 /* PaperWidgetEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000017 /* PaperWidgetEmptyView.swift */; };
+		CD2000000000000000000036 /* PaperWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000018 /* PaperWidgetPreviews.swift */; };
+		CD2000000000000000000037 /* PaperWidgetSnapshotKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000019 /* PaperWidgetSnapshotKind.swift */; };
+		CD2000000000000000000038 /* PaperWidgetSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001A /* PaperWidgetSnapshotView.swift */; };
+		CD2000000000000000000039 /* PaperWidgetTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001B /* PaperWidgetTheme.swift */; };
+		CD200000000000000000003A /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001D /* WidgetConstants.swift */; };
+		CD200000000000000000003B /* WidgetNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001E /* WidgetNote.swift */; };
+		CD200000000000000000003C /* NotesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001F /* NotesProvider.swift */; };
+		CD200000000000000000003D /* MacWidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000020 /* MacWidgetStore.swift */; };
+		CD200000000000000000003E /* MacWidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000C /* MacWidgetConstants.swift */; };
+		CD200000000000000000003F /* PaperNoteWidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000000F /* PaperNoteWidgetContent.swift */; };
+		CD2000000000000000000040 /* PaperNoteWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000010 /* PaperNoteWidgetView.swift */; };
+		CD2000000000000000000041 /* PaperOverviewNoteRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000011 /* PaperOverviewNoteRow.swift */; };
+		CD2000000000000000000042 /* PaperOverviewWidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000013 /* PaperOverviewWidgetContent.swift */; };
+		CD2000000000000000000043 /* PaperOverviewWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000014 /* PaperOverviewWidgetView.swift */; };
+		CD2000000000000000000044 /* PaperTodoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000015 /* PaperTodoRow.swift */; };
+		CD2000000000000000000045 /* PaperWidgetBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000016 /* PaperWidgetBackground.swift */; };
+		CD2000000000000000000046 /* PaperWidgetEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000017 /* PaperWidgetEmptyView.swift */; };
+		CD2000000000000000000047 /* PaperWidgetSnapshotKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000019 /* PaperWidgetSnapshotKind.swift */; };
+		CD2000000000000000000048 /* PaperWidgetSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001A /* PaperWidgetSnapshotView.swift */; };
+		CD2000000000000000000049 /* PaperWidgetTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001B /* PaperWidgetTheme.swift */; };
+		CD200000000000000000004A /* WidgetSnapshotRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001C /* WidgetSnapshotRenderer.swift */; };
+		CD200000000000000000004B /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001D /* WidgetConstants.swift */; };
+		CD200000000000000000004C /* WidgetNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001E /* WidgetNote.swift */; };
+		CD200000000000000000004D /* NotesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD200000000000000000001F /* NotesProvider.swift */; };
+		CD200000000000000000004E /* MacWidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000020 /* MacWidgetStore.swift */; };
+		CD200000000000000000004F /* MacWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000022 /* MacWidgetTests.swift */; };
+		CD2000000000000000000050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000025 /* Assets.xcassets */; };
+		CD2000000000000000000051 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000026 /* Localizable.strings */; };
+		CD2000000000000000000052 /* OnlynoteWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000003 /* OnlynoteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CD2000000000000000000056 /* MacWidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000020 /* MacWidgetStore.swift */; };
+		CD2000000000000000000057 /* MacWidgetBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000021 /* MacWidgetBridge.swift */; };
+		CD2000000000000000000058 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000026 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +91,13 @@
 			remoteGlobalIDString = 33CC111A2044C6BA0003C045;
 			remoteInfo = FLX;
 		};
+		CD2000000000000000000009 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33CC10E52044A3C60003C045 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CD2000000000000000000004;
+			remoteInfo = OnlynoteWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -58,6 +109,17 @@
 			files = (
 			);
 			name = "Bundle Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD2000000000000000000008 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				CD2000000000000000000052 /* OnlynoteWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -84,6 +146,36 @@
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		CD2000000000000000000003 /* OnlynoteWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OnlynoteWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD200000000000000000000C /* MacWidgetConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacWidgetConstants.swift"; sourceTree = "<group>"; };
+		CD200000000000000000000D /* OnlynoteWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnlynoteWidgetBundle.swift"; sourceTree = "<group>"; };
+		CD200000000000000000000E /* PaperNoteWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperNoteWidget.swift"; sourceTree = "<group>"; };
+		CD200000000000000000000F /* PaperNoteWidgetContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperNoteWidgetContent.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000010 /* PaperNoteWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperNoteWidgetView.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000011 /* PaperOverviewNoteRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperOverviewNoteRow.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000012 /* PaperOverviewWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperOverviewWidget.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000013 /* PaperOverviewWidgetContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperOverviewWidgetContent.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000014 /* PaperOverviewWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperOverviewWidgetView.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000015 /* PaperTodoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperTodoRow.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000016 /* PaperWidgetBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetBackground.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000017 /* PaperWidgetEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetEmptyView.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000018 /* PaperWidgetPreviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetPreviews.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000019 /* PaperWidgetSnapshotKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetSnapshotKind.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001A /* PaperWidgetSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetSnapshotView.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001B /* PaperWidgetTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaperWidgetTheme.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001C /* WidgetSnapshotRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WidgetSnapshotRenderer.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001D /* WidgetConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "WidgetConstants.swift"; path = "../../ios/OnlynoteWidget/WidgetConstants.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001E /* WidgetNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "WidgetNote.swift"; path = "../../ios/OnlynoteWidget/WidgetNote.swift"; sourceTree = "<group>"; };
+		CD200000000000000000001F /* NotesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "NotesProvider.swift"; path = "../../ios/OnlynoteWidget/NotesProvider.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000020 /* MacWidgetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacWidgetStore.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000021 /* MacWidgetBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacWidgetBridge.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000022 /* MacWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MacWidgetTests.swift"; sourceTree = "<group>"; };
+		CD2000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		CD2000000000000000000024 /* OnlynoteWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "OnlynoteWidget.entitlements"; sourceTree = "<group>"; };
+		CD2000000000000000000025 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		CD2000000000000000000027 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		CD2000000000000000000028 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		CD2000000000000000000029 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,12 +194,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CD2000000000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		331C80D6294CF71000263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
+				CD2000000000000000000022 /* MacWidgetTests.swift */,
 				331C80D7294CF71000263BE5 /* RunnerTests.swift */,
 			);
 			path = RunnerTests;
@@ -127,6 +228,8 @@
 		33CC10E42044A3C60003C045 = {
 			isa = PBXGroup;
 			children = (
+				CD2000000000000000000001 /* OnlynoteWidget */,
+				CD2000000000000000000002 /* Shared */,
 				33FAB671232836740065AC1E /* Runner */,
 				33CEB47122A05771004F2AC0 /* Flutter */,
 				331C80D6294CF71000263BE5 /* RunnerTests */,
@@ -138,6 +241,7 @@
 		33CC10EE2044A3C60003C045 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				CD2000000000000000000003 /* OnlynoteWidget.appex */,
 				33CC10ED2044A3C60003C045 /* onlynote.app */,
 				331C80D5294CF71000263BE5 /* RunnerTests.xctest */,
 			);
@@ -170,6 +274,7 @@
 		33FAB671232836740065AC1E /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				CD2000000000000000000021 /* MacWidgetBridge.swift */,
 				CD1000010000000000000002 /* PhotoTextBridge.swift */,
 				CD1000010000000000000004 /* VoiceMemoBridge.swift */,
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
@@ -187,6 +292,45 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CD2000000000000000000001 /* OnlynoteWidget */ = {
+			isa = PBXGroup;
+			children = (
+				CD200000000000000000000C /* MacWidgetConstants.swift */,
+				CD200000000000000000000D /* OnlynoteWidgetBundle.swift */,
+				CD200000000000000000000E /* PaperNoteWidget.swift */,
+				CD200000000000000000000F /* PaperNoteWidgetContent.swift */,
+				CD2000000000000000000010 /* PaperNoteWidgetView.swift */,
+				CD2000000000000000000011 /* PaperOverviewNoteRow.swift */,
+				CD2000000000000000000012 /* PaperOverviewWidget.swift */,
+				CD2000000000000000000013 /* PaperOverviewWidgetContent.swift */,
+				CD2000000000000000000014 /* PaperOverviewWidgetView.swift */,
+				CD2000000000000000000015 /* PaperTodoRow.swift */,
+				CD2000000000000000000016 /* PaperWidgetBackground.swift */,
+				CD2000000000000000000017 /* PaperWidgetEmptyView.swift */,
+				CD2000000000000000000018 /* PaperWidgetPreviews.swift */,
+				CD2000000000000000000019 /* PaperWidgetSnapshotKind.swift */,
+				CD200000000000000000001A /* PaperWidgetSnapshotView.swift */,
+				CD200000000000000000001B /* PaperWidgetTheme.swift */,
+				CD200000000000000000001C /* WidgetSnapshotRenderer.swift */,
+				CD2000000000000000000023 /* Info.plist */,
+				CD2000000000000000000024 /* OnlynoteWidget.entitlements */,
+				CD2000000000000000000025 /* Assets.xcassets */,
+				CD2000000000000000000026 /* Localizable.strings */,
+			);
+			path = OnlynoteWidget;
+			sourceTree = "<group>";
+		};
+		CD2000000000000000000002 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				CD2000000000000000000020 /* MacWidgetStore.swift */,
+				CD200000000000000000001D /* WidgetConstants.swift */,
+				CD200000000000000000001E /* WidgetNote.swift */,
+				CD200000000000000000001F /* NotesProvider.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,6 +358,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 33CC10FB2044A3C60003C045 /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
+				CD2000000000000000000008 /* Embed App Extensions */,
 				33CC10E92044A3C60003C045 /* Sources */,
 				33CC10EA2044A3C60003C045 /* Frameworks */,
 				33CC10EB2044A3C60003C045 /* Resources */,
@@ -223,6 +368,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CD200000000000000000000A /* PBXTargetDependency */,
 				33CC11202044C79F0003C045 /* PBXTargetDependency */,
 			);
 			name = Runner;
@@ -232,6 +378,23 @@
 			productName = Runner;
 			productReference = 33CC10ED2044A3C60003C045 /* onlynote.app */;
 			productType = "com.apple.product-type.application";
+		};
+		CD2000000000000000000004 /* OnlynoteWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD200000000000000000000B /* Build configuration list for PBXNativeTarget "OnlynoteWidget" */;
+			buildPhases = (
+				CD2000000000000000000005 /* Sources */,
+				CD2000000000000000000006 /* Frameworks */,
+				CD2000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OnlynoteWidget;
+			productName = OnlynoteWidget;
+			productReference = CD2000000000000000000003 /* OnlynoteWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -244,6 +407,14 @@
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					CD2000000000000000000004 = {
+						CreatedOnToolsVersion = 26.6;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = { enabled = 1; };
+							com.apple.Sandbox = { enabled = 1; };
+						};
+					};
 					331C80D4294CF70F00263BE5 = {
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 33CC10EC2044A3C60003C045;
@@ -253,6 +424,7 @@
 						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = { enabled = 1; };
 							com.apple.Sandbox = {
 								enabled = 1;
 							};
@@ -269,6 +441,8 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				"zh-Hans",
+				"zh-Hant",
 				en,
 				Base,
 			);
@@ -280,6 +454,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				CD2000000000000000000004 /* OnlynoteWidget */,
 				33CC10EC2044A3C60003C045 /* Runner */,
 				331C80D4294CF70F00263BE5 /* RunnerTests */,
 				33CC111A2044C6BA0003C045 /* Flutter Assemble */,
@@ -299,8 +474,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD2000000000000000000058 /* Localizable.strings in Resources */,
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD2000000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD2000000000000000000050 /* Assets.xcassets in Resources */,
+				CD2000000000000000000051 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +537,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD200000000000000000003E /* MacWidgetConstants.swift in Sources */,
+				CD200000000000000000003F /* PaperNoteWidgetContent.swift in Sources */,
+				CD2000000000000000000040 /* PaperNoteWidgetView.swift in Sources */,
+				CD2000000000000000000041 /* PaperOverviewNoteRow.swift in Sources */,
+				CD2000000000000000000042 /* PaperOverviewWidgetContent.swift in Sources */,
+				CD2000000000000000000043 /* PaperOverviewWidgetView.swift in Sources */,
+				CD2000000000000000000044 /* PaperTodoRow.swift in Sources */,
+				CD2000000000000000000045 /* PaperWidgetBackground.swift in Sources */,
+				CD2000000000000000000046 /* PaperWidgetEmptyView.swift in Sources */,
+				CD2000000000000000000047 /* PaperWidgetSnapshotKind.swift in Sources */,
+				CD2000000000000000000048 /* PaperWidgetSnapshotView.swift in Sources */,
+				CD2000000000000000000049 /* PaperWidgetTheme.swift in Sources */,
+				CD200000000000000000004A /* WidgetSnapshotRenderer.swift in Sources */,
+				CD200000000000000000004B /* WidgetConstants.swift in Sources */,
+				CD200000000000000000004C /* WidgetNote.swift in Sources */,
+				CD200000000000000000004D /* NotesProvider.swift in Sources */,
+				CD200000000000000000004E /* MacWidgetStore.swift in Sources */,
+				CD200000000000000000004F /* MacWidgetTests.swift in Sources */,
 				331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -360,11 +563,40 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD2000000000000000000056 /* MacWidgetStore.swift in Sources */,
+				CD2000000000000000000057 /* MacWidgetBridge.swift in Sources */,
 				CD1000010000000000000001 /* PhotoTextBridge.swift in Sources */,
 				CD1000010000000000000003 /* VoiceMemoBridge.swift in Sources */,
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD2000000000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD200000000000000000002A /* MacWidgetConstants.swift in Sources */,
+				CD200000000000000000002B /* OnlynoteWidgetBundle.swift in Sources */,
+				CD200000000000000000002C /* PaperNoteWidget.swift in Sources */,
+				CD200000000000000000002D /* PaperNoteWidgetContent.swift in Sources */,
+				CD200000000000000000002E /* PaperNoteWidgetView.swift in Sources */,
+				CD200000000000000000002F /* PaperOverviewNoteRow.swift in Sources */,
+				CD2000000000000000000030 /* PaperOverviewWidget.swift in Sources */,
+				CD2000000000000000000031 /* PaperOverviewWidgetContent.swift in Sources */,
+				CD2000000000000000000032 /* PaperOverviewWidgetView.swift in Sources */,
+				CD2000000000000000000033 /* PaperTodoRow.swift in Sources */,
+				CD2000000000000000000034 /* PaperWidgetBackground.swift in Sources */,
+				CD2000000000000000000035 /* PaperWidgetEmptyView.swift in Sources */,
+				CD2000000000000000000036 /* PaperWidgetPreviews.swift in Sources */,
+				CD2000000000000000000037 /* PaperWidgetSnapshotKind.swift in Sources */,
+				CD2000000000000000000038 /* PaperWidgetSnapshotView.swift in Sources */,
+				CD2000000000000000000039 /* PaperWidgetTheme.swift in Sources */,
+				CD200000000000000000003A /* WidgetConstants.swift in Sources */,
+				CD200000000000000000003B /* WidgetNote.swift in Sources */,
+				CD200000000000000000003C /* NotesProvider.swift in Sources */,
+				CD200000000000000000003D /* MacWidgetStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +613,11 @@
 			target = 33CC111A2044C6BA0003C045 /* Flutter Assemble */;
 			targetProxy = 33CC111F2044C79F0003C045 /* PBXContainerItemProxy */;
 		};
+		CD200000000000000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CD2000000000000000000004 /* OnlynoteWidget */;
+			targetProxy = CD2000000000000000000009 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -391,6 +628,16 @@
 			);
 			name = MainMenu.xib;
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		CD2000000000000000000026 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CD2000000000000000000027 /* en */,
+				CD2000000000000000000028 /* zh-Hans */,
+				CD2000000000000000000029 /* zh-Hant */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -680,6 +927,87 @@
 			};
 			name = Release;
 		};
+		CD2000000000000000000053 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteWidget/OnlynoteWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				ONLYNOTE_APP_BUNDLE_ID = com.appsbay.onlynote;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(ONLYNOTE_APP_BUNDLE_ID).OnlynoteWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		CD2000000000000000000054 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteWidget/OnlynoteWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				ONLYNOTE_APP_BUNDLE_ID = com.appsbay.onlynote;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(ONLYNOTE_APP_BUNDLE_ID).OnlynoteWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		CD2000000000000000000055 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = OnlynoteWidget/OnlynoteWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = F694X76A5X;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = OnlynoteWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks", );
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				ONLYNOTE_APP_BUNDLE_ID = com.appsbay.onlynote;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(ONLYNOTE_APP_BUNDLE_ID).OnlynoteWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -719,6 +1047,16 @@
 				33CC111C2044C6BA0003C045 /* Debug */,
 				33CC111D2044C6BA0003C045 /* Release */,
 				338D0CEB231458BD00FA5F75 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD200000000000000000000B /* Build configuration list for PBXNativeTarget "OnlynoteWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD2000000000000000000053 /* Debug */,
+				CD2000000000000000000054 /* Release */,
+				CD2000000000000000000055 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

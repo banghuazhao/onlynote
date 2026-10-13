@@ -12,6 +12,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  const macWidgets = MethodChannel(MacWidgetSnapshotPlatform.channelName);
   const mobileChannels = [
     'home_widget',
     'home_widget/updates',
@@ -20,10 +21,16 @@ void main() {
     'plugins.flutter.io/google_mobile_ads/ump',
   ];
   late List<String> calls;
+  late List<MethodCall> macCalls;
 
   setUp(() {
     debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
     calls = [];
+    macCalls = [];
+    messenger.setMockMethodCallHandler(macWidgets, (call) async {
+      macCalls.add(call);
+      return null;
+    });
     for (final name in mobileChannels) {
       messenger.setMockMessageHandler(name, (_) async {
         calls.add(name);
@@ -39,6 +46,7 @@ void main() {
     for (final name in mobileChannels) {
       messenger.setMockMessageHandler(name, null);
     }
+    messenger.setMockMethodCallHandler(macWidgets, null);
     debugDefaultTargetPlatformOverride = null;
   });
 
@@ -48,8 +56,13 @@ void main() {
     await ConsentGate.instance.resolve();
     await ConsentGate.instance.showPrivacyOptionsForm();
     AdsManager.debugPrintID();
-    await WidgetSync.instance.init();
-    await WidgetSync.instance.sync();
+    final sync = WidgetSync(
+      readNotes: () => [],
+      watchNotes: () => const Stream<Object?>.empty(),
+    );
+    addTearDown(sync.dispose);
+    await sync.init();
+    await sync.sync();
     await WidgetLaunch.instance.init();
     final scanner = DocumentScanner();
     addTearDown(scanner.dispose);
@@ -63,6 +76,13 @@ void main() {
     expect(ConsentGate.instance.isPrivacyOptionsRequired, isFalse);
     expect(AdsManager.bannerAdUnitId, isEmpty);
     expect(calls, isEmpty);
+    expect(macCalls.map((call) => call.method), [
+      'saveSnapshot',
+      'refresh',
+      'saveSnapshot',
+      'refresh',
+      'initialize',
+    ]);
   });
 
   test('macOS offers native media and purchases with supported capture actions',
@@ -73,7 +93,8 @@ void main() {
     expect(PlatformCapabilities.voiceMemos, isTrue);
     expect(PlatformCapabilities.camera, isFalse);
     expect(PlatformCapabilities.documentScanner, isFalse);
-    expect(PlatformCapabilities.homeWidgets, isFalse);
+    expect(PlatformCapabilities.homeWidgets, isTrue);
+    expect(PlatformCapabilities.mobileHomeWidgets, isFalse);
     expect(PlatformCapabilities.mobileAds, isFalse);
   });
 

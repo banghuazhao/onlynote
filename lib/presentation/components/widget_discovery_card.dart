@@ -10,6 +10,7 @@ class WidgetDiscoveryCard extends StatelessWidget {
     required this.actionLabel,
     required this.onOpen,
     required this.onDismiss,
+    this.icon = Icons.widgets_outlined,
   });
 
   final String title;
@@ -17,6 +18,7 @@ class WidgetDiscoveryCard extends StatelessWidget {
   final String actionLabel;
   final VoidCallback onOpen;
   final VoidCallback onDismiss;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class WidgetDiscoveryCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.only(top: tokens.space2),
-                  child: Icon(Icons.widgets_outlined,
+                  child: Icon(icon,
                       color: context.colors.onSurfaceVariant, size: 22),
                 ),
                 SizedBox(width: tokens.space3),

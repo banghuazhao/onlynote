@@ -9,7 +9,7 @@ A minimalist notes & checklist app built with Flutter.
 - Quick note-taking with rich colors to organize at a glance
 - Checklist / todo items inside any note
 - One-time, daily, and weekly reminders that open their note when tapped
-- Home Screen widgets for pinned and recent notes, with contextual setup guidance
+- Mobile Home Screen widgets and native Mac paper widgets for notes and checklists
 - One-tap image sharing — turn a note into a shareable image
 - Multi-select to bulk-delete notes
 - Localized in English, Simplified Chinese, and Traditional Chinese
@@ -17,7 +17,7 @@ A minimalist notes & checklist app built with Flutter.
 
 ## Premium
 
-On iOS, the free plan includes up to 10 notes, checklists, one-time reminders,
+On iOS and macOS, the free plan includes up to 10 notes, checklists, one-time reminders,
 default card styling, up to 3 folders, and up to 3 saved templates. Premium
 unlocks unlimited notes, folders and saved templates, repeating reminders,
 voice recording, individual card styling, and removes ads with a one-time purchase.
@@ -53,6 +53,11 @@ The native Mac app uses the same `com.appsbay.onlynote` bundle ID and Premium
 purchase as iOS. Run `flutter run -d macos` for development and
 `flutter build macos --release` for a release build. See
 [macOS setup and release](macos/README.md) for signing, permissions, and testing.
+
+Native Mac widgets require macOS 14 or later. Choose a paper widget for a selected
+note or an overview of the library. They share a local App Group snapshot with
+the Mac app; phone and Mac libraries transfer through backups and do not
+automatically synchronize.
 
 AdMob unit IDs and signing credentials are not committed — see `lib/Tools/ad_ids_release.sample.dart` and `ios/Flutter/Secrets.xcconfig.sample` for the templates used in release builds.
 

@@ -55,7 +55,8 @@ void main() {
     }, variant: TargetPlatformVariant.only(platform));
   }
 
-  testWidgets('Mac Settings hides mobile extras and keeps core configuration',
+  testWidgets(
+      'Mac Settings exposes desktop widgets and keeps core configuration',
       (tester) async {
     tester.view.physicalSize = const Size(1100, 720);
     tester.view.devicePixelRatio = 1;
@@ -67,6 +68,7 @@ void main() {
         .pumpWidget(_host(SettingsScreen(purchases: fixture.purchases)));
     await tester.pumpAndSettle();
     expect(find.text(S.current.Widget), findsNothing);
+    expect(find.text(S.current.Widget_macOS_Title), findsOneWidget);
     expect(find.text(S.current.More_Apps), findsNothing);
     expect(find.text(S.current.Default_Card_Style), findsOneWidget);
     expect(find.text(S.current.Manage_Folders), findsOneWidget);

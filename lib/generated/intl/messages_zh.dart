@@ -93,6 +93,36 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage("桌面小组件"),
+    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
+      "在 Mac 桌面或通知中心查看笔记和清单。桌面小组件需要 macOS 14 或更新版本。",
+    ),
+    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
+      "将 Onlynote 小组件添加到 Mac 桌面，一眼查看你的笔记。",
+    ),
+    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage("添加到桌面"),
+    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
+      "右键点击桌面空白处，选择“编辑小组件”。",
+    ),
+    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
+      "在小组件图库中搜索 Onlynote。",
+    ),
+    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
+      "选择概览或笔记小组件，再选择尺寸。",
+    ),
+    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
+      "将小组件拖到桌面，然后点击“完成”。",
+    ),
+    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
+      "概览小组件可显示多条笔记，笔记小组件可显示一条笔记或清单。右键点击笔记小组件，选择“编辑小组件”，再选择笔记。保留“首条笔记”以显示笔记列表中的第一条笔记。",
+    ),
+    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage("纸张和颜色"),
+    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
+      "在 Onlynote 的“卡片样式”中选择纸张和颜色。如需在桌面显示这些颜色，打开“系统设置”>“桌面与程序坞”，将“小组件样式”设为“全彩”。在较新版本的 macOS 中，将“使桌面小组件变暗”设为“永不”。",
+    ),
+    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
+      "点击小组件中的笔记即可打开，点击“新建”可开始记录。",
+    ),
     "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
       "将笔记、标签、已保存视图、文件夹、照片、录音、历史记录、模板和提醒日期保存在一个 Onlynote 文件中。包含封存笔记和废纸篓。在保存对话框中选择位置。文件最大 256 MB。",
     ),

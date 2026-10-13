@@ -8,10 +8,16 @@
 PRODUCT_NAME = Onlynote
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.appsbay.onlynote
+// A separate bundle ID can be supplied for native tests without touching the
+// installed app's sandbox. Release builds keep the App Store identifier.
+ONLYNOTE_APP_BUNDLE_ID = com.appsbay.onlynote
+PRODUCT_BUNDLE_IDENTIFIER = $(ONLYNOTE_APP_BUNDLE_ID)
 
 // The existing iOS app and the macOS platform share one App Store record.
 DEVELOPMENT_TEAM = F694X76A5X
+// App Group access requires the app and extension to carry the same team
+// signature. Ad-hoc signatures cannot share the team-prefixed container.
+CODE_SIGN_IDENTITY = Apple Development
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.appsbay. All rights reserved.

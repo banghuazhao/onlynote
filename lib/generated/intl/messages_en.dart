@@ -109,6 +109,42 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage(
+      "Desktop widgets",
+    ),
+    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
+      "Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.",
+    ),
+    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
+      "Add Onlynote widgets to your Mac desktop for a quick glance at your notes.",
+    ),
+    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage(
+      "Add to Desktop",
+    ),
+    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
+      "Right-click an empty area of your desktop and choose Edit Widgets.",
+    ),
+    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
+      "Search for Onlynote in the widget gallery.",
+    ),
+    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
+      "Choose an overview or a note widget, then select a size.",
+    ),
+    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
+      "Drag the widget onto your desktop, then click Done.",
+    ),
+    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
+      "Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.",
+    ),
+    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage(
+      "Paper and color",
+    ),
+    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
+      "Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.",
+    ),
+    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
+      "Click a note in the widget to open it, or click New to start writing.",
+    ),
     "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
       "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
     ),

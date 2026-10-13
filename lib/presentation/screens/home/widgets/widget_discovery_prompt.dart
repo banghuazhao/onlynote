@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:onlynote/Tools/widget_discovery_settings.dart';
+import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/widget_discovery_card.dart';
 import 'package:onlynote/presentation/screens/settings/widget_guide_screen.dart';
@@ -26,10 +27,8 @@ class _WidgetDiscoveryPromptState extends State<WidgetDiscoveryPrompt>
   bool _ready = false;
   bool _checking = false;
 
-  bool get _supported =>
-      !kIsWeb &&
-      (defaultTargetPlatform == TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS);
+  bool get _supported => PlatformCapabilities.homeWidgets;
+  bool get _isMac => defaultTargetPlatform == TargetPlatform.macOS;
 
   @override
   void initState() {
@@ -60,7 +59,7 @@ class _WidgetDiscoveryPromptState extends State<WidgetDiscoveryPrompt>
     _checking = true;
     try {
       await _settings.load();
-      if (!_settings.handled) {
+      if (!_settings.handled && !_isMac) {
         try {
           // The plugin returns widgets belonging to this app on both platforms.
           // A user who already added one does not need the invitation.
@@ -95,13 +94,24 @@ class _WidgetDiscoveryPromptState extends State<WidgetDiscoveryPrompt>
     return Padding(
       padding: EdgeInsets.fromLTRB(context.tokens.space4, context.tokens.space2,
           context.tokens.space4, 0),
-      child: WidgetDiscoveryCard(
-        title: l10n.Widget_Discovery_Title,
-        body: l10n.Widget_Discovery_Body,
-        actionLabel: l10n.Widget_Add_To_Home,
-        onOpen: _openGuide,
-        onDismiss: () => unawaited(_settings.complete()),
-      ),
+      child: Center(
+          child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
+              child: WidgetDiscoveryCard(
+                title: l10n.Widget_Discovery_Title,
+                body: _isMac
+                    ? l10n.Widget_Discovery_Body_macOS
+                    : l10n.Widget_Discovery_Body,
+                actionLabel: _isMac
+                    ? l10n.Widget_Add_To_Desktop
+                    : l10n.Widget_Add_To_Home,
+                icon: _isMac
+                    ? Icons.desktop_windows_outlined
+                    : Icons.widgets_outlined,
+                onOpen: _openGuide,
+                onDismiss: () => unawaited(_settings.complete()),
+              ))),
     );
   }
 }

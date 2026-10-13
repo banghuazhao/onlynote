@@ -4,7 +4,11 @@ import SwiftUI
 /// Values that have to agree with the Flutter side. Their Dart counterparts
 /// live in `lib/Tools/widget_sync.dart` and `lib/Tools/widget_launch.dart`.
 enum WidgetConstants {
+    #if os(macOS)
+    static let appGroupId = MacWidgetStore.appGroupId
+    #else
     static let appGroupId = "group.com.appsbay.onlynote"
+    #endif
     static let payloadKey = "onlynote_widget_payload"
     static let kind = "OnlynoteWidget"
 

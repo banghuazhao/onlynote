@@ -3,6 +3,10 @@ import FlutterMacOS
 
 @main
 class AppDelegate: FlutterAppDelegate {
+  override func application(_ application: NSApplication, open urls: [URL]) {
+    for url in urls { MacWidgetBridge.open(url) }
+  }
+
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     return true
   }

@@ -83,6 +83,62 @@ Widget app(Widget home) => MaterialApp(
     );
 
 void main() {
+  testWidgets('desktop navigation preserves an open media sheet and draft',
+      (tester) async {
+    final repository = EditorRepository();
+    final bloc = AddUpdateBloc(
+        AddNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
+    for (final family in fonts.keys) {
+      kAppFontFamilies[family] = (
+              {textStyle, color, fontSize, fontWeight, fontStyle}) =>
+          (textStyle ?? const TextStyle()).copyWith(
+              color: color,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle);
+    }
+    addTearDown(() async {
+      kAppFontFamilies.addAll(fonts);
+      await bloc.close();
+    });
+    await tester.pumpWidget(app(BlocProvider.value(
+        value: bloc,
+        child: AddUpdateNoteScreen(
+            autosaveStore: EditorAutosaveStore(repository)))));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Draft stays here');
+    final tags = find.byKey(const ValueKey('editor-edit-tags'));
+    await tester.ensureVisible(tags);
+    await tester.tap(tags);
+    await tester.pumpAndSettle();
+    final input = find.byKey(const ValueKey('note-tag-input'));
+    await tester.enterText(input, 'Unconfirmed tag');
+
+    final blocked = DesktopCommands.instance.prepareToExit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+
+    expect(await blocked, AppExitResponse.cancel);
+    expect(input, findsOneWidget);
+    expect(find.text('Unconfirmed tag'), findsOneWidget);
+    expect(find.byType(AddUpdateNoteScreen), findsOneWidget);
+    expect(repository.notes.values.every((note) => note.tags?.isEmpty ?? true),
+        isTrue);
+
+    Navigator.of(tester.element(input)).pop();
+    await tester.pumpAndSettle();
+    final allowed = DesktopCommands.instance.prepareToExit();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(await allowed, AppExitResponse.exit);
+    expect(repository.notes.values.single.title, 'Draft stays here');
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('desktop exit saves the last keystroke before allowing Quit',
       (tester) async {
     final repository = EditorRepository();
