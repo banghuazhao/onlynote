@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' show AppExitResponse;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -6,7 +7,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/Tools/desktop_commands.dart';
+import 'package:onlynote/Tools/export_archive.dart';
 import 'package:onlynote/presentation/screens/settings/backup_screen.dart';
+import 'package:onlynote/services/note_bulk_export.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -27,6 +30,27 @@ Finder get _exportButton =>
     find.widgetWithText(FilledButton, S.current.Backup_Export);
 Finder get _restoreButton =>
     find.widgetWithText(OutlinedButton, S.current.Backup_Choose);
+Finder get _exportNotesButton =>
+    find.widgetWithText(OutlinedButton, S.current.Export_Notes);
+Finder get _saveNotesButton =>
+    find.widgetWithText(OutlinedButton, S.current.Export_Notes_Save_As);
+Finder _formatChip(NoteBulkExportFormat format) =>
+    find.byKey(ValueKey('note-export-format-${format.name}'));
+
+/// A finished archive, standing in for one the real builder streamed to disk.
+/// The file itself is written in setUp: a widget test's own zone never
+/// completes real file I/O, so touching the disk inside a test body would
+/// leave the export pending forever.
+NoteArchiveExport _archive(
+  File file, {
+  int exported = 2,
+  int skipped = 0,
+  int failed = 0,
+}) =>
+    NoteArchiveExport(
+        file,
+        NoteBulkExportResult(
+            exported: exported, skipped: skipped, failed: failed));
 
 Future<void> _drainFeedback(WidgetTester tester) async {
   await tester.pump(const Duration(seconds: 5));
@@ -382,4 +406,266 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  group('readable note export', () {
+    late Directory directory;
+    late File archiveFile;
+    setUp(() async {
+      directory = await Directory.systemTemp.createTemp('onlynote-export-ui');
+      archiveFile = File('${directory.path}/Onlynote-notes.zip');
+      await archiveFile.writeAsBytes([1, 2, 3, 4]);
+    });
+
+    /// Every section fits without scrolling, so a tap always lands on the
+    /// button it names rather than on whatever the list happens to show.
+    void showWholeScreen(WidgetTester tester) {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    tearDown(() async {
+      if (await directory.exists()) await directory.delete(recursive: true);
+    });
+
+    for (final saved in [true, false]) {
+      testWidgets('Mac save reports ${saved ? 'saved' : 'cancelled'}',
+          (tester) async {
+        File? savedFile;
+        String? suggested;
+        showWholeScreen(tester);
+        await tester.pumpWidget(_host(BackupScreen(
+          exportNotes: (format, onProgress) async {
+            onProgress(1, 2);
+            onProgress(2, 2);
+            return _archive(archiveFile);
+          },
+          saveNotes: (file, name) async {
+            savedFile = file;
+            suggested = name;
+            return saved;
+          },
+        )));
+        await tester.pumpAndSettle();
+        expect(find.text(S.current.Export_Notes_Desktop_Description),
+            findsOneWidget);
+        expect(find.text(S.current.Export_Notes_Description), findsNothing);
+        await tester.tap(_saveNotesButton);
+        await tester.pumpAndSettle();
+        expect(savedFile!.path, archiveFile.path);
+        expect(suggested, 'Onlynote-notes.zip');
+        expect(
+            find.text(saved
+                ? S.current.Export_Notes_Saved
+                : S.current.Export_Notes_Save_Cancelled),
+            findsOneWidget);
+        expect(find.byType(LinearProgressIndicator), findsNothing);
+        expect(tester.takeException(), isNull);
+        await _drainFeedback(tester);
+      }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+    }
+
+    for (final (status, message) in [
+      (ShareResultStatus.success, (S strings) => strings.Export_Notes_Shared),
+      (
+        ShareResultStatus.dismissed,
+        (S strings) => strings.Export_Notes_Cancelled
+      ),
+      (
+        ShareResultStatus.unavailable,
+        (S strings) => strings.Export_Notes_Prepared
+      ),
+    ]) {
+      testWidgets('sharing the archive reports $status', (tester) async {
+        ShareParams? captured;
+        showWholeScreen(tester);
+        await tester.pumpWidget(_host(BackupScreen(
+          exportNotes: (format, onProgress) async => _archive(archiveFile),
+          shareNotes: (params) async {
+            captured = params;
+            return ShareResult('test-action', status);
+          },
+        )));
+        await tester.pumpAndSettle();
+        await tester.tap(_exportNotesButton);
+        await tester.pumpAndSettle();
+        expect(find.text(message(S.current)), findsOneWidget);
+        expect(find.text(S.current.Export_Notes_Failed), findsNothing);
+        final params = captured!;
+        expect(params.fileNameOverrides, ['Onlynote-notes.zip']);
+        expect(params.files!.single.mimeType, 'application/zip');
+        // The archive is shared from disk, so the prepared file survives.
+        expect(params.files!.single.path, archiveFile.path);
+        expect(params.sharePositionOrigin, isNotNull);
+        expect(tester.takeException(), isNull);
+        await _drainFeedback(tester);
+      });
+    }
+
+    testWidgets('the chosen format reaches the builder', (tester) async {
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async =>
+            const ShareResult('test-action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      // Markdown is the default, because it keeps the most of a note.
+      expect(
+          tester
+              .widget<ChoiceChip>(_formatChip(NoteBulkExportFormat.markdown))
+              .selected,
+          isTrue);
+      await tester.tap(_formatChip(NoteBulkExportFormat.pdf));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.pdf]);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('an empty library says so instead of sharing', (tester) async {
+      var shares = 0;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) async => null,
+        shareNotes: (_) async {
+          shares++;
+          return const ShareResult('test-action', ShareResultStatus.success);
+        },
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(shares, 0);
+      expect(find.text(S.current.Export_Notes_Empty), findsOneWidget);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('notes that could not be exported are counted in the result',
+        (tester) async {
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) async =>
+            _archive(archiveFile, exported: 8, failed: 2),
+        shareNotes: (_) async =>
+            const ShareResult('test-action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(
+          find.text('${S.current.Export_Notes_Shared} '
+              '${S.current.Export_Notes_Incomplete(2)}'),
+          findsOneWidget);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('an export where every note failed reports a failure',
+        (tester) async {
+      var shares = 0;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) async =>
+            _archive(archiveFile, exported: 0, failed: 3),
+        shareNotes: (_) async {
+          shares++;
+          return const ShareResult('test-action', ShareResultStatus.success);
+        },
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(shares, 0);
+      expect(find.text(S.current.Export_Notes_Failed), findsOneWidget);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a failed build reports failure and can be retried',
+        (tester) async {
+      var attempts = 0;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) async {
+          attempts++;
+          if (attempts == 1) throw StateError('Disk full');
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async =>
+            const ShareResult('test-action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Export_Notes_Failed), findsOneWidget);
+      expect(tester.widget<OutlinedButton>(_exportNotesButton).onPressed,
+          isNotNull);
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(attempts, 2);
+      expect(find.text(S.current.Export_Notes_Shared), findsOneWidget);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a pending export blocks the backup actions and vice versa',
+        (tester) async {
+      final pending = Completer<NoteArchiveExport?>();
+      var backups = 0;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) => pending.future,
+        shareNotes: (_) async =>
+            const ShareResult('test-action', ShareResultStatus.success),
+        exportBackup: () async {
+          backups++;
+          return Uint8List.fromList([1]);
+        },
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pump();
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(tester.widget<FilledButton>(_exportButton).onPressed, isNull);
+      expect(tester.widget<OutlinedButton>(_restoreButton).onPressed, isNull);
+      expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+      await tester.tap(_exportButton, warnIfMissed: false);
+      await tester.pump();
+      expect(backups, 0);
+      pending.complete(_archive(archiveFile));
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Export_Notes_Shared), findsOneWidget);
+      expect(tester.widget<FilledButton>(_exportButton).onPressed, isNotNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('progress counts notes as the export walks the library',
+        (tester) async {
+      final pending = Completer<NoteArchiveExport?>();
+      late void Function(int, int) report;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportNotes: (format, onProgress) {
+          report = onProgress;
+          return pending.future;
+        },
+        shareNotes: (_) async =>
+            const ShareResult('test-action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pump();
+      expect(find.text(S.current.Export_Notes_Preparing), findsOneWidget);
+      report(3, 40);
+      await tester.pump();
+      expect(find.text('3 / 40'), findsOneWidget);
+      pending.complete(_archive(archiveFile));
+      await tester.pumpAndSettle();
+      await _drainFeedback(tester);
+    });
+  });
 }

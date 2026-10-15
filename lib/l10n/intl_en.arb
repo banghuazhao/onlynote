@@ -744,5 +744,28 @@
   "Sort_Modified_Oldest": "Oldest first",
   "Sort_Title_Asc": "Title A–Z",
   "Sort_Title_Desc": "Title Z–A",
-  "Sort_Switched_To_Manual": "Switched to manual order"
+  "Sort_Switched_To_Manual": "Switched to manual order",
+  "Export_Notes": "Export notes",
+  "Export_Notes_Description": "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose Save to Files or a storage app from the share menu.",
+  "Export_Notes_Desktop_Description": "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose a location in the save dialog.",
+  "Export_Notes_Format": "Format",
+  "Export_Notes_Save_As": "Save notes…",
+  "Export_Notes_Preparing": "Exporting your notes…",
+  "Export_Notes_Empty": "There are no notes to export yet.",
+  "Export_Notes_Saved": "Notes saved.",
+  "Export_Notes_Save_Cancelled": "Note export save cancelled.",
+  "Export_Notes_Shared": "Note export completed. Check the selected app to confirm it was saved.",
+  "Export_Notes_Cancelled": "Note export sharing cancelled.",
+  "Export_Notes_Prepared": "Notes exported. This device could not confirm whether they were shared.",
+  "Export_Notes_Failed": "Could not export your notes. Check available storage and that photos and recordings are accessible.",
+  "Export_Notes_Save_Failed": "Could not save the export. Check available storage and try again.",
+  "Export_Notes_Share_Failed": "Export prepared, but sharing failed. Please try again.",
+  "Export_Notes_Incomplete": "{count, plural, one{1 note could not be exported.} other{{count} notes could not be exported.}}",
+  "@Export_Notes_Incomplete": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

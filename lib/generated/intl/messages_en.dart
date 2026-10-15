@@ -107,6 +107,9 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m34(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
+  static String m35(count) =>
+      "${Intl.plural(count, one: '1 note could not be exported.', other: '${count} notes could not be exported.')}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage(
@@ -472,6 +475,44 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
     "Expand_Section": m8,
+    "Export_Notes": MessageLookupByLibrary.simpleMessage("Export notes"),
+    "Export_Notes_Description": MessageLookupByLibrary.simpleMessage(
+      "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose Save to Files or a storage app from the share menu.",
+    ),
+    "Export_Notes_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose a location in the save dialog.",
+    ),
+    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("Format"),
+    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("Save notes…"),
+    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage(
+      "Exporting your notes…",
+    ),
+    "Export_Notes_Empty": MessageLookupByLibrary.simpleMessage(
+      "There are no notes to export yet.",
+    ),
+    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("Notes saved."),
+    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Note export save cancelled.",
+    ),
+    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
+      "Note export completed. Check the selected app to confirm it was saved.",
+    ),
+    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Note export sharing cancelled.",
+    ),
+    "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
+      "Notes exported. This device could not confirm whether they were shared.",
+    ),
+    "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not export your notes. Check available storage and that photos and recordings are accessible.",
+    ),
+    "Export_Notes_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save the export. Check available storage and try again.",
+    ),
+    "Export_Notes_Share_Failed": MessageLookupByLibrary.simpleMessage(
+      "Export prepared, but sharing failed. Please try again.",
+    ),
+    "Export_Notes_Incomplete": m35,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage(

@@ -91,6 +91,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m34(items, photos) => "${items} 項 · ${photos} 張照片";
 
+  static String m35(count) => "${count} 則筆記無法匯出。";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage("桌面小工具"),
@@ -386,6 +388,40 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
     "Expand_Section": m8,
+    "Export_Notes": MessageLookupByLibrary.simpleMessage("匯出筆記"),
+    "Export_Notes_Description": MessageLookupByLibrary.simpleMessage(
+      "將所有筆記（包括已歸檔的筆記）匯出為一個壓縮檔，每則筆記一個可讀檔案，Markdown 還會附帶照片和錄音。請在分享選單中選擇「儲存到檔案」或其他儲存應用程式。",
+    ),
+    "Export_Notes_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "將所有筆記（包括已歸檔的筆記）匯出為一個壓縮檔，每則筆記一個可讀檔案，Markdown 還會附帶照片和錄音。請在儲存對話框中選擇位置。",
+    ),
+    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("格式"),
+    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("儲存筆記…"),
+    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage("正在匯出筆記…"),
+    "Export_Notes_Empty": MessageLookupByLibrary.simpleMessage("暫無可匯出的筆記。"),
+    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("筆記已儲存。"),
+    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消儲存匯出檔案。",
+    ),
+    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
+      "筆記匯出完成。請在所選應用程式中確認是否已儲存。",
+    ),
+    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消分享匯出檔案。",
+    ),
+    "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
+      "筆記已匯出。此裝置無法確認是否已分享。",
+    ),
+    "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法匯出筆記。請檢查可用儲存空間，並確認照片和錄音均可存取。",
+    ),
+    "Export_Notes_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法儲存匯出檔案。請檢查可用儲存空間後重試。",
+    ),
+    "Export_Notes_Share_Failed": MessageLookupByLibrary.simpleMessage(
+      "匯出檔案已準備好，但分享失敗。請重試。",
+    ),
+    "Export_Notes_Incomplete": m35,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("飛速掃描"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage("更新備忘錄失敗, 請重試"),

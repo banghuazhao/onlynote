@@ -7,11 +7,16 @@ class SettingsChoice<T> extends StatelessWidget {
       required this.values,
       required this.selected,
       required this.label,
-      required this.onSelected});
+      required this.onSelected,
+      this.keyOf});
   final List<T> values;
   final T selected;
   final String Function(T) label;
   final ValueChanged<T> onSelected;
+
+  /// An optional per-option key, so a caller's tests can address one choice
+  /// without depending on its label text.
+  final Key Function(T)? keyOf;
 
   @override
   Widget build(BuildContext context) => Wrap(
@@ -20,6 +25,7 @@ class SettingsChoice<T> extends StatelessWidget {
         children: [
           for (final value in values)
             ChoiceChip(
+              key: keyOf?.call(value),
               label: Text(label(value)),
               selected: value == selected,
               showCheckmark: true,

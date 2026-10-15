@@ -742,5 +742,28 @@
   "Sort_Modified_Oldest": "最早修改",
   "Sort_Title_Asc": "標題 A–Z",
   "Sort_Title_Desc": "標題 Z–A",
-  "Sort_Switched_To_Manual": "已切換為手動排序"
+  "Sort_Switched_To_Manual": "已切換為手動排序",
+  "Export_Notes": "匯出筆記",
+  "Export_Notes_Description": "將所有筆記（包括已歸檔的筆記）匯出為一個壓縮檔，每則筆記一個可讀檔案，Markdown 還會附帶照片和錄音。請在分享選單中選擇「儲存到檔案」或其他儲存應用程式。",
+  "Export_Notes_Desktop_Description": "將所有筆記（包括已歸檔的筆記）匯出為一個壓縮檔，每則筆記一個可讀檔案，Markdown 還會附帶照片和錄音。請在儲存對話框中選擇位置。",
+  "Export_Notes_Format": "格式",
+  "Export_Notes_Save_As": "儲存筆記…",
+  "Export_Notes_Preparing": "正在匯出筆記…",
+  "Export_Notes_Empty": "暫無可匯出的筆記。",
+  "Export_Notes_Saved": "筆記已儲存。",
+  "Export_Notes_Save_Cancelled": "已取消儲存匯出檔案。",
+  "Export_Notes_Shared": "筆記匯出完成。請在所選應用程式中確認是否已儲存。",
+  "Export_Notes_Cancelled": "已取消分享匯出檔案。",
+  "Export_Notes_Prepared": "筆記已匯出。此裝置無法確認是否已分享。",
+  "Export_Notes_Failed": "無法匯出筆記。請檢查可用儲存空間，並確認照片和錄音均可存取。",
+  "Export_Notes_Save_Failed": "無法儲存匯出檔案。請檢查可用儲存空間後重試。",
+  "Export_Notes_Share_Failed": "匯出檔案已準備好，但分享失敗。請重試。",
+  "Export_Notes_Incomplete": "{count} 則筆記無法匯出。",
+  "@Export_Notes_Incomplete": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

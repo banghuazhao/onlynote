@@ -5511,6 +5511,168 @@ class S {
       args: [],
     );
   }
+
+  /// `Export notes`
+  String get Export_Notes {
+    return Intl.message(
+      'Export notes',
+      name: 'Export_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose Save to Files or a storage app from the share menu.`
+  String get Export_Notes_Description {
+    return Intl.message(
+      'Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose Save to Files or a storage app from the share menu.',
+      name: 'Export_Notes_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose a location in the save dialog.`
+  String get Export_Notes_Desktop_Description {
+    return Intl.message(
+      'Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose a location in the save dialog.',
+      name: 'Export_Notes_Desktop_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Format`
+  String get Export_Notes_Format {
+    return Intl.message(
+      'Format',
+      name: 'Export_Notes_Format',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save notes…`
+  String get Export_Notes_Save_As {
+    return Intl.message(
+      'Save notes…',
+      name: 'Export_Notes_Save_As',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exporting your notes…`
+  String get Export_Notes_Preparing {
+    return Intl.message(
+      'Exporting your notes…',
+      name: 'Export_Notes_Preparing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There are no notes to export yet.`
+  String get Export_Notes_Empty {
+    return Intl.message(
+      'There are no notes to export yet.',
+      name: 'Export_Notes_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes saved.`
+  String get Export_Notes_Saved {
+    return Intl.message(
+      'Notes saved.',
+      name: 'Export_Notes_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note export save cancelled.`
+  String get Export_Notes_Save_Cancelled {
+    return Intl.message(
+      'Note export save cancelled.',
+      name: 'Export_Notes_Save_Cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note export completed. Check the selected app to confirm it was saved.`
+  String get Export_Notes_Shared {
+    return Intl.message(
+      'Note export completed. Check the selected app to confirm it was saved.',
+      name: 'Export_Notes_Shared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note export sharing cancelled.`
+  String get Export_Notes_Cancelled {
+    return Intl.message(
+      'Note export sharing cancelled.',
+      name: 'Export_Notes_Cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes exported. This device could not confirm whether they were shared.`
+  String get Export_Notes_Prepared {
+    return Intl.message(
+      'Notes exported. This device could not confirm whether they were shared.',
+      name: 'Export_Notes_Prepared',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not export your notes. Check available storage and that photos and recordings are accessible.`
+  String get Export_Notes_Failed {
+    return Intl.message(
+      'Could not export your notes. Check available storage and that photos and recordings are accessible.',
+      name: 'Export_Notes_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save the export. Check available storage and try again.`
+  String get Export_Notes_Save_Failed {
+    return Intl.message(
+      'Could not save the export. Check available storage and try again.',
+      name: 'Export_Notes_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export prepared, but sharing failed. Please try again.`
+  String get Export_Notes_Share_Failed {
+    return Intl.message(
+      'Export prepared, but sharing failed. Please try again.',
+      name: 'Export_Notes_Share_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 note could not be exported.} other{{count} notes could not be exported.}}`
+  String Export_Notes_Incomplete(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note could not be exported.',
+      other: '$count notes could not be exported.',
+      name: 'Export_Notes_Incomplete',
+      desc: '',
+      args: [count],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
