@@ -36,6 +36,7 @@ mixin _$HomeEvent {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -76,6 +77,7 @@ mixin _$HomeEvent {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -116,6 +118,7 @@ mixin _$HomeEvent {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -154,6 +157,7 @@ mixin _$HomeEvent {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -184,6 +188,7 @@ mixin _$HomeEvent {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -214,6 +219,7 @@ mixin _$HomeEvent {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -365,6 +371,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -408,6 +415,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -451,6 +459,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -495,6 +504,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -528,6 +538,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -561,6 +572,7 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -654,6 +666,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -697,6 +710,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -740,6 +754,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -784,6 +799,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -817,6 +833,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -850,6 +867,7 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -967,6 +985,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -1010,6 +1029,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -1053,6 +1073,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -1097,6 +1118,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -1130,6 +1152,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -1163,6 +1186,7 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -1292,6 +1316,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -1335,6 +1360,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -1378,6 +1404,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -1422,6 +1449,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -1455,6 +1483,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -1488,6 +1517,7 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -1602,6 +1632,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -1645,6 +1676,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -1688,6 +1720,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -1732,6 +1765,7 @@ class _$SearchChangedImpl implements _SearchChanged {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -1765,6 +1799,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -1798,6 +1833,7 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -1918,6 +1954,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -1961,6 +1998,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -2004,6 +2042,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -2048,6 +2087,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -2081,6 +2121,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -2114,6 +2155,7 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -2227,6 +2269,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -2270,6 +2313,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -2313,6 +2357,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -2357,6 +2402,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -2390,6 +2436,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -2423,6 +2470,7 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -2547,6 +2595,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -2590,6 +2639,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -2633,6 +2683,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -2677,6 +2728,7 @@ class _$SelectFolderImpl implements _SelectFolder {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -2710,6 +2762,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -2743,6 +2796,7 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -2857,6 +2911,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -2900,6 +2955,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -2943,6 +2999,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -2987,6 +3044,7 @@ class _$ShowTrashImpl implements _ShowTrash {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -3020,6 +3078,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -3053,6 +3112,7 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -3165,6 +3225,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -3208,6 +3269,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -3251,6 +3313,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -3295,6 +3358,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -3328,6 +3392,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -3361,6 +3426,7 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -3474,6 +3540,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -3517,6 +3584,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -3560,6 +3628,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -3604,6 +3673,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -3637,6 +3707,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -3670,6 +3741,7 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -3758,6 +3830,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -3801,6 +3874,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -3844,6 +3918,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -3888,6 +3963,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -3921,6 +3997,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -3954,6 +4031,7 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -4067,6 +4145,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -4110,6 +4189,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -4153,6 +4233,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -4197,6 +4278,7 @@ class _$TagsChangedImpl implements _TagsChanged {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -4230,6 +4312,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -4263,6 +4346,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -4375,6 +4459,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -4418,6 +4503,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -4461,6 +4547,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -4505,6 +4592,7 @@ class _$RemoveTagImpl implements _RemoveTag {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -4538,6 +4626,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -4571,6 +4660,7 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -4598,6 +4688,320 @@ abstract class _RemoveTag implements HomeEvent {
   String get tag;
   @JsonKey(ignore: true)
   _$$RemoveTagImplCopyWith<_$RemoveTagImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SortChangedImplCopyWith<$Res> {
+  factory _$$SortChangedImplCopyWith(
+          _$SortChangedImpl value, $Res Function(_$SortChangedImpl) then) =
+      __$$SortChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({NoteSortOrder order});
+}
+
+/// @nodoc
+class __$$SortChangedImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SortChangedImpl>
+    implements _$$SortChangedImplCopyWith<$Res> {
+  __$$SortChangedImplCopyWithImpl(
+      _$SortChangedImpl _value, $Res Function(_$SortChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? order = null,
+  }) {
+    return _then(_$SortChangedImpl(
+      null == order
+          ? _value.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as NoteSortOrder,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SortChangedImpl implements _SortChanged {
+  const _$SortChangedImpl(this.order);
+
+  @override
+  final NoteSortOrder order;
+
+  @override
+  String toString() {
+    return 'HomeEvent.sortChanged(order: $order)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SortChangedImpl &&
+            (identical(other.order, order) || other.order == order));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, order);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SortChangedImplCopyWith<_$SortChangedImpl> get copyWith =>
+      __$$SortChangedImplCopyWithImpl<_$SortChangedImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(NoteSearchFilter filter) removeFilter,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function() removeIncludeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
+        setCardStyle,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+  }) {
+    return sortChanged(order);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(NoteSearchFilter filter)? removeFilter,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function()? removeIncludeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+  }) {
+    return sortChanged?.call(order);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(NoteSearchFilter filter)? removeFilter,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function()? removeIncludeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (sortChanged != null) {
+      return sortChanged(order);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_RemoveFilter value) removeFilter,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_RemoveIncludeArchived value)
+        removeIncludeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+  }) {
+    return sortChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_RemoveFilter value)? removeFilter,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+  }) {
+    return sortChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_RemoveFilter value)? removeFilter,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    required TResult orElse(),
+  }) {
+    if (sortChanged != null) {
+      return sortChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SortChanged implements HomeEvent {
+  const factory _SortChanged(final NoteSortOrder order) = _$SortChangedImpl;
+
+  NoteSortOrder get order;
+  @JsonKey(ignore: true)
+  _$$SortChangedImplCopyWith<_$SortChangedImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -4691,6 +5095,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -4734,6 +5139,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -4777,6 +5183,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -4821,6 +5228,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -4854,6 +5262,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -4887,6 +5296,7 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -5001,6 +5411,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -5044,6 +5455,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -5087,6 +5499,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -5131,6 +5544,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -5164,6 +5578,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -5197,6 +5612,7 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -5330,6 +5746,7 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -5373,6 +5790,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -5416,6 +5834,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -5460,6 +5879,7 @@ class _$SetArchivedImpl implements _SetArchived {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -5493,6 +5913,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -5526,6 +5947,7 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -5669,6 +6091,7 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -5712,6 +6135,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -5755,6 +6179,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -5799,6 +6224,7 @@ class _$SetTagsImpl implements _SetTags {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -5832,6 +6258,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -5865,6 +6292,7 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -6028,6 +6456,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -6071,6 +6500,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -6114,6 +6544,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -6158,6 +6589,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -6191,6 +6623,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -6224,6 +6657,7 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -6345,6 +6779,7 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -6388,6 +6823,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -6431,6 +6867,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -6475,6 +6912,7 @@ class _$TogglePinImpl implements _TogglePin {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -6508,6 +6946,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -6541,6 +6980,7 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -6659,6 +7099,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -6702,6 +7143,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -6745,6 +7187,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -6789,6 +7232,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -6822,6 +7266,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -6855,6 +7300,7 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -6974,6 +7420,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -7017,6 +7464,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -7060,6 +7508,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -7104,6 +7553,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -7137,6 +7587,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -7170,6 +7621,7 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -7292,6 +7744,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -7335,6 +7788,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -7378,6 +7832,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -7422,6 +7877,7 @@ class _$CreateFolderImpl implements _CreateFolder {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -7455,6 +7911,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -7488,6 +7945,7 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -7610,6 +8068,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -7653,6 +8112,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -7696,6 +8156,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -7740,6 +8201,7 @@ class _$RenameFolderImpl implements _RenameFolder {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -7773,6 +8235,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -7806,6 +8269,7 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -7920,6 +8384,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -7963,6 +8428,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -8006,6 +8472,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -8050,6 +8517,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -8083,6 +8551,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -8116,6 +8585,7 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -8238,6 +8708,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function() removeIncludeArchived,
     required TResult Function(Set<String> tags) tagsChanged,
     required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
     required TResult Function(List<SavedNoteView> views) savedViewsChanged,
     required TResult Function(SavedNoteView view) applySavedView,
     required TResult Function(String noteId, bool archived,
@@ -8281,6 +8752,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function()? removeIncludeArchived,
     TResult? Function(Set<String> tags)? tagsChanged,
     TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
     TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult? Function(SavedNoteView view)? applySavedView,
     TResult? Function(String noteId, bool archived,
@@ -8324,6 +8796,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function()? removeIncludeArchived,
     TResult Function(Set<String> tags)? tagsChanged,
     TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
     TResult Function(List<SavedNoteView> views)? savedViewsChanged,
     TResult Function(SavedNoteView view)? applySavedView,
     TResult Function(String noteId, bool archived,
@@ -8368,6 +8841,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
         removeIncludeArchived,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
     required TResult Function(_SavedViewsChanged value) savedViewsChanged,
     required TResult Function(_ApplySavedView value) applySavedView,
     required TResult Function(_SetArchived value) setArchived,
@@ -8401,6 +8875,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
     TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult? Function(_ApplySavedView value)? applySavedView,
     TResult? Function(_SetArchived value)? setArchived,
@@ -8434,6 +8909,7 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
     TResult Function(_SavedViewsChanged value)? savedViewsChanged,
     TResult Function(_ApplySavedView value)? applySavedView,
     TResult Function(_SetArchived value)? setArchived,
@@ -8487,6 +8963,7 @@ mixin _$HomeState {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -8512,6 +8989,7 @@ mixin _$HomeState {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8537,6 +9015,7 @@ mixin _$HomeState {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8643,6 +9122,7 @@ class _$InitialImpl implements _Initial {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -8671,6 +9151,7 @@ class _$InitialImpl implements _Initial {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8699,6 +9180,7 @@ class _$InitialImpl implements _Initial {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8808,6 +9290,7 @@ class _$LoadingImpl implements _Loading {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -8836,6 +9319,7 @@ class _$LoadingImpl implements _Loading {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8864,6 +9348,7 @@ class _$LoadingImpl implements _Loading {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -8939,6 +9424,7 @@ abstract class _$$LoadedImplCopyWith<$Res> {
       List<String> availableTags,
       List<SavedNoteView> savedViews,
       String? selectedViewId,
+      NoteSortOrder sortOrder,
       int trashCount,
       Map<String, int> folderCounts,
       int allNotesCount});
@@ -8968,6 +9454,7 @@ class __$$LoadedImplCopyWithImpl<$Res>
     Object? availableTags = null,
     Object? savedViews = null,
     Object? selectedViewId = freezed,
+    Object? sortOrder = null,
     Object? trashCount = null,
     Object? folderCounts = null,
     Object? allNotesCount = null,
@@ -9025,6 +9512,10 @@ class __$$LoadedImplCopyWithImpl<$Res>
           ? _value.selectedViewId
           : selectedViewId // ignore: cast_nullable_to_non_nullable
               as String?,
+      sortOrder: null == sortOrder
+          ? _value.sortOrder
+          : sortOrder // ignore: cast_nullable_to_non_nullable
+              as NoteSortOrder,
       trashCount: null == trashCount
           ? _value.trashCount
           : trashCount // ignore: cast_nullable_to_non_nullable
@@ -9058,6 +9549,7 @@ class _$LoadedImpl implements _Loaded {
       final List<String> availableTags = const <String>[],
       final List<SavedNoteView> savedViews = const <SavedNoteView>[],
       this.selectedViewId,
+      this.sortOrder = NoteSortOrder.manual,
       this.trashCount = 0,
       final Map<String, int> folderCounts = const <String, int>{},
       this.allNotesCount = 0})
@@ -9142,6 +9634,9 @@ class _$LoadedImpl implements _Loaded {
   final String? selectedViewId;
   @override
   @JsonKey()
+  final NoteSortOrder sortOrder;
+  @override
+  @JsonKey()
   final int trashCount;
 
   /// Active notes per folder id, for the folder picker. Counts ignore the
@@ -9166,7 +9661,7 @@ class _$LoadedImpl implements _Loaded {
 
   @override
   String toString() {
-    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, filters: $filters, selectedFolderId: $selectedFolderId, showTrash: $showTrash, showArchive: $showArchive, includeArchived: $includeArchived, archiveCount: $archiveCount, selectedTags: $selectedTags, availableTags: $availableTags, savedViews: $savedViews, selectedViewId: $selectedViewId, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
+    return 'HomeState.loaded(notes: $notes, folders: $folders, searchQuery: $searchQuery, filters: $filters, selectedFolderId: $selectedFolderId, showTrash: $showTrash, showArchive: $showArchive, includeArchived: $includeArchived, archiveCount: $archiveCount, selectedTags: $selectedTags, availableTags: $availableTags, savedViews: $savedViews, selectedViewId: $selectedViewId, sortOrder: $sortOrder, trashCount: $trashCount, folderCounts: $folderCounts, allNotesCount: $allNotesCount)';
   }
 
   @override
@@ -9197,6 +9692,8 @@ class _$LoadedImpl implements _Loaded {
                 .equals(other._savedViews, _savedViews) &&
             (identical(other.selectedViewId, selectedViewId) ||
                 other.selectedViewId == selectedViewId) &&
+            (identical(other.sortOrder, sortOrder) ||
+                other.sortOrder == sortOrder) &&
             (identical(other.trashCount, trashCount) ||
                 other.trashCount == trashCount) &&
             const DeepCollectionEquality()
@@ -9221,6 +9718,7 @@ class _$LoadedImpl implements _Loaded {
       const DeepCollectionEquality().hash(_availableTags),
       const DeepCollectionEquality().hash(_savedViews),
       selectedViewId,
+      sortOrder,
       trashCount,
       const DeepCollectionEquality().hash(_folderCounts),
       allNotesCount);
@@ -9250,6 +9748,7 @@ class _$LoadedImpl implements _Loaded {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -9270,6 +9769,7 @@ class _$LoadedImpl implements _Loaded {
         availableTags,
         savedViews,
         selectedViewId,
+        sortOrder,
         trashCount,
         folderCounts,
         allNotesCount);
@@ -9294,6 +9794,7 @@ class _$LoadedImpl implements _Loaded {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -9314,6 +9815,7 @@ class _$LoadedImpl implements _Loaded {
         availableTags,
         savedViews,
         selectedViewId,
+        sortOrder,
         trashCount,
         folderCounts,
         allNotesCount);
@@ -9338,6 +9840,7 @@ class _$LoadedImpl implements _Loaded {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -9360,6 +9863,7 @@ class _$LoadedImpl implements _Loaded {
           availableTags,
           savedViews,
           selectedViewId,
+          sortOrder,
           trashCount,
           folderCounts,
           allNotesCount);
@@ -9420,6 +9924,7 @@ abstract class _Loaded implements HomeState {
       final List<String> availableTags,
       final List<SavedNoteView> savedViews,
       final String? selectedViewId,
+      final NoteSortOrder sortOrder,
       final int trashCount,
       final Map<String, int> folderCounts,
       final int allNotesCount}) = _$LoadedImpl;
@@ -9437,6 +9942,7 @@ abstract class _Loaded implements HomeState {
   List<String> get availableTags;
   List<SavedNoteView> get savedViews;
   String? get selectedViewId;
+  NoteSortOrder get sortOrder;
   int get trashCount;
 
   /// Active notes per folder id, for the folder picker. Counts ignore the
@@ -9529,6 +10035,7 @@ class _$ErrorImpl implements _Error {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)
@@ -9557,6 +10064,7 @@ class _$ErrorImpl implements _Error {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?
@@ -9585,6 +10093,7 @@ class _$ErrorImpl implements _Error {
             List<String> availableTags,
             List<SavedNoteView> savedViews,
             String? selectedViewId,
+            NoteSortOrder sortOrder,
             int trashCount,
             Map<String, int> folderCounts,
             int allNotesCount)?

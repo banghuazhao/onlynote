@@ -1106,6 +1106,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Simple Calculator",
     ),
     "Small": MessageLookupByLibrary.simpleMessage("Small"),
+    "Sort_By": MessageLookupByLibrary.simpleMessage("Sort by"),
+    "Sort_Manual": MessageLookupByLibrary.simpleMessage("Manual order"),
+    "Sort_Modified_Newest": MessageLookupByLibrary.simpleMessage(
+      "Last modified",
+    ),
+    "Sort_Modified_Oldest": MessageLookupByLibrary.simpleMessage(
+      "Oldest first",
+    ),
+    "Sort_Switched_To_Manual": MessageLookupByLibrary.simpleMessage(
+      "Switched to manual order",
+    ),
+    "Sort_Title_Asc": MessageLookupByLibrary.simpleMessage("Title A–Z"),
+    "Sort_Title_Desc": MessageLookupByLibrary.simpleMessage("Title Z–A"),
     "Starter_Templates": MessageLookupByLibrary.simpleMessage(
       "Starter templates",
     ),

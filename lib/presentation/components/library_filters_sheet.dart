@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
@@ -17,14 +18,19 @@ sealed class LibraryFilterResult {
 }
 
 class ApplyLibraryFilters extends LibraryFilterResult {
-  const ApplyLibraryFilters(this.filters, this.tags, this.scope);
+  const ApplyLibraryFilters(this.filters, this.tags, this.scope, {this.sort});
   final Set<NoteSearchFilter> filters;
   final Set<String> tags;
   final NoteArchiveScope scope;
+
+  /// A null order leaves the current one alone. Trash offers no sort section,
+  /// because it always lists most recently deleted first.
+  final NoteSortOrder? sort;
 }
 
 class CreateSavedNoteView extends ApplyLibraryFilters {
-  const CreateSavedNoteView(super.filters, super.tags, super.scope);
+  const CreateSavedNoteView(super.filters, super.tags, super.scope,
+      {super.sort});
 }
 
 class ApplySavedNoteView extends LibraryFilterResult {
@@ -56,6 +62,7 @@ class LibraryFiltersSheet extends StatefulWidget {
     this.folderNames = const {},
     this.showTrash = false,
     this.viewsUnavailable = false,
+    this.sort = NoteSortOrder.manual,
   });
   final Set<NoteSearchFilter> filters;
   final Set<String> selectedTags;
@@ -66,6 +73,7 @@ class LibraryFiltersSheet extends StatefulWidget {
   final Map<String, String> folderNames;
   final bool showTrash;
   final bool viewsUnavailable;
+  final NoteSortOrder sort;
 
   @override
   State<LibraryFiltersSheet> createState() => _LibraryFiltersSheetState();
@@ -75,6 +83,7 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
   late final Set<NoteSearchFilter> _filters = Set.of(widget.filters);
   late final Set<String> _tags = Set.of(widget.selectedTags);
   late NoteArchiveScope _scope = widget.scope;
+  late NoteSortOrder _sort = widget.sort;
   final _tagSearchController = TextEditingController();
   final _savedViewSearchController = TextEditingController();
 
@@ -135,6 +144,33 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Trash has no sort section: it always lists most recently deleted
+          // first, so a control here could only promise what it cannot do.
+          if (!widget.showTrash) ...[
+            _heading(s.Sort_By),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: LayoutBuilder(
+                  builder: (context, constraints) =>
+                      Wrap(spacing: 8, runSpacing: 4, children: [
+                        for (final order in NoteSortOrder.values)
+                          ChoiceChip(
+                            key: ValueKey('library-sort-${order.name}'),
+                            avatarBoxConstraints: const BoxConstraints.tightFor(
+                                width: 24, height: 24),
+                            label: _chipLabel(noteSortOrderLabel(order, s),
+                                constraints.maxWidth),
+                            selected: _sort == order,
+                            // Re-tapping the selected order keeps it, so the
+                            // library can never end up with no order at all.
+                            onSelected: (selected) {
+                              if (selected) setState(() => _sort = order);
+                            },
+                          ),
+                      ])),
+            ),
+            const Divider(height: 24),
+          ],
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: LayoutBuilder(
@@ -236,7 +272,8 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                 onPressed: () => Navigator.pop(
                     context,
                     ApplyLibraryFilters(
-                        Set.of(_filters), Set.of(_tags), _scope)),
+                        Set.of(_filters), Set.of(_tags), _scope,
+                        sort: _sort)),
                 child: Text(s.Done),
               ),
               TextButton(
@@ -304,7 +341,8 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
               viewCount: widget.savedViews.length,
               maxViews: SavedNoteViewStore.maxViews,
               onSave: () => Navigator.pop(context,
-                  CreateSavedNoteView(Set.of(_filters), Set.of(_tags), _scope)),
+                  CreateSavedNoteView(Set.of(_filters), Set.of(_tags), _scope,
+                      sort: _sort)),
             ),
         ],
       ),

@@ -5441,6 +5441,76 @@ class S {
       args: [],
     );
   }
+
+  /// `Sort by`
+  String get Sort_By {
+    return Intl.message(
+      'Sort by',
+      name: 'Sort_By',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manual order`
+  String get Sort_Manual {
+    return Intl.message(
+      'Manual order',
+      name: 'Sort_Manual',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last modified`
+  String get Sort_Modified_Newest {
+    return Intl.message(
+      'Last modified',
+      name: 'Sort_Modified_Newest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Oldest first`
+  String get Sort_Modified_Oldest {
+    return Intl.message(
+      'Oldest first',
+      name: 'Sort_Modified_Oldest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title A–Z`
+  String get Sort_Title_Asc {
+    return Intl.message(
+      'Title A–Z',
+      name: 'Sort_Title_Asc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title Z–A`
+  String get Sort_Title_Desc {
+    return Intl.message(
+      'Title Z–A',
+      name: 'Sort_Title_Desc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switched to manual order`
+  String get Sort_Switched_To_Manual {
+    return Intl.message(
+      'Switched to manual order',
+      name: 'Sort_Switched_To_Manual',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -6,6 +6,7 @@ import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/presentation/components/note_tags_sheet.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 ThemeData _previewTheme() {
@@ -58,6 +59,7 @@ Widget _previewApp(Widget child, {bool largeChinese = false}) => MaterialApp(
 
 @Preview(name: 'Library filters and saved views', size: Size(390, 700))
 Widget libraryFiltersPreview() => _previewApp(LibraryFiltersSheet(
+      sort: NoteSortOrder.titleAsc,
       filters: const {NoteSearchFilter.unfinished, NoteSearchFilter.recordings},
       selectedTags: const {'Work'},
       availableTags: const [

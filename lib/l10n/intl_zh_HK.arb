@@ -735,5 +735,12 @@
   "Note_Theme_Kraft_Notebook": "牛皮紙筆記簿",
   "Note_Theme_Parchment": "羊皮紙",
   "Premium_Note_Themes": "進階筆記主題",
-  "Premium_Note_Themes_Description": "解鎖點陣手帳、牛皮紙筆記簿和羊皮紙。"
+  "Premium_Note_Themes_Description": "解鎖點陣手帳、牛皮紙筆記簿和羊皮紙。",
+  "Sort_By": "排序方式",
+  "Sort_Manual": "手動排序",
+  "Sort_Modified_Newest": "最近修改",
+  "Sort_Modified_Oldest": "最早修改",
+  "Sort_Title_Asc": "標題 A–Z",
+  "Sort_Title_Desc": "標題 Z–A",
+  "Sort_Switched_To_Manual": "已切換為手動排序"
 }

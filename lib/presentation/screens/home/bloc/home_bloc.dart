@@ -3,6 +3,7 @@ import 'dart:ui' show Color;
 import 'package:onlynote/Tools/widget_commands.dart';
 
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/audio_storage.dart';
@@ -12,6 +13,7 @@ import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/services/note_theme_access.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
+import 'package:onlynote/Tools/app_sort_settings.dart';
 import 'package:onlynote/Tools/reminder_data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -47,8 +49,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this._getNoteUsecase,
     this._updateNoteUsecase, {
     @ignoreParam PremiumAccess? premiumAccess,
+    @ignoreParam AppSortSettings? sortSettings,
   })  : premiumAccess = premiumAccess ?? PremiumAccess.instance,
+        sortSettings = sortSettings ?? AppSortSettings.instance,
         super(const HomeState.initial()) {
+    // The stored choice is read once, after startup has loaded it. Nothing
+    // here touches the plugin, so a bloc built in a test keeps manual order.
+    _sortOrder = this.sortSettings.order;
     // Refreshes and mutations share one queue. A second checklist tap reads
     // the first saved result; pin/folder changes cannot race that write.
     on<HomeEvent>(_handleEvent,
@@ -70,6 +77,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetNoteUsecase _getNoteUsecase;
   final UpdateNoteUsecase _updateNoteUsecase;
   final PremiumAccess premiumAccess;
+  final AppSortSettings sortSettings;
   late final PhotoSearchIndex? _photoSearchIndex;
 
   void _photoSearchUpdated() {
@@ -99,6 +107,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Set<String> _selectedTags = {};
   List<SavedNoteView> _savedViews = [];
   String? _selectedViewId;
+  NoteSortOrder _sortOrder = NoteSortOrder.manual;
 
   Future<String?> createFolder(String name) {
     if (isClosed) return Future.value(_i10n.Failed_to_save_folder);
@@ -246,6 +255,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _selectedViewId = null;
         emit(_buildLoaded());
       }
+    } else if (event is _SortChanged) {
+      await _onSortChanged(event, emit);
     } else if (event is _SavedViewsChanged) {
       _savedViews = List.of(event.views);
       if (!_savedViews.any((view) => view.id == _selectedViewId)) {
@@ -453,6 +464,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ...latest.where((note) => note.isPinned),
       ...latest.where((note) => !note.isPinned),
     ];
+    // A dragged arrangement is only ever visible in manual order, so a drop
+    // that arrives under any other sort switches back rather than saving an
+    // order the grid would immediately re-sort away.
+    if (_sortOrder != NoteSortOrder.manual) {
+      await _setSortOrder(NoteSortOrder.manual);
+    }
     emit(_buildLoaded(overrideVisible: ordered));
 
     // A drag snapshot can predate a queued checkbox change. Apply ordering to
@@ -468,6 +485,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final context = getIt<AppRouter>().context;
       if (context.mounted) context.showToast(error, isError: true);
     }
+  }
+
+  Future<void> _onSortChanged(
+    _SortChanged event,
+    Emitter<HomeState> emit,
+  ) async {
+    if (event.order == _sortOrder) return;
+    await _setSortOrder(event.order);
+    // Sorting arranges what the current criteria already selected, so the
+    // active saved view stays applied and selected.
+    emit(_buildLoaded());
+  }
+
+  /// Applies the order in memory first; a failed write only costs the choice
+  /// its persistence, never the arrangement on screen.
+  Future<void> _setSortOrder(NoteSortOrder order) async {
+    _sortOrder = order;
+    await sortSettings.setOrder(order);
   }
 
   void _onSearchChanged(_SearchChanged event, Emitter<HomeState> emit) {
@@ -680,6 +715,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       availableTags: _availableTags(),
       savedViews: List.unmodifiable(_savedViews),
       selectedViewId: _selectedViewId,
+      sortOrder: _sortOrder,
       trashCount: _trashedNotes.length,
       folderCounts: _folderCounts(),
       allNotesCount: _activeNotes.length,
@@ -722,16 +758,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return visible;
   }
 
-  int _compareLibraryNotes(Note a, Note b) {
-    if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
-    if (a.sortOrder != null && b.sortOrder != null) {
-      final order = a.sortOrder!.compareTo(b.sortOrder!);
-      if (order != 0) return order;
-    }
-    final epoch = DateTime.fromMillisecondsSinceEpoch(0);
-    final date = (b.dateTime ?? epoch).compareTo(a.dateTime ?? epoch);
-    return date != 0 ? date : (a.id ?? '').compareTo(b.id ?? '');
-  }
+  int _compareLibraryNotes(Note a, Note b) =>
+      compareLibraryNotes(a, b, _sortOrder);
 
   List<String> _availableTags() {
     final tags = <String, String>{};

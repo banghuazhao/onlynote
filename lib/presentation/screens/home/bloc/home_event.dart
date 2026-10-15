@@ -24,6 +24,7 @@ class HomeEvent with _$HomeEvent {
   const factory HomeEvent.removeIncludeArchived() = _RemoveIncludeArchived;
   const factory HomeEvent.tagsChanged(Set<String> tags) = _TagsChanged;
   const factory HomeEvent.removeTag(String tag) = _RemoveTag;
+  const factory HomeEvent.sortChanged(NoteSortOrder order) = _SortChanged;
   const factory HomeEvent.savedViewsChanged(List<SavedNoteView> views) =
       _SavedViewsChanged;
   const factory HomeEvent.applySavedView(SavedNoteView view) = _ApplySavedView;

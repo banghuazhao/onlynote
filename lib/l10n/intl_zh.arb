@@ -735,5 +735,12 @@
   "Note_Theme_Kraft_Notebook": "牛皮纸笔记本",
   "Note_Theme_Parchment": "羊皮纸",
   "Premium_Note_Themes": "高级笔记主题",
-  "Premium_Note_Themes_Description": "解锁点阵手帐、牛皮纸笔记本和羊皮纸。"
+  "Premium_Note_Themes_Description": "解锁点阵手帐、牛皮纸笔记本和羊皮纸。",
+  "Sort_By": "排序方式",
+  "Sort_Manual": "手动排序",
+  "Sort_Modified_Newest": "最近修改",
+  "Sort_Modified_Oldest": "最早修改",
+  "Sort_Title_Asc": "标题 A–Z",
+  "Sort_Title_Desc": "标题 Z–A",
+  "Sort_Switched_To_Manual": "已切换为手动排序"
 }

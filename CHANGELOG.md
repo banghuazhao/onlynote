@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added Sort by to the library panel, with manual order, last modified, oldest first, and title A–Z or Z–A; the choice is remembered between launches.
+- Kept pinned notes above every sort order, and left Trash on most recently deleted first.
+- Switched back to manual order when reordering starts, so a dragged arrangement is always the one on screen.
+
 - Added stationery-inspired note themes with app defaults, per-note overrides, and Premium advanced styles.
 - Grouped card appearance controls into horizontal Theme, Color, Text, and Layout sections.
 - Localized reminder dates on Home cards using the app language and device clock preference.

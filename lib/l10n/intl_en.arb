@@ -737,5 +737,12 @@
   "Note_Theme_Kraft_Notebook": "Kraft notebook",
   "Note_Theme_Parchment": "Parchment",
   "Premium_Note_Themes": "Premium note themes",
-  "Premium_Note_Themes_Description": "Unlock dotted journals, kraft notebooks, and parchment paper."
+  "Premium_Note_Themes_Description": "Unlock dotted journals, kraft notebooks, and parchment paper.",
+  "Sort_By": "Sort by",
+  "Sort_Manual": "Manual order",
+  "Sort_Modified_Newest": "Last modified",
+  "Sort_Modified_Oldest": "Oldest first",
+  "Sort_Title_Asc": "Title A–Z",
+  "Sort_Title_Desc": "Title Z–A",
+  "Sort_Switched_To_Manual": "Switched to manual order"
 }
