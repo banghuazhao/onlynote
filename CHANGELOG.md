@@ -2,12 +2,21 @@
 
 ## Unreleased
 
+## 1.9.0+19
+
 - Added Export notes to Backup & Restore, saving every note, including archived ones, as one zip of Markdown, plain text, or PDF files — one file per note.
 - Kept photos and recordings beside their Markdown notes in the export, with links that resolve once the archive is unpacked.
 - Reported export progress per note, and finished an export that one unreadable note or missing photo would otherwise have stopped.
 - Added Sort by to the library panel, with manual order, last modified, oldest first, and title A–Z or Z–A; the choice is remembered between launches.
 - Kept pinned notes above every sort order, and left Trash on most recently deleted first.
 - Switched back to manual order when reordering starts, so a dragged arrangement is always the one on screen.
+
+## 1.8.0+18
+
+- Added the native macOS app with resizable layouts, app menus, keyboard shortcuts, and right-click actions.
+- Added Mac paper-note and overview widgets with note selection and interactive checklists.
+- Added Mac voice memos, photo text recognition, reminders, and backup import and export.
+- Added Mac widget setup guidance in English, Simplified Chinese, and Traditional Chinese.
 
 - Added stationery-inspired note themes with app defaults, per-note overrides, and Premium advanced styles.
 - Grouped card appearance controls into horizontal Theme, Color, Text, and Layout sections.
