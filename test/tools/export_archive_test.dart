@@ -54,4 +54,52 @@ void main() {
     // Discarding twice, or after a close that already failed, is still safe.
     await archive.discard();
   });
+
+  test('the archive name carries a sortable stamp', () {
+    expect(ExportArchive.nameFor(DateTime(2026, 10, 16, 9, 5, 3)),
+        'Onlynote-notes-2026-10-16T09-05-03.zip');
+    expect(ExportArchive.nameFor(DateTime(2026, 1, 2, 3, 4, 5)),
+        startsWith(ExportArchive.namePrefix));
+  });
+
+  test('sweeping clears earlier exports and nothing else', () async {
+    final earlier =
+        File('${directory.path}/${ExportArchive.nameFor(DateTime(2026, 1, 1))}')
+          ..writeAsBytesSync([1]);
+    final alsoMine =
+        File('${directory.path}/${ExportArchive.namePrefix}stray.zip')
+          ..writeAsBytesSync([1]);
+    // A backup, a photo and a folder of someone else's temporary files are
+    // not this app's export archives and must survive.
+    final backup = File('${directory.path}/Onlynote-2026-01-01.onlynote')
+      ..writeAsBytesSync([1]);
+    final photo = File('${directory.path}/${ExportArchive.namePrefix}1.jpg')
+      ..writeAsBytesSync([1]);
+    final other = File('${directory.path}/something-else.zip')
+      ..writeAsBytesSync([1]);
+    final nested = await Directory('${directory.path}/nested').create();
+
+    await ExportArchive.sweep(directory);
+
+    expect(earlier.existsSync(), isFalse);
+    expect(alsoMine.existsSync(), isFalse);
+    expect(backup.existsSync(), isTrue);
+    expect(photo.existsSync(), isTrue);
+    expect(other.existsSync(), isTrue);
+    expect(nested.existsSync(), isTrue);
+  });
+
+  test('a fresh export survives its own sweep', () async {
+    await ExportArchive.sweep(directory);
+    final archive = ExportArchive.create(
+        '${directory.path}/${ExportArchive.nameFor(DateTime.now())}');
+    await archive.add(NoteExportBytes('Trip.md', Uint8List.fromList([1])));
+    await archive.close();
+    expect(archive.file.existsSync(), isTrue);
+  });
+
+  test('sweeping a directory that is not there is not an error', () async {
+    final missing = Directory('${directory.path}/gone');
+    await expectLater(ExportArchive.sweep(missing), completes);
+  });
 }

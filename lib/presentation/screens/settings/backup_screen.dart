@@ -268,11 +268,12 @@ class _BackupScreenState extends State<BackupScreen> {
             'DroidSansFallback.ttf'
           ].map((name) => rootBundle.load('assets/fonts/$name')))
         : const <ByteData>[];
-    final stamp =
-        DateTime.now().toIso8601String().replaceAll(':', '-').split('.').first;
     final directory = await getTemporaryDirectory();
-    final archive =
-        ExportArchive.create('${directory.path}/Onlynote-notes-$stamp.zip');
+    // The previous export's archive had to survive its share sheet, so it is
+    // still here; clear it now that the user has asked for a fresh one.
+    await ExportArchive.sweep(directory);
+    final archive = ExportArchive.create(
+        '${directory.path}/${ExportArchive.nameFor(DateTime.now())}');
     try {
       final export = NoteBulkExport(
         format: format,

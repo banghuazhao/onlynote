@@ -19,12 +19,44 @@ class NoteArchiveExport {
 class ExportArchive {
   ExportArchive._(this._encoder, this.file);
 
+  static const namePrefix = 'Onlynote-notes-';
+
   final ZipFileEncoder _encoder;
   final File file;
 
   static ExportArchive create(String path) {
     final encoder = ZipFileEncoder()..create(path);
     return ExportArchive._(encoder, File(path));
+  }
+
+  /// The archive's own filename, which is also what the user is offered in the
+  /// save dialog or share sheet.
+  static String nameFor(DateTime now) =>
+      '$namePrefix${now.toIso8601String().replaceAll(':', '-').split('.').first}.zip';
+
+  /// Deletes archives left by earlier exports.
+  ///
+  /// An export has to stay available until the share sheet or save dialog is
+  /// finished with it, so its archive outlives the export itself and the next
+  /// export clears it instead. Only this app's own archives are touched, and
+  /// a file that refuses to go is left alone: temporary clutter is never worth
+  /// failing an export over.
+  static Future<void> sweep(Directory directory) async {
+    try {
+      await for (final entity in directory.list(followLinks: false)) {
+        if (entity is! File) continue;
+        final name = entity.uri.pathSegments.last;
+        if (!name.startsWith(namePrefix) || !name.endsWith('.zip')) continue;
+        try {
+          await entity.delete();
+        } catch (_) {
+          continue;
+        }
+      }
+    } catch (_) {
+      // An unreadable temporary directory is the next export's problem, not
+      // this one's.
+    }
   }
 
   Future<void> add(NoteExportEntry entry) async {
