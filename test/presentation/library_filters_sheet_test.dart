@@ -7,6 +7,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 Future<Completer<LibraryFilterResult?>> open(
@@ -19,6 +20,7 @@ Future<Completer<LibraryFilterResult?>> open(
   Map<String, String> folderNames = const {},
   String? selectedViewId,
   NoteArchiveScope scope = NoteArchiveScope.active,
+  NoteSortOrder sort = NoteSortOrder.manual,
   bool trash = false,
   bool unavailable = false,
   Locale locale = const Locale('en'),
@@ -35,6 +37,7 @@ Future<Completer<LibraryFilterResult?>> open(
           folderNames: folderNames,
           selectedViewId: selectedViewId,
           scope: scope,
+          sort: sort,
           showTrash: trash,
           viewsUnavailable: unavailable);
   await tester.pumpWidget(MaterialApp(
@@ -82,6 +85,15 @@ List<SavedNoteView> _savedViews(int count) => [
       for (var index = 0; index < count; index++)
         SavedNoteView(id: 'view-$index', name: 'View ${index + 1}'),
     ];
+
+/// Chips below the fold need scrolling before a tap can land on them.
+Future<void> tapChip(WidgetTester tester, String value) async {
+  final chip = key(value);
+  await tester.ensureVisible(chip);
+  await tester.pumpAndSettle();
+  await tester.tap(chip);
+  await tester.pump();
+}
 
 Future<void> searchTags(WidgetTester tester, String query) async {
   final field = key('library-search-tags');
@@ -973,10 +985,9 @@ void main() {
     final original = <NoteSearchFilter>{NoteSearchFilter.photos};
     final result =
         await open(tester, filters: original, tags: ['Work', ' WORK ', '项目']);
-    await tester.tap(key('library-filter-checklists'));
-    await tester.tap(key('library-tag-work'));
-    await tester.tap(key('library-include-archived'));
-    await tester.pump();
+    await tapChip(tester, 'library-filter-checklists');
+    await tapChip(tester, 'library-tag-work');
+    await tapChip(tester, 'library-include-archived');
     expect(result.isCompleted, isFalse);
     expect(original, {NoteSearchFilter.photos});
     expect(key('library-tag-work'), findsOneWidget);
@@ -995,8 +1006,7 @@ void main() {
 
   testWidgets('closing sheet discards in-progress filters', (tester) async {
     final result = await open(tester, tags: ['Work']);
-    await tester.tap(key('library-tag-work'));
-    await tester.pump();
+    await tapChip(tester, 'library-tag-work');
     await tester.tap(find.byTooltip('Close'));
     await tester.pumpAndSettle();
     expect(await result.future, isNull);
@@ -1123,9 +1133,8 @@ void main() {
   testWidgets('Save view captures changed filters without editing stored views',
       (tester) async {
     final result = await open(tester, tags: ['Work']);
-    await tester.tap(key('library-filter-unfinished'));
-    await tester.tap(key('library-tag-work'));
-    await tester.pump();
+    await tapChip(tester, 'library-filter-unfinished');
+    await tapChip(tester, 'library-tag-work');
     await tester.ensureVisible(key('library-save-view'));
     await tester.tap(key('library-save-view'));
     await tester.pumpAndSettle();
@@ -1156,10 +1165,93 @@ void main() {
     }
   });
 
-  testWidgets('Trash omits archive toggles and view creation', (tester) async {
+  testWidgets('Trash omits archive toggles, view creation and sorting',
+      (tester) async {
     await open(tester, trash: true);
     expect(key('library-include-archived'), findsNothing);
     expect(key('library-save-view'), findsNothing);
+    // Trash always lists most recently deleted first, so offering an order
+    // here would promise something the list does not do.
+    for (final order in NoteSortOrder.values) {
+      expect(key('library-sort-${order.name}'), findsNothing);
+    }
+  });
+
+  testWidgets('sort order applies on Done without disturbing other criteria',
+      (tester) async {
+    final result = await open(tester,
+        sort: NoteSortOrder.modifiedNewest,
+        filters: const {NoteSearchFilter.photos},
+        tags: ['Work'],
+        selectedTags: const {'Work'});
+    expect(
+        tester.widget<ChoiceChip>(key('library-sort-modifiedNewest')).selected,
+        isTrue);
+    await tester.tap(key('library-sort-titleAsc'));
+    await tester.pump();
+    expect(result.isCompleted, isFalse);
+    expect(tester.widget<ChoiceChip>(key('library-sort-titleAsc')).selected,
+        isTrue);
+    expect(
+        tester.widget<ChoiceChip>(key('library-sort-modifiedNewest')).selected,
+        isFalse);
+    final done = key('library-apply-filters');
+    await tester.ensureVisible(done);
+    await tester.pumpAndSettle();
+    await tester.tap(done.hitTestable());
+    await tester.pumpAndSettle();
+    final selection = (await result.future) as ApplyLibraryFilters;
+    expect(selection.sort, NoteSortOrder.titleAsc);
+    expect(selection.filters, {NoteSearchFilter.photos});
+    expect(selection.tags, {'Work'});
+  });
+
+  testWidgets('closing the sheet discards a sort change', (tester) async {
+    final result = await open(tester, sort: NoteSortOrder.titleDesc);
+    await tester.tap(key('library-sort-modifiedOldest'));
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(await result.future, isNull);
+  });
+
+  testWidgets('re-tapping and clearing filters both keep an order selected',
+      (tester) async {
+    final result = await open(tester, sort: NoteSortOrder.titleAsc);
+    await tester.tap(key('library-sort-titleAsc'));
+    await tester.pump();
+    expect(tester.widget<ChoiceChip>(key('library-sort-titleAsc')).selected,
+        isTrue);
+    final clear = key('library-clear-filters');
+    await tester.ensureVisible(clear);
+    await tester.pumpAndSettle();
+    await tester.tap(clear.hitTestable());
+    await tester.pumpAndSettle();
+    // Clearing filters narrows what is shown; it is not a request to
+    // rearrange what remains.
+    expect(tester.widget<ChoiceChip>(key('library-sort-titleAsc')).selected,
+        isTrue);
+    final done = key('library-apply-filters');
+    await tester.ensureVisible(done);
+    await tester.pumpAndSettle();
+    await tester.tap(done.hitTestable());
+    await tester.pumpAndSettle();
+    expect(((await result.future) as ApplyLibraryFilters).sort,
+        NoteSortOrder.titleAsc);
+  });
+
+  testWidgets('saving a view carries the order chosen in the same visit',
+      (tester) async {
+    final result = await open(tester, sort: NoteSortOrder.manual);
+    await tester.tap(key('library-sort-modifiedOldest'));
+    await tester.pump();
+    final save = key('library-save-view');
+    await tester.ensureVisible(save);
+    await tester.pumpAndSettle();
+    await tester.tap(save.hitTestable());
+    await tester.pumpAndSettle();
+    final selection = (await result.future) as CreateSavedNoteView;
+    expect(selection.sort, NoteSortOrder.modifiedOldest);
   });
 
   for (final locale in [const Locale('zh'), const Locale('zh', 'HK')]) {

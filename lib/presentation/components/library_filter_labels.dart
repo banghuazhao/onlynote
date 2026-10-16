@@ -1,5 +1,6 @@
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 
 String noteSearchFilterLabel(NoteSearchFilter filter, S strings) =>
@@ -11,6 +12,14 @@ String noteSearchFilterLabel(NoteSearchFilter filter, S strings) =>
       NoteSearchFilter.unfinished => strings.Filter_Unfinished,
       NoteSearchFilter.recordings => strings.Filter_Recordings,
       NoteSearchFilter.scans => strings.Filter_Scans,
+    };
+
+String noteSortOrderLabel(NoteSortOrder order, S strings) => switch (order) {
+      NoteSortOrder.manual => strings.Sort_Manual,
+      NoteSortOrder.modifiedNewest => strings.Sort_Modified_Newest,
+      NoteSortOrder.modifiedOldest => strings.Sort_Modified_Oldest,
+      NoteSortOrder.titleAsc => strings.Sort_Title_Asc,
+      NoteSortOrder.titleDesc => strings.Sort_Title_Desc,
     };
 
 /// Describes the criteria that will be applied, using only local metadata.

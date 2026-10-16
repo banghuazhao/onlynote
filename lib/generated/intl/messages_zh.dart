@@ -91,6 +91,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m34(items, photos) => "${items} 项 · ${photos} 张照片";
 
+  static String m35(count) => "${count} 条笔记无法导出。";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage("桌面小组件"),
@@ -386,6 +388,40 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
     "Expand_Section": m8,
+    "Export_Notes": MessageLookupByLibrary.simpleMessage("导出笔记"),
+    "Export_Notes_Description": MessageLookupByLibrary.simpleMessage(
+      "将所有笔记（包括已归档的笔记）导出为一个压缩包，每条笔记一个可读文件，Markdown 还会附带照片和录音。请在分享菜单中选择“存储到文件”或其他存储应用。",
+    ),
+    "Export_Notes_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "将所有笔记（包括已归档的笔记）导出为一个压缩包，每条笔记一个可读文件，Markdown 还会附带照片和录音。请在保存对话框中选择位置。",
+    ),
+    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("格式"),
+    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("保存笔记…"),
+    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage("正在导出笔记…"),
+    "Export_Notes_Empty": MessageLookupByLibrary.simpleMessage("暂无可导出的笔记。"),
+    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("笔记已保存。"),
+    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消保存导出文件。",
+    ),
+    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
+      "笔记导出完成。请在所选应用中确认是否已保存。",
+    ),
+    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消分享导出文件。",
+    ),
+    "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
+      "笔记已导出。此设备无法确认是否已分享。",
+    ),
+    "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法导出笔记。请检查可用存储空间，并确认照片和录音均可访问。",
+    ),
+    "Export_Notes_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法保存导出文件。请检查可用存储空间后重试。",
+    ),
+    "Export_Notes_Share_Failed": MessageLookupByLibrary.simpleMessage(
+      "导出文件已准备好，但分享失败。请重试。",
+    ),
+    "Export_Notes_Incomplete": m35,
     "Express_Scan": MessageLookupByLibrary.simpleMessage("飞速扫描"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage("更新备忘录失败, 请重试"),
@@ -856,6 +892,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage("极简计算器"),
     "Small": MessageLookupByLibrary.simpleMessage("小"),
+    "Sort_By": MessageLookupByLibrary.simpleMessage("排序方式"),
+    "Sort_Manual": MessageLookupByLibrary.simpleMessage("手动排序"),
+    "Sort_Modified_Newest": MessageLookupByLibrary.simpleMessage("最近修改"),
+    "Sort_Modified_Oldest": MessageLookupByLibrary.simpleMessage("最早修改"),
+    "Sort_Switched_To_Manual": MessageLookupByLibrary.simpleMessage("已切换为手动排序"),
+    "Sort_Title_Asc": MessageLookupByLibrary.simpleMessage("标题 A–Z"),
+    "Sort_Title_Desc": MessageLookupByLibrary.simpleMessage("标题 Z–A"),
     "Starter_Templates": MessageLookupByLibrary.simpleMessage("入门模板"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("数独迷"),
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("添加标签"),

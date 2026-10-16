@@ -48,6 +48,7 @@ import 'package:onlynote/services/purchase_service.dart';
 import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:screenshot/screenshot.dart';
@@ -295,6 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
               availableTags: state.availableTags,
               folderId: state.selectedFolderId,
               showTrash: state.showTrash,
+              sortOrder: state.sortOrder,
               scope: state.showArchive
                   ? NoteArchiveScope.archived
                   : state.includeArchived
@@ -318,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
           availableTags: data.availableTags,
           scope: data.scope,
           showTrash: data.showTrash,
+          sort: data.sortOrder,
           savedViews: data.views,
           selectedViewId: data.selectedViewId,
           folderNames: data.folderNames,
@@ -361,10 +364,14 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           if (!mounted) return;
           _applyView(view);
+          final savedSort = result.sort;
+          if (savedSort != null) bloc.add(HomeEvent.sortChanged(savedSort));
           context.showToast(S.of(context).View_Saved);
         case ApplyLibraryFilters():
           bloc.add(HomeEvent.filtersChanged(result.filters));
           bloc.add(HomeEvent.tagsChanged(result.tags));
+          final sort = result.sort;
+          if (sort != null) bloc.add(HomeEvent.sortChanged(sort));
           if (!data.showTrash && result.scope != data.scope) {
             if (result.scope == NoteArchiveScope.archived) {
               bloc.add(const HomeEvent.showArchive(true));
@@ -944,7 +951,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           data.searchQuery
                                                               .trim()
                                                               .isEmpty &&
-                                                          data.filters.isEmpty,
+                                                          data.filters
+                                                              .isEmpty &&
+                                                          // Dragging writes
+                                                          // manual order, so
+                                                          // the grid waits for
+                                                          // that order to land.
+                                                          data.sortOrder ==
+                                                              NoteSortOrder
+                                                                  .manual,
                                                   onEnterReorderMode: () {
                                                     _searchController.clear();
                                                     context
@@ -956,6 +971,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         .add(const HomeEvent
                                                             .filtersChanged(
                                                             {}));
+                                                    // Reordering is only
+                                                    // meaningful in manual
+                                                    // order; say so instead of
+                                                    // silently rearranging.
+                                                    if (data.sortOrder !=
+                                                        NoteSortOrder.manual) {
+                                                      context
+                                                          .read<HomeBloc>()
+                                                          .add(const HomeEvent
+                                                              .sortChanged(
+                                                              NoteSortOrder
+                                                                  .manual));
+                                                      context.showToast(S
+                                                          .of(context)
+                                                          .Sort_Switched_To_Manual);
+                                                    }
                                                     setState(() {
                                                       _isSearchVisible = false;
                                                       _isReorderMode = true;

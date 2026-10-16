@@ -18,6 +18,7 @@ class HomeState with _$HomeState {
     @Default(<String>[]) List<String> availableTags,
     @Default(<SavedNoteView>[]) List<SavedNoteView> savedViews,
     String? selectedViewId,
+    @Default(NoteSortOrder.manual) NoteSortOrder sortOrder,
     @Default(0) int trashCount,
 
     /// Active notes per folder id, for the folder picker. Counts ignore the

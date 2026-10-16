@@ -21,6 +21,7 @@ import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 
 import 'Tools/ads_manager.dart';
 import 'Tools/app_layout_settings.dart';
+import 'Tools/app_sort_settings.dart';
 import 'Tools/app_typography_settings.dart';
 import 'Tools/consent_gate.dart';
 import 'Tools/image_storage.dart';
@@ -87,6 +88,7 @@ Future<void> main() async {
 
   await AppTypographySettings.instance.load();
   await AppLayoutSettings.instance.load();
+  await AppSortSettings.instance.load();
   await AppAppearanceSettings.instance.load();
   await AppCardStyleSettings.instance.load();
   await OnboardingSettings.instance.load();
