@@ -1,4 +1,4 @@
-- New stationery-inspired note themes, including Premium styles.
-- Simpler style controls and search for folders, templates and saved views.
-- Copy note text and checklist items, with clearer note history.
-- Clearer search results, reminder details and backup feedback.
+- Sort your notes by last modified, oldest first or title, or keep dragging them into your own order.
+- Export your whole library as Markdown, plain text or PDF, one file per note in a single archive.
+- Markdown exports keep your photos and recordings beside each note.
+- Pinned notes stay at the top in every sort order.

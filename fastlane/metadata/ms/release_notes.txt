@@ -1,4 +1,4 @@
-- Tema nota baharu berinspirasikan kertas dan buku nota, termasuk gaya Premium.
-- Kawalan gaya yang lebih mudah serta carian folder, templat dan paparan tersimpan.
-- Salin teks nota dan item senarai semak, dengan sejarah nota yang lebih jelas.
-- Hasil carian, butiran peringatan dan maklum balas sandaran yang lebih jelas.
+- Susun nota anda menurut kali terakhir diubah, terlama dahulu atau tajuk, atau terus aturkan sendiri dengan menariknya.
+- Eksport seluruh koleksi nota anda sebagai Markdown, teks biasa atau PDF: satu fail bagi setiap nota dalam satu arkib.
+- Eksport Markdown menyimpan foto dan rakaman anda bersama setiap nota.
+- Nota yang disemat kekal di bahagian atas dalam semua susunan.

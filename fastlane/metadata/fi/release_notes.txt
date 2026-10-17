@@ -1,4 +1,4 @@
-- Uusia paperista ja muistikirjoista inspiroituneita muistiinpanoteemoja, mukana myös Premium-tyylit.
-- Helpommat tyyliasetukset sekä kansioiden, mallipohjien ja tallennettujen näkymien haku.
-- Kopioi muistiinpanojen tekstiä ja tarkistuslistojen kohtia. Muistiinpanohistoria on nyt selkeämpi.
-- Selkeämmät hakutulokset sekä tiedot muistutuksista ja varmuuskopioinnista.
+- Järjestä muistiinpanot viimeksi muokatun, vanhimman tai otsikon mukaan – tai järjestä ne edelleen itse vetämällä.
+- Vie koko muistiinpanokokoelmasi Markdownina, pelkkänä tekstinä tai PDF:nä: yksi tiedosto jokaisesta muistiinpanosta yhdessä arkistossa.
+- Markdown-vienti tallentaa valokuvat ja äänitykset kunkin muistiinpanon yhteyteen.
+- Kiinnitetyt muistiinpanot pysyvät ylimpänä kaikissa järjestyksissä.

@@ -1,4 +1,4 @@
-- Tema catatan baru yang terinspirasi dari kertas dan buku catatan, termasuk gaya Premium.
-- Pengaturan gaya lebih sederhana, dengan pencarian folder, templat, dan tampilan tersimpan.
-- Salin teks catatan dan item daftar periksa, dengan riwayat catatan yang lebih jelas.
-- Hasil pencarian, detail pengingat, dan informasi pencadangan lebih jelas.
+- Urutkan catatan menurut terakhir diubah, terlama lebih dahulu, atau judul, atau tetap atur sendiri dengan menariknya.
+- Ekspor seluruh koleksi catatan sebagai Markdown, teks biasa, atau PDF: satu file per catatan dalam satu arsip.
+- Ekspor Markdown menyimpan foto dan rekaman di samping setiap catatan.
+- Catatan yang disematkan tetap berada di atas pada semua urutan.

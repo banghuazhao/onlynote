@@ -1,4 +1,4 @@
-- De nouveaux thèmes de notes inspirés du papier et des cahiers, y compris des styles Premium.
-- Des réglages de style simplifiés et la recherche de dossiers, de modèles et de vues enregistrées.
-- Copiez le texte des notes et les éléments des listes de tâches, avec un historique de notes plus clair.
-- Des résultats de recherche plus lisibles et des renseignements plus clairs sur les rappels et les sauvegardes.
+- Triez vos notes par dernière modification, des plus anciennes d'abord ou par titre, ou continuez de les classer vous-même en les faisant glisser.
+- Exportez toute votre bibliothèque de notes en Markdown, en texte brut ou en PDF : un fichier par note, réunis dans une seule archive.
+- Les exportations Markdown conservent vos photos et vos enregistrements à côté de chaque note.
+- Les notes épinglées demeurent en haut, quel que soit le tri.

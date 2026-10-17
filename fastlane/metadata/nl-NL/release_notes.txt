@@ -1,4 +1,4 @@
-- Nieuwe notitiethema's geïnspireerd op papier en notitieboeken, inclusief Premium-stijlen.
-- Eenvoudigere stijlinstellingen en zoeken naar mappen, sjablonen en opgeslagen weergaven.
-- Kopieer notitietekst en checklistitems, met een duidelijkere notitiegeschiedenis.
-- Duidelijkere zoekresultaten, herinneringsdetails en feedback over back-ups.
+- Sorteer je notities op laatst gewijzigd, oudste eerst of titel, of blijf ze zelf in de juiste volgorde slepen.
+- Exporteer je hele notitieverzameling als Markdown, platte tekst of PDF: één bestand per notitie in één archief.
+- Bij Markdown-export staan je foto's en opnamen naast elke notitie.
+- Vastgezette notities blijven in elke sortering bovenaan staan.

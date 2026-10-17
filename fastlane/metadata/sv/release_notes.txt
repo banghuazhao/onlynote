@@ -1,4 +1,4 @@
-- Nya anteckningsteman inspirerade av papper och anteckningsböcker, inklusive Premium-stilar.
-- Enklare stilinställningar och sökning efter mappar, mallar och sparade vyer.
-- Kopiera anteckningstext och punkter i checklistor, med tydligare anteckningshistorik.
-- Tydligare sökresultat, påminnelsedetaljer och återkoppling om säkerhetskopiering.
+- Sortera dina anteckningar efter senast ändrad, äldst först eller titel – eller fortsätt dra dem i din egen ordning.
+- Exportera hela din anteckningssamling som Markdown, oformaterad text eller PDF: en fil per anteckning i ett och samma arkiv.
+- Markdown-export sparar dina foton och inspelningar intill varje anteckning.
+- Fästa anteckningar ligger alltid först, oavsett sortering.

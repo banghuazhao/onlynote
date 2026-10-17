@@ -1,4 +1,4 @@
-- Neue Notizdesigns im Stil von Papier und Notizbüchern, auch mit Premium-Designs.
-- Einfachere Stileinstellungen und Suche nach Ordnern, Vorlagen und gespeicherten Ansichten.
-- Notiztexte und Checklistenpunkte kopieren, mit übersichtlicherem Notizverlauf.
-- Klarere Suchergebnisse sowie Informationen zu Erinnerungen und zur Datensicherung.
+- Notizen nach letzter Änderung, älteste zuerst oder nach Titel sortieren – oder sie weiterhin selbst per Ziehen anordnen.
+- Die gesamte Notizsammlung als Markdown, einfachen Text oder PDF exportieren: eine Datei pro Notiz in einem Archiv.
+- Beim Markdown-Export liegen Fotos und Aufnahmen direkt neben der jeweiligen Notiz.
+- Angepinnte Notizen bleiben in jeder Sortierung ganz oben.

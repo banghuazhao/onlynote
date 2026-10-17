@@ -1,4 +1,4 @@
-- Nye notetemaer inspireret af papir og notesbøger, også med Premium-stile.
-- Enklere stilindstillinger og søgning efter mapper, skabeloner og gemte visninger.
-- Kopiér notetekst og punkter i tjeklister, med en mere overskuelig notehistorik.
-- Tydeligere søgeresultater, oplysninger om påmindelser og feedback om sikkerhedskopiering.
+- Sortér dine noter efter senest ændret, ældste først eller titel – eller træk dem fortsat i din egen rækkefølge.
+- Eksportér hele din notesamling som Markdown, almindelig tekst eller PDF: én fil pr. note i ét samlet arkiv.
+- Markdown-eksport gemmer dine billeder og optagelser sammen med hver note.
+- Fastgjorte noter bliver vist øverst, uanset sortering.
