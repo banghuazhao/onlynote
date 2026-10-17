@@ -12,7 +12,19 @@ enum DesktopCommand { newNote, settings, searchNotes, findInNote, undo, redo }
 /// Connects the native menu to the current route and waits for all editor
 /// writes before macOS is allowed to terminate the Flutter engine.
 class DesktopCommands extends ChangeNotifier {
+  DesktopCommands({Duration? saveBudget})
+      : saveBudget = saveBudget ?? const Duration(seconds: 5);
   static final instance = DesktopCommands();
+
+  /// How long a quit waits for editor saves before it stops waiting.
+  ///
+  /// Saving a note is a local write of milliseconds, so reaching this means a
+  /// save is stuck rather than slow. macOS gives an app no way to say "still
+  /// working": until this answers, the app sits in NSTerminateLater with no
+  /// window and looks frozen, which is what App Review rejects. So the wait is
+  /// bounded and a stuck save answers exit — the app quits and that one write
+  /// is lost, rather than hanging with everything else already saved.
+  final Duration saveBudget;
 
   final _commands = <_CommandRegistration>[];
   final _editors = <Future<bool> Function()>[];
@@ -80,8 +92,12 @@ class DesktopCommands extends ChangeNotifier {
     _pendingSaves.add(tracked);
   }
 
-  Future<AppExitResponse> prepareToExit() =>
-      _exitRequest ??= _flushEditors().whenComplete(() => _exitRequest = null);
+  Future<AppExitResponse> prepareToExit() => _exitRequest ??= _flushEditors()
+      // The budget covers the whole flush, not each save: only a bound on the
+      // total can promise macOS an answer. Saves that are still running keep
+      // running; they are simply no longer waited on.
+      .timeout(saveBudget, onTimeout: () => AppExitResponse.exit)
+      .whenComplete(() => _exitRequest = null);
 
   Future<AppExitResponse> _flushEditors() async {
     var saved = true;

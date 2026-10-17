@@ -88,4 +88,59 @@ void main() {
     expect(await commands.prepareToExit(), AppExitResponse.exit);
     commands.dispose();
   });
+
+  test('a save that never finishes still lets the app quit', () async {
+    final commands =
+        DesktopCommands(saveBudget: const Duration(milliseconds: 20));
+    final stuck = Completer<bool>();
+    commands.registerEditor(() => stuck.future);
+    var reached = false;
+    commands.registerEditor(() async {
+      reached = true;
+      return true;
+    });
+    // macOS has no way to be told "still working", so an unanswerable save
+    // must not be able to hold the quit open.
+    expect(await commands.prepareToExit(), AppExitResponse.exit);
+    expect(reached, isFalse);
+    stuck.complete(true);
+    commands.dispose();
+  });
+
+  test('a tracked save that never finishes is bounded too', () async {
+    final commands =
+        DesktopCommands(saveBudget: const Duration(milliseconds: 20));
+    final stuck = Completer<bool>();
+    commands.registerEditor(() async => true);
+    commands.trackSave(stuck.future);
+    expect(await commands.prepareToExit(), AppExitResponse.exit);
+    stuck.complete(false);
+    commands.dispose();
+  });
+
+  test('a slow save inside the budget still decides the answer', () async {
+    final commands = DesktopCommands(saveBudget: const Duration(seconds: 30));
+    commands.registerEditor(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      return false;
+    });
+    // The bound is a backstop, not a shortcut: a save that answers in time
+    // still cancels the quit.
+    expect(await commands.prepareToExit(), AppExitResponse.cancel);
+    commands.dispose();
+  });
+
+  test('a quit that timed out can be retried once saves recover', () async {
+    final commands =
+        DesktopCommands(saveBudget: const Duration(milliseconds: 20));
+    final stuck = Completer<bool>();
+    var recovered = false;
+    commands
+        .registerEditor(() => recovered ? Future.value(true) : stuck.future);
+    expect(await commands.prepareToExit(), AppExitResponse.exit);
+    recovered = true;
+    expect(await commands.prepareToExit(), AppExitResponse.exit);
+    stuck.complete(true);
+    commands.dispose();
+  });
 }
