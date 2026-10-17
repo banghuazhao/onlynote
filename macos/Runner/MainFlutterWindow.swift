@@ -2,8 +2,6 @@ import Cocoa
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
-  private var exitRequestPending = false
-
   override func awakeFromNib() {
     // AppKit loads the main nib on the main thread, although NSObject's
     // awakeFromNib declaration predates actor isolation.
@@ -30,24 +28,20 @@ class MainFlutterWindow: NSWindow {
     center()
   }
 
-  // Closing the sole window should use Flutter's cancelable app-exit flow,
-  // so an editor can finish its save before the engine is torn down.
+  // Onlynote has one window, so its close button and ⌘W quit the app, which
+  // is what macOS expects of a single-window app: there is no supported way to
+  // reopen a main window once it is gone, and an app left running without one
+  // looks hung.
+  //
+  // Quitting goes through AppKit's own termination flow so that Flutter can
+  // flush pending editor saves and cancel the quit. Asking Dart here instead,
+  // and terminating from inside that reply, made the engine send a second
+  // System.requestAppExit whose answer never arrived through AppKit's nested
+  // termination run loop, which left the app unresponsive.
+  //
+  // The window is never closed on its own: a cancelled quit has to leave the
+  // app usable, with its window still on screen.
   override func performClose(_ sender: Any?) {
-    guard !exitRequestPending,
-          let controller = contentViewController as? FlutterViewController else { return }
-    exitRequestPending = true
-    let channel = FlutterMethodChannel(
-      name: "flutter/platform", binaryMessenger: controller.engine.binaryMessenger,
-      codec: FlutterJSONMethodCodec.sharedInstance()
-    )
-    channel.invokeMethod("System.requestAppExit", arguments: ["type": "cancelable"]) { [weak self] response in
-      MainActor.assumeIsolated {
-        self?.exitRequestPending = false
-        guard let reply = response as? [String: Any], reply["response"] as? String == "exit" else { return }
-        // The application delegate forwards termination to Flutter too. All
-        // save handlers are idempotent and already flushed at this point.
-        NSApplication.shared.terminate(sender)
-      }
-    }
+    NSApplication.shared.terminate(sender)
   }
 }
