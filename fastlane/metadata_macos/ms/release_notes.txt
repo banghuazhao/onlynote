@@ -1,0 +1,8 @@
+Onlynote kini tersedia sebagai aplikasi Mac asli.
+• Menu Mac, pintasan Command dan tindakan klik kanan.
+• Widget kertas untuk desktop dan Pusat Pemberitahuan pada macOS 14 atau lebih baharu.
+• Import foto, pengecaman teks pada peranti dan memo suara Premium.
+• Eksport dan pulihkan sandaran .onlynote melalui dialog simpan Mac.
+• Bebas iklan pada Mac dan menyokong pemulihan pembelian Premium terdahulu.
+
+Memerlukan macOS 12 atau lebih baharu. Setiap peranti menyimpan pustaka setempat sendiri; pindahkan nota dan media melalui sandaran.

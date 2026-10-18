@@ -1,0 +1,30 @@
+Onlynote brings simple notes, checklists and everyday plans to your Mac. Write with the feel of paper, keep useful details together, and find them when you need them.
+
+WRITE AND ORGANIZE
+• Capture ideas with simple formatting, a writing focus mode, undo and redo, automatic saving, and note history.
+• Organize notes with folders, tags, pins, saved search views, Archive and Trash.
+• Start from shopping, packing, daily-plan and meeting templates, or save your own templates.
+• Add photos from your Mac and recognize their text on-device. Search can find text in your photos, too.
+• Keep a daily note and revisit it through the calendar.
+• Set reminders that take you back to the right note.
+• Copy note text or share notes as an image, PDF or Markdown.
+
+MADE FOR MAC
+Use native menus, Command-key shortcuts and right-click note actions in a resizable window. Choose stationery styles, from classic paper and sticky notes to ruled notebooks and grid paper.
+
+NATIVE DESKTOP WIDGETS
+On macOS 14 or later, keep an overview of your library or a selected note or checklist on your desktop or in Notification Center. Check off checklist items in the widget and click a note to open it in Onlynote.
+
+YOUR LOCAL LIBRARY
+No account or sign-in is required. Each device has its own local library. Transfer notes, photos and recordings between Mac and iPhone by exporting a .onlynote backup and restoring it on the other device.
+
+FREE AND PREMIUM
+The Mac app is ad-free. The free plan includes up to 10 notes, checklists, one-time reminders, up to 3 folders and 3 saved templates, and default card styling.
+
+A one-time Premium purchase unlocks unlimited notes, folders and saved templates, repeating reminders, voice memos, individual card styles, and Premium note themes. No subscription. Existing Remove Ads purchases also include Premium; use Restore Purchases with the same Apple Account.
+
+Voice transcription requires on-device Speech support for the selected language.
+
+Requires macOS 12 or later. Native desktop and Notification Center widgets require macOS 14 or later.
+
+Interface languages: English, Simplified Chinese and Traditional Chinese.

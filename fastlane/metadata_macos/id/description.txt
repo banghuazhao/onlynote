@@ -1,0 +1,30 @@
+Onlynote menghadirkan catatan sederhana, daftar periksa, dan rencana sehari-hari di Mac. Tulis dengan tampilan kertas, kumpulkan informasi penting, dan temukan kembali saat dibutuhkan.
+
+TULIS DAN ATUR
+• Format teks sederhana, mode fokus, urungkan dan ulangi, penyimpanan otomatis, serta riwayat catatan.
+• Folder, tag, catatan yang disematkan, tampilan pencarian tersimpan, arsip, dan sampah.
+• Templat belanja, berkemas, rencana harian, dan rapat, atau simpan templat sendiri.
+• Tambahkan foto dari Mac dan kenali teksnya di perangkat. Pencarian juga dapat menemukan teks dalam foto.
+• Buat catatan harian dan buka kembali melalui kalender.
+• Atur pengingat yang membuka catatan terkait.
+• Salin teks atau bagikan catatan sebagai gambar, PDF, atau Markdown.
+
+DIBUAT UNTUK MAC
+Gunakan menu bawaan, pintasan Command, dan tindakan klik kanan dalam jendela yang ukurannya dapat diubah. Pilih gaya kertas klasik, catatan tempel, buku bergaris, atau kertas kotak.
+
+WIDGET DESKTOP
+Dengan macOS 14 atau lebih baru, tampilkan ringkasan pustaka atau catatan atau daftar periksa yang dipilih di desktop atau Pusat Pemberitahuan. Centang tugas langsung di widget dan klik catatan untuk membukanya di Onlynote.
+
+PUSTAKA LOKAL ANDA
+Tidak perlu akun atau masuk. Setiap perangkat memiliki pustaka lokal sendiri. Pindahkan catatan, foto, dan rekaman antara Mac dan iPhone dengan mengekspor cadangan .onlynote lalu memulihkannya di perangkat lain.
+
+GRATIS DAN PREMIUM
+Aplikasi Mac bebas iklan. Versi gratis mencakup hingga 10 catatan, daftar periksa, pengingat satu kali, 3 folder, 3 templat tersimpan, dan gaya kartu bawaan.
+
+Pembelian Premium satu kali membuka catatan, folder, dan templat tersimpan tanpa batas, pengingat berulang, memo suara, gaya kartu per catatan, dan tema Premium. Tanpa langganan. Pembelian penghapusan iklan sebelumnya juga mencakup Premium; pulihkan pembelian dengan Akun Apple yang sama.
+
+Transkripsi memerlukan dukungan pengenalan ucapan di perangkat untuk bahasa yang dipilih.
+
+Memerlukan macOS 12 atau lebih baru. Widget desktop dan Pusat Pemberitahuan memerlukan macOS 14 atau lebih baru.
+
+Bahasa antarmuka: Inggris, Tionghoa Sederhana, dan Tionghoa Tradisional.

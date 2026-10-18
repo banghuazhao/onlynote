@@ -1,0 +1,8 @@
+Onlynote is now available as a native Mac app.
+• Write and organize notes with native menus, Command-key shortcuts and right-click actions.
+• Add paper widgets to your desktop or Notification Center on macOS 14 or later.
+• Import photos, recognize text on-device, and use Premium voice memos.
+• Save and restore .onlynote backups with a Mac Save As dialog.
+• The Mac app is ad-free and supports restoring your existing Premium purchase.
+
+Requires macOS 12 or later. Each device keeps its own local library; transfer notes and media through backups.

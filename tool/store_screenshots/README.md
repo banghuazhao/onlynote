@@ -45,6 +45,96 @@ Check [Apple's screenshot specifications](https://developer.apple.com/help/app-s
 and [Google's screenshot guidelines](https://support.google.com/googleplay/android-developer/answer/9866151)
 before using the tooling for a later release.
 
+## Mac screenshots
+
+Mac capture is opt-in and uses the production desktop layouts, localized sample
+notes, and isolated services. It outputs 2880 × 1800 pixels, one of Apple's
+accepted 16:10 Mac sizes. The eight app screens use the existing warm paper
+captions. A ninth image places the real library viewport beside real SwiftUI
+widget renders; its caption states that desktop widgets require macOS 14 or later.
+No desktop or device chrome is drawn around the app.
+
+First generate the native previews with the `RunnerTests` widget snapshot test,
+which writes `note-medium.png`, `note-chinese.png`, and `checklist-large.png` to
+`build/mac-widget-previews`. The capture harness loads those native renders;
+it does not recreate their text or controls.
+The Chinese compositions use the genuine Chinese note render; the checklist
+remains an English example of the content a user can write.
+
+```sh
+flutter test test/presentation/store_screenshots_test.dart --no-pub \
+  --dart-define=CAPTURE_STORE_SCREENSHOTS=true \
+  --dart-define=STORE_DEVICES=macos \
+  --dart-define=STORE_OUTPUT_ROOT=build/store_screenshots/2026-10-14 \
+  --concurrency=1
+python3 tool/store_screenshots/prepare_macos.py
+```
+
+For a first visual check, add `--dart-define=STORE_LOCALES=en` and
+`--dart-define=STORE_SCREENS=home,formattedNote,desktopWidgets`. The complete
+capture creates nine images for each of English, Simplified Chinese, and
+Traditional Chinese. Raw captures are in `macos/<locale>`, upload-ready JPEGs
+are in `upload/macos/<locale>`, and `macos-manifest.json` records the ordered
+files, dimensions, hashes, and App Store locale mapping. Contact sheets are
+saved beside the manifest. Mac exports have their own preparation command;
+the earlier mobile screenshot sets remain separate.
+
+## Mac upload and release
+
+The Mac release tools target `MAC_OS` and `APP_DESKTOP` screenshot sets.
+Credentials stay outside the repository in
+`~/Development/secret/AppStoreConnect_API_keys/asc_token.py`; both tools accept
+`--credentials-helper` to select another helper. The release commands below use
+the current defaults, version 1.8.0 and build 18; pass `--version` and `--build`
+explicitly for a later release. Actions require `--execute`, except `inspect`
+and `status`, which read the existing store records.
+
+Build the Flutter release configuration, then archive, export, and verify the
+universal Mac app and its widget extension:
+
+```sh
+flutter build macos --release --build-name=1.8.0 --build-number=18
+python3 tool/build_macos_release.py --execute --skip-flutter-config
+```
+
+If automatic export cannot use cloud signing, reuse the archive with installed
+Mac App Store application/installer certificates and profiles for both targets:
+
+```sh
+python3 tool/build_macos_release.py --execute --export-only --manual-export
+```
+
+The build tool exports `build/macos-release/export/Onlynote.pkg`. Upload the
+localized listing and prepared screenshots, validate that exact package with
+Apple, then upload it:
+
+```sh
+python3 tool/release_macos.py inspect
+python3 tool/release_macos.py prepare-listing --execute
+python3 tool/release_macos.py upload-screenshots --execute
+python3 tool/release_macos.py validate-package --package build/macos-release/export/Onlynote.pkg --execute
+python3 tool/release_macos.py upload-package --package build/macos-release/export/Onlynote.pkg --execute
+python3 tool/release_macos.py status
+```
+
+After Apple reports the build as `VALID`, `prepare-review` attaches that build
+and verifies the listing, screenshots, encryption declaration, and reviewer
+details. `submit-review` sends the Mac version to App Review, with automatic
+release after approval. Logs and the resumable journal are in
+`build/macos-release`.
+
+```sh
+python3 tool/release_macos.py prepare-review --execute
+python3 tool/release_macos.py submit-review --execute
+python3 tool/release_macos.py status
+```
+
+Mac 1.8.0 (18) was uploaded, validated, and submitted on October 14, 2026.
+Its 19 localized listings and 27 screenshots were verified. The submission is
+**Waiting for Review**, with automatic release after Apple approves it.
+The signed package and release evidence are in the ignored `build/macos-release`
+directory; screenshot previews are in `build/store_screenshots/2026-10-14`.
+
 ## Upload
 
 The uploader loads credential helpers from `~/Development/secret` without

@@ -1,0 +1,30 @@
+Onlynote bringt einfache Notizen, Checklisten und Alltagspläne auf deinen Mac. Halte Gedanken auf Papierstilen fest, sammle wichtige Details und finde sie schnell wieder.
+
+SCHREIBEN UND ORGANISIEREN
+• Einfache Textformatierung, Fokusmodus, Rückgängig und Wiederholen, automatisches Speichern und Notizverlauf.
+• Ordner, Tags, angeheftete Notizen, gespeicherte Suchansichten, Archiv und Papierkorb.
+• Vorlagen für Einkäufe, Packlisten, Tagespläne und Besprechungen sowie eigene gespeicherte Vorlagen.
+• Fotos vom Mac hinzufügen und Text auf dem Gerät erkennen. Auch Text in Fotos lässt sich durchsuchen.
+• Tägliche Notizen erstellen und über den Kalender wieder aufrufen.
+• Erinnerungen festlegen, die zur passenden Notiz führen.
+• Text kopieren oder Notizen als Bild, PDF oder Markdown teilen.
+
+FÜR DEN MAC
+Nutze native Menüs, Command-Tastenkürzel und Rechtsklick-Aktionen in einem Fenster mit anpassbarer Größe. Wähle klassische Papierstile, Haftnotizen, linierte Notizbücher oder kariertes Papier.
+
+NATIVE DESKTOP-WIDGETS
+Ab macOS 14 kannst du eine Übersicht deiner Bibliothek oder eine ausgewählte Notiz oder Checkliste auf dem Schreibtisch oder in der Mitteilungszentrale anzeigen. Hake Aufgaben direkt im Widget ab und öffne Notizen per Klick in Onlynote.
+
+DEINE LOKALE BIBLIOTHEK
+Kein Konto und keine Anmeldung nötig. Jedes Gerät hat seine eigene lokale Bibliothek. Übertrage Notizen, Fotos und Aufnahmen zwischen Mac und iPhone, indem du eine .onlynote-Sicherung exportierst und auf dem anderen Gerät wiederherstellst.
+
+KOSTENLOS UND PREMIUM
+Die Mac-App ist werbefrei. Kostenlos sind bis zu 10 Notizen, Checklisten, einmalige Erinnerungen, 3 Ordner, 3 gespeicherte Vorlagen und der Standard-Kartenstil enthalten.
+
+Ein einmaliger Premium-Kauf schaltet unbegrenzte Notizen, Ordner und gespeicherte Vorlagen, wiederkehrende Erinnerungen, Sprachmemos, individuelle Kartenstile und Premium-Notizthemen frei. Kein Abonnement. Frühere Käufe zum Entfernen von Werbung enthalten ebenfalls Premium. Stelle den Kauf mit demselben Apple Account wieder her.
+
+Die Sprachtranskription erfordert eine auf dem Gerät unterstützte Sprache.
+
+Erfordert macOS 12 oder neuer. Native Desktop-Widgets und Widgets in der Mitteilungszentrale erfordern macOS 14 oder neuer.
+
+Oberfläche: Englisch, vereinfachtes Chinesisch und traditionelles Chinesisch.

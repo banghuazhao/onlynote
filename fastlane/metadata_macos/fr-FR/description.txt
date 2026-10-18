@@ -1,0 +1,30 @@
+Onlynote apporte des notes simples, des listes et vos projets du quotidien sur Mac. Écrivez sur des pages inspirées du papier, rassemblez les informations utiles et retrouvez-les au bon moment.
+
+ÉCRIRE ET ORGANISER
+• Mise en forme simple, mode concentration, annulation et rétablissement, enregistrement automatique et historique des notes.
+• Dossiers, étiquettes, notes épinglées, recherches enregistrées, archives et corbeille.
+• Modèles pour les courses, les bagages, les plans quotidiens et les réunions, ou vos propres modèles enregistrés.
+• Ajoutez des photos depuis votre Mac et reconnaissez leur texte sur l’appareil. La recherche trouve aussi le texte des photos.
+• Créez une note quotidienne et retrouvez-la dans le calendrier.
+• Définissez des rappels qui ouvrent la bonne note.
+• Copiez le texte ou partagez les notes sous forme d’image, de PDF ou de Markdown.
+
+CONÇU POUR MAC
+Profitez des menus natifs, des raccourcis avec Command et des actions par clic droit dans une fenêtre redimensionnable. Choisissez du papier classique, des notes adhésives, des carnets lignés ou du papier quadrillé.
+
+WIDGETS NATIFS
+Avec macOS 14 ou ultérieur, affichez un aperçu de votre bibliothèque ou une note ou liste choisie sur le bureau ou dans le Centre de notifications. Cochez les tâches dans le widget et cliquez sur une note pour l’ouvrir dans Onlynote.
+
+VOTRE BIBLIOTHÈQUE LOCALE
+Aucun compte ni connexion nécessaire. Chaque appareil possède sa propre bibliothèque locale. Transférez notes, photos et enregistrements entre Mac et iPhone en exportant une sauvegarde .onlynote puis en la restaurant sur l’autre appareil.
+
+GRATUIT ET PREMIUM
+L’app Mac est sans publicité. La version gratuite comprend jusqu’à 10 notes, des listes, des rappels ponctuels, 3 dossiers, 3 modèles enregistrés et le style de carte par défaut.
+
+Un achat unique de Premium débloque un nombre illimité de notes, dossiers et modèles enregistrés, les rappels récurrents, les mémos vocaux, les styles de carte individuels et les thèmes Premium. Aucun abonnement. Les anciens achats de suppression des publicités incluent aussi Premium ; restaurez votre achat avec le même compte Apple.
+
+La transcription nécessite la prise en charge de la reconnaissance vocale sur l’appareil pour la langue choisie.
+
+Nécessite macOS 12 ou ultérieur. Les widgets natifs du bureau et du Centre de notifications nécessitent macOS 14 ou ultérieur.
+
+Interface en anglais, chinois simplifié et chinois traditionnel.

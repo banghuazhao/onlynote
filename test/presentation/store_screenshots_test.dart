@@ -62,15 +62,24 @@ import '../support/premium_test_fakes.dart';
 import '../support/store_screenshot_content.dart';
 
 const _captureEnabled = bool.fromEnvironment('CAPTURE_STORE_SCREENSHOTS');
-const _outputRoot = 'build/store_screenshots/2026-10-08';
+const _outputRoot = String.fromEnvironment('STORE_OUTPUT_ROOT',
+    defaultValue: 'build/store_screenshots/2026-10-08');
 const _captureKey = ValueKey('store-screenshot');
 
 class _Device {
-  const _Device(this.name, this.size, this.pixelRatio, {this.ios = false});
+  const _Device(this.name, this.size, this.pixelRatio,
+      {this.ios = false, this.macos = false});
   final String name;
   final Size size;
   final double pixelRatio;
   final bool ios;
+  final bool macos;
+  bool get apple => ios || macos;
+  TargetPlatform get platform => macos
+      ? TargetPlatform.macOS
+      : ios
+          ? TargetPlatform.iOS
+          : TargetPlatform.android;
   bool get tablet => size.width >= 600;
 }
 
@@ -81,6 +90,7 @@ const _devices = [
   _Device('playphone', Size(360, 640), 3),
   _Device('play7inch', Size(600, 960), 2),
   _Device('play10inch', Size(800, 1280), 2),
+  _Device('macos', Size(1440, 900), 2, macos: true),
 ];
 
 bool _selected(String filter, String value) =>
@@ -104,7 +114,7 @@ ThemeData _captureTheme(_Device device) {
   ButtonStyle? button(ButtonStyle? style) => style?.copyWith(
       textStyle: WidgetStatePropertyAll(font(base.textTheme.labelLarge)));
   return base.copyWith(
-    platform: device.ios ? TargetPlatform.iOS : TargetPlatform.android,
+    platform: device.platform,
     textTheme: base.textTheme
         .apply(fontFamily: 'Roboto', fontFamilyFallback: ['DroidSansFallback']),
     primaryTextTheme: base.primaryTextTheme
@@ -277,7 +287,7 @@ class _CaptureRouter extends AppRouter {
 
 class _CaptureHost {
   _CaptureHost(this.home, this.selection, this.detail, this.router,
-      this.fixture, this.templates, this.agenda);
+      this.fixture, this.templates, this.agenda, this.widgetImages);
   final HomeBloc home;
   final MultipleDeleteBloc selection;
   final NoteDetailBloc detail;
@@ -285,12 +295,14 @@ class _CaptureHost {
   final PremiumTestFixture fixture;
   final CustomNoteTemplateStore templates;
   final ReminderAgendaController agenda;
+  final _DesktopWidgetImages? widgetImages;
 
   Future<void> dispose(WidgetTester tester) async {
     debugPrint('store dispose: unmount');
     FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
+    widgetImages?.dispose();
     // Stream controllers close in the real test zone. Creating their close
     // futures inside the widget fake zone can leave asyncExpand waiting forever.
     await tester.runAsync(() async {
@@ -309,6 +321,60 @@ class _CaptureHost {
   }
 }
 
+StoreScreenshotCaption _desktopWidgetCaption(
+        StoreScreenshotLanguage language) =>
+    switch (language) {
+      StoreScreenshotLanguage.english => const StoreScreenshotCaption(
+          'Your notes, right on your desktop',
+          'Paper widgets keep a note or checklist close. Desktop widgets require macOS 14 or later.'),
+      StoreScreenshotLanguage.simplifiedChinese => const StoreScreenshotCaption(
+          '把笔记，放在桌面上', '纸张风格小组件，让笔记和清单随手可见。桌面小组件需要 macOS 14 或更高版本。'),
+      StoreScreenshotLanguage.traditionalChinese =>
+        const StoreScreenshotCaption(
+            '把筆記，放在桌面上', '紙張風格小工具，讓筆記和清單隨手可見。桌面小工具需要 macOS 14 或以上版本。'),
+    };
+
+/// These images are rendered from the production SwiftUI widget content by
+/// RunnerTests. The store composition adds no desktop chrome or invented UI.
+class _DesktopWidgetImages {
+  _DesktopWidgetImages(this.note, this.checklist);
+
+  final ui.Image note;
+  final ui.Image checklist;
+
+  static Future<_DesktopWidgetImages> load(
+      StoreScreenshotLanguage language) async {
+    Future<ui.Image> decode(String name) async {
+      final file = File('build/mac-widget-previews/$name.png');
+      if (!await file.exists()) {
+        throw StateError(
+            'Render the native widget previews first: ${file.path}');
+      }
+      final codec = await ui.instantiateImageCodec(await file.readAsBytes());
+      try {
+        return (await codec.getNextFrame()).image;
+      } finally {
+        codec.dispose();
+      }
+    }
+
+    final note = await decode(language == StoreScreenshotLanguage.english
+        ? 'note-medium'
+        : 'note-chinese');
+    try {
+      return _DesktopWidgetImages(note, await decode('checklist-large'));
+    } catch (_) {
+      note.dispose();
+      rethrow;
+    }
+  }
+
+  void dispose() {
+    note.dispose();
+    checklist.dispose();
+  }
+}
+
 /// The title treatment is store artwork. Everything below it is a production
 /// app screen, constrained to the remaining viewport without a device mockup.
 class _StoreFrame extends StatelessWidget {
@@ -316,20 +382,30 @@ class _StoreFrame extends StatelessWidget {
       {required this.device,
       required this.heading,
       required this.subtitle,
+      this.widgetImages,
       required this.child});
   final _Device device;
   final String heading;
   final String subtitle;
+  final _DesktopWidgetImages? widgetImages;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final headerHeight = device.size.height * (device.tablet ? .08 : .14);
-    final headerSize =
-        device.tablet ? (device.size.width < 700 ? 28.0 : 34.0) : 22.0;
+    final headerHeight =
+        device.macos ? 116.0 : device.size.height * (device.tablet ? .08 : .14);
+    final headerSize = device.macos
+        ? 42.0
+        : device.tablet
+            ? (device.size.width < 700 ? 28.0 : 34.0)
+            : 22.0;
     // On the smallest Play canvas this keeps the actual app above 80% of the
     // image area, including its border and rounded corners.
-    final inset = device.tablet ? 24.0 : 8.0;
+    final inset = device.macos
+        ? 32.0
+        : device.tablet
+            ? 24.0
+            : 8.0;
     return ColoredBox(
       color: const Color(0xFFF4E9D6),
       child: Column(children: [
@@ -369,11 +445,13 @@ class _StoreFrame extends StatelessWidget {
                                           fontFamilyFallback: const [
                                             'DroidSansFallback'
                                           ],
-                                          fontSize: device.tablet
-                                              ? (device.size.width < 700
-                                                  ? 14
-                                                  : 16)
-                                              : 11.5,
+                                          fontSize: device.macos
+                                              ? 19
+                                              : device.tablet
+                                                  ? (device.size.width < 700
+                                                      ? 14
+                                                      : 16)
+                                                  : 11.5,
                                           fontWeight: FontWeight.w400,
                                           height: 1.22,
                                           color: const Color(0xFF665D50),
@@ -384,31 +462,54 @@ class _StoreFrame extends StatelessWidget {
         Expanded(
             child: Padding(
           padding: EdgeInsets.fromLTRB(inset, 0, inset, inset),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-                color: const Color(0xFFF9F2E5),
-                borderRadius: BorderRadius.circular(device.tablet ? 18 : 12),
-                border: Border.all(color: const Color(0xFFD6C7AF)),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Color(0x143E3020),
-                      blurRadius: 16,
-                      offset: Offset(0, 5))
-                ]),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(device.tablet ? 18 : 12),
-                child: LayoutBuilder(
-                    builder: (context, constraints) => MediaQuery(
-                        data: MediaQuery.of(context).copyWith(
-                            size: Size(
-                                constraints.maxWidth, constraints.maxHeight),
-                            padding: EdgeInsets.zero,
-                            viewPadding: EdgeInsets.zero,
-                            viewInsets: EdgeInsets.zero,
-                            textScaler: TextScaler.noScaling,
-                            disableAnimations: true),
-                        child: child))),
-          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+                child: DecoratedBox(
+              decoration: BoxDecoration(
+                  color: const Color(0xFFF9F2E5),
+                  borderRadius: BorderRadius.circular(device.tablet ? 18 : 12),
+                  border: Border.all(color: const Color(0xFFD6C7AF)),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x143E3020),
+                        blurRadius: 16,
+                        offset: Offset(0, 5))
+                  ]),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(device.tablet ? 18 : 12),
+                  child: LayoutBuilder(
+                      builder: (context, constraints) => MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                              size: Size(
+                                  constraints.maxWidth, constraints.maxHeight),
+                              padding: EdgeInsets.zero,
+                              viewPadding: EdgeInsets.zero,
+                              viewInsets: EdgeInsets.zero,
+                              textScaler: TextScaler.noScaling,
+                              disableAnimations: true),
+                          child: child))),
+            )),
+            if (widgetImages case final images?) ...[
+              const SizedBox(width: 24),
+              SizedBox(
+                  width: 344,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AspectRatio(
+                          aspectRatio: images.note.width / images.note.height,
+                          child: RawImage(
+                              image: images.note, fit: BoxFit.contain)),
+                      const SizedBox(height: 20),
+                      AspectRatio(
+                          aspectRatio:
+                              images.checklist.width / images.checklist.height,
+                          child: RawImage(
+                              image: images.checklist, fit: BoxFit.contain)),
+                    ],
+                  )),
+            ],
+          ]),
         )),
       ]),
     );
@@ -416,8 +517,9 @@ class _StoreFrame extends StatelessWidget {
 }
 
 Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
-    StoreScreenshotContent content, StoreScreenshotScreen screen) async {
-  final fixture = PremiumTestFixture(premium: true, supported: device.ios);
+    StoreScreenshotContent content, StoreScreenshotScreen screen,
+    {bool desktopWidgets = false}) async {
+  final fixture = PremiumTestFixture(premium: true, supported: device.apple);
   await fixture.init();
   final notes = _Notes(content.notes());
   final folders = _Folders(content.folders);
@@ -469,17 +571,25 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
     for (final reminder in content.reminders)
       // Reminders live in ReminderData rather than the Note model. The Android
       // appearance sample has no reminder so its whole card fits the preview.
-      if (!(screen == StoreScreenshotScreen.cardStyle &&
-          !device.ios &&
-          reminder.noteId == content.styleNote.id))
+      // The compact library beside the widgets uses a note without a reminder
+      // so the snapshot focuses on its content rather than narrow date badges.
+      if (!(desktopWidgets &&
+              reminder.noteId == StoreScreenshotContent.journalNoteId) &&
+          !(screen == StoreScreenshotScreen.cardStyle &&
+              !device.apple &&
+              reminder.noteId == content.styleNote.id))
         Reminder(
             reminderDate: reminder.reminderDate,
             reminderId: reminder.reminderId,
             noteId: reminder.noteId),
   ];
   final theme = _captureTheme(device);
-  final host =
-      _CaptureHost(home, selection, detail, router, fixture, templates, agenda);
+  final widgetImages = desktopWidgets
+      ? await tester.runAsync(() => _DesktopWidgetImages.load(content.language))
+      : null;
+  final host = _CaptureHost(home, selection, detail, router, fixture, templates,
+      agenda, widgetImages);
+  final widgetCaption = _desktopWidgetCaption(content.language);
   await tester.pumpWidget(MultiBlocProvider(
       providers: [
         BlocProvider.value(value: home),
@@ -510,8 +620,13 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
             ],
             builder: (context, child) => _StoreFrame(
                 device: device,
-                heading: content.heading(screen, ios: device.ios),
-                subtitle: _subtitle(content, screen, ios: device.ios),
+                heading: desktopWidgets
+                    ? widgetCaption.heading
+                    : content.heading(screen, ios: device.apple),
+                subtitle: desktopWidgets
+                    ? widgetCaption.subtitle
+                    : _subtitle(content, screen, ios: device.apple),
+                widgetImages: widgetImages,
                 child: child!),
           ))));
   await tester.pumpAndSettle();
@@ -559,7 +674,8 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
 }
 
 Future<void> _capture(WidgetTester tester, _Device device,
-    StoreScreenshotContent content, StoreScreenshotScreen screen) async {
+    StoreScreenshotContent content, StoreScreenshotScreen screen,
+    {String? filename}) async {
   expect(Localizations.localeOf(tester.element(find.byType(Navigator).first)),
       content.locale,
       reason: 'The app interface must match the artwork language.');
@@ -569,7 +685,7 @@ Future<void> _capture(WidgetTester tester, _Device device,
       tester.renderObject<RenderRepaintBoundary>(find.byKey(_captureKey));
   final number = (screen.index + 1).toString().padLeft(2, '0');
   final path =
-      '$_outputRoot/${device.name}/${content.outputCode}/$number-${screen.name}.png';
+      '$_outputRoot/${device.name}/${content.outputCode}/${filename ?? '$number-${screen.name}'}.png';
   await tester.runAsync(() async {
     final image = await boundary.toImage(pixelRatio: device.pixelRatio);
     try {
@@ -719,6 +835,11 @@ void main() {
   });
 
   for (final device in _devices) {
+    // Keep the existing six-device mobile export unchanged. Mac captures are
+    // explicitly requested with STORE_DEVICES=macos and a separate output root.
+    if (device.macos && const String.fromEnvironment('STORE_DEVICES').isEmpty) {
+      continue;
+    }
     if (!_selected(
         const String.fromEnvironment('STORE_DEVICES'), device.name)) {
       continue;
@@ -735,32 +856,42 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
-        debugDefaultTargetPlatformOverride =
-            device.ios ? TargetPlatform.iOS : TargetPlatform.android;
         final content = StoreScreenshotContent(language);
-        try {
-          for (final screen in StoreScreenshotScreen.values) {
-            if (!_selected(
-                const String.fromEnvironment('STORE_SCREENS'), screen.name)) {
-              continue;
-            }
-            _CaptureHost? host;
-            try {
-              debugPrint(
-                  'store mount: ${device.name}/${content.outputCode}/${screen.name}');
-              host = await _mount(tester, device, content, screen);
-              debugPrint('store mounted: ${screen.name}');
-              await _capture(tester, device, content, screen);
-              debugPrint('store captured: ${screen.name}');
-            } finally {
-              if (host != null) await host.dispose(tester);
-              debugPrint('store disposed: ${screen.name}');
-            }
+        for (final screen in StoreScreenshotScreen.values) {
+          if (!_selected(
+              const String.fromEnvironment('STORE_SCREENS'), screen.name)) {
+            continue;
           }
-        } finally {
-          debugDefaultTargetPlatformOverride = previousDefaultPlatform;
+          _CaptureHost? host;
+          try {
+            debugPrint(
+                'store mount: ${device.name}/${content.outputCode}/${screen.name}');
+            host = await _mount(tester, device, content, screen);
+            debugPrint('store mounted: ${screen.name}');
+            await _capture(tester, device, content, screen);
+            debugPrint('store captured: ${screen.name}');
+          } finally {
+            if (host != null) await host.dispose(tester);
+            debugPrint('store disposed: ${screen.name}');
+          }
         }
-      }, timeout: const Timeout(Duration(minutes: 8)));
+        if (device.macos &&
+            _selected(const String.fromEnvironment('STORE_SCREENS'),
+                'desktopWidgets')) {
+          _CaptureHost? host;
+          try {
+            host = await _mount(
+                tester, device, content, StoreScreenshotScreen.home,
+                desktopWidgets: true);
+            await _capture(tester, device, content, StoreScreenshotScreen.home,
+                filename: '09-desktopWidgets');
+          } finally {
+            if (host != null) await host.dispose(tester);
+          }
+        }
+      },
+          timeout: const Timeout(Duration(minutes: 8)),
+          variant: TargetPlatformVariant.only(device.platform));
     }
   }
 }

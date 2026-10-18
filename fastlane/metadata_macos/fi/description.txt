@@ -1,0 +1,30 @@
+Onlynote tuo selkeät muistiinpanot, tarkistuslistat ja arjen suunnitelmat Macille. Kirjoita paperityyleillä, pidä tärkeät tiedot yhdessä ja löydä ne tarvittaessa.
+
+KIRJOITA JA JÄRJESTÄ
+• Yksinkertainen tekstin muotoilu, keskittymistila, kumoa ja tee uudelleen, automaattinen tallennus sekä muistiinpanojen historia.
+• Kansiot, tunnisteet, kiinnitetyt muistiinpanot, tallennetut hakunäkymät, arkisto ja roskakori.
+• Pohjat ostoksille, pakkaamiselle, päiväsuunnitelmille ja kokouksille sekä omat tallennetut pohjat.
+• Lisää kuvia Macilta ja tunnista niiden teksti laitteessa. Haku löytää myös kuvissa olevaa tekstiä.
+• Luo päivittäinen muistiinpano ja palaa siihen kalenterista.
+• Aseta muistutuksia, jotka avaavat oikean muistiinpanon.
+• Kopioi tekstiä tai jaa muistiinpanot kuvana, PDF:nä tai Markdownina.
+
+SUUNNITELTU MACILLE
+Käytä Macin valikoita, Command-pikanäppäimiä ja hiiren oikean painikkeen toimintoja ikkunassa, jonka kokoa voi muuttaa. Valitse tavallinen paperi, muistilappu, viivoitettu muistikirja tai ruutupaperi.
+
+TYÖPÖYTÄWIDGETIT
+macOS 14:ssä ja uudemmissa voit näyttää kirjaston yleiskatsauksen tai valitun muistiinpanon tai tarkistuslistan työpöydällä tai Ilmoituskeskuksessa. Merkitse tehtäviä valmiiksi widgetissä ja avaa muistiinpano Onlynotessa klikkaamalla sitä.
+
+PAIKALLINEN KIRJASTOSI
+Tiliä tai kirjautumista ei tarvita. Jokaisella laitteella on oma paikallinen kirjastonsa. Siirrä muistiinpanot, kuvat ja tallenteet Macin ja iPhonen välillä viemällä .onlynote-varmuuskopio ja palauttamalla se toisella laitteella.
+
+ILMAISVERSIO JA PREMIUM
+Mac-sovellus on mainokseton. Ilmaisversio sisältää enintään 10 muistiinpanoa, tarkistuslistat, kertaluonteiset muistutukset, 3 kansiota, 3 tallennettua pohjaa ja korttien oletustyylin.
+
+Premiumin kertaosto avaa rajattomat muistiinpanot, kansiot ja tallennetut pohjat, toistuvat muistutukset, äänimuistiot, yksilölliset korttityylit ja Premium-teemat. Ei tilausta. Aiemmat mainosten poistoon tehdyt ostot sisältävät myös Premiumin; palauta ostosi samalla Apple-tilillä.
+
+Puheen litterointi edellyttää valitun kielen laitteessa toimivaa puheentunnistusta.
+
+Vaatii macOS 12:n tai uudemman. Työpöydän ja Ilmoituskeskuksen widgetit vaativat macOS 14:n tai uudemman.
+
+Käyttöliittymän kielet: englanti, yksinkertaistettu kiina ja perinteinen kiina.

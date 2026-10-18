@@ -1,0 +1,30 @@
+Onlynote ger dig enkla anteckningar, checklistor och vardagsplaner på din Mac. Skriv på pappersstilar, samla användbar information och hitta den när du behöver den.
+
+SKRIV OCH ORGANISERA
+• Enkel textformatering, fokusläge, ångra och gör om, automatisk sparning och anteckningshistorik.
+• Mappar, taggar, fästa anteckningar, sparade sökvyer, arkiv och papperskorg.
+• Mallar för inköp, packning, dagsplaner och möten, eller egna sparade mallar.
+• Lägg till bilder från din Mac och känn igen text på enheten. Sökningen hittar även text i bilder.
+• Skapa en daglig anteckning och återvänd till den via kalendern.
+• Ställ in påminnelser som öppnar rätt anteckning.
+• Kopiera text eller dela anteckningar som bild, PDF eller Markdown.
+
+SKAPAT FÖR MAC
+Använd inbyggda menyer, Command-kortkommandon och högerklick i ett fönster med justerbar storlek. Välj vanligt papper, klisterlappar, linjerade anteckningsböcker eller rutat papper.
+
+WIDGETAR PÅ SKRIVBORDET
+Med macOS 14 eller senare kan du visa en översikt av biblioteket eller en vald anteckning eller checklista på skrivbordet eller i Notiscenter. Bocka av uppgifter i widgeten och klicka på en anteckning för att öppna den i Onlynote.
+
+DITT LOKALA BIBLIOTEK
+Inget konto eller någon inloggning behövs. Varje enhet har ett eget lokalt bibliotek. Flytta anteckningar, bilder och inspelningar mellan Mac och iPhone genom att exportera en .onlynote-säkerhetskopia och återställa den på den andra enheten.
+
+GRATIS OCH PREMIUM
+Mac-appen är reklamfri. Gratisversionen innehåller upp till 10 anteckningar, checklistor, engångspåminnelser, 3 mappar, 3 sparade mallar och standardstil för kort.
+
+Ett engångsköp av Premium låser upp obegränsade anteckningar, mappar och sparade mallar samt återkommande påminnelser, röstmemon, individuella kortstilar och Premium-teman. Ingen prenumeration. Tidigare köp för att ta bort reklam innehåller också Premium; återställ ditt köp med samma Apple-konto.
+
+Transkribering kräver att det valda språket stöder taligenkänning på enheten.
+
+Kräver macOS 12 eller senare. Widgetar på skrivbordet och i Notiscenter kräver macOS 14 eller senare.
+
+Gränssnittet finns på engelska, förenklad kinesiska och traditionell kinesiska.

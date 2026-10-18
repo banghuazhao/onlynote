@@ -1,0 +1,30 @@
+Onlynote giver dig enkle noter, tjeklister og hverdagsplaner på din Mac. Skriv på papirflader, saml nyttige oplysninger, og find dem igen, når du har brug for dem.
+
+SKRIV OG ORGANISER
+• Enkel tekstformatering, fokustilstand, fortryd og gentag, automatisk lagring og notehistorik.
+• Mapper, mærker, fastgjorte noter, gemte søgevisninger, arkiv og papirkurv.
+• Skabeloner til indkøb, pakning, dagsplaner og møder, eller dine egne gemte skabeloner.
+• Tilføj fotos fra din Mac, og genkend tekst på enheden. Søgning finder også tekst i fotos.
+• Opret en daglig note, og find den igen via kalenderen.
+• Indstil påmindelser, der åbner den rigtige note.
+• Kopiér tekst, eller del noter som billede, PDF eller Markdown.
+
+LAVET TIL MAC
+Brug indbyggede menuer, Command-genveje og højreklik i et vindue, du kan ændre størrelsen på. Vælg almindeligt papir, selvklæbende noter, linjerede notesbøger eller ternet papir.
+
+WIDGETS TIL SKRIVEBORDET
+På macOS 14 eller nyere kan du vise en oversigt over dit bibliotek eller en valgt note eller tjekliste på skrivebordet eller i Notifikationscenter. Markér opgaver direkte i widgetten, og klik på en note for at åbne den i Onlynote.
+
+DIT LOKALE BIBLIOTEK
+Ingen konto eller login er nødvendigt. Hver enhed har sit eget lokale bibliotek. Flyt noter, fotos og optagelser mellem Mac og iPhone ved at eksportere en .onlynote-sikkerhedskopi og gendanne den på den anden enhed.
+
+GRATIS OG PREMIUM
+Mac-appen er uden reklamer. Gratisversionen omfatter op til 10 noter, tjeklister, engangspåmindelser, 3 mapper, 3 gemte skabeloner og standardkortstil.
+
+Et engangskøb af Premium giver ubegrænsede noter, mapper og gemte skabeloner samt gentagne påmindelser, stemmememoer, individuelle kortstile og Premium-notetemaer. Intet abonnement. Tidligere køb af fjernelse af reklamer omfatter også Premium; gendan dit køb med den samme Apple-konto.
+
+Transskription kræver understøttelse af talegenkendelse på enheden for det valgte sprog.
+
+Kræver macOS 12 eller nyere. Widgets på skrivebordet og i Notifikationscenter kræver macOS 14 eller nyere.
+
+Brugerfladen er på engelsk, forenklet kinesisk og traditionelt kinesisk.

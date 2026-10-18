@@ -1,0 +1,8 @@
+Onlynote ya está disponible como app nativa para Mac.
+• Menús nativos, atajos con Command y acciones con el botón derecho.
+• Widgets de papel para el escritorio y el Centro de notificaciones con macOS 14 o posterior.
+• Importación de fotos, reconocimiento de texto en el dispositivo y notas de voz Premium.
+• Exporta y restaura copias .onlynote con el diálogo de guardado de Mac.
+• Sin anuncios en Mac y con restauración de compras anteriores de Premium.
+
+Requiere macOS 12 o posterior. Cada dispositivo conserva su biblioteca local; transfiere notas y archivos multimedia mediante copias de seguridad.

@@ -1,0 +1,30 @@
+Onlynote lleva notas sencillas, listas y planes cotidianos a tu Mac. Escribe con el aspecto del papel, reúne la información útil y encuéntrala cuando la necesites.
+
+ESCRIBE Y ORGANIZA
+• Formato de texto sencillo, modo de concentración, deshacer y rehacer, guardado automático e historial de notas.
+• Carpetas, etiquetas, notas fijadas, búsquedas guardadas, archivo y papelera.
+• Plantillas para compras, equipaje, planes diarios y reuniones, o tus propias plantillas guardadas.
+• Añade fotos desde el Mac y reconoce su texto en el dispositivo. La búsqueda también encuentra texto en las fotos.
+• Crea una nota diaria y vuelve a ella desde el calendario.
+• Configura recordatorios que te llevan a la nota correspondiente.
+• Copia texto o comparte notas como imagen, PDF o Markdown.
+
+DISEÑADO PARA MAC
+Usa menús nativos, atajos con Command y acciones con el botón derecho en una ventana de tamaño ajustable. Elige papel clásico, notas adhesivas, cuadernos con líneas o papel cuadriculado.
+
+WIDGETS NATIVOS
+Con macOS 14 o posterior, coloca una vista de tu biblioteca o una nota o lista seleccionada en el escritorio o el Centro de notificaciones. Marca tareas en el widget y abre una nota en Onlynote con un clic.
+
+TU BIBLIOTECA LOCAL
+No necesitas una cuenta ni iniciar sesión. Cada dispositivo tiene su propia biblioteca local. Transfiere notas, fotos y grabaciones entre Mac y iPhone exportando una copia .onlynote y restaurándola en el otro dispositivo.
+
+GRATIS Y PREMIUM
+La app para Mac no tiene anuncios. El plan gratuito incluye hasta 10 notas, listas, recordatorios puntuales, 3 carpetas, 3 plantillas guardadas y el estilo de tarjeta predeterminado.
+
+Una compra única de Premium desbloquea notas, carpetas y plantillas guardadas ilimitadas, recordatorios periódicos, notas de voz, estilos de tarjeta individuales y temas Premium. Sin suscripción. Las compras anteriores para eliminar anuncios también incluyen Premium; restaura la compra con la misma cuenta de Apple.
+
+La transcripción requiere compatibilidad con el reconocimiento de voz en el dispositivo para el idioma elegido.
+
+Requiere macOS 12 o posterior. Los widgets nativos de escritorio y del Centro de notificaciones requieren macOS 14 o posterior.
+
+Interfaz en inglés, chino simplificado y chino tradicional.

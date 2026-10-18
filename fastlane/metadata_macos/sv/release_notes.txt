@@ -1,0 +1,8 @@
+Onlynote finns nu som en app för Mac.
+• Mac-menyer, Command-kortkommandon och högerklick.
+• Papperswidgetar på skrivbordet och i Notiscenter med macOS 14 eller senare.
+• Bildimport, textigenkänning på enheten och Premium-röstmemon.
+• Exportera och återställ .onlynote-säkerhetskopior via Macens spara-dialogruta.
+• Reklamfri på Mac, med återställning av tidigare Premium-köp.
+
+Kräver macOS 12 eller senare. Varje enhet behåller sitt lokala bibliotek; flytta anteckningar och medier via säkerhetskopior.

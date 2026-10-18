@@ -1,0 +1,8 @@
+Onlynote on nyt saatavilla Mac-sovelluksena.
+• Macin valikot, Command-pikanäppäimet ja hiiren oikean painikkeen toiminnot.
+• Paperiwidgetit työpöydälle ja Ilmoituskeskukseen macOS 14:ssä tai uudemmassa.
+• Kuvien tuonti, tekstintunnistus laitteessa ja Premium-äänimuistiot.
+• Vie ja palauta .onlynote-varmuuskopioita Macin tallennusikkunassa.
+• Mainokseton Mac-versio, jossa aiemmat Premium-ostot voi palauttaa.
+
+Vaatii macOS 12:n tai uudemman. Jokaisella laitteella on oma paikallinen kirjastonsa; siirrä muistiinpanot ja media varmuuskopioiden avulla.

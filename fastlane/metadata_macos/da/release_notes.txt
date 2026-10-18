@@ -1,0 +1,8 @@
+Onlynote findes nu som en app til Mac.
+• Mac-menuer, Command-genveje og højreklik.
+• Papirwidgets på skrivebordet og i Notifikationscenter med macOS 14 eller nyere.
+• Import af fotos, tekstgenkendelse på enheden og Premium-stemmememoer.
+• Eksportér og gendan .onlynote-sikkerhedskopier med Mac-dialogen til lagring.
+• Ingen reklamer på Mac; eksisterende Premium-køb kan gendannes.
+
+Kræver macOS 12 eller nyere. Hver enhed beholder sit lokale bibliotek; flyt noter og medier via sikkerhedskopier.

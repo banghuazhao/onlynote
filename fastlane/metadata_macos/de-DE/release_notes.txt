@@ -1,0 +1,8 @@
+Onlynote ist jetzt als native Mac-App verfügbar.
+• Native Menüs, Command-Tastenkürzel und Rechtsklick-Aktionen.
+• Papier-Widgets für Schreibtisch und Mitteilungszentrale ab macOS 14.
+• Fotoimport, Texterkennung auf dem Gerät und Premium-Sprachmemos.
+• .onlynote-Sicherungen über einen Mac-Speicherdialog exportieren und wiederherstellen.
+• Werbefrei auf dem Mac; bestehende Premium-Käufe lassen sich wiederherstellen.
+
+Erfordert macOS 12 oder neuer. Jedes Gerät behält seine lokale Bibliothek; Notizen und Medien werden über Sicherungen übertragen.
