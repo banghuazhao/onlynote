@@ -164,6 +164,45 @@ Future<void> _openPicker(
 void main() {
   setUpAll(() => initializeDateFormatting());
 
+  testWidgets(
+      'custom snippet retains counts, selection identity and stored content',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('chosen', 'Weekly planning'),
+      CustomNoteTemplate(
+        id: 'blank',
+        name: 'Blank content',
+        body: ' \t\n',
+        items: const ['\u3000'],
+        createdAt: DateTime.utc(2026, 10, 20),
+      ),
+    ]);
+    final saved = preferences.values[CustomNoteTemplateStore.storageKey];
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results,
+        store: store, size: const Size(280, 700), textScale: 2);
+    expect(find.text('Private content body'), findsOneWidget);
+    expect(find.text(S.current.Template_Details(1, 1)), findsOneWidget);
+    expect(find.text(S.current.Template_Details(1, 0)), findsOneWidget);
+    expect(find.byKey(const ValueKey('template-content-snippet-blank')),
+        findsNothing);
+    final chosen = store.templates.first;
+    final tile = find.byKey(const ValueKey('custom-template-chosen'));
+    await tester.ensureVisible(tile);
+    await tester.pumpAndSettle();
+    expect(tile.hitTestable(), findsOneWidget);
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(results.single!.custom, same(chosen));
+    expect(results.single!.custom!.body, 'Private content body');
+    expect(results.single!.custom!.voiceMemos.single.path,
+        'template_audio/unavailable.m4a');
+    expect(preferences.writes, 0);
+    expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('name search is literal, ordered and never searches note content',
       (tester) async {
     final preferences = _SearchPreferences();

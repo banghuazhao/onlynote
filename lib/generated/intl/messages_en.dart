@@ -62,59 +62,65 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m16(date) => "Saved ${date}";
 
-  static String m17(number) => "Note color ${number}";
+  static String m17(count) =>
+      "${Intl.plural(count, one: '1 selected note hidden by search', other: '${count} selected notes hidden by search')}";
 
-  static String m18(minutes) => "${minutes} min";
+  static String m18(count) =>
+      "${Intl.plural(count, one: '1 note selected', other: '${count} notes selected')}";
 
-  static String m19(name) => "Open ${name} in library";
+  static String m19(number) => "Note color ${number}";
 
-  static String m20(number) => "Photo ${number}";
+  static String m20(minutes) => "${minutes} min";
 
-  static String m21(limit) =>
+  static String m21(name) => "Open ${name} in library";
+
+  static String m22(number) => "Photo ${number}";
+
+  static String m23(limit) =>
       "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
 
-  static String m22(limit) =>
+  static String m24(limit) =>
       "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
 
-  static String m23(price) => "Unlock forever for ${price}";
+  static String m25(price) => "Unlock forever for ${price}";
 
-  static String m24(limit) =>
+  static String m26(limit) =>
       "The free plan includes ${limit} saved templates. Upgrade for unlimited templates.";
 
-  static String m25(time) => "Next reminder: ${time}";
+  static String m27(time) => "Next reminder: ${time}";
 
-  static String m26(date) => "Remind me: ${date}";
+  static String m28(date) => "Remind me: ${date}";
 
-  static String m27(price) => "Remove ads permanently for ${price}.";
+  static String m29(price) => "Remove ads permanently for ${price}.";
 
-  static String m28(criterion) => "Remove ${criterion}";
+  static String m30(criterion) => "Remove ${criterion}";
 
-  static String m29(limit) =>
+  static String m31(limit) =>
       "You can save up to ${limit} views. Delete a saved view to add another.";
 
-  static String m30(query) => "Search: ${query}";
+  static String m32(query) => "Search: ${query}";
 
-  static String m31(tags) => "Tags: ${tags}";
+  static String m33(tags) => "Tags: ${tags}";
 
-  static String m32(count) =>
+  static String m34(count) =>
       "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
 
-  static String m33(count) =>
+  static String m35(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m34(count, formattedCount) =>
+  static String m36(count, formattedCount) =>
       "${Intl.plural(count, one: '${formattedCount} note', other: '${formattedCount} notes')}";
 
-  static String m35(count) =>
+  static String m37(count) =>
       "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
 
-  static String m36(count) =>
+  static String m38(count) =>
       "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
 
-  static String m37(limit) =>
+  static String m39(limit) =>
       "You can select up to ${limit} tags. Deselect a tag to choose another.";
 
-  static String m38(items, photos) =>
+  static String m40(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -585,6 +591,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Restored": MessageLookupByLibrary.simpleMessage(
       "Version restored",
     ),
+    "History_Search": MessageLookupByLibrary.simpleMessage(
+      "Search note history",
+    ),
+    "History_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching versions.",
+    ),
     "History_Title": MessageLookupByLibrary.simpleMessage("Note history"),
     "History_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This note or version is no longer available.",
@@ -615,6 +627,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Link_Empty": MessageLookupByLibrary.simpleMessage(
       "No notes to link yet. Create another note first.",
     ),
+    "Link_Hidden_By_Search_Count": m17,
     "Link_Limit": MessageLookupByLibrary.simpleMessage(
       "You can link up to 100 notes. Remove a link to add another.",
     ),
@@ -624,6 +637,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Could not update this note. Try again.",
     ),
     "Link_Search": MessageLookupByLibrary.simpleMessage("Search notes"),
+    "Link_Selected_Count": m18,
     "Link_Unavailable": MessageLookupByLibrary.simpleMessage(
       "Note unavailable",
     ),
@@ -659,7 +673,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Added Successfully",
     ),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("Note archived"),
-    "Note_Color": m17,
+    "Note_Color": m19,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -688,7 +702,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "Less than 1 min",
     ),
-    "Note_Info_Reading_Minutes": m18,
+    "Note_Info_Reading_Minutes": m20,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage(
       "Estimated reading time",
     ),
@@ -784,7 +798,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Write a note",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
-    "Open_Folder_In_Library": m19,
+    "Open_Folder_In_Library": m21,
     "Open_Linked_Note": MessageLookupByLibrary.simpleMessage(
       "Open linked note",
     ),
@@ -834,7 +848,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m20,
+    "Photo_Text_Photo": m22,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -869,7 +883,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
       "Unlock this feature with Premium.",
     ),
-    "Premium_Folder_Limit": m21,
+    "Premium_Folder_Limit": m23,
     "Premium_Folders": MessageLookupByLibrary.simpleMessage(
       "Unlimited folders",
     ),
@@ -880,7 +894,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Free includes 3 folders and 3 saved templates.",
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("No ads"),
-    "Premium_Note_Limit": m22,
+    "Premium_Note_Limit": m24,
     "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage(
       "Premium note themes",
     ),
@@ -891,11 +905,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "One-time purchase. No subscription.",
     ),
-    "Premium_One_Time_Price": m23,
+    "Premium_One_Time_Price": m25,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage(
       "Repeating reminders",
     ),
-    "Premium_Template_Limit": m24,
+    "Premium_Template_Limit": m26,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage(
       "Unlimited saved templates",
     ),
@@ -940,7 +954,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m25,
+    "Reminder_Next_Time": m27,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -957,7 +971,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m26,
+    "Reminder_Suggestion": m28,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -1004,8 +1018,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m27,
-    "Remove_Library_Criterion": m28,
+    "Remove_Ads_Price": m29,
+    "Remove_Library_Criterion": m30,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -1052,10 +1066,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save this view. Try again.",
     ),
-    "Saved_View_Limit_Reached": m29,
+    "Saved_View_Limit_Reached": m31,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
-    "Saved_View_Search": m30,
-    "Saved_View_Tags": m31,
+    "Saved_View_Search": m32,
+    "Saved_View_Tags": m33,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No matching saved views.",
@@ -1064,7 +1078,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("Search folders"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
-    "Search_Results_Count": m32,
+    "Search_Results_Count": m34,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage(
       "Search saved views",
     ),
@@ -1073,7 +1087,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Search templates",
     ),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m33,
+    "Selection_Checklist_Added": m35,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -1156,7 +1170,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "Use up to 20 tags, with 40 characters per tag.",
     ),
-    "Tag_Usage_Count": m34,
+    "Tag_Usage_Count": m36,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
       "Counts include active and archived notes across all folders. Search and filters do not change them.",
     ),
@@ -1164,12 +1178,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Counts include notes in Trash across all folders. Search and filters do not change them.",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
-    "Tags_Hidden_By_Search_Count": m35,
+    "Tags_Hidden_By_Search_Count": m37,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No tags match your search",
     ),
-    "Tags_Selected_Count": m36,
-    "Tags_Selection_Limit_Reached": m37,
+    "Tags_Selected_Count": m38,
+    "Tags_Selection_Limit_Reached": m39,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -1198,7 +1212,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m38,
+    "Template_Details": m40,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

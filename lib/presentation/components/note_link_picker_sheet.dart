@@ -84,6 +84,12 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
             hasReminder: false,
             photoText: _photoSearchIndex?.textsForNote(note) ?? const []))
         .toList();
+    final matchingIds = matches.map((note) => note.id).toSet();
+    final hiddenSelectionCount = _search.text.trim().isEmpty
+        ? 0
+        : _selected
+            .where((id) => knownIds.contains(id) && !matchingIds.contains(id))
+            .length;
     return SafeArea(
       top: false,
       child: SizedBox(
@@ -150,8 +156,38 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
                 itemCount: unavailable.length +
                     matches.length +
-                    (matches.isEmpty ? 1 : 0),
+                    (matches.isEmpty ? 1 : 0) +
+                    1,
                 itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                      child: Semantics(
+                        liveRegion: true,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              strings.Link_Selected_Count(_selected.length),
+                              key: const ValueKey('note-link-selection-count'),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                            if (hiddenSelectionCount > 0)
+                              Text(
+                                strings.Link_Hidden_By_Search_Count(
+                                    hiddenSelectionCount),
+                                key: const ValueKey(
+                                    'note-link-hidden-selection-count'),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  index -= 1;
                   if (index < unavailable.length) {
                     final id = unavailable[index];
                     return ListTile(

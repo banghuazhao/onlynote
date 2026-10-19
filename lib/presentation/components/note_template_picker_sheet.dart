@@ -7,6 +7,7 @@ import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/confirm_dialog.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/presentation/components/template_name_search.dart';
+import 'package:onlynote/presentation/components/template_content_snippet.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_templates.dart';
 
@@ -230,8 +231,7 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   minVerticalPadding: 16,
                   leading: _icon(Icons.notes_outlined),
                   title: Text(template.name),
-                  subtitle: Text(strings.Template_Details(
-                      template.items.length, template.imagePaths.length)),
+                  subtitle: TemplateContentSubtitle(template: template),
                   trailing: IconButton(
                     key: ValueKey('manage-template-${template.id}'),
                     tooltip: strings.Template_Manage,

@@ -11,6 +11,10 @@ import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/services/note_history.dart';
 
+class _HistoryChanges extends ChangeNotifier {
+  bool get hasHistoryListeners => hasListeners;
+}
+
 NoteHistoryVersion _version({String id = 'version'}) => NoteHistoryVersion(
       id: id,
       savedAt: DateTime.utc(2026, 10, 10, 10),
@@ -37,6 +41,7 @@ Future<void> _open(WidgetTester tester,
     {required List<NoteHistoryVersion> versions,
     Future<NoteHistoryRestoreResult> Function(String)? restore,
     void Function(bool?)? onClosed,
+    Listenable? changes,
     Locale locale = const Locale('en'),
     double textScale = 1}) async {
   await tester.pumpWidget(MaterialApp(
@@ -61,7 +66,8 @@ Future<void> _open(WidgetTester tester,
                         builder: (_) => NoteHistorySheet(
                             noteId: 'note',
                             readVersions: () => versions,
-                            restoreVersion: restore));
+                            restoreVersion: restore,
+                            changes: changes));
                     onClosed?.call(result);
                   },
                   child: const Text('History'),
@@ -74,6 +80,234 @@ Future<void> _open(WidgetTester tester,
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('history search matches saved fields literally without writes',
+      (tester) async {
+    final versions = [
+      NoteHistoryVersion(
+        id: 'title',
+        savedAt: DateTime.utc(2026, 10, 20),
+        note: NoteDto(title: 'Release [draft].*', description: 'Tea plan'),
+      ),
+      NoteHistoryVersion(
+        id: 'body',
+        savedAt: DateTime.utc(2026, 10, 19),
+        note: NoteDto(title: 'Second', description: 'Meet in 茶室😀 tomorrow'),
+      ),
+      NoteHistoryVersion(
+        id: 'checklist',
+        savedAt: DateTime.utc(2026, 10, 18),
+        note: NoteDto(
+          title: 'Third',
+          todoList: [
+            TodoDto(title: null),
+            TodoDto(title: 'REVIEW the invoice')
+          ],
+        ),
+      ),
+      NoteHistoryVersion(
+        id: 'transcript',
+        savedAt: DateTime.utc(2026, 10, 17),
+        note: NoteDto(title: 'Fourth', voiceMemos: const [
+          {'transcript': null},
+          {'transcript': 42},
+          {
+            'transcript': <String>['not text']
+          },
+          {'transcript': 'Recorded voice café'},
+        ]),
+      ),
+    ];
+    final originalNotes = [for (final version in versions) version.note];
+    var restores = 0;
+    await _open(tester, versions: versions, restore: (_) async {
+      restores++;
+      return NoteHistoryRestoreResult.restored;
+    });
+    final field = find.byKey(const ValueKey('history-search'));
+    for (final (query, id) in [
+      (' [DRAFT].* ', 'title'),
+      ('茶室😀', 'body'),
+      ('review', 'checklist'),
+      ('CAFÉ', 'transcript'),
+    ]) {
+      await tester.enterText(field, query);
+      await tester.pumpAndSettle();
+      expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+      expect(find.byKey(ValueKey('history-version-$id')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+    await tester.enterText(field, r'[]()\\^$+?');
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    expect(find.text(S.current.History_Empty), findsNothing);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('history-search-reset')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(field).controller!.text, isEmpty);
+    expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
+    await tester.enterText(field, ' \n\t ');
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
+    expect(restores, 0);
+    for (var index = 0; index < versions.length; index++) {
+      expect(versions[index].note, same(originalNotes[index]));
+    }
+  });
+
+  testWidgets('search survives preview, data refresh, and failed restore retry',
+      (tester) async {
+    final changes = _HistoryChanges();
+    addTearDown(changes.dispose);
+    final chosen = NoteHistoryVersion(
+        id: 'chosen-match',
+        savedAt: DateTime.utc(2026, 10, 19),
+        note: NoteDto(title: 'Find chosen', description: 'Saved body'));
+    final versions = <NoteHistoryVersion>[_version(id: 'other'), chosen];
+    final attempts = <String>[];
+    await _open(tester, versions: versions, changes: changes,
+        restore: (id) async {
+      attempts.add(id);
+      return attempts.length == 1
+          ? NoteHistoryRestoreResult.failed
+          : NoteHistoryRestoreResult.restored;
+    });
+    final field = find.byKey(const ValueKey('history-search'));
+    await tester.enterText(field, 'chosen');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(field).controller!.text, 'chosen');
+    await tester
+        .tap(find.byKey(const ValueKey('history-version-chosen-match')));
+    await tester.pumpAndSettle();
+    versions.remove(chosen);
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    expect(find.text('Saved body'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, S.current.History_Title));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(field).controller!.text, 'chosen');
+    expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    versions.add(chosen);
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    await tester
+        .tap(find.byKey(const ValueKey('history-version-chosen-match')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.History_Restore_Failed), findsOneWidget);
+    expect(find.text('Saved body'), findsOneWidget);
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+    await tester.pumpAndSettle();
+    expect(attempts, ['chosen-match', 'chosen-match']);
+    expect(find.byType(NoteHistorySheet), findsNothing);
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    expect(changes.hasHistoryListeners, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('active search remains recoverable after all versions disappear',
+      (tester) async {
+    final changes = _HistoryChanges();
+    addTearDown(changes.dispose);
+    final versions = [_version()];
+    await _open(tester, versions: versions, changes: changes);
+    final field = find.byKey(const ValueKey('history-search'));
+    await tester.enterText(field, 'missing');
+    await tester.pumpAndSettle();
+    versions.clear();
+    changes.notifyListeners();
+    await tester.pumpAndSettle();
+    expect(field, findsOneWidget);
+    expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('history-clear-search')));
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.History_Empty), findsOneWidget);
+    expect(find.text(S.current.History_Search_Empty), findsNothing);
+    expect(find.byKey(const ValueKey('history-restore-action')), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    changes.notifyListeners();
+    await tester.pump();
+    expect(changes.hasHistoryListeners, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('search and clear fit a narrow large-text keyboard layout',
+      (tester) async {
+    tester.view.physicalSize = const Size(280, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+    await _open(tester,
+        versions: [_version()], locale: const Locale('zh', 'HK'), textScale: 2);
+    final field = find.byKey(const ValueKey('history-search'));
+    await tester.enterText(field, '不存在[]');
+    tester.view.viewInsets = const FakeViewPadding(bottom: 240);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final clear = find.byKey(const ValueKey('history-search-reset'));
+    await tester.ensureVisible(clear);
+    await tester.pumpAndSettle();
+    expect(clear.hitTestable(), findsOneWidget);
+    await tester.tap(clear);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(field).controller!.text, isEmpty);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('history change listener moves to replacement and detaches',
+      (tester) async {
+    final first = _HistoryChanges();
+    final second = _HistoryChanges();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    Widget app(Listenable changes) => MaterialApp(
+          supportedLocales: S.delegate.supportedLocales,
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: Scaffold(
+            body: NoteHistorySheet(
+              noteId: 'note',
+              readVersions: () => [_version()],
+              changes: changes,
+            ),
+          ),
+        );
+    await tester.pumpWidget(app(first));
+    await tester.pumpAndSettle();
+    expect(first.hasHistoryListeners, isTrue);
+    final field = find.byKey(const ValueKey('history-search'));
+    await tester.enterText(field, 'recorded');
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(app(second));
+    await tester.pumpAndSettle();
+    expect(first.hasHistoryListeners, isFalse);
+    expect(second.hasHistoryListeners, isTrue);
+    expect(tester.widget<TextField>(field).controller!.text, 'recorded');
+    first.notifyListeners();
+    second.notifyListeners();
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    expect(second.hasHistoryListeners, isFalse);
+    second.notifyListeners();
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
       'recording-only summaries skip blank and malformed transcripts without writes',

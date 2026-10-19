@@ -3030,6 +3030,26 @@ class S {
     );
   }
 
+  /// `Search note history`
+  String get History_Search {
+    return Intl.message(
+      'Search note history',
+      name: 'History_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching versions.`
+  String get History_Search_Empty {
+    return Intl.message(
+      'No matching versions.',
+      name: 'History_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Saved {date}`
   String History_Version(String date) {
     return Intl.message(
@@ -3676,6 +3696,30 @@ class S {
       name: 'Link_Limit',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{count, plural, one{1 note selected} other{{count} notes selected}}`
+  String Link_Selected_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note selected',
+      other: '$count notes selected',
+      name: 'Link_Selected_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 selected note hidden by search} other{{count} selected notes hidden by search}}`
+  String Link_Hidden_By_Search_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 selected note hidden by search',
+      other: '$count selected notes hidden by search',
+      name: 'Link_Hidden_By_Search_Count',
+      desc: '',
+      args: [count],
     );
   }
 

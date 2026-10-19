@@ -121,21 +121,51 @@ void main() {
       Note(id: 'other', title: 'Shopping', description: 'Buy bread'),
     ]);
     final search = find.byKey(const ValueKey('note-link-search'));
+    expect(find.text(S.current.Link_Selected_Count(0)), findsOneWidget);
+    expect(find.byKey(const ValueKey('note-link-hidden-selection-count')),
+        findsNothing);
     await tester.enterText(search, 'budget');
     await tester.pump();
     expect(find.text('Meeting'), findsOneWidget);
     expect(find.text('Recorded idea'), findsNothing);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-tagged')));
     await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(1)), findsOneWidget);
+    expect(find.byKey(const ValueKey('note-link-hidden-selection-count')),
+        findsNothing);
     await tester.enterText(search, 'mountain');
     await tester.pump();
     expect(find.text('Recorded idea'), findsOneWidget);
     expect(find.text('Meeting'), findsNothing);
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-voice')));
     await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
     await tester.enterText(search, 'unmatched');
     await tester.pump();
     expect(find.text(S.current.No_Search_Results), findsOneWidget);
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(2)), findsOneWidget);
+    final clearSearch = find.descendant(
+      of: search,
+      matching: find.byType(IconButton),
+    );
+    await tester.tap(clearSearch);
+    await tester.pump();
+    expect(find.byKey(const ValueKey('note-link-hidden-selection-count')),
+        findsNothing);
+    expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
+    expect(
+        tester
+            .widget<CheckboxListTile>(
+                find.byKey(const ValueKey('choose-note-link-tagged')))
+            .value,
+        isTrue);
+    expect(
+        tester
+            .widget<CheckboxListTile>(
+                find.byKey(const ValueKey('choose-note-link-voice')))
+            .value,
+        isTrue);
     await tester.tap(find.byKey(const ValueKey('save-note-links')));
     await tester.pumpAndSettle();
     expect(results.single, ['tagged', 'voice']);
@@ -148,6 +178,7 @@ void main() {
     await _openPicker(tester, results, notes: [Note(id: 'a', title: 'A')]);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-a')));
     await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(1)), findsOneWidget);
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
     expect(results, [null]);
@@ -161,14 +192,55 @@ void main() {
         notes: [Note(id: 'deleted', deletedAt: DateTime(2026))]);
     expect(find.text(S.current.Link_Unavailable), findsNWidgets(2));
     expect(find.text(S.current.Link_Empty), findsOneWidget);
+    expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
     final remove = find.byTooltip(S.current.Link_Remove);
     await tester.tap(remove.first);
     await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(1)), findsOneWidget);
     await tester.tap(remove.first);
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('save-note-links')));
     await tester.pumpAndSettle();
     expect(results.single, isEmpty);
+  });
+
+  testWidgets(
+      'hidden feedback excludes unavailable selections and normalizes IDs',
+      (tester) async {
+    final results = <List<String>?>[];
+    final selectedIds = ['current', 'a', 'a', 'b', 'missing', 'deleted'];
+    await _openPicker(tester, results, selectedIds: selectedIds, notes: [
+      Note(id: 'current', title: 'Current note'),
+      Note(id: 'a', title: 'Alpha'),
+      Note(id: 'b', title: 'Beta', isArchived: true),
+      Note(id: 'b', title: 'Beta', isArchived: true),
+      Note(id: 'deleted', title: 'Deleted note', deletedAt: DateTime(2026)),
+    ]);
+    expect(find.text(S.current.Link_Selected_Count(4)), findsOneWidget);
+    await tester.enterText(
+        find.byKey(const ValueKey('note-link-search')), 'alpha');
+    await tester.pump();
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
+    expect(find.text(S.current.Link_Unavailable), findsNWidgets(2));
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Beta'), findsNothing);
+    await tester.tap(find.descendant(
+      of: find.byKey(const ValueKey('remove-unavailable-link-missing')),
+      matching: find.byType(IconButton),
+    ));
+    await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(3)), findsOneWidget);
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
+    await tester.enterText(
+        find.byKey(const ValueKey('note-link-search')), '   ');
+    await tester.pump();
+    expect(find.byKey(const ValueKey('note-link-hidden-selection-count')),
+        findsNothing);
+    await tester.tap(find.byKey(const ValueKey('save-note-links')));
+    await tester.pumpAndSettle();
+    expect(results.single, ['a', 'b', 'deleted']);
+    expect(selectedIds, ['current', 'a', 'a', 'b', 'missing', 'deleted']);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('link limit still allows removal before adding another note',
@@ -183,9 +255,11 @@ void main() {
     final extra = find.byKey(const ValueKey('choose-note-link-extra'));
     expect(tester.widget<CheckboxListTile>(extra).onChanged, isNull);
     expect(find.text(S.current.Link_Limit), findsOneWidget);
+    expect(find.text(S.current.Link_Selected_Count(100)), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-note-0')));
     await tester.pump();
     expect(tester.widget<CheckboxListTile>(extra).onChanged, isNotNull);
+    expect(find.text(S.current.Link_Selected_Count(99)), findsOneWidget);
     await tester.tap(extra);
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('save-note-links')));
@@ -252,18 +326,71 @@ void main() {
       tester,
       results,
       notes: [
+        Note(id: 'hidden', title: '另一份筆記'),
         Note(id: 'long', title: '這是一份很長的旅行計劃筆記標題', isArchived: true),
       ],
+      selectedIds: const ['hidden', 'unavailable'],
       locale: const Locale('zh', 'HK'),
       size: const Size(320, 640),
       textScale: 2,
     );
+    await tester.enterText(
+        find.byKey(const ValueKey('note-link-search')), '旅行');
+    await tester.pump();
+    expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
     expect(tester.takeException(), isNull);
+    await tester
+        .ensureVisible(find.byKey(const ValueKey('choose-note-link-long')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('choose-note-link-long')).hitTestable(),
+        findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-long')));
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('save-note-links')));
     await tester.pumpAndSettle();
-    expect(results.single, ['long']);
+    expect(results.single, ['hidden', 'unavailable', 'long']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'selection feedback can scroll with keyboard open on narrow screen',
+      (tester) async {
+    final results = <List<String>?>[];
+    await _openPicker(
+      tester,
+      results,
+      notes: [
+        Note(id: 'hidden', title: 'Another note'),
+        Note(id: 'visible', title: 'Visible note'),
+      ],
+      selectedIds: const ['hidden', 'missing'],
+      size: const Size(320, 640),
+      textScale: 2,
+    );
+    tester.view.viewInsets = const FakeViewPadding(bottom: 240);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.enterText(
+        find.byKey(const ValueKey('note-link-search')), 'visible');
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
+    expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    final list = find.byKey(const ValueKey('note-link-results'));
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('choose-note-link-visible')),
+      80,
+      scrollable: find.descendant(of: list, matching: find.byType(Scrollable)),
+      maxScrolls: 10,
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('choose-note-link-visible')).hitTestable(),
+        findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('choose-note-link-visible')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('save-note-links')));
+    await tester.pumpAndSettle();
+    expect(results.single, ['hidden', 'missing', 'visible']);
     expect(tester.takeException(), isNull);
   });
 

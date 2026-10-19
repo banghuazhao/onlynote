@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_search.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
@@ -38,6 +39,7 @@ class NoteHistorySheet extends StatefulWidget {
 }
 
 class _NoteHistorySheetState extends State<NoteHistorySheet> {
+  final _search = TextEditingController();
   NoteHistoryVersion? _selected;
   bool _restoring = false;
   NoteHistoryRestoreResult? _result;
@@ -52,6 +54,16 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     _changes?.addListener(_refresh);
   }
 
+  @override
+  void didUpdateWidget(covariant NoteHistorySheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final changes = widget.changes ?? _history;
+    if (identical(changes, _changes)) return;
+    _changes?.removeListener(_refresh);
+    _changes = changes;
+    _changes?.addListener(_refresh);
+  }
+
   void _refresh() {
     if (mounted) setState(() {});
   }
@@ -59,7 +71,13 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
   @override
   void dispose() {
     _changes?.removeListener(_refresh);
+    _search.dispose();
     super.dispose();
+  }
+
+  void _clearSearch() {
+    if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
+    setState(_search.clear);
   }
 
   Future<void> _restore() async {
@@ -95,6 +113,8 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     final versions = widget.readVersions?.call() ??
         _history?.versionsFor(widget.noteId) ??
         const <NoteHistoryVersion>[];
+    final matches = filterNoteHistoryVersions(versions, _search.text,
+        searchableText: (version) => _searchableText(version.note));
     return AppSheet(
       title: selected == null ? s.History_Title : s.History_Preview,
       footer: selected == null
@@ -143,32 +163,50 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         child: selected == null
-            ? versions.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(children: [
-                      Icon(Icons.history_rounded,
-                          size: 36,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
-                      const SizedBox(height: 16),
-                      Text(s.History_Empty, textAlign: TextAlign.center),
-                    ]),
-                  )
-                : Column(children: [
-                    for (final version in versions)
+            ? Column(
+                children: [
+                  if (versions.isNotEmpty || _search.text.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: NoteHistorySearchField(
+                        controller: _search,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (matches.isEmpty && _search.text.trim().isNotEmpty)
+                    NoteHistorySearchEmpty(onClear: _clearSearch)
+                  else if (versions.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(children: [
+                        Icon(Icons.history_rounded,
+                            size: 36,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant),
+                        const SizedBox(height: 16),
+                        Text(s.History_Empty, textAlign: TextAlign.center),
+                      ]),
+                    )
+                  else
+                    for (final version in matches)
                       NoteHistoryVersionTile(
                         key: ValueKey('history-version-${version.id}'),
                         title: _title(version.note, s),
                         dateLabel: _date(version.savedAt),
                         snippet: _snippet(version.note),
                         mediaCounts: _MediaCounts(note: version.note),
-                        onPressed: () => setState(() {
-                          _selected = version;
-                          _result = null;
-                        }),
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          setState(() {
+                            _selected = version;
+                            _result = null;
+                          });
+                        },
                       ),
-                  ])
+                ],
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -204,6 +242,18 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     if (note.title?.trim().isNotEmpty ?? false) return note.title!;
     final snippet = _snippet(note);
     return snippet.isEmpty ? s.History_Title : snippet.split('\n').first;
+  }
+
+  static Iterable<String> _searchableText(NoteDto note) sync* {
+    yield note.title ?? '';
+    yield note.description ?? '';
+    for (final todo in note.todoList ?? const <TodoDto>[]) {
+      yield todo.title ?? '';
+    }
+    for (final memo in note.voiceMemos ?? const <Map>[]) {
+      final transcript = memo['transcript'];
+      if (transcript is String) yield transcript;
+    }
   }
 
   static String _snippet(NoteDto note) {
