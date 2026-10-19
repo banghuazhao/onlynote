@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/services/note_search.dart';
@@ -56,6 +57,7 @@ class LibraryFiltersSheet extends StatefulWidget {
     this.filters = const {},
     this.selectedTags = const {},
     this.availableTags = const [],
+    this.tagUsageCounts,
     this.scope = NoteArchiveScope.active,
     this.savedViews = const [],
     this.selectedViewId,
@@ -67,6 +69,10 @@ class LibraryFiltersSheet extends StatefulWidget {
   final Set<NoteSearchFilter> filters;
   final Set<String> selectedTags;
   final List<String> availableTags;
+
+  /// Counts keyed by [tagKey]. Omit this snapshot for callers without counts;
+  /// an explicit empty map still shows zero for selected tags absent from it.
+  final Map<String, int>? tagUsageCounts;
   final NoteArchiveScope scope;
   final List<SavedNoteView> savedViews;
   final String? selectedViewId;
@@ -123,6 +129,15 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
+    final tagCountFormat =
+        NumberFormat.decimalPattern(Localizations.localeOf(context).toString());
+    String tagLabel(String tag) {
+      final counts = widget.tagUsageCounts;
+      if (counts == null) return tag;
+      final count = counts[tagKey(tag)] ?? 0;
+      return '$tag · ${s.Tag_Usage_Count(count, tagCountFormat.format(count))}';
+    }
+
     final tags = <String, String>{};
     for (final tag in [...widget.selectedTags, ...widget.availableTags]) {
       tags.putIfAbsent(tagKey(tag), () => tag);
@@ -204,6 +219,17 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             ),
           if (tags.isNotEmpty) ...[
             _heading(s.Filter_Tags),
+            if (widget.tagUsageCounts != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  widget.showTrash
+                      ? s.Tag_Usage_Counts_Trash_Hint
+                      : s.Tag_Usage_Counts_Hint,
+                  key: const ValueKey('library-tag-usage-counts-hint'),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: TextField(
@@ -252,7 +278,8 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                             key: ValueKey('library-tag-${tagKey(tag)}'),
                             avatarBoxConstraints: const BoxConstraints.tightFor(
                                 width: 24, height: 24),
-                            label: _chipLabel(tag, constraints.maxWidth),
+                            label:
+                                _chipLabel(tagLabel(tag), constraints.maxWidth),
                             selected: _tags
                                 .any((value) => tagKey(value) == tagKey(tag)),
                             onSelected: _tags.length < maxNoteTags ||
@@ -271,8 +298,7 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                 key: const ValueKey('library-apply-filters'),
                 onPressed: () => Navigator.pop(
                     context,
-                    ApplyLibraryFilters(
-                        Set.of(_filters), Set.of(_tags), _scope,
+                    ApplyLibraryFilters(Set.of(_filters), Set.of(_tags), _scope,
                         sort: _sort)),
                 child: Text(s.Done),
               ),
@@ -340,7 +366,8 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             SavedViewSaveAction(
               viewCount: widget.savedViews.length,
               maxViews: SavedNoteViewStore.maxViews,
-              onSave: () => Navigator.pop(context,
+              onSave: () => Navigator.pop(
+                  context,
                   CreateSavedNoteView(Set.of(_filters), Set.of(_tags), _scope,
                       sort: _sort)),
             ),

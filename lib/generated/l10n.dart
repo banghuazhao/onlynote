@@ -4264,6 +4264,11 @@ class S {
     );
   }
 
+  /// `Folder`
+  String get Note_Info_Folder {
+    return Intl.message('Folder', name: 'Note_Info_Folder', desc: '', args: []);
+  }
+
   /// `Words`
   String get Note_Info_Words {
     return Intl.message('Words', name: 'Note_Info_Words', desc: '', args: []);
@@ -5156,6 +5161,38 @@ class S {
   /// `Search tags`
   String get Search_Tags {
     return Intl.message('Search tags', name: 'Search_Tags', desc: '', args: []);
+  }
+
+  /// `{count, plural, one{{formattedCount} note} other{{formattedCount} notes}}`
+  String Tag_Usage_Count(int count, String formattedCount) {
+    return Intl.plural(
+      count,
+      one: '$formattedCount note',
+      other: '$formattedCount notes',
+      name: 'Tag_Usage_Count',
+      desc: '',
+      args: [count, formattedCount],
+    );
+  }
+
+  /// `Counts include active and archived notes across all folders. Search and filters do not change them.`
+  String get Tag_Usage_Counts_Hint {
+    return Intl.message(
+      'Counts include active and archived notes across all folders. Search and filters do not change them.',
+      name: 'Tag_Usage_Counts_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Counts include notes in Trash across all folders. Search and filters do not change them.`
+  String get Tag_Usage_Counts_Trash_Hint {
+    return Intl.message(
+      'Counts include notes in Trash across all folders. Search and filters do not change them.',
+      name: 'Tag_Usage_Counts_Trash_Hint',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `No tags match your search`

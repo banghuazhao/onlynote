@@ -9,6 +9,7 @@ import 'app_sheet.dart';
 Future<void> showNoteInfoSheet({
   required BuildContext context,
   required NoteStatistics statistics,
+  String? folderName,
   DateTime? modifiedAt,
   DateTime? deletedAt,
 }) =>
@@ -16,6 +17,7 @@ Future<void> showNoteInfoSheet({
       context: context,
       builder: (_) => NoteInfoSheet(
         statistics: statistics,
+        folderName: folderName,
         modifiedAt: modifiedAt,
         deletedAt: deletedAt,
       ),
@@ -26,11 +28,15 @@ class NoteInfoSheet extends StatelessWidget {
   const NoteInfoSheet({
     super.key,
     required this.statistics,
+    this.folderName,
     this.modifiedAt,
     this.deletedAt,
   });
 
   final NoteStatistics statistics;
+
+  /// A resolved display name only; missing folders never display their ID.
+  final String? folderName;
 
   /// Existing saved or draft metadata; absent legacy dates stay absent.
   final DateTime? modifiedAt;
@@ -42,6 +48,7 @@ class NoteInfoSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = S.of(context);
     final theme = Theme.of(context);
+    final folder = folderName?.trim();
     final numbers = NumberFormat.decimalPattern(
       Localizations.localeOf(context).toString(),
     );
@@ -59,6 +66,12 @@ class NoteInfoSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (folder != null && folder.isNotEmpty)
+              _StatisticRow(
+                id: 'folder',
+                label: strings.Note_Info_Folder,
+                value: folder,
+              ),
             if (modifiedAt != null)
               _StatisticRow(
                 id: 'last-modified',

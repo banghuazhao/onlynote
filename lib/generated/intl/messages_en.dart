@@ -102,16 +102,19 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m33(count) =>
       "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m34(count) =>
-      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+  static String m34(count, formattedCount) =>
+      "${Intl.plural(count, one: '${formattedCount} note', other: '${formattedCount} notes')}";
 
   static String m35(count) =>
+      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+
+  static String m36(count) =>
       "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
 
-  static String m36(limit) =>
+  static String m37(limit) =>
       "You can select up to ${limit} tags. Deselect a tag to choose another.";
 
-  static String m37(items, photos) =>
+  static String m38(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
@@ -673,6 +676,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
     ),
+    "Note_Info_Folder": MessageLookupByLibrary.simpleMessage("Folder"),
     "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage(
       "Last modified",
     ),
@@ -1143,13 +1147,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "Use up to 20 tags, with 40 characters per tag.",
     ),
+    "Tag_Usage_Count": m34,
+    "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
+      "Counts include active and archived notes across all folders. Search and filters do not change them.",
+    ),
+    "Tag_Usage_Counts_Trash_Hint": MessageLookupByLibrary.simpleMessage(
+      "Counts include notes in Trash across all folders. Search and filters do not change them.",
+    ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
-    "Tags_Hidden_By_Search_Count": m34,
+    "Tags_Hidden_By_Search_Count": m35,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No tags match your search",
     ),
-    "Tags_Selected_Count": m35,
-    "Tags_Selection_Limit_Reached": m36,
+    "Tags_Selected_Count": m36,
+    "Tags_Selection_Limit_Reached": m37,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -1178,7 +1189,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m37,
+    "Template_Details": m38,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),

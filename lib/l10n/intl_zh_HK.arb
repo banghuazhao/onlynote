@@ -522,6 +522,7 @@
   },
   "Note_Info": "筆記資訊",
   "Note_Info_Last_Modified": "最後修改",
+  "Note_Info_Folder": "資料夾",
   "Note_Info_Words": "字數",
   "Note_Info_Characters": "字元數",
   "Note_Info_Reading_Time": "預計閱讀時間",
@@ -659,6 +660,19 @@
   "Backup_Export_Prepared": "備份已準備好。此裝置無法確認是否已分享。",
   "Remove_Library_Criterion": "移除{criterion}",
   "Search_Tags": "搜尋標籤",
+  "Tag_Usage_Count": "{formattedCount} 則筆記",
+  "@Tag_Usage_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formattedCount": {
+        "type": "String"
+      }
+    }
+  },
+  "Tag_Usage_Counts_Hint": "數量包括所有資料夾中未封存和已封存的筆記，不受搜尋和篩選條件影響。",
+  "Tag_Usage_Counts_Trash_Hint": "數量包括回收站中所有資料夾的筆記，不受搜尋和篩選條件影響。",
   "Tags_Search_Empty": "沒有符合搜尋條件的標籤",
   "Backup_Saved_Views": "已儲存的檢視",
   "@Remove_Library_Criterion": {

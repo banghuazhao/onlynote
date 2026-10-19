@@ -13,6 +13,7 @@ import 'package:onlynote/services/note_selection_transfer.dart';
 import 'package:onlynote/services/note_selection_checklist.dart';
 import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_statistics.dart';
+import 'package:onlynote/services/note_folder_info.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -494,6 +495,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     await showNoteInfoSheet(
       context: context,
       statistics: NoteStatistics.fromNote(note),
+      folderName: noteFolderInfoName(note.folderId),
       modifiedAt: note.dateTime,
       deletedAt: note.isDeleted ? note.deletedAt : null,
     );

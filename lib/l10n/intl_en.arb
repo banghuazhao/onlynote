@@ -522,6 +522,7 @@
   },
   "Note_Info": "Note info",
   "Note_Info_Last_Modified": "Last modified",
+  "Note_Info_Folder": "Folder",
   "Note_Info_Words": "Words",
   "Note_Info_Characters": "Characters",
   "Note_Info_Reading_Time": "Estimated reading time",
@@ -661,6 +662,19 @@
   "Backup_Export_Prepared": "Backup prepared. This device could not confirm whether it was shared.",
   "Remove_Library_Criterion": "Remove {criterion}",
   "Search_Tags": "Search tags",
+  "Tag_Usage_Count": "{count, plural, one{{formattedCount} note} other{{formattedCount} notes}}",
+  "@Tag_Usage_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formattedCount": {
+        "type": "String"
+      }
+    }
+  },
+  "Tag_Usage_Counts_Hint": "Counts include active and archived notes across all folders. Search and filters do not change them.",
+  "Tag_Usage_Counts_Trash_Hint": "Counts include notes in Trash across all folders. Search and filters do not change them.",
   "Tags_Search_Empty": "No tags match your search",
   "Backup_Saved_Views": "Saved views",
   "@Remove_Library_Criterion": {

@@ -35,6 +35,7 @@ import 'package:onlynote/services/note_selection_transfer.dart';
 import 'package:onlynote/services/note_selection_checklist.dart';
 import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_statistics.dart';
+import 'package:onlynote/services/note_folder_info.dart';
 import 'package:onlynote/presentation/components/note_info_sheet.dart';
 import 'package:onlynote/presentation/components/note_theme_surface.dart';
 import 'package:onlynote/presentation/components/note_selection_menu.dart';
@@ -584,6 +585,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                 showNoteInfoSheet(
                     context: context,
                     statistics: NoteStatistics.fromNote(draft),
+                    folderName: noteFolderInfoName(draft.folderId),
                     modifiedAt:
                         hasModificationMetadata ? draft.dateTime : null);
               }),

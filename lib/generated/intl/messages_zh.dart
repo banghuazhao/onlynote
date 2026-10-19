@@ -89,13 +89,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m33(count) => "已添加 ${count} 项清单";
 
-  static String m34(count) => "搜索隐藏了 ${count} 个已选标签";
+  static String m34(count, formattedCount) => "${formattedCount} 条笔记";
 
-  static String m35(count) => "已选 ${count} 个标签";
+  static String m35(count) => "搜索隐藏了 ${count} 个已选标签";
 
-  static String m36(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+  static String m36(count) => "已选 ${count} 个标签";
 
-  static String m37(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m37(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+
+  static String m38(items, photos) => "${items} 项 · ${photos} 张照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -532,6 +534,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "包含标题、正文、清单和语音转写。中日韩文字按字计数。",
     ),
+    "Note_Info_Folder": MessageLookupByLibrary.simpleMessage("文件夹"),
     "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage("最后修改"),
     "Note_Info_Moved_To_Trash": MessageLookupByLibrary.simpleMessage("移至回收站"),
     "Note_Info_Photos": MessageLookupByLibrary.simpleMessage("照片"),
@@ -874,11 +877,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "最多添加20个标签，每个标签不超过40个字符。",
     ),
+    "Tag_Usage_Count": m34,
+    "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
+      "数量包括所有文件夹中的未归档和已归档笔记，不受搜索和筛选条件影响。",
+    ),
+    "Tag_Usage_Counts_Trash_Hint": MessageLookupByLibrary.simpleMessage(
+      "数量包括回收站中所有文件夹的笔记，不受搜索和筛选条件影响。",
+    ),
     "Tags": MessageLookupByLibrary.simpleMessage("标签"),
-    "Tags_Hidden_By_Search_Count": m34,
+    "Tags_Hidden_By_Search_Count": m35,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("没有符合搜索条件的标签"),
-    "Tags_Selected_Count": m35,
-    "Tags_Selection_Limit_Reached": m36,
+    "Tags_Selected_Count": m36,
+    "Tags_Selection_Limit_Reached": m37,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "无法更新模板，请重试。",
@@ -903,7 +913,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m37,
+    "Template_Details": m38,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

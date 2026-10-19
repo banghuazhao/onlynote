@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added note counts beside library tags, with clear scope descriptions and one count per note even when tag spellings repeat.
+- Remembered the selected Markdown, plain text, or PDF export format, with a safe Markdown fallback when preferences are unavailable.
+- Added resolved folder names to Note info in the reader and editor, omitting missing or unavailable folder references.
 - Added a visible sort label above the library for non-manual ordering, while keeping Trash's deletion-date order separate.
 - Added the existing last-modified timestamp to Note info, using the app language and device clock preference.
 - Added a Mac keyboard-shortcuts guide in Settings for note creation, search, editing, and clipboard commands.

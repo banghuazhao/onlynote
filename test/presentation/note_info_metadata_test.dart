@@ -5,8 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/locator.dart';
+import 'package:onlynote/data/dto/folder_dto.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/repository/folder_repository.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/domain/usecase/add_note_usecase.dart';
 import 'package:onlynote/domain/usecase/get_note_usecase.dart';
@@ -42,6 +44,28 @@ class _Notes implements NoteRepository {
   @override
   Future<void> deleteMultiNotes(List<String> ids) async {
     ids.forEach(values.remove);
+  }
+}
+
+class _Folders implements FolderRepository {
+  final values = <FolderDto>[];
+  bool fail = false;
+  int writes = 0;
+
+  @override
+  List<FolderDto> getAllFolders() {
+    if (fail) throw StateError('Folder storage unavailable');
+    return values;
+  }
+
+  @override
+  Future<void> addUpdateFolder(FolderDto folder) async {
+    writes++;
+  }
+
+  @override
+  Future<void> deleteFolder(String id) async {
+    writes++;
   }
 }
 
@@ -104,6 +128,21 @@ Future<void> _closeInfo(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<NoteInfoSheet> _readerInfo(WidgetTester tester,
+    {required bool trashed}) async {
+  if (trashed) {
+    await tester.tap(find.byTooltip(S.current.Note_Info));
+  } else {
+    await tester.tap(find.byTooltip(S.current.More_Options));
+    await tester.pumpAndSettle();
+    final action = find.text(S.current.Note_Info);
+    await tester.ensureVisible(action);
+    await tester.tap(action);
+  }
+  await tester.pumpAndSettle();
+  return tester.widget<NoteInfoSheet>(find.byType(NoteInfoSheet));
+}
+
 void main() {
   final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
   setUpAll(() async {
@@ -125,12 +164,13 @@ void main() {
 
   for (final (name, existing) in [
     ('new blank', null),
-    ('legacy', Note(id: 'note', title: 'Original')),
+    ('legacy', Note(id: 'note', title: 'Original', folderId: 'saved-folder')),
     (
       'existing',
       Note(
           id: 'note',
           title: 'Original',
+          folderId: 'saved-folder',
           dateTime: DateTime(2020, 1, 2, 13, 45)),
     ),
   ]) {
@@ -141,6 +181,13 @@ void main() {
       tester.view.physicalSize = const Size(390, 844);
       addTearDown(tester.view.reset);
       final notes = _Notes();
+      final folders = _Folders()
+        ..values.addAll([
+          FolderDto(id: 'saved-folder', name: 'Saved folder'),
+          FolderDto(id: 'new-folder', name: 'New draft folder'),
+        ]);
+      locator.registerSingleton<FolderRepository>(folders);
+      addTearDown(() => locator.unregister<FolderRepository>());
       final store = _FailingStore();
       final bloc =
           AddUpdateBloc(AddNoteUsecase(notes), UpdateNoteUsecase(notes));
@@ -153,6 +200,7 @@ void main() {
         value: bloc,
         child: AddUpdateNoteScreen(
           note: existing,
+          folderId: 'new-folder',
           autosaveStore: store,
           positionStore: NotePositionStore.memory(),
         ),
@@ -161,6 +209,8 @@ void main() {
 
       final initial = await _editorInfo(tester);
       expect(initial.modifiedAt, existing?.dateTime);
+      expect(initial.folderName,
+          existing == null ? 'New draft folder' : 'Saved folder');
       expect(store.drafts, isEmpty);
       expect(store.saveAttempts, 0);
       if (existing?.dateTime == null) {
@@ -168,6 +218,9 @@ void main() {
             findsNothing);
       }
       await _closeInfo(tester);
+      final folderId = existing?.folderId ?? 'new-folder';
+      folders.values[existing == null ? 1 : 0] =
+          FolderDto(id: folderId, name: 'Renamed folder');
 
       await tester.enterText(find.byKey(const ValueKey('note-title-input')),
           'Actual draft change');
@@ -179,6 +232,7 @@ void main() {
       final draft = store.drafts.last;
       final edited = await _editorInfo(tester);
       expect(edited.modifiedAt, draft.dateTime);
+      expect(edited.folderName, 'Renamed folder');
       expect(edited.modifiedAt, isNotNull);
       expect(edited.modifiedAt, isNot(existing?.dateTime));
       expect(edited.statistics.wordCount, 3);
@@ -191,13 +245,30 @@ void main() {
               dateTime: draft.dateTime, locale: 'en', use24HourFormat: false));
       expect(store.saveAttempts, 1);
       expect(notes.writes, 0);
+      await _closeInfo(tester);
+      folders.values.clear();
+      final missingFolder = await _editorInfo(tester);
+      expect(missingFolder.folderName, isNull);
+      expect(
+          find.byKey(const ValueKey('note-info-folder-value')), findsNothing);
+      await _closeInfo(tester);
+      folders.fail = true;
+      final unavailableFolder = await _editorInfo(tester);
+      expect(unavailableFolder.folderName, isNull);
+      expect(store.saveAttempts, 1);
+      expect(notes.writes, 0);
+      expect(folders.writes, 0);
       expect(tester.takeException(), isNull);
     });
   }
 
-  for (final trashed in [false, true]) {
+  for (final (library, trashed, archived) in [
+    ('active', false, false),
+    ('archived', false, true),
+    ('Trash', true, false),
+  ]) {
     testWidgets(
-        '${trashed ? 'Trash' : 'active'} reader passes modification metadata without saving',
+        '$library reader passes current folder and modification metadata without saving',
         (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(390, 844);
@@ -209,8 +280,14 @@ void main() {
         title: 'Saved note',
         dateTime: modified,
         deletedAt: deleted,
+        isArchived: archived,
+        folderId: 'reader-folder',
       );
       final notes = _Notes()..values['note'] = NoteDto.fromNote(note);
+      final folders = _Folders()
+        ..values.add(FolderDto(id: 'reader-folder', name: 'Reader folder'));
+      locator.registerSingleton<FolderRepository>(folders);
+      addTearDown(() => locator.unregister<FolderRepository>());
       final detail =
           NoteDetailBloc(GetNoteUsecase(notes), UpdateNoteUsecase(notes));
       final router = _ReaderRouter();
@@ -235,19 +312,10 @@ void main() {
         ),
       ));
       await tester.pumpAndSettle();
-      if (trashed) {
-        await tester.tap(find.byTooltip(S.current.Note_Info));
-      } else {
-        await tester.tap(find.byTooltip(S.current.More_Options));
-        await tester.pumpAndSettle();
-        final action = find.text(S.current.Note_Info);
-        await tester.ensureVisible(action);
-        await tester.tap(action);
-      }
-      await tester.pumpAndSettle();
-      final sheet = tester.widget<NoteInfoSheet>(find.byType(NoteInfoSheet));
+      final sheet = await _readerInfo(tester, trashed: trashed);
       expect(sheet.modifiedAt, modified);
       expect(sheet.deletedAt, deleted);
+      expect(sheet.folderName, 'Reader folder');
       expect(
           tester
               .widget<Text>(
@@ -257,6 +325,22 @@ void main() {
               dateTime: modified, locale: 'en', use24HourFormat: false));
       expect(notes.writes, 0);
       expect(notes.values['note']!.toDomain(), note);
+      await _closeInfo(tester);
+      folders.values[0] =
+          FolderDto(id: 'reader-folder', name: 'Renamed reader folder');
+      expect((await _readerInfo(tester, trashed: trashed)).folderName,
+          'Renamed reader folder');
+      await _closeInfo(tester);
+      folders.values.clear();
+      expect((await _readerInfo(tester, trashed: trashed)).folderName, isNull);
+      expect(
+          find.byKey(const ValueKey('note-info-folder-value')), findsNothing);
+      await _closeInfo(tester);
+      folders.fail = true;
+      expect((await _readerInfo(tester, trashed: trashed)).folderName, isNull);
+      expect(notes.writes, 0);
+      expect(notes.values['note']!.toDomain(), note);
+      expect(folders.writes, 0);
       expect(tester.takeException(), isNull);
     });
   }

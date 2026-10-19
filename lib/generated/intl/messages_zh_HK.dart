@@ -89,13 +89,15 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m33(count) => "已加入 ${count} 項清單";
 
-  static String m34(count) => "搜尋隱藏了 ${count} 個已選標籤";
+  static String m34(count, formattedCount) => "${formattedCount} 則筆記";
 
-  static String m35(count) => "已選取 ${count} 個標籤";
+  static String m35(count) => "搜尋隱藏了 ${count} 個已選標籤";
 
-  static String m36(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+  static String m36(count) => "已選取 ${count} 個標籤";
 
-  static String m37(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m37(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+
+  static String m38(items, photos) => "${items} 項 · ${photos} 張照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -534,6 +536,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "包含標題、內文、清單和語音轉寫。中日韓文字按字計數。",
     ),
+    "Note_Info_Folder": MessageLookupByLibrary.simpleMessage("資料夾"),
     "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage("最後修改"),
     "Note_Info_Moved_To_Trash": MessageLookupByLibrary.simpleMessage("移至回收站"),
     "Note_Info_Photos": MessageLookupByLibrary.simpleMessage("照片"),
@@ -874,11 +877,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "最多新增20個標籤，每個標籤不超過40個字元。",
     ),
+    "Tag_Usage_Count": m34,
+    "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
+      "數量包括所有資料夾中未封存和已封存的筆記，不受搜尋和篩選條件影響。",
+    ),
+    "Tag_Usage_Counts_Trash_Hint": MessageLookupByLibrary.simpleMessage(
+      "數量包括回收站中所有資料夾的筆記，不受搜尋和篩選條件影響。",
+    ),
     "Tags": MessageLookupByLibrary.simpleMessage("標籤"),
-    "Tags_Hidden_By_Search_Count": m34,
+    "Tags_Hidden_By_Search_Count": m35,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("沒有符合搜尋條件的標籤"),
-    "Tags_Selected_Count": m35,
-    "Tags_Selection_Limit_Reached": m36,
+    "Tags_Selected_Count": m36,
+    "Tags_Selection_Limit_Reached": m37,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "無法更新範本，請重試。",
@@ -903,7 +913,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m37,
+    "Template_Details": m38,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(

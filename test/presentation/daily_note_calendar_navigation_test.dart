@@ -396,6 +396,14 @@ void main() {
         for (final enabled in [true, false]) {
           await _tap(tester, 'home-library-filters');
           expect(find.byType(LibraryFiltersSheet), findsOneWidget);
+          if (cycle == 0 && enabled) {
+            expect(
+                tester
+                    .widget<LibraryFiltersSheet>(
+                        find.byType(LibraryFiltersSheet))
+                    .tagUsageCounts,
+                home.tagUsageCounts);
+          }
           final checklists =
               find.byKey(const ValueKey('library-filter-checklists'));
           await tester.ensureVisible(checklists);

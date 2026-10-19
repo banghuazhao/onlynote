@@ -9,9 +9,11 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/export_archive.dart';
 import 'package:onlynote/presentation/components/backup_export_section.dart';
+import 'package:onlynote/presentation/components/note_export_section.dart';
 import 'package:onlynote/presentation/screens/settings/backup_screen.dart';
 import 'package:onlynote/services/backup/backup_export_status.dart';
 import 'package:onlynote/services/note_bulk_export.dart';
+import 'package:onlynote/services/note_export_format_store.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -36,6 +38,45 @@ class _FailingStatusStore extends BackupExportStatusStore {
   Future<void> record(BackupExportRecord record) async =>
       throw StateError('Write failed');
 }
+
+class _ControlledFormatStore extends NoteExportFormatStore {
+  final initialRead = Completer<NoteBulkExportFormat>();
+  final written = <NoteBulkExportFormat>[];
+  Completer<void>? pendingWrite;
+
+  @override
+  Future<NoteBulkExportFormat> read() => initialRead.future;
+
+  @override
+  Future<void> write(NoteBulkExportFormat format) async {
+    written.add(format);
+    await pendingWrite?.future;
+  }
+}
+
+class _FailingFormatStore extends NoteExportFormatStore {
+  @override
+  Future<NoteBulkExportFormat> read() async => throw StateError('Read failed');
+
+  @override
+  Future<void> write(NoteBulkExportFormat format) async =>
+      throw StateError('Write failed');
+}
+
+class _PendingFormatPreferences extends MemoryPreferences {
+  final firstWrite = Completer<void>();
+  final writes = <String>[];
+
+  @override
+  Future<void> setString(String key, String value) async {
+    writes.add(value);
+    if (writes.length == 1) await firstWrite.future;
+    await super.setString(key, value);
+  }
+}
+
+NoteBulkExportFormat _visibleFormat(WidgetTester tester) =>
+    tester.widget<NoteExportSection>(find.byType(NoteExportSection)).format;
 
 BackupExportRecord? _visibleRecord(WidgetTester tester) => tester
     .widget<BackupExportSection>(find.byType(BackupExportSection))
@@ -768,6 +809,8 @@ void main() {
       final formats = <NoteBulkExportFormat>[];
       showWholeScreen(tester);
       await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore:
+            NoteExportFormatStore(preferences: MemoryPreferences()),
         exportNotes: (format, onProgress) async {
           formats.add(format);
           return _archive(archiveFile);
@@ -788,6 +831,321 @@ void main() {
       await tester.pumpAndSettle();
       expect(formats, [NoteBulkExportFormat.pdf]);
       await _drainFeedback(tester);
+    });
+
+    testWidgets('reopening shares pending format writes and the latest choice',
+        (tester) async {
+      final preferences = _PendingFormatPreferences();
+      final store = NoteExportFormatStore(preferences: preferences);
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(exportFormatStore: store)));
+      await tester.pumpAndSettle();
+      await tester.tap(_formatChip(NoteBulkExportFormat.pdf));
+      await tester.pump();
+      await tester.tap(_formatChip(NoteBulkExportFormat.plainText));
+      await tester.pump();
+      expect(preferences.writes, ['pdf']);
+      expect(preferences.values[NoteExportFormatStore.storageKey], isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.plainText);
+      await tester.tap(_formatChip(NoteBulkExportFormat.markdown));
+      await tester.pump();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      expect(preferences.writes, ['pdf']);
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.markdown]);
+
+      preferences.firstWrite.complete();
+      await tester.pumpAndSettle();
+      expect(preferences.writes, ['pdf', 'plainText', 'markdown']);
+      expect(preferences.values[NoteExportFormatStore.storageKey], 'markdown');
+      await _drainFeedback(tester);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: NoteExportFormatStore(preferences: preferences),
+      )));
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final format in NoteBulkExportFormat.values) {
+      testWidgets('$format is remembered and used after reopening',
+          (tester) async {
+        final preferences = MemoryPreferences()
+          ..values[NoteExportFormatStore.storageKey] =
+              NoteBulkExportFormat.pdf.name;
+        final formats = <NoteBulkExportFormat>[];
+        showWholeScreen(tester);
+        await tester.pumpWidget(_host(BackupScreen(
+          exportFormatStore: NoteExportFormatStore(preferences: preferences),
+        )));
+        await tester.pumpAndSettle();
+        expect(_visibleFormat(tester), NoteBulkExportFormat.pdf);
+        await tester.tap(_formatChip(format));
+        await tester.pumpAndSettle();
+        expect(_visibleFormat(tester), format);
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpWidget(_host(BackupScreen(
+          exportFormatStore: NoteExportFormatStore(preferences: preferences),
+          exportNotes: (selected, onProgress) async {
+            formats.add(selected);
+            return _archive(archiveFile);
+          },
+          shareNotes: (_) async => ShareResult.unavailable,
+        )));
+        await tester.pumpAndSettle();
+        expect(_visibleFormat(tester), format);
+        expect(tester.widget<ChoiceChip>(_formatChip(format)).selected, isTrue);
+        await tester.tap(_exportNotesButton);
+        await tester.pumpAndSettle();
+        expect(formats, [format]);
+        expect(tester.takeException(), isNull);
+        await _drainFeedback(tester);
+      });
+    }
+
+    testWidgets('preference failures keep the chosen format exportable',
+        (tester) async {
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: _FailingFormatStore(),
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      await tester.tap(_formatChip(NoteBulkExportFormat.plainText));
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.plainText);
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.plainText]);
+      expect(find.text(S.current.Export_Notes_Prepared), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a late preference read never replaces an explicit choice',
+        (tester) async {
+      final store = _ControlledFormatStore();
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_formatChip(NoteBulkExportFormat.pdf));
+      await tester.pumpAndSettle();
+      store.initialRead.complete(NoteBulkExportFormat.plainText);
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.pdf);
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.pdf]);
+      expect(store.written, [NoteBulkExportFormat.pdf]);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('full backup work does not discard a delayed format preference',
+        (tester) async {
+      final store = _ControlledFormatStore();
+      final backup = Completer<Uint8List>();
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportBackup: () => backup.future,
+        shareBackup: (_) async => ShareResult.unavailable,
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportButton);
+      await tester.pump();
+      store.initialRead.complete(NoteBulkExportFormat.pdf);
+      await tester.pump();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.pdf);
+      backup.complete(Uint8List.fromList([1]));
+      await tester.pumpAndSettle();
+      await _drainFeedback(tester);
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.pdf]);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets(
+        'a late read cannot change a pending or completed export choice',
+        (tester) async {
+      final store = _ControlledFormatStore();
+      final pending = Completer<NoteArchiveExport?>();
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) {
+          formats.add(format);
+          return pending.future;
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pump();
+      expect(formats, [NoteBulkExportFormat.markdown]);
+      store.initialRead.complete(NoteBulkExportFormat.pdf);
+      await tester.pump();
+      await tester.tap(_formatChip(NoteBulkExportFormat.plainText));
+      await tester.pump();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      expect(store.written, isEmpty);
+      pending.complete(_archive(archiveFile));
+      await tester.pumpAndSettle();
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a preference read after export completes keeps its format',
+        (tester) async {
+      final store = _ControlledFormatStore();
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      store.initialRead.complete(NoteBulkExportFormat.pdf);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.markdown]);
+      expect(_visibleFormat(tester), NoteBulkExportFormat.markdown);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('rapid choices apply immediately while preference writes wait',
+        (tester) async {
+      final store = _ControlledFormatStore()
+        ..initialRead.complete(NoteBulkExportFormat.markdown)
+        ..pendingWrite = Completer<void>();
+      final formats = <NoteBulkExportFormat>[];
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) async {
+          formats.add(format);
+          return _archive(archiveFile);
+        },
+        shareNotes: (_) async => ShareResult.unavailable,
+      )));
+      await tester.pumpAndSettle();
+      for (final format in [
+        NoteBulkExportFormat.pdf,
+        NoteBulkExportFormat.markdown,
+        NoteBulkExportFormat.plainText,
+      ]) {
+        await tester.tap(_formatChip(format));
+        await tester.pump();
+        expect(_visibleFormat(tester), format);
+      }
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(formats, [NoteBulkExportFormat.plainText]);
+      expect(store.written, [
+        NoteBulkExportFormat.pdf,
+        NoteBulkExportFormat.markdown,
+        NoteBulkExportFormat.plainText,
+      ]);
+      store.pendingWrite!.complete();
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    for (final fail in [false, true]) {
+      testWidgets('format read after disposal safely handles error: $fail',
+          (tester) async {
+        final store = _ControlledFormatStore();
+        showWholeScreen(tester);
+        await tester.pumpWidget(_host(BackupScreen(exportFormatStore: store)));
+        await tester.pumpAndSettle();
+        await tester.pumpWidget(const SizedBox.shrink());
+        if (fail) {
+          store.initialRead.completeError(StateError('Read failed'));
+        } else {
+          store.initialRead.complete(NoteBulkExportFormat.pdf);
+        }
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('disposal during a chosen export and delayed read is safe',
+        (tester) async {
+      final store = _ControlledFormatStore()..pendingWrite = Completer<void>();
+      final pending = Completer<NoteArchiveExport?>();
+      final formats = <NoteBulkExportFormat>[];
+      var shares = 0;
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        exportFormatStore: store,
+        exportNotes: (format, onProgress) {
+          formats.add(format);
+          return pending.future;
+        },
+        shareNotes: (_) async {
+          shares++;
+          return ShareResult.unavailable;
+        },
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_formatChip(NoteBulkExportFormat.pdf));
+      await tester.pump();
+      await tester.tap(_exportNotesButton);
+      await tester.pump();
+      expect(formats, [NoteBulkExportFormat.pdf]);
+      await tester.pumpWidget(const SizedBox.shrink());
+      store.initialRead.complete(NoteBulkExportFormat.plainText);
+      store.pendingWrite!.complete();
+      pending.complete(_archive(archiveFile));
+      await tester.pumpAndSettle();
+      expect(shares, 0);
+      expect(store.written, [NoteBulkExportFormat.pdf]);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('an empty library says so instead of sharing', (tester) async {

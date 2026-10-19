@@ -32,6 +32,7 @@ import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_bulk_export.dart';
 import 'package:onlynote/services/note_export.dart';
+import 'package:onlynote/services/note_export_format_store.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:path_provider/path_provider.dart';
@@ -47,6 +48,7 @@ class BackupScreen extends StatefulWidget {
     this.exportNotes,
     this.shareNotes,
     this.saveNotes,
+    this.exportFormatStore,
   });
 
   final Future<Uint8List> Function()? exportBackup;
@@ -68,6 +70,9 @@ class BackupScreen extends StatefulWidget {
 
   /// Returns true once saved, false when the save dialog was cancelled.
   final Future<bool> Function(File file, String suggestedName)? saveNotes;
+
+  /// Optional local readable-export preferences, independent of backup status.
+  final NoteExportFormatStore? exportFormatStore;
   @override
   State<BackupScreen> createState() => _BackupScreenState();
 }
@@ -82,6 +87,8 @@ class _BackupScreenState extends State<BackupScreen> {
   late final BackupExportStatusStore _backupStatusStore;
   BackupExportRecord? _lastBackupExport;
   var _backupStatusRevision = 0;
+  late final NoteExportFormatStore _exportFormatStore;
+  var _noteFormatRevision = 0;
 
   @override
   void initState() {
@@ -89,7 +96,37 @@ class _BackupScreenState extends State<BackupScreen> {
     _unregisterExitGuard =
         DesktopCommands.instance.registerEditor(() async => !_busy);
     _backupStatusStore = widget.backupStatusStore ?? BackupExportStatusStore();
+    _exportFormatStore =
+        widget.exportFormatStore ?? NoteExportFormatStore.instance;
     unawaited(_loadBackupStatus());
+    unawaited(_loadNoteFormat());
+  }
+
+  Future<void> _loadNoteFormat() async {
+    final revision = _noteFormatRevision;
+    try {
+      final format = await _exportFormatStore.read();
+      if (mounted && revision == _noteFormatRevision) {
+        setState(() => _noteFormat = format);
+      }
+    } catch (_) {
+      // Optional preferences cannot block the controls, including test stores.
+    }
+  }
+
+  void _selectNoteFormat(NoteBulkExportFormat format) {
+    if (_busy) return;
+    _noteFormatRevision++;
+    setState(() => _noteFormat = format);
+    unawaited(_persistNoteFormat(format));
+  }
+
+  Future<void> _persistNoteFormat(NoteBulkExportFormat format) async {
+    try {
+      await _exportFormatStore.write(format);
+    } catch (_) {
+      // The displayed choice still controls export if persistence fails.
+    }
   }
 
   Future<void> _loadBackupStatus() async {
@@ -357,12 +394,15 @@ class _BackupScreenState extends State<BackupScreen> {
 
   Future<void> _exportNotes() async {
     if (_busy) return;
+    // Freeze the displayed selection before starting; a late initial read
+    // must not change this export or the selection shown during its progress.
+    _noteFormatRevision++;
+    final format = _noteFormat;
     setState(() {
       _busy = true;
       _progress = S.of(context).Export_Notes_Preparing;
     });
     final origin = ShareHelper.shareOriginFromKey(_exportNotesKey);
-    final format = _noteFormat;
     NoteArchiveExport? export;
     try {
       export = await (widget.exportNotes ?? _buildNoteExport)(
@@ -565,8 +605,7 @@ class _BackupScreenState extends State<BackupScreen> {
                                 saveToFile: _saveToFile,
                                 format: _noteFormat,
                                 exportButtonKey: _exportNotesKey,
-                                onFormatChanged: (format) =>
-                                    setState(() => _noteFormat = format),
+                                onFormatChanged: _selectNoteFormat,
                                 onExport: _busy ? null : _exportNotes,
                               ),
                               const SizedBox(height: 16),

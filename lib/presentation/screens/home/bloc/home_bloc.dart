@@ -761,11 +761,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   int _compareLibraryNotes(Note a, Note b) =>
       compareLibraryNotes(a, b, _sortOrder);
 
+  Iterable<Note> get _tagCatalogNotes =>
+      _showTrash ? _trashedNotes : _activeNotes.followedBy(_archivedNotes);
+
+  /// Note counts for the current tag catalog, independent of library filters.
+  /// Keys use the same normalization as tag selection and search. A note with
+  /// repeated spellings of a tag contributes only once to that tag's count.
+  Map<String, int> get tagUsageCounts {
+    final counts = <String, int>{};
+    for (final note in _tagCatalogNotes) {
+      for (final key in note.tags.map(tagKey).toSet()) {
+        counts[key] = (counts[key] ?? 0) + 1;
+      }
+    }
+    return Map.unmodifiable(counts);
+  }
+
   List<String> _availableTags() {
     final tags = <String, String>{};
-    final notes =
-        _showTrash ? _trashedNotes : [..._activeNotes, ..._archivedNotes];
-    for (final note in notes) {
+    for (final note in _tagCatalogNotes) {
       for (final tag in note.tags) {
         tags.putIfAbsent(tagKey(tag), () => tag);
       }

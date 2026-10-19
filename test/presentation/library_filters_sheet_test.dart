@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
@@ -15,6 +16,7 @@ Future<Completer<LibraryFilterResult?>> open(
   Set<NoteSearchFilter> filters = const {},
   Set<String> selectedTags = const {},
   List<String> tags = const [],
+  Map<String, int>? tagUsageCounts,
   List<SavedNoteView> views = const [],
   ValueNotifier<List<SavedNoteView>>? viewUpdates,
   Map<String, String> folderNames = const {},
@@ -33,6 +35,7 @@ Future<Completer<LibraryFilterResult?>> open(
           filters: filters,
           selectedTags: selectedTags,
           availableTags: tags,
+          tagUsageCounts: tagUsageCounts,
           savedViews: currentViews,
           folderNames: folderNames,
           selectedViewId: selectedViewId,
@@ -131,6 +134,116 @@ void expectTagCounts(WidgetTester tester, int selected, int hidden) {
 }
 
 void main() {
+  testWidgets('callers without count data retain plain tag labels',
+      (tester) async {
+    await open(tester, tags: ['Work'], selectedTags: {'Removed tag'});
+    expect(find.text('Work'), findsOneWidget);
+    expect(find.text('Removed tag'), findsOneWidget);
+    expect(key('library-tag-usage-counts-hint'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('tag usage labels pluralize and keep orphan selections at zero',
+      (tester) async {
+    final counts = {'work': 12, 'personal': 1};
+    await open(tester,
+        tags: ['Work', ' WORK ', 'Personal'],
+        selectedTags: {'Removed tag'},
+        tagUsageCounts: counts);
+    expect(find.text('Work · 12 notes'), findsOneWidget);
+    expect(find.text('Personal · 1 note'), findsOneWidget);
+    expect(find.text('Removed tag · 0 notes'), findsOneWidget);
+    expect(key('library-tag-work'), findsOneWidget);
+    expect(tester.widget<FilterChip>(key('library-tag-removed tag')).selected,
+        isTrue);
+    final hint = key('library-tag-usage-counts-hint');
+    final strings = S.of(tester.element(hint));
+    expect(tester.widget<Text>(hint).data, strings.Tag_Usage_Counts_Hint);
+
+    await searchTags(tester, '12');
+    expect(key('library-tags-search-empty'), findsOneWidget);
+    expectTagCounts(tester, 1, 1);
+    expect(counts, {'work': 12, 'personal': 1});
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('explicit empty count data gives selected orphan tags zero',
+      (tester) async {
+    await open(tester, selectedTags: {'Removed tag'}, tagUsageCounts: const {});
+    expect(find.text('Removed tag · 0 notes'), findsOneWidget);
+    expect(key('library-tag-usage-counts-hint'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('counted tag search retains hidden selections when applied',
+      (tester) async {
+    final result = await open(tester,
+        selectedTags: {'Work'},
+        tags: ['Work', 'Personal'],
+        tagUsageCounts: {'work': 12, 'personal': 1},
+        filters: {NoteSearchFilter.recordings});
+    await searchTags(tester, '  PERSONAL  ');
+    expect(find.text('Personal · 1 note'), findsOneWidget);
+    expect(key('library-tag-work'), findsNothing);
+    await tapChip(tester, 'library-tag-personal');
+    expectTagCounts(tester, 2, 1);
+    await tester.ensureVisible(key('library-apply-filters'));
+    await tester.tap(key('library-apply-filters'));
+    await tester.pumpAndSettle();
+    final selected = (await result.future) as ApplyLibraryFilters;
+    expect(selected.tags, {'Work', 'Personal'});
+    expect(selected.filters, {NoteSearchFilter.recordings});
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Trash count hint describes its separate note pool',
+      (tester) async {
+    await open(tester,
+        tags: ['Work'], tagUsageCounts: {'work': 2}, trash: true);
+    final hint = key('library-tag-usage-counts-hint');
+    final strings = S.of(tester.element(hint));
+    expect(tester.widget<Text>(hint).data, strings.Tag_Usage_Counts_Trash_Hint);
+    expect(find.text('Work · 2 notes'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK'),
+  ]) {
+    testWidgets('localized usage counts fit narrow 2× text in $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final longTag = '個人工作計劃' * 6;
+      await open(tester,
+          tags: [longTag, 'Work'],
+          tagUsageCounts: {longTag: 1234, 'work': 1},
+          locale: locale,
+          textScale: 2);
+      final chip = key('library-tag-$longTag');
+      final strings = S.of(tester.element(chip));
+      final formattedCount =
+          NumberFormat.decimalPattern(locale.toString()).format(1234);
+      final label = find
+          .text('$longTag · ${strings.Tag_Usage_Count(1234, formattedCount)}');
+      expect(label, findsOneWidget);
+      expect(tester.widget<Text>(label).maxLines, isNull);
+      await tester.ensureVisible(chip);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await searchTags(tester, 'Work');
+      await tapChip(tester, 'library-tag-work');
+      expect(
+          tester.widget<FilterChip>(key('library-tag-work')).selected, isTrue);
+      await tester.ensureVisible(key('library-apply-filters'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final count in [19, 20]) {
     testWidgets('tag feedback counts all $count selections hidden by search',
         (tester) async {

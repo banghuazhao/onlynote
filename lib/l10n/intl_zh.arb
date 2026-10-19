@@ -522,6 +522,7 @@
   },
   "Note_Info": "笔记信息",
   "Note_Info_Last_Modified": "最后修改",
+  "Note_Info_Folder": "文件夹",
   "Note_Info_Words": "字数",
   "Note_Info_Characters": "字符数",
   "Note_Info_Reading_Time": "预计阅读时间",
@@ -659,6 +660,19 @@
   "Backup_Export_Prepared": "备份已准备好。此设备无法确认是否已分享。",
   "Remove_Library_Criterion": "移除{criterion}",
   "Search_Tags": "搜索标签",
+  "Tag_Usage_Count": "{formattedCount} 条笔记",
+  "@Tag_Usage_Count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "formattedCount": {
+        "type": "String"
+      }
+    }
+  },
+  "Tag_Usage_Counts_Hint": "数量包括所有文件夹中的未归档和已归档笔记，不受搜索和筛选条件影响。",
+  "Tag_Usage_Counts_Trash_Hint": "数量包括回收站中所有文件夹的笔记，不受搜索和筛选条件影响。",
   "Tags_Search_Empty": "没有符合搜索条件的标签",
   "Backup_Saved_Views": "已保存的视图",
   "@Remove_Library_Criterion": {

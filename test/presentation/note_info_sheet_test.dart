@@ -37,6 +37,66 @@ VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
     );
 
 void main() {
+  testWidgets('resolved folder name has a localized label and semantics',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note()),
+        folderName: '  Travel plans  ',
+      )));
+      await tester.pumpAndSettle();
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('note-info-folder-value')))
+              .data,
+          'Travel plans');
+      expect(find.text(S.current.Note_Info_Folder), findsOneWidget);
+      expect(
+          find.bySemanticsLabel('${S.current.Note_Info_Folder}: Travel plans'),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('unresolved or blank folder metadata omits the optional row',
+      (tester) async {
+    for (final folderName in [null, '', ' \t\n ']) {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note()),
+        folderName: folderName,
+      )));
+      await tester.pumpAndSettle();
+      expect(
+          find.byKey(const ValueKey('note-info-folder-value')), findsNothing);
+      expect(find.text(S.current.Note_Info_Folder), findsNothing);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('long folder name previews fit regular and Chinese 2x layouts',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    for (final (preview, size) in [
+      (noteInfoLongFolderPreview, const Size(390, 620)),
+      (noteInfoChineseLongFolderPreview, const Size(280, 700)),
+    ]) {
+      tester.view.physicalSize = size;
+      await tester.pumpWidget(preview());
+      await tester.pumpAndSettle();
+      expect(
+          find.byKey(const ValueKey('note-info-folder-value')), findsOneWidget);
+      await tester.ensureVisible(
+          find.byKey(const ValueKey('note-info-recording-duration-value')));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   for (final locale in [
     const Locale('en'),
     const Locale('zh'),

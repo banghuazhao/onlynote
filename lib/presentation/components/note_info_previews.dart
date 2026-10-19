@@ -31,6 +31,18 @@ Widget noteInfoMissingDatePreview() =>
     const _NoteInfoPreview(showModified: false);
 
 @Preview(
+    name: 'Note info — long folder name', group: 'Note', size: Size(390, 620))
+Widget noteInfoLongFolderPreview() => const _NoteInfoPreview(longFolder: true);
+
+@Preview(
+  name: 'Note info — Chinese long folder 2×',
+  group: 'Note',
+  size: Size(280, 700),
+)
+Widget noteInfoChineseLongFolderPreview() =>
+    const _NoteInfoPreview(chinese: true, textScale: 2, longFolder: true);
+
+@Preview(
   name: 'Note info — Chinese 2× narrow',
   group: 'Note',
   size: Size(280, 700),
@@ -67,6 +79,7 @@ class _NoteInfoPreview extends StatelessWidget {
     this.trashed = false,
     this.use24HourFormat = false,
     this.showModified = true,
+    this.longFolder = false,
   });
 
   final bool chinese;
@@ -75,6 +88,7 @@ class _NoteInfoPreview extends StatelessWidget {
   final bool trashed;
   final bool use24HourFormat;
   final bool showModified;
+  final bool longFolder;
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +172,11 @@ class _NoteInfoPreview extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: NoteInfoSheet(
             statistics: NoteStatistics.fromNote(note),
+            folderName: longFolder
+                ? (chinese
+                    ? '家庭旅行與週末散步的靈感和詳細計劃'
+                    : 'Family trips and weekend walks with detailed plans')
+                : (chinese ? '旅行計劃' : 'Travel plans'),
             modifiedAt: note.dateTime,
             deletedAt: note.deletedAt,
           ),
