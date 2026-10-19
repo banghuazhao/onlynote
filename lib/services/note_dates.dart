@@ -1,5 +1,24 @@
 import 'package:intl/intl.dart';
 
+/// The reader shows the stored timestamp in the local calendar, using the app's
+/// locale and device clock preference. As with Flutter's clock formatting,
+/// false retains the locale's default and true requests a 24-hour clock.
+/// Missing metadata stays empty.
+String noteReaderDateTimeLabel({
+  required DateTime? dateTime,
+  required String locale,
+  required bool use24HourFormat,
+}) {
+  if (dateTime == null) return '';
+  final format = DateFormat.yMMMd(locale);
+  if (use24HourFormat) {
+    format.add_Hm();
+  } else {
+    format.add_jm();
+  }
+  return format.format(dateTime.toLocal());
+}
+
 /// A Trash card labels its stored deletion date. Ordinary card dates retain
 /// their existing formatting, and hidden or missing dates stay absent.
 String? noteCardDateLabel({

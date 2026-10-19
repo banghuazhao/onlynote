@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:onlynote/Tools/app_checklist_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/presentation/components/photo_text_review_sheet.dart';
@@ -637,6 +638,7 @@ Widget checklistProgressPreview() => MaterialApp(
           kind: PaperNoteKind.sheet,
           color: AppColors.parchment,
           child: NoteChecklist(
+              settings: AppChecklistSettings.memory(),
               todos: [
                 Todo(id: 'one', title: 'Pick up fresh bread'),
                 Todo(id: 'two', title: 'Bring a reusable bag', completed: true),

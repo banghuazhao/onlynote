@@ -23,170 +23,99 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(notes, folders, photos) =>
       "${notes} notes · ${folders} folders · ${photos} photos";
 
-  static String m1(count) =>
-      "${Intl.plural(count, one: '1 linked note', other: '${count} linked notes')}";
+  static String m1(date) => "Last backup saved: ${date}";
 
-  static String m2(date) => "Moved to Trash on ${date}";
+  static String m2(date) => "Last backup shared: ${date}";
 
   static String m3(count) =>
-      "${Intl.plural(count, one: '1 scanned page', other: '${count} scanned pages')}";
+      "${Intl.plural(count, one: '1 linked note', other: '${count} linked notes')}";
 
-  static String m4(count) => "Completed (${count})";
+  static String m4(date) => "Moved to Trash on ${date}";
 
   static String m5(count) =>
+      "${Intl.plural(count, one: '1 scanned page', other: '${count} scanned pages')}";
+
+  static String m6(count) => "Completed (${count})";
+
+  static String m7(count) =>
       "${Intl.plural(count, one: '1 task copied', other: '${count} tasks copied')}";
 
-  static String m6(completed, total) => "${completed} of ${total} complete";
+  static String m8(completed, total) => "${completed} of ${total} complete";
 
-  static String m7(heading) => "Collapse ${heading}";
+  static String m9(heading) => "Collapse ${heading}";
 
-  static String m8(heading) => "Expand ${heading}";
-
-  static String m9(count) =>
-      "Replaced ${Intl.plural(count, one: '1 match', other: '${count} matches')}";
-
-  static String m10(count) => "${count} notes";
+  static String m10(heading) => "Expand ${heading}";
 
   static String m11(count) =>
-      "${Intl.plural(count, one: '1 photo', other: '${count} photos')}";
+      "${Intl.plural(count, one: '1 note could not be exported.', other: '${count} notes could not be exported.')}";
 
   static String m12(count) =>
+      "Replaced ${Intl.plural(count, one: '1 match', other: '${count} matches')}";
+
+  static String m13(count) => "${count} notes";
+
+  static String m14(count) =>
+      "${Intl.plural(count, one: '1 photo', other: '${count} photos')}";
+
+  static String m15(count) =>
       "${Intl.plural(count, one: '1 recording', other: '${count} recordings')}";
 
-  static String m13(date) => "Saved ${date}";
+  static String m16(date) => "Saved ${date}";
 
-  static String m14(number) => "Note color ${number}";
+  static String m17(number) => "Note color ${number}";
 
-  static String m15(minutes) => "${minutes} min";
+  static String m18(minutes) => "${minutes} min";
 
-  static String m16(name) => "Open ${name} in library";
+  static String m19(name) => "Open ${name} in library";
 
-  static String m17(number) => "Photo ${number}";
-
-  static String m18(limit) =>
-      "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
-
-  static String m19(limit) =>
-      "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
-
-  static String m20(price) => "Unlock forever for ${price}";
+  static String m20(number) => "Photo ${number}";
 
   static String m21(limit) =>
+      "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
+
+  static String m22(limit) =>
+      "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
+
+  static String m23(price) => "Unlock forever for ${price}";
+
+  static String m24(limit) =>
       "The free plan includes ${limit} saved templates. Upgrade for unlimited templates.";
 
-  static String m22(time) => "Next reminder: ${time}";
+  static String m25(time) => "Next reminder: ${time}";
 
-  static String m23(date) => "Remind me: ${date}";
+  static String m26(date) => "Remind me: ${date}";
 
-  static String m24(price) => "Remove ads permanently for ${price}.";
+  static String m27(price) => "Remove ads permanently for ${price}.";
 
-  static String m25(criterion) => "Remove ${criterion}";
+  static String m28(criterion) => "Remove ${criterion}";
 
-  static String m26(limit) =>
+  static String m29(limit) =>
       "You can save up to ${limit} views. Delete a saved view to add another.";
 
-  static String m27(query) => "Search: ${query}";
+  static String m30(query) => "Search: ${query}";
 
-  static String m28(tags) => "Tags: ${tags}";
-
-  static String m29(count) =>
-      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
-
-  static String m30(count) =>
-      "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
-
-  static String m31(count) =>
-      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+  static String m31(tags) => "Tags: ${tags}";
 
   static String m32(count) =>
-      "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
+      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
 
-  static String m33(limit) =>
-      "You can select up to ${limit} tags. Deselect a tag to choose another.";
+  static String m33(count) =>
+      "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
 
-  static String m34(items, photos) =>
-      "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
+  static String m34(count) =>
+      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
 
   static String m35(count) =>
-      "${Intl.plural(count, one: '1 note could not be exported.', other: '${count} notes could not be exported.')}";
+      "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
+
+  static String m36(limit) =>
+      "You can select up to ${limit} tags. Deselect a tag to choose another.";
+
+  static String m37(items, photos) =>
+      "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage(
-      "Desktop widgets",
-    ),
-    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
-      "Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.",
-    ),
-    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
-      "Add Onlynote widgets to your Mac desktop for a quick glance at your notes.",
-    ),
-    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage(
-      "Add to Desktop",
-    ),
-    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
-      "Right-click an empty area of your desktop and choose Edit Widgets.",
-    ),
-    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
-      "Search for Onlynote in the widget gallery.",
-    ),
-    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
-      "Choose an overview or a note widget, then select a size.",
-    ),
-    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
-      "Drag the widget onto your desktop, then click Done.",
-    ),
-    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
-      "Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.",
-    ),
-    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage(
-      "Paper and color",
-    ),
-    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
-      "Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.",
-    ),
-    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
-      "Click a note in the widget to open it, or click New to start writing.",
-    ),
-    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
-      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
-    ),
-    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "Backup save cancelled.",
-    ),
-    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
-      "Could not save the backup. Check available storage and try again.",
-    ),
-    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage(
-      "Backup saved.",
-    ),
-    "Backup_Save_As": MessageLookupByLibrary.simpleMessage(
-      "Save backup…",
-    ),
-    "Choose_Image_File": MessageLookupByLibrary.simpleMessage(
-      "Choose an image file",
-    ),
-    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage(
-      "Close Window",
-    ),
-    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage(
-      "File",
-    ),
-    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage(
-      "New Note",
-    ),
-    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage(
-      "Quit Onlynote",
-    ),
-    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage(
-      "Window",
-    ),
-    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
-      "All Premium features are unlocked.",
-    ),
-    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
-      "Already purchased Premium? Restore your purchase below.",
-    ),
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
@@ -224,11 +153,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
       "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose Save to Files or a storage app from the share menu. Maximum file size: 256 MB.",
     ),
+    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
+    ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not create the backup. Check available storage and that all photos and recordings are accessible. Backups must fit within 256 MB.",
     ),
+    "Backup_Export_Last_Saved": m1,
+    "Backup_Export_Last_Shared": m2,
+    "Backup_Export_No_Record": MessageLookupByLibrary.simpleMessage(
+      "No backup export recorded",
+    ),
     "Backup_Export_Prepared": MessageLookupByLibrary.simpleMessage(
       "Backup prepared. This device could not confirm whether it was shared.",
+    ),
+    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Backup save cancelled.",
+    ),
+    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save the backup. Check available storage and try again.",
+    ),
+    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage(
+      "Backup saved.",
     ),
     "Backup_Export_Share_Failed": MessageLookupByLibrary.simpleMessage(
       "Backup prepared, but sharing failed. Please try again.",
@@ -267,6 +213,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Restoring": MessageLookupByLibrary.simpleMessage(
       "Restoring your notes and photos…",
     ),
+    "Backup_Save_As": MessageLookupByLibrary.simpleMessage("Save backup…"),
     "Backup_Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
       "Schedule future reminder notifications",
@@ -276,9 +223,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Cancel_Searching": MessageLookupByLibrary.simpleMessage(
       "Cancel searching",
     ),
-    "Card_Linked_Notes_Count": m1,
-    "Card_Moved_To_Trash_On": m2,
-    "Card_Scanned_Pages_Count": m3,
+    "Card_Linked_Notes_Count": m3,
+    "Card_Moved_To_Trash_On": m4,
+    "Card_Scanned_Pages_Count": m5,
     "Card_Size": MessageLookupByLibrary.simpleMessage("Card Size"),
     "Card_Style": MessageLookupByLibrary.simpleMessage("Card style"),
     "Card_Style_Color": MessageLookupByLibrary.simpleMessage("Color"),
@@ -333,11 +280,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "Use default style",
     ),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("All done"),
-    "Checklist_Completed": m4,
+    "Checklist_Completed": m6,
     "Checklist_Copy_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not copy tasks. Please try again.",
     ),
-    "Checklist_Copy_Success": m5,
+    "Checklist_Copy_Success": m7,
     "Checklist_Copy_Unfinished": MessageLookupByLibrary.simpleMessage(
       "Copy unfinished",
     ),
@@ -350,13 +297,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This checklist item is no longer available.",
     ),
-    "Checklist_Progress": m6,
+    "Checklist_Progress": m8,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("Reset checklist"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage(
       "Checklist reset",
     ),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage(
       "Choose From Gallery",
+    ),
+    "Choose_Image_File": MessageLookupByLibrary.simpleMessage(
+      "Choose an image file",
     ),
     "Choose_Linked_Notes": MessageLookupByLibrary.simpleMessage(
       "Choose linked notes",
@@ -366,7 +316,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("Clear filters"),
     "Clear_Search": MessageLookupByLibrary.simpleMessage("Clear search"),
-    "Collapse_Section": m7,
+    "Collapse_Section": m9,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "Choose a note to add the selected text.",
     ),
@@ -446,6 +396,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Delete this item?",
     ),
     "Delete_View": MessageLookupByLibrary.simpleMessage("Delete view"),
+    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage(
+      "Close Window",
+    ),
+    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage("File"),
+    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage("New Note"),
+    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage("Quit Onlynote"),
+    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage("Window"),
     "Document_Scan": MessageLookupByLibrary.simpleMessage("Scan document"),
     "Document_Scan_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not finish adding the scanned pages. Please try again.",
@@ -474,45 +431,45 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tap a photo to resize it. Press and hold to move it.",
     ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
-    "Expand_Section": m8,
+    "Expand_Section": m10,
     "Export_Notes": MessageLookupByLibrary.simpleMessage("Export notes"),
+    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Note export sharing cancelled.",
+    ),
     "Export_Notes_Description": MessageLookupByLibrary.simpleMessage(
       "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose Save to Files or a storage app from the share menu.",
     ),
     "Export_Notes_Desktop_Description": MessageLookupByLibrary.simpleMessage(
       "Save every note, including archived ones, as one zip of readable files — one file per note, with photos and recordings beside Markdown. Choose a location in the save dialog.",
     ),
-    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("Format"),
-    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("Save notes…"),
-    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage(
-      "Exporting your notes…",
-    ),
     "Export_Notes_Empty": MessageLookupByLibrary.simpleMessage(
       "There are no notes to export yet.",
-    ),
-    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("Notes saved."),
-    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "Note export save cancelled.",
-    ),
-    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
-      "Note export completed. Check the selected app to confirm it was saved.",
-    ),
-    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "Note export sharing cancelled.",
-    ),
-    "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
-      "Notes exported. This device could not confirm whether they were shared.",
     ),
     "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not export your notes. Check available storage and that photos and recordings are accessible.",
     ),
+    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("Format"),
+    "Export_Notes_Incomplete": m11,
+    "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
+      "Notes exported. This device could not confirm whether they were shared.",
+    ),
+    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage(
+      "Exporting your notes…",
+    ),
+    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("Save notes…"),
+    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "Note export save cancelled.",
+    ),
     "Export_Notes_Save_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the export. Check available storage and try again.",
     ),
+    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("Notes saved."),
     "Export_Notes_Share_Failed": MessageLookupByLibrary.simpleMessage(
       "Export prepared, but sharing failed. Please try again.",
     ),
-    "Export_Notes_Incomplete": m35,
+    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
+      "Note export completed. Check the selected app to confirm it was saved.",
+    ),
     "Express_Scan": MessageLookupByLibrary.simpleMessage("Express Scan"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage(
@@ -576,14 +533,14 @@ class MessageLookup extends MessageLookupByLibrary {
       "That replacement would make a title or checklist item too long.",
     ),
     "Find_Replace_With": MessageLookupByLibrary.simpleMessage("Replace with"),
-    "Find_Replaced": m9,
+    "Find_Replaced": m12,
     "Folder_Created": MessageLookupByLibrary.simpleMessage("Folder created"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("Folder deleted"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("Folder name"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage(
       "Please enter a folder name.",
     ),
-    "Folder_Notes_Count": m10,
+    "Folder_Notes_Count": m13,
     "Folder_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No matching folders.",
     ),
@@ -613,9 +570,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Empty": MessageLookupByLibrary.simpleMessage(
       "Saved changes will appear here.",
     ),
-    "History_Photos": m11,
+    "History_Photos": m14,
     "History_Preview": MessageLookupByLibrary.simpleMessage("Version preview"),
-    "History_Recordings": m12,
+    "History_Recordings": m15,
     "History_Restore": MessageLookupByLibrary.simpleMessage(
       "Restore this version",
     ),
@@ -629,7 +586,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Unavailable": MessageLookupByLibrary.simpleMessage(
       "This note or version is no longer available.",
     ),
-    "History_Version": m13,
+    "History_Version": m16,
     "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("Drop photo here"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("Image Guru"),
     "Image_Move": MessageLookupByLibrary.simpleMessage("Move photo"),
@@ -690,7 +647,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Note Added Successfully",
     ),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("Note archived"),
-    "Note_Color": m14,
+    "Note_Color": m17,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("Note Deleted"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Duplicated Successfully",
@@ -715,7 +672,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "Less than 1 min",
     ),
-    "Note_Info_Reading_Minutes": m15,
+    "Note_Info_Reading_Minutes": m18,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage(
       "Estimated reading time",
     ),
@@ -811,7 +768,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Write a note",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
-    "Open_Folder_In_Library": m16,
+    "Open_Folder_In_Library": m19,
     "Open_Linked_Note": MessageLookupByLibrary.simpleMessage(
       "Open linked note",
     ),
@@ -861,7 +818,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m17,
+    "Photo_Text_Photo": m20,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -884,13 +841,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Description": MessageLookupByLibrary.simpleMessage(
       "All Premium features are unlocked, with no ads.",
     ),
+    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "All Premium features are unlocked.",
+    ),
+    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "Already purchased Premium? Restore your purchase below.",
+    ),
     "Premium_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
       "Already removed ads? Your purchase includes Premium. Restore it below.",
     ),
     "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
       "Unlock this feature with Premium.",
     ),
-    "Premium_Folder_Limit": m18,
+    "Premium_Folder_Limit": m21,
     "Premium_Folders": MessageLookupByLibrary.simpleMessage(
       "Unlimited folders",
     ),
@@ -901,7 +864,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Free includes 3 folders and 3 saved templates.",
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("No ads"),
-    "Premium_Note_Limit": m19,
+    "Premium_Note_Limit": m22,
     "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage(
       "Premium note themes",
     ),
@@ -912,11 +875,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "One-time purchase. No subscription.",
     ),
-    "Premium_One_Time_Price": m20,
+    "Premium_One_Time_Price": m23,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage(
       "Repeating reminders",
     ),
-    "Premium_Template_Limit": m21,
+    "Premium_Template_Limit": m24,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage(
       "Unlimited saved templates",
     ),
@@ -961,7 +924,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m22,
+    "Reminder_Next_Time": m25,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -978,7 +941,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m23,
+    "Reminder_Suggestion": m26,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -1016,8 +979,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m24,
-    "Remove_Library_Criterion": m25,
+    "Remove_Ads_Price": m27,
+    "Remove_Library_Criterion": m28,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
@@ -1064,10 +1027,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save this view. Try again.",
     ),
-    "Saved_View_Limit_Reached": m26,
+    "Saved_View_Limit_Reached": m29,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
-    "Saved_View_Search": m27,
-    "Saved_View_Tags": m28,
+    "Saved_View_Search": m30,
+    "Saved_View_Tags": m31,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No matching saved views.",
@@ -1076,7 +1039,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("Search folders"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
-    "Search_Results_Count": m29,
+    "Search_Results_Count": m32,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage(
       "Search saved views",
     ),
@@ -1085,7 +1048,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Search templates",
     ),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m30,
+    "Selection_Checklist_Added": m33,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
@@ -1169,12 +1132,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Use up to 20 tags, with 40 characters per tag.",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
-    "Tags_Hidden_By_Search_Count": m31,
+    "Tags_Hidden_By_Search_Count": m34,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No tags match your search",
     ),
-    "Tags_Selected_Count": m32,
-    "Tags_Selection_Limit_Reached": m33,
+    "Tags_Selected_Count": m35,
+    "Tags_Selection_Limit_Reached": m36,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -1203,7 +1166,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m34,
+    "Template_Details": m37,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -1339,6 +1302,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Could not open this website.",
     ),
     "Widget": MessageLookupByLibrary.simpleMessage("Home Screen Widget"),
+    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage(
+      "Add to Desktop",
+    ),
     "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage(
       "Add to Home Screen",
     ),
@@ -1357,11 +1323,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "Widget_Choose_Note_iOS": MessageLookupByLibrary.simpleMessage(
       "Touch and hold your widget, choose Edit Widget, then select a note or checklist. Available on iOS 17 or later.",
     ),
+    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
+      "Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.",
+    ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "See your notes at a glance, without opening the app.",
     ),
+    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
+      "Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.",
+    ),
     "Widget_Discovery_Body": MessageLookupByLibrary.simpleMessage(
       "Add a widget to your Home Screen for a quick glance at your notes.",
+    ),
+    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
+      "Add Onlynote widgets to your Mac desktop for a quick glance at your notes.",
     ),
     "Widget_Discovery_Title": MessageLookupByLibrary.simpleMessage(
       "Keep pinned notes in view",
@@ -1390,9 +1365,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "Widget_Step_iOS_4": MessageLookupByLibrary.simpleMessage(
       "Choose a size and tap Add Widget.",
     ),
+    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
+      "Right-click an empty area of your desktop and choose Edit Widgets.",
+    ),
+    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
+      "Search for Onlynote in the widget gallery.",
+    ),
+    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
+      "Choose an overview or a note widget, then select a size.",
+    ),
+    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
+      "Drag the widget onto your desktop, then click Done.",
+    ),
     "Widget_Steps_Title": MessageLookupByLibrary.simpleMessage("How to add it"),
+    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage(
+      "Paper and color",
+    ),
+    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
+      "Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.",
+    ),
     "Widget_Tip": MessageLookupByLibrary.simpleMessage(
       "Tap a note in the widget to open it, or tap New to start writing.",
+    ),
+    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
+      "Click a note in the widget to open it, or click New to start writing.",
+    ),
+    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage(
+      "Desktop widgets",
     ),
     "World_Weather_Live": MessageLookupByLibrary.simpleMessage(
       "World Weather Live",

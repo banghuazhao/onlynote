@@ -8,10 +8,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/Tools/desktop_commands.dart';
 import 'package:onlynote/Tools/export_archive.dart';
+import 'package:onlynote/presentation/components/backup_export_section.dart';
 import 'package:onlynote/presentation/screens/settings/backup_screen.dart';
+import 'package:onlynote/services/backup/backup_export_status.dart';
 import 'package:onlynote/services/note_bulk_export.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../support/memory_preferences.dart';
+
+class _ControlledStatusStore extends BackupExportStatusStore {
+  final initialRead = Completer<BackupExportRecord?>();
+  final recorded = <BackupExportRecord>[];
+
+  @override
+  Future<BackupExportRecord?> read() => initialRead.future;
+
+  @override
+  Future<void> record(BackupExportRecord record) async => recorded.add(record);
+}
+
+class _FailingStatusStore extends BackupExportStatusStore {
+  @override
+  Future<BackupExportRecord?> read() async => throw StateError('Read failed');
+
+  @override
+  Future<void> record(BackupExportRecord record) async =>
+      throw StateError('Write failed');
+}
+
+BackupExportRecord? _visibleRecord(WidgetTester tester) => tester
+    .widget<BackupExportSection>(find.byType(BackupExportSection))
+    .lastExport;
 
 Widget _host(BackupScreen screen) => MaterialApp(
       locale: const Locale('en'),
@@ -58,6 +86,210 @@ Future<void> _drainFeedback(WidgetTester tester) async {
 }
 
 void main() {
+  group('last completed backup export', () {
+    final priorDate = DateTime.utc(2025, 1, 2, 13, 14);
+
+    Future<BackupExportStatusStore> previousExport(
+        MemoryPreferences preferences) async {
+      final store = BackupExportStatusStore(preferences: preferences);
+      await store.record(BackupExportRecord(
+          exportedAt: priorDate, destination: BackupExportDestination.saved));
+      return store;
+    }
+
+    testWidgets('no recorded export has a neutral first-use status',
+        (tester) async {
+      await tester.pumpWidget(_host(BackupScreen(
+          backupStatusStore:
+              BackupExportStatusStore(preferences: MemoryPreferences()))));
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Backup_Export_No_Record), findsOneWidget);
+      expect(_visibleRecord(tester), isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final status in ShareResultStatus.values) {
+      testWidgets('$status updates status only for a confirmed share',
+          (tester) async {
+        final preferences = MemoryPreferences();
+        final store = await previousExport(preferences);
+        await tester.pumpWidget(_host(BackupScreen(
+          backupStatusStore: store,
+          exportBackup: () async => Uint8List.fromList([1]),
+          shareBackup: (_) async => ShareResult('action', status),
+        )));
+        await tester.pumpAndSettle();
+        expect(_visibleRecord(tester)!.exportedAt, priorDate);
+        await tester.tap(_exportButton);
+        await tester.pumpAndSettle();
+        final record = _visibleRecord(tester)!;
+        if (status == ShareResultStatus.success) {
+          expect(record.destination, BackupExportDestination.shared);
+          expect(record.exportedAt.isAfter(priorDate), isTrue);
+          expect(find.textContaining('Last backup shared:'), findsOneWidget);
+        } else {
+          expect(record.destination, BackupExportDestination.saved);
+          expect(record.exportedAt, priorDate);
+        }
+        await _drainFeedback(tester);
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpWidget(_host(BackupScreen(
+          backupStatusStore: BackupExportStatusStore(preferences: preferences),
+        )));
+        await tester.pumpAndSettle();
+        final reopened = _visibleRecord(tester)!;
+        expect(reopened.destination, record.destination);
+        expect(reopened.exportedAt.millisecondsSinceEpoch,
+            record.exportedAt.millisecondsSinceEpoch);
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    for (final saved in [true, false]) {
+      testWidgets(
+          'Mac ${saved ? 'save' : 'cancellation'} retains accurate status',
+          (tester) async {
+        final preferences = MemoryPreferences();
+        await tester.pumpWidget(_host(BackupScreen(
+          backupStatusStore: await previousExport(preferences),
+          exportBackup: () async => Uint8List.fromList([1]),
+          saveBackup: (_, __) async => saved,
+        )));
+        await tester.pumpAndSettle();
+        await tester
+            .tap(find.widgetWithText(FilledButton, S.current.Backup_Save_As));
+        await tester.pumpAndSettle();
+        final record = _visibleRecord(tester)!;
+        expect(record.destination, BackupExportDestination.saved);
+        expect(record.exportedAt.isAfter(priorDate), saved);
+        expect(find.textContaining('Last backup saved:'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await _drainFeedback(tester);
+      }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+    }
+
+    for (final stage in ['preparation', 'share', 'save']) {
+      testWidgets('$stage failure preserves the previous status',
+          (tester) async {
+        final preferences = MemoryPreferences();
+        await tester.pumpWidget(_host(BackupScreen(
+          backupStatusStore: await previousExport(preferences),
+          exportBackup: () async {
+            if (stage == 'preparation') throw StateError('Preparation failed');
+            return Uint8List.fromList([1]);
+          },
+          shareBackup: (_) async => throw StateError('Share failed'),
+          saveBackup: (_, __) async => throw StateError('Save failed'),
+        )));
+        await tester.pumpAndSettle();
+        await tester.tap(stage == 'save'
+            ? find.widgetWithText(FilledButton, S.current.Backup_Save_As)
+            : _exportButton);
+        await tester.pumpAndSettle();
+        expect(_visibleRecord(tester)!.exportedAt, priorDate);
+        expect(
+            _visibleRecord(tester)!.destination, BackupExportDestination.saved);
+        expect(
+            (await BackupExportStatusStore(preferences: preferences).read())!
+                .exportedAt,
+            priorDate);
+        expect(tester.takeException(), isNull);
+        await _drainFeedback(tester);
+      },
+          variant: TargetPlatformVariant.only(
+              stage == 'save' ? TargetPlatform.macOS : TargetPlatform.android));
+    }
+
+    testWidgets('status dates the snapshot before waiting for preparation',
+        (tester) async {
+      final prepared = Completer<Uint8List>();
+      final store = _ControlledStatusStore()..initialRead.complete(null);
+      late DateTime preparationStarted;
+      await tester.pumpWidget(_host(BackupScreen(
+        backupStatusStore: store,
+        exportBackup: () {
+          preparationStarted = DateTime.now().toUtc();
+          return prepared.future;
+        },
+        shareBackup: (_) async =>
+            const ShareResult('action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      final beforeExport = DateTime.now().toUtc();
+      await tester.tap(_exportButton);
+      await tester.pump();
+      expect(store.recorded, isEmpty);
+      prepared.complete(Uint8List.fromList([1]));
+      await tester.pumpAndSettle();
+      final recorded = store.recorded.single;
+      expect(recorded.exportedAt.isUtc, isTrue);
+      expect(recorded.exportedAt.isBefore(beforeExport), isFalse);
+      expect(recorded.exportedAt.isAfter(preparationStarted), isFalse);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a delayed initial read cannot replace a completed share',
+        (tester) async {
+      final store = _ControlledStatusStore();
+      await tester.pumpWidget(_host(BackupScreen(
+        backupStatusStore: store,
+        exportBackup: () async => Uint8List.fromList([1]),
+        shareBackup: (_) async =>
+            const ShareResult('action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportButton);
+      await tester.pumpAndSettle();
+      final recorded = store.recorded.single;
+      store.initialRead.complete(BackupExportRecord(
+          exportedAt: priorDate, destination: BackupExportDestination.saved));
+      await tester.pumpAndSettle();
+      expect(_visibleRecord(tester), same(recorded));
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('status storage failures preserve a successful export outcome',
+        (tester) async {
+      await tester.pumpWidget(_host(BackupScreen(
+        backupStatusStore: _FailingStatusStore(),
+        exportBackup: () async => Uint8List.fromList([1]),
+        shareBackup: (_) async =>
+            const ShareResult('action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportButton);
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Backup_Export_Shared), findsOneWidget);
+      expect(
+          _visibleRecord(tester)!.destination, BackupExportDestination.shared);
+      expect(find.text(S.current.Backup_Export_Share_Failed), findsNothing);
+      expect(tester.widget<FilledButton>(_exportButton).onPressed, isNotNull);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
+    });
+
+    testWidgets('a save completed after disposal is still recorded safely',
+        (tester) async {
+      final saved = Completer<bool>();
+      final store = _ControlledStatusStore()..initialRead.complete(null);
+      await tester.pumpWidget(_host(BackupScreen(
+        backupStatusStore: store,
+        exportBackup: () async => Uint8List.fromList([1]),
+        saveBackup: (_, __) => saved.future,
+      )));
+      await tester.pumpAndSettle();
+      await tester
+          .tap(find.widgetWithText(FilledButton, S.current.Backup_Save_As));
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+      saved.complete(true);
+      await tester.pumpAndSettle();
+      expect(store.recorded.single.destination, BackupExportDestination.saved);
+      expect(tester.takeException(), isNull);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+  });
+
   for (final saved in [true, false]) {
     testWidgets('Mac Save As reports ${saved ? 'saved' : 'cancelled'}',
         (tester) async {
@@ -427,6 +659,35 @@ void main() {
 
     tearDown(() async {
       if (await directory.exists()) await directory.delete(recursive: true);
+    });
+
+    testWidgets('readable exports do not change the full backup status',
+        (tester) async {
+      final preferences = MemoryPreferences();
+      final store = BackupExportStatusStore(preferences: preferences);
+      final priorDate = DateTime.utc(2025, 1, 2);
+      await store.record(BackupExportRecord(
+          exportedAt: priorDate, destination: BackupExportDestination.saved));
+      showWholeScreen(tester);
+      await tester.pumpWidget(_host(BackupScreen(
+        backupStatusStore: store,
+        exportNotes: (format, onProgress) async => _archive(archiveFile),
+        shareNotes: (_) async =>
+            const ShareResult('action', ShareResultStatus.success),
+      )));
+      await tester.pumpAndSettle();
+      await tester.tap(_exportNotesButton);
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Export_Notes_Shared), findsOneWidget);
+      expect(_visibleRecord(tester)!.exportedAt, priorDate);
+      expect(
+          _visibleRecord(tester)!.destination, BackupExportDestination.saved);
+      expect(
+          (await BackupExportStatusStore(preferences: preferences).read())!
+              .exportedAt,
+          priorDate);
+      expect(tester.takeException(), isNull);
+      await _drainFeedback(tester);
     });
 
     for (final saved in [true, false]) {

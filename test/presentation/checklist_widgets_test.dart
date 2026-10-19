@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onlynote/Tools/app_checklist_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note.dart';
@@ -61,7 +62,10 @@ Finder _todoFields() => find.byWidgetPredicate((widget) =>
     (widget.key as ValueKey<String>).value.startsWith('todo-field-'));
 
 void main() {
+  late AppChecklistSettings checklistSettings;
   setUp(() {
+    checklistSettings = AppChecklistSettings.memory();
+    addTearDown(checklistSettings.dispose);
     final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
     for (final family in fonts.keys) {
       kAppFontFamilies[family] = (
@@ -353,6 +357,7 @@ void main() {
             builder: (context, setState) => Padding(
                 padding: const EdgeInsets.all(16),
                 child: NoteChecklist(
+                    settings: checklistSettings,
                     todos: todos,
                     onToggle: (id) => setState(() => todos = [
                           for (final todo in todos)
@@ -386,10 +391,15 @@ void main() {
                   TextButton(
                       onPressed: () => setState(() => exportMode = true),
                       child: const Text('Export')),
-                  NoteChecklist(todos: [
-                    Todo(id: 'a', title: 'Milk'),
-                    Todo(id: 'b', title: 'Eggs', completed: true)
-                  ], exportMode: exportMode, onToggle: (_) {}, onReset: () {}),
+                  NoteChecklist(
+                      settings: checklistSettings,
+                      todos: [
+                        Todo(id: 'a', title: 'Milk'),
+                        Todo(id: 'b', title: 'Eggs', completed: true)
+                      ],
+                      exportMode: exportMode,
+                      onToggle: (_) {},
+                      onReset: () {}),
                 ])))));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('checklist-completed-toggle')));
@@ -422,6 +432,7 @@ void main() {
                 child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: NoteChecklist(
+                        settings: checklistSettings,
                         todos: [Todo(id: 'a', title: title, completed: true)],
                         readOnly: true,
                         onToggle: (_) => toggles++,

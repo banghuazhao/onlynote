@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -25,6 +26,7 @@ import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/note_export_section.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
+import 'package:onlynote/services/backup/backup_export_status.dart';
 import 'package:onlynote/services/backup/backup_service.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_autosave.dart';
@@ -41,6 +43,7 @@ class BackupScreen extends StatefulWidget {
     this.exportBackup,
     this.shareBackup,
     this.saveBackup,
+    this.backupStatusStore,
     this.exportNotes,
     this.shareNotes,
     this.saveNotes,
@@ -52,6 +55,9 @@ class BackupScreen extends StatefulWidget {
   /// Returns true once saved, false when the save dialog was cancelled.
   final Future<bool> Function(Uint8List bytes, String suggestedName)?
       saveBackup;
+
+  /// Optional local status storage; injectable without native preferences.
+  final BackupExportStatusStore? backupStatusStore;
 
   /// Builds the readable export archive, reporting progress per note.
   final Future<NoteArchiveExport?> Function(
@@ -73,12 +79,46 @@ class _BackupScreenState extends State<BackupScreen> {
   String? _progress;
   NoteBulkExportFormat _noteFormat = NoteBulkExportFormat.markdown;
   late final VoidCallback _unregisterExitGuard;
+  late final BackupExportStatusStore _backupStatusStore;
+  BackupExportRecord? _lastBackupExport;
+  var _backupStatusRevision = 0;
 
   @override
   void initState() {
     super.initState();
     _unregisterExitGuard =
         DesktopCommands.instance.registerEditor(() async => !_busy);
+    _backupStatusStore = widget.backupStatusStore ?? BackupExportStatusStore();
+    unawaited(_loadBackupStatus());
+  }
+
+  Future<void> _loadBackupStatus() async {
+    final revision = _backupStatusRevision;
+    try {
+      final record = await _backupStatusStore.read();
+      if (mounted && revision == _backupStatusRevision) {
+        setState(() => _lastBackupExport = record);
+      }
+    } catch (_) {
+      // Export metadata is optional, including an injected storage provider.
+    }
+  }
+
+  void _recordBackupExport(
+      DateTime exportedAt, BackupExportDestination destination) {
+    final record =
+        BackupExportRecord(exportedAt: exportedAt, destination: destination);
+    _backupStatusRevision++;
+    if (mounted) setState(() => _lastBackupExport = record);
+    unawaited(_persistBackupStatus(record));
+  }
+
+  Future<void> _persistBackupStatus(BackupExportRecord record) async {
+    try {
+      await _backupStatusStore.record(record);
+    } catch (_) {
+      // A completed save/share must keep its outcome even if metadata fails.
+    }
   }
 
   @override
@@ -127,6 +167,7 @@ class _BackupScreenState extends State<BackupScreen> {
       _progress = S.of(context).Backup_Preparing;
     });
     final origin = ShareHelper.shareOriginFromKey(_exportKey);
+    final exportedAt = DateTime.now().toUtc();
     var prepared = false;
     try {
       final bytes = widget.exportBackup != null
@@ -142,6 +183,9 @@ class _BackupScreenState extends State<BackupScreen> {
       final name = 'Onlynote-$stamp.onlynote';
       if (_saveToFile) {
         final saved = await (widget.saveBackup ?? _saveBackup)(bytes, name);
+        if (saved) {
+          _recordBackupExport(exportedAt, BackupExportDestination.saved);
+        }
         if (!mounted) return;
         _message(saved
             ? S.of(context).Backup_Export_Saved
@@ -159,6 +203,9 @@ class _BackupScreenState extends State<BackupScreen> {
       final result = widget.shareBackup != null
           ? await widget.shareBackup!(params)
           : await SharePlus.instance.share(params);
+      if (result.status == ShareResultStatus.success) {
+        _recordBackupExport(exportedAt, BackupExportDestination.shared);
+      }
       if (!mounted) return;
       final strings = S.of(context);
       _message(switch (result.status) {
@@ -509,6 +556,7 @@ class _BackupScreenState extends State<BackupScreen> {
                             children: [
                               BackupExportSection(
                                 saveToFile: _saveToFile,
+                                lastExport: _lastBackupExport,
                                 exportButtonKey: _exportKey,
                                 onExport: _busy ? null : _export,
                               ),

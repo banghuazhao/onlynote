@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:onlynote/Tools/app_checklist_settings.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/paper_note.dart';
@@ -21,6 +24,7 @@ class NoteChecklist extends StatefulWidget {
     this.titleBuilder,
     this.expandCompleted = false,
     this.clipboardWriter,
+    this.settings,
   });
 
   final List<Todo> todos;
@@ -33,6 +37,9 @@ class NoteChecklist extends StatefulWidget {
   final Widget Function(Todo todo, TextStyle style)? titleBuilder;
   final bool expandCompleted;
 
+  /// A shared display preference; injection keeps previews and tests isolated.
+  final AppChecklistSettings? settings;
+
   /// An optional clipboard adapter for isolated previews and tests. Copying
   /// shares a snapshot of the unfinished titles and never changes the note.
   /// The reader uses [Clipboard.setData] when no adapter is provided.
@@ -43,18 +50,44 @@ class NoteChecklist extends StatefulWidget {
 }
 
 class _NoteChecklistState extends State<NoteChecklist> {
-  bool _completedExpanded = true;
+  late AppChecklistSettings _settings;
   bool _copying = false;
   bool _copyFailed = false;
   int? _copiedCount;
 
   @override
+  void initState() {
+    super.initState();
+    _bindSettings();
+  }
+
+  void _bindSettings() {
+    _settings = widget.settings ?? AppChecklistSettings.instance;
+    _settings.addListener(_settingsChanged);
+    unawaited(_settings.load());
+  }
+
+  void _settingsChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   void didUpdateWidget(covariant NoteChecklist oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.settings != widget.settings) {
+      _settings.removeListener(_settingsChanged);
+      _bindSettings();
+    }
     if (oldWidget.todos != widget.todos) {
       _copyFailed = false;
       _copiedCount = null;
     }
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_settingsChanged);
+    super.dispose();
   }
 
   Future<void> _copyUnfinished() async {
@@ -90,6 +123,7 @@ class _NoteChecklistState extends State<NoteChecklist> {
 
   @override
   Widget build(BuildContext context) {
+    final completedExpanded = _settings.completedExpanded;
     final active = widget.todos.where((todo) => !todo.completed).toList();
     final completed = widget.todos.where((todo) => todo.completed).toList();
     final canCopy = !widget.exportMode &&
@@ -216,15 +250,15 @@ class _NoteChecklistState extends State<NoteChecklist> {
                   )
                 else
                   Semantics(
-                    expanded: _completedExpanded || widget.expandCompleted,
+                    expanded: completedExpanded || widget.expandCompleted,
                     child: TextButton.icon(
                       key: const ValueKey('checklist-completed-toggle'),
                       onPressed: widget.expandCompleted
                           ? null
-                          : () => setState(
-                              () => _completedExpanded = !_completedExpanded),
+                          : () => unawaited(_settings.setCompletedExpanded(
+                              !_settings.completedExpanded)),
                       icon: AnimatedRotation(
-                        turns: _completedExpanded || widget.expandCompleted
+                        turns: completedExpanded || widget.expandCompleted
                             ? 0.25
                             : 0,
                         duration: duration,
@@ -241,7 +275,7 @@ class _NoteChecklistState extends State<NoteChecklist> {
                       ),
                     ),
                   ),
-                if (_completedExpanded ||
+                if (completedExpanded ||
                     widget.exportMode ||
                     widget.expandCompleted)
                   for (final todo in completed) _row(todo, duration),

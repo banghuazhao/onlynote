@@ -6,6 +6,59 @@ import 'package:onlynote/services/note_dates.dart';
 void main() {
   setUpAll(() => initializeDateFormatting());
 
+  test('reader dates respect locale and the device clock preference', () {
+    final date = DateTime(2026, 10, 11, 17, 45);
+    for (final (locale, localeDefault, twentyFourHour) in [
+      ('en', 'Oct 11, 2026 5:45 PM', 'Oct 11, 2026 17:45'),
+      ('zh', '2026年10月11日 17:45', '2026年10月11日 17:45'),
+      ('zh_HK', '2026年10月11日 下午5:45', '2026年10月11日 17:45'),
+    ]) {
+      expect(
+        noteReaderDateTimeLabel(
+            dateTime: date, locale: locale, use24HourFormat: false),
+        localeDefault,
+      );
+      expect(
+        noteReaderDateTimeLabel(
+            dateTime: date, locale: locale, use24HourFormat: true),
+        twentyFourHour,
+      );
+    }
+  });
+
+  test('reader timestamps convert UTC metadata without changing the date', () {
+    final date = DateTime.utc(2026, 10, 11, 23, 45);
+    for (final locale in ['en', 'zh', 'zh_HK']) {
+      for (final use24HourFormat in [false, true]) {
+        final expected = DateFormat.yMMMd(locale);
+        if (use24HourFormat) {
+          expected.add_Hm();
+        } else {
+          expected.add_jm();
+        }
+        expect(
+          noteReaderDateTimeLabel(
+              dateTime: date, locale: locale, use24HourFormat: use24HourFormat),
+          expected.format(date.toLocal()),
+        );
+      }
+    }
+    expect(date, DateTime.utc(2026, 10, 11, 23, 45));
+    expect(date.isUtc, isTrue);
+  });
+
+  test('missing reader timestamps stay empty for all supported locales', () {
+    for (final locale in ['en', 'zh', 'zh_HK']) {
+      for (final use24HourFormat in [false, true]) {
+        expect(
+          noteReaderDateTimeLabel(
+              dateTime: null, locale: locale, use24HourFormat: use24HourFormat),
+          isEmpty,
+        );
+      }
+    }
+  });
+
   test('Trash cards label deletion date instead of the ordinary note date', () {
     final ordinary = DateTime(2020, 1, 2);
     final deleted = DateTime(2026, 10, 11, 14, 30);

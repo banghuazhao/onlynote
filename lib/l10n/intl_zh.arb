@@ -759,6 +759,23 @@
   "Export_Notes_Save_Failed": "无法保存导出文件。请检查可用存储空间后重试。",
   "Export_Notes_Share_Failed": "导出文件已准备好，但分享失败。请重试。",
   "Export_Notes_Incomplete": "{count} 条笔记无法导出。",
+  "Backup_Export_No_Record": "尚无备份导出记录",
+  "Backup_Export_Last_Saved": "上次保存备份：{date}",
+  "@Backup_Export_Last_Saved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "Backup_Export_Last_Shared": "上次分享备份：{date}",
+  "@Backup_Export_Last_Shared": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "@Export_Notes_Incomplete": {
     "placeholders": {
       "count": {

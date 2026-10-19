@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:onlynote/Tools/app_checklist_settings.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
@@ -27,17 +28,27 @@ Widget checklistCopyDarkPreview() => const _ChecklistCopyPreview(dark: true);
 Widget checklistCopyChinesePreview() =>
     const _ChecklistCopyPreview(chinese: true, textScale: 2);
 
+@Preview(
+  name: 'Remember completed collapse',
+  group: 'Checklist',
+  size: Size(390, 700),
+)
+Widget checklistRememberCollapsePreview() =>
+    const _ChecklistCopyPreview(rememberCollapse: true);
+
 /// A local clipboard fixture keeps interaction independent of native APIs.
 class _ChecklistCopyPreview extends StatefulWidget {
   const _ChecklistCopyPreview({
     this.dark = false,
     this.chinese = false,
     this.textScale = 1,
+    this.rememberCollapse = false,
   });
 
   final bool dark;
   final bool chinese;
   final double textScale;
+  final bool rememberCollapse;
 
   @override
   State<_ChecklistCopyPreview> createState() => _ChecklistCopyPreviewState();
@@ -46,10 +57,14 @@ class _ChecklistCopyPreview extends StatefulWidget {
 class _ChecklistCopyPreviewState extends State<_ChecklistCopyPreview> {
   late List<Todo> _todos;
   String? _clipboard;
+  late final AppChecklistSettings _settings;
+  int _readerGeneration = 0;
 
   @override
   void initState() {
     super.initState();
+    _settings = AppChecklistSettings.memory(
+        completedExpanded: !widget.rememberCollapse);
     _todos = [
       Todo(id: 'bag', title: widget.chinese ? '帶上購物袋' : 'Bring shopping bags'),
       Todo(
@@ -61,6 +76,12 @@ class _ChecklistCopyPreviewState extends State<_ChecklistCopyPreview> {
           id: 'bread',
           title: widget.chinese ? '麵包和新鮮水果' : 'Bread and fresh fruit'),
     ];
+  }
+
+  @override
+  void dispose() {
+    _settings.dispose();
+    super.dispose();
   }
 
   @override
@@ -101,7 +122,9 @@ class _ChecklistCopyPreviewState extends State<_ChecklistCopyPreview> {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: NoteChecklist(
+                      key: ValueKey(_readerGeneration),
                       todos: _todos,
+                      settings: _settings,
                       onToggle: (id) => setState(() {
                         _todos = [
                           for (final todo in _todos)
@@ -122,6 +145,12 @@ class _ChecklistCopyPreviewState extends State<_ChecklistCopyPreview> {
                     ),
                   ),
                 ),
+                if (widget.rememberCollapse)
+                  TextButton(
+                    key: const ValueKey('checklist-preview-reopen'),
+                    onPressed: () => setState(() => _readerGeneration++),
+                    child: const Text('Reopen checklist'),
+                  ),
                 if (_clipboard != null) ...[
                   const SizedBox(height: 24),
                   Text(

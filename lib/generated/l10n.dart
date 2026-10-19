@@ -55,6 +55,251 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
+  /// `Desktop widgets`
+  String get Widget_macOS_Title {
+    return Intl.message(
+      'Desktop widgets',
+      name: 'Widget_macOS_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.`
+  String get Widget_Description_macOS {
+    return Intl.message(
+      'Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.',
+      name: 'Widget_Description_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Onlynote widgets to your Mac desktop for a quick glance at your notes.`
+  String get Widget_Discovery_Body_macOS {
+    return Intl.message(
+      'Add Onlynote widgets to your Mac desktop for a quick glance at your notes.',
+      name: 'Widget_Discovery_Body_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to Desktop`
+  String get Widget_Add_To_Desktop {
+    return Intl.message(
+      'Add to Desktop',
+      name: 'Widget_Add_To_Desktop',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Right-click an empty area of your desktop and choose Edit Widgets.`
+  String get Widget_Step_macOS_1 {
+    return Intl.message(
+      'Right-click an empty area of your desktop and choose Edit Widgets.',
+      name: 'Widget_Step_macOS_1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search for Onlynote in the widget gallery.`
+  String get Widget_Step_macOS_2 {
+    return Intl.message(
+      'Search for Onlynote in the widget gallery.',
+      name: 'Widget_Step_macOS_2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose an overview or a note widget, then select a size.`
+  String get Widget_Step_macOS_3 {
+    return Intl.message(
+      'Choose an overview or a note widget, then select a size.',
+      name: 'Widget_Step_macOS_3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Drag the widget onto your desktop, then click Done.`
+  String get Widget_Step_macOS_4 {
+    return Intl.message(
+      'Drag the widget onto your desktop, then click Done.',
+      name: 'Widget_Step_macOS_4',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.`
+  String get Widget_Choose_Note_macOS {
+    return Intl.message(
+      'Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.',
+      name: 'Widget_Choose_Note_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paper and color`
+  String get Widget_Style_Title {
+    return Intl.message(
+      'Paper and color',
+      name: 'Widget_Style_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.`
+  String get Widget_Style_macOS {
+    return Intl.message(
+      'Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.',
+      name: 'Widget_Style_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Click a note in the widget to open it, or click New to start writing.`
+  String get Widget_Tip_macOS {
+    return Intl.message(
+      'Click a note in the widget to open it, or click New to start writing.',
+      name: 'Widget_Tip_macOS',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Close Window`
+  String get Desktop_Menu_Close_Window {
+    return Intl.message(
+      'Close Window',
+      name: 'Desktop_Menu_Close_Window',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose an image file`
+  String get Choose_Image_File {
+    return Intl.message(
+      'Choose an image file',
+      name: 'Choose_Image_File',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save backup…`
+  String get Backup_Save_As {
+    return Intl.message(
+      'Save backup…',
+      name: 'Backup_Save_As',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.`
+  String get Backup_Export_Desktop_Description {
+    return Intl.message(
+      'Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.',
+      name: 'Backup_Export_Desktop_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup saved.`
+  String get Backup_Export_Saved {
+    return Intl.message(
+      'Backup saved.',
+      name: 'Backup_Export_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Backup save cancelled.`
+  String get Backup_Export_Save_Cancelled {
+    return Intl.message(
+      'Backup save cancelled.',
+      name: 'Backup_Export_Save_Cancelled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save the backup. Check available storage and try again.`
+  String get Backup_Export_Save_Failed {
+    return Intl.message(
+      'Could not save the backup. Check available storage and try again.',
+      name: 'Backup_Export_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All Premium features are unlocked.`
+  String get Premium_Desktop_Description {
+    return Intl.message(
+      'All Premium features are unlocked.',
+      name: 'Premium_Desktop_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already purchased Premium? Restore your purchase below.`
+  String get Premium_Desktop_Existing_Purchase {
+    return Intl.message(
+      'Already purchased Premium? Restore your purchase below.',
+      name: 'Premium_Desktop_Existing_Purchase',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `File`
+  String get Desktop_Menu_File {
+    return Intl.message('File', name: 'Desktop_Menu_File', desc: '', args: []);
+  }
+
+  /// `Window`
+  String get Desktop_Menu_Window {
+    return Intl.message(
+      'Window',
+      name: 'Desktop_Menu_Window',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quit Onlynote`
+  String get Desktop_Menu_Quit {
+    return Intl.message(
+      'Quit Onlynote',
+      name: 'Desktop_Menu_Quit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Note`
+  String get Desktop_Menu_New_Note {
+    return Intl.message(
+      'New Note',
+      name: 'Desktop_Menu_New_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Notes`
   String get notes {
     return Intl.message('Notes', name: 'notes', desc: '', args: []);
@@ -5192,264 +5437,9 @@ class S {
     );
   }
 
-  /// `Choose an image file`
-  String get Choose_Image_File {
-    return Intl.message(
-      "Choose an image file",
-      name: 'Choose_Image_File',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Save backup…`
-  String get Backup_Save_As {
-    return Intl.message(
-      "Save backup…",
-      name: 'Backup_Save_As',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.`
-  String get Backup_Export_Desktop_Description {
-    return Intl.message(
-      "Save your notes, tags, saved views, folders, photos, recordings, history, templates, and reminder dates in one Onlynote file. Includes archived notes and Trash. Choose a location in the save dialog. Maximum file size: 256 MB.",
-      name: 'Backup_Export_Desktop_Description',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Backup saved.`
-  String get Backup_Export_Saved {
-    return Intl.message(
-      "Backup saved.",
-      name: 'Backup_Export_Saved',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Backup save cancelled.`
-  String get Backup_Export_Save_Cancelled {
-    return Intl.message(
-      "Backup save cancelled.",
-      name: 'Backup_Export_Save_Cancelled',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Could not save the backup. Check available storage and try again.`
-  String get Backup_Export_Save_Failed {
-    return Intl.message(
-      "Could not save the backup. Check available storage and try again.",
-      name: 'Backup_Export_Save_Failed',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `All Premium features are unlocked.`
-  String get Premium_Desktop_Description {
-    return Intl.message(
-      "All Premium features are unlocked.",
-      name: 'Premium_Desktop_Description',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Already purchased Premium? Restore your purchase below.`
-  String get Premium_Desktop_Existing_Purchase {
-    return Intl.message(
-      "Already purchased Premium? Restore your purchase below.",
-      name: 'Premium_Desktop_Existing_Purchase',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `File`
-  String get Desktop_Menu_File {
-    return Intl.message(
-      "File",
-      name: 'Desktop_Menu_File',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Window`
-  String get Desktop_Menu_Window {
-    return Intl.message(
-      "Window",
-      name: 'Desktop_Menu_Window',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Quit Onlynote`
-  String get Desktop_Menu_Quit {
-    return Intl.message(
-      "Quit Onlynote",
-      name: 'Desktop_Menu_Quit',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `New Note`
-  String get Desktop_Menu_New_Note {
-    return Intl.message(
-      "New Note",
-      name: 'Desktop_Menu_New_Note',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Close Window`
-  String get Desktop_Menu_Close_Window {
-    return Intl.message(
-      'Close Window',
-      name: 'Desktop_Menu_Close_Window',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Desktop widgets`
-  String get Widget_macOS_Title {
-    return Intl.message(
-      "Desktop widgets",
-      name: 'Widget_macOS_Title',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.`
-  String get Widget_Description_macOS {
-    return Intl.message(
-      "Keep notes and checklists on your Mac desktop or in Notification Center. Desktop widgets require macOS 14 or later.",
-      name: 'Widget_Description_macOS',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Add Onlynote widgets to your Mac desktop for a quick glance at your notes.`
-  String get Widget_Discovery_Body_macOS {
-    return Intl.message(
-      "Add Onlynote widgets to your Mac desktop for a quick glance at your notes.",
-      name: 'Widget_Discovery_Body_macOS',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Add to Desktop`
-  String get Widget_Add_To_Desktop {
-    return Intl.message(
-      "Add to Desktop",
-      name: 'Widget_Add_To_Desktop',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Right-click an empty area of your desktop and choose Edit Widgets.`
-  String get Widget_Step_macOS_1 {
-    return Intl.message(
-      "Right-click an empty area of your desktop and choose Edit Widgets.",
-      name: 'Widget_Step_macOS_1',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Search for Onlynote in the widget gallery.`
-  String get Widget_Step_macOS_2 {
-    return Intl.message(
-      "Search for Onlynote in the widget gallery.",
-      name: 'Widget_Step_macOS_2',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Choose an overview or a note widget, then select a size.`
-  String get Widget_Step_macOS_3 {
-    return Intl.message(
-      "Choose an overview or a note widget, then select a size.",
-      name: 'Widget_Step_macOS_3',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Drag the widget onto your desktop, then click Done.`
-  String get Widget_Step_macOS_4 {
-    return Intl.message(
-      "Drag the widget onto your desktop, then click Done.",
-      name: 'Widget_Step_macOS_4',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.`
-  String get Widget_Choose_Note_macOS {
-    return Intl.message(
-      "Use an overview widget for several notes, or a note widget for one note or checklist. Right-click the note widget, choose Edit Widget, then select a note. Leave Top note selected to show the first note in your library.",
-      name: 'Widget_Choose_Note_macOS',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Paper and color`
-  String get Widget_Style_Title {
-    return Intl.message(
-      "Paper and color",
-      name: 'Widget_Style_Title',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.`
-  String get Widget_Style_macOS {
-    return Intl.message(
-      "Choose paper and color with Card style in Onlynote. To show those colors on the desktop, open System Settings > Desktop & Dock and set Widget style to Full-color. On newer macOS versions, set Dim widgets on desktop to Never.",
-      name: 'Widget_Style_macOS',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Click a note in the widget to open it, or click New to start writing.`
-  String get Widget_Tip_macOS {
-    return Intl.message(
-      "Click a note in the widget to open it, or click New to start writing.",
-      name: 'Widget_Tip_macOS',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Sort by`
   String get Sort_By {
-    return Intl.message(
-      'Sort by',
-      name: 'Sort_By',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Sort by', name: 'Sort_By', desc: '', args: []);
   }
 
   /// `Manual order`
@@ -5671,6 +5661,36 @@ class S {
       name: 'Export_Notes_Incomplete',
       desc: '',
       args: [count],
+    );
+  }
+
+  /// `No backup export recorded`
+  String get Backup_Export_No_Record {
+    return Intl.message(
+      'No backup export recorded',
+      name: 'Backup_Export_No_Record',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last backup saved: {date}`
+  String Backup_Export_Last_Saved(String date) {
+    return Intl.message(
+      'Last backup saved: $date',
+      name: 'Backup_Export_Last_Saved',
+      desc: '',
+      args: [date],
+    );
+  }
+
+  /// `Last backup shared: {date}`
+  String Backup_Export_Last_Shared(String date) {
+    return Intl.message(
+      'Last backup shared: $date',
+      name: 'Backup_Export_Last_Shared',
+      desc: '',
+      args: [date],
     );
   }
 }

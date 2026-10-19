@@ -761,6 +761,23 @@
   "Export_Notes_Save_Failed": "Could not save the export. Check available storage and try again.",
   "Export_Notes_Share_Failed": "Export prepared, but sharing failed. Please try again.",
   "Export_Notes_Incomplete": "{count, plural, one{1 note could not be exported.} other{{count} notes could not be exported.}}",
+  "Backup_Export_No_Record": "No backup export recorded",
+  "Backup_Export_Last_Saved": "Last backup saved: {date}",
+  "@Backup_Export_Last_Saved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "Backup_Export_Last_Shared": "Last backup shared: {date}",
+  "@Backup_Export_Last_Shared": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "@Export_Notes_Incomplete": {
     "placeholders": {
       "count": {

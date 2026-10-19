@@ -23,147 +23,82 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(notes, folders, photos) =>
       "${notes} 条笔记 · ${folders} 个文件夹 · ${photos} 张照片";
 
-  static String m1(count) => "${count} 篇关联笔记";
+  static String m1(date) => "上次保存备份：${date}";
 
-  static String m2(date) => "于 ${date}移至回收站";
+  static String m2(date) => "上次分享备份：${date}";
 
-  static String m3(count) => "${count} 页扫描文档";
+  static String m3(count) => "${count} 篇关联笔记";
 
-  static String m4(count) => "已完成（${count}）";
+  static String m4(date) => "于 ${date}移至回收站";
 
-  static String m5(count) => "已复制 ${count} 项待办事项";
+  static String m5(count) => "${count} 页扫描文档";
 
-  static String m6(completed, total) => "已完成 ${completed} / ${total} 项";
+  static String m6(count) => "已完成（${count}）";
 
-  static String m7(heading) => "收起${heading}";
+  static String m7(count) => "已复制 ${count} 项待办事项";
 
-  static String m8(heading) => "展开${heading}";
+  static String m8(completed, total) => "已完成 ${completed} / ${total} 项";
 
-  static String m9(count) => "已替换 ${count} 处";
+  static String m9(heading) => "收起${heading}";
 
-  static String m10(count) => "${count} 条备忘录";
+  static String m10(heading) => "展开${heading}";
 
-  static String m11(count) => "${count} 张照片";
+  static String m11(count) => "${count} 条笔记无法导出。";
 
-  static String m12(count) => "${count} 段录音";
+  static String m12(count) => "已替换 ${count} 处";
 
-  static String m13(date) => "保存于 ${date}";
+  static String m13(count) => "${count} 条备忘录";
 
-  static String m14(number) => "笔记颜色 ${number}";
+  static String m14(count) => "${count} 张照片";
 
-  static String m15(minutes) => "${minutes} 分钟";
+  static String m15(count) => "${count} 段录音";
 
-  static String m16(name) => "在笔记库中打开${name}";
+  static String m16(date) => "保存于 ${date}";
 
-  static String m17(number) => "照片 ${number}";
+  static String m17(number) => "笔记颜色 ${number}";
 
-  static String m18(limit) => "免费版包含 ${limit} 个文件夹。升级即可创建无限文件夹。";
+  static String m18(minutes) => "${minutes} 分钟";
 
-  static String m19(limit) => "免费版包含 ${limit} 条笔记。升级即可创建无限笔记。";
+  static String m19(name) => "在笔记库中打开${name}";
 
-  static String m20(price) => "支付 ${price} 永久解锁";
+  static String m20(number) => "照片 ${number}";
 
-  static String m21(limit) => "免费版包含 ${limit} 个自定义模板。升级即可保存无限模板。";
+  static String m21(limit) => "免费版包含 ${limit} 个文件夹。升级即可创建无限文件夹。";
 
-  static String m22(time) => "下次提醒：${time}";
+  static String m22(limit) => "免费版包含 ${limit} 条笔记。升级即可创建无限笔记。";
 
-  static String m23(date) => "提醒我：${date}";
+  static String m23(price) => "支付 ${price} 永久解锁";
 
-  static String m24(price) => "支付 ${price} 永久移除广告。";
+  static String m24(limit) => "免费版包含 ${limit} 个自定义模板。升级即可保存无限模板。";
 
-  static String m25(criterion) => "移除${criterion}";
+  static String m25(time) => "下次提醒：${time}";
 
-  static String m26(limit) => "最多可保存 ${limit} 个视图。删除一个已保存的视图后可添加新视图。";
+  static String m26(date) => "提醒我：${date}";
 
-  static String m27(query) => "搜索：${query}";
+  static String m27(price) => "支付 ${price} 永久移除广告。";
 
-  static String m28(tags) => "标签：${tags}";
+  static String m28(criterion) => "移除${criterion}";
 
-  static String m29(count) => "${count} 条笔记";
+  static String m29(limit) => "最多可保存 ${limit} 个视图。删除一个已保存的视图后可添加新视图。";
 
-  static String m30(count) => "已添加 ${count} 项清单";
+  static String m30(query) => "搜索：${query}";
 
-  static String m31(count) => "搜索隐藏了 ${count} 个已选标签";
+  static String m31(tags) => "标签：${tags}";
 
-  static String m32(count) => "已选 ${count} 个标签";
+  static String m32(count) => "${count} 条笔记";
 
-  static String m33(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+  static String m33(count) => "已添加 ${count} 项清单";
 
-  static String m34(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m34(count) => "搜索隐藏了 ${count} 个已选标签";
 
-  static String m35(count) => "${count} 条笔记无法导出。";
+  static String m35(count) => "已选 ${count} 个标签";
+
+  static String m36(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+
+  static String m37(items, photos) => "${items} 项 · ${photos} 张照片";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage("桌面小组件"),
-    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
-      "在 Mac 桌面或通知中心查看笔记和清单。桌面小组件需要 macOS 14 或更新版本。",
-    ),
-    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
-      "将 Onlynote 小组件添加到 Mac 桌面，一眼查看你的笔记。",
-    ),
-    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage("添加到桌面"),
-    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
-      "右键点击桌面空白处，选择“编辑小组件”。",
-    ),
-    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
-      "在小组件图库中搜索 Onlynote。",
-    ),
-    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
-      "选择概览或笔记小组件，再选择尺寸。",
-    ),
-    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
-      "将小组件拖到桌面，然后点击“完成”。",
-    ),
-    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
-      "概览小组件可显示多条笔记，笔记小组件可显示一条笔记或清单。右键点击笔记小组件，选择“编辑小组件”，再选择笔记。保留“首条笔记”以显示笔记列表中的第一条笔记。",
-    ),
-    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage("纸张和颜色"),
-    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
-      "在 Onlynote 的“卡片样式”中选择纸张和颜色。如需在桌面显示这些颜色，打开“系统设置”>“桌面与程序坞”，将“小组件样式”设为“全彩”。在较新版本的 macOS 中，将“使桌面小组件变暗”设为“永不”。",
-    ),
-    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
-      "点击小组件中的笔记即可打开，点击“新建”可开始记录。",
-    ),
-    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
-      "将笔记、标签、已保存视图、文件夹、照片、录音、历史记录、模板和提醒日期保存在一个 Onlynote 文件中。包含封存笔记和废纸篓。在保存对话框中选择位置。文件最大 256 MB。",
-    ),
-    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "已取消保存备份。",
-    ),
-    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
-      "无法保存备份。请检查可用存储空间并重试。",
-    ),
-    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage(
-      "备份已保存。",
-    ),
-    "Backup_Save_As": MessageLookupByLibrary.simpleMessage(
-      "保存备份…",
-    ),
-    "Choose_Image_File": MessageLookupByLibrary.simpleMessage(
-      "选择图片文件",
-    ),
-    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage(
-      "关闭窗口",
-    ),
-    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage(
-      "文件",
-    ),
-    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage(
-      "新建笔记",
-    ),
-    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage(
-      "退出 Onlynote",
-    ),
-    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage(
-      "窗口",
-    ),
-    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
-      "全部高级功能已解锁。",
-    ),
-    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
-      "已购买高级版？可在下方恢复购买。",
-    ),
     "Add_Image": MessageLookupByLibrary.simpleMessage("添加照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("添加备忘录"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),
@@ -193,12 +128,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Export_Description": MessageLookupByLibrary.simpleMessage(
       "将笔记、标签、已保存视图、文件夹、照片、录音、历史记录、模板和提醒日期保存在一个Onlynote文件中。包含封存笔记和废纸篓。可从分享菜单保存到文件或存储应用。文件最大256 MB。",
     ),
+    "Backup_Export_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "将笔记、标签、已保存视图、文件夹、照片、录音、历史记录、模板和提醒日期保存在一个 Onlynote 文件中。包含封存笔记和废纸篓。在保存对话框中选择位置。文件最大 256 MB。",
+    ),
     "Backup_Export_Failed": MessageLookupByLibrary.simpleMessage(
       "无法创建备份。请检查可用存储空间，并确认所有照片和录音可用。备份必须小于256 MB。",
     ),
+    "Backup_Export_Last_Saved": m1,
+    "Backup_Export_Last_Shared": m2,
+    "Backup_Export_No_Record": MessageLookupByLibrary.simpleMessage("尚无备份导出记录"),
     "Backup_Export_Prepared": MessageLookupByLibrary.simpleMessage(
       "备份已准备好。此设备无法确认是否已分享。",
     ),
+    "Backup_Export_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消保存备份。",
+    ),
+    "Backup_Export_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法保存备份。请检查可用存储空间并重试。",
+    ),
+    "Backup_Export_Saved": MessageLookupByLibrary.simpleMessage("备份已保存。"),
     "Backup_Export_Share_Failed": MessageLookupByLibrary.simpleMessage(
       "备份已准备好，但分享失败。请重试。",
     ),
@@ -224,6 +172,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "笔记已恢复。部分提醒通知未能安排；请打开相应笔记重新设置。",
     ),
     "Backup_Restoring": MessageLookupByLibrary.simpleMessage("正在恢复笔记和照片…"),
+    "Backup_Save_As": MessageLookupByLibrary.simpleMessage("保存备份…"),
     "Backup_Saved_Views": MessageLookupByLibrary.simpleMessage("已保存的视图"),
     "Backup_Schedule_Reminders": MessageLookupByLibrary.simpleMessage(
       "安排未来的提醒通知",
@@ -231,9 +180,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Backup_Title": MessageLookupByLibrary.simpleMessage("备份与恢复"),
     "Cancel": MessageLookupByLibrary.simpleMessage("取消"),
     "Cancel_Searching": MessageLookupByLibrary.simpleMessage("取消搜索"),
-    "Card_Linked_Notes_Count": m1,
-    "Card_Moved_To_Trash_On": m2,
-    "Card_Scanned_Pages_Count": m3,
+    "Card_Linked_Notes_Count": m3,
+    "Card_Moved_To_Trash_On": m4,
+    "Card_Scanned_Pages_Count": m5,
     "Card_Size": MessageLookupByLibrary.simpleMessage("卡片大小"),
     "Card_Style": MessageLookupByLibrary.simpleMessage("卡片样式"),
     "Card_Style_Color": MessageLookupByLibrary.simpleMessage("颜色"),
@@ -272,11 +221,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "使用默认样式",
     ),
     "Checklist_All_Done": MessageLookupByLibrary.simpleMessage("全部完成"),
-    "Checklist_Completed": m4,
+    "Checklist_Completed": m6,
     "Checklist_Copy_Failed": MessageLookupByLibrary.simpleMessage(
       "无法复制待办事项，请重试。",
     ),
-    "Checklist_Copy_Success": m5,
+    "Checklist_Copy_Success": m7,
     "Checklist_Copy_Unfinished": MessageLookupByLibrary.simpleMessage(
       "复制未完成事项",
     ),
@@ -285,15 +234,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Checklist_Item_Unavailable": MessageLookupByLibrary.simpleMessage(
       "此清单事项已不可用。",
     ),
-    "Checklist_Progress": m6,
+    "Checklist_Progress": m8,
     "Checklist_Reset": MessageLookupByLibrary.simpleMessage("重置清单"),
     "Checklist_Reset_Done": MessageLookupByLibrary.simpleMessage("清单已重置"),
     "Choose_From_Gallery": MessageLookupByLibrary.simpleMessage("从相册选择"),
+    "Choose_Image_File": MessageLookupByLibrary.simpleMessage("选择图片文件"),
     "Choose_Linked_Notes": MessageLookupByLibrary.simpleMessage("选择关联笔记"),
     "Classical_Music_Box": MessageLookupByLibrary.simpleMessage("古典音乐盒"),
     "Clear_Filters": MessageLookupByLibrary.simpleMessage("清除筛选"),
     "Clear_Search": MessageLookupByLibrary.simpleMessage("清除搜索"),
-    "Collapse_Section": m7,
+    "Collapse_Section": m9,
     "Copy_Selection_Destination": MessageLookupByLibrary.simpleMessage(
       "选择笔记，添加所选文字。",
     ),
@@ -359,6 +309,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Delete_Todo_Confirm_Title": MessageLookupByLibrary.simpleMessage("删除此项？"),
     "Delete_View": MessageLookupByLibrary.simpleMessage("删除视图"),
+    "Desktop_Menu_Close_Window": MessageLookupByLibrary.simpleMessage("关闭窗口"),
+    "Desktop_Menu_File": MessageLookupByLibrary.simpleMessage("文件"),
+    "Desktop_Menu_New_Note": MessageLookupByLibrary.simpleMessage("新建笔记"),
+    "Desktop_Menu_Quit": MessageLookupByLibrary.simpleMessage("退出 Onlynote"),
+    "Desktop_Menu_Window": MessageLookupByLibrary.simpleMessage("窗口"),
     "Document_Scan": MessageLookupByLibrary.simpleMessage("扫描文档"),
     "Document_Scan_Failed": MessageLookupByLibrary.simpleMessage(
       "无法完成添加扫描页面，请重试。",
@@ -387,41 +342,41 @@ class MessageLookup extends MessageLookupByLibrary {
       "点按照片可调整大小，长按可移动位置。",
     ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
-    "Expand_Section": m8,
+    "Expand_Section": m10,
     "Export_Notes": MessageLookupByLibrary.simpleMessage("导出笔记"),
+    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消分享导出文件。",
+    ),
     "Export_Notes_Description": MessageLookupByLibrary.simpleMessage(
       "将所有笔记（包括已归档的笔记）导出为一个压缩包，每条笔记一个可读文件，Markdown 还会附带照片和录音。请在分享菜单中选择“存储到文件”或其他存储应用。",
     ),
     "Export_Notes_Desktop_Description": MessageLookupByLibrary.simpleMessage(
       "将所有笔记（包括已归档的笔记）导出为一个压缩包，每条笔记一个可读文件，Markdown 还会附带照片和录音。请在保存对话框中选择位置。",
     ),
-    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("格式"),
-    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("保存笔记…"),
-    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage("正在导出笔记…"),
     "Export_Notes_Empty": MessageLookupByLibrary.simpleMessage("暂无可导出的笔记。"),
-    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("笔记已保存。"),
-    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "已取消保存导出文件。",
+    "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法导出笔记。请检查可用存储空间，并确认照片和录音均可访问。",
     ),
-    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
-      "笔记导出完成。请在所选应用中确认是否已保存。",
-    ),
-    "Export_Notes_Cancelled": MessageLookupByLibrary.simpleMessage(
-      "已取消分享导出文件。",
-    ),
+    "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("格式"),
+    "Export_Notes_Incomplete": m11,
     "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
       "笔记已导出。此设备无法确认是否已分享。",
     ),
-    "Export_Notes_Failed": MessageLookupByLibrary.simpleMessage(
-      "无法导出笔记。请检查可用存储空间，并确认照片和录音均可访问。",
+    "Export_Notes_Preparing": MessageLookupByLibrary.simpleMessage("正在导出笔记…"),
+    "Export_Notes_Save_As": MessageLookupByLibrary.simpleMessage("保存笔记…"),
+    "Export_Notes_Save_Cancelled": MessageLookupByLibrary.simpleMessage(
+      "已取消保存导出文件。",
     ),
     "Export_Notes_Save_Failed": MessageLookupByLibrary.simpleMessage(
       "无法保存导出文件。请检查可用存储空间后重试。",
     ),
+    "Export_Notes_Saved": MessageLookupByLibrary.simpleMessage("笔记已保存。"),
     "Export_Notes_Share_Failed": MessageLookupByLibrary.simpleMessage(
       "导出文件已准备好，但分享失败。请重试。",
     ),
-    "Export_Notes_Incomplete": m35,
+    "Export_Notes_Shared": MessageLookupByLibrary.simpleMessage(
+      "笔记导出完成。请在所选应用中确认是否已保存。",
+    ),
     "Express_Scan": MessageLookupByLibrary.simpleMessage("飞速扫描"),
     "Failed_to_Update_note_please_try_again":
         MessageLookupByLibrary.simpleMessage("更新备忘录失败, 请重试"),
@@ -471,12 +426,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "替换后标题或清单条目会太长。",
     ),
     "Find_Replace_With": MessageLookupByLibrary.simpleMessage("替换为"),
-    "Find_Replaced": m9,
+    "Find_Replaced": m12,
     "Folder_Created": MessageLookupByLibrary.simpleMessage("已创建文件夹"),
     "Folder_Deleted": MessageLookupByLibrary.simpleMessage("已删除文件夹"),
     "Folder_Name": MessageLookupByLibrary.simpleMessage("文件夹名称"),
     "Folder_Name_Required": MessageLookupByLibrary.simpleMessage("请输入文件夹名称。"),
-    "Folder_Notes_Count": m10,
+    "Folder_Notes_Count": m13,
     "Folder_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "没有符合搜索条件的文件夹。",
     ),
@@ -496,9 +451,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Format_Text": MessageLookupByLibrary.simpleMessage("文字样式"),
     "History_Current": MessageLookupByLibrary.simpleMessage("已与此版本相同"),
     "History_Empty": MessageLookupByLibrary.simpleMessage("保存的修改会显示在这里。"),
-    "History_Photos": m11,
+    "History_Photos": m14,
     "History_Preview": MessageLookupByLibrary.simpleMessage("版本预览"),
-    "History_Recordings": m12,
+    "History_Recordings": m15,
     "History_Restore": MessageLookupByLibrary.simpleMessage("恢复此版本"),
     "History_Restore_Failed": MessageLookupByLibrary.simpleMessage(
       "无法恢复此版本，请重试。",
@@ -506,7 +461,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "History_Restored": MessageLookupByLibrary.simpleMessage("已恢复版本"),
     "History_Title": MessageLookupByLibrary.simpleMessage("备忘录历史"),
     "History_Unavailable": MessageLookupByLibrary.simpleMessage("此备忘录或版本已不可用。"),
-    "History_Version": m13,
+    "History_Version": m16,
     "Image_Drop_Here": MessageLookupByLibrary.simpleMessage("将照片放在这里"),
     "Image_Guru": MessageLookupByLibrary.simpleMessage("咕噜滤镜"),
     "Image_Move": MessageLookupByLibrary.simpleMessage("移动照片"),
@@ -553,7 +508,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加备忘录"),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("笔记已封存"),
-    "Note_Color": m14,
+    "Note_Color": m17,
     "Note_Deleted": MessageLookupByLibrary.simpleMessage("已删除备忘录"),
     "Note_Duplicated_Successfully": MessageLookupByLibrary.simpleMessage(
       "已成功复制备忘录",
@@ -576,7 +531,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Reading_Less_Than_Minute": MessageLookupByLibrary.simpleMessage(
       "不到 1 分钟",
     ),
-    "Note_Info_Reading_Minutes": m15,
+    "Note_Info_Reading_Minutes": m18,
     "Note_Info_Reading_Time": MessageLookupByLibrary.simpleMessage("预计阅读时间"),
     "Note_Info_Recording_Duration": MessageLookupByLibrary.simpleMessage(
       "录音总时长",
@@ -638,7 +593,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage("备忘录放上主屏幕"),
     "Onboarding_Write_Note": MessageLookupByLibrary.simpleMessage("写备忘录"),
     "Onlynote": MessageLookupByLibrary.simpleMessage("极简备忘录"),
-    "Open_Folder_In_Library": m16,
+    "Open_Folder_In_Library": m19,
     "Open_Linked_Note": MessageLookupByLibrary.simpleMessage("打开关联笔记"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "这些备忘录及其照片、提醒将被永久删除，且无法恢复。",
@@ -682,7 +637,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "未找到文字。请尝试文字更大、更清晰的照片。",
     ),
-    "Photo_Text_Photo": m17,
+    "Photo_Text_Photo": m20,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage("照片中的文字"),
     "Photo_Text_Review_Hint": MessageLookupByLibrary.simpleMessage(
       "添加到备忘录前，请检查并编辑文字。",
@@ -701,13 +656,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Description": MessageLookupByLibrary.simpleMessage(
       "全部高级功能已解锁，且无广告。",
     ),
+    "Premium_Desktop_Description": MessageLookupByLibrary.simpleMessage(
+      "全部高级功能已解锁。",
+    ),
+    "Premium_Desktop_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
+      "已购买高级版？可在下方恢复购买。",
+    ),
     "Premium_Existing_Purchase": MessageLookupByLibrary.simpleMessage(
       "已购买移除广告？您的购买已包含高级版。可在下方恢复购买。",
     ),
     "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
       "升级到高级版即可解锁此功能。",
     ),
-    "Premium_Folder_Limit": m18,
+    "Premium_Folder_Limit": m21,
     "Premium_Folders": MessageLookupByLibrary.simpleMessage("无限文件夹"),
     "Premium_Free_Core": MessageLookupByLibrary.simpleMessage(
       "免费创建最多 10 条笔记，使用清单和普通提醒。",
@@ -716,7 +677,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "免费版包含 3 个文件夹和 3 个自定义模板。",
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("无广告"),
-    "Premium_Note_Limit": m19,
+    "Premium_Note_Limit": m22,
     "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage("高级笔记主题"),
     "Premium_Note_Themes_Description": MessageLookupByLibrary.simpleMessage(
       "解锁点阵手帐、牛皮纸笔记本和羊皮纸。",
@@ -725,9 +686,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "一次性购买，无需订阅。",
     ),
-    "Premium_One_Time_Price": m20,
+    "Premium_One_Time_Price": m23,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage("重复提醒"),
-    "Premium_Template_Limit": m21,
+    "Premium_Template_Limit": m24,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage("无限自定义模板"),
     "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("语音备忘录"),
     "Privacy": MessageLookupByLibrary.simpleMessage("隐私"),
@@ -754,7 +715,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "请选择将来的时间来设置提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小时后"),
-    "Reminder_Next_Time": m22,
+    "Reminder_Next_Time": m25,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一周后"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重复"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
@@ -767,7 +728,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "稍后 10 分钟提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("稍后 1 小时提醒"),
-    "Reminder_Suggestion": m23,
+    "Reminder_Suggestion": m26,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "使用建议时间",
     ),
@@ -797,8 +758,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即将到来"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m24,
-    "Remove_Library_Criterion": m25,
+    "Remove_Ads_Price": m27,
+    "Remove_Library_Criterion": m28,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重命名模板"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重命名视图"),
@@ -823,10 +784,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("删除此视图？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("保存搜索或筛选，下次快速打开。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("无法保存此视图，请重试。"),
-    "Saved_View_Limit_Reached": m26,
+    "Saved_View_Limit_Reached": m29,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("视图名称"),
-    "Saved_View_Search": m27,
-    "Saved_View_Tags": m28,
+    "Saved_View_Search": m30,
+    "Saved_View_Tags": m31,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已保存的视图"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "没有符合搜索条件的已保存视图。",
@@ -835,12 +796,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜索"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜索文件夹"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜索备忘录"),
-    "Search_Results_Count": m29,
+    "Search_Results_Count": m32,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜索已保存的视图"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜索标签"),
     "Search_Templates": MessageLookupByLibrary.simpleMessage("搜索模板"),
     "Select": MessageLookupByLibrary.simpleMessage("选择"),
-    "Selection_Checklist_Added": m30,
+    "Selection_Checklist_Added": m33,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "无法保存清单项。",
     ),
@@ -906,10 +867,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "最多添加20个标签，每个标签不超过40个字符。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("标签"),
-    "Tags_Hidden_By_Search_Count": m31,
+    "Tags_Hidden_By_Search_Count": m34,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("没有符合搜索条件的标签"),
-    "Tags_Selected_Count": m32,
-    "Tags_Selection_Limit_Reached": m33,
+    "Tags_Selected_Count": m35,
+    "Tags_Selection_Limit_Reached": m36,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "无法更新模板，请重试。",
@@ -934,7 +895,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m34,
+    "Template_Details": m37,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -1042,6 +1003,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "We_Play_Piano": MessageLookupByLibrary.simpleMessage("弹钢琴"),
     "Web_Link_Open_Failed": MessageLookupByLibrary.simpleMessage("无法打开此网站。"),
     "Widget": MessageLookupByLibrary.simpleMessage("主屏幕小组件"),
+    "Widget_Add_To_Desktop": MessageLookupByLibrary.simpleMessage("添加到桌面"),
     "Widget_Add_To_Home": MessageLookupByLibrary.simpleMessage("添加到主屏幕"),
     "Widget_Add_Unsupported": MessageLookupByLibrary.simpleMessage(
       "当前桌面不支持自动添加，请按下面的步骤操作。",
@@ -1056,11 +1018,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "Widget_Choose_Note_iOS": MessageLookupByLibrary.simpleMessage(
       "长按小组件，选择“编辑小组件”，再选择笔记或待办清单。适用于 iOS 17 及以上版本。",
     ),
+    "Widget_Choose_Note_macOS": MessageLookupByLibrary.simpleMessage(
+      "概览小组件可显示多条笔记，笔记小组件可显示一条笔记或清单。右键点击笔记小组件，选择“编辑小组件”，再选择笔记。保留“首条笔记”以显示笔记列表中的第一条笔记。",
+    ),
     "Widget_Description": MessageLookupByLibrary.simpleMessage(
       "不用打开 App，一眼看到你的备忘录。",
     ),
+    "Widget_Description_macOS": MessageLookupByLibrary.simpleMessage(
+      "在 Mac 桌面或通知中心查看笔记和清单。桌面小组件需要 macOS 14 或更新版本。",
+    ),
     "Widget_Discovery_Body": MessageLookupByLibrary.simpleMessage(
       "添加主屏幕小组件，一眼查看你的备忘录。",
+    ),
+    "Widget_Discovery_Body_macOS": MessageLookupByLibrary.simpleMessage(
+      "将 Onlynote 小组件添加到 Mac 桌面，一眼查看你的笔记。",
     ),
     "Widget_Discovery_Title": MessageLookupByLibrary.simpleMessage(
       "让置顶备忘录随时可见",
@@ -1083,10 +1054,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "Widget_Step_iOS_4": MessageLookupByLibrary.simpleMessage(
       "选择尺寸，然后点按“添加小组件”。",
     ),
+    "Widget_Step_macOS_1": MessageLookupByLibrary.simpleMessage(
+      "右键点击桌面空白处，选择“编辑小组件”。",
+    ),
+    "Widget_Step_macOS_2": MessageLookupByLibrary.simpleMessage(
+      "在小组件图库中搜索 Onlynote。",
+    ),
+    "Widget_Step_macOS_3": MessageLookupByLibrary.simpleMessage(
+      "选择概览或笔记小组件，再选择尺寸。",
+    ),
+    "Widget_Step_macOS_4": MessageLookupByLibrary.simpleMessage(
+      "将小组件拖到桌面，然后点击“完成”。",
+    ),
     "Widget_Steps_Title": MessageLookupByLibrary.simpleMessage("添加方法"),
+    "Widget_Style_Title": MessageLookupByLibrary.simpleMessage("纸张和颜色"),
+    "Widget_Style_macOS": MessageLookupByLibrary.simpleMessage(
+      "在 Onlynote 的“卡片样式”中选择纸张和颜色。如需在桌面显示这些颜色，打开“系统设置”>“桌面与程序坞”，将“小组件样式”设为“全彩”。在较新版本的 macOS 中，将“使桌面小组件变暗”设为“永不”。",
+    ),
     "Widget_Tip": MessageLookupByLibrary.simpleMessage(
       "点按小组件里的备忘录即可打开；点按“新建”直接开始记录。",
     ),
+    "Widget_Tip_macOS": MessageLookupByLibrary.simpleMessage(
+      "点击小组件中的笔记即可打开，点击“新建”可开始记录。",
+    ),
+    "Widget_macOS_Title": MessageLookupByLibrary.simpleMessage("桌面小组件"),
     "World_Weather_Live": MessageLookupByLibrary.simpleMessage("极简天气"),
     "Yes_Habit": MessageLookupByLibrary.simpleMessage("签签习惯"),
     "notes": MessageLookupByLibrary.simpleMessage("备忘录"),

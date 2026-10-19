@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_document_view.dart';
+import 'package:onlynote/presentation/components/note_reader_date_label.dart';
 import 'package:onlynote/presentation/components/formatted_note_text.dart';
 import 'package:onlynote/presentation/components/note_find_bar.dart';
 import 'package:onlynote/presentation/components/note_search_text.dart';
@@ -1274,8 +1275,8 @@ class LoadedView extends StatelessWidget {
                         ),
                       const SizedBox(height: AppSpacings.l),
                     ],
-                    SelectableText(
-                      note.dateWithTime,
+                    NoteReaderDateLabel(
+                      dateTime: note.dateTime,
                       style: AppTypography.description.copyWith(
                         color: AppColors.ink.withValues(alpha: 0.55),
                       ),

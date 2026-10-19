@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onlynote/Tools/app_checklist_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -44,7 +45,10 @@ Widget _app(Widget child,
     );
 
 void main() {
+  late AppChecklistSettings checklistSettings;
   setUp(() {
+    checklistSettings = AppChecklistSettings.memory();
+    addTearDown(checklistSettings.dispose);
     final fonts = Map<String, GoogleFontBuilder>.of(kAppFontFamilies);
     for (final family in fonts.keys) {
       kAppFontFamilies[family] = (
@@ -85,6 +89,7 @@ void main() {
       return null;
     });
     await tester.pumpWidget(_app(NoteChecklist(
+      settings: checklistSettings,
       todos: todos,
       onToggle: (_) => toggles++,
       onReset: () => resets++,
@@ -109,13 +114,18 @@ void main() {
   testWidgets('empty, completed, blank and exported checklists hide copy',
       (tester) async {
     final fixtures = [
-      NoteChecklist(todos: const []),
-      NoteChecklist(todos: [Todo(title: 'Done', completed: true)]),
-      NoteChecklist(todos: [
+      NoteChecklist(settings: checklistSettings, todos: const []),
+      NoteChecklist(
+          settings: checklistSettings,
+          todos: [Todo(title: 'Done', completed: true)]),
+      NoteChecklist(settings: checklistSettings, todos: [
         Todo(id: 'blank', title: ' \n '),
         Todo(id: 'null'),
       ]),
-      NoteChecklist(todos: [Todo(title: 'Milk')], exportMode: true),
+      NoteChecklist(
+          settings: checklistSettings,
+          todos: [Todo(title: 'Milk')],
+          exportMode: true),
     ];
     for (final fixture in fixtures) {
       await tester.pumpWidget(_app(fixture));
@@ -133,6 +143,7 @@ void main() {
     var toggles = 0;
     var resets = 0;
     await tester.pumpWidget(_app(NoteChecklist(
+      settings: checklistSettings,
       todos: [
         Todo(id: 'a', title: 'Milk'),
         Todo(id: 'b', title: 'Bread', completed: true),
@@ -164,6 +175,7 @@ void main() {
     final pending = Completer<void>();
     var writes = 0;
     await tester.pumpWidget(_app(NoteChecklist(
+      settings: checklistSettings,
       todos: [Todo(title: 'Milk')],
       clipboardWriter: (_) {
         writes++;
@@ -203,7 +215,8 @@ void main() {
       }
       return null;
     });
-    await tester.pumpWidget(_app(NoteChecklist(todos: [Todo(title: 'Milk')])));
+    await tester.pumpWidget(_app(NoteChecklist(
+        settings: checklistSettings, todos: [Todo(title: 'Milk')])));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(_copyKey));
@@ -229,6 +242,7 @@ void main() {
         (tester) async {
       final pending = Completer<void>();
       await tester.pumpWidget(_app(NoteChecklist(
+        settings: checklistSettings,
         todos: [Todo(title: 'Milk')],
         clipboardWriter: (_) => pending.future,
       )));
@@ -255,6 +269,7 @@ void main() {
     final payloads = <String>[];
     await tester.pumpWidget(_app(StatefulBuilder(
       builder: (context, setState) => NoteChecklist(
+        settings: checklistSettings,
         todos: todos,
         onToggle: (id) => setState(() => todos = [
               for (final todo in todos)
@@ -296,6 +311,7 @@ void main() {
         final payloads = <String>[];
         await tester.pumpWidget(_app(
           NoteChecklist(
+            settings: checklistSettings,
             todos: [
               Todo(id: 'a', title: 'Bring bread and fresh fruit for tomorrow'),
               Todo(id: 'b', title: 'Milk', completed: true),

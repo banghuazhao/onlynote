@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added the last backup export date, distinguishing backups saved on Mac from backups shared on mobile, while keeping previous status after cancelled or failed exports.
+- Localized note-reader dates and times, including the device's 12-hour or 24-hour clock preference.
+- Remembered whether completed checklist items are collapsed across notes and launches, while keeping every item visible in exports and search navigation.
+
 ## 1.9.0+19
 
 - Added Export notes to Backup & Restore, saving every note, including archived ones, as one zip of Markdown, plain text, or PDF files — one file per note.
