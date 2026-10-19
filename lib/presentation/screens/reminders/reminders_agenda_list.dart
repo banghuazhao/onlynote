@@ -15,6 +15,7 @@ class RemindersAgendaList extends StatelessWidget {
     required this.onReschedule,
     this.busyReminderId,
     this.onRefresh,
+    this.emptyState,
   });
 
   final List<ReminderAgendaEntry> entries;
@@ -24,6 +25,7 @@ class RemindersAgendaList extends StatelessWidget {
   final ValueChanged<ReminderAgendaEntry> onSnooze;
   final ValueChanged<ReminderAgendaEntry> onReschedule;
   final Future<void> Function()? onRefresh;
+  final Widget? emptyState;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +46,7 @@ class RemindersAgendaList extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 760),
           child: rows.isEmpty
-              ? const _AgendaEmptyState()
+              ? emptyState ?? const _AgendaEmptyState()
               : switch (rows[index]) {
                   final ReminderAgendaGroup group => _AgendaSectionHeader(
                       group: group, count: sections[group]!.length),

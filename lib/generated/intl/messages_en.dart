@@ -986,6 +986,15 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("Overdue"),
     "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("Reschedule"),
+    "Reminders_Search": MessageLookupByLibrary.simpleMessage(
+      "Search reminders",
+    ),
+    "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
+      "Try another search or clear it to see all reminders.",
+    ),
+    "Reminders_Search_Empty_Title": MessageLookupByLibrary.simpleMessage(
+      "No matching reminders",
+    ),
     "Reminders_Snooze": MessageLookupByLibrary.simpleMessage("Snooze"),
     "Reminders_Snooze_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not snooze this reminder. Try again.",

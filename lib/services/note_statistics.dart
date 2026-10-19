@@ -1,5 +1,6 @@
 import 'package:characters/characters.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/services/recording_duration.dart';
 
 /// Summarizes visible text and attachment metadata without opening media files.
 /// Text totals include title, body, nonempty checklist items, and transcripts;
@@ -57,10 +58,7 @@ class NoteStatistics {
     // Approximate reading pace: 200 separated words or 300 CJK characters
     // per minute. Integer arithmetic keeps exact minute boundaries stable.
     final seconds = (separatedWords * 3 + cjkCharacters * 2 + 9) ~/ 10;
-    final recordingDurationMs = note.voiceMemos.fold<int>(
-      0,
-      (total, memo) => total + (memo.durationMs < 0 ? 0 : memo.durationMs),
-    );
+    final recordingDurationMs = totalRecordingDurationMs(note.voiceMemos);
     final attachedPaths = note.imagePaths.toSet();
     final scanPaths = note.imageLayouts
         .where((layout) =>

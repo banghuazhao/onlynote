@@ -9,12 +9,13 @@ import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 
-VoiceMemo _memo(String id, {String? transcript}) => VoiceMemo(
-    id: id,
-    path: 'note_audio/$id.m4a',
-    durationMs: 42000,
-    createdAt: DateTime(2026, 10, 6),
-    transcript: transcript);
+VoiceMemo _memo(String id, {String? transcript, int durationMs = 42000}) =>
+    VoiceMemo(
+        id: id,
+        path: 'note_audio/$id.m4a',
+        durationMs: durationMs,
+        createdAt: DateTime(2026, 10, 6),
+        transcript: transcript);
 
 Widget _host(NoteCard card,
         {Locale locale = const Locale('en'), double scale = 1}) =>
@@ -45,7 +46,8 @@ void main() {
         .pumpWidget(_host(NoteCard(note: note, onTap: () => opened = true)));
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.mic_none_rounded), findsOneWidget);
-    expect(find.text(S.current.History_Recordings(1)), findsOneWidget);
+    expect(
+        find.text('${S.current.History_Recordings(1)} · 0:42'), findsOneWidget);
     expect(tester.getSize(find.byType(NoteCard)).height, greaterThan(88));
     await tester.tap(find.byIcon(Icons.mic_none_rounded));
     await tester.pump();
@@ -76,7 +78,8 @@ void main() {
     expect(
         find.byKey(const ValueKey('card-transcript-source')), findsOneWidget);
     expect(find.text(S.current.Voice_Memo), findsOneWidget);
-    expect(find.text(S.current.History_Recordings(2)), findsOneWidget);
+    expect(
+        find.text('${S.current.History_Recordings(2)} · 1:24'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -90,8 +93,48 @@ void main() {
     await tester.pumpWidget(_host(NoteCard(note: note),
         locale: const Locale('zh', 'HK'), scale: 2.4));
     await tester.pumpAndSettle();
-    expect(find.text('1 段錄音'), findsOneWidget);
+    expect(find.text('1 段錄音 · 0:42'), findsOneWidget);
     expect(find.byIcon(Icons.mic_none_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('card sums stored durations and ignores invalid negative time',
+      (tester) async {
+    final note = Note(id: 'metadata', voiceMemos: [
+      _memo('missing-first', durationMs: 600),
+      _memo('missing-invalid', durationMs: -42000),
+      _memo('missing-second', durationMs: 600),
+    ]);
+    await tester.pumpWidget(_host(NoteCard(note: note)));
+    await tester.pumpAndSettle();
+    expect(
+        find.text('${S.current.History_Recordings(3)} · 0:01'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('recording summary remains absent for notes without recordings',
+      (tester) async {
+    await tester.pumpWidget(_host(NoteCard(note: Note(title: 'Written note'))));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('card-recordings-summary')), findsNothing);
+    expect(find.byIcon(Icons.mic_none_rounded), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('long combined duration fits a narrow Chinese large-text card',
+      (tester) async {
+    tester.view.physicalSize = const Size(180, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final note = Note(id: 'long-audio', voiceMemos: [
+      _memo('first-day', durationMs: const Duration(hours: 24).inMilliseconds),
+      _memo('extra-hour',
+          durationMs: const Duration(hours: 1, seconds: 5).inMilliseconds),
+    ]);
+    await tester.pumpWidget(_host(NoteCard(note: note),
+        locale: const Locale('zh', 'HK'), scale: 2.4));
+    await tester.pumpAndSettle();
+    expect(find.text('2 段錄音 · 1500:05'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

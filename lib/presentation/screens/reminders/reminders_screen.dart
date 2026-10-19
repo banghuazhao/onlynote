@@ -11,7 +11,7 @@ import 'package:onlynote/services/reminder_agenda.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
 
 import 'reminder_agenda_live.dart';
-import 'reminders_agenda_list.dart';
+import 'reminders_agenda_search.dart';
 
 @RoutePage(name: 'RemindersRoute')
 class RemindersScreen extends StatefulWidget {
@@ -176,22 +176,18 @@ class _RemindersScreenState extends State<RemindersScreen>
                         child: Text(l10n.Retry)),
                   ],
                 ),
-              if (controller.loading && controller.entries.isEmpty)
-                const Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else
-                Expanded(
-                  child: RemindersAgendaList(
-                    entries: controller.entries,
-                    now: controller.referenceTime,
-                    busyReminderId: controller.busyReminderId,
-                    onRefresh: controller.refresh,
-                    onOpen: _openNote,
-                    onSnooze: _snooze,
-                    onReschedule: _reschedule,
-                  ),
+              Expanded(
+                child: SearchableRemindersAgenda(
+                  entries: controller.entries,
+                  now: controller.referenceTime,
+                  loading: controller.loading,
+                  busyReminderId: controller.busyReminderId,
+                  onRefresh: controller.refresh,
+                  onOpen: _openNote,
+                  onSnooze: _snooze,
+                  onReschedule: _reschedule,
                 ),
+              ),
             ]),
           ),
         ),

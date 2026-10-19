@@ -2685,6 +2685,36 @@ class S {
     );
   }
 
+  /// `Search reminders`
+  String get Reminders_Search {
+    return Intl.message(
+      'Search reminders',
+      name: 'Reminders_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching reminders`
+  String get Reminders_Search_Empty_Title {
+    return Intl.message(
+      'No matching reminders',
+      name: 'Reminders_Search_Empty_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Try another search or clear it to see all reminders.`
+  String get Reminders_Search_Empty_Message {
+    return Intl.message(
+      'Try another search or clear it to see all reminders.',
+      name: 'Reminders_Search_Empty_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Could not load reminders. Try again.`
   String get Reminders_Load_Failed {
     return Intl.message(

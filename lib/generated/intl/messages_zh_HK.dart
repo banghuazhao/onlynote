@@ -760,6 +760,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已過期"),
     "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
+    "Reminders_Search": MessageLookupByLibrary.simpleMessage("搜尋提醒"),
+    "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
+      "請嘗試其他搜尋詞，或清除搜尋以查看所有提醒。",
+    ),
+    "Reminders_Search_Empty_Title": MessageLookupByLibrary.simpleMessage(
+      "沒有符合條件的提醒",
+    ),
     "Reminders_Snooze": MessageLookupByLibrary.simpleMessage("稍後提醒"),
     "Reminders_Snooze_Failed": MessageLookupByLibrary.simpleMessage(
       "無法延後此提醒，請重試。",

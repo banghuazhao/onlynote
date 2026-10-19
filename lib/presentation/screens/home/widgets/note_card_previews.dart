@@ -99,6 +99,12 @@ class _NoteCardsPreviewState extends State<_NoteCardsPreview> {
               ? '想試做一個小書架，放在窗邊。'
               : 'Try a small bookshelf by the window.',
         ),
+        VoiceMemo(
+          id: 'follow-up',
+          path: 'note_audio/preview-follow-up.m4a',
+          durationMs: 477000,
+          createdAt: DateTime(2026, 10, 5),
+        ),
       ],
     ),
     Note(

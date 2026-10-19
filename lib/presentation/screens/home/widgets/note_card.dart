@@ -20,6 +20,7 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/presentation/theme/note_card_typography.dart';
 import 'package:onlynote/services/note_dates.dart';
+import 'package:onlynote/services/recording_duration.dart';
 import 'package:screenshot/screenshot.dart';
 
 class NoteCard extends StatefulWidget {
@@ -429,8 +430,10 @@ class NoteCardState extends State<NoteCard> {
                             const SizedBox(width: 6),
                             Flexible(
                                 child: Text(
-                                    S.of(context).History_Recordings(
-                                        note.voiceMemos.length),
+                                    '${strings.History_Recordings(note.voiceMemos.length)} · '
+                                    '${formatRecordingDuration(totalRecordingDurationMs(note.voiceMemos))}',
+                                    key: const ValueKey(
+                                        'card-recordings-summary'),
                                     style: typography.description.copyWith(
                                         color: AppColors.ink
                                             .withValues(alpha: 0.7)))),

@@ -205,7 +205,8 @@ void main() {
       expect(find.byKey(const ValueKey('card-todo-blank')), findsNothing);
       expect(find.text(S.current.Card_Scanned_Pages_Count(1)), findsOneWidget);
       expect(find.text(S.current.Card_Linked_Notes_Count(2)), findsOneWidget);
-      expect(find.text(S.current.History_Recordings(1)), findsOneWidget);
+      expect(find.text('${S.current.History_Recordings(1)} · 0:42'),
+          findsOneWidget);
       expect(
           find.bySemanticsLabel(
               '${S.current.History_Photos(1)}, ${S.current.Card_Scanned_Pages_Count(1)}'),

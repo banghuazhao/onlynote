@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_dates.dart';
 import 'package:onlynote/services/note_statistics.dart';
+import 'package:onlynote/services/recording_duration.dart';
 
 import 'app_sheet.dart';
 
@@ -135,7 +136,7 @@ class NoteInfoSheet extends StatelessWidget {
             _StatisticRow(
               id: 'recording-duration',
               label: strings.Note_Info_Recording_Duration,
-              value: _formatRecordingDuration(statistics.recordingDurationMs),
+              value: formatRecordingDuration(statistics.recordingDurationMs),
             ),
             const SizedBox(height: 12),
             Text(
@@ -149,12 +150,6 @@ class NoteInfoSheet extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Matches the player's minutes:seconds display without capping combined time.
-String _formatRecordingDuration(int milliseconds) {
-  final seconds = milliseconds ~/ 1000;
-  return '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
 }
 
 class _StatisticRow extends StatelessWidget {
