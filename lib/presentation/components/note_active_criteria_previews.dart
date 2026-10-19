@@ -3,6 +3,7 @@ import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/note_tags.dart';
 
 import 'note_active_criteria_summary.dart';
@@ -35,33 +36,53 @@ Widget activeCriteriaChinesePreview() =>
 Widget activeCriteriaChineseLandscapePreview() => const _ActiveCriteriaPreview(
     dark: true, locale: Locale('zh', 'HK'), textScale: 2);
 
+@Preview(
+  name: 'Library sort alone — traditional Chinese 2× narrow',
+  group: 'Library',
+  size: Size(180, 340),
+)
+Widget activeSortOnlyPreview() => const _ActiveCriteriaPreview(
+      locale: Locale('zh', 'HK'),
+      textScale: 2,
+      sortOnly: true,
+      sortOrder: NoteSortOrder.titleAsc,
+    );
+
 /// The fixture uses local selection state and can be reset without media IO.
 class _ActiveCriteriaPreview extends StatefulWidget {
   const _ActiveCriteriaPreview({
     this.dark = false,
     this.locale = const Locale('en'),
     this.textScale = 1,
+    this.sortOnly = false,
+    this.sortOrder = NoteSortOrder.modifiedNewest,
   });
 
   final bool dark;
   final Locale locale;
   final double textScale;
+  final bool sortOnly;
+  final NoteSortOrder sortOrder;
 
   @override
   State<_ActiveCriteriaPreview> createState() => _ActiveCriteriaPreviewState();
 }
 
 class _ActiveCriteriaPreviewState extends State<_ActiveCriteriaPreview> {
-  final _filters = <NoteSearchFilter>{
-    NoteSearchFilter.recordings,
-    NoteSearchFilter.scans,
-    NoteSearchFilter.unfinished,
+  late final _filters = <NoteSearchFilter>{
+    if (!widget.sortOnly) ...[
+      NoteSearchFilter.recordings,
+      NoteSearchFilter.scans,
+      NoteSearchFilter.unfinished,
+    ],
   };
   late final _tags = <String>{
-    widget.locale.languageCode == 'zh' ? '项目资料与会议纪要' : 'Research',
-    widget.locale.languageCode == 'zh' ? '需要跟进' : 'Follow-up',
+    if (!widget.sortOnly) ...[
+      widget.locale.languageCode == 'zh' ? '项目资料与会议纪要' : 'Research',
+      widget.locale.languageCode == 'zh' ? '需要跟进' : 'Follow-up',
+    ],
   };
-  bool _includeArchived = true;
+  late bool _includeArchived = !widget.sortOnly;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -100,6 +121,7 @@ class _ActiveCriteriaPreviewState extends State<_ActiveCriteriaPreview> {
                   filters: _filters,
                   tags: _tags,
                   includeArchived: _includeArchived,
+                  sortOrder: widget.sortOrder,
                   onRemoveFilter: (filter) =>
                       setState(() => _filters.remove(filter)),
                   onRemoveTag: (tag) => setState(() => _tags

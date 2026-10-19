@@ -494,6 +494,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     await showNoteInfoSheet(
       context: context,
       statistics: NoteStatistics.fromNote(note),
+      modifiedAt: note.dateTime,
       deletedAt: note.isDeleted ? note.deletedAt : null,
     );
   }

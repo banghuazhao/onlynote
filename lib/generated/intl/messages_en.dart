@@ -598,6 +598,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "Include archived notes",
     ),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
+    "Keyboard_Shortcuts": MessageLookupByLibrary.simpleMessage(
+      "Keyboard shortcuts",
+    ),
+    "Keyboard_Shortcuts_Description": MessageLookupByLibrary.simpleMessage(
+      "A quick reference for Onlynote on Mac.",
+    ),
+    "Keyboard_Shortcuts_Find_Context": MessageLookupByLibrary.simpleMessage(
+      "Search the library, or find text in the open note.",
+    ),
     "Large": MessageLookupByLibrary.simpleMessage("Large"),
     "Library_Filters": MessageLookupByLibrary.simpleMessage("Library filters"),
     "Link_Empty": MessageLookupByLibrary.simpleMessage(
@@ -663,6 +672,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
+    ),
+    "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage(
+      "Last modified",
     ),
     "Note_Info_Moved_To_Trash": MessageLookupByLibrary.simpleMessage(
       "Moved to Trash",

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added a visible sort label above the library for non-manual ordering, while keeping Trash's deletion-date order separate.
+- Added the existing last-modified timestamp to Note info, using the app language and device clock preference.
+- Added a Mac keyboard-shortcuts guide in Settings for note creation, search, editing, and clipboard commands.
 - Added the last backup export date, distinguishing backups saved on Mac from backups shared on mobile, while keeping previous status after cancelled or failed exports.
 - Localized note-reader dates and times, including the device's 12-hour or 24-hour clock preference.
 - Remembered whether completed checklist items are collapsed across notes and launches, while keeping every item visible in exports and search navigation.

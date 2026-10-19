@@ -10,8 +10,10 @@ import 'package:onlynote/presentation/components/note_info_previews.dart';
 import 'package:onlynote/presentation/components/note_info_sheet.dart';
 import 'package:onlynote/services/note_statistics.dart';
 
-Widget _host(Widget child) => MaterialApp(
-      locale: const Locale('en'),
+Widget _host(Widget child,
+        {Locale locale = const Locale('en'), bool use24HourFormat = false}) =>
+    MaterialApp(
+      locale: locale,
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [
         S.delegate,
@@ -19,6 +21,11 @@ Widget _host(Widget child) => MaterialApp(
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(alwaysUse24HourFormat: use24HourFormat),
+        child: child!,
+      ),
       home: Scaffold(body: child),
     );
 
@@ -30,6 +37,65 @@ VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
     );
 
 void main() {
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK'),
+  ]) {
+    for (final use24HourFormat in [false, true]) {
+      testWidgets(
+          'last modified respects $locale and 24-hour=$use24HourFormat with semantics',
+          (tester) async {
+        final modified = DateTime.utc(2020, 1, 2, 14, 45);
+        final semantics = tester.ensureSemantics();
+        try {
+          await tester.pumpWidget(_host(
+            NoteInfoSheet(
+              statistics: NoteStatistics.fromNote(Note(title: 'Old plan')),
+              modifiedAt: modified,
+            ),
+            locale: locale,
+            use24HourFormat: use24HourFormat,
+          ));
+          await tester.pumpAndSettle();
+          final formatter = DateFormat.yMMMd(locale.toString());
+          if (use24HourFormat) {
+            formatter.add_Hm();
+          } else {
+            formatter.add_jm();
+          }
+          final expected = formatter.format(modified.toLocal());
+          final value =
+              find.byKey(const ValueKey('note-info-last-modified-value'));
+          expect(tester.widget<Text>(value).data, expected);
+          expect(find.text(S.current.Note_Info_Last_Modified), findsOneWidget);
+          expect(
+              find.bySemanticsLabel(
+                  '${S.current.Note_Info_Last_Modified}: $expected'),
+              findsOneWidget);
+          expect(tester.takeException(), isNull);
+        } finally {
+          semantics.dispose();
+        }
+      });
+    }
+  }
+
+  testWidgets('missing legacy modification metadata stays absent',
+      (tester) async {
+    await tester.pumpWidget(_host(NoteInfoSheet(
+      statistics: NoteStatistics.fromNote(Note(title: 'Old plan')),
+      deletedAt: DateTime(2026, 10, 11),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('note-info-last-modified-value')),
+        findsNothing);
+    expect(find.text(S.current.Note_Info_Last_Modified), findsNothing);
+    expect(find.byKey(const ValueKey('note-info-moved-to-trash-value')),
+        findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('stored deletion timestamp is labeled in note info and semantics',
       (tester) async {
     final deleted = DateTime.utc(2026, 10, 11, 23, 30);
@@ -46,6 +112,7 @@ void main() {
           onPressed: () => showNoteInfoSheet(
             context: context,
             statistics: NoteStatistics.fromNote(note),
+            modifiedAt: note.dateTime,
             deletedAt: note.deletedAt,
           ),
           child: const Text('Info'),
@@ -58,6 +125,12 @@ void main() {
           DateFormat.yMMMd('en').add_jm().format(deleted.toLocal());
       final date = find.byKey(const ValueKey('note-info-moved-to-trash-value'));
       expect(tester.widget<Text>(date).data, expected);
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('note-info-last-modified-value')))
+              .data,
+          DateFormat.yMMMd('en').add_jm().format(note.dateTime!));
       expect(
           find.bySemanticsLabel(
               '${S.current.Note_Info_Moved_To_Trash}: $expected'),
@@ -108,6 +181,13 @@ void main() {
               .add_jm()
               .format(DateTime(2026, 10, 11, 14, 30)));
       expect(find.text(S.current.Note_Info_Moved_To_Trash), findsOneWidget);
+      final modified =
+          find.byKey(const ValueKey('note-info-last-modified-value'));
+      expect(
+          tester.widget<Text>(modified).data,
+          DateFormat.yMMMd(locale)
+              .add_jm()
+              .format(DateTime(2026, 10, 7, 14, 15)));
       await tester.ensureVisible(
           find.byKey(const ValueKey('note-info-recording-duration-value')));
       await tester.pumpAndSettle();
@@ -331,11 +411,23 @@ void main() {
       (noteInfoLightPreview, const Size(390, 620)),
       (noteInfoDarkPreview, const Size(390, 620)),
       (noteInfoChinesePreview, const Size(280, 700)),
+      (noteInfo24HourPreview, const Size(390, 620)),
+      (noteInfoMissingDatePreview, const Size(390, 620)),
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(preview());
       await tester.pumpAndSettle();
       expect(find.byType(NoteInfoSheet), findsOneWidget);
+      final modified =
+          find.byKey(const ValueKey('note-info-last-modified-value'));
+      if (preview == noteInfoMissingDatePreview) {
+        expect(modified, findsNothing);
+      } else {
+        expect(modified, findsOneWidget);
+        if (preview == noteInfo24HourPreview) {
+          expect(tester.widget<Text>(modified).data, 'Oct 7, 2026 14:15');
+        }
+      }
       expect(
           find.byKey(const ValueKey('note-info-words-value')), findsOneWidget);
       expect(find.byKey(const ValueKey('note-info-characters-value')),

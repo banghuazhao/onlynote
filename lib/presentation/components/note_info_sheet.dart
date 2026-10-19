@@ -9,12 +9,16 @@ import 'app_sheet.dart';
 Future<void> showNoteInfoSheet({
   required BuildContext context,
   required NoteStatistics statistics,
+  DateTime? modifiedAt,
   DateTime? deletedAt,
 }) =>
     showAppSheet<void>(
       context: context,
-      builder: (_) =>
-          NoteInfoSheet(statistics: statistics, deletedAt: deletedAt),
+      builder: (_) => NoteInfoSheet(
+        statistics: statistics,
+        modifiedAt: modifiedAt,
+        deletedAt: deletedAt,
+      ),
     );
 
 /// A compact, read-only summary of the saved note or current editor draft.
@@ -22,10 +26,14 @@ class NoteInfoSheet extends StatelessWidget {
   const NoteInfoSheet({
     super.key,
     required this.statistics,
+    this.modifiedAt,
     this.deletedAt,
   });
 
   final NoteStatistics statistics;
+
+  /// Existing saved or draft metadata; absent legacy dates stay absent.
+  final DateTime? modifiedAt;
 
   /// Stored deletion metadata only; absent values never infer a Trash date.
   final DateTime? deletedAt;
@@ -51,6 +59,16 @@ class NoteInfoSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (modifiedAt != null)
+              _StatisticRow(
+                id: 'last-modified',
+                label: strings.Note_Info_Last_Modified,
+                value: noteReaderDateTimeLabel(
+                  dateTime: modifiedAt,
+                  locale: Localizations.localeOf(context).toString(),
+                  use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+                ),
+              ),
             if (deletedAt != null)
               _StatisticRow(
                 id: 'moved-to-trash',

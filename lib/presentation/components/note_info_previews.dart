@@ -20,6 +20,16 @@ Widget noteInfoLightPreview() => const _NoteInfoPreview();
 )
 Widget noteInfoDarkPreview() => const _NoteInfoPreview(dark: true);
 
+@Preview(name: 'Note info — 24-hour clock', group: 'Note', size: Size(390, 620))
+Widget noteInfo24HourPreview() => const _NoteInfoPreview(use24HourFormat: true);
+
+@Preview(
+    name: 'Note info — legacy date missing',
+    group: 'Note',
+    size: Size(390, 620))
+Widget noteInfoMissingDatePreview() =>
+    const _NoteInfoPreview(showModified: false);
+
 @Preview(
   name: 'Note info — Chinese 2× narrow',
   group: 'Note',
@@ -55,16 +65,21 @@ class _NoteInfoPreview extends StatelessWidget {
     this.dark = false,
     this.textScale = 1,
     this.trashed = false,
+    this.use24HourFormat = false,
+    this.showModified = true,
   });
 
   final bool chinese;
   final bool dark;
   final double textScale;
   final bool trashed;
+  final bool use24HourFormat;
+  final bool showModified;
 
   @override
   Widget build(BuildContext context) {
     final note = Note(
+      dateTime: showModified ? DateTime(2026, 10, 7, 14, 15) : null,
       deletedAt: trashed ? DateTime(2026, 10, 11, 14, 30) : null,
       title: chinese ? '週末散步' : 'Weekend walk',
       description: chinese
@@ -133,6 +148,7 @@ class _NoteInfoPreview extends StatelessWidget {
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
           textScaler: TextScaler.linear(textScale),
+          alwaysUse24HourFormat: use24HourFormat,
           disableAnimations: true,
         ),
         child: child!,
@@ -142,6 +158,7 @@ class _NoteInfoPreview extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: NoteInfoSheet(
             statistics: NoteStatistics.fromNote(note),
+            modifiedAt: note.dateTime,
             deletedAt: note.deletedAt,
           ),
         ),

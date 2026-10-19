@@ -24,6 +24,9 @@
   "Desktop_Menu_Window": "窗口",
   "Desktop_Menu_Quit": "退出 Onlynote",
   "Desktop_Menu_New_Note": "新建笔记",
+  "Keyboard_Shortcuts": "键盘快捷键",
+  "Keyboard_Shortcuts_Description": "Onlynote Mac 版快捷键速查。",
+  "Keyboard_Shortcuts_Find_Context": "搜索笔记库，或在当前打开的笔记中查找文本。",
   "notes": "备忘录",
   "Edit": "编辑",
   "save": "保存",
@@ -518,6 +521,7 @@
     }
   },
   "Note_Info": "笔记信息",
+  "Note_Info_Last_Modified": "最后修改",
   "Note_Info_Words": "字数",
   "Note_Info_Characters": "字符数",
   "Note_Info_Reading_Time": "预计阅读时间",

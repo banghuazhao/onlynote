@@ -1467,15 +1467,21 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<HomeBloc>().state.mapOrNull(loaded: (data) {
         final includeArchived =
             data.includeArchived && !data.showArchive && !data.showTrash;
+        // Trash always lists most recently deleted first, independently of
+        // the library's persisted order. Only describe sorting it applies.
+        final sortOrder =
+            data.showTrash ? NoteSortOrder.manual : data.sortOrder;
         if (data.filters.isEmpty &&
             data.selectedTags.isEmpty &&
-            !includeArchived) {
+            !includeArchived &&
+            sortOrder == NoteSortOrder.manual) {
           return null;
         }
         return NoteActiveCriteriaSummary(
           filters: data.filters,
           tags: data.selectedTags,
           includeArchived: includeArchived,
+          sortOrder: sortOrder,
           onRemoveFilter: (filter) =>
               _removeActiveCriterion(HomeEvent.removeFilter(filter)),
           onRemoveTag: (tag) =>

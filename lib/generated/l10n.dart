@@ -300,6 +300,36 @@ class S {
     );
   }
 
+  /// `Keyboard shortcuts`
+  String get Keyboard_Shortcuts {
+    return Intl.message(
+      'Keyboard shortcuts',
+      name: 'Keyboard_Shortcuts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A quick reference for Onlynote on Mac.`
+  String get Keyboard_Shortcuts_Description {
+    return Intl.message(
+      'A quick reference for Onlynote on Mac.',
+      name: 'Keyboard_Shortcuts_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search the library, or find text in the open note.`
+  String get Keyboard_Shortcuts_Find_Context {
+    return Intl.message(
+      'Search the library, or find text in the open note.',
+      name: 'Keyboard_Shortcuts_Find_Context',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Notes`
   String get notes {
     return Intl.message('Notes', name: 'notes', desc: '', args: []);
@@ -4222,6 +4252,16 @@ class S {
   /// `Note info`
   String get Note_Info {
     return Intl.message('Note info', name: 'Note_Info', desc: '', args: []);
+  }
+
+  /// `Last modified`
+  String get Note_Info_Last_Modified {
+    return Intl.message(
+      'Last modified',
+      name: 'Note_Info_Last_Modified',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Words`

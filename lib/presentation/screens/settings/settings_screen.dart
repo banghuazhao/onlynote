@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'manage_folders_screen.dart';
 import 'backup_screen.dart';
+import 'keyboard_shortcuts_screen.dart';
 import 'premium_screen.dart';
 import 'widget_guide_screen.dart';
 
@@ -136,6 +137,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       MaterialPageRoute<void>(
                                         builder: (_) =>
                                             const WidgetGuideScreen(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              if (!kIsWeb &&
+                                  defaultTargetPlatform ==
+                                      TargetPlatform.macOS) ...[
+                                SizedBox(height: tokens.space4),
+                                Card(
+                                  child: ListTile(
+                                    key: const ValueKey(
+                                        'settings-keyboard-shortcuts'),
+                                    leading:
+                                        const Icon(Icons.keyboard_outlined),
+                                    title:
+                                        Text(S.of(context).Keyboard_Shortcuts),
+                                    subtitle: Text(S
+                                        .of(context)
+                                        .Keyboard_Shortcuts_Description),
+                                    trailing:
+                                        const Icon(Icons.chevron_right_rounded),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (_) =>
+                                            const KeyboardShortcutsScreen(),
                                       ),
                                     ),
                                   ),

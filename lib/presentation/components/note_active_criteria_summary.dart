@@ -3,11 +3,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/note_tags.dart';
 
 import 'library_filter_labels.dart';
 
-/// Only selected criteria are shown; callbacks leave data and scope to Home.
+/// Selected criteria and derived sorting; callbacks leave data and scope to Home.
 class NoteActiveCriteriaSummary extends StatelessWidget {
   const NoteActiveCriteriaSummary({
     super.key,
@@ -17,6 +18,7 @@ class NoteActiveCriteriaSummary extends StatelessWidget {
     required this.onRemoveTag,
     this.includeArchived = false,
     this.onRemoveIncludeArchived,
+    this.sortOrder = NoteSortOrder.manual,
   });
 
   final Set<NoteSearchFilter> filters;
@@ -25,10 +27,14 @@ class NoteActiveCriteriaSummary extends StatelessWidget {
   final ValueChanged<String> onRemoveTag;
   final bool includeArchived;
   final VoidCallback? onRemoveIncludeArchived;
+  final NoteSortOrder sortOrder;
 
   @override
   Widget build(BuildContext context) {
-    if (filters.isEmpty && tags.isEmpty && !includeArchived) {
+    if (filters.isEmpty &&
+        tags.isEmpty &&
+        !includeArchived &&
+        sortOrder == NoteSortOrder.manual) {
       return const SizedBox.shrink();
     }
     final strings = S.of(context);
@@ -41,21 +47,21 @@ class NoteActiveCriteriaSummary extends StatelessWidget {
       // Keep each delete action reachable on narrow screens without shrinking
       // the touch target or reserving vertical space outside the notes scroll.
       final labelWidth = math.max(40.0, constraints.maxWidth - 116);
+      Widget chipLabel(String label) => ConstrainedBox(
+            // RawChip derives its content height from the label before
+            // placing the delete control, so both need the same minimum.
+            constraints: BoxConstraints(minHeight: 48, maxWidth: labelWidth),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              widthFactor: 1,
+              heightFactor: 1,
+              child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          );
       Widget chip(String key, String label, VoidCallback? onDeleted) =>
           InputChip(
             key: ValueKey(key),
-            label: ConstrainedBox(
-              // RawChip derives its content height from the label before
-              // placing the delete control, so both need the same minimum.
-              constraints: BoxConstraints(minHeight: 48, maxWidth: labelWidth),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                widthFactor: 1,
-                heightFactor: 1,
-                child:
-                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ),
+            label: chipLabel(label),
             tooltip: label,
             onDeleted: onDeleted,
             deleteButtonTooltipMessage: strings.Remove_Library_Criterion(label),
@@ -69,11 +75,24 @@ class NoteActiveCriteriaSummary extends StatelessWidget {
             materialTapTargetSize: MaterialTapTargetSize.padded,
             visualDensity: VisualDensity.standard,
           );
+      final sortLabel =
+          '${strings.Sort_By}: ${noteSortOrderLabel(sortOrder, strings)}';
       return SingleChildScrollView(
         key: const ValueKey('home-active-criteria-summary'),
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Row(spacing: 8, children: [
+          if (sortOrder != NoteSortOrder.manual)
+            Tooltip(
+              message: sortLabel,
+              child: Chip(
+                key: const ValueKey('active-sort-order'),
+                avatar: const Icon(Icons.sort_rounded),
+                label: chipLabel(sortLabel),
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                visualDensity: VisualDensity.standard,
+              ),
+            ),
           for (final filter in NoteSearchFilter.values)
             if (filters.contains(filter))
               chip(

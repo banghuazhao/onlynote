@@ -7,6 +7,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/library_filter_labels.dart';
 import 'package:onlynote/presentation/components/note_active_criteria_summary.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/note_tags.dart';
 
 Widget _host(Widget child,
@@ -80,6 +81,60 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final order in NoteSortOrder.values.where(
+    (order) => order != NoteSortOrder.manual,
+  )) {
+    testWidgets('shows $order without filters as an informational chip',
+        (tester) async {
+      await tester.pumpWidget(_host(NoteActiveCriteriaSummary(
+        filters: const {},
+        tags: const {},
+        sortOrder: order,
+        onRemoveFilter: (_) => fail('Sorting cannot remove a filter'),
+        onRemoveTag: (_) => fail('Sorting cannot remove a tag'),
+      )));
+      await tester.pumpAndSettle();
+
+      final label =
+          '${S.current.Sort_By}: ${noteSortOrderLabel(order, S.current)}';
+      expect(_key('home-active-criteria-summary'), findsOneWidget);
+      expect(find.text(label), findsOneWidget);
+      expect(find.byTooltip(label), findsOneWidget);
+      expect(find.byType(InputChip), findsNothing);
+      final chip = tester.widget<Chip>(_key('active-sort-order'));
+      expect(chip.onDeleted, isNull);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('switching to manual removes a sort-only summary',
+      (tester) async {
+    final order = ValueNotifier(NoteSortOrder.modifiedNewest);
+    addTearDown(order.dispose);
+    await tester.pumpWidget(_host(ValueListenableBuilder(
+      valueListenable: order,
+      builder: (_, value, child) => NoteActiveCriteriaSummary(
+        filters: const {},
+        tags: const {},
+        sortOrder: value,
+        onRemoveFilter: (_) => fail('No filter is selected'),
+        onRemoveTag: (_) => fail('No tag is selected'),
+      ),
+    )));
+    await tester.pumpAndSettle();
+    expect(_key('active-sort-order'), findsOneWidget);
+
+    order.value = NoteSortOrder.titleDesc;
+    await tester.pumpAndSettle();
+    expect(find.text('${S.current.Sort_By}: ${S.current.Sort_Title_Desc}'),
+        findsOneWidget);
+    order.value = NoteSortOrder.manual;
+    await tester.pumpAndSettle();
+    expect(_key('home-active-criteria-summary'), findsNothing);
+    expect(_key('active-sort-order'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('shows selected criteria and reports deletion without mutation',
       (tester) async {
     final filters = <NoteSearchFilter>{
@@ -97,6 +152,7 @@ void main() {
       filters: filters,
       tags: tags,
       includeArchived: true,
+      sortOrder: NoteSortOrder.titleAsc,
       onRemoveFilter: removedFilters.add,
       onRemoveTag: removedTags.add,
       onRemoveIncludeArchived: () => removedScope++,
@@ -105,6 +161,7 @@ void main() {
 
     expect(_key('home-active-criteria-summary'), findsOneWidget);
     expect(find.byType(InputChip), findsNWidgets(6));
+    expect(_key('active-sort-order'), findsOneWidget);
     for (final filter in NoteSearchFilter.values) {
       expect(_key('active-filter-${filter.name}'),
           filters.contains(filter) ? findsOneWidget : findsNothing);
@@ -126,6 +183,7 @@ void main() {
     expect(filters, originalFilters);
     expect(tags, originalTags);
     expect(find.byType(InputChip), findsNWidgets(6));
+    expect(_key('active-sort-order'), findsOneWidget);
   });
 
   testWidgets('parent removes just one criterion until the summary disappears',
@@ -190,6 +248,7 @@ void main() {
               filters: filters,
               tags: tags,
               includeArchived: true,
+              sortOrder: NoteSortOrder.modifiedNewest,
               onRemoveFilter: removedFilters.add,
               onRemoveTag: removedTags.add,
               onRemoveIncludeArchived: () => removedScope++,
@@ -205,6 +264,12 @@ void main() {
           final position = tester.state<ScrollableState>(scrollable).position;
           expect(position.axis, Axis.horizontal);
           expect(position.maxScrollExtent, greaterThan(0));
+          final sortLabel =
+              '${S.current.Sort_By}: ${S.current.Sort_Modified_Newest}';
+          expect(find.text(sortLabel), findsOneWidget);
+          expect(find.byTooltip(sortLabel), findsOneWidget);
+          expect(
+              tester.widget<Chip>(_key('active-sort-order')).onDeleted, isNull);
 
           for (final (key, label) in [
             for (final filter in filters)

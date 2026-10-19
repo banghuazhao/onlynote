@@ -24,6 +24,9 @@
   "Desktop_Menu_Window": "Window",
   "Desktop_Menu_Quit": "Quit Onlynote",
   "Desktop_Menu_New_Note": "New Note",
+  "Keyboard_Shortcuts": "Keyboard shortcuts",
+  "Keyboard_Shortcuts_Description": "A quick reference for Onlynote on Mac.",
+  "Keyboard_Shortcuts_Find_Context": "Search the library, or find text in the open note.",
  "notes": "Notes",
  "Edit": "Edit",
  "save": "Save",
@@ -518,6 +521,7 @@
     }
   },
   "Note_Info": "Note info",
+  "Note_Info_Last_Modified": "Last modified",
   "Note_Info_Words": "Words",
   "Note_Info_Characters": "Characters",
   "Note_Info_Reading_Time": "Estimated reading time",

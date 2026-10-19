@@ -471,6 +471,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Image_Resize": MessageLookupByLibrary.simpleMessage("调整照片大小"),
     "Include_Archived": MessageLookupByLibrary.simpleMessage("包含封存笔记"),
     "Instant_Face": MessageLookupByLibrary.simpleMessage("Instant Face"),
+    "Keyboard_Shortcuts": MessageLookupByLibrary.simpleMessage("键盘快捷键"),
+    "Keyboard_Shortcuts_Description": MessageLookupByLibrary.simpleMessage(
+      "Onlynote Mac 版快捷键速查。",
+    ),
+    "Keyboard_Shortcuts_Find_Context": MessageLookupByLibrary.simpleMessage(
+      "搜索笔记库，或在当前打开的笔记中查找文本。",
+    ),
     "Large": MessageLookupByLibrary.simpleMessage("大"),
     "Library_Filters": MessageLookupByLibrary.simpleMessage("笔记筛选"),
     "Link_Empty": MessageLookupByLibrary.simpleMessage("暂无可关联的笔记，请先创建其他笔记。"),
@@ -525,6 +532,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "包含标题、正文、清单和语音转写。中日韩文字按字计数。",
     ),
+    "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage("最后修改"),
     "Note_Info_Moved_To_Trash": MessageLookupByLibrary.simpleMessage("移至回收站"),
     "Note_Info_Photos": MessageLookupByLibrary.simpleMessage("照片"),
     "Note_Info_Reading_Empty": MessageLookupByLibrary.simpleMessage("0 分钟"),

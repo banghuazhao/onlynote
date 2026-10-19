@@ -9,6 +9,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:onlynote/Tools/app_sort_settings.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/locator.dart';
 import 'package:onlynote/common/constants.dart';
@@ -38,6 +39,8 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 // Home's FocusDetector uses VisibilityDetector internally.
 // ignore: depend_on_referenced_packages
 import 'package:visibility_detector/visibility_detector.dart';
+
+import '../support/memory_preferences.dart';
 
 final _savedView = SavedNoteView(
   id: 'missing-release',
@@ -184,6 +187,7 @@ Future<(_Notes, HomeBloc)> _openHome(
   Locale locale = const Locale('en'),
   bool disableAnimations = true,
   TargetPlatform platform = TargetPlatform.iOS,
+  AppSortSettings? sortSettings,
 }) async {
   tester.view.physicalSize = Size(width, height);
   tester.view.devicePixelRatio = 1;
@@ -207,6 +211,7 @@ Future<(_Notes, HomeBloc)> _openHome(
     MoveNoteToFolderUsecase(notes),
     GetNoteUsecase(notes),
     UpdateNoteUsecase(notes),
+    sortSettings: sortSettings,
   );
   final selection = MultipleDeleteBloc(DeleteMultipleNotesUsecase(notes));
   final router = _Router();
@@ -735,9 +740,15 @@ void main() {
         'closed-search criteria removals fit ${width}x$height at 2x in $locale',
         (tester) async {
       final (notes, home) = await _openHome(tester,
-          width: width, height: height, textScale: 2, locale: locale);
+          width: width,
+          height: height,
+          textScale: 2,
+          locale: locale,
+          sortSettings: AppSortSettings(preferences: MemoryPreferences()));
       final originalNotes =
           notes.getAllNotes().map((note) => note.toDomain()).toList();
+      await _send(tester, home,
+          const HomeEvent.sortChanged(NoteSortOrder.modifiedNewest));
       await _send(tester, home, const HomeEvent.selectFolder('work'));
       await _send(tester, home, const HomeEvent.includeArchived(true));
       await _send(
@@ -751,6 +762,9 @@ void main() {
           const HomeEvent.tagsChanged({'Unavailable', 'Research'}));
       expect(find.byType(TextField), findsNothing);
       expect(find.byKey(const ValueKey('home-active-criteria-summary')),
+          findsOneWidget);
+      expect(
+          find.text('${S.current.Sort_By}: ${S.current.Sort_Modified_Newest}'),
           findsOneWidget);
 
       await _removeCriterion(
@@ -774,6 +788,7 @@ void main() {
       expect(
           find.byKey(const ValueKey('active-filter-pinned')), findsOneWidget);
       expect(find.byKey(const ValueKey('active-tag-research')), findsOneWidget);
+      expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
       expect(notes.getAllNotes().map((note) => note.toDomain()).toList(),
           originalNotes);
       expect(notes.writes, 0);
@@ -925,5 +940,110 @@ void main() {
     _expectScope(home, folderId: 'work');
     expect(_visibleIds(home), {'active-alpha', 'active-beta'});
     expect(tester.takeException(), isNull);
+  });
+
+  // Keep the saved-view recovery test first: its serialized singleton store
+  // operations must run in the same widget-test fake clock (see above).
+  testWidgets('persisted sorting is visible without opening search or filters',
+      (tester) async {
+    final store = MemoryPreferences();
+    store.values[AppSortSettings.storageKey] = 'titleAsc';
+    final settings = AppSortSettings(preferences: store);
+    await settings.load();
+    final (notes, home) = await _openHome(tester, sortSettings: settings);
+    final originalNotes = notes.getAllNotes().toList();
+
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byKey(const ValueKey('home-active-criteria-summary')),
+        findsOneWidget);
+    expect(find.text('${S.current.Sort_By}: ${S.current.Sort_Title_Asc}'),
+        findsOneWidget);
+    expect(
+        tester
+            .widget<Chip>(find.byKey(const ValueKey('active-sort-order')))
+            .onDeleted,
+        isNull);
+    expect(find.byType(InputChip), findsNothing);
+
+    await _send(tester, home,
+        const HomeEvent.sortChanged(NoteSortOrder.modifiedOldest));
+    expect(find.text('${S.current.Sort_By}: ${S.current.Sort_Modified_Oldest}'),
+        findsOneWidget);
+    expect(store.values[AppSortSettings.storageKey], 'modifiedOldest');
+    await _send(
+        tester, home, const HomeEvent.sortChanged(NoteSortOrder.manual));
+    expect(find.byKey(const ValueKey('active-sort-order')), findsNothing);
+    expect(find.byKey(const ValueKey('home-active-criteria-summary')),
+        findsNothing);
+    expect(notes.getAllNotes(), originalNotes);
+    expect(notes.writes, 0);
+  });
+
+  testWidgets(
+      'sort summary follows Archive and empty results but hides in Trash',
+      (tester) async {
+    final settings = AppSortSettings(preferences: MemoryPreferences());
+    final (notes, home) = await _openHome(tester, sortSettings: settings);
+    await _send(
+        tester, home, const HomeEvent.sortChanged(NoteSortOrder.titleDesc));
+    await _send(tester, home, const HomeEvent.showArchive(true));
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+    expect(_visibleIds(home), {'archive-work', 'archive-personal'});
+
+    await _send(tester, home, const HomeEvent.searchChanged('missing'));
+    expect(_visibleIds(home), isEmpty);
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+    await _send(tester, home,
+        const HomeEvent.filtersChanged({NoteSearchFilter.pinned}));
+    await _send(tester, home, const HomeEvent.tagsChanged({'Unavailable'}));
+    await _send(tester, home, const HomeEvent.showTrash(true));
+    expect(find.byKey(const ValueKey('active-sort-order')), findsNothing);
+    expect(find.byKey(const ValueKey('active-filter-pinned')), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('active-tag-unavailable')), findsOneWidget);
+
+    await _send(tester, home, const HomeEvent.showArchive(true));
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+    await _removeCriterion(
+        tester, 'active-filter-pinned', S.current.Filter_Pinned);
+    await _removeCriterion(
+        tester, 'active-tag-unavailable', '${S.current.Tags}: Unavailable');
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+    expect(find.byType(InputChip), findsNothing);
+    expect(notes.writes, 0);
+  });
+
+  testWidgets('entering manual reorder removes the active sort label',
+      (tester) async {
+    final store = MemoryPreferences();
+    final settings = AppSortSettings(preferences: store);
+    final (notes, home) = await _openHome(tester, sortSettings: settings);
+    await _send(
+        tester, home, const HomeEvent.sortChanged(NoteSortOrder.titleAsc));
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+
+    final note = find.text('Release alpha');
+    await tester.ensureVisible(note);
+    await tester.longPress(note);
+    await tester.pumpAndSettle();
+    final reorder = find.text(S.current.Reorder);
+    await tester.ensureVisible(reorder);
+    await tester.tap(reorder);
+    await tester.pumpAndSettle();
+
+    expect(home.state.mapOrNull(loaded: (state) => state.sortOrder),
+        NoteSortOrder.manual);
+    expect(find.byKey(const ValueKey('active-sort-order')), findsNothing);
+    expect(find.byKey(const ValueKey('home-active-criteria-summary')),
+        findsNothing);
+    expect(find.byType(GridView), findsOneWidget);
+    expect(tester.widget<GridView>(find.byType(GridView)).key,
+        const ValueKey('home-reorder-grid'));
+    expect(store.values[AppSortSettings.storageKey], 'manual');
+    expect(notes.writes, 0);
+    expect(tester.takeException(), isNull);
+    // Reordering announces the switch to manual order with a timed toast.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
   });
 }

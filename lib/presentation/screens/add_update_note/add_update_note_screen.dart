@@ -574,10 +574,18 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
               title: Text(S.of(context).Note_Info),
               onPressed: (sheetContext) {
                 Navigator.pop(sheetContext);
+                final draft = _currentDraft(_form.state);
+                // A new blank editor seeds its clock on opening; only show
+                // existing metadata, seeded content, or an actual draft edit.
+                final hasModificationMetadata = widget.note != null ||
+                    widget.template != null ||
+                    widget.customTemplateNote != null ||
+                    _hadUserChange;
                 showNoteInfoSheet(
                     context: context,
-                    statistics:
-                        NoteStatistics.fromNote(_currentDraft(_form.state)));
+                    statistics: NoteStatistics.fromNote(draft),
+                    modifiedAt:
+                        hasModificationMetadata ? draft.dateTime : null);
               }),
           if (MediaQuery.sizeOf(context).width < 260)
             AppSheetAction(
