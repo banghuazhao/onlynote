@@ -644,15 +644,32 @@ class _BackupScreenState extends State<BackupScreen> {
 }
 
 /// Counts validated backup records without reading or modifying their media.
-BackupRestoreMetadata backupRestoreMetadata(BackupContents contents) =>
-    BackupRestoreMetadata(
-      createdAt: contents.createdAt,
-      noteCount: contents.notes.length,
-      folderCount: contents.folders.length,
-      photoCount: contents.photos.length,
-      templateCount: contents.templates.length,
-      recordingFileCount: contents.audio.length,
-      savedViewCount: contents.savedViews.length,
-      historyVersionCount: contents.histories.values
-          .fold(0, (total, versions) => total + versions.length),
-    );
+BackupRestoreMetadata backupRestoreMetadata(BackupContents contents) {
+  var activeNotes = 0;
+  var archivedNotes = 0;
+  var trashedNotes = 0;
+  for (final note in contents.notes) {
+    // Trash takes precedence even when the note was archived before deletion.
+    if (note.isDeleted) {
+      trashedNotes++;
+    } else if (note.isArchived) {
+      archivedNotes++;
+    } else {
+      activeNotes++;
+    }
+  }
+  return BackupRestoreMetadata(
+    createdAt: contents.createdAt,
+    noteCount: contents.notes.length,
+    activeNoteCount: activeNotes,
+    archivedNoteCount: archivedNotes,
+    trashedNoteCount: trashedNotes,
+    folderCount: contents.folders.length,
+    photoCount: contents.photos.length,
+    templateCount: contents.templates.length,
+    recordingFileCount: contents.audio.length,
+    savedViewCount: contents.savedViews.length,
+    historyVersionCount: contents.histories.values
+        .fold(0, (total, versions) => total + versions.length),
+  );
+}

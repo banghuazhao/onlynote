@@ -496,6 +496,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       context: context,
       statistics: NoteStatistics.fromNote(note),
       folderName: noteFolderInfoName(note.folderId),
+      dailyNoteDateKey: note.dailyNoteDateKey,
       modifiedAt: note.dateTime,
       deletedAt: note.isDeleted ? note.deletedAt : null,
     );

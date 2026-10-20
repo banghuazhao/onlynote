@@ -394,7 +394,19 @@ void main() {
       tester,
       NoteLinksSection(
         linkedNoteIds: const ['untitled'],
-        notes: [Note(id: 'untitled', title: '  ')],
+        notes: [
+          Note(
+              id: 'untitled',
+              title: '  ',
+              description: 'Private linked body',
+              isArchived: true)
+        ],
+        backlinks: [
+          Note(
+              id: 'source',
+              title: 'Source',
+              todo: [Todo(title: 'Private incoming task')])
+        ],
         onOpen: opened.add,
         onEdit: () => fail('Export must not edit links'),
         exportMode: true,
@@ -403,7 +415,173 @@ void main() {
     expect(find.text(S.current.Note_Untitled), findsOneWidget);
     expect(find.byKey(const ValueKey('edit-note-links')), findsNothing);
     expect(find.byType(InkWell), findsNothing);
+    expect(find.byKey(const ValueKey('linked-note-untitled-snippet')),
+        findsNothing);
+    expect(find.byKey(const ValueKey('backlink-note-source-snippet')),
+        findsNothing);
+    expect(find.text('Private linked body'), findsNothing);
+    expect(find.text('Private incoming task'), findsNothing);
+    expect(find.text(S.current.Archive), findsOneWidget);
     expect(opened, isEmpty);
+  });
+
+  testWidgets(
+      'relationship excerpts retain order, identities and unavailable privacy',
+      (tester) async {
+    final body = Note(
+        id: 'body',
+        title: 'Trip',
+        description: '  Visit\n the   coast ',
+        isArchived: true);
+    final task = Note(
+        id: 'task',
+        title: 'Trip',
+        todo: [Todo(title: 'Pack 茶😀 and chargers')]);
+    final voice = Note(id: 'voice', title: 'Trip', voiceMemos: [
+      VoiceMemo(
+          id: 'memo',
+          path: 'note_audio/unavailable.m4a',
+          durationMs: 1000,
+          createdAt: DateTime(2026),
+          transcript: 'Confirm the cabin reservation')
+    ]);
+    final blank =
+        Note(id: 'blank', title: 'Blank', description: ' \t\n', todo: [
+      Todo(title: null),
+      Todo(title: ' ')
+    ], voiceMemos: [
+      VoiceMemo(
+          id: 'empty',
+          path: 'note_audio/unavailable-empty.m4a',
+          durationMs: 0,
+          createdAt: DateTime(2026),
+          transcript: '\t')
+    ]);
+    final deleted = Note(
+        id: 'deleted',
+        title: 'Deleted private title',
+        description: 'Deleted private content',
+        deletedAt: DateTime(2026));
+    final firstIncoming = Note(
+        id: 'source',
+        title: 'Older incoming',
+        description: 'Older private content');
+    final incoming = Note(
+        id: 'source', title: 'Incoming', description: 'Latest incoming body');
+    final opened = <Note>[];
+    var edits = 0;
+    await _pump(
+        tester,
+        SingleChildScrollView(
+            child: NoteLinksSection(
+          linkedNoteIds: const [
+            'body',
+            'body',
+            'task',
+            'voice',
+            'blank',
+            'missing',
+            'deleted'
+          ],
+          notes: [
+            body,
+            body.copyWith(description: 'Later duplicate content'),
+            task,
+            voice,
+            blank,
+            deleted
+          ],
+          backlinks: [firstIncoming, incoming, deleted],
+          onOpen: opened.add,
+          onEdit: () => edits++,
+        )));
+    for (final (key, content) in [
+      ('linked-note-body', 'Visit the coast'),
+      ('linked-note-task', 'Pack 茶😀 and chargers'),
+      ('linked-note-voice', 'Confirm the cabin reservation'),
+      ('backlink-note-source', 'Latest incoming body'),
+    ]) {
+      final snippet = find.byKey(ValueKey('$key-snippet'));
+      expect(tester.widget<Text>(snippet).data, content);
+      expect(tester.widget<Text>(snippet).maxLines, 2);
+      expect(tester.widget<Text>(snippet).overflow, TextOverflow.ellipsis);
+      final row = find.byKey(ValueKey(key));
+      await tester.ensureVisible(row);
+      await tester.pumpAndSettle();
+      await tester.tap(row);
+    }
+    expect(opened, [body, task, voice, incoming]);
+    for (var index = 0; index < opened.length; index++) {
+      expect(opened[index], same([body, task, voice, incoming][index]));
+    }
+    expect(find.byKey(const ValueKey('linked-note-body')), findsOneWidget);
+    expect(find.byKey(const ValueKey('backlink-note-source')), findsOneWidget);
+    expect(find.text('Older incoming'), findsNothing);
+    expect(find.text('Later duplicate content'), findsNothing);
+    expect(find.text('Deleted private title'), findsNothing);
+    expect(find.text('Deleted private content'), findsNothing);
+    expect(find.byKey(const ValueKey('backlink-note-deleted')), findsNothing);
+    for (final id in ['blank', 'missing', 'deleted']) {
+      expect(find.byKey(ValueKey('linked-note-$id-snippet')), findsNothing);
+    }
+    expect(find.text(S.current.Link_Unavailable), findsNWidgets(2));
+    expect(find.text(S.current.Archive), findsOneWidget);
+    expect(
+        tester.getTopLeft(find.byKey(const ValueKey('linked-note-body'))).dy,
+        lessThan(tester
+            .getTopLeft(find.byKey(const ValueKey('linked-note-task')))
+            .dy));
+    await tester.ensureVisible(find.byKey(const ValueKey('edit-note-links')));
+    await tester.tap(find.byKey(const ValueKey('edit-note-links')));
+    expect(edits, 1);
+    expect(body.description, '  Visit\n the   coast ');
+    expect(voice.voiceMemos.single.path, 'note_audio/unavailable.m4a');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('read-only relationships retain bounded whole-grapheme snippets',
+      (tester) async {
+    const family = '👨‍👩‍👧‍👦';
+    final prefix = List.filled(159, '茶').join();
+    final note =
+        Note(id: 'unicode', title: '閱讀筆記', description: '$prefix${family}more');
+    final semantics = tester.ensureSemantics();
+    try {
+      await _pump(
+          tester,
+          SingleChildScrollView(
+              child: NoteLinksSection(
+            linkedNoteIds: const ['unicode'],
+            notes: [note],
+            backlinks: [note],
+          )),
+          locale: const Locale('zh', 'HK'),
+          size: const Size(280, 700),
+          textScale: 2);
+      for (final key in ['linked-note-unicode', 'backlink-note-unicode']) {
+        final row = find.byKey(ValueKey(key));
+        final snippet = find.byKey(ValueKey('$key-snippet'));
+        expect(tester.widget<Text>(snippet).data, '$prefix$family…');
+        expect(tester.widget<Text>(snippet).data, isNot(contains('\ufffd')));
+        await tester.ensureVisible(row);
+        await tester.pumpAndSettle();
+        expect(
+            tester
+                .getSemantics(row)
+                .getSemanticsData()
+                .flagsCollection
+                .isButton,
+            isFalse);
+        final bounds = tester.getRect(snippet);
+        expect(bounds.left, greaterThanOrEqualTo(0));
+        expect(bounds.right, lessThanOrEqualTo(280));
+      }
+      expect(find.byType(InkWell), findsNothing);
+      expect(find.byKey(const ValueKey('edit-note-links')), findsNothing);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('narrow Chinese link picker supports large text and Done',

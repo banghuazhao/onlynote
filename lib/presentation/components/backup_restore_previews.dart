@@ -74,6 +74,9 @@ class _BackupRestorePreview extends StatelessWidget {
                       metadata: BackupRestoreMetadata(
                         createdAt: DateTime(2026, 10, 7, 14, 30),
                         noteCount: 24,
+                        activeNoteCount: 17,
+                        archivedNoteCount: 5,
+                        trashedNoteCount: 2,
                         folderCount: 3,
                         photoCount: 16,
                         templateCount: 2,

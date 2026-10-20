@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added active, archived, and Trash note counts to the backup restore confirmation.
+- Added stored-text previews beneath linked notes and backlinks in the reader and editor.
+- Added the associated daily-note date to Note info, independently of later edits and titles.
 - Added matching text excerpts to template results, including checklist items, tags, transcripts, and localized starter content.
 - Added localized recording dates and times beside voice memo playback controls, respecting the device clock preference.
 - Expanded daily-note calendar previews with transcript excerpts, photo and scan counts, and recording counts and duration.

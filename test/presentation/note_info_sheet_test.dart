@@ -37,6 +37,74 @@ VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
     );
 
 void main() {
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK'),
+  ]) {
+    testWidgets(
+        'daily association is a localized date without a clock in $locale',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        for (final use24HourFormat in [false, true]) {
+          await tester.pumpWidget(_host(
+            NoteInfoSheet(
+              statistics: NoteStatistics.fromNote(Note(title: 'Renamed plan')),
+              dailyNoteDateKey: '2024-02-29',
+              modifiedAt: DateTime.utc(2026, 10, 11, 23, 30),
+              deletedAt: DateTime(2027, 1, 2, 17, 45),
+            ),
+            locale: locale,
+            use24HourFormat: use24HourFormat,
+          ));
+          await tester.pumpAndSettle();
+          final expected =
+              DateFormat.yMMMd(locale.toString()).format(DateTime(2024, 2, 29));
+          final value =
+              find.byKey(const ValueKey('note-info-daily-note-date-value'));
+          expect(tester.widget<Text>(value).data, expected);
+          expect(
+              find.bySemanticsLabel(
+                  '${S.current.Note_Info_Daily_Note_Date}: $expected'),
+              findsOneWidget);
+          expect(find.byKey(const ValueKey('note-info-last-modified-value')),
+              findsOneWidget);
+          expect(find.byKey(const ValueKey('note-info-moved-to-trash-value')),
+              findsOneWidget);
+          expect(tester.takeException(), isNull);
+        }
+      } finally {
+        semantics.dispose();
+      }
+    });
+  }
+
+  testWidgets('ordinary and invalid daily dates omit their optional row',
+      (tester) async {
+    for (final key in [
+      null,
+      '',
+      '2026-02-29',
+      '2026-10-32',
+      ' 2024-02-29 ',
+      '2024-02-29T00:00:00Z',
+    ]) {
+      await tester.pumpWidget(_host(NoteInfoSheet(
+        statistics: NoteStatistics.fromNote(Note(title: 'February 29, 2024')),
+        dailyNoteDateKey: key,
+        modifiedAt: DateTime(2024, 2, 29),
+      )));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('note-info-daily-note-date-value')),
+          findsNothing);
+      expect(find.text(S.current.Note_Info_Daily_Note_Date), findsNothing);
+      expect(find.byKey(const ValueKey('note-info-last-modified-value')),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets('resolved folder name has a localized label and semantics',
       (tester) async {
     final semantics = tester.ensureSemantics();
@@ -164,6 +232,7 @@ void main() {
       dateTime: DateTime(2020, 1, 2),
       deletedAt: deleted,
       sortOrder: 17,
+      dailyNoteDateKey: '2024-02-29',
     );
     final semantics = tester.ensureSemantics();
     try {
@@ -174,6 +243,7 @@ void main() {
             statistics: NoteStatistics.fromNote(note),
             modifiedAt: note.dateTime,
             deletedAt: note.deletedAt,
+            dailyNoteDateKey: note.dailyNoteDateKey,
           ),
           child: const Text('Info'),
         ),
@@ -198,6 +268,13 @@ void main() {
       expect(note.deletedAt, deleted);
       expect(note.dateTime, DateTime(2020, 1, 2));
       expect(note.sortOrder, 17);
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('note-info-daily-note-date-value')))
+              .data,
+          'Feb 29, 2024');
+      expect(note.dailyNoteDateKey, '2024-02-29');
       expect(tester.takeException(), isNull);
       await tester.tap(find.byTooltip('Close'));
       await tester.pumpAndSettle();
@@ -473,11 +550,35 @@ void main() {
       (noteInfoChinesePreview, const Size(280, 700)),
       (noteInfo24HourPreview, const Size(390, 620)),
       (noteInfoMissingDatePreview, const Size(390, 620)),
+      (dailyNoteInfoLightPreview, const Size(390, 620)),
+      (dailyNoteInfoDarkPreview, const Size(390, 620)),
+      (dailyNoteInfoChinesePreview, const Size(280, 700)),
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(preview());
       await tester.pumpAndSettle();
       expect(find.byType(NoteInfoSheet), findsOneWidget);
+      final dailyDate =
+          find.byKey(const ValueKey('note-info-daily-note-date-value'));
+      final dailyPreview = [
+        dailyNoteInfoLightPreview,
+        dailyNoteInfoDarkPreview,
+        dailyNoteInfoChinesePreview,
+      ].contains(preview);
+      if (dailyPreview) {
+        expect(
+            tester.widget<Text>(dailyDate).data,
+            preview == dailyNoteInfoChinesePreview
+                ? '2024年2月29日'
+                : 'Feb 29, 2024');
+        await tester.ensureVisible(dailyDate);
+        await tester.pumpAndSettle();
+        final bounds = tester.getRect(dailyDate);
+        expect(bounds.left, greaterThanOrEqualTo(0));
+        expect(bounds.right, lessThanOrEqualTo(size.width));
+      } else {
+        expect(dailyDate, findsNothing);
+      }
       final modified =
           find.byKey(const ValueKey('note-info-last-modified-value'));
       if (preview == noteInfoMissingDatePreview) {

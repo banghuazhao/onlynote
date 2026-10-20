@@ -157,6 +157,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Autosave_Retry": MessageLookupByLibrary.simpleMessage("Not saved"),
     "Autosave_Saved": MessageLookupByLibrary.simpleMessage("Saved"),
     "Autosave_Saving": MessageLookupByLibrary.simpleMessage("Saving…"),
+    "Backup_Active_Notes": MessageLookupByLibrary.simpleMessage("Active notes"),
+    "Backup_Archived_Notes": MessageLookupByLibrary.simpleMessage(
+      "Archived notes",
+    ),
     "Backup_Choose": MessageLookupByLibrary.simpleMessage("Choose backup file"),
     "Backup_Contents": m0,
     "Backup_Created": MessageLookupByLibrary.simpleMessage("Backup created"),
@@ -233,6 +237,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Schedule future reminder notifications",
     ),
     "Backup_Title": MessageLookupByLibrary.simpleMessage("Backup & Restore"),
+    "Backup_Trashed_Notes": MessageLookupByLibrary.simpleMessage(
+      "Notes in Trash",
+    ),
     "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "Cancel_Searching": MessageLookupByLibrary.simpleMessage(
       "Cancel searching",
@@ -705,6 +712,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Note_Info_Counting_Hint": MessageLookupByLibrary.simpleMessage(
       "Includes title, note text, checklist items, and transcripts. CJK characters count individually.",
+    ),
+    "Note_Info_Daily_Note_Date": MessageLookupByLibrary.simpleMessage(
+      "Daily note date",
     ),
     "Note_Info_Folder": MessageLookupByLibrary.simpleMessage("Folder"),
     "Note_Info_Last_Modified": MessageLookupByLibrary.simpleMessage(

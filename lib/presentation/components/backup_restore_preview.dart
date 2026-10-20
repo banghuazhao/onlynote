@@ -7,6 +7,9 @@ class BackupRestoreMetadata {
   const BackupRestoreMetadata({
     required this.createdAt,
     required this.noteCount,
+    required this.activeNoteCount,
+    required this.archivedNoteCount,
+    required this.trashedNoteCount,
     required this.folderCount,
     required this.photoCount,
     required this.templateCount,
@@ -17,6 +20,9 @@ class BackupRestoreMetadata {
 
   final DateTime createdAt;
   final int noteCount;
+  final int activeNoteCount;
+  final int archivedNoteCount;
+  final int trashedNoteCount;
   final int folderCount;
   final int photoCount;
   final int templateCount;
@@ -58,6 +64,21 @@ class BackupRestorePreview extends StatelessWidget {
           key: const ValueKey('backup-preview-contents'),
         ),
         const SizedBox(height: 8),
+        _MetadataRow(
+          id: 'active-notes',
+          label: strings.Backup_Active_Notes,
+          value: numbers.format(metadata.activeNoteCount),
+        ),
+        _MetadataRow(
+          id: 'archived-notes',
+          label: strings.Backup_Archived_Notes,
+          value: numbers.format(metadata.archivedNoteCount),
+        ),
+        _MetadataRow(
+          id: 'trashed-notes',
+          label: strings.Backup_Trashed_Notes,
+          value: numbers.format(metadata.trashedNoteCount),
+        ),
         _MetadataRow(
           id: 'templates',
           label: strings.My_Templates,

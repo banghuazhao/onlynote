@@ -586,6 +586,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                     context: context,
                     statistics: NoteStatistics.fromNote(draft),
                     folderName: noteFolderInfoName(draft.folderId),
+                    dailyNoteDateKey: draft.dailyNoteDateKey,
                     modifiedAt:
                         hasModificationMetadata ? draft.dateTime : null);
               }),

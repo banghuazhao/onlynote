@@ -1,4 +1,12 @@
 import 'package:intl/intl.dart';
+import 'package:onlynote/domain/model/daily_note_date.dart';
+
+/// A daily-note association is a calendar day, not a timestamp to convert.
+/// Invalid or absent keys never infer a day from other note metadata.
+String dailyNoteDateLabel({required String? dateKey, required String locale}) {
+  if (!isValidDailyNoteDateKey(dateKey)) return '';
+  return DateFormat.yMMMd(locale).format(DateTime.parse(dateKey!));
+}
 
 /// The reader shows the stored timestamp in the local calendar, using the app's
 /// locale and device clock preference. As with Flutter's clock formatting,

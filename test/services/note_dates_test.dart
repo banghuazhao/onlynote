@@ -6,6 +6,48 @@ import 'package:onlynote/services/note_dates.dart';
 void main() {
   setUpAll(() => initializeDateFormatting());
 
+  test('daily associations format the stored calendar date without a clock',
+      () {
+    for (final (locale, expected) in [
+      ('en', 'Feb 29, 2024'),
+      ('zh', '2024年2月29日'),
+      ('zh_HK', '2024年2月29日'),
+    ]) {
+      expect(
+          dailyNoteDateLabel(dateKey: '2024-02-29', locale: locale), expected);
+    }
+    expect(dailyNoteDateLabel(dateKey: '0001-01-01', locale: 'en'), 'Jan 1, 1');
+    expect(dailyNoteDateLabel(dateKey: '9999-12-31', locale: 'en'),
+        'Dec 31, 9999');
+    expect(dailyNoteDateLabel(dateKey: '2026-10-11', locale: 'en'),
+        'Oct 11, 2026');
+  });
+
+  test('missing and invalid daily associations never invent a calendar date',
+      () {
+    for (final key in [
+      null,
+      '',
+      '  ',
+      '2026-02-29',
+      '2024-02-30',
+      '2026-13-01',
+      '2026-00-01',
+      '2026-10-00',
+      '2026-10-32',
+      '2026-1-01',
+      '0000-01-01',
+      '10000-01-01',
+      ' 2024-02-29 ',
+      '2024-02-29T00:00:00Z',
+    ]) {
+      for (final locale in ['en', 'zh', 'zh_HK']) {
+        expect(dailyNoteDateLabel(dateKey: key, locale: locale), isEmpty,
+            reason: '$key in $locale');
+      }
+    }
+  });
+
   test('reader dates respect locale and the device clock preference', () {
     final date = DateTime(2026, 10, 11, 17, 45);
     for (final (locale, localeDefault, twentyFourHour) in [

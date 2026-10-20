@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/note_link_content_snippet.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/services/note_links.dart';
 
@@ -98,6 +99,8 @@ class NoteLinksSection extends StatelessWidget {
             ? note.title!.trim()
             : strings.Note_Untitled;
     final interactive = note != null && onOpen != null && !exportMode;
+    final snippet =
+        note == null || exportMode ? '' : noteLinkContentSnippet(note);
     final ink = AppColors.ink.withValues(alpha: note == null ? .48 : .88);
     final content = ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 48),
@@ -119,6 +122,19 @@ class NoteLinksSection extends StatelessWidget {
                           .textTheme
                           .bodyMedium
                           ?.copyWith(color: ink)),
+                  if (snippet.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(snippet,
+                          key: ValueKey('$key-snippet'),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                  color: AppColors.ink.withValues(alpha: .68))),
+                    ),
                   if (note?.isArchived == true)
                     Padding(
                       padding: const EdgeInsets.only(top: 2),

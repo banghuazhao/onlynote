@@ -50,6 +50,26 @@ Widget noteInfoChineseLongFolderPreview() =>
 Widget noteInfoChinesePreview() =>
     const _NoteInfoPreview(chinese: true, textScale: 2);
 
+@Preview(name: 'Daily note info — light', group: 'Note', size: Size(390, 620))
+Widget dailyNoteInfoLightPreview() => const _NoteInfoPreview(dailyNote: true);
+
+@Preview(
+  name: 'Daily note info — dark',
+  group: 'Note',
+  size: Size(390, 620),
+  brightness: Brightness.dark,
+)
+Widget dailyNoteInfoDarkPreview() =>
+    const _NoteInfoPreview(dailyNote: true, dark: true);
+
+@Preview(
+  name: 'Daily note info — Chinese 2× narrow',
+  group: 'Note',
+  size: Size(280, 700),
+)
+Widget dailyNoteInfoChinesePreview() =>
+    const _NoteInfoPreview(dailyNote: true, chinese: true, textScale: 2);
+
 @Preview(name: 'Trash note info — light', group: 'Note', size: Size(390, 620))
 Widget trashNoteInfoLightPreview() => const _NoteInfoPreview(trashed: true);
 
@@ -80,6 +100,7 @@ class _NoteInfoPreview extends StatelessWidget {
     this.use24HourFormat = false,
     this.showModified = true,
     this.longFolder = false,
+    this.dailyNote = false,
   });
 
   final bool chinese;
@@ -89,12 +110,14 @@ class _NoteInfoPreview extends StatelessWidget {
   final bool use24HourFormat;
   final bool showModified;
   final bool longFolder;
+  final bool dailyNote;
 
   @override
   Widget build(BuildContext context) {
     final note = Note(
       dateTime: showModified ? DateTime(2026, 10, 7, 14, 15) : null,
       deletedAt: trashed ? DateTime(2026, 10, 11, 14, 30) : null,
+      dailyNoteDateKey: dailyNote ? '2024-02-29' : null,
       title: chinese ? '週末散步' : 'Weekend walk',
       description: chinese
           ? '沿海邊散步，看看春天的風景。\n記得留點時間給自己。 🌿'
@@ -178,6 +201,7 @@ class _NoteInfoPreview extends StatelessWidget {
                     : 'Family trips and weekend walks with detailed plans')
                 : (chinese ? '旅行計劃' : 'Travel plans'),
             modifiedAt: note.dateTime,
+            dailyNoteDateKey: note.dailyNoteDateKey,
             deletedAt: note.deletedAt,
           ),
         ),

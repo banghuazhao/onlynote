@@ -11,6 +11,7 @@ Future<void> showNoteInfoSheet({
   required BuildContext context,
   required NoteStatistics statistics,
   String? folderName,
+  String? dailyNoteDateKey,
   DateTime? modifiedAt,
   DateTime? deletedAt,
 }) =>
@@ -19,6 +20,7 @@ Future<void> showNoteInfoSheet({
       builder: (_) => NoteInfoSheet(
         statistics: statistics,
         folderName: folderName,
+        dailyNoteDateKey: dailyNoteDateKey,
         modifiedAt: modifiedAt,
         deletedAt: deletedAt,
       ),
@@ -30,6 +32,7 @@ class NoteInfoSheet extends StatelessWidget {
     super.key,
     required this.statistics,
     this.folderName,
+    this.dailyNoteDateKey,
     this.modifiedAt,
     this.deletedAt,
   });
@@ -38,6 +41,9 @@ class NoteInfoSheet extends StatelessWidget {
 
   /// A resolved display name only; missing folders never display their ID.
   final String? folderName;
+
+  /// A saved local calendar association, independent of titles and timestamps.
+  final String? dailyNoteDateKey;
 
   /// Existing saved or draft metadata; absent legacy dates stay absent.
   final DateTime? modifiedAt;
@@ -50,6 +56,10 @@ class NoteInfoSheet extends StatelessWidget {
     final strings = S.of(context);
     final theme = Theme.of(context);
     final folder = folderName?.trim();
+    final dailyDate = dailyNoteDateLabel(
+      dateKey: dailyNoteDateKey,
+      locale: Localizations.localeOf(context).toString(),
+    );
     final numbers = NumberFormat.decimalPattern(
       Localizations.localeOf(context).toString(),
     );
@@ -82,6 +92,12 @@ class NoteInfoSheet extends StatelessWidget {
                   locale: Localizations.localeOf(context).toString(),
                   use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
                 ),
+              ),
+            if (dailyDate.isNotEmpty)
+              _StatisticRow(
+                id: 'daily-note-date',
+                label: strings.Note_Info_Daily_Note_Date,
+                value: dailyDate,
               ),
             if (deletedAt != null)
               _StatisticRow(

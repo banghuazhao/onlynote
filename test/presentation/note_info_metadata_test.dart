@@ -24,6 +24,7 @@ import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_autosave.dart';
 import 'package:onlynote/services/note_dates.dart';
 import 'package:onlynote/services/note_position_store.dart';
+import 'package:onlynote/services/note_templates.dart';
 
 class _Notes implements NoteRepository {
   final values = <String, NoteDto>{};
@@ -173,6 +174,15 @@ void main() {
           folderId: 'saved-folder',
           dateTime: DateTime(2020, 1, 2, 13, 45)),
     ),
+    (
+      'renamed daily note',
+      Note(
+          id: 'note',
+          title: 'A renamed daily note',
+          folderId: 'saved-folder',
+          dateTime: DateTime(2020, 1, 2, 13, 45),
+          dailyNoteDateKey: '2024-02-29'),
+    ),
   ]) {
     testWidgets(
         '$name editor retains initial metadata and reports a real unsaved draft edit',
@@ -209,6 +219,14 @@ void main() {
 
       final initial = await _editorInfo(tester);
       expect(initial.modifiedAt, existing?.dateTime);
+      expect(initial.dailyNoteDateKey, existing?.dailyNoteDateKey);
+      final dailyDate =
+          find.byKey(const ValueKey('note-info-daily-note-date-value'));
+      if (existing?.dailyNoteDateKey == null) {
+        expect(dailyDate, findsNothing);
+      } else {
+        expect(tester.widget<Text>(dailyDate).data, 'Feb 29, 2024');
+      }
       expect(initial.folderName,
           existing == null ? 'New draft folder' : 'Saved folder');
       expect(store.drafts, isEmpty);
@@ -232,6 +250,13 @@ void main() {
       final draft = store.drafts.last;
       final edited = await _editorInfo(tester);
       expect(edited.modifiedAt, draft.dateTime);
+      expect(draft.dailyNoteDateKey, existing?.dailyNoteDateKey);
+      expect(edited.dailyNoteDateKey, existing?.dailyNoteDateKey);
+      if (existing?.dailyNoteDateKey != null) {
+        expect(tester.widget<Text>(dailyDate).data, 'Feb 29, 2024');
+      } else {
+        expect(dailyDate, findsNothing);
+      }
       expect(edited.folderName, 'Renamed folder');
       expect(edited.modifiedAt, isNotNull);
       expect(edited.modifiedAt, isNot(existing?.dateTime));
@@ -262,6 +287,55 @@ void main() {
     });
   }
 
+  for (final custom in [false, true]) {
+    testWidgets(
+        '${custom ? 'custom' : 'starter'} template editor has no inferred daily association',
+        (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.reset);
+      final notes = _Notes();
+      locator.registerSingleton<NoteRepository>(notes);
+      addTearDown(() => locator.unregister<NoteRepository>());
+      final store = _FailingStore();
+      final bloc =
+          AddUpdateBloc(AddNoteUsecase(notes), UpdateNoteUsecase(notes));
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump();
+        await bloc.close();
+      });
+      await tester.pumpWidget(_app(BlocProvider.value(
+        value: bloc,
+        child: AddUpdateNoteScreen(
+          template: custom ? null : NoteTemplate.dailyPlan,
+          customTemplateNote: custom
+              ? Note(
+                  id: 'template-seed',
+                  title: 'February 29, 2024',
+                  dateTime: DateTime(2024, 2, 29))
+              : null,
+          autosaveStore: store,
+          positionStore: NotePositionStore.memory(),
+        ),
+      )));
+      await tester.pumpAndSettle();
+      // Selected template content already has its own initial autosave.
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      final draftCount = store.drafts.length;
+      final saveAttempts = store.saveAttempts;
+      final info = await _editorInfo(tester);
+      expect(info.dailyNoteDateKey, isNull);
+      expect(find.byKey(const ValueKey('note-info-daily-note-date-value')),
+          findsNothing);
+      expect(store.drafts.length, draftCount);
+      expect(store.saveAttempts, saveAttempts);
+      expect(notes.writes, 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final (library, trashed, archived) in [
     ('active', false, false),
     ('archived', false, true),
@@ -282,6 +356,7 @@ void main() {
         deletedAt: deleted,
         isArchived: archived,
         folderId: 'reader-folder',
+        dailyNoteDateKey: '2024-02-29',
       );
       final notes = _Notes()..values['note'] = NoteDto.fromNote(note);
       final folders = _Folders()
@@ -316,6 +391,13 @@ void main() {
       expect(sheet.modifiedAt, modified);
       expect(sheet.deletedAt, deleted);
       expect(sheet.folderName, 'Reader folder');
+      expect(sheet.dailyNoteDateKey, '2024-02-29');
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('note-info-daily-note-date-value')))
+              .data,
+          'Feb 29, 2024');
       expect(
           tester
               .widget<Text>(

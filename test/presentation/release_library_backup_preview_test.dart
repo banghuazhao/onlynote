@@ -76,6 +76,17 @@ void main() {
       expect(tester.takeException(), isNull);
       await _capture(tester, '$name-top');
       await tester.ensureVisible(
+          find.byKey(const ValueKey('backup-preview-trashed-notes-value')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('backup-preview-active-notes-value')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('backup-preview-archived-notes-value')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('backup-preview-trashed-notes-value')),
+          findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await _capture(tester, '$name-scopes');
+      await tester.ensureVisible(
           find.byKey(const ValueKey('backup-preview-history-versions-value')));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

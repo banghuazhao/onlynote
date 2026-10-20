@@ -4420,6 +4420,16 @@ class S {
     );
   }
 
+  /// `Daily note date`
+  String get Note_Info_Daily_Note_Date {
+    return Intl.message(
+      'Daily note date',
+      name: 'Note_Info_Daily_Note_Date',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Folder`
   String get Note_Info_Folder {
     return Intl.message('Folder', name: 'Note_Info_Folder', desc: '', args: []);
@@ -5259,6 +5269,36 @@ class S {
     return Intl.message(
       'History versions',
       name: 'Backup_History_Versions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Active notes`
+  String get Backup_Active_Notes {
+    return Intl.message(
+      'Active notes',
+      name: 'Backup_Active_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Archived notes`
+  String get Backup_Archived_Notes {
+    return Intl.message(
+      'Archived notes',
+      name: 'Backup_Archived_Notes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes in Trash`
+  String get Backup_Trashed_Notes {
+    return Intl.message(
+      'Notes in Trash',
+      name: 'Backup_Trashed_Notes',
       desc: '',
       args: [],
     );
