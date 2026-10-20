@@ -4,8 +4,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/template_content_snippet.dart';
 import 'package:onlynote/presentation/components/template_content_snippet_previews.dart';
@@ -15,6 +17,7 @@ CustomNoteTemplate _template({
   String title = '',
   String body = '',
   List<String> items = const [],
+  List<VoiceMemo> voiceMemos = const [],
 }) =>
     CustomNoteTemplate(
       id: 'test',
@@ -22,6 +25,14 @@ CustomNoteTemplate _template({
       title: title,
       body: body,
       items: items,
+      voiceMemos: voiceMemos,
+      createdAt: DateTime(2026, 10, 20),
+    );
+
+VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
+      id: id,
+      path: 'template_audio/unavailable-$id.m4a',
+      durationMs: durationMs,
       createdAt: DateTime(2026, 10, 20),
     );
 
@@ -123,6 +134,71 @@ void main() {
         snippet);
   });
 
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('recording-only template details are localized in $locale',
+        (tester) async {
+      tester.view.physicalSize = const Size(280, 700);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      for (final (recordings, duration) in [
+        (<VoiceMemo>[], ''),
+        ([_memo('zero', 0)], '0:00'),
+        (
+          [
+            _memo('fraction-first', 600),
+            _memo('negative', -42000),
+            _memo('fraction-second', 600),
+          ],
+          '0:01',
+        ),
+        (
+          [
+            _memo('day', const Duration(hours: 24).inMilliseconds),
+            _memo('extra', const Duration(hours: 1, seconds: 5).inMilliseconds),
+          ],
+          '1500:05',
+        ),
+      ]) {
+        final template = _template(voiceMemos: recordings);
+        final original = template.toJson();
+        await tester.pumpWidget(MaterialApp(
+          locale: locale,
+          supportedLocales: S.delegate.supportedLocales,
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(2),
+            ),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: ListTile(
+              title: Text(template.name),
+              subtitle: TemplateContentSubtitle(template: template),
+            ),
+          ),
+        ));
+        await tester.pumpAndSettle();
+        expect(find.text(S.current.Template_Details(0, 0)), findsOneWidget);
+        expect(_key('template-content-snippet-test'), findsNothing);
+        final details = _key('template-recording-details-test');
+        expect(details, recordings.isEmpty ? findsNothing : findsOneWidget);
+        if (recordings.isNotEmpty) {
+          expect(tester.widget<Text>(details).data,
+              '${S.current.History_Recordings(recordings.length)} · $duration');
+        }
+        expect(template.toJson(), original);
+        expect(tester.takeException(), isNull);
+      }
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
   for (final (name, preview, size, locale, brightness) in [
     (
       'template-snippets-light',
@@ -161,6 +237,12 @@ void main() {
       expect(Theme.of(tester.element(search)).brightness, brightness);
       expect(find.text(S.current.Template_Details(2, 1)), findsOneWidget);
       expect(find.text(S.current.Template_Details(3, 0)), findsOneWidget);
+      expect(find.text('${S.current.History_Recordings(2)} · 8:42'),
+          findsOneWidget);
+      expect(find.text('${S.current.History_Recordings(1)} · 1:05'),
+          findsOneWidget);
+      expect(_key('template-recording-details-checklist'), findsNothing);
+      expect(_key('template-content-snippet-audio'), findsNothing);
       expect(find.text('Buy fresh vegetables · Prepare lunches · Plan dinners'),
           findsOneWidget);
       expect(find.text('閱讀筆記：觀察、問題與下一步 👨‍👩‍👧‍👦'), findsOneWidget);

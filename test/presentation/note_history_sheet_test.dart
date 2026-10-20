@@ -163,7 +163,10 @@ void main() {
     final chosen = NoteHistoryVersion(
         id: 'chosen-match',
         savedAt: DateTime.utc(2026, 10, 19),
-        note: NoteDto(title: 'Find chosen', description: 'Saved body'));
+        note: NoteDto(
+            title: 'Saved version',
+            description: '${'Earlier saved body\n' * 25}Chosen detail'));
+    final savedBody = chosen.note.description!;
     final versions = <NoteHistoryVersion>[_version(id: 'other'), chosen];
     final attempts = <String>[];
     await _open(tester, versions: versions, changes: changes,
@@ -180,13 +183,16 @@ void main() {
     changes.notifyListeners();
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, 'chosen');
+    final row = find.byKey(const ValueKey('history-version-chosen-match'));
+    expect(
+        tester.widget<NoteHistoryVersionTile>(row).snippet, '…Chosen detail');
     await tester
         .tap(find.byKey(const ValueKey('history-version-chosen-match')));
     await tester.pumpAndSettle();
     versions.remove(chosen);
     changes.notifyListeners();
     await tester.pumpAndSettle();
-    expect(find.text('Saved body'), findsOneWidget);
+    expect(find.text(savedBody), findsOneWidget);
     await tester.tap(find.widgetWithText(TextButton, S.current.History_Title));
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, 'chosen');
@@ -200,7 +206,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('history-restore-action')));
     await tester.pumpAndSettle();
     expect(find.text(S.current.History_Restore_Failed), findsOneWidget);
-    expect(find.text('Saved body'), findsOneWidget);
+    expect(find.text(savedBody), findsOneWidget);
     changes.notifyListeners();
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('history-restore-action')));
@@ -210,6 +216,45 @@ void main() {
     changes.notifyListeners();
     await tester.pumpAndSettle();
     expect(changes.hasHistoryListeners, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('query changes only the snippet and clearing restores exact text',
+      (tester) async {
+    final body = 'Stable body title\n${'Earlier context ' * 30}';
+    final version = NoteHistoryVersion(
+      id: 'matching-context',
+      savedAt: DateTime.utc(2026, 10, 19),
+      note: NoteDto(
+        description: body,
+        todoList: [TodoDto(title: 'Buy literal [tea]')],
+        voiceMemos: const [
+          {'transcript': false},
+          {'transcript': 'Recorded 茶室😀 thought'},
+        ],
+      ),
+    );
+    await _open(tester, versions: [version]);
+    final row = find.byKey(const ValueKey('history-version-matching-context'));
+    final field = find.byKey(const ValueKey('history-search'));
+    expect(
+        tester.widget<NoteHistoryVersionTile>(row).title, 'Stable body title');
+    expect(tester.widget<NoteHistoryVersionTile>(row).snippet, body.trim());
+    for (final (query, expected) in [
+      ('[TEA]', '…[tea]'),
+      ('茶室😀', '…茶室😀 thought'),
+      ('stable', 'Stable body title Earlier context'),
+    ]) {
+      await tester.enterText(field, query);
+      await tester.pumpAndSettle();
+      final tile = tester.widget<NoteHistoryVersionTile>(row);
+      expect(tile.title, 'Stable body title');
+      expect(tile.snippet, startsWith(expected));
+    }
+    await tester.tap(find.byKey(const ValueKey('history-clear-search')));
+    await tester.pumpAndSettle();
+    expect(tester.widget<NoteHistoryVersionTile>(row).snippet, body.trim());
+    expect(version.note.description, body);
     expect(tester.takeException(), isNull);
   });
 

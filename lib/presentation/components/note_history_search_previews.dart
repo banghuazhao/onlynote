@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/data/dto/note_dto.dart';
 
 import 'app_sheet.dart';
+import 'note_history_content_snippet.dart';
 import 'note_history_search.dart';
 import 'note_history_version_tile.dart';
 
@@ -50,7 +52,8 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
     (
       id: 'review',
       title: 'Release review [draft]',
-      text: 'Review the checklist and keep this recorded thought. 茶😀',
+      text: 'Earlier saved notes and context.\n'
+          'Review the checklist and keep this recorded thought. 茶😀',
     ),
     (id: 'tea', title: 'Tea plan', text: 'Plan the afternoon walk. 茶室😀'),
   ];
@@ -119,7 +122,10 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
                                 dateLabel: widget.chinese
                                     ? '2026年10月20日 上午10:00'
                                     : 'Oct 20, 2026, 10:00 AM',
-                                snippet: version.text,
+                                snippet: noteHistoryContentSnippet(
+                                  NoteDto(description: version.text),
+                                  query: _search.text,
+                                ),
                                 mediaCounts: const SizedBox.shrink(),
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();

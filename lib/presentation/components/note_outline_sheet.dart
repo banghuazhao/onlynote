@@ -17,7 +17,7 @@ Future<NoteOutlineEntry?> showNoteOutlineSheet({
       ),
     );
 
-class NoteOutlineSheet extends StatelessWidget {
+class NoteOutlineSheet extends StatefulWidget {
   const NoteOutlineSheet({
     super.key,
     required this.entries,
@@ -30,12 +30,47 @@ class NoteOutlineSheet extends StatelessWidget {
   final ValueChanged<NoteOutlineEntry>? onEntrySelected;
 
   @override
+  State<NoteOutlineSheet> createState() => _NoteOutlineSheetState();
+}
+
+class _NoteOutlineSheetState extends State<NoteOutlineSheet> {
+  final _search = TextEditingController();
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _select(NoteOutlineEntry entry) {
+    FocusScope.of(context).unfocus();
+    if (widget.onEntrySelected != null) {
+      widget.onEntrySelected!(entry);
+    } else {
+      Navigator.pop(context, entry);
+    }
+  }
+
+  void _clearSearch() {
+    if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
+    setState(_search.clear);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final strings = S.of(context);
     final colors = Theme.of(context).colorScheme;
-    final current = currentOffset == null
+    // The current section belongs to the complete outline even when search
+    // hides it. Filtering must never assign that indicator to another heading.
+    final current = widget.currentOffset == null
         ? null
-        : currentNoteOutlineEntry(entries, currentOffset!);
+        : currentNoteOutlineEntry(widget.entries, widget.currentOffset!);
+    final query = _search.text.trim().toLowerCase();
+    final entries = query.isEmpty
+        ? widget.entries
+        : widget.entries
+            .where((entry) => entry.text.toLowerCase().contains(query))
+            .toList();
     return AppSheet(
       title: strings.Note_Outline,
       child: Column(
@@ -50,6 +85,44 @@ class NoteOutlineSheet extends StatelessWidget {
                     .bodyMedium
                     ?.copyWith(color: colors.onSurfaceVariant)),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: TextField(
+              key: const ValueKey('note-outline-search'),
+              controller: _search,
+              onChanged: (_) => setState(() {}),
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => FocusScope.of(context).unfocus(),
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
+              decoration: InputDecoration(
+                labelText: strings.Note_Outline_Search,
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _search.text.isEmpty
+                    ? null
+                    : IconButton(
+                        key: const ValueKey('note-outline-search-clear'),
+                        tooltip: strings.Clear_Search,
+                        onPressed: _clearSearch,
+                        icon: const Icon(Icons.clear_rounded),
+                      ),
+              ),
+            ),
+          ),
+          if (query.isNotEmpty && entries.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  strings.Note_Outline_Search_Empty,
+                  key: const ValueKey('note-outline-search-empty'),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: colors.onSurfaceVariant),
+                ),
+              ),
+            ),
           for (final entry in entries)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),
@@ -67,9 +140,7 @@ class NoteOutlineSheet extends StatelessWidget {
                     ? Text(strings.Note_Outline_Current)
                     : null,
                 trailing: const Icon(Icons.arrow_forward_rounded, size: 20),
-                onTap: () => onEntrySelected != null
-                    ? onEntrySelected!(entry)
-                    : Navigator.pop(context, entry),
+                onTap: () => _select(entry),
               ),
             ),
         ],

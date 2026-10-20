@@ -185,6 +185,10 @@ void main() {
     expect(find.text('Private content body'), findsOneWidget);
     expect(find.text(S.current.Template_Details(1, 1)), findsOneWidget);
     expect(find.text(S.current.Template_Details(1, 0)), findsOneWidget);
+    expect(
+        find.text('${S.current.History_Recordings(1)} · 0:01'), findsOneWidget);
+    expect(find.byKey(const ValueKey('template-recording-details-blank')),
+        findsNothing);
     expect(find.byKey(const ValueKey('template-content-snippet-blank')),
         findsNothing);
     final chosen = store.templates.first;

@@ -4148,6 +4148,26 @@ class S {
     );
   }
 
+  /// `Search headings`
+  String get Note_Outline_Search {
+    return Intl.message(
+      'Search headings',
+      name: 'Note_Outline_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching headings.`
+  String get Note_Outline_Search_Empty {
+    return Intl.message(
+      'No matching headings.',
+      name: 'Note_Outline_Search_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Undo`
   String get Note_Undo {
     return Intl.message('Undo', name: 'Note_Undo', desc: '', args: []);

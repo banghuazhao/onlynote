@@ -495,6 +495,8 @@
   "Note_Outline": "Outline",
   "Note_Outline_Hint": "Tap a heading to jump to it",
   "Note_Outline_Current": "Current section",
+  "Note_Outline_Search": "Search headings",
+  "Note_Outline_Search_Empty": "No matching headings.",
   "Note_Undo": "Undo",
   "Note_Redo": "Redo",
   "Web_Link_Open_Failed": "Could not open this website.",

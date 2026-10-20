@@ -9,15 +9,24 @@ import 'note_outline_sheet.dart';
 @Preview(name: 'Outline', group: 'Note', size: Size(390, 570))
 Widget noteOutlinePreview() => const _OutlinePreview();
 
+@Preview(name: 'Outline — dark', group: 'Note', size: Size(390, 570))
+Widget noteOutlineDarkPreview() =>
+    const _OutlinePreview(brightness: Brightness.dark);
+
 @Preview(
     name: 'Outline — large Chinese text', group: 'Note', size: Size(320, 640))
 Widget noteOutlineLargeTextPreview() =>
     const _OutlinePreview(chinese: true, textScale: 2);
 
 class _OutlinePreview extends StatefulWidget {
-  const _OutlinePreview({this.chinese = false, this.textScale = 1});
+  const _OutlinePreview({
+    this.chinese = false,
+    this.textScale = 1,
+    this.brightness = Brightness.light,
+  });
   final bool chinese;
   final double textScale;
+  final Brightness brightness;
 
   @override
   State<_OutlinePreview> createState() => _OutlinePreviewState();
@@ -36,7 +45,10 @@ class _OutlinePreviewState extends State<_OutlinePreview> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: S.delegate.supportedLocales,
-        theme: ThemeData(colorSchemeSeed: const Color(0xFF685947)),
+        theme: ThemeData(
+          colorSchemeSeed: const Color(0xFF685947),
+          brightness: widget.brightness,
+        ),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)
               .copyWith(textScaler: TextScaler.linear(widget.textScale)),

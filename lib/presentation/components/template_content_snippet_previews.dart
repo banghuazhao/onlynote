@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 import 'app_sheet.dart';
@@ -59,6 +60,20 @@ class _TemplateContentSnippetsPreviewState
           'Projects to move forward, people to catch up with, and time to rest.',
       items: const ['Review the calendar', 'Choose three priorities'],
       imagePaths: const ['preview-photo.jpg'],
+      voiceMemos: [
+        VoiceMemo(
+          id: 'planning',
+          path: 'template_audio/preview-planning.m4a',
+          durationMs: 250000,
+          createdAt: DateTime(2026, 10, 20),
+        ),
+        VoiceMemo(
+          id: 'recap',
+          path: 'template_audio/preview-recap.m4a',
+          durationMs: 272000,
+          createdAt: DateTime(2026, 10, 20),
+        ),
+      ],
       createdAt: DateTime(2026, 10, 20),
     ),
     CustomNoteTemplate(
@@ -71,6 +86,19 @@ class _TemplateContentSnippetsPreviewState
       id: 'title',
       name: '閱讀與研究茶😀',
       title: '閱讀筆記：觀察、問題與下一步 👨‍👩‍👧‍👦',
+      createdAt: DateTime(2026, 10, 20),
+    ),
+    CustomNoteTemplate(
+      id: 'audio',
+      name: 'Audio notebook',
+      voiceMemos: [
+        VoiceMemo(
+          id: 'audio-only',
+          path: 'template_audio/preview-audio-only.m4a',
+          durationMs: 65000,
+          createdAt: DateTime(2026, 10, 20),
+        ),
+      ],
       createdAt: DateTime(2026, 10, 20),
     ),
   ];

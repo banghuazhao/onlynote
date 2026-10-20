@@ -732,6 +732,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage(
       "Tap a heading to jump to it",
     ),
+    "Note_Outline_Search": MessageLookupByLibrary.simpleMessage(
+      "Search headings",
+    ),
+    "Note_Outline_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching headings.",
+    ),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("Redo"),
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage(
       "Show writing tools",

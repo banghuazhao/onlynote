@@ -572,6 +572,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Outline": MessageLookupByLibrary.simpleMessage("大綱"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage("目前部分"),
     "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage("輕點標題，跳至該部分"),
+    "Note_Outline_Search": MessageLookupByLibrary.simpleMessage("搜尋標題"),
+    "Note_Outline_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有符合條件的標題。",
+    ),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("重做"),
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage("顯示寫作工具"),
     "Note_Theme": MessageLookupByLibrary.simpleMessage("筆記主題"),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_content_snippet.dart';
 import 'package:onlynote/presentation/components/note_history_search.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -195,7 +196,8 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
                         key: ValueKey('history-version-${version.id}'),
                         title: _title(version.note, s),
                         dateLabel: _date(version.savedAt),
-                        snippet: _snippet(version.note),
+                        snippet: noteHistoryContentSnippet(version.note,
+                            query: _search.text),
                         mediaCounts: _MediaCounts(note: version.note),
                         onPressed: () {
                           FocusScope.of(context).unfocus();
@@ -240,7 +242,7 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
 
   String _title(NoteDto note, S s) {
     if (note.title?.trim().isNotEmpty ?? false) return note.title!;
-    final snippet = _snippet(note);
+    final snippet = noteHistoryContentSnippet(note);
     return snippet.isEmpty ? s.History_Title : snippet.split('\n').first;
   }
 
@@ -254,24 +256,6 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
       final transcript = memo['transcript'];
       if (transcript is String) yield transcript;
     }
-  }
-
-  static String _snippet(NoteDto note) {
-    if (note.description?.trim().isNotEmpty ?? false) {
-      return note.description!.trim();
-    }
-    final checklist = (note.todoList ?? const <TodoDto>[])
-        .map((todo) => todo.title ?? '')
-        .where((title) => title.trim().isNotEmpty)
-        .join(', ');
-    if (checklist.isNotEmpty) return checklist;
-    for (final memo in note.voiceMemos ?? const <Map>[]) {
-      final transcript = memo['transcript'];
-      if (transcript is String && transcript.trim().isNotEmpty) {
-        return transcript.trim();
-      }
-    }
-    return '';
   }
 }
 

@@ -76,6 +76,17 @@ void main() {
       expect(Localizations.localeOf(tester.element(field)), locale);
       expect(Theme.of(tester.element(field)).brightness, brightness);
       expect(find.byType(NoteHistoryVersionTile), findsNWidgets(2));
+      await tester.enterText(field, '茶😀');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+      final matchingRow =
+          find.byKey(const ValueKey('history-search-version-review'));
+      expect(
+          tester.widget<NoteHistoryVersionTile>(matchingRow).snippet, '…茶😀');
+      expect(tester.widget<NoteHistoryVersionTile>(matchingRow).title,
+          'Release review [draft]');
+      await _capture(tester, '$name-match');
       await tester.enterText(field, '[DRAFT]');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();

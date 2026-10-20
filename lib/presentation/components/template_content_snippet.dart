@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/recording_duration.dart';
 
 const _snippetLength = 160;
 
@@ -48,7 +49,7 @@ Iterable<String> _normalizedCharacters(Iterable<String> parts) sync* {
   }
 }
 
-/// Keeps the existing checklist/photo counts alongside the content preview.
+/// Keeps content and media metadata together without opening template files.
 class TemplateContentSubtitle extends StatelessWidget {
   const TemplateContentSubtitle({super.key, required this.template});
 
@@ -76,6 +77,15 @@ class TemplateContentSubtitle extends StatelessWidget {
               template.items.length, template.imagePaths.length),
           key: ValueKey('template-content-counts-${template.id}'),
         ),
+        if (template.voiceMemos.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '${S.of(context).History_Recordings(template.voiceMemos.length)} · '
+              '${formatRecordingDuration(totalRecordingDurationMs(template.voiceMemos))}',
+              key: ValueKey('template-recording-details-${template.id}'),
+            ),
+          ),
       ],
     );
   }

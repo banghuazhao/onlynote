@@ -570,6 +570,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Outline": MessageLookupByLibrary.simpleMessage("大纲"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage("当前部分"),
     "Note_Outline_Hint": MessageLookupByLibrary.simpleMessage("轻点标题，跳转至该部分"),
+    "Note_Outline_Search": MessageLookupByLibrary.simpleMessage("搜索标题"),
+    "Note_Outline_Search_Empty": MessageLookupByLibrary.simpleMessage(
+      "没有匹配的标题。",
+    ),
     "Note_Redo": MessageLookupByLibrary.simpleMessage("重做"),
     "Note_ShowWritingTools": MessageLookupByLibrary.simpleMessage("显示写作工具"),
     "Note_Theme": MessageLookupByLibrary.simpleMessage("笔记主题"),
