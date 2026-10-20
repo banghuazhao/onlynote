@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/note_tags.dart';
+import 'package:onlynote/services/saved_note_views.dart';
 
 import 'app_sheet.dart';
+import 'library_filter_labels.dart';
 import 'library_tag_selection_feedback.dart';
 import 'saved_view_name_search.dart';
 
@@ -52,12 +55,23 @@ class _LibrarySearchPreviewState extends State<_LibrarySearchPreview> {
   final _viewSearch = TextEditingController();
   final _tags = {for (var i = 1; i <= maxNoteTags; i++) 'Work $i'};
   String _selectedView = 'work';
-  static const _views = [
-    (id: 'work', name: 'Project follow-ups'),
-    (id: 'meetings', name: 'Meeting recordings'),
-    (id: 'literal', name: 'C++ [2026]'),
-    (id: 'unicode', name: 'Ångström research'),
-    (id: 'chinese', name: '項目會議與閱讀資料'),
+  static final _views = [
+    SavedNoteView(
+        id: 'work',
+        name: 'Project follow-ups',
+        query: 'call',
+        folderId: 'work',
+        filters: {NoteSearchFilter.unfinished},
+        tags: ['Project A']),
+    SavedNoteView(
+        id: 'meetings',
+        name: 'Meeting recordings',
+        query: 'quarterly review',
+        filters: {NoteSearchFilter.recordings},
+        archiveScope: NoteArchiveScope.all),
+    SavedNoteView(id: 'literal', name: 'C++ [2026]'),
+    SavedNoteView(id: 'unicode', name: 'Ångström research'),
+    SavedNoteView(id: 'chinese', name: '項目會議與閱讀資料'),
   ];
 
   @override
@@ -92,13 +106,18 @@ class _LibrarySearchPreviewState extends State<_LibrarySearchPreview> {
         ),
         home: Scaffold(body: Builder(builder: (context) {
           final strings = S.of(context);
+          final folderNames = {
+            'work': widget.locale.languageCode == 'zh' ? '工作項目' : 'Projects',
+          };
           final query = tagKey(_tagSearch.text);
           final tags = [
             for (var i = 1; i <= maxNoteTags; i++) 'Work $i',
             'C++',
           ].where((tag) => tagKey(tag).contains(query));
           final views = filterSavedViewNames(_views, _viewSearch.text,
-              nameOf: (view) => view.name);
+              nameOf: (view) => view.name,
+              additionalSearchText: (view) => savedNoteViewCriteriaLabels(view,
+                  strings: strings, folderNames: folderNames));
           return Align(
             alignment: Alignment.bottomCenter,
             child: AppSheet(
@@ -169,6 +188,12 @@ class _LibrarySearchPreviewState extends State<_LibrarySearchPreview> {
                       key: ValueKey('preview-saved-view-${view.id}'),
                       leading: const Icon(Icons.bookmark_border_rounded),
                       title: Text(view.name),
+                      subtitle: Text(
+                        savedNoteViewDescription(view,
+                            strings: strings, folderNames: folderNames),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       selected: view.id == _selectedView,
                       onTap: () => setState(() => _selectedView = view.id),
                     ),

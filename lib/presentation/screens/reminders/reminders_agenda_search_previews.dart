@@ -12,12 +12,14 @@ import 'package:onlynote/services/reminder_agenda.dart';
 import 'reminders_agenda_search.dart';
 
 @Preview(
-    name: 'Search reminders — light', group: 'Library', size: Size(390, 780))
+    name: 'Reminder search snippets — light',
+    group: 'Library',
+    size: Size(390, 780))
 Widget reminderSearchLightPreview({ThemeData? theme}) =>
     _ReminderSearchPreview(theme: theme);
 
 @Preview(
-  name: 'Search reminders — dark',
+  name: 'Reminder search snippets — dark',
   group: 'Library',
   size: Size(390, 780),
   brightness: Brightness.dark,
@@ -26,7 +28,7 @@ Widget reminderSearchDarkPreview({ThemeData? theme}) =>
     _ReminderSearchPreview(dark: true, theme: theme);
 
 @Preview(
-  name: 'Search reminders — Chinese 2× narrow',
+  name: 'Reminder search snippets — Chinese 2× narrow',
   group: 'Library',
   size: Size(320, 640),
 )
@@ -100,7 +102,8 @@ class _ReminderSearchPreview extends StatelessWidget {
                             path: 'note_audio/follow-up.m4a',
                             durationMs: 12000,
                             createdAt: now,
-                            transcript: 'Discuss follow-up [2026].'),
+                            transcript:
+                                'Ask about follow-up [2026] before the next appointment.'),
                       ]),
                   now.add(const Duration(hours: 2))),
               entry(3, Note(id: 'cjk', title: '閱讀清單', tags: ['茶😀']),

@@ -110,6 +110,14 @@ void main() {
       expect(find.text(chinese ? '閱讀清單' : 'Call dentist'), findsOneWidget);
       expect(find.text(chinese ? 'Review C++ [2026] notes' : 'Errands'),
           findsOneWidget);
+      final firstId = chinese ? 3 : 1;
+      final secondId = chinese ? 4 : 2;
+      for (final id in [firstId, secondId]) {
+        final snippet = tester
+            .widget<Text>(find.byKey(ValueKey('reminder-search-snippet-$id')));
+        expect(snippet.data, contains(chinese ? '茶😀' : 'follow-up [2026]'));
+        expect(snippet.maxLines, 2);
+      }
       await _capture(tester, name);
       await tester.enterText(field, 'not found');
       await tester.testTextInput.receiveAction(TextInputAction.search);
@@ -124,6 +132,8 @@ void main() {
       expect(tester.widget<TextField>(field).controller!.text, isEmpty);
       expect(
           find.byKey(const ValueKey('reminders-search-empty')), findsNothing);
+      expect(find.byKey(ValueKey('reminder-search-snippet-$firstId')),
+          findsNothing);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     });

@@ -153,7 +153,9 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
         ? widget.savedViews
         : filterSavedViewNames(
             widget.savedViews, _savedViewSearchController.text,
-            nameOf: (view) => view.name);
+            nameOf: (view) => view.name,
+            additionalSearchText: (view) => savedNoteViewCriteriaLabels(view,
+                strings: s, folderNames: widget.folderNames));
     return AppSheet(
       title: s.Library_Filters,
       child: Column(

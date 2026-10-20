@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -114,6 +115,93 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
     expect(results, [null]);
+  });
+
+  testWidgets('search previews explain the matching field and preserve choice',
+      (tester) async {
+    final results = <NoteCopyDestination?>[];
+    final prefix = List.filled(50, 'Earlier background. ').join();
+    final note = Note(
+      id: 'target',
+      title: 'Title marker',
+      description: '${prefix}Bodyneedle after the background',
+      todo: [Todo(id: 'task', title: 'Pack taskneedle', completed: true)],
+      tags: ['Tagneedle'],
+      voiceMemos: [
+        VoiceMemo(
+          id: 'private-memo',
+          path: 'note_audio/unavailable.m4a',
+          durationMs: 1000,
+          createdAt: DateTime(2026, 10, 20),
+          transcript: '${prefix}Transcriptneedle [tea] 閱讀茶😀',
+        ),
+      ],
+    );
+    await _openPicker(tester, results, notes: [
+      note,
+      Note(id: 'other', title: 'Other destination', description: 'Unrelated'),
+    ]);
+    final search = find.byKey(const ValueKey('note-copy-search'));
+    final snippet = find.byKey(const ValueKey('note-copy-snippet-target'));
+    for (final (query, content) in [
+      (' bodyneedle ', 'Bodyneedle after the background'),
+      ('TASKNEEDLE', 'taskneedle'),
+      ('transcriptneedle', 'Transcriptneedle [tea] 閱讀茶😀'),
+      ('tagneedle', 'Tagneedle'),
+      ('[TEA]', '[tea] 閱讀茶😀'),
+    ]) {
+      await tester.enterText(search, query);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(snippet).data,
+          startsWith(query == 'tagneedle' ? content : '…$content'));
+      expect(
+          find.byKey(const ValueKey('note-copy-existing-other')), findsNothing);
+      expect(find.byKey(const ValueKey('note-copy-new')), findsOneWidget);
+      expect(results, isEmpty);
+    }
+    await tester.enterText(search, 'Title marker');
+    await tester.pumpAndSettle();
+    expect(tester.widget<Text>(snippet).data, note.description);
+    await tester.enterText(search, '');
+    await tester.pumpAndSettle();
+    expect(tester.widget<Text>(snippet).data, note.description);
+    await tester.enterText(search, '閱讀茶😀');
+    await tester.pumpAndSettle();
+    expect(tester.widget<Text>(snippet).data, startsWith('…閱讀茶😀'));
+    final target = find.byKey(const ValueKey('note-copy-existing-target'));
+    await tester.ensureVisible(target);
+    await tester.tap(target);
+    await tester.pumpAndSettle();
+    expect(results.single!.noteId, 'target');
+    expect(note.todo.single.completed, isTrue);
+    expect(note.voiceMemos.single.path, 'note_audio/unavailable.m4a');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'filtered transcript destination can be cancelled without a choice',
+      (tester) async {
+    final results = <NoteCopyDestination?>[];
+    await _openPicker(tester, results, notes: [
+      Note(id: 'target', voiceMemos: [
+        VoiceMemo(
+          id: 'memo',
+          path: 'note_audio/unavailable.m4a',
+          durationMs: 1000,
+          createdAt: DateTime(2026, 10, 20),
+          transcript: 'Confirm reservation',
+        ),
+      ]),
+    ]);
+    await tester.enterText(
+        find.byKey(const ValueKey('note-copy-search')), 'reservation');
+    await tester.pumpAndSettle();
+    expect(find.text('…reservation'), findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(results, [null]);
+    expect(find.text('Choose destination'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('narrow large-text Chinese picker remains usable',

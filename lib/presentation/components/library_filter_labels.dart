@@ -22,9 +22,10 @@ String noteSortOrderLabel(NoteSortOrder order, S strings) => switch (order) {
       NoteSortOrder.titleDesc => strings.Sort_Title_Desc,
     };
 
-/// Describes the criteria that will be applied, using only local metadata.
+/// Labels the criteria that will be applied, using only local metadata.
 /// Missing folders resolve to All Notes, matching saved-view application.
-String savedNoteViewDescription(
+/// Separate labels also let search match displayed fields independently.
+List<String> savedNoteViewCriteriaLabels(
   SavedNoteView view, {
   required S strings,
   Map<String, String> folderNames = const {},
@@ -41,5 +42,14 @@ String savedNoteViewDescription(
       strings.Saved_View_Tags(resolved.tags.join(', ')),
     if (resolved.archiveScope == NoteArchiveScope.archived) strings.Archive,
     if (resolved.archiveScope == NoteArchiveScope.all) strings.Include_Archived,
-  ].join(' · ');
+  ];
 }
+
+String savedNoteViewDescription(
+  SavedNoteView view, {
+  required S strings,
+  Map<String, String> folderNames = const {},
+}) =>
+    savedNoteViewCriteriaLabels(view,
+            strings: strings, folderNames: folderNames)
+        .join(' · ');

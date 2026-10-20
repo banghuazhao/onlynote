@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 /// Literal Unicode name matching retains input order and original objects.
+/// Callers may opt into additional fields, each matched independently.
 List<T> filterSavedViewNames<T>(
   Iterable<T> views,
   String query, {
   required String Function(T) nameOf,
+  Iterable<String> Function(T)? additionalSearchText,
 }) {
   final trimmed = query.trim();
   if (trimmed.isEmpty) return views.toList(growable: false);
   final pattern =
       RegExp(RegExp.escape(trimmed), caseSensitive: false, unicode: true);
   return views
-      .where((view) => pattern.hasMatch(nameOf(view)))
+      .where((view) =>
+          pattern.hasMatch(nameOf(view)) ||
+          additionalSearchText?.call(view).any(pattern.hasMatch) == true)
       .toList(growable: false);
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/note_search_match_snippet.dart';
 import 'package:onlynote/services/note_search.dart';
 
 /// A choice only. The screen that supplied notes owns creation and persistence.
@@ -164,6 +165,11 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                           .map((todo) => todo.title?.trim() ?? '')
                           .where((title) => title.isNotEmpty)
                           .join(' · ');
+                  final matchSnippet =
+                      noteSearchMatchSnippet(note, _search.text);
+                  final subtitle = matchSnippet.isNotEmpty
+                      ? matchSnippet
+                      : searchExcerpt(excerpt, _search.text);
                   return ListTile(
                     key: ValueKey('note-copy-existing-${note.id}'),
                     minVerticalPadding: 12,
@@ -175,10 +181,12 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    subtitle: excerpt.isEmpty
+                    subtitle: subtitle.isEmpty
                         ? null
-                        : Text(searchExcerpt(excerpt, _search.text),
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
+                        : Text(subtitle,
+                            key: ValueKey('note-copy-snippet-${note.id}'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => Navigator.pop(
                         context, NoteCopyDestination.existing(note.id!)),

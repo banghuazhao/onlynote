@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/note_search_match_snippet.dart';
 import 'package:onlynote/presentation/components/reminder_labels.dart';
 import 'package:onlynote/services/reminder_agenda.dart';
 
@@ -16,6 +17,7 @@ class RemindersAgendaList extends StatelessWidget {
     this.busyReminderId,
     this.onRefresh,
     this.emptyState,
+    this.searchQuery = '',
   });
 
   final List<ReminderAgendaEntry> entries;
@@ -26,6 +28,7 @@ class RemindersAgendaList extends StatelessWidget {
   final ValueChanged<ReminderAgendaEntry> onReschedule;
   final Future<void> Function()? onRefresh;
   final Widget? emptyState;
+  final String searchQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +55,8 @@ class RemindersAgendaList extends StatelessWidget {
                       group: group, count: sections[group]!.length),
                   final ReminderAgendaEntry entry => _ReminderAgendaCard(
                       entry: entry,
+                      matchSnippet:
+                          noteSearchMatchSnippet(entry.note, searchQuery),
                       now: now,
                       busy: busyReminderId == entry.reminder.reminderId,
                       actionsEnabled: busyReminderId == null,
@@ -143,6 +148,7 @@ class _AgendaSectionHeader extends StatelessWidget {
 class _ReminderAgendaCard extends StatelessWidget {
   const _ReminderAgendaCard({
     required this.entry,
+    required this.matchSnippet,
     required this.now,
     required this.busy,
     required this.actionsEnabled,
@@ -152,6 +158,7 @@ class _ReminderAgendaCard extends StatelessWidget {
   });
 
   final ReminderAgendaEntry entry;
+  final String matchSnippet;
   final DateTime now;
   final bool busy;
   final bool actionsEnabled;
@@ -213,10 +220,26 @@ class _ReminderAgendaCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(noteLabel,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(noteLabel,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium),
+                      if (matchSnippet.isNotEmpty &&
+                          matchSnippet != noteLabel) ...[
+                        const SizedBox(height: 4),
+                        Text(matchSnippet,
+                            key: ValueKey(
+                                'reminder-search-snippet-${entry.reminder.reminderId}'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant)),
+                      ],
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Icon(Icons.chevron_right_rounded,

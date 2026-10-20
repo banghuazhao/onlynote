@@ -106,6 +106,7 @@ class _SearchableRemindersAgendaState extends State<SearchableRemindersAgenda> {
             // Each new query starts with its first matching reminder visible.
             key: ValueKey(query.trim()),
             entries: matches,
+            searchQuery: query,
             now: widget.now,
             busyReminderId: widget.busyReminderId,
             onRefresh: widget.onRefresh,

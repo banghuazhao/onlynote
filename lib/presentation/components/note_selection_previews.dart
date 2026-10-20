@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
 import 'package:onlynote/presentation/components/note_selection_menu.dart';
@@ -20,6 +22,16 @@ List<Note> previewCopyDestinations() => [
         id: 'trip',
         title: 'Weekend trip',
         description: 'Take the coastal path and stop at the market.',
+        voiceMemos: [
+          VoiceMemo(
+            id: 'trip-recording',
+            path: 'note_audio/unavailable-trip.m4a',
+            durationMs: 1000,
+            createdAt: DateTime(2026, 10, 20),
+            transcript: '${List.filled(30, 'Earlier travel ideas. ').join()}'
+                'Reserve the cabin [2026] and bring 茶😀 for the journey.',
+          ),
+        ],
       ),
       Note(
         id: 'shopping',
@@ -29,18 +41,42 @@ List<Note> previewCopyDestinations() => [
     ];
 
 @Preview(name: 'Copy selected text destination', size: Size(390, 740))
-Widget copySelectionDestinationPreview() => _destinationPreview(AppTheme.light);
+Widget copySelectionDestinationPreview({ThemeData? theme}) =>
+    _destinationPreview(theme ?? AppTheme.light);
 
 @Preview(
     name: 'Copy selected text destination dark',
     size: Size(390, 740),
     brightness: Brightness.dark)
-Widget copySelectionDestinationDarkPreview() =>
-    _destinationPreview(AppTheme.dark);
+Widget copySelectionDestinationDarkPreview({ThemeData? theme}) =>
+    _destinationPreview(theme ?? AppTheme.dark);
 
-Widget _destinationPreview(ThemeData theme) => MaterialApp(
+@Preview(
+    name: 'Copy selected text destination Chinese narrow 2×',
+    size: Size(280, 700))
+Widget copySelectionDestinationChinesePreview({ThemeData? theme}) =>
+    _destinationPreview(theme ?? AppTheme.light, chinese: true, textScale: 2);
+
+Widget _destinationPreview(ThemeData theme,
+        {bool chinese = false, double textScale = 1}) =>
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: theme,
-      localizationsDelegates: const [S.delegate],
+      locale: chinese ? const Locale('zh', 'HK') : const Locale('en'),
+      supportedLocales: S.delegate.supportedLocales,
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(textScale),
+          disableAnimations: true,
+        ),
+        child: child!,
+      ),
       home: Scaffold(
         body: NoteCopyDestinationSheet(notes: previewCopyDestinations()),
       ),

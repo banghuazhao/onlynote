@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_agenda_list.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -36,6 +37,8 @@ Future<void> _pumpAgenda(WidgetTester tester,
     int? busyReminderId,
     Locale locale = const Locale('en'),
     double textScale = 1,
+    bool dark = false,
+    String searchQuery = '',
     Size size = const Size(390, 844),
     ValueChanged<ReminderAgendaEntry>? onOpen,
     ValueChanged<ReminderAgendaEntry>? onSnooze,
@@ -45,7 +48,7 @@ Future<void> _pumpAgenda(WidgetTester tester,
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
   await tester.pumpWidget(MaterialApp(
-    theme: AppTheme.light,
+    theme: dark ? AppTheme.dark : AppTheme.light,
     locale: locale,
     supportedLocales: S.delegate.supportedLocales,
     localizationsDelegates: const [
@@ -63,6 +66,7 @@ Future<void> _pumpAgenda(WidgetTester tester,
     home: Scaffold(
       body: RemindersAgendaList(
         entries: entries ?? _entries,
+        searchQuery: searchQuery,
         now: _now,
         busyReminderId: busyReminderId,
         onOpen: onOpen ?? (_) {},
@@ -75,6 +79,116 @@ Future<void> _pumpAgenda(WidgetTester tester,
 }
 
 void main() {
+  testWidgets('matching snippets show the field behind unrelated note text',
+      (tester) async {
+    final entry = ReminderAgendaEntry(
+      reminder: _entries.first.reminder,
+      dueDate: _entries.first.dueDate,
+      note: Note(
+          id: 'past',
+          title: 'Routine',
+          description: 'Unrelated body',
+          todo: [
+            Todo(id: 'todo', title: 'Collect C++ [2026] notes')
+          ],
+          tags: [
+            'priority'
+          ],
+          voiceMemos: [
+            VoiceMemo(
+                id: 'memo',
+                path: 'note_audio/unavailable.m4a',
+                durationMs: 1000,
+                createdAt: _now,
+                transcript: 'Discuss 閱讀茶😀 tomorrow'),
+          ]),
+    );
+    final snippet = find.byKey(const ValueKey('reminder-search-snippet-1'));
+    for (final (query, expected) in [
+      ('UNRELATED', 'Unrelated body'),
+      (' c++ [2026] ', '…C++ [2026] notes'),
+      ('茶😀', '…茶😀 tomorrow'),
+      ('PRIORITY', 'priority'),
+    ]) {
+      await _pumpAgenda(tester, entries: [entry], searchQuery: query);
+      expect(find.text('Routine'), findsOneWidget);
+      final text = tester.widget<Text>(snippet);
+      expect(text.data, expected);
+      expect(text.maxLines, 2);
+      expect(text.overflow, TextOverflow.ellipsis);
+    }
+    for (final query in ['Routine', '.*', 'missing', '', '  \t ']) {
+      await _pumpAgenda(tester, entries: [entry], searchQuery: query);
+      expect(find.text('Routine'), findsOneWidget);
+      expect(snippet, findsNothing);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('body and checklist title fallbacks avoid duplicate snippet text',
+      (tester) async {
+    for (final note in [
+      Note(id: 'past', description: 'Call dentist'),
+      Note(id: 'past', todo: [Todo(id: 'todo', title: 'Call dentist')]),
+    ]) {
+      await _pumpAgenda(tester,
+          entries: [
+            ReminderAgendaEntry(
+              reminder: _entries.first.reminder,
+              dueDate: _entries.first.dueDate,
+              note: note,
+            ),
+          ],
+          searchQuery: 'Call');
+      expect(find.text('Call dentist'), findsOneWidget);
+      expect(find.byKey(const ValueKey('reminder-search-snippet-1')),
+          findsNothing);
+    }
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final dark in [false, true]) {
+    testWidgets(
+        'narrow large-text snippets keep actions usable in ${dark ? 'dark' : 'light'} mode',
+        (tester) async {
+      final entry = ReminderAgendaEntry(
+        reminder: _entries.first.reminder,
+        dueDate: _entries.first.dueDate,
+        note: Note(
+          id: 'past',
+          title: '閱讀清單與研究計畫',
+          description: '記得帶閱讀茶😀的研究筆記與投影設備，準備明天的討論會議。',
+        ),
+      );
+      final opened = <ReminderAgendaEntry>[];
+      final snoozed = <ReminderAgendaEntry>[];
+      final rescheduled = <ReminderAgendaEntry>[];
+      await _pumpAgenda(tester,
+          entries: [entry],
+          locale: const Locale('zh', 'HK'),
+          size: const Size(320, 640),
+          textScale: 2,
+          dark: dark,
+          searchQuery: '茶😀',
+          onOpen: opened.add,
+          onSnooze: snoozed.add,
+          onReschedule: rescheduled.add);
+      final snippet = find.byKey(const ValueKey('reminder-search-snippet-1'));
+      expect(snippet, findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byKey(const ValueKey('open-reminder-1')));
+      for (final action in ['snooze', 'reschedule']) {
+        final button = find.byKey(ValueKey('$action-reminder-1'));
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+      }
+      expect(opened.single, same(entry));
+      expect(snoozed.single, same(entry));
+      expect(rescheduled.single, same(entry));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets('grouped reminder rows open notes and expose distinct actions',
       (tester) async {
     final opened = <int>[];

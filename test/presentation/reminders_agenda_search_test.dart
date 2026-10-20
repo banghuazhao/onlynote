@@ -200,6 +200,18 @@ void main() {
     expect(find.text('Upcoming'), findsOneWidget);
     expect(find.text('Other errands'), findsNothing);
     expect(find.text('1'), findsNWidgets(3));
+    expect(
+        tester
+            .widget<Text>(
+                find.byKey(const ValueKey('reminder-search-snippet-1')))
+            .data,
+        'Dentist');
+    expect(
+        tester
+            .widget<Text>(
+                find.byKey(const ValueKey('reminder-search-snippet-3')))
+            .data,
+        '…dentist');
     await tester.tap(find.byKey(const ValueKey('open-reminder-1')));
     await tester.tap(find.byKey(const ValueKey('snooze-reminder-1')));
     await tester.tap(find.byKey(const ValueKey('reschedule-reminder-3')));
@@ -239,6 +251,8 @@ void main() {
     expect(find.text('Phone call'), findsOneWidget);
     expect(find.byKey(const ValueKey('reminders-search-empty')), findsNothing);
     expect(find.byKey(const ValueKey('reminders-clear-search')), findsNothing);
+    expect(
+        find.byKey(const ValueKey('reminder-search-snippet-1')), findsNothing);
   });
 
   testWidgets('query stays through loading, new data, and an empty schedule',
@@ -264,6 +278,12 @@ void main() {
     ]);
     expect(find.text('New appointment'), findsOneWidget);
     expect(find.text('Unrelated'), findsNothing);
+    expect(
+        tester
+            .widget<Text>(
+                find.byKey(const ValueKey('reminder-search-snippet-2')))
+            .data,
+        '…dentist');
     await _pumpAgenda(tester, entries: []);
     expect(find.text(S.current.Reminders_Search_Empty_Title), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('reminders-clear-search')));
@@ -286,6 +306,29 @@ void main() {
     await tester.tap(clear);
     await tester.pumpAndSettle();
     expect(find.text('閱讀茶😀'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('title-only and empty text matches do not show a snippet',
+      (tester) async {
+    await _pumpAgenda(tester, entries: [
+      _entry(1,
+          title: 'Routine',
+          description: '  ',
+          todos: [Todo(id: 'empty')],
+          voiceMemos: [_memo(null), _memo(''), _memo('  ')]),
+    ]);
+    await tester.enterText(
+        find.byKey(const ValueKey('reminders-search')), 'routine');
+    await tester.pump();
+    expect(find.text('Routine'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('reminder-search-snippet-1')), findsNothing);
+    await tester.tap(find.byKey(const ValueKey('reminders-clear-search')));
+    await tester.pump();
+    expect(find.text('Routine'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('reminder-search-snippet-1')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

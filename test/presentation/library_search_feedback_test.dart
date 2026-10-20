@@ -12,9 +12,10 @@ import 'package:onlynote/presentation/components/library_tag_selection_feedback.
 import 'package:onlynote/presentation/components/saved_view_name_search.dart';
 
 class _NamedView {
-  const _NamedView(this.id, this.name);
+  const _NamedView(this.id, this.name, {this.fields = const []});
   final String id;
   final String name;
+  final List<String> fields;
 }
 
 Finder _key(String value) => find.byKey(ValueKey(value));
@@ -87,6 +88,36 @@ void main() {
     expect(matches('  研究  ').single, same(views[4]));
     expect(views.map((view) => view.id),
         ['z', 'a', 'symbol', 'unicode', 'chinese']);
+  });
+
+  test('additional saved-view fields opt in without joining unrelated text',
+      () {
+    final views = [
+      const _NamedView('first', 'Planning',
+          fields: ['C++ [2026]', 'North', 'South']),
+      const _NamedView('second', 'C++ [2026]', fields: ['Ångström', '項目研究']),
+      const _NamedView('third', 'Reference', fields: ['C++ [2026]']),
+    ];
+    List<_NamedView> matches(String query, {bool includeFields = true}) =>
+        filterSavedViewNames(views, query,
+            nameOf: (view) => view.name,
+            additionalSearchText: includeFields ? (view) => view.fields : null);
+    expect(matches('C++', includeFields: false), [same(views[1])]);
+    expect(
+        matches(' [2026] '), [same(views[0]), same(views[1]), same(views[2])]);
+    expect(matches('.*'), isEmpty);
+    expect(matches('ångström'), [same(views[1])]);
+    expect(matches('研究'), [same(views[1])]);
+    expect(matches('Planning C++'), isEmpty);
+    expect(matches('North South'), isEmpty);
+    expect(matches('missing'), isEmpty);
+    expect(matches(' \t '), orderedEquals(views));
+    expect(
+        filterSavedViewNames(views, ' ',
+            nameOf: (_) => throw StateError('Blank searches need no names'),
+            additionalSearchText: (_) =>
+                throw StateError('Blank searches need no fields')),
+        orderedEquals(views));
   });
 
   for (final (selected, hidden) in [(0, 0), (1, 1), (19, 19), (20, 20)]) {
@@ -186,6 +217,20 @@ void main() {
       expect(_key('library-saved-views-search-empty'), findsNothing);
       expect(tester.takeException(), isNull);
       await _capture(tester, '$name-views-match');
+
+      await tester.ensureVisible(viewSearch);
+      await tester.enterText(viewSearch, S.current.Include_Archived);
+      await tester.pumpAndSettle();
+      final criteriaMatch = _key('preview-saved-view-meetings');
+      expect(criteriaMatch, findsOneWidget);
+      expect(_key('preview-saved-view-literal'), findsNothing);
+      expect(_key('preview-saved-view-work'), findsNothing);
+      await tester.ensureVisible(criteriaMatch);
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: criteriaMatch, matching: find.byType(Text)),
+          findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+      await _capture(tester, '$name-views-criteria');
 
       await tester.ensureVisible(viewSearch);
       await tester.enterText(viewSearch, 'missing');

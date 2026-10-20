@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added matching text previews to Copy to note results, including checklist items, tags, and recording transcripts.
+- Expanded saved-view search to include its query, tags, resolved folder, filters, and archive scope.
+- Added matching text snippets to reminder search results using stored note text, checklist items, tags, and transcripts.
 - Added note counts beside library tags, with clear scope descriptions and one count per note even when tag spellings repeat.
 - Remembered the selected Markdown, plain text, or PDF export format, with a safe Markdown fallback when preferences are unavailable.
 - Added resolved folder names to Note info in the reader and editor, omitting missing or unavailable folder references.

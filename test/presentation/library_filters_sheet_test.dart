@@ -285,7 +285,8 @@ void main() {
     });
   }
 
-  testWidgets('saved-view search matches names literally and preserves order',
+  testWidgets(
+      'saved-view search matches names and query while preserving order',
       (tester) async {
     final views = [
       SavedNoteView(id: 'z', name: 'Work', query: 'only-search-query'),
@@ -318,8 +319,9 @@ void main() {
     expect(key('library-saved-views-search-empty'), findsOneWidget);
     expect(key('saved-view-literal'), findsNothing);
     await searchViews(tester, 'only-search-query');
-    expect(key('library-saved-views-search-empty'), findsOneWidget);
-    expect(key('saved-view-z'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsNothing);
+    expect(key('saved-view-z'), findsOneWidget);
+    expect(key('saved-view-a'), findsNothing);
     expect(result.isCompleted, isFalse);
 
     final clear = key('library-clear-saved-view-search');
@@ -340,6 +342,106 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final locale in [
+    const Locale('en'),
+    const Locale('zh'),
+    const Locale('zh', 'HK')
+  ]) {
+    testWidgets(
+        'saved views search displayed criteria independently in $locale',
+        (tester) async {
+      final target = SavedNoteView(
+          id: 'private-view-id',
+          name: 'Reference',
+          query: 'Call [2026]',
+          filters: {NoteSearchFilter.recordings, NoteSearchFilter.scans},
+          tags: ['Ångström', '項目研究'],
+          folderId: 'private-folder-id',
+          archiveScope: NoteArchiveScope.all);
+      final original = target.toJson();
+      await open(tester,
+          views: [SavedNoteView(id: 'other', name: 'Other'), target],
+          folderNames: {'private-folder-id': 'Current folder'},
+          locale: locale);
+      final strings = S.of(tester.element(key('library-search-saved-views')));
+      for (final query in [
+        'current FOLDER',
+        'Call [2026]',
+        'ångström',
+        '研究',
+        strings.Filter_Recordings,
+        strings.Filter_Scans,
+        strings.Include_Archived,
+      ]) {
+        await searchViews(tester, query);
+        expect(key('saved-view-private-view-id'), findsOneWidget);
+        expect(key('saved-view-other'), findsNothing);
+        expect(key('library-saved-views-search-empty'), findsNothing);
+      }
+      for (final query in [
+        'private-view-id',
+        'private-folder-id',
+        '.*',
+        'Current folder · ${strings.Saved_View_Search('Call [2026]')}',
+        'Reference Current folder',
+      ]) {
+        await searchViews(tester, query);
+        expect(key('saved-view-private-view-id'), findsNothing);
+        expect(key('library-saved-views-search-empty'), findsOneWidget);
+      }
+      expect(target.toJson(), original);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('archived saved-view scope is searchable in $locale',
+        (tester) async {
+      await open(tester,
+          views: [
+            SavedNoteView(
+                id: 'archived',
+                name: 'Reference',
+                archiveScope: NoteArchiveScope.archived),
+            SavedNoteView(id: 'active', name: 'Current'),
+          ],
+          locale: locale);
+      await searchViews(tester, S.current.Archive);
+      expect(key('saved-view-archived'), findsOneWidget);
+      expect(key('saved-view-active'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('folder search uses current names and missing-folder fallback',
+      (tester) async {
+    final target = SavedNoteView(
+        id: 'target', name: 'Reference', folderId: 'private-folder-id');
+    final updates = ValueNotifier([target]);
+    final folders = {'private-folder-id': 'Original folder'};
+    addTearDown(updates.dispose);
+    await open(tester, viewUpdates: updates, folderNames: folders);
+    await searchViews(tester, 'Original folder');
+    expect(key('saved-view-target'), findsOneWidget);
+    folders['private-folder-id'] = 'Renamed folder';
+    updates.value = [target];
+    await tester.pumpAndSettle();
+    expect(key('saved-view-target'), findsNothing);
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    await searchViews(tester, 'Renamed folder');
+    expect(key('saved-view-target'), findsOneWidget);
+    folders.clear();
+    updates.value = [target];
+    await tester.pumpAndSettle();
+    expect(key('saved-view-target'), findsNothing);
+    await searchViews(tester, 'private-folder-id');
+    expect(key('library-saved-views-search-empty'), findsOneWidget);
+    await searchViews(tester, S.current.All_Notes);
+    expect(key('saved-view-target'), findsOneWidget);
+    expect(tester.widget<Text>(key('saved-view-target-description')).data,
+        S.current.All_Notes);
+    expect(target.folderId, 'private-folder-id');
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('searched saved views retain original apply, rename and delete',
       (tester) async {
     final target = SavedNoteView(
@@ -353,7 +455,7 @@ void main() {
     final views = [SavedNoteView(id: 'other', name: 'Other'), target];
     for (final action in ['apply', 'rename', 'delete']) {
       final result = await open(tester, views: views);
-      await searchViews(tester, '[2026]');
+      await searchViews(tester, 'Keep query');
       final row = key('saved-view-literal');
       expect(key('saved-view-other'), findsNothing);
       await tester.ensureVisible(row);
