@@ -1,0 +1,3 @@
+- Sortiere deine Bibliothek und exportiere alle Notizen als Markdown, Klartext oder PDF.
+- Finde Notizen schneller mit aussagekräftigeren Suchvorschauen, Aufnahmedetails und Übersichten für Tagesnotizen.
+- Klarere Rückmeldungen zu Backups, bessere Layouts bei großer Schrift und zuverlässigere Navigation.

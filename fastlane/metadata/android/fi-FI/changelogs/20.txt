@@ -1,0 +1,3 @@
+- Lajittele kirjastosi ja vie kaikki muistiinpanot Markdown-, teksti- tai PDF-muodossa.
+- Löydä muistiinpanot nopeammin kattavampien hakuesikatselujen, tallennetietojen ja päivämuistiinpanojen yhteenvetojen avulla.
+- Selkeämpi palaute varmuuskopioinnista, parempi asettelu suurella tekstillä ja luotettavampi navigointi.

@@ -1,4 +1,3 @@
-- Urutkan catatan menurut terakhir diubah, terlama lebih dahulu, atau judul, atau tetap atur sendiri dengan menariknya.
-- Ekspor seluruh koleksi catatan sebagai Markdown, teks biasa, atau PDF: satu file per catatan dalam satu arsip.
-- Ekspor Markdown menyimpan foto dan rekaman di samping setiap catatan.
-- Catatan yang disematkan tetap berada di atas pada semua urutan.
+- Urutkan koleksi catatan dan ekspor semua catatan sebagai Markdown, teks biasa, atau PDF.
+- Temukan catatan lebih cepat dengan pratinjau pencarian yang lebih lengkap, detail rekaman, dan ringkasan catatan harian.
+- Informasi pencadangan lebih jelas, tata letak lebih baik untuk teks besar, dan navigasi lebih andal.

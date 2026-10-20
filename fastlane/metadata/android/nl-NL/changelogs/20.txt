@@ -1,0 +1,3 @@
+- Sorteer je bibliotheek en exporteer alle notities als Markdown, platte tekst of PDF.
+- Vind notities sneller met uitgebreidere zoekvoorbeelden, opnamegegevens en samenvattingen van dagnotities.
+- Duidelijkere meldingen over back-ups, een betere indeling bij grote tekst en betrouwbaardere navigatie.

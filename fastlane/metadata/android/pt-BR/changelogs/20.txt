@@ -1,0 +1,3 @@
+- Ordene sua biblioteca e exporte todas as notas como Markdown, texto simples ou PDF.
+- Encontre notas mais rápido com prévias de busca mais completas, detalhes das gravações e resumos das notas diárias.
+- Informações de backup mais claras, layouts melhores com letras grandes e navegação mais confiável.

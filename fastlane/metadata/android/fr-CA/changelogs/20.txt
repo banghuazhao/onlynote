@@ -1,0 +1,3 @@
+- Triez votre bibliothèque et exportez toutes vos notes au format Markdown, texte brut ou PDF.
+- Retrouvez vos notes plus vite grâce à des aperçus de recherche enrichis, aux détails des enregistrements et aux résumés des notes quotidiennes.
+- Des indications de sauvegarde plus claires, un affichage amélioré en gros caractères et une navigation plus fiable.

@@ -1,4 +1,3 @@
-- Notizen nach letzter Änderung, älteste zuerst oder nach Titel sortieren – oder sie weiterhin selbst per Ziehen anordnen.
-- Die gesamte Notizsammlung als Markdown, einfachen Text oder PDF exportieren: eine Datei pro Notiz in einem Archiv.
-- Beim Markdown-Export liegen Fotos und Aufnahmen direkt neben der jeweiligen Notiz.
-- Angepinnte Notizen bleiben in jeder Sortierung ganz oben.
+- Sortiere deine Bibliothek und exportiere alle Notizen als Markdown, Klartext oder PDF.
+- Finde Notizen schneller mit ausführlicheren Suchvorschauen, Aufnahmedetails und Zusammenfassungen täglicher Notizen.
+- Klarere Rückmeldungen zu Backups, bessere Layouts bei großer Schrift und zuverlässigere Navigation.

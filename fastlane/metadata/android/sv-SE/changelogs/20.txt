@@ -1,0 +1,3 @@
+- Sortera ditt bibliotek och exportera alla anteckningar som Markdown, oformaterad text eller PDF.
+- Hitta anteckningar snabbare med fylligare sökförhandsvisningar, inspelningsdetaljer och sammanfattningar av dagsanteckningar.
+- Tydligare besked om säkerhetskopiering, bättre layout med stor text och stabilare navigering.

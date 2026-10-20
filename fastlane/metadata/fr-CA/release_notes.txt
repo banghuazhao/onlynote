@@ -1,4 +1,3 @@
-- Triez vos notes par dernière modification, des plus anciennes d'abord ou par titre, ou continuez de les classer vous-même en les faisant glisser.
-- Exportez toute votre bibliothèque de notes en Markdown, en texte brut ou en PDF : un fichier par note, réunis dans une seule archive.
-- Les exportations Markdown conservent vos photos et vos enregistrements à côté de chaque note.
-- Les notes épinglées demeurent en haut, quel que soit le tri.
+- Triez votre bibliothèque et exportez toutes vos notes en Markdown, en texte brut ou en PDF.
+- Trouvez vos notes plus vite grâce à des aperçus de recherche plus complets, aux détails des enregistrements et aux résumés des notes quotidiennes.
+- Des messages de sauvegarde plus clairs, une meilleure mise en page avec le texte agrandi et une navigation plus fiable.

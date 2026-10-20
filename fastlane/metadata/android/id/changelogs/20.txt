@@ -1,0 +1,3 @@
+- Urutkan pustaka dan ekspor semua catatan sebagai Markdown, teks biasa, atau PDF.
+- Temukan catatan lebih cepat dengan pratinjau pencarian yang lebih lengkap, detail rekaman, dan ringkasan catatan harian.
+- Informasi pencadangan lebih jelas, tata letak lebih baik untuk teks besar, dan navigasi lebih andal.

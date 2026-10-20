@@ -1,4 +1,3 @@
-- Ordena tus notas por última modificación, más antiguas primero o por título, o sigue arrastrándolas en tu propio orden.
-- Exporta toda tu colección de notas como Markdown, texto sin formato o PDF: un archivo por nota en un único archivo comprimido.
-- Las exportaciones en Markdown guardan tus fotos y grabaciones junto a cada nota.
-- Las notas fijadas se mantienen arriba con cualquier orden.
+- Ordena tu biblioteca y exporta todas las notas como Markdown, texto sin formato o PDF.
+- Encuentra notas más rápido con vistas previas de búsqueda más completas, detalles de las grabaciones y resúmenes de notas diarias.
+- Información más clara sobre las copias de seguridad, mejor distribución con texto grande y una navegación más confiable.

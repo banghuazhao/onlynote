@@ -1,8 +1,4 @@
-Onlynote kini tersedia sebagai aplikasi Mac.
-• Menu Mac, pintasan Command, dan tindakan klik kanan.
-• Widget kertas untuk desktop dan Pusat Pemberitahuan di macOS 14 atau lebih baru.
-• Impor foto, pengenalan teks di perangkat, dan memo suara Premium.
-• Ekspor dan pulihkan cadangan .onlynote melalui dialog penyimpanan Mac.
-• Bebas iklan di Mac dan dapat memulihkan pembelian Premium sebelumnya.
-
-Memerlukan macOS 12 atau lebih baru. Setiap perangkat menyimpan pustaka lokal sendiri; pindahkan catatan dan media melalui cadangan.
+- Urutkan koleksi catatan dan ekspor semua catatan sebagai Markdown, teks biasa, atau PDF.
+- Temukan catatan lebih cepat dengan pratinjau pencarian yang lebih lengkap, detail rekaman, dan ringkasan catatan harian.
+- Informasi pencadangan lebih jelas, tata letak lebih baik untuk teks besar, dan navigasi lebih andal.
+- Onlynote kini hadir di Mac, dengan widget desktop dan pintasan keyboard.

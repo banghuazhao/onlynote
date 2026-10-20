@@ -1,0 +1,3 @@
+- Sortér dit bibliotek, og eksportér alle noter som Markdown, ren tekst eller PDF.
+- Find noter hurtigere med bedre søgevisninger, optagelsesdetaljer og oversigter over dagsnoter.
+- Tydeligere beskeder om sikkerhedskopiering, bedre layout med stor tekst og mere stabil navigation.

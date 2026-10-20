@@ -1,4 +1,3 @@
-- Sorteer je notities op laatst gewijzigd, oudste eerst of titel, of blijf ze zelf in de juiste volgorde slepen.
-- Exporteer je hele notitieverzameling als Markdown, platte tekst of PDF: één bestand per notitie in één archief.
-- Bij Markdown-export staan je foto's en opnamen naast elke notitie.
-- Vastgezette notities blijven in elke sortering bovenaan staan.
+- Sorteer je bibliotheek en exporteer alle notities als Markdown, platte tekst of PDF.
+- Vind notities sneller met uitgebreidere zoekvoorbeelden, opnamegegevens en samenvattingen van dagelijkse notities.
+- Duidelijkere meldingen over back-ups, betere lay-outs bij grote tekst en betrouwbaardere navigatie.

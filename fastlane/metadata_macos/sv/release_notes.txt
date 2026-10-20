@@ -1,8 +1,4 @@
-Onlynote finns nu som en app för Mac.
-• Mac-menyer, Command-kortkommandon och högerklick.
-• Papperswidgetar på skrivbordet och i Notiscenter med macOS 14 eller senare.
-• Bildimport, textigenkänning på enheten och Premium-röstmemon.
-• Exportera och återställ .onlynote-säkerhetskopior via Macens spara-dialogruta.
-• Reklamfri på Mac, med återställning av tidigare Premium-köp.
-
-Kräver macOS 12 eller senare. Varje enhet behåller sitt lokala bibliotek; flytta anteckningar och medier via säkerhetskopior.
+- Sortera ditt bibliotek och exportera alla anteckningar som Markdown, oformaterad text eller PDF.
+- Hitta anteckningar snabbare med mer utförliga sökförhandsvisningar, inspelningsdetaljer och sammanfattningar av dagliga anteckningar.
+- Tydligare besked om säkerhetskopiering, bättre layout med stor text och mer tillförlitlig navigering.
+- Onlynote finns nu på Mac, med skrivbordswidgetar och kortkommandon.

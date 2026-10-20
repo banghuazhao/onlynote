@@ -1,4 +1,3 @@
-- Sortér dine noter efter senest ændret, ældste først eller titel – eller træk dem fortsat i din egen rækkefølge.
-- Eksportér hele din notesamling som Markdown, almindelig tekst eller PDF: én fil pr. note i ét samlet arkiv.
-- Markdown-eksport gemmer dine billeder og optagelser sammen med hver note.
-- Fastgjorte noter bliver vist øverst, uanset sortering.
+- Sortér dit bibliotek, og eksportér alle noter som Markdown, ren tekst eller PDF.
+- Find noter hurtigere med mere udførlige forhåndsvisninger i søgninger, oplysninger om optagelser og oversigter over daglige noter.
+- Tydeligere beskeder om sikkerhedskopiering, bedre layout med stor tekst og mere pålidelig navigation.

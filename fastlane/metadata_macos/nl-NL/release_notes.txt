@@ -1,8 +1,4 @@
-Onlynote is nu beschikbaar als native Mac-app.
-• Native menu’s, Command-sneltoetsen en acties met de rechtermuisknop.
-• Papierwidgets voor bureaublad en berichtencentrum met macOS 14 of nieuwer.
-• Foto-import, tekstherkenning op het apparaat en Premium-spraakmemo’s.
-• Exporteer en herstel .onlynote-reservekopieën met het Mac-opslagvenster.
-• Geen advertenties op Mac; bestaande Premium-aankopen kunnen worden hersteld.
-
-Vereist macOS 12 of nieuwer. Elk apparaat behoudt een eigen lokale bibliotheek; zet notities en media over via reservekopieën.
+- Sorteer je bibliotheek en exporteer alle notities als Markdown, platte tekst of PDF.
+- Vind notities sneller met uitgebreidere zoekvoorbeelden, opnamegegevens en samenvattingen van dagelijkse notities.
+- Duidelijkere meldingen over back-ups, betere lay-outs bij grote tekst en betrouwbaardere navigatie.
+- Onlynote is nu beschikbaar op Mac, met bureaubladwidgets en sneltoetsen.

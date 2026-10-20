@@ -1,0 +1,3 @@
+- Sort your library and export all notes as Markdown, plain text or PDF.
+- Find notes faster with richer search previews, recording details and daily-note summaries.
+- Clearer backup feedback, better large-text layouts and more reliable navigation.

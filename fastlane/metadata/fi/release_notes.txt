@@ -1,4 +1,3 @@
-- Järjestä muistiinpanot viimeksi muokatun, vanhimman tai otsikon mukaan – tai järjestä ne edelleen itse vetämällä.
-- Vie koko muistiinpanokokoelmasi Markdownina, pelkkänä tekstinä tai PDF:nä: yksi tiedosto jokaisesta muistiinpanosta yhdessä arkistossa.
-- Markdown-vienti tallentaa valokuvat ja äänitykset kunkin muistiinpanon yhteyteen.
-- Kiinnitetyt muistiinpanot pysyvät ylimpänä kaikissa järjestyksissä.
+- Järjestä muistiinpanokirjastosi ja vie kaikki muistiinpanot Markdown-, teksti- tai PDF-tiedostoina.
+- Löydä muistiinpanot nopeammin monipuolisempien hakuesikatselujen, tallenteiden tietojen ja päivittäisten muistiinpanojen yhteenvetojen avulla.
+- Selkeämmät varmuuskopioinnin ilmoitukset, parempi asettelu suurella tekstillä ja luotettavampi navigointi.

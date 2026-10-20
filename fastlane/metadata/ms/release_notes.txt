@@ -1,4 +1,3 @@
-- Susun nota anda menurut kali terakhir diubah, terlama dahulu atau tajuk, atau terus aturkan sendiri dengan menariknya.
-- Eksport seluruh koleksi nota anda sebagai Markdown, teks biasa atau PDF: satu fail bagi setiap nota dalam satu arkib.
-- Eksport Markdown menyimpan foto dan rakaman anda bersama setiap nota.
-- Nota yang disemat kekal di bahagian atas dalam semua susunan.
+- Susun pustaka anda dan eksport semua nota sebagai Markdown, teks biasa atau PDF.
+- Cari nota dengan lebih pantas melalui pratonton carian yang lebih lengkap, butiran rakaman dan ringkasan nota harian.
+- Maklumat sandaran yang lebih jelas, susun atur teks besar yang lebih baik dan navigasi yang lebih andal.

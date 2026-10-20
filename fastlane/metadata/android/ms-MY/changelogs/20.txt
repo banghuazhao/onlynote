@@ -1,0 +1,3 @@
+- Isih pustaka anda dan eksport semua nota sebagai Markdown, teks biasa atau PDF.
+- Cari nota dengan lebih pantas melalui pratonton carian yang lebih lengkap, butiran rakaman dan ringkasan nota harian.
+- Maklum balas sandaran lebih jelas, susun atur teks besar lebih baik dan navigasi lebih stabil.
