@@ -24,17 +24,43 @@ Widget backupRestoreDarkPreview() => const _BackupRestorePreview(dark: true);
 Widget backupRestoreChinesePreview() =>
     const _BackupRestorePreview(chinese: true, textScale: 2);
 
+@Preview(
+    name: 'Restore backup — large counts',
+    group: 'Backup',
+    size: Size(390, 700))
+Widget backupRestoreLargeCountsPreview() =>
+    const _BackupRestorePreview(largeCounts: true);
+
+@Preview(
+  name: 'Restore backup — large counts dark',
+  group: 'Backup',
+  size: Size(390, 700),
+  brightness: Brightness.dark,
+)
+Widget backupRestoreLargeCountsDarkPreview() =>
+    const _BackupRestorePreview(dark: true, largeCounts: true);
+
+@Preview(
+  name: 'Restore backup — Chinese 2× landscape',
+  group: 'Backup',
+  size: Size(700, 280),
+)
+Widget backupRestoreChineseLandscapePreview() =>
+    const _BackupRestorePreview(chinese: true, textScale: 2, largeCounts: true);
+
 /// Only local metadata and Flutter widgets; no backup/media/native imports.
 class _BackupRestorePreview extends StatelessWidget {
   const _BackupRestorePreview({
     this.dark = false,
     this.chinese = false,
     this.textScale = 1,
+    this.largeCounts = false,
   });
 
   final bool dark;
   final bool chinese;
   final double textScale;
+  final bool largeCounts;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -73,16 +99,16 @@ class _BackupRestorePreview extends StatelessWidget {
                     BackupRestorePreview(
                       metadata: BackupRestoreMetadata(
                         createdAt: DateTime(2026, 10, 7, 14, 30),
-                        noteCount: 24,
-                        activeNoteCount: 17,
-                        archivedNoteCount: 5,
-                        trashedNoteCount: 2,
-                        folderCount: 3,
-                        photoCount: 16,
-                        templateCount: 2,
-                        recordingFileCount: 5,
-                        savedViewCount: 4,
-                        historyVersionCount: 38,
+                        noteCount: largeCounts ? 10000 : 24,
+                        activeNoteCount: largeCounts ? 9000 : 17,
+                        archivedNoteCount: largeCounts ? 750 : 5,
+                        trashedNoteCount: largeCounts ? 250 : 2,
+                        folderCount: largeCounts ? 1000 : 3,
+                        photoCount: largeCounts ? 10000 : 16,
+                        templateCount: largeCounts ? 100 : 2,
+                        recordingFileCount: largeCounts ? 10000 : 5,
+                        savedViewCount: largeCounts ? 30 : 4,
+                        historyVersionCount: largeCounts ? 1000000 : 38,
                       ),
                     ),
                     const SizedBox(height: 16),

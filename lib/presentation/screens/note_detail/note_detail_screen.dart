@@ -101,6 +101,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   bool _savingTemplate = false;
   bool _templateActionOpen = false;
   bool _changingLibrary = false;
+  bool _openingNoteRoute = false;
   Note? _lastSavedNote;
   int _reviewGeneration = 0;
   WidgetCommands? _widgetCommands;
@@ -632,11 +633,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   Future<void> _editNote(Note note) async {
-    if (_changingLibrary || _exportingImage) return;
-    await _saveReadingPosition();
-    if (!mounted) return;
-    await context.router.push(AddUpdateNoteRoute(note: note));
-    _reload();
+    if (_changingLibrary ||
+        _exportingImage ||
+        _openingNoteRoute ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingNoteRoute = true;
+    try {
+      await _saveReadingPosition();
+      if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+      await context.router.push(AddUpdateNoteRoute(note: note));
+      _reload();
+    } finally {
+      _openingNoteRoute = false;
+    }
   }
 
   Future<void> _changeLibrary(
@@ -709,28 +720,41 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   Future<void> _openLinkedNote(Note note) async {
-    if (_changingLibrary || note.id == null) return;
+    if (_changingLibrary ||
+        _openingNoteRoute ||
+        note.id == null ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     final current = availableLinkedNote(note.id!, _libraryNotes);
     if (current == null) {
       showTransientSnackBar(
           context, SnackBar(content: Text(S.of(context).Link_Unavailable)));
       return;
     }
-    await _saveReadingPosition();
-    if (!mounted) return;
-    await context.router.push(NoteDetailRoute(noteId: current.id!));
-    _reload();
+    _openingNoteRoute = true;
+    try {
+      await _saveReadingPosition();
+      if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
+      await context.router.push(NoteDetailRoute(noteId: current.id!));
+      _reload();
+    } finally {
+      _openingNoteRoute = false;
+    }
   }
 
   Future<void> _showHistory(Note note) async {
     final history = NoteHistory.initializedInstance;
     if (history == null || note.id == null) return;
-    final restored =
-        await showNoteHistorySheet(context, noteId: note.id!, history: history);
-    if (restored == true && mounted) {
-      context
-          .read<NoteDetailBloc>()
-          .add(NoteDetailEvent.showNote(widget.noteId));
+    final noteId = note.id!;
+    final restored = await showNoteHistorySheet(context,
+        noteId: noteId, history: history, onRestored: () {
+      if (mounted && widget.noteId == noteId) _reload();
+    });
+    if (restored == true &&
+        mounted &&
+        widget.noteId == noteId &&
+        ModalRoute.of(context)?.isCurrent == true) {
       showTransientSnackBar(
           context, SnackBar(content: Text(S.of(context).History_Restored)));
     }

@@ -17,7 +17,9 @@ import 'package:onlynote/services/note_find.dart';
 import 'package:onlynote/services/note_outline.dart';
 
 Future<void> _pump(WidgetTester tester, Widget child,
-    {Size size = const Size(390, 700), double textScale = 1}) async {
+    {Size size = const Size(390, 700),
+    double textScale = 1,
+    bool disableAnimations = true}) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetPhysicalSize);
@@ -32,7 +34,8 @@ Future<void> _pump(WidgetTester tester, Widget child,
     supportedLocales: S.delegate.supportedLocales,
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
-          disableAnimations: true, textScaler: TextScaler.linear(textScale)),
+          disableAnimations: disableAnimations,
+          textScaler: TextScaler.linear(textScale)),
       child: child!,
     ),
     home: Scaffold(body: child),
@@ -70,6 +73,72 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('outline choice cannot pop the page twice or after cancellation',
+      (tester) async {
+    const entry = NoteOutlineEntry(text: 'Heading', start: 0, end: 7);
+    final results = <NoteOutlineEntry?>[];
+    await _pump(
+        tester,
+        Builder(
+            builder: (context) => TextButton(
+                  child: const Text('Open outline'),
+                  onPressed: () async => results.add(await showNoteOutlineSheet(
+                      context: context, entries: [entry])),
+                )),
+        disableAnimations: false);
+    await tester.tap(find.text('Open outline'));
+    await tester.pumpAndSettle();
+    final choose = tester
+        .widget<ListTile>(find.byKey(const ValueKey('note-outline-entry-0')))
+        .onTap!;
+    choose();
+    choose();
+    await tester.pumpAndSettle();
+    choose();
+    expect(results, [entry]);
+    expect(results.single, same(entry));
+    expect(find.text('Open outline'), findsOneWidget);
+    await tester.tap(find.text('Open outline'));
+    await tester.pumpAndSettle();
+    final cancelled = tester
+        .widget<ListTile>(find.byKey(const ValueKey('note-outline-entry-0')))
+        .onTap!;
+    await tester.tap(find.byTooltip('Close'));
+    cancelled();
+    await tester.pumpAndSettle();
+    cancelled();
+    expect(results, [entry, null]);
+    expect(find.text('Open outline'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'covered outline rejects captured selection and preserves callback previews',
+      (tester) async {
+    const entry = NoteOutlineEntry(text: 'Heading', start: 0, end: 7);
+    final selected = <NoteOutlineEntry>[];
+    await _pump(tester,
+        NoteOutlineSheet(entries: [entry], onEntrySelected: selected.add));
+    final choose = tester
+        .widget<ListTile>(find.byKey(const ValueKey('note-outline-entry-0')))
+        .onTap!;
+    showDialog<void>(
+        context: tester.element(find.byType(NoteOutlineSheet)),
+        builder: (_) => const AlertDialog(content: Text('Covered')));
+    await tester.pumpAndSettle();
+    choose();
+    expect(selected, isEmpty);
+    Navigator.pop(tester.element(find.text('Covered')));
+    await tester.pumpAndSettle();
+    choose();
+    choose();
+    expect(selected, [entry, entry]);
+    await tester.pumpWidget(const SizedBox.shrink());
+    choose();
+    expect(selected, [entry, entry]);
+    expect(tester.takeException(), isNull);
+  });
 
   test('stale detach cannot remove a newly attached document', () async {
     final controller = NoteOutlineNavigationController();

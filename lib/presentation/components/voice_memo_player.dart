@@ -36,6 +36,21 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   bool _busy = false;
   String? _error;
   final _menuKey = GlobalKey();
+  int _memoRevision = 0;
+  int _menuRevision = 0;
+
+  bool _isCurrent(int revision) => mounted && revision == _memoRevision;
+
+  void _releasePath(String? path) {
+    if (path == null) return;
+    unawaited(_service.stopPlaybackFor(path).catchError((Object error) {
+      debugPrint('Recording playback cleanup deferred: $error');
+    }));
+    unawaited(_service.cancelTranscriptionFor(path).catchError((Object error) {
+      debugPrint('Recording transcription cleanup deferred: $error');
+    }));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,98 +64,132 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   }
 
   Future<void> _play() async {
-    if (_busy) return;
+    if (!mounted || _busy) return;
+    final revision = _memoRevision;
+    final memo = widget.memo;
+    final resolvePath = widget.resolvePath;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      _absolutePath ??= await widget.resolvePath(widget.memo.path);
-      if (!mounted) return;
-      if (_service.state.value.path == _absolutePath &&
-          _service.state.value.playing) {
-        await _service.pause();
+      final path = _absolutePath ?? await resolvePath(memo.path);
+      if (!mounted || !_isCurrent(revision)) return;
+      _absolutePath = path;
+      if (_service.state.value.path == path && _service.state.value.playing) {
+        await _service.pauseFor(path);
       } else {
-        await _service.play(_absolutePath!);
+        await _service.play(path);
       }
+      if (!_isCurrent(revision)) _releasePath(path);
     } catch (_) {
-      if (mounted) _error = S.of(context).Voice_Play_Failed;
+      if (mounted && _isCurrent(revision)) {
+        _error = S.of(context).Voice_Play_Failed;
+      }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (_isCurrent(revision)) setState(() => _busy = false);
     }
   }
 
   Future<void> _remove() async {
+    if (!mounted || _busy) return;
+    final onRemove = widget.onRemove;
+    if (onRemove == null) return;
+    final revision = _memoRevision;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      if (_service.state.value.path == _absolutePath) {
-        await _service.stopPlayback();
+      if (_absolutePath case final String path) {
+        await _service.stopPlaybackFor(path);
       }
-      await widget.onRemove!();
+      if (!_isCurrent(revision)) return;
+      await onRemove();
     } catch (_) {
-      if (mounted) _error = S.of(context).Voice_Save_Failed;
+      if (mounted && _isCurrent(revision)) {
+        _error = S.of(context).Voice_Save_Failed;
+      }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (_isCurrent(revision)) setState(() => _busy = false);
     }
   }
 
   Future<void> _share() async {
-    if (_busy) return;
+    if (!mounted || _busy) return;
+    final revision = _memoRevision;
+    final memo = widget.memo;
+    final onShare = widget.onShare;
+    final resolvePath = widget.resolvePath;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      if (_absolutePath != null &&
-          _service.state.value.path == _absolutePath &&
+      final path = _absolutePath;
+      if (path != null &&
+          _service.state.value.path == path &&
           _service.state.value.playing) {
-        await _service.pause();
+        await _service.pauseFor(path);
       }
-      if (!mounted) return;
-      if (widget.onShare != null) {
-        await widget.onShare!();
+      if (!mounted || !_isCurrent(revision)) return;
+      if (onShare != null) {
+        await onShare();
       } else {
-        await ShareHelper.shareVoiceMemo(context, widget.memo,
-            resolvePath: widget.resolvePath,
+        await ShareHelper.shareVoiceMemo(context, memo,
+            resolvePath: resolvePath,
             sharePositionOrigin: ShareHelper.shareOriginFromKey(_menuKey));
       }
     } catch (_) {
-      if (mounted) _error = S.of(context).Share_Audio_Failed;
+      if (mounted && _isCurrent(revision)) {
+        _error = S.of(context).Share_Audio_Failed;
+      }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (_isCurrent(revision)) setState(() => _busy = false);
     }
   }
 
-  Future<void> _editTranscript({String? initial}) async {
+  Future<void> _editTranscript({String? initial, int? expectedRevision}) async {
+    final revision = expectedRevision ?? _memoRevision;
+    final onTranscriptChanged = widget.onTranscriptChanged;
+    if (!mounted || !_isCurrent(revision) || onTranscriptChanged == null) {
+      return;
+    }
     final changed = await showVoiceTranscriptEditor(context,
         initial: initial ?? widget.memo.transcript ?? '');
-    if (changed == null || !mounted) return;
+    if (changed == null || !_isCurrent(revision)) return;
     try {
-      await widget.onTranscriptChanged!(changed.isEmpty ? null : changed);
+      await onTranscriptChanged(changed.isEmpty ? null : changed);
     } catch (_) {
-      if (mounted) setState(() => _error = S.of(context).Voice_Save_Failed);
+      if (mounted && _isCurrent(revision)) {
+        setState(() => _error = S.of(context).Voice_Save_Failed);
+      }
     }
   }
 
   Future<void> _transcribe() async {
+    if (!mounted || _busy || widget.onTranscriptChanged == null) return;
+    final revision = _memoRevision;
+    final memo = widget.memo;
+    final resolvePath = widget.resolvePath;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      _absolutePath ??= await widget.resolvePath(widget.memo.path);
-      if (!mounted) return;
+      final path = _absolutePath ?? await resolvePath(memo.path);
+      if (!mounted || !_isCurrent(revision)) return;
+      _absolutePath = path;
       final locale = Localizations.localeOf(context);
       final language = locale.languageCode == 'zh'
           ? (locale.countryCode == 'HK' ? 'zh-HK' : 'zh-CN')
           : 'en-US';
-      final text = await _service.transcribe(_absolutePath!, locale: language);
-      if (mounted) await _editTranscript(initial: text);
+      final text = await _service.transcribe(path, locale: language);
+      if (_isCurrent(revision)) {
+        await _editTranscript(initial: text, expectedRevision: revision);
+      }
     } catch (error) {
-      if (mounted) {
+      if (mounted && _isCurrent(revision)) {
         _error = error is PlatformException &&
                 error.code == 'transcription_unavailable'
             ? S.of(context).Voice_Transcription_Unavailable
@@ -149,25 +198,28 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
                 : S.of(context).Voice_Transcription_Failed;
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (_isCurrent(revision)) setState(() => _busy = false);
     }
   }
 
   @override
   void didUpdateWidget(covariant VoiceMemoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.memo.path != oldWidget.memo.path) _absolutePath = null;
+    if (widget.memo.id != oldWidget.memo.id ||
+        widget.memo.path != oldWidget.memo.path) {
+      _memoRevision++;
+      _releasePath(_absolutePath);
+      _absolutePath = null;
+      _busy = false;
+      _error = null;
+    }
   }
 
   @override
   void dispose() {
     _service.state.removeListener(_changed);
-    if (_absolutePath != null && _service.state.value.path == _absolutePath) {
-      unawaited(_service.stopPlayback());
-    }
-    if (_absolutePath != null) {
-      unawaited(_service.cancelTranscriptionFor(_absolutePath!));
-    }
+    _memoRevision++;
+    _releasePath(_absolutePath);
     super.dispose();
   }
 
@@ -176,7 +228,7 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
     final l10n = S.of(context);
     final tokens = context.tokens;
     final state = _service.state.value;
-    final active = state.path == _absolutePath;
+    final active = _absolutePath != null && state.path == _absolutePath;
     final playing = active && state.playing;
     return Container(
       padding: EdgeInsets.all(tokens.space3),
@@ -213,7 +265,9 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
           PopupMenuButton<String>(
               key: _menuKey,
               enabled: !_busy,
+              onOpened: () => _menuRevision = _memoRevision,
               onSelected: (value) {
+                if (_busy || !_isCurrent(_menuRevision)) return;
                 if (value == 'share') unawaited(_share());
                 if (value == 'remove') unawaited(_remove());
                 if (value == 'transcript') unawaited(_editTranscript());

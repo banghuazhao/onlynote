@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:onlynote/Tools/app_typography_settings.dart';
 import 'package:onlynote/Tools/locator.dart';
@@ -14,6 +15,7 @@ import 'package:onlynote/domain/usecase/get_note_usecase.dart';
 import 'package:onlynote/domain/usecase/update_note_usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_info_sheet.dart';
+import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'package:onlynote/presentation/screens/note_detail/note_detail_screen.dart';
@@ -21,20 +23,27 @@ import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_dates.dart';
 import 'package:onlynote/services/note_statistics.dart';
+import 'package:onlynote/services/note_history.dart';
 
 class _Notes implements NoteRepository {
   _Notes(Iterable<Note> initial)
       : values = {for (final note in initial) note.id!: NoteDto.fromNote(note)};
   final Map<String, NoteDto> values;
   final writes = <String>[];
+  final reads = <String, int>{};
   Future<NoteDto> Function(String)? readOverride;
+  Future<void> Function(NoteDto)? beforeSave;
   @override
-  Future<NoteDto> getNote(String id) async =>
-      readOverride == null ? values[id]! : await readOverride!(id);
+  Future<NoteDto> getNote(String id) async {
+    reads.update(id, (count) => count + 1, ifAbsent: () => 1);
+    return readOverride == null ? values[id]! : await readOverride!(id);
+  }
+
   @override
   List<NoteDto> getAllNotes() => values.values.toList();
   @override
   Future<void> addUpdateNote(NoteDto note) async {
+    await beforeSave?.call(note);
     writes.add(note.id!);
     values[note.id!] = note;
   }
@@ -63,6 +72,30 @@ class _Router extends RootStackRouter {
                     body: Text(
                         'Editing ${data.argsAs<AddUpdateNoteRouteArgs>().note!.id}')))),
       ];
+}
+
+class _WaitingPositionStorage extends MemoryNotePositionStorage {
+  Completer<void>? waiting;
+  int writes = 0;
+
+  @override
+  Future<void> write(String key, String value) async {
+    writes++;
+    await waiting?.future;
+    await super.write(key, value);
+  }
+}
+
+class _HistoryBox extends Fake implements Box {
+  final _values = <dynamic, dynamic>{};
+
+  @override
+  dynamic get(dynamic key, {dynamic defaultValue}) =>
+      _values[key] ?? defaultValue;
+  @override
+  Future<void> put(dynamic key, dynamic value) async => _values[key] = value;
+  @override
+  Future<void> flush() async {}
 }
 
 Future<_Router> _mount(WidgetTester tester, _Notes notes,
@@ -136,6 +169,158 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  for (final completion in ['open', 'dismissed', 'reader closed']) {
+    testWidgets(
+        'successful history restore refreshes once with $completion reader',
+        (tester) async {
+      final original =
+          Note(id: 'a', title: 'Original title', description: 'Original body');
+      final current = original.copyWith(
+          title: 'Current title', description: 'Current body');
+      final notes = _Notes([current]);
+      final history = NoteHistory(box: _HistoryBox(), repository: notes);
+      final previousHistory = NoteHistory.initializedInstance;
+      NoteHistory.configure(history);
+      addTearDown(() {
+        NoteHistory.initializedInstance = previousHistory;
+        history.dispose();
+      });
+      await history.recordBeforeSave(
+          NoteDto.fromNote(original), NoteDto.fromNote(current));
+      final version = history.versionsFor('a').single;
+      final permitWrite = Completer<void>();
+      final started = Completer<void>();
+      notes.beforeSave = (_) async {
+        started.complete();
+        await permitWrite.future;
+      };
+      final router = await _mount(tester, notes);
+      addTearDown(() {
+        if (!permitWrite.isCompleted) permitWrite.complete();
+      });
+      await _push(tester, router, 'a', NotePositionStore.memory());
+      await tester.tap(find.byTooltip(S.current.More_Options));
+      await tester.pumpAndSettle();
+      final historyAction = find.text(S.current.History_Title);
+      await tester.ensureVisible(historyAction);
+      await tester.tap(historyAction);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('history-version-${version.id}')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+      await tester.pump();
+      expect(started.isCompleted, isTrue);
+      if (completion != 'open') {
+        await tester.tap(find.byTooltip('Close'));
+        await tester.pumpAndSettle();
+        expect(find.byType(NoteHistorySheet), findsNothing);
+        expect(_loaded(tester).note.title, 'Current title');
+      }
+      if (completion == 'reader closed') {
+        await router.maybePop();
+        await tester.pumpAndSettle();
+        expect(find.text('Library'), findsOneWidget);
+      }
+      final readsBeforeCompletion = notes.reads['a']!;
+      permitWrite.complete();
+      await tester.pumpAndSettle();
+      expect(notes.values['a']!.title, 'Original title');
+      expect(notes.writes, ['a']);
+      expect(find.byType(NoteHistorySheet), findsNothing);
+      if (completion == 'reader closed') {
+        expect(notes.reads['a'], readsBeforeCompletion);
+        expect(find.text('Library'), findsOneWidget);
+        expect(find.byType(LoadedView), findsNothing);
+      } else {
+        expect(notes.reads['a'], readsBeforeCompletion + 1);
+        expect(_loaded(tester).note.title, 'Original title');
+        expect(_loaded(tester).note.description, 'Original body');
+        expect(router.stack, hasLength(2));
+      }
+      expect(tester.takeException(), isNull);
+      if (completion == 'open') {
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+      }
+    });
+  }
+
+  for (final linked in [false, true]) {
+    for (final covered in [false, true]) {
+      testWidgets(
+          '${linked ? 'linked reader' : 'Edit'} waits for one position save${covered ? ' and respects a covering sheet' : ' despite repeated taps'}',
+          (tester) async {
+        final a = Note(
+            id: 'a',
+            title: 'Reading project',
+            description:
+                'Project paragraph to remember while navigating.\n' * 70,
+            linkedNoteIds: ['b']);
+        final b =
+            Note(id: 'b', title: 'Linked project', description: 'Other text');
+        final notes = _Notes([a, b]);
+        locator.registerSingleton<NoteRepository>(notes);
+        addTearDown(() => locator.unregister<NoteRepository>());
+        final storage = _WaitingPositionStorage();
+        final positions = NotePositionStore(storage: storage);
+        final router = await _mount(tester, notes);
+        await _push(tester, router, 'a', positions);
+        final view = _loaded(tester);
+        view.scrollController!.jumpTo(300);
+        await tester.pump();
+        final beforeWrites = storage.writes;
+        storage.waiting = Completer<void>();
+        final VoidCallback action;
+        if (linked) {
+          action = () => view.onOpenLinkedNote!(b);
+        } else {
+          action = tester
+              .widget<TextButton>(find.descendant(
+                  of: find.byTooltip(S.current.Edit),
+                  matching: find.byType(TextButton)))
+              .onPressed!;
+        }
+        action();
+        action();
+        await tester.pump();
+        expect(storage.writes, beforeWrites + 1);
+        if (covered) {
+          unawaited(showDialog<void>(
+              context: tester.element(find.byType(LoadedView)),
+              builder: (_) =>
+                  const AlertDialog(title: Text('Another action'))));
+          await tester.pumpAndSettle();
+        }
+        storage.waiting!.complete();
+        storage.waiting = null;
+        await tester.pumpAndSettle();
+        if (covered) {
+          expect(find.text('Another action'), findsOneWidget);
+          expect(router.stack, hasLength(2));
+          expect(find.text('Editing a'), findsNothing);
+          Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+          await tester.pumpAndSettle();
+          action();
+          await tester.pumpAndSettle();
+        }
+        if (linked) {
+          expect(_loaded(tester).note.id, 'b');
+          expect(
+              router.stack.where((route) => route.name == NoteDetailRoute.name),
+              hasLength(2));
+        } else {
+          expect(find.text('Editing a'), findsOneWidget);
+          expect(
+              router.stack
+                  .where((route) => route.name == AddUpdateNoteRoute.name),
+              hasLength(1));
+        }
+        expect(notes.writes, isEmpty);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
 
   testWidgets('stacked readers retain their own content, info and position',
       (tester) async {

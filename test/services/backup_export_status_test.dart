@@ -23,13 +23,19 @@ class _FailingPreferences extends MemoryPreferences {
 }
 
 class _PendingWritePreferences extends MemoryPreferences {
+  _PendingWritePreferences({this.failFirst = false});
+
   final firstWrite = Completer<void>();
   final writes = <String>[];
+  final bool failFirst;
 
   @override
   Future<void> setString(String key, String value) async {
     writes.add(value);
-    if (writes.length == 1) await firstWrite.future;
+    if (writes.length == 1) {
+      await firstWrite.future;
+      if (failFirst) throw StateError('First write failed');
+    }
     await super.setString(key, value);
   }
 }
@@ -112,20 +118,26 @@ void main() {
     expect((await store.read())!.destination, BackupExportDestination.shared);
   });
 
-  test('successive export writes retain completion order', () async {
-    final preferences = _PendingWritePreferences();
-    final store = BackupExportStatusStore(preferences: preferences);
-    final first = store.record(BackupExportRecord(
-        exportedAt: DateTime.utc(2025),
-        destination: BackupExportDestination.saved));
-    final second = store.record(BackupExportRecord(
-        exportedAt: snapshot, destination: BackupExportDestination.shared));
-    expect(preferences.writes, hasLength(1));
-    preferences.firstWrite.complete();
-    await Future.wait([first, second]);
-    final reopened =
-        await BackupExportStatusStore(preferences: preferences).read();
-    expect(reopened!.exportedAt, snapshot);
-    expect(reopened.destination, BackupExportDestination.shared);
-  });
+  for (final failFirst in [false, true]) {
+    test('successive writes remain ordered when first fails: $failFirst',
+        () async {
+      final preferences = _PendingWritePreferences(failFirst: failFirst);
+      final store = BackupExportStatusStore(preferences: preferences);
+      final first = store.record(BackupExportRecord(
+          exportedAt: DateTime.utc(2025),
+          destination: BackupExportDestination.saved));
+      final latest = BackupExportRecord(
+          exportedAt: snapshot, destination: BackupExportDestination.shared);
+      final second = store.record(latest);
+      expect(preferences.writes, hasLength(1));
+      expect(await store.read(), same(latest));
+      preferences.firstWrite.complete();
+      await Future.wait([first, second]);
+      expect(preferences.writes, hasLength(2));
+      final reopened =
+          await BackupExportStatusStore(preferences: preferences).read();
+      expect(reopened!.exportedAt, snapshot);
+      expect(reopened.destination, BackupExportDestination.shared);
+    });
+  }
 }

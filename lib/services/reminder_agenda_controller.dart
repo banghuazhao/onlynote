@@ -91,11 +91,13 @@ class ReminderAgendaController extends ChangeNotifier {
     busyReminderId = entry.reminder.reminderId;
     _notify();
     try {
+      final note = await resolveNote(entry);
+      // Reading a note may yield to another window or reminder update. Check
+      // the live schedule after that wait, immediately before the mutation.
       final matches = readReminders()
           .where((r) => r.reminderId == entry.reminder.reminderId);
       if (matches.isEmpty) return ReminderAgendaActionResult.unavailable;
       final current = matches.first;
-      final note = await resolveNote(entry);
       if (note == null || current.noteId != entry.reminder.noteId) {
         return ReminderAgendaActionResult.unavailable;
       }

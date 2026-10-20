@@ -41,6 +41,7 @@ Future<void> _open(WidgetTester tester,
     {required List<NoteHistoryVersion> versions,
     Future<NoteHistoryRestoreResult> Function(String)? restore,
     void Function(bool?)? onClosed,
+    VoidCallback? onRestored,
     Listenable? changes,
     Locale locale = const Locale('en'),
     double textScale = 1}) async {
@@ -67,6 +68,7 @@ Future<void> _open(WidgetTester tester,
                             noteId: 'note',
                             readVersions: () => versions,
                             restoreVersion: restore,
+                            onRestored: onRestored,
                             changes: changes));
                     onClosed?.call(result);
                   },
@@ -591,10 +593,12 @@ void main() {
   testWidgets('explicit restore uses selected version and reports completion',
       (tester) async {
     final restored = <String>[];
+    var refreshes = 0;
     bool? result;
     await _open(tester,
         versions: [_version(id: 'chosen')],
         onClosed: (value) => result = value,
+        onRestored: () => refreshes++,
         restore: (id) async {
           restored.add(id);
           return NoteHistoryRestoreResult.restored;
@@ -605,7 +609,166 @@ void main() {
     await tester.pumpAndSettle();
     expect(restored, ['chosen']);
     expect(result, isTrue);
+    expect(refreshes, 1);
     expect(find.byType(NoteHistorySheet), findsNothing);
+  });
+
+  testWidgets(
+      'pending restore completing during dismissal leaves the reader open',
+      (tester) async {
+    final completion = Completer<NoteHistoryRestoreResult>();
+    final results = <bool?>[];
+    final attempted = <String>[];
+    var refreshes = 0;
+    await _open(tester,
+        versions: [_version(id: 'chosen')],
+        onRestored: () => refreshes++,
+        onClosed: results.add,
+        restore: (id) {
+          attempted.add(id);
+          return completion.future;
+        });
+    await tester.tap(find.byKey(const ValueKey('history-version-chosen')));
+    await tester.pumpAndSettle();
+    final restore = tester
+        .widget<FilledButton>(
+            find.byKey(const ValueKey('history-restore-action')))
+        .onPressed!;
+    restore();
+    restore();
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pump(const Duration(milliseconds: 20));
+    expect(find.byType(NoteHistorySheet), findsOneWidget);
+    completion.complete(NoteHistoryRestoreResult.restored);
+    await tester.pumpAndSettle();
+    restore();
+    expect(attempted, ['chosen']);
+    expect(refreshes, 1);
+    expect(results, [null]);
+    expect(find.text('History'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('pending restore completion cannot dismiss a covering dialog',
+      (tester) async {
+    final completion = Completer<NoteHistoryRestoreResult>();
+    final results = <bool?>[];
+    final attempted = <String>[];
+    var refreshes = 0;
+    await _open(tester,
+        versions: [_version(id: 'chosen')],
+        onRestored: () => refreshes++,
+        onClosed: results.add,
+        restore: (id) {
+          attempted.add(id);
+          return completion.future;
+        });
+    await tester.tap(find.byKey(const ValueKey('history-version-chosen')));
+    await tester.pumpAndSettle();
+    final restore = tester
+        .widget<FilledButton>(
+            find.byKey(const ValueKey('history-restore-action')))
+        .onPressed!;
+    restore();
+    await tester.pump();
+    showDialog<void>(
+        context: tester.element(find.byType(NoteHistorySheet)),
+        builder: (_) => const AlertDialog(content: Text('Covered')));
+    await tester.pump(const Duration(milliseconds: 300));
+    completion.complete(NoteHistoryRestoreResult.restored);
+    await tester.pumpAndSettle();
+    expect(find.text('Covered'), findsOneWidget);
+    restore();
+    expect(attempted, ['chosen']);
+    expect(refreshes, 1);
+    expect(results, isEmpty);
+    Navigator.pop(tester.element(find.text('Covered')));
+    await tester.pumpAndSettle();
+    expect(find.text(S.current.History_Restored), findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(results, [null]);
+    expect(find.text('History'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('restore notifies its owner once after the sheet is disposed',
+      (tester) async {
+    final completion = Completer<NoteHistoryRestoreResult>();
+    final results = <bool?>[];
+    var refreshes = 0;
+    await _open(tester,
+        versions: [_version(id: 'chosen')],
+        onClosed: results.add,
+        onRestored: () => refreshes++,
+        restore: (_) => completion.future);
+    await tester.tap(find.byKey(const ValueKey('history-version-chosen')));
+    await tester.pumpAndSettle();
+    final restore = tester
+        .widget<FilledButton>(
+            find.byKey(const ValueKey('history-restore-action')))
+        .onPressed!;
+    restore();
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NoteHistorySheet), findsNothing);
+    expect(results, [null]);
+    expect(refreshes, 0);
+    completion.complete(NoteHistoryRestoreResult.restored);
+    await tester.pumpAndSettle();
+    restore();
+    expect(refreshes, 1);
+    expect(results, [null]);
+    expect(find.text('History'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final outcome in [
+    NoteHistoryRestoreResult.failed,
+    NoteHistoryRestoreResult.unavailable,
+    NoteHistoryRestoreResult.unchanged
+  ]) {
+    testWidgets('$outcome does not notify the owner of a restored note',
+        (tester) async {
+      var refreshes = 0;
+      await _open(tester,
+          versions: [_version()],
+          onRestored: () => refreshes++,
+          restore: (_) async => outcome);
+      await tester.tap(find.byKey(const ValueKey('history-version-version')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+      await tester.pumpAndSettle();
+      expect(refreshes, 0);
+      expect(find.byType(NoteHistorySheet), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets(
+      'owner refresh failure does not turn a completed restore into failure',
+      (tester) async {
+    final results = <bool?>[];
+    var refreshes = 0;
+    await _open(tester,
+        versions: [_version()],
+        onClosed: results.add,
+        onRestored: () {
+          refreshes++;
+          throw StateError('Refresh unavailable');
+        },
+        restore: (_) async => NoteHistoryRestoreResult.restored);
+    await tester.tap(find.byKey(const ValueKey('history-version-version')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+    await tester.pumpAndSettle();
+    expect(refreshes, 1);
+    expect(results, [true]);
+    expect(find.text(S.current.History_Restore_Failed), findsNothing);
+    expect(find.text('History'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('failed restore keeps preview and retries the same version',

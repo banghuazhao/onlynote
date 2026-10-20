@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
 
+void _closeCurrentSheet(BuildContext context) {
+  if (!context.mounted || ModalRoute.of(context)?.isCurrent != true) return;
+  Navigator.pop(context);
+}
+
 /// Shared, scrollable modal surface for every in-app action sheet.
 Future<T?> showAppSheet<T>({
   required BuildContext context,
@@ -56,7 +61,7 @@ class AppSheet extends StatelessWidget {
                 ),
                 IconButton(
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => _closeCurrentSheet(context),
                   icon: const Icon(Icons.close_rounded),
                 ),
               ]),
@@ -140,7 +145,7 @@ Future<void> showAppActionSheet({
           ],
           const SizedBox(height: 12),
           OutlinedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _closeCurrentSheet(context),
             child: Text(S.of(context).Cancel),
           ),
         ],

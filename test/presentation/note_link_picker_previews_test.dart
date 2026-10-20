@@ -48,7 +48,23 @@ void main() {
       expect(find.text(S.current.Link_Selected_Count(3)), findsOneWidget);
       expect(hiddenCount, findsNothing);
 
+      await tester.enterText(search, 'coastal');
+      await tester.pumpAndSettle();
+      final travelSnippet =
+          find.byKey(const ValueKey('note-link-snippet-travel'));
+      await tester.ensureVisible(travelSnippet);
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<Text>(travelSnippet).data, startsWith('…coastal walk'));
+      expect(tester.widget<Text>(travelSnippet).maxLines, 2);
+      expect(find.byTooltip(S.current.Clear_Search), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.ensureVisible(search);
       await tester.enterText(search, 'packing');
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(count, -60,
+          scrollable: scrollable, maxScrolls: 10);
       await tester.pumpAndSettle();
       expect(find.text(S.current.Link_Selected_Count(3)), findsOneWidget);
       expect(

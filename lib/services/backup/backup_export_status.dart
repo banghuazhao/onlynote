@@ -22,6 +22,8 @@ class BackupExportStatusStore {
   BackupExportStatusStore({SharedPreferencesAsync? preferences})
       : _preferences = preferences;
 
+  /// Share the completed status and write order across reopened screens.
+  static final instance = BackupExportStatusStore();
   static const storageKey = 'backup_export_status_v1';
 
   SharedPreferencesAsync? _preferences;

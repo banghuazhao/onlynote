@@ -50,7 +50,7 @@ void main() {
     );
     expect(noteLinkContentSnippet(note, query: ' ORDINARY '),
         'Ordinary body without this match');
-    expect(noteLinkContentSnippet(note, query: '[TEA]'), 'Buy [tea]');
+    expect(noteLinkContentSnippet(note, query: '[TEA]'), '…[tea]');
     expect(noteLinkContentSnippet(note, query: 'cabin'), 'CABIN reservation');
     expect(noteLinkContentSnippet(note, query: '.*'),
         'Ordinary body without this match');
@@ -65,11 +65,11 @@ void main() {
       voiceMemos: [_memo('${prefix}Mountain cabin for the weekend')],
     );
     final body = noteLinkContentSnippet(note, query: 'unique destination');
-    expect(body, startsWith('…'));
+    expect(body, startsWith('…Unique destination'));
     expect(body, contains('Unique destination'));
     expect(body.characters.length, lessThanOrEqualTo(161));
     final transcript = noteLinkContentSnippet(note, query: 'mountain cabin');
-    expect(transcript, startsWith('…'));
+    expect(transcript, startsWith('…Mountain cabin'));
     expect(transcript, contains('Mountain cabin'));
   });
 
@@ -78,7 +78,7 @@ void main() {
     final note = Note(description: 'Keep this receipt');
     final cachedText = ['MARKET 茶\nTotal: 12.50 [paid]'];
     expect(noteLinkContentSnippet(note, query: '[PAID]', photoText: cachedText),
-        'MARKET 茶 Total: 12.50 [paid]');
+        '…[paid]');
     expect(noteLinkContentSnippet(note, photoText: cachedText),
         'Keep this receipt');
     expect(noteLinkContentSnippet(note, query: '.*', photoText: cachedText),
@@ -96,5 +96,15 @@ void main() {
         '茶 $family $accented');
     expect(noteLinkContentSnippet(Note(description: long), query: family),
         contains(family));
+  });
+
+  test('a match within a combined grapheme starts with that complete grapheme',
+      () {
+    const family = '👨‍👩‍👧‍👦';
+    const accented = 'e\u0301';
+    final note = Note(description: 'Earlier $family$accented Match');
+    expect(
+        noteLinkContentSnippet(note, query: '👩'), '…$family$accented Match');
+    expect(noteLinkContentSnippet(note, query: '\u0301'), '…$accented Match');
   });
 }

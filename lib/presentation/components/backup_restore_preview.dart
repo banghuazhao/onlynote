@@ -120,8 +120,14 @@ class _MetadataRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // AlertDialog measures this content intrinsically, so avoid LayoutBuilder
+    // here. Stack at narrow window widths or when large text needs more room.
+    final useStacked = stacked ||
+        MediaQuery.sizeOf(context).width < 360 ||
+        MediaQuery.textScalerOf(context).scale(16) >= 24;
     final labelWidget = Text(
       label,
+      key: ValueKey('backup-preview-$id-label'),
       style: theme.textTheme.bodyMedium?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
       ),
@@ -136,7 +142,7 @@ class _MetadataRow extends StatelessWidget {
       child: Semantics(
         label: '$label: $value',
         excludeSemantics: true,
-        child: stacked
+        child: useStacked
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [labelWidget, const SizedBox(height: 4), valueWidget],

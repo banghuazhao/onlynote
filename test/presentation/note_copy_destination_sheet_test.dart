@@ -15,6 +15,7 @@ Future<void> _openPicker(
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),
   double textScale = 1,
+  bool disableAnimations = true,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -33,7 +34,7 @@ Future<void> _openPicker(
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: TextScaler.linear(textScale),
-        disableAnimations: true,
+        disableAnimations: disableAnimations,
       ),
       child: child!,
     ),
@@ -56,6 +57,67 @@ Future<void> _openPicker(
 
 void main() {
   setUpAll(() => initializeDateFormatting());
+
+  for (final destination in ['new', 'existing-target']) {
+    testWidgets('$destination choice finishes once during exit animation',
+        (tester) async {
+      final results = <NoteCopyDestination?>[];
+      await _openPicker(tester, results,
+          notes: [Note(id: 'target', title: 'Target')],
+          disableAnimations: false);
+      final choose = tester
+          .widget<ListTile>(find.byKey(ValueKey('note-copy-$destination')))
+          .onTap!;
+      choose();
+      choose();
+      await tester.pumpAndSettle();
+      choose();
+      expect(results, hasLength(1));
+      expect(results.single!.noteId, destination == 'new' ? null : 'target');
+      expect(find.text('Choose destination'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets(
+      'covered and cancelled copy sheets reject captured choices and clear',
+      (tester) async {
+    final results = <NoteCopyDestination?>[];
+    await _openPicker(tester, results,
+        notes: [Note(id: 'target', title: 'Target')], disableAnimations: false);
+    final search = find.byKey(const ValueKey('note-copy-search'));
+    await tester.enterText(search, 'Target');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    final choose = tester
+        .widget<ListTile>(
+            find.byKey(const ValueKey('note-copy-existing-target')))
+        .onTap!;
+    final clear = tester
+        .widget<IconButton>(find.byWidgetPredicate((widget) =>
+            widget is IconButton && widget.tooltip == S.current.Clear_Search))
+        .onPressed!;
+    final sheetContext = tester.element(find.byType(NoteCopyDestinationSheet));
+    showDialog<void>(
+        context: sheetContext,
+        builder: (_) => const AlertDialog(content: Text('Covered')));
+    await tester.pumpAndSettle();
+    choose();
+    clear();
+    expect(tester.widget<TextField>(search).controller!.text, 'Target');
+    expect(results, isEmpty);
+    Navigator.pop(tester.element(find.text('Covered')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Close'));
+    choose();
+    clear();
+    await tester.pumpAndSettle();
+    choose();
+    clear();
+    expect(results, [null]);
+    expect(find.text('Choose destination'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('shows eligible previews and returns an existing note choice',
       (tester) async {

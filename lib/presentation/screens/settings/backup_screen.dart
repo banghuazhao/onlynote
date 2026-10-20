@@ -95,7 +95,8 @@ class _BackupScreenState extends State<BackupScreen> {
     super.initState();
     _unregisterExitGuard =
         DesktopCommands.instance.registerEditor(() async => !_busy);
-    _backupStatusStore = widget.backupStatusStore ?? BackupExportStatusStore();
+    _backupStatusStore =
+        widget.backupStatusStore ?? BackupExportStatusStore.instance;
     _exportFormatStore =
         widget.exportFormatStore ?? NoteExportFormatStore.instance;
     unawaited(_loadBackupStatus());

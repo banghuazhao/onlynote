@@ -26,6 +26,7 @@ class _RemindersScreenState extends State<RemindersScreen>
     with WidgetsBindingObserver {
   ReminderAgendaController? _controller;
   Timer? _clockRefresh;
+  bool _openingNote = false;
 
   @override
   void initState() {
@@ -65,10 +66,16 @@ class _RemindersScreenState extends State<RemindersScreen>
   }
 
   Future<void> _openNote(ReminderAgendaEntry entry) async {
+    if (_openingNote ||
+        _controller!.busyReminderId != null ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingNote = true;
     final l10n = S.of(context);
     try {
       final note = await _controller!.resolveNote(entry);
-      if (!mounted) return;
+      if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
       if (note == null) {
         context.showToast(l10n.Reminders_Note_Unavailable, isError: true);
         await _controller!.refresh();
@@ -77,9 +84,11 @@ class _RemindersScreenState extends State<RemindersScreen>
       await context.router.push(NoteDetailRoute(noteId: note.id!));
       if (mounted) await _controller!.refresh();
     } catch (_) {
-      if (mounted) {
+      if (mounted && ModalRoute.of(context)?.isCurrent == true) {
         context.showToast(l10n.Reminders_Load_Failed, isError: true);
       }
+    } finally {
+      _openingNote = false;
     }
   }
 

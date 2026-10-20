@@ -35,6 +35,7 @@ class NoteOutlineSheet extends StatefulWidget {
 
 class _NoteOutlineSheetState extends State<NoteOutlineSheet> {
   final _search = TextEditingController();
+  bool _closing = false;
 
   @override
   void dispose() {
@@ -43,16 +44,22 @@ class _NoteOutlineSheetState extends State<NoteOutlineSheet> {
   }
 
   void _select(NoteOutlineEntry entry) {
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     if (widget.onEntrySelected != null) {
       widget.onEntrySelected!(entry);
     } else {
+      _closing = true;
       Navigator.pop(context, entry);
     }
   }
 
   void _clearSearch() {
-    if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
     setState(_search.clear);
   }
 

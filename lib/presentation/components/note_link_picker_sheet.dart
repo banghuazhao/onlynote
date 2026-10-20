@@ -42,6 +42,25 @@ class NoteLinkPickerSheet extends StatefulWidget {
 
 class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
   final _search = TextEditingController();
+  bool _closing = false;
+
+  bool get _canAct =>
+      mounted && !_closing && ModalRoute.of(context)?.isCurrent != false;
+
+  void _finish({bool save = false}) {
+    if (!_canAct) return;
+    final result = save
+        ? normalizeLinkedNoteIds(_selected, noteId: widget.currentNoteId)
+        : null;
+    _closing = true;
+    Navigator.pop(context, result);
+  }
+
+  void _clearSearch() {
+    if (!_canAct) return;
+    setState(_search.clear);
+  }
+
   final _photoSearchIndex = PhotoSearchIndex.initializedInstance;
   late final Set<String> _selected = {
     ...normalizeLinkedNoteIds(widget.selectedIds, noteId: widget.currentNoteId),
@@ -115,7 +134,7 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                   IconButton(
                     tooltip:
                         MaterialLocalizations.of(context).closeButtonTooltip,
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: _finish,
                     icon: const Icon(Icons.close_rounded),
                   ),
                 ],
@@ -135,9 +154,8 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                   suffixIcon: _search.text.isEmpty
                       ? null
                       : IconButton(
-                          tooltip: MaterialLocalizations.of(context)
-                              .deleteButtonTooltip,
-                          onPressed: () => setState(_search.clear),
+                          tooltip: strings.Clear_Search,
+                          onPressed: _clearSearch,
                           icon: const Icon(Icons.close_rounded),
                         ),
                 ),
@@ -198,7 +216,9 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                       title: Text(strings.Link_Unavailable),
                       trailing: IconButton(
                         tooltip: strings.Link_Remove,
-                        onPressed: () => setState(() => _selected.remove(id)),
+                        onPressed: () {
+                          if (_canAct) setState(() => _selected.remove(id));
+                        },
                         icon: const Icon(Icons.close_rounded),
                       ),
                     );
@@ -255,13 +275,16 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                           ),
                     onChanged: !selected && _selected.length >= maxLinkedNotes
                         ? null
-                        : (value) => setState(() {
+                        : (value) {
+                            if (!_canAct) return;
+                            setState(() {
                               if (value == true) {
                                 _selected.add(note.id!);
                               } else {
                                 _selected.remove(note.id);
                               }
-                            }),
+                            });
+                          },
                   );
                 },
               ),
@@ -271,10 +294,7 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
               child: FilledButton(
                 key: const ValueKey('save-note-links'),
-                onPressed: () => Navigator.pop(
-                    context,
-                    normalizeLinkedNoteIds(_selected,
-                        noteId: widget.currentNoteId)),
+                onPressed: () => _finish(save: true),
                 child: Text(strings.Done),
               ),
             ),

@@ -66,6 +66,21 @@ void main() {
       ('backup-light', backupRestoreLightPreview, const Size(390, 700)),
       ('backup-dark', backupRestoreDarkPreview, const Size(390, 700)),
       ('backup-chinese', backupRestoreChinesePreview, const Size(280, 700)),
+      (
+        'backup-large-counts',
+        backupRestoreLargeCountsPreview,
+        const Size(390, 700)
+      ),
+      (
+        'backup-large-counts-dark',
+        backupRestoreLargeCountsDarkPreview,
+        const Size(390, 700)
+      ),
+      (
+        'backup-chinese-landscape',
+        backupRestoreChineseLandscapePreview,
+        const Size(700, 280)
+      ),
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(RepaintBoundary(

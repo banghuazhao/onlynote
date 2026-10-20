@@ -361,6 +361,51 @@ void main() {
   }
 
   testWidgets(
+      'metadata rows adapt to narrow windows and large text independently',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    for (final (width, textScale, stacked) in [
+      (320.0, 1.0, true),
+      (800.0, 2.0, true),
+      (800.0, 1.0, false),
+    ]) {
+      tester.view.physicalSize = Size(width, 700);
+      await tester.pumpWidget(_host(_metadata(), textScale: textScale));
+      await tester.pumpAndSettle();
+      for (final id in [
+        'created',
+        'active-notes',
+        'archived-notes',
+        'trashed-notes',
+        'templates',
+        'recording-files',
+        'saved-views',
+        'history-versions',
+      ]) {
+        final label = find.byKey(ValueKey('backup-preview-$id-label'));
+        final value = find.byKey(ValueKey('backup-preview-$id-value'));
+        await tester.ensureVisible(value);
+        await tester.pumpAndSettle();
+        final labelBounds = tester.getRect(label);
+        final valueBounds = tester.getRect(value);
+        if (stacked || id == 'created') {
+          expect(valueBounds.top, greaterThanOrEqualTo(labelBounds.bottom));
+          expect(valueBounds.left, closeTo(labelBounds.left, 0.01));
+        } else {
+          expect(valueBounds.top, closeTo(labelBounds.top, 0.01));
+          expect(valueBounds.left, greaterThan(labelBounds.right));
+        }
+        expect(labelBounds.left, greaterThanOrEqualTo(0));
+        expect(labelBounds.right, lessThanOrEqualTo(width));
+        expect(valueBounds.left, greaterThanOrEqualTo(0));
+        expect(valueBounds.right, lessThanOrEqualTo(width));
+      }
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets(
       'isolated restore dialogs fit light, dark and Chinese 2x narrow layouts',
       (tester) async {
     addTearDown(() => tester.view.resetPhysicalSize());
@@ -370,32 +415,66 @@ void main() {
       (backupRestoreLightPreview, const Size(390, 700)),
       (backupRestoreDarkPreview, const Size(390, 700)),
       (backupRestoreChinesePreview, const Size(280, 700)),
+      (backupRestoreLargeCountsPreview, const Size(390, 700)),
+      (backupRestoreLargeCountsDarkPreview, const Size(390, 700)),
+      (backupRestoreChineseLandscapePreview, const Size(700, 280)),
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(preview());
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
+      final metadata = tester
+          .widget<BackupRestorePreview>(find.byType(BackupRestorePreview))
+          .metadata;
+      final locale = Localizations.localeOf(
+          tester.element(find.byType(BackupRestorePreview)));
+      final numbers = NumberFormat.decimalPattern(locale.toString());
+      final stacked = preview == backupRestoreChinesePreview ||
+          preview == backupRestoreChineseLandscapePreview;
       for (final (id, value) in [
-        ('active-notes', '17'),
-        ('archived-notes', '5'),
-        ('trashed-notes', '2'),
+        ('active-notes', metadata.activeNoteCount),
+        ('archived-notes', metadata.archivedNoteCount),
+        ('trashed-notes', metadata.trashedNoteCount),
+        ('templates', metadata.templateCount),
+        ('recording-files', metadata.recordingFileCount),
+        ('saved-views', metadata.savedViewCount),
+        ('history-versions', metadata.historyVersionCount),
       ]) {
         final count = find.byKey(ValueKey('backup-preview-$id-value'));
+        final label = find.byKey(ValueKey('backup-preview-$id-label'));
         await tester.ensureVisible(count);
         await tester.pumpAndSettle();
-        expect(tester.widget<Text>(count).data, value);
+        expect(tester.widget<Text>(count).data, numbers.format(value));
         final bounds = tester.getRect(count);
+        final labelBounds = tester.getRect(label);
+        expect(bounds.left, greaterThanOrEqualTo(0));
+        expect(bounds.right, lessThanOrEqualTo(size.width));
+        expect(labelBounds.left, greaterThanOrEqualTo(0));
+        expect(labelBounds.right, lessThanOrEqualTo(size.width));
+        expect(bounds.top, greaterThanOrEqualTo(0));
+        expect(bounds.bottom, lessThanOrEqualTo(size.height));
+        if (stacked) {
+          expect(bounds.left, closeTo(labelBounds.left, 0.01));
+          expect(bounds.top, greaterThanOrEqualTo(labelBounds.bottom));
+        } else {
+          expect(bounds.top, closeTo(labelBounds.top, 0.01));
+          expect(bounds.left, greaterThan(labelBounds.right));
+        }
+        expect(tester.takeException(), isNull);
+      }
+      for (final action in [
+        find.widgetWithText(TextButton, S.current.Cancel),
+        find.widgetWithText(FilledButton, S.current.Restore),
+      ]) {
+        await tester.ensureVisible(action);
+        await tester.pumpAndSettle();
+        final bounds = tester.getRect(action);
+        expect(action.hitTestable(), findsOneWidget);
         expect(bounds.left, greaterThanOrEqualTo(0));
         expect(bounds.right, lessThanOrEqualTo(size.width));
         expect(bounds.top, greaterThanOrEqualTo(0));
         expect(bounds.bottom, lessThanOrEqualTo(size.height));
       }
-      await tester.ensureVisible(
-          find.byKey(const ValueKey('backup-preview-history-versions-value')));
-      await tester.pumpAndSettle();
-      expect(find.text('38'), findsOneWidget);
-      expect(find.text(S.current.Cancel), findsOneWidget);
-      expect(find.text(S.current.Restore), findsOneWidget);
       expect(tester.takeException(), isNull);
     }
   });

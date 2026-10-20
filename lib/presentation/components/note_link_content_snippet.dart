@@ -14,7 +14,9 @@ String noteLinkContentSnippet(
   final pattern = searchPattern(query);
   if (pattern != null) {
     for (final text in _content(note).followedBy(photoText)) {
-      if (pattern.hasMatch(text)) return _prefix(searchExcerpt(text, query));
+      if (pattern.hasMatch(text)) {
+        return _prefix(searchExcerpt(text, query, leadingContext: 0));
+      }
     }
   }
   for (final text in _content(note)) {

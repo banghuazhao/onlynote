@@ -11,10 +11,13 @@ import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
 
 Future<bool?> showNoteHistorySheet(BuildContext context,
-        {required String noteId, NoteHistory? history}) =>
+        {required String noteId,
+        NoteHistory? history,
+        VoidCallback? onRestored}) =>
     showAppSheet<bool>(
         context: context,
-        builder: (_) => NoteHistorySheet(noteId: noteId, history: history));
+        builder: (_) => NoteHistorySheet(
+            noteId: noteId, history: history, onRestored: onRestored));
 
 /// Versions are previews until the user explicitly chooses Restore. Repository
 /// failures keep the selected preview and offer a retry of the same version.
@@ -26,6 +29,7 @@ class NoteHistorySheet extends StatefulWidget {
     this.readVersions,
     this.restoreVersion,
     this.changes,
+    this.onRestored,
   });
 
   final String noteId;
@@ -34,6 +38,7 @@ class NoteHistorySheet extends StatefulWidget {
   final Future<NoteHistoryRestoreResult> Function(String versionId)?
       restoreVersion;
   final Listenable? changes;
+  final VoidCallback? onRestored;
 
   @override
   State<NoteHistorySheet> createState() => _NoteHistorySheetState();
@@ -83,7 +88,13 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
 
   Future<void> _restore() async {
     final selected = _selected;
-    if (_restoring || selected == null) return;
+    if (!mounted ||
+        _restoring ||
+        selected == null ||
+        ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    final onRestored = widget.onRestored;
     setState(() {
       _restoring = true;
       _result = null;
@@ -96,10 +107,24 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     } catch (_) {
       result = NoteHistoryRestoreResult.failed;
     }
+    if (result == NoteHistoryRestoreResult.restored) {
+      // Persistence can complete after the sheet is dismissed. Its owner must
+      // still refresh, even though this route can no longer return true.
+      try {
+        onRestored?.call();
+      } catch (error) {
+        // A refresh error does not undo the successful repository write.
+        debugPrint('Restored note refresh deferred: $error');
+      }
+    }
     if (!mounted) return;
     if (result == NoteHistoryRestoreResult.restored) {
-      Navigator.pop(context, true);
-      return;
+      // The user may have dismissed or covered this sheet during the write.
+      // Its completion must never pop a different route.
+      if (ModalRoute.of(context)?.isCurrent != false) {
+        Navigator.pop(context, true);
+        return;
+      }
     }
     setState(() {
       _restoring = false;

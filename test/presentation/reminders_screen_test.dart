@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,6 +8,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_screen.dart';
+import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
 
@@ -22,7 +25,98 @@ Future<void> _pumpScreen(
       home: RemindersScreen(controller: controller),
     ));
 
+class _AgendaRouter extends RootStackRouter {
+  _AgendaRouter(this.controller);
+  final ReminderAgendaController controller;
+
+  @override
+  List<AutoRoute> get routes => [
+        AutoRoute(
+            initial: true,
+            page: PageInfo('TestAgendaRoute',
+                builder: (_) => RemindersScreen(controller: controller))),
+        AutoRoute(
+            page: PageInfo(NoteDetailRoute.name,
+                builder: (data) => Scaffold(
+                    body: Text(
+                        'Reading ${data.argsAs<NoteDetailRouteArgs>().noteId}')))),
+      ];
+}
+
 void main() {
+  for (final covered in [false, true]) {
+    testWidgets(
+        'slow note lookup ${covered ? 'cannot navigate under another sheet' : 'opens one reader after repeated taps'}',
+        (tester) async {
+      final now = DateTime(2026, 10, 20, 14);
+      final note = Note(id: 'note', title: 'Appointments');
+      final lookup = Completer<Note?>();
+      var reads = 0;
+      final controller = ReminderAgendaController(
+        readReminders: () =>
+            [Reminder(reminderDate: now, reminderId: 42, noteId: 'note')],
+        readNotes: () async => [note],
+        readNote: (_) {
+          reads++;
+          return lookup.future;
+        },
+        readPendingSnoozes: (_) async => {},
+        now: () => now,
+        snoozeReminder: (_, __) async => false,
+        rescheduleReminder: (_, __, ___) async => false,
+      );
+      final router = _AgendaRouter(controller);
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+        controller.dispose();
+      });
+      await tester.pumpWidget(MaterialApp.router(
+        theme: AppTheme.light,
+        routerConfig: router.config(),
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+      ));
+      await tester.pumpAndSettle();
+      final open = tester
+          .widget<InkWell>(find.byKey(const ValueKey('open-reminder-42')))
+          .onTap!;
+      open();
+      open();
+      expect(reads, 1);
+      if (covered) {
+        unawaited(showDialog<void>(
+            context: tester.element(find.byType(RemindersScreen)),
+            builder: (_) => const AlertDialog(title: Text('Another action'))));
+        await tester.pumpAndSettle();
+      }
+      lookup.complete(note);
+      await tester.pumpAndSettle();
+      if (covered) {
+        expect(find.text('Another action'), findsOneWidget);
+        expect(find.text('Reading note'), findsNothing);
+        expect(
+            router.stack.where((route) => route.name == NoteDetailRoute.name),
+            isEmpty);
+        Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+        await tester.pumpAndSettle();
+        open();
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('Reading note'), findsOneWidget);
+      expect(router.stack.where((route) => route.name == NoteDetailRoute.name),
+          hasLength(1));
+      await router.maybePop();
+      await tester.pumpAndSettle();
+      expect(find.byType(RemindersScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final withSearch in [false, true]) {
     testWidgets(
         'agenda snooze sheet sends delay and refreshes${withSearch ? ' while searching' : ''}',

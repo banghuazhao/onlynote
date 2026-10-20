@@ -152,7 +152,18 @@ class VoiceMemoService {
   Future<void> pause() => _serialize(() async {
         _accept(await _platform.invoke('pause'));
       });
+
+  Future<void> pauseFor(String absolutePath) => _serialize(() async {
+        if (state.value.path != absolutePath || !state.value.playing) return;
+        _accept(await _platform.invoke('pause'));
+      });
   Future<void> stopPlayback() => _serialize(() async {
+        _accept(await _platform.invoke('stopPlayback'));
+      });
+
+  /// Cleanup for one player cannot stop a different file queued ahead of it.
+  Future<void> stopPlaybackFor(String absolutePath) => _serialize(() async {
+        if (state.value.path != absolutePath) return;
         _accept(await _platform.invoke('stopPlayback'));
       });
   Future<String> transcribe(String absolutePath, {String? locale}) {

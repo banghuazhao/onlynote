@@ -17,6 +17,7 @@ import 'package:onlynote/services/voice_memo_service.dart';
 class _Platform implements VoiceMemoPlatform {
   final events = StreamController<Object?>.broadcast();
   final calls = <String>[];
+  final playedPaths = <String>[];
   bool denied = false;
   bool unsupported = false;
   Completer<Object?>? recognition;
@@ -26,6 +27,7 @@ class _Platform implements VoiceMemoPlatform {
   Future<Object?> invoke(String method,
       [Map<String, Object?>? arguments]) async {
     calls.add(method);
+    if (method == 'play') playedPaths.add(arguments!['path']! as String);
     if (method == 'startRecording' && denied) {
       throw PlatformException(code: 'permission_denied');
     }
@@ -47,7 +49,8 @@ class _Platform implements VoiceMemoPlatform {
           : method == 'play'
               ? 'playing'
               : 'idle',
-      'path': '/app/note_audio/memo.m4a',
+      'path':
+          method == 'play' ? arguments!['path'] : '/app/note_audio/memo.m4a',
       'durationMs': method == 'startRecording' ? 0 : 5000
     };
   }
@@ -226,6 +229,135 @@ void main() {
     await tester.pumpAndSettle();
     expect(platform.calls.last, 'pause');
     expect(pathResolutions, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  for (final transcribe in [false, true]) {
+    testWidgets(
+        'replacing a memo while resolving never starts old ${transcribe ? 'transcription' : 'playback'}',
+        (tester) async {
+      createService();
+      final oldPath = Completer<String>();
+      final changed = memo.copyWith(path: 'note_audio/next.m4a');
+      final transcripts = <String?>[];
+      Widget player(VoiceMemo value) => VoiceMemoPlayer(
+            memo: value,
+            service: service,
+            resolvePath: (path) async =>
+                path == memo.path ? await oldPath.future : '/app/$path',
+            onTranscriptChanged: (text) async => transcripts.add(text),
+          );
+      await tester.pumpWidget(_host(player(memo)));
+      await tester.pumpAndSettle();
+      if (transcribe) {
+        await tester.tap(find.byType(PopupMenuButton<String>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(S.current.Voice_Transcribe));
+      } else {
+        await tester.tap(find.byTooltip(S.current.Voice_Play));
+      }
+      await tester.pump();
+      await tester.pumpWidget(_host(player(changed)));
+      oldPath.complete('/app/${memo.path}');
+      await tester.pumpAndSettle();
+      expect(
+          platform.calls, isNot(contains(transcribe ? 'transcribe' : 'play')));
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(transcripts, isEmpty);
+      await tester.tap(find.byTooltip(S.current.Voice_Play));
+      await tester.pumpAndSettle();
+      expect(platform.playedPaths, ['/app/note_audio/next.m4a']);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
+  testWidgets('a memo replacement cannot receive an older transcript draft',
+      (tester) async {
+    createService();
+    final oldWrites = <String?>[];
+    final newWrites = <String?>[];
+    Widget player(VoiceMemo value, List<String?> writes) => VoiceMemoPlayer(
+          memo: value,
+          service: service,
+          resolvePath: (path) async => '/app/$path',
+          onTranscriptChanged: (text) async => writes.add(text),
+        );
+    await tester.pumpWidget(
+        _host(player(memo.copyWith(transcript: 'Original'), oldWrites)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Voice_Edit_Transcript));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+        find.byKey(const ValueKey('voice-transcript-editor-input')),
+        'Draft for the original recording');
+    // The same path under a new identity must also invalidate old callbacks.
+    await tester.pumpWidget(_host(player(
+        memo.copyWith(id: 'replacement', transcript: 'Keep replacement'),
+        newWrites)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Voice_Save));
+    await tester.pumpAndSettle();
+    expect(oldWrites, isEmpty);
+    expect(newWrites, isEmpty);
+    expect(find.text('Keep replacement'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets(
+      'path changes cancel old recognition without editing the new memo',
+      (tester) async {
+    createService();
+    platform.recognition = Completer<Object?>();
+    final writes = <String?>[];
+    Widget player(VoiceMemo value) => VoiceMemoPlayer(
+          memo: value,
+          service: service,
+          resolvePath: (path) async => '/app/$path',
+          onTranscriptChanged: (text) async => writes.add(text),
+        );
+    await tester.pumpWidget(_host(player(memo)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Voice_Transcribe));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump();
+    expect(service.isTranscribingPath('/app/${memo.path}'), isTrue);
+    await tester.pumpWidget(
+        _host(player(memo.copyWith(path: 'note_audio/replacement.m4a'))));
+    await tester.pumpAndSettle();
+    expect(platform.calls, contains('cancelTranscription'));
+    expect(writes, isEmpty);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text(S.current.Voice_Transcription_Failed), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('a menu opened for an older memo cannot remove its replacement',
+      (tester) async {
+    createService();
+    var removed = 0;
+    Widget player(VoiceMemo value) => VoiceMemoPlayer(
+          memo: value,
+          service: service,
+          resolvePath: (path) async => '/app/$path',
+          onRemove: () async => removed++,
+        );
+    await tester.pumpWidget(_host(player(memo)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(_host(player(memo.copyWith(id: 'replacement'))));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Voice_Delete));
+    await tester.pumpAndSettle();
+    expect(removed, 0);
+    expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 

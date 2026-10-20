@@ -47,6 +47,22 @@ class NoteCopyDestinationSheet extends StatefulWidget {
 
 class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
   final _search = TextEditingController();
+  bool _closing = false;
+
+  void _finish([NoteCopyDestination? destination]) {
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    _closing = true;
+    Navigator.pop(context, destination);
+  }
+
+  void _clearSearch() {
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    setState(_search.clear);
+  }
 
   List<Note> get _available => <String, Note>{
         for (final note in widget.notes)
@@ -94,7 +110,7 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                 ),
                 IconButton(
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _finish,
                   icon: const Icon(Icons.close_rounded),
                 ),
               ]),
@@ -119,9 +135,8 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                   suffixIcon: _search.text.isEmpty
                       ? null
                       : IconButton(
-                          tooltip: MaterialLocalizations.of(context)
-                              .deleteButtonTooltip,
-                          onPressed: () => setState(_search.clear),
+                          tooltip: strings.Clear_Search,
+                          onPressed: _clearSearch,
                           icon: const Icon(Icons.close_rounded),
                         ),
                 ),
@@ -141,8 +156,7 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                       title: Text(strings.Copy_Selection_New_Note),
                       subtitle: Text(strings.Copy_Selection_New_Note_Hint),
                       trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => Navigator.pop(
-                          context, const NoteCopyDestination.newNote()),
+                      onTap: () => _finish(const NoteCopyDestination.newNote()),
                     );
                   }
                   if (matches.isEmpty) {
@@ -188,8 +202,8 @@ class _NoteCopyDestinationSheetState extends State<NoteCopyDestinationSheet> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => Navigator.pop(
-                        context, NoteCopyDestination.existing(note.id!)),
+                    onTap: () =>
+                        _finish(NoteCopyDestination.existing(note.id!)),
                   );
                 },
               ),

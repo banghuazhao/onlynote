@@ -137,6 +137,40 @@ void main() {
     await service.stopPlayback();
     expect(platform.calls.last, 'stopPlayback');
   });
+
+  for (final pause in [false, true]) {
+    test(
+        '${pause ? 'pause' : 'cleanup'} for an older file cannot affect queued playback of another file',
+        () async {
+      const nextPath = '/app/note_audio/next.m4a';
+      final nextPlayback = Completer<Object?>();
+      platform.action = (method, args) async {
+        if (method == 'play') {
+          if (args!['path'] == nextPath) return nextPlayback.future;
+          return {'phase': 'playing', 'path': path};
+        }
+        return {'phase': 'idle'};
+      };
+      await service.play(path);
+      final next = service.play(nextPath);
+      final cleanup =
+          pause ? service.pauseFor(path) : service.stopPlaybackFor(path);
+      await Future<void>.delayed(Duration.zero);
+      nextPlayback.complete({'phase': 'playing', 'path': nextPath});
+      await next;
+      await cleanup;
+      expect(service.state.value.path, nextPath);
+      expect(service.state.value.playing, isTrue);
+      expect(platform.calls, ['play', 'play']);
+      if (pause) {
+        await service.pauseFor(nextPath);
+      } else {
+        await service.stopPlaybackFor(nextPath);
+      }
+      expect(platform.calls.last, pause ? 'pause' : 'stopPlayback');
+      expect(service.state.value.playing, isFalse);
+    });
+  }
   test('cancel before a queued transcription starts never invokes recognition',
       () async {
     final prepared = Completer<Object?>();

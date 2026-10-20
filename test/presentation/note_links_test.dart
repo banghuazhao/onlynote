@@ -15,6 +15,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),
   double textScale = 1,
+  bool disableAnimations = true,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -33,7 +34,7 @@ Future<void> _pump(
     builder: (context, child) => MediaQuery(
       data: MediaQuery.of(context).copyWith(
         textScaler: TextScaler.linear(textScale),
-        disableAnimations: true,
+        disableAnimations: disableAnimations,
       ),
       child: child!,
     ),
@@ -50,6 +51,7 @@ Future<void> _openPicker(
   Locale locale = const Locale('en'),
   Size size = const Size(390, 844),
   double textScale = 1,
+  bool disableAnimations = true,
 }) async {
   await _pump(
     tester,
@@ -67,6 +69,7 @@ Future<void> _openPicker(
     locale: locale,
     size: size,
     textScale: textScale,
+    disableAnimations: disableAnimations,
   );
   await tester.tap(find.text('Open picker'));
   await tester.pumpAndSettle();
@@ -74,6 +77,77 @@ Future<void> _openPicker(
 
 void main() {
   setUpAll(() => initializeDateFormatting());
+
+  testWidgets(
+      'Done finishes once and rejects captured link changes during exit',
+      (tester) async {
+    final results = <List<String>?>[];
+    final original = ['target'];
+    await _openPicker(tester, results,
+        notes: [Note(id: 'target', title: 'Target')],
+        selectedIds: original,
+        disableAnimations: false);
+    final change = tester
+        .widget<CheckboxListTile>(
+            find.byKey(const ValueKey('choose-note-link-target')))
+        .onChanged!;
+    final save = tester
+        .widget<FilledButton>(find.byKey(const ValueKey('save-note-links')))
+        .onPressed!;
+    save();
+    change(false);
+    save();
+    await tester.pumpAndSettle();
+    save();
+    change(false);
+    expect(results, [
+      ['target']
+    ]);
+    expect(original, ['target']);
+    expect(find.text('Open picker'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'covered and cancelled link sheets reject captured Done and clear',
+      (tester) async {
+    final results = <List<String>?>[];
+    await _openPicker(tester, results,
+        notes: [Note(id: 'target', title: 'Target')],
+        selectedIds: ['target'],
+        disableAnimations: false);
+    final search = find.byKey(const ValueKey('note-link-search'));
+    await tester.enterText(search, 'Target');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    final save = tester
+        .widget<FilledButton>(find.byKey(const ValueKey('save-note-links')))
+        .onPressed!;
+    final clear = tester
+        .widget<IconButton>(find.byWidgetPredicate((widget) =>
+            widget is IconButton && widget.tooltip == S.current.Clear_Search))
+        .onPressed!;
+    final sheetContext = tester.element(find.byType(NoteLinkPickerSheet));
+    showDialog<void>(
+        context: sheetContext,
+        builder: (_) => const AlertDialog(content: Text('Covered')));
+    await tester.pumpAndSettle();
+    save();
+    clear();
+    expect(tester.widget<TextField>(search).controller!.text, 'Target');
+    expect(results, isEmpty);
+    Navigator.pop(tester.element(find.text('Covered')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Close'));
+    save();
+    clear();
+    await tester.pumpAndSettle();
+    save();
+    clear();
+    expect(results, [null]);
+    expect(find.text('Open picker'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('picker excludes self and trash but selects archived notes',
       (tester) async {
@@ -136,7 +210,7 @@ void main() {
     await tester.enterText(search, 'mountain');
     await tester.pump();
     expect(find.text('Recorded idea'), findsOneWidget);
-    expect(find.text('Book the mountain cabin.'), findsOneWidget);
+    expect(find.text('…mountain cabin.'), findsOneWidget);
     expect(find.text('Meeting'), findsNothing);
     expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-voice')));
@@ -236,7 +310,7 @@ void main() {
     final search = find.byKey(const ValueKey('note-link-search'));
     for (final (query, expected) in [
       ('coastal', 'Coastal walk'),
-      ('[TEA]', 'Buy [tea]'),
+      ('[TEA]', '[tea]'),
       ('mountain', 'Mountain cabin'),
     ]) {
       await tester.enterText(search, query);

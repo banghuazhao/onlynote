@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Prevented repeated or delayed sheet and note actions from navigating twice or dismissing a different page.
+- Refreshed restored note content even when its history sheet closes before the restore finishes.
+- Rejected stale reminder and recording actions when their note, schedule, or recording changes during an asynchronous operation.
+- Kept the latest backup export status visible across screen reopening while preference writes are pending.
+- Improved large-text backup metadata layout, linked-note search excerpts, and clear-search accessibility labels.
 - Added active, archived, and Trash note counts to the backup restore confirmation.
 - Added stored-text previews beneath linked notes and backlinks in the reader and editor.
 - Added the associated daily-note date to Note info, independently of later edits and titles.

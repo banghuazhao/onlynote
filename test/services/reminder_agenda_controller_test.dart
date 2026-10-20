@@ -98,6 +98,50 @@ void main() {
     expect(controller.entries.single.dueDate, newTime);
   });
 
+  for (final change in ['edited', 'deleted', 'reassigned']) {
+    test('reminder $change during note lookup rejects the stale action',
+        () async {
+      controller.dispose();
+      final lookup = Completer<Note?>();
+      controller = ReminderAgendaController(
+        readReminders: () => reminders,
+        readNotes: () async => [note!],
+        readNote: (_) => lookup.future,
+        readPendingSnoozes: (_) async => {},
+        snoozeReminder: (_, __) async {
+          saves++;
+          return true;
+        },
+        rescheduleReminder: (_, __, ___) async {
+          saves++;
+          return true;
+        },
+        now: () => now,
+      );
+      await controller.refresh();
+      final entry = controller.entries.single;
+      final result = controller.reschedule(
+          entry, now.add(const Duration(hours: 1)), ReminderRepeat.none);
+      expect(controller.busyReminderId, 42);
+      reminders = change == 'deleted'
+          ? []
+          : [
+              Reminder(
+                  reminderId: 42,
+                  noteId: change == 'reassigned' ? 'other' : 'note',
+                  reminderDate: now.add(const Duration(days: 3))),
+            ];
+      lookup.complete(note);
+      expect(
+          await result,
+          change == 'edited'
+              ? ReminderAgendaActionResult.changed
+              : ReminderAgendaActionResult.unavailable);
+      expect(saves, 0);
+      expect(controller.busyReminderId, isNull);
+    });
+  }
+
   test('failed reload keeps the previous agenda available with retry state',
       () async {
     await controller.refresh();
