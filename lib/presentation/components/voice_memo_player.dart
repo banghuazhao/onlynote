@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/voice_memo_date_label.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -202,6 +203,12 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
                         ? '${formatVoiceMemoDuration(state.positionMs)} / ${formatVoiceMemoDuration(widget.memo.durationMs)}'
                         : formatVoiceMemoDuration(widget.memo.durationMs),
                     style: context.textStyles.bodySmall),
+                SizedBox(height: tokens.space1),
+                VoiceMemoDateLabel(
+                  createdAt: widget.memo.createdAt,
+                  style: context.textStyles.bodySmall
+                      ?.copyWith(color: context.colors.onSurfaceVariant),
+                ),
               ])),
           PopupMenuButton<String>(
               key: _menuKey,

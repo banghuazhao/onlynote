@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/voice_memo_composer.dart';
+import 'package:onlynote/presentation/components/voice_memo_date_label.dart';
 import 'package:onlynote/presentation/components/voice_memo_player.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
@@ -50,7 +53,9 @@ class _Platform implements VoiceMemoPlatform {
   }
 }
 
-Widget _host(Widget child, {double scale = 1, Locale? locale}) => MaterialApp(
+Widget _host(Widget child,
+        {double scale = 1, Locale? locale, bool use24HourClock = false}) =>
+    MaterialApp(
       locale: locale,
       theme: ThemeData(extensions: const [AppTokens()]),
       localizationsDelegates: const [
@@ -62,12 +67,15 @@ Widget _host(Widget child, {double scale = 1, Locale? locale}) => MaterialApp(
       supportedLocales: S.delegate.supportedLocales,
       builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(scale), disableAnimations: true),
+              textScaler: TextScaler.linear(scale),
+              alwaysUse24HourFormat: use24HourClock,
+              disableAnimations: true),
           child: child!),
       home: Scaffold(body: child),
     );
 
 void main() {
+  setUpAll(() => initializeDateFormatting());
   late _Platform platform;
   late VoiceMemoService service;
   late List<VoiceMemo> retained;
@@ -199,17 +207,115 @@ void main() {
   testWidgets('player delegates play and pause for its own memo',
       (tester) async {
     createService();
+    var pathResolutions = 0;
     await tester.pumpWidget(_host(VoiceMemoPlayer(
         memo: memo.copyWith(durationMs: 5000),
         service: service,
-        resolvePath: (path) async => '/app/$path')));
+        resolvePath: (path) async {
+          pathResolutions++;
+          return '/app/$path';
+        })));
     await tester.pumpAndSettle();
+    expect(find.byType(VoiceMemoDateLabel), findsOneWidget);
+    expect(pathResolutions, 0);
+    expect(platform.calls, ['state']);
     await tester.tap(find.byTooltip('Play'));
     await tester.pumpAndSettle();
     expect(platform.calls.last, 'play');
     await tester.tap(find.byTooltip('Pause'));
     await tester.pumpAndSettle();
     expect(platform.calls.last, 'pause');
+    expect(pathResolutions, 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets(
+      'player shows stored creation time and updates without opening media',
+      (tester) async {
+    createService();
+    var pathResolutions = 0;
+    final stored = memo.copyWith(createdAt: DateTime.utc(2026, 10, 11, 23, 45));
+    Widget player(VoiceMemo value) => VoiceMemoPlayer(
+          memo: value,
+          service: service,
+          resolvePath: (path) async {
+            pathResolutions++;
+            return '/app/$path';
+          },
+        );
+    final dateText = find.descendant(
+        of: find.byType(VoiceMemoDateLabel), matching: find.byType(Text));
+    await tester.pumpWidget(_host(player(stored),
+        locale: const Locale('zh', 'HK'), use24HourClock: true));
+    await tester.pumpAndSettle();
+    expect(
+        tester
+            .widget<VoiceMemoDateLabel>(find.byType(VoiceMemoDateLabel))
+            .createdAt,
+        same(stored.createdAt));
+    expect(
+        tester.widget<Text>(dateText).data,
+        S.current.Voice_Recorded_At(DateFormat.yMMMd('zh_HK')
+            .add_Hm()
+            .format(stored.createdAt.toLocal())));
+    final changed = stored.copyWith(createdAt: DateTime(2027, 1, 2, 9, 7));
+    await tester.pumpWidget(_host(player(changed)));
+    await tester.pumpAndSettle();
+    expect(tester.widget<Text>(dateText).data, 'Recorded Jan 2, 2027 9:07 AM');
+    expect(pathResolutions, 0);
+    expect(platform.calls, ['state']);
+    expect(stored.createdAt, DateTime.utc(2026, 10, 11, 23, 45));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('large-text recording timestamp keeps share and remove reachable',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    createService();
+    var pathResolutions = 0;
+    var shared = 0;
+    var removed = 0;
+    await tester.pumpWidget(_host(
+        SingleChildScrollView(
+          child: VoiceMemoPlayer(
+            memo: memo.copyWith(
+                durationMs: 5000, createdAt: DateTime(2026, 10, 11, 17, 45)),
+            service: service,
+            resolvePath: (path) async {
+              pathResolutions++;
+              return '/app/$path';
+            },
+            onShare: () async => shared++,
+            onRemove: () async => removed++,
+          ),
+        ),
+        locale: const Locale('zh', 'HK'),
+        scale: 2,
+        use24HourClock: true));
+    await tester.pumpAndSettle();
+    final label = find.byType(VoiceMemoDateLabel);
+    expect(label, findsOneWidget);
+    final bounds = tester.getRect(label);
+    expect(bounds.left, greaterThanOrEqualTo(0));
+    expect(bounds.right, lessThanOrEqualTo(320));
+    expect(tester.takeException(), isNull);
+    final menu = find.byType(PopupMenuButton<String>);
+    await tester.ensureVisible(menu);
+    await tester.tap(menu);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Share));
+    await tester.pumpAndSettle();
+    expect(shared, 1);
+    await tester.tap(menu);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Voice_Delete));
+    await tester.pumpAndSettle();
+    expect(removed, 1);
+    expect(pathResolutions, 0);
+    expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
   });
   testWidgets('large Chinese text keeps recording controls usable',

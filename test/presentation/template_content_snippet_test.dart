@@ -11,6 +11,7 @@ import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/template_content_snippet.dart';
 import 'package:onlynote/presentation/components/template_content_snippet_previews.dart';
+import 'package:onlynote/services/note_templates.dart';
 
 CustomNoteTemplate _template({
   String name = 'Planning',
@@ -18,6 +19,7 @@ CustomNoteTemplate _template({
   String body = '',
   List<String> items = const [],
   List<VoiceMemo> voiceMemos = const [],
+  List<String> tags = const [],
 }) =>
     CustomNoteTemplate(
       id: 'test',
@@ -26,14 +28,16 @@ CustomNoteTemplate _template({
       body: body,
       items: items,
       voiceMemos: voiceMemos,
+      tags: tags,
       createdAt: DateTime(2026, 10, 20),
     );
 
-VoiceMemo _memo(String id, int durationMs) => VoiceMemo(
+VoiceMemo _memo(String id, int durationMs, {String? transcript}) => VoiceMemo(
       id: id,
       path: 'template_audio/unavailable-$id.m4a',
       durationMs: durationMs,
       createdAt: DateTime(2026, 10, 20),
+      transcript: transcript,
     );
 
 Finder _key(String value) => find.byKey(ValueKey(value));
@@ -134,6 +138,117 @@ void main() {
         snippet);
   });
 
+  test('search reveals matching body, checklist, transcript and tag text', () {
+    final prefix = List.filled(100, 'Earlier background. ').join();
+    final template = _template(
+      name: 'Named template',
+      title: 'Stored title',
+      body: '${prefix}Deepbody [2026] after the long prefix',
+      items: ['Unrelated task', 'Bring [tea] and C++ notes'],
+      voiceMemos: [
+        _memo('memo', 1000, transcript: 'Remember the CABIN reservation')
+      ],
+      tags: ['Travel-tag'],
+    );
+    final saved = template.toJson();
+    expect(templateContentSnippet(template, query: ' DEEPBODY [2026] '),
+        '…Deepbody [2026] after the long prefix');
+    expect(templateContentSnippet(template, query: '[TEA]'),
+        '…[tea] and C++ notes');
+    expect(templateContentSnippet(template, query: 'c++'), '…C++ notes');
+    expect(
+        templateContentSnippet(template, query: 'cabin'), '…CABIN reservation');
+    expect(templateContentSnippet(template, query: 'travel-TAG'), 'Travel-tag');
+    final fallback = templateContentSnippet(template);
+    for (final query in [
+      '',
+      '\t \u3000',
+      'Named template',
+      'Stored title',
+      '.*',
+      'missing',
+      'template_audio',
+      'unavailable-memo',
+      'memo'
+    ]) {
+      expect(templateContentSnippet(template, query: query), fallback,
+          reason: query);
+    }
+    expect(template.toJson(), saved);
+  });
+
+  test(
+      'search keeps empty and title-only fallback while exposing audio-only text',
+      () {
+    final template = _template(name: 'A name', title: 'A title');
+    expect(templateContentSnippet(template, query: 'A name'), 'A title');
+    expect(templateContentSnippet(template, query: 'A title'), 'A title');
+    expect(
+        templateContentSnippet(_template(name: 'Equal', title: 'Equal'),
+            query: 'equal'),
+        isEmpty);
+    expect(templateContentSnippet(_template(), query: 'missing'), isEmpty);
+    final audio = _template(voiceMemos: [
+      _memo('audio', 1000, transcript: 'Confirm the reservation')
+    ]);
+    expect(templateContentSnippet(audio), isEmpty);
+    expect(templateContentSnippet(audio, query: 'reservation'), '…reservation');
+  });
+
+  test('matching snippets remain bounded and retain complete Unicode graphemes',
+      () {
+    const family = '👨‍👩‍👧‍👦';
+    const accented = 'e\u0301';
+    final tail = List.filled(200, '茶').join();
+    final template = _template(body: 'Before $family$accented Match $tail');
+    final snippet =
+        templateContentSnippet(template, query: '$family$accented Match');
+    expect(snippet, startsWith('…$family$accented Match'));
+    expect(snippet, endsWith('…'));
+    expect(snippet.characters.length, lessThanOrEqualTo(161));
+    expect(templateContentSnippet(template, query: '👩'),
+        startsWith('…$family$accented'));
+    expect(templateContentSnippet(template, query: '\u0301'),
+        startsWith('…$accented Match'));
+    expect(templateContentSnippet(_template(items: ['研究閱讀茶😀']), query: '茶😀'),
+        '…茶😀');
+  });
+
+  for (final locale in S.delegate.supportedLocales) {
+    test(
+        'starter snippets explain localized body and checklist matches in $locale',
+        () async {
+      final strings = await S.load(locale);
+      final content = NoteTemplate.dailyPlan.content(strings);
+      for (final query in [
+        '',
+        '\t\u3000',
+        content.title,
+        content.summary,
+        '.*'
+      ]) {
+        expect(starterTemplateContentSnippet(content, query: query),
+            content.summary);
+      }
+      expect(starterTemplateContentSnippet(content, query: content.body.trim()),
+          content.body.trim().split(RegExp(r'\s+')).join(' '));
+      final item = content.items.last;
+      expect(
+          starterTemplateContentSnippet(content,
+              query: ' ${item.toUpperCase()} '),
+          item);
+      final summaryEnd = content.summary.characters
+          .toList()
+          .reversed
+          .take(5)
+          .toList()
+          .reversed
+          .join();
+      expect(starterTemplateContentSnippet(content, query: summaryEnd),
+          '…$summaryEnd');
+    });
+  }
+
   for (final locale in S.delegate.supportedLocales) {
     testWidgets('recording-only template details are localized in $locale',
         (tester) async {
@@ -222,7 +337,7 @@ void main() {
       Brightness.light,
     ),
   ]) {
-    testWidgets('$name retains counts, name search and selection',
+    testWidgets('$name retains counts, matching content search and selection',
         (tester) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
@@ -263,8 +378,34 @@ void main() {
       await tester.enterText(search, 'vegetables');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
-      expect(_key('template-name-search-empty'), findsOneWidget);
-      expect(_key('template-snippet-select-checklist'), findsNothing);
+      expect(_key('template-name-search-empty'), findsNothing);
+      expect(_key('template-snippet-select-checklist'), findsOneWidget);
+      expect(
+          tester.widget<Text>(_key('template-content-snippet-checklist')).data,
+          '…vegetables');
+      for (final (query, expected) in [
+        ('deepbody [2026]', '…Deepbody [2026]'),
+        ('MICROPHONE', '…microphone'),
+        ('planning-tag', 'planning-tag'),
+        ('茶😀', '…茶😀'),
+      ]) {
+        await tester.ensureVisible(search);
+        await tester.enterText(search, query);
+        await tester.testTextInput.receiveAction(TextInputAction.search);
+        await tester.pumpAndSettle();
+        expect(tester.widget<ListTile>(body).selected, isTrue);
+        final match = _key('template-content-snippet-body');
+        expect(tester.widget<Text>(match).data, startsWith(expected));
+        expect(find.text('${S.current.History_Recordings(2)} · 8:42'),
+            findsOneWidget);
+        await tester.ensureVisible(match);
+        await tester.pumpAndSettle();
+        final bounds = tester.getRect(match);
+        expect(bounds.left, greaterThanOrEqualTo(0));
+        expect(bounds.right, lessThanOrEqualTo(size.width));
+        expect(tester.takeException(), isNull);
+        if (query == 'deepbody [2026]') await _capture(tester, '$name-match');
+      }
       await tester.ensureVisible(search);
       await tester.enterText(search, 'weekly');
       await tester.testTextInput.receiveAction(TextInputAction.search);

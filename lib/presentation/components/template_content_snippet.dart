@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/recording_duration.dart';
+import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_templates.dart';
 
 const _snippetLength = 160;
 
 /// A display-only prefix from stored text; it never opens template media.
-String templateContentSnippet(CustomNoteTemplate template) {
+String templateContentSnippet(CustomNoteTemplate template,
+    {String query = ''}) {
+  final match = _matchingSnippet(_searchableContent(template), query);
+  if (match.isNotEmpty) return match;
   final body = _prefix([template.body]);
   if (body.isNotEmpty) return body;
   final checklist = _prefix(template.items);
@@ -14,6 +19,34 @@ String templateContentSnippet(CustomNoteTemplate template) {
   final title = _prefix([template.title]);
   final name = _prefix([template.name]);
   return title.toLowerCase() == name.toLowerCase() ? '' : title;
+}
+
+/// Starter summaries stay familiar unless another stored field explains search.
+String starterTemplateContentSnippet(NoteTemplateContent content,
+    {String query = ''}) {
+  final match = _matchingSnippet(
+      [content.summary, content.body, ...content.items], query);
+  return match.isEmpty ? content.summary : match;
+}
+
+String _matchingSnippet(Iterable<String> text, String query) {
+  final pattern = searchPattern(query);
+  if (pattern == null) return '';
+  for (final value in text) {
+    if (pattern.hasMatch(value)) {
+      return _prefix([searchExcerpt(value, query, leadingContext: 0)]);
+    }
+  }
+  return '';
+}
+
+Iterable<String> _searchableContent(CustomNoteTemplate template) sync* {
+  yield template.body;
+  yield* template.items;
+  for (final memo in template.voiceMemos) {
+    if (memo.transcript case final String text) yield text;
+  }
+  yield* template.tags;
 }
 
 String _prefix(Iterable<String> parts) {
@@ -51,13 +84,15 @@ Iterable<String> _normalizedCharacters(Iterable<String> parts) sync* {
 
 /// Keeps content and media metadata together without opening template files.
 class TemplateContentSubtitle extends StatelessWidget {
-  const TemplateContentSubtitle({super.key, required this.template});
+  const TemplateContentSubtitle(
+      {super.key, required this.template, this.query = ''});
 
   final CustomNoteTemplate template;
+  final String query;
 
   @override
   Widget build(BuildContext context) {
-    final snippet = templateContentSnippet(template);
+    final snippet = templateContentSnippet(template, query: query);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

@@ -230,7 +230,8 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   minVerticalPadding: 16,
                   leading: _icon(Icons.notes_outlined),
                   title: Text(template.name),
-                  subtitle: TemplateContentSubtitle(template: template),
+                  subtitle: TemplateContentSubtitle(
+                      template: template, query: _searchController.text),
                   trailing: IconButton(
                     key: ValueKey('manage-template-${template.id}'),
                     tooltip: strings.Template_Manage,
@@ -268,7 +269,13 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   NoteTemplate.meeting => Icons.groups_outlined,
                 }),
                 title: Text(template.content(strings).title),
-                subtitle: Text(template.content(strings).summary),
+                subtitle: Text(
+                  starterTemplateContentSnippet(template.content(strings),
+                      query: _searchController.text),
+                  key: ValueKey('template-starter-snippet-${template.name}'),
+                  maxLines: _searchController.text.trim().isEmpty ? null : 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: _busy || _closing
                     ? null

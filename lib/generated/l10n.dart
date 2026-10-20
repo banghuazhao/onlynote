@@ -3149,6 +3149,16 @@ class S {
     return Intl.message('Voice memo', name: 'Voice_Memo', desc: '', args: []);
   }
 
+  /// `Recorded {date}`
+  String Voice_Recorded_At(String date) {
+    return Intl.message(
+      'Recorded $date',
+      name: 'Voice_Recorded_At',
+      desc: '',
+      args: [date],
+    );
+  }
+
   /// `Record`
   String get Voice_Record {
     return Intl.message('Record', name: 'Voice_Record', desc: '', args: []);

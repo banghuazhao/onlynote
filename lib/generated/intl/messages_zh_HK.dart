@@ -105,6 +105,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m41(items, photos) => "${items} 項 · ${photos} 張照片";
 
+  static String m42(date) => "錄製於 ${date}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Image": MessageLookupByLibrary.simpleMessage("加入照片"),
@@ -1031,6 +1033,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage("無法播放此錄音。請重試。"),
     "Voice_Record": MessageLookupByLibrary.simpleMessage("錄音"),
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage("無法錄音，請重試。"),
+    "Voice_Recorded_At": m42,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "最多錄製 5 分鐘，可選擇轉成文字。",
     ),

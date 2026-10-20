@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added matching text excerpts to template results, including checklist items, tags, transcripts, and localized starter content.
+- Added localized recording dates and times beside voice memo playback controls, respecting the device clock preference.
+- Expanded daily-note calendar previews with transcript excerpts, photo and scan counts, and recording counts and duration.
 - Added matching text previews to Copy to note results, including checklist items, tags, and recording transcripts.
 - Expanded saved-view search to include its query, tags, resolved folder, filters, and archive scope.
 - Added matching text snippets to reminder search results using stored note text, checklist items, tags, and transcripts.

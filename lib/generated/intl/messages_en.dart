@@ -126,6 +126,8 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m41(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
+  static String m42(date) => "Recorded ${date}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
@@ -1340,6 +1342,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not record. Please try again.",
     ),
+    "Voice_Recorded_At": m42,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "Record up to 5 minutes. Transcription is optional.",
     ),

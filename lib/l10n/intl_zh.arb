@@ -351,6 +351,8 @@
   "History_Photos": "{count} 张照片",
   "History_Recordings": "{count} 段录音",
   "Voice_Memo": "语音备忘录",
+  "Voice_Recorded_At": "录制于 {date}",
+  "@Voice_Recorded_At": {"placeholders": {"date": {"type": "String"}}},
   "Voice_Record": "录音",
   "Voice_Stop": "停止录音",
   "Voice_Play": "播放",

@@ -351,6 +351,8 @@
   "History_Photos": "{count, plural, one{1 photo} other{{count} photos}}",
   "History_Recordings": "{count, plural, one{1 recording} other{{count} recordings}}",
   "Voice_Memo": "Voice memo",
+  "Voice_Recorded_At": "Recorded {date}",
+  "@Voice_Recorded_At": {"placeholders": {"date": {"type": "String"}}},
   "Voice_Record": "Record",
   "Voice_Stop": "Stop recording",
   "Voice_Play": "Play",

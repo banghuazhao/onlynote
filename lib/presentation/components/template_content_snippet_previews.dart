@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/template_content_search.dart';
 
 import 'app_sheet.dart';
 import 'template_content_snippet.dart';
@@ -57,8 +58,11 @@ class _TemplateContentSnippetsPreviewState
       id: 'body',
       name: 'Weekly planning',
       body:
-          'Projects to move forward, people to catch up with, and time to rest.',
+          'Projects to move forward, people to catch up with, and time to rest. '
+          '${List.filled(20, 'Earlier planning ideas. ').join()}'
+          'Deepbody [2026] after the long background.',
       items: const ['Review the calendar', 'Choose three priorities'],
+      tags: const ['planning-tag'],
       imagePaths: const ['preview-photo.jpg'],
       voiceMemos: [
         VoiceMemo(
@@ -66,6 +70,7 @@ class _TemplateContentSnippetsPreviewState
           path: 'template_audio/preview-planning.m4a',
           durationMs: 250000,
           createdAt: DateTime(2026, 10, 20),
+          transcript: 'Remember the microphone and bring 茶😀.',
         ),
         VoiceMemo(
           id: 'recap',
@@ -134,8 +139,8 @@ class _TemplateContentSnippetsPreviewState
         ),
         home: Scaffold(
           body: Builder(builder: (context) {
-            final matches = filterTemplateNames(_templates, _search.text,
-                displayName: (template) => template.name);
+            final matches =
+                TemplateContentSearch(_search.text).filterCustom(_templates);
             return Align(
               alignment: Alignment.bottomCenter,
               child: AppSheet(
@@ -161,7 +166,8 @@ class _TemplateContentSnippetsPreviewState
                           minVerticalPadding: 16,
                           leading: const Icon(Icons.notes_outlined),
                           title: Text(template.name),
-                          subtitle: TemplateContentSubtitle(template: template),
+                          subtitle: TemplateContentSubtitle(
+                              template: template, query: _search.text),
                           selected: _selected == template.id,
                           onTap: () => setState(() => _selected = template.id),
                         ),

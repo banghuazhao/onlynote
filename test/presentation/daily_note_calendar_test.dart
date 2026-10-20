@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/daily_note_calendar_sheet.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -23,6 +25,14 @@ void main() {
     dailyNoteDateKey: '2026-09-23',
     isArchived: true,
   );
+
+  VoiceMemo recording(String id, {int durationMs = 0, String? transcript}) =>
+      VoiceMemo(
+          id: id,
+          path: 'note_audio/unavailable-$id.m4a',
+          durationMs: durationMs,
+          createdAt: today,
+          transcript: transcript);
 
   Future<void> pump(
     WidgetTester tester, {
@@ -134,6 +144,166 @@ void main() {
         tester, find.byKey(const ValueKey('daily-calendar-selected-note')));
     expect(opened, isEmpty);
     expect(openedToday, 0);
+  });
+
+  testWidgets(
+      'selected preview uses body then checklist then stored transcripts',
+      (tester) async {
+    final original = Note(
+      id: 'today',
+      title: 'Saved voice thoughts',
+      description: '  Body first  ',
+      todo: [Todo(title: '  Checklist first  '), Todo(title: 'Next item')],
+      dailyNoteDateKey: '2026-10-06',
+      voiceMemos: [
+        recording('empty', transcript: ' \t '),
+        recording('first', transcript: '  First voice\nthought  '),
+        recording('second', transcript: '\t Second thought  '),
+      ],
+    );
+    final snippet =
+        find.byKey(const ValueKey('daily-calendar-selected-snippet'));
+    await pump(tester, notes: [original]);
+    expect(tester.widget<Text>(snippet).data, 'Body first');
+    final checklistOnly = original.copyWith(description: ' \n ');
+    await pump(tester, notes: [checklistOnly]);
+    expect(tester.widget<Text>(snippet).data, 'Checklist first, Next item');
+    final audioOnly =
+        checklistOnly.copyWith(todo: [Todo(title: '  ')], isArchived: true);
+    await pump(tester, notes: [audioOnly]);
+    expect(tester.widget<Text>(snippet).data,
+        'First voice thought Second thought');
+    expect(
+        find.byKey(const ValueKey('daily-calendar-archived')), findsOneWidget);
+    expect(tester.widget<Text>(snippet).maxLines, 2);
+    expect(tester.widget<Text>(snippet).overflow, TextOverflow.ellipsis);
+    expect(original.description, '  Body first  ');
+    expect(original.todo.first.title, '  Checklist first  ');
+    expect(original.voiceMemos[1].transcript, '  First voice\nthought  ');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('transcript prefixes preserve graphemes and remain bounded',
+      (tester) async {
+    const family = '👨‍👩‍👧‍👦';
+    final transcript = '  ${family * 161}  ';
+    await pump(tester, notes: [
+      Note(
+          id: 'today',
+          dailyNoteDateKey: '2026-10-06',
+          voiceMemos: [recording('long', transcript: transcript)]),
+    ]);
+    final snippet = tester.widget<Text>(
+        find.byKey(const ValueKey('daily-calendar-selected-snippet')));
+    expect(snippet.data, '${family * 160}…');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'media-only preview counts declared attachments without reading files',
+      (tester) async {
+    final opened = <DateTime>[];
+    final saved = Note(
+      id: 'today',
+      title: 'Media memory',
+      dailyNoteDateKey: '2026-10-06',
+      imagePaths: [
+        'unavailable/photo-1.jpg',
+        'unavailable/photo-2.jpg',
+        'unavailable/page.jpg',
+        'unavailable/page.jpg',
+      ],
+      imageLayouts: const [
+        NoteImageLayout(
+            path: 'unavailable/page.jpg', textOffset: 0, isDocumentPage: true),
+        NoteImageLayout(
+            path: 'unavailable/page.jpg', textOffset: 4, isDocumentPage: true),
+        NoteImageLayout(
+            path: 'detached/page.jpg', textOffset: 0, isDocumentPage: true),
+        NoteImageLayout(path: 'unavailable/photo-1.jpg', textOffset: 0),
+      ],
+      voiceMemos: [
+        recording('one', durationMs: 61200),
+        recording('two', durationMs: 1000),
+        recording('invalid', durationMs: -500),
+      ],
+      isArchived: true,
+    );
+    await pump(tester, notes: [saved], onOpenDay: opened.add);
+    expect(find.byKey(const ValueKey('daily-calendar-selected-snippet')),
+        findsNothing);
+    expect(find.text('2 photos'), findsOneWidget);
+    expect(find.text('1 scanned page'), findsOneWidget);
+    expect(find.text('3 recordings · 1:02'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('daily-calendar-archived')), findsOneWidget);
+    expect(opened, isEmpty);
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-selected-note')));
+    expect(opened, [today]);
+    expect(saved.imagePaths, hasLength(4));
+    expect(saved.imageLayouts, hasLength(4));
+    expect(saved.voiceMemos.last.durationMs, -500);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('zero media and detached scan layouts are omitted',
+      (tester) async {
+    final saved = Note(
+        id: 'today',
+        title: 'Text note',
+        dailyNoteDateKey: '2026-10-06',
+        imageLayouts: const [
+          NoteImageLayout(
+              path: 'detached/page.jpg', textOffset: 0, isDocumentPage: true),
+        ]);
+    await pump(tester, notes: [saved]);
+    expect(find.byKey(const ValueKey('daily-calendar-media-summary')),
+        findsNothing);
+    expect(find.byKey(const ValueKey('daily-calendar-selected-snippet')),
+        findsNothing);
+    await pump(tester, notes: [
+      saved.copyWith(voiceMemos: [recording('zero', transcript: '\n \t')]),
+    ]);
+    expect(find.byKey(const ValueKey('daily-calendar-photos')), findsNothing);
+    expect(find.byKey(const ValueKey('daily-calendar-scans')), findsNothing);
+    expect(find.text('1 recording · 0:00'), findsOneWidget);
+    expect(find.byKey(const ValueKey('daily-calendar-selected-snippet')),
+        findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('selected media and transcripts refresh when the note changes',
+      (tester) async {
+    final saved = Note(
+      id: 'today',
+      title: 'Original media',
+      dailyNoteDateKey: '2026-10-06',
+      voiceMemos: [recording('one', durationMs: 1000, transcript: 'Original')],
+    );
+    await pump(tester, notes: [saved]);
+    expect(find.text('1 recording · 0:01'), findsOneWidget);
+    final updated = saved.copyWith(
+      imagePaths: ['unavailable/new-photo.jpg'],
+      voiceMemos: [
+        recording('two', durationMs: 125000, transcript: 'Latest thoughts'),
+      ],
+      isArchived: true,
+    );
+    await pump(tester, notes: [updated]);
+    expect(find.text('Original'), findsNothing);
+    expect(find.text('Latest thoughts'), findsOneWidget);
+    expect(find.text('1 photo'), findsOneWidget);
+    expect(find.text('1 recording · 2:05'), findsOneWidget);
+    expect(find.text('October 6, 2026'), findsOneWidget);
+    await pump(tester, notes: [updated.copyWith(deletedAt: today)]);
+    expect(find.byKey(const ValueKey('daily-calendar-media-summary')),
+        findsNothing);
+    expect(find.byKey(const ValueKey('daily-calendar-selected-snippet')),
+        findsNothing);
+    expect(
+        find.byKey(const ValueKey('daily-calendar-no-note')), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('monthly saved-day totals follow the displayed month and Today',

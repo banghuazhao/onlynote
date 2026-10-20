@@ -309,19 +309,25 @@ void main() {
     await _openPicker(tester, results, store: store);
     final chosen = store.templates.first;
     final reads = preferences.reads;
-    for (final query in [
-      'Unique routine',
-      ' content label ',
-      'CONTENT BODY',
-      'content task',
-      'projecttag',
-      'content transcript',
+    for (final (query, snippet) in [
+      ('Unique routine', 'Private content body'),
+      (' content label ', 'Private content body'),
+      ('CONTENT BODY', '…content body'),
+      ('content task', '…content task'),
+      ('projecttag', 'projecttag'),
+      ('content transcript', '…content transcript'),
     ]) {
       await _query(tester, query);
       expect(
           find.byKey(const ValueKey('custom-template-chosen')), findsOneWidget);
       expect(find.byKey(const ValueKey('custom-template-other')), findsNothing);
       expect(_searchEmpty, findsNothing);
+      expect(
+          tester
+              .widget<Text>(
+                  find.byKey(const ValueKey('template-content-snippet-chosen')))
+              .data,
+          snippet);
       expect(preferences.reads, reads);
       expect(preferences.writes, 0);
       expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
@@ -337,6 +343,47 @@ void main() {
     expect(preferences.writes, 0);
     expect(tester.takeException(), isNull);
   });
+
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets(
+        'starter result excerpts follow localized matching fields in $locale',
+        (tester) async {
+      final preferences = _SearchPreferences();
+      final store = _searchStore(preferences, []);
+      final results = <NoteTemplateSelection?>[];
+      await _openPicker(tester, results, store: store, locale: locale);
+      final content = NoteTemplate.meeting.content(S.current);
+      final snippet =
+          find.byKey(const ValueKey('template-starter-snippet-meeting'));
+      // Search is a single-line field; pasted line breaks are removed by its
+      // formatter. Use the first heading as a real query into the saved body.
+      final bodyHeading = content.body
+          .split('\n')
+          .map((line) => line.trim())
+          .firstWhere((line) => line.isNotEmpty);
+      await _query(tester, bodyHeading);
+      expect(snippet, findsOneWidget);
+      await tester.ensureVisible(snippet);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(snippet).data,
+          content.body.trim().split(RegExp(r'\s+')).join(' '));
+      await _query(tester, content.items.last);
+      await tester.ensureVisible(snippet);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(snippet).data, content.items.last);
+      await _query(tester, content.title);
+      await tester.ensureVisible(snippet);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(snippet).data, content.summary);
+      final meeting = find.byKey(const ValueKey('template-meeting'));
+      await tester.ensureVisible(meeting);
+      await tester.tap(meeting);
+      await tester.pumpAndSettle();
+      expect(results.single!.builtIn, NoteTemplate.meeting);
+      expect(preferences.writes, 0);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets(
       'filtered custom selection keeps its identity and guards stale taps',

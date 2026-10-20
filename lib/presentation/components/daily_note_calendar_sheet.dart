@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/domain/model/daily_note_date.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/daily_note_calendar.dart';
+import 'package:onlynote/services/recording_duration.dart';
 
 import 'app_sheet.dart';
 
@@ -411,13 +413,7 @@ class _SelectedDayPreview extends StatelessWidget {
     final theme = Theme.of(context);
     final saved = note;
     final title = saved?.title?.trim();
-    final snippet = saved?.description?.trim().isNotEmpty == true
-        ? saved!.description!.trim()
-        : saved?.todo
-                .map((todo) => todo.title?.trim() ?? '')
-                .where((title) => title.isNotEmpty)
-                .join(', ') ??
-            '';
+    final snippet = _selectedDaySnippet(saved);
     return Card(
       key: const ValueKey('daily-calendar-selection'),
       child: InkWell(
@@ -462,11 +458,13 @@ class _SelectedDayPreview extends StatelessWidget {
                 if (snippet.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(snippet,
+                      key: const ValueKey('daily-calendar-selected-snippet'),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant)),
                 ],
+                _SelectedDayMediaSummary(note: saved),
                 if (saved.isArchived) ...[
                   const SizedBox(height: 8),
                   Text(s.Archive,
@@ -477,6 +475,95 @@ class _SelectedDayPreview extends StatelessWidget {
               ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+String _selectedDaySnippet(Note? note) {
+  if (note == null) return '';
+  final body = note.description?.trim() ?? '';
+  if (body.isNotEmpty) return body;
+  final checklist = note.todo
+      .map((todo) => todo.title?.trim() ?? '')
+      .where((title) => title.isNotEmpty)
+      .join(', ');
+  if (checklist.isNotEmpty) return checklist;
+  return _transcriptSnippet(note.voiceMemos);
+}
+
+/// Only a short, normalized prefix is needed to identify an audio-only note.
+String _transcriptSnippet(Iterable<VoiceMemo> recordings) {
+  const limit = 160;
+  final characters = _transcriptCharacters(recordings).take(limit + 1).toList();
+  if (characters.length <= limit) return characters.join();
+  return '${characters.take(limit).join().trimRight()}…';
+}
+
+Iterable<String> _transcriptCharacters(Iterable<VoiceMemo> recordings) sync* {
+  var hasText = false;
+  var pendingSpace = false;
+  for (final recording in recordings) {
+    for (final character in (recording.transcript ?? '').characters) {
+      if (character.trim().isEmpty) {
+        if (hasText) pendingSpace = true;
+        continue;
+      }
+      if (pendingSpace) yield ' ';
+      yield character;
+      hasText = true;
+      pendingSpace = false;
+    }
+    if (hasText) pendingSpace = true;
+  }
+}
+
+class _SelectedDayMediaSummary extends StatelessWidget {
+  const _SelectedDayMediaSummary({required this.note});
+
+  final Note note;
+
+  @override
+  Widget build(BuildContext context) {
+    // Match NoteStatistics: document pages count unique attached paths, while
+    // detached layouts and on-disk availability do not affect these totals.
+    final attachedPaths = note.imagePaths.toSet();
+    final scanPaths = note.imageLayouts
+        .where((layout) =>
+            layout.isDocumentPage && attachedPaths.contains(layout.path))
+        .map((layout) => layout.path)
+        .toSet();
+    final photoCount =
+        note.imagePaths.where((path) => !scanPaths.contains(path)).length;
+    if (photoCount == 0 && scanPaths.isEmpty && note.voiceMemos.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final s = S.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: DefaultTextStyle.merge(
+        style: Theme.of(context)
+            .textTheme
+            .bodySmall
+            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        child: Wrap(
+          key: const ValueKey('daily-calendar-media-summary'),
+          spacing: 12,
+          runSpacing: 4,
+          children: [
+            if (photoCount > 0)
+              Text(s.History_Photos(photoCount),
+                  key: const ValueKey('daily-calendar-photos')),
+            if (scanPaths.isNotEmpty)
+              Text(s.Card_Scanned_Pages_Count(scanPaths.length),
+                  key: const ValueKey('daily-calendar-scans')),
+            if (note.voiceMemos.isNotEmpty)
+              Text(
+                  '${s.History_Recordings(note.voiceMemos.length)} · '
+                  '${formatRecordingDuration(totalRecordingDurationMs(note.voiceMemos))}',
+                  key: const ValueKey('daily-calendar-recordings')),
+          ],
         ),
       ),
     );

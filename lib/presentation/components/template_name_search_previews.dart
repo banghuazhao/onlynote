@@ -9,6 +9,7 @@ import 'package:onlynote/services/template_content_search.dart';
 
 import 'app_sheet.dart';
 import 'template_name_search.dart';
+import 'template_content_snippet.dart';
 
 @Preview(
     name: 'Template content search — light',
@@ -132,11 +133,12 @@ class _TemplateNameSearchPreviewState
                         style: Theme.of(context).textTheme.titleMedium),
                   ),
                 );
-            Widget row(String key, String name) => ListTile(
+            Widget row(String key, String name, Widget subtitle) => ListTile(
                   key: ValueKey(key),
                   minVerticalPadding: 16,
                   leading: const Icon(Icons.notes_outlined),
                   title: Text(name),
+                  subtitle: subtitle,
                   onTap: () => setState(() => _selected = name),
                 );
             return Align(
@@ -160,11 +162,25 @@ class _TemplateNameSearchPreviewState
                       const TemplateNameSearchEmpty(),
                     heading(strings.My_Templates),
                     for (final template in customMatches)
-                      row('custom-template-${template.id}', template.name),
+                      row(
+                          'custom-template-${template.id}',
+                          template.name,
+                          TemplateContentSubtitle(
+                              template: template, query: _controller.text)),
                     heading(strings.Starter_Templates),
                     for (final template in starterMatches)
-                      row('template-${template.name}',
-                          template.content(strings).title),
+                      row(
+                          'template-${template.name}',
+                          template.content(strings).title,
+                          Text(
+                              starterTemplateContentSnippet(
+                                  template.content(strings),
+                                  query: _controller.text),
+                              key: ValueKey(
+                                  'template-starter-snippet-${template.name}'),
+                              maxLines:
+                                  _controller.text.trim().isEmpty ? null : 2,
+                              overflow: TextOverflow.ellipsis)),
                     if (_selected != null)
                       Padding(
                         padding: const EdgeInsets.all(12),
