@@ -101,9 +101,14 @@ class _NoteTagsSheetState extends State<NoteTagsSheet> {
     final l10n = S.of(context);
     final colors = Theme.of(context).colorScheme;
     final selectedKeys = _tags.map(tagKey).toSet();
+    final query = tagKey(_controller.text);
     final suggestions = _suggestions
-        .where((suggestion) => !selectedKeys.contains(tagKey(suggestion)))
+        .where((suggestion) =>
+            !selectedKeys.contains(tagKey(suggestion)) &&
+            tagKey(suggestion).contains(query))
         .toList();
+    final noMatchingSuggestions =
+        _suggestions.isNotEmpty && query.isNotEmpty && suggestions.isEmpty;
     final chipAnimation = MediaQuery.disableAnimationsOf(context)
         ? ChipAnimationStyle(
             enableAnimation: AnimationStyle.noAnimation,
@@ -131,13 +136,25 @@ class _NoteTagsSheetState extends State<NoteTagsSheet> {
                 labelText: l10n.Tags,
                 hintText: l10n.Tag_Hint,
                 border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  key: const ValueKey('note-tags-add'),
-                  tooltip: l10n.Tag_Hint,
-                  onPressed: tagKey(_controller.text).isEmpty
-                      ? null
-                      : () => _add(_controller.text, clearInput: true),
-                  icon: const Icon(Icons.add_rounded),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_controller.text.isNotEmpty)
+                      IconButton(
+                        key: const ValueKey('note-tags-clear-input'),
+                        tooltip: l10n.Clear_Search,
+                        onPressed: _controller.clear,
+                        icon: const Icon(Icons.clear_rounded),
+                      ),
+                    IconButton(
+                      key: const ValueKey('note-tags-add'),
+                      tooltip: l10n.Tag_Hint,
+                      onPressed: query.isEmpty
+                          ? null
+                          : () => _add(_controller.text, clearInput: true),
+                      icon: const Icon(Icons.add_rounded),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -191,7 +208,8 @@ class _NoteTagsSheetState extends State<NoteTagsSheet> {
                           ),
                       ],
                     ),
-                  if (_tags.isNotEmpty && suggestions.isNotEmpty)
+                  if (_tags.isNotEmpty &&
+                      (suggestions.isNotEmpty || noMatchingSuggestions))
                     const Divider(height: 24),
                   if (suggestions.isNotEmpty)
                     Wrap(
@@ -205,11 +223,19 @@ class _NoteTagsSheetState extends State<NoteTagsSheet> {
                             avatar: const Icon(Icons.add_rounded, size: 18),
                             avatarBoxConstraints: const BoxConstraints.tightFor(
                                 width: 24, height: 24),
-                            onPressed: () => _add(tag),
+                            onPressed: () => _add(tag, clearInput: true),
                             materialTapTargetSize: MaterialTapTargetSize.padded,
                             chipAnimationStyle: chipAnimation,
                           ),
                       ],
+                    ),
+                  if (noMatchingSuggestions)
+                    Text(
+                      l10n.Tag_Suggestions_Empty,
+                      key: const ValueKey('note-tag-suggestions-empty'),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                     ),
                 ],
               );

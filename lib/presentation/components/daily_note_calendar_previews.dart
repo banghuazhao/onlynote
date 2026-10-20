@@ -16,13 +16,18 @@ Widget dailyNoteCalendarPhonePreview() => _preview();
 @Preview(name: 'Daily note calendar — narrow Chinese', size: Size(320, 760))
 Widget dailyNoteCalendarChinesePreview() => _preview(chinese: true);
 
+@Preview(name: 'Daily note calendar — narrow large text', size: Size(320, 760))
+Widget dailyNoteCalendarLargeTextPreview() => _preview(largeText: true);
+
 @Preview(
     name: 'Daily note calendar — dark tablet',
     size: Size(760, 900),
     brightness: Brightness.dark)
 Widget dailyNoteCalendarTabletPreview() => _preview(dark: true);
 
-Widget _preview({bool chinese = false, bool dark = false}) => MaterialApp(
+Widget _preview(
+        {bool chinese = false, bool dark = false, bool largeText = false}) =>
+    MaterialApp(
       theme: dark ? AppTheme.dark : AppTheme.light,
       locale: chinese ? const Locale('zh', 'HK') : const Locale('en'),
       supportedLocales: S.delegate.supportedLocales,
@@ -34,8 +39,8 @@ Widget _preview({bool chinese = false, bool dark = false}) => MaterialApp(
       ],
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
-          textScaler: TextScaler.linear(chinese ? 1.5 : 1),
-          disableAnimations: chinese,
+          textScaler: TextScaler.linear(largeText ? 2.2 : (chinese ? 1.5 : 1)),
+          disableAnimations: chinese || largeText,
         ),
         child: child!,
       ),
@@ -78,6 +83,11 @@ Widget _preview({bool chinese = false, bool dark = false}) => MaterialApp(
                           chinese ? '新發現與值得記住的小事。' : 'Places to revisit.',
                       dailyNoteDateKey: '2026-09-23',
                       isArchived: true,
+                    ),
+                    Note(
+                      id: 'new-year',
+                      title: chinese ? '新年心願' : 'New year wishes',
+                      dailyNoteDateKey: '2027-01-01',
                     ),
                   ],
                   onOpenDay: previewOpenDailyCalendarDay,

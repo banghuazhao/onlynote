@@ -130,6 +130,85 @@ void main() {
     expect(empty.lastDay, isNull);
   });
 
+  test('saved-day navigation skips gaps across leap dates, months and years',
+      () {
+    final index = DailyNoteCalendarIndex.fromNotes([
+      Note(id: 'new-year', dailyNoteDateKey: '2027-01-01'),
+      Note(id: 'leap', dailyNoteDateKey: '2024-02-29'),
+      Note(id: 'old-year', dailyNoteDateKey: '2026-12-31'),
+      Note(id: 'march', dailyNoteDateKey: '2024-03-02'),
+    ]);
+    expect(index.previousSavedDay(DateTime(2024, 2, 29)), isNull);
+    expect(index.nextSavedDay(DateTime(2024, 2, 28)), DateTime(2024, 2, 29));
+    expect(index.nextSavedDay(DateTime(2024, 2, 29, 23, 59)),
+        DateTime(2024, 3, 2));
+    expect(index.previousSavedDay(DateTime(2024, 3, 1)), DateTime(2024, 2, 29));
+    expect(index.nextSavedDay(DateTime(2024, 3, 1)), DateTime(2024, 3, 2));
+    expect(index.nextSavedDay(DateTime(2024, 3, 2)), DateTime(2026, 12, 31));
+    expect(index.nextSavedDay(DateTime(2026, 12, 31)), DateTime(2027, 1, 1));
+    expect(
+        index.previousSavedDay(DateTime(2027, 1, 1)), DateTime(2026, 12, 31));
+    expect(index.nextSavedDay(DateTime(2027, 1, 1)), isNull);
+    final local = DateTime(2024, 3, 1, 0, 30);
+    expect(
+        index.previousSavedDay(local.toUtc()), index.previousSavedDay(local));
+    expect(index.nextSavedDay(local.toUtc()), index.nextSavedDay(local));
+  });
+
+  test('saved-day navigation has no wrap and handles supported date extremes',
+      () {
+    final first = DateTime(1);
+    final last = DateTime(9999, 12, 31);
+    final index = DailyNoteCalendarIndex.fromNotes([
+      Note(id: 'last', dailyNoteDateKey: '9999-12-31'),
+      Note(id: 'first', dailyNoteDateKey: '0001-01-01'),
+    ]);
+    expect(index.previousSavedDay(first), isNull);
+    expect(index.nextSavedDay(first), last);
+    expect(index.previousSavedDay(last), first);
+    expect(index.nextSavedDay(last), isNull);
+    final empty = DailyNoteCalendarIndex.fromNotes([]);
+    expect(empty.previousSavedDay(first), isNull);
+    expect(empty.nextSavedDay(last), isNull);
+    final single = DailyNoteCalendarIndex.fromNotes([
+      Note(id: 'only', dailyNoteDateKey: '2026-10-06'),
+    ]);
+    expect(single.previousSavedDay(DateTime(2026, 10, 6)), isNull);
+    expect(single.nextSavedDay(DateTime(2026, 10, 6)), isNull);
+    expect(single.nextSavedDay(first), DateTime(2026, 10, 6));
+    expect(single.previousSavedDay(last), DateTime(2026, 10, 6));
+  });
+
+  test('saved-day navigation visits each valid day once with archived fallback',
+      () {
+    final active = Note(id: 'active', dailyNoteDateKey: '2026-10-06');
+    final archived =
+        Note(id: 'archived', isArchived: true, dailyNoteDateKey: '2026-10-06');
+    final index = DailyNoteCalendarIndex.fromNotes([
+      archived,
+      active,
+      Note(
+          id: 'earlier-archive',
+          isArchived: true,
+          dailyNoteDateKey: '2026-09-23'),
+      Note(
+          id: 'deleted',
+          dailyNoteDateKey: '2026-10-05',
+          deletedAt: DateTime(2026, 10, 6)),
+      Note(id: 'invalid', dailyNoteDateKey: '2026-02-29'),
+      Note(id: 'ordinary', dateTime: DateTime(2026, 10, 4)),
+      Note(id: ' ', dailyNoteDateKey: '2026-10-07'),
+    ]);
+    expect(index.nextSavedDay(DateTime(2026, 9, 23)), DateTime(2026, 10, 6));
+    expect(
+        index.previousSavedDay(DateTime(2026, 10, 6)), DateTime(2026, 9, 23));
+    expect(index.noteForDay(DateTime(2026, 10, 6)), same(active));
+    expect(index.nextSavedDay(DateTime(2026, 10, 6)), isNull);
+    final fallback = DailyNoteCalendarIndex.fromNotes([archived]);
+    expect(fallback.nextSavedDay(DateTime(2026, 10, 5)), DateTime(2026, 10, 6));
+    expect(fallback.noteForDay(DateTime(2026, 10, 6)), same(archived));
+  });
+
   test('existingForDay reads latest edits/deletion/archive and never creates',
       () {
     final repository = _Notes();

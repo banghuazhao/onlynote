@@ -33,9 +33,10 @@ void main() {
     Locale locale = const Locale('en'),
     double textScale = 1,
     bool reduceMotion = false,
+    bool dark = false,
   }) async {
     await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
+      theme: dark ? AppTheme.dark : AppTheme.light,
       locale: locale,
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [
@@ -177,6 +178,131 @@ void main() {
     expect(find.text('February 28, 2027'), findsOneWidget);
   });
 
+  testWidgets('saved-note controls browse sparse dates without opening a note',
+      (tester) async {
+    final opened = <DateTime>[];
+    var openedToday = 0;
+    final nextYear = Note(
+        id: 'next-year', title: 'A new year', dailyNoteDateKey: '2027-01-01');
+    await pump(tester,
+        notes: [nextYear, october, september],
+        onOpenDay: opened.add,
+        onOpenToday: () => openedToday++);
+    final previous =
+        find.byKey(const ValueKey('daily-calendar-previous-saved'));
+    final next = find.byKey(const ValueKey('daily-calendar-next-saved'));
+    await tap(tester, previous);
+    expect(find.text('October 3, 2026'), findsOneWidget);
+    expect(find.text('Renamed daily note'), findsOneWidget);
+    await tap(tester, previous);
+    expect(find.text('September 2026'), findsOneWidget);
+    expect(find.text('September 23, 2026'), findsOneWidget);
+    expect(find.text('Archived September note'), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNull);
+    await tap(tester, next);
+    expect(find.text('October 2026'), findsOneWidget);
+    expect(find.text('October 3, 2026'), findsOneWidget);
+    await tap(tester, next);
+    expect(find.text('January 2027'), findsOneWidget);
+    expect(find.text('January 1, 2027'), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    expect(opened, isEmpty);
+    expect(openedToday, 0);
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-selected-note')));
+    expect(opened, [DateTime(2027, 1, 1)]);
+    expect(openedToday, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('saved-note navigation starts strictly around an empty date',
+      (tester) async {
+    final opened = <DateTime>[];
+    await pump(tester, onOpenDay: opened.add);
+    await tap(tester, day(DateTime(2026, 10, 1)));
+    await tap(tester, find.byKey(const ValueKey('daily-calendar-next-saved')));
+    expect(find.text('October 3, 2026'), findsOneWidget);
+    await tap(tester, day(DateTime(2026, 10, 2)));
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-previous-saved')));
+    expect(find.text('September 23, 2026'), findsOneWidget);
+    expect(find.text('September 2026'), findsOneWidget);
+    expect(opened, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('empty and single-date calendars disable unavailable directions',
+      (tester) async {
+    final opened = <DateTime>[];
+    var openedToday = 0;
+    await pump(tester,
+        notes: [], onOpenDay: opened.add, onOpenToday: () => openedToday++);
+    final previous =
+        find.byKey(const ValueKey('daily-calendar-previous-saved'));
+    final next = find.byKey(const ValueKey('daily-calendar-next-saved'));
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNull);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    await pump(tester,
+        notes: [october],
+        onOpenDay: opened.add,
+        onOpenToday: () => openedToday++);
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNotNull);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    await tap(tester, previous);
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNull);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    await pump(tester,
+        notes: [october.copyWith(deletedAt: today)],
+        onOpenDay: opened.add,
+        onOpenToday: () => openedToday++);
+    expect(find.text('October 3, 2026'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('daily-calendar-no-note')), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNull);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    expect(opened, isEmpty);
+    expect(openedToday, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('saved navigation reaches year boundaries without wrapping',
+      (tester) async {
+    final opened = <DateTime>[];
+    await pump(tester,
+        notes: [
+          Note(id: 'first', title: 'First', dailyNoteDateKey: '0001-01-01'),
+          Note(id: 'last', title: 'Last', dailyNoteDateKey: '9999-12-31'),
+        ],
+        onOpenDay: opened.add);
+    final previous =
+        find.byKey(const ValueKey('daily-calendar-previous-saved'));
+    final next = find.byKey(const ValueKey('daily-calendar-next-saved'));
+    await tap(tester, previous);
+    expect(find.byKey(const ValueKey('daily-calendar-day-0001-01-01')),
+        findsOneWidget);
+    expect(find.text('First'), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(previous).onPressed, isNull);
+    expect(
+        tester
+            .widget<IconButton>(
+                find.byKey(const ValueKey('daily-calendar-previous-month')))
+            .onPressed,
+        isNull);
+    await tap(tester, next);
+    expect(find.byKey(const ValueKey('daily-calendar-day-9999-12-31')),
+        findsOneWidget);
+    expect(find.text('Last'), findsOneWidget);
+    expect(tester.widget<OutlinedButton>(next).onPressed, isNull);
+    expect(
+        tester
+            .widget<IconButton>(
+                find.byKey(const ValueKey('daily-calendar-next-month')))
+            .onPressed,
+        isNull);
+    expect(opened, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
       'trash and ordinary notes are excluded and updates keep the month',
       (tester) async {
@@ -245,6 +371,34 @@ void main() {
             .duration,
         Duration.zero);
     await tap(tester, day(DateTime(2026, 10, 3)));
+    expect(find.text('Renamed daily note'), findsOneWidget);
+    final previous =
+        find.byKey(const ValueKey('daily-calendar-previous-saved'));
+    await tap(tester, previous);
+    expect(find.text('Archived September note'), findsOneWidget);
+    expect(tester.getRect(previous).left, greaterThanOrEqualTo(0));
+    expect(tester.getRect(previous).right, lessThanOrEqualTo(320));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('saved controls wrap on a narrow dark calendar at large text',
+      (tester) async {
+    size(tester, const Size(320, 760));
+    await pump(tester, dark: true, textScale: 2.2, reduceMotion: true);
+    for (final key in [
+      'daily-calendar-previous-saved',
+      'daily-calendar-next-saved'
+    ]) {
+      final button = find.byKey(ValueKey(key));
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      final bounds = tester.getRect(button);
+      expect(bounds.left, greaterThanOrEqualTo(0));
+      expect(bounds.right, lessThanOrEqualTo(320));
+      expect(bounds.height, greaterThanOrEqualTo(48));
+    }
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-previous-saved')));
     expect(find.text('Renamed daily note'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

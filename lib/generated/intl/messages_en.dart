@@ -365,6 +365,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Next_Month": MessageLookupByLibrary.simpleMessage(
       "Next month",
     ),
+    "Daily_Note_Calendar_Next_Saved": MessageLookupByLibrary.simpleMessage(
+      "Next saved note",
+    ),
     "Daily_Note_Calendar_No_Note": MessageLookupByLibrary.simpleMessage(
       "No daily note for this date.",
     ),
@@ -378,6 +381,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Previous_Month": MessageLookupByLibrary.simpleMessage(
       "Previous month",
     ),
+    "Daily_Note_Calendar_Previous_Saved": MessageLookupByLibrary.simpleMessage(
+      "Previous saved note",
+    ),
+    "Daily_Note_Calendar_Saved_Navigation_Hint":
+        MessageLookupByLibrary.simpleMessage(
+          "Browse saved dates, then tap the note to open it.",
+        ),
     "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Default_Card_Style": MessageLookupByLibrary.simpleMessage(
       "Default card style",
@@ -1169,6 +1179,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("Add a tag"),
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "Use up to 20 tags, with 40 characters per tag.",
+    ),
+    "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
+      "No matching tag suggestions. You can add a new tag.",
     ),
     "Tag_Usage_Count": m36,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(

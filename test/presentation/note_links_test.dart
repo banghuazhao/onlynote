@@ -136,6 +136,7 @@ void main() {
     await tester.enterText(search, 'mountain');
     await tester.pump();
     expect(find.text('Recorded idea'), findsOneWidget);
+    expect(find.text('Book the mountain cabin.'), findsOneWidget);
     expect(find.text('Meeting'), findsNothing);
     expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('choose-note-link-voice')));
@@ -169,6 +170,92 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('save-note-links')));
     await tester.pumpAndSettle();
     expect(results.single, ['tagged', 'voice']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('content snippets distinguish identical and untitled notes',
+      (tester) async {
+    final results = <List<String>?>[];
+    await _openPicker(tester, results, notes: [
+      Note(id: 'coast', title: 'Trip', description: 'Visit the coast'),
+      Note(
+        id: 'mountain',
+        title: 'Trip',
+        description: 'Hike the mountain',
+        isArchived: true,
+      ),
+      Note(id: 'untitled', todo: [Todo(title: 'Pack the tent')]),
+    ]);
+    expect(find.text('Trip'), findsNWidgets(2));
+    for (final (id, content) in [
+      ('coast', 'Visit the coast'),
+      ('mountain', 'Hike the mountain'),
+      ('untitled', 'Pack the tent'),
+    ]) {
+      final snippet = find.byKey(ValueKey('note-link-snippet-$id'));
+      await tester.ensureVisible(snippet);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(snippet).data, content);
+      expect(tester.widget<Text>(snippet).maxLines, 2);
+      expect(tester.widget<Text>(snippet).overflow, TextOverflow.ellipsis);
+    }
+    expect(find.text(S.current.Note_Untitled), findsOneWidget);
+    expect(find.text(S.current.Archive), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('choose-note-link-untitled')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('save-note-links')));
+    await tester.pumpAndSettle();
+    expect(results.single, ['untitled']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('search reveals matching content without changing draft links',
+      (tester) async {
+    final results = <List<String>?>[];
+    final prefix = List.filled(80, 'Earlier text ').join();
+    await _openPicker(tester, results, selectedIds: [
+      'context'
+    ], notes: [
+      Note(
+        id: 'context',
+        title: 'Travel',
+        description: '${prefix}Coastal walk',
+        todo: [Todo(title: 'Buy [tea]')],
+        voiceMemos: [
+          VoiceMemo(
+            id: 'memo',
+            path: 'note_audio/missing.m4a',
+            durationMs: 0,
+            createdAt: DateTime(2026),
+            transcript: '${prefix}Mountain cabin',
+          ),
+        ],
+      ),
+      Note(id: 'other', title: 'Other note'),
+    ]);
+    final search = find.byKey(const ValueKey('note-link-search'));
+    for (final (query, expected) in [
+      ('coastal', 'Coastal walk'),
+      ('[TEA]', 'Buy [tea]'),
+      ('mountain', 'Mountain cabin'),
+    ]) {
+      await tester.enterText(search, query);
+      await tester.pump();
+      final snippet = find.byKey(const ValueKey('note-link-snippet-context'));
+      expect(tester.widget<Text>(snippet).data, contains(expected));
+      expect(
+          find.byKey(const ValueKey('choose-note-link-other')), findsNothing);
+      expect(
+        tester
+            .widget<CheckboxListTile>(
+                find.byKey(const ValueKey('choose-note-link-context')))
+            .value,
+        isTrue,
+      );
+    }
+    await tester.tap(find.byKey(const ValueKey('save-note-links')));
+    await tester.pumpAndSettle();
+    expect(results.single, ['context']);
     expect(tester.takeException(), isNull);
   });
 
@@ -327,7 +414,12 @@ void main() {
       results,
       notes: [
         Note(id: 'hidden', title: '另一份筆記'),
-        Note(id: 'long', title: '這是一份很長的旅行計劃筆記標題', isArchived: true),
+        Note(
+          id: 'long',
+          title: '這是一份很長的旅行計劃筆記標題',
+          description: '帶著家人👨‍👩‍👧‍👦一起旅行，出發前先安排住宿、交通和每天的行程。',
+          isArchived: true,
+        ),
       ],
       selectedIds: const ['hidden', 'unavailable'],
       locale: const Locale('zh', 'HK'),
@@ -339,6 +431,8 @@ void main() {
     await tester.pump();
     expect(find.text(S.current.Link_Selected_Count(2)), findsOneWidget);
     expect(find.text(S.current.Link_Hidden_By_Search_Count(1)), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('note-link-snippet-long')), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester
         .ensureVisible(find.byKey(const ValueKey('choose-note-link-long')));

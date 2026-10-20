@@ -3459,6 +3459,16 @@ class S {
     return Intl.message('Add a tag', name: 'Tag_Hint', desc: '', args: []);
   }
 
+  /// `No matching tag suggestions. You can add a new tag.`
+  String get Tag_Suggestions_Empty {
+    return Intl.message(
+      'No matching tag suggestions. You can add a new tag.',
+      name: 'Tag_Suggestions_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Use up to 20 tags, with 40 characters per tag.`
   String get Tag_Invalid {
     return Intl.message(
@@ -3958,6 +3968,36 @@ class S {
     return Intl.message(
       'Next month',
       name: 'Daily_Note_Calendar_Next_Month',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Previous saved note`
+  String get Daily_Note_Calendar_Previous_Saved {
+    return Intl.message(
+      'Previous saved note',
+      name: 'Daily_Note_Calendar_Previous_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next saved note`
+  String get Daily_Note_Calendar_Next_Saved {
+    return Intl.message(
+      'Next saved note',
+      name: 'Daily_Note_Calendar_Next_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Browse saved dates, then tap the note to open it.`
+  String get Daily_Note_Calendar_Saved_Navigation_Hint {
+    return Intl.message(
+      'Browse saved dates, then tap the note to open it.',
+      name: 'Daily_Note_Calendar_Saved_Navigation_Hint',
       desc: '',
       args: [],
     );

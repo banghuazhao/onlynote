@@ -83,11 +83,18 @@ class _DailyNoteCalendarSheetState extends State<DailyNoteCalendarSheet> {
     if (index.noteForDay(day) != null) widget.onOpenDay(day);
   }
 
+  void _showSavedDay(DateTime day) => setState(() {
+        _selectedDay = day;
+        _month = DateTime(day.year, day.month);
+      });
+
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
     final theme = Theme.of(context);
     final index = DailyNoteCalendarIndex.fromNotes(widget.notes);
+    final previousSavedDay = index.previousSavedDay(_selectedDay);
+    final nextSavedDay = index.nextSavedDay(_selectedDay);
     return AppSheet(
       title: s.Daily_Note_Calendar,
       footer: FilledButton.icon(
@@ -156,6 +163,50 @@ class _DailyNoteCalendarSheetState extends State<DailyNoteCalendarSheet> {
             ),
             _buildMonth(context, index),
             const SizedBox(height: 16),
+            LayoutBuilder(builder: (context, constraints) {
+              final buttonWidth = constraints.maxWidth >= 520
+                  ? (constraints.maxWidth - 8) / 2
+                  : constraints.maxWidth;
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  SizedBox(
+                    width: buttonWidth,
+                    child: OutlinedButton.icon(
+                      key: const ValueKey('daily-calendar-previous-saved'),
+                      onPressed: previousSavedDay == null
+                          ? null
+                          : () => _showSavedDay(previousSavedDay),
+                      icon: const Icon(Icons.skip_previous_rounded),
+                      label: Text(s.Daily_Note_Calendar_Previous_Saved,
+                          textAlign: TextAlign.center),
+                    ),
+                  ),
+                  SizedBox(
+                    width: buttonWidth,
+                    child: OutlinedButton.icon(
+                      key: const ValueKey('daily-calendar-next-saved'),
+                      onPressed: nextSavedDay == null
+                          ? null
+                          : () => _showSavedDay(nextSavedDay),
+                      icon: const Icon(Icons.skip_next_rounded),
+                      label: Text(s.Daily_Note_Calendar_Next_Saved,
+                          textAlign: TextAlign.center),
+                    ),
+                  ),
+                ],
+              );
+            }),
+            const SizedBox(height: 8),
+            Text(
+              s.Daily_Note_Calendar_Saved_Navigation_Hint,
+              key: const ValueKey('daily-calendar-saved-navigation-hint'),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
             _SelectedDayPreview(
               date: _selectedDay,
               note: index.noteForDay(_selectedDay),

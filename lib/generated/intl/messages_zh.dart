@@ -281,6 +281,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Next_Month": MessageLookupByLibrary.simpleMessage(
       "下个月",
     ),
+    "Daily_Note_Calendar_Next_Saved": MessageLookupByLibrary.simpleMessage(
+      "下一篇已保存的笔记",
+    ),
     "Daily_Note_Calendar_No_Note": MessageLookupByLibrary.simpleMessage(
       "这一天没有每日笔记。",
     ),
@@ -292,6 +295,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Previous_Month": MessageLookupByLibrary.simpleMessage(
       "上个月",
     ),
+    "Daily_Note_Calendar_Previous_Saved": MessageLookupByLibrary.simpleMessage(
+      "上一篇已保存的笔记",
+    ),
+    "Daily_Note_Calendar_Saved_Navigation_Hint":
+        MessageLookupByLibrary.simpleMessage("浏览已保存的日期，再点按笔记打开。"),
     "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Default_Card_Style": MessageLookupByLibrary.simpleMessage("默认卡片样式"),
     "Default_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
@@ -891,6 +899,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("添加标签"),
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "最多添加20个标签，每个标签不超过40个字符。",
+    ),
+    "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
+      "没有匹配的标签建议。你可以添加新标签。",
     ),
     "Tag_Usage_Count": m36,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(

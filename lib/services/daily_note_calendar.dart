@@ -43,4 +43,24 @@ class DailyNoteCalendarIndex {
   final DateTime? lastDay;
 
   Note? noteForDay(DateTime day) => notesByDay[dailyNoteDateKey(day)];
+
+  /// The nearest saved day strictly before [day], skipping empty dates.
+  DateTime? previousSavedDay(DateTime day) {
+    final target = dailyNoteDateKey(day);
+    String? previous;
+    for (final key in notesByDay.keys) {
+      if (key.compareTo(target) >= 0) break;
+      previous = key;
+    }
+    return previous == null ? null : DateTime.parse(previous);
+  }
+
+  /// The nearest saved day strictly after [day], skipping empty dates.
+  DateTime? nextSavedDay(DateTime day) {
+    final target = dailyNoteDateKey(day);
+    for (final key in notesByDay.keys) {
+      if (key.compareTo(target) > 0) return DateTime.parse(key);
+    }
+    return null;
+  }
 }

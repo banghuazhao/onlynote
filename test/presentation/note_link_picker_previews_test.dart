@@ -60,6 +60,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(packing.hitTestable(), findsOneWidget);
       expect(tester.widget<CheckboxListTile>(packing).value, isTrue);
+      final snippet = find.byKey(const ValueKey('note-link-snippet-packing'));
+      expect(snippet, findsOneWidget);
+      expect(tester.widget<Text>(snippet).data, contains('raincoats'));
+      expect(tester.widget<Text>(snippet).maxLines, 2);
+      expect(find.text(S.current.Archive), findsOneWidget);
       await tester.tap(packing);
       await tester.pumpAndSettle();
 

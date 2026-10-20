@@ -281,6 +281,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Next_Month": MessageLookupByLibrary.simpleMessage(
       "下個月",
     ),
+    "Daily_Note_Calendar_Next_Saved": MessageLookupByLibrary.simpleMessage(
+      "下一篇已儲存的筆記",
+    ),
     "Daily_Note_Calendar_No_Note": MessageLookupByLibrary.simpleMessage(
       "這一天沒有每日筆記。",
     ),
@@ -292,6 +295,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "Daily_Note_Calendar_Previous_Month": MessageLookupByLibrary.simpleMessage(
       "上個月",
     ),
+    "Daily_Note_Calendar_Previous_Saved": MessageLookupByLibrary.simpleMessage(
+      "上一篇已儲存的筆記",
+    ),
+    "Daily_Note_Calendar_Saved_Navigation_Hint":
+        MessageLookupByLibrary.simpleMessage("瀏覽已儲存的日期，再點按筆記開啟。"),
     "Daily_Note_Calendar_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Default_Card_Style": MessageLookupByLibrary.simpleMessage("預設卡片樣式"),
     "Default_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
@@ -891,6 +899,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("新增標籤"),
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "最多新增20個標籤，每個標籤不超過40個字元。",
+    ),
+    "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有符合條件的標籤建議。你可以新增標籤。",
     ),
     "Tag_Usage_Count": m36,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(

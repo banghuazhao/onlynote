@@ -9,8 +9,19 @@ import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 
 List<Note> previewLinkedNotes() => [
-      Note(id: 'travel', title: 'Weekend trip', tags: ['Travel']),
-      Note(id: 'packing', title: 'Packing list', isArchived: true),
+      Note(
+        id: 'travel',
+        title: 'Weekend trip',
+        description:
+            'A quiet coastal walk, tea by the sea, and time together 👨‍👩‍👧‍👦.',
+        tags: ['Travel'],
+      ),
+      Note(
+        id: 'packing',
+        title: 'Packing list',
+        todo: [Todo(title: '雨衣、茶、充電器 — raincoats, tea, and chargers')],
+        isArchived: true,
+      ),
       Note(id: 'meeting', title: 'Project meeting notes'),
     ];
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/note_link_content_snippet.dart';
 import 'package:onlynote/services/note_links.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/photo_search_index.dart';
@@ -216,6 +217,12 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                   }
                   final note = matches[matchIndex];
                   final selected = _selected.contains(note.id);
+                  final snippet = noteLinkContentSnippet(
+                    note,
+                    query: _search.text,
+                    photoText:
+                        _photoSearchIndex?.textsForNote(note) ?? const [],
+                  );
                   return CheckboxListTile(
                     key: ValueKey('choose-note-link-${note.id}'),
                     value: selected,
@@ -230,7 +237,22 @@ class _NoteLinkPickerSheetState extends State<NoteLinkPickerSheet> {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    subtitle: note.isArchived ? Text(strings.Archive) : null,
+                    subtitle: snippet.isEmpty && !note.isArchived
+                        ? null
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (snippet.isNotEmpty)
+                                Text(
+                                  snippet,
+                                  key: ValueKey('note-link-snippet-${note.id}'),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              if (note.isArchived) Text(strings.Archive),
+                            ],
+                          ),
                     onChanged: !selected && _selected.length >= maxLinkedNotes
                         ? null
                         : (value) => setState(() {
