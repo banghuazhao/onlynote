@@ -304,11 +304,33 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.widget<Text>(_key('template-search-selected')).data,
             'C++ [2026]');
+        for (final query in [
+          'weekly review',
+          ' quarterly budget ',
+          'SUPPLIER',
+          'finance',
+          'projector',
+        ]) {
+          await _search(tester, query);
+          expect(_key('custom-template-work'), findsOneWidget);
+          expect(_key('custom-template-literal'), findsNothing);
+          expect(_key('custom-template-cjk'), findsNothing);
+          expect(tester.widget<Text>(_key('template-search-selected')).data,
+              'C++ [2026]');
+        }
+        await tester.testTextInput.receiveAction(TextInputAction.search);
+        await tester.pumpAndSettle();
+        await _capture(tester, '$name-content-match');
+        await _search(tester, '👨‍👩‍👧‍👦');
+        expect(_key('custom-template-cjk'), findsOneWidget);
         await _search(tester, ' 茶😀 ');
         expect(_key('custom-template-cjk'), findsOneWidget);
         expect(literal, findsNothing);
         expect(tester.widget<Text>(_key('template-search-selected')).data,
             'C++ [2026]');
+        await _search(tester, S.current.Template_Packing_Summary);
+        expect(_key('template-packing'), findsOneWidget);
+        expect(_key('custom-template-work'), findsNothing);
         final starterName = S.current.Template_Meeting_Title;
         await _search(tester, starterName);
         final meeting = _key('template-meeting');

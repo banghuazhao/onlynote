@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_agenda_search.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -14,14 +15,29 @@ ReminderAgendaEntry _entry(int id,
     {String? title,
     String? description,
     List<Todo> todos = const [],
+    List<String> tags = const [],
+    List<VoiceMemo> voiceMemos = const [],
     DateTime? due}) {
   final date = due ?? _now;
   return ReminderAgendaEntry(
     reminder: Reminder(reminderId: id, noteId: '$id', reminderDate: date),
-    note: Note(id: '$id', title: title, description: description, todo: todos),
+    note: Note(
+        id: '$id',
+        title: title,
+        description: description,
+        todo: todos,
+        tags: tags,
+        voiceMemos: voiceMemos),
     dueDate: date,
   );
 }
+
+VoiceMemo _memo(String? transcript) => VoiceMemo(
+    id: 'private-recording-id',
+    path: 'note_audio/private-recording-path.m4a',
+    durationMs: 1000,
+    createdAt: _now,
+    transcript: transcript);
 
 Future<void> _pumpAgenda(
   WidgetTester tester, {
@@ -99,15 +115,74 @@ void main() {
     expect(entries.length, 3);
   });
 
+  test('agenda search matches tags and transcripts without duplicating entries',
+      () {
+    final entries = [
+      _entry(1, title: 'Errands', tags: ['Dentist']),
+      _entry(2,
+          title: 'Appointments',
+          description: 'Bring paperwork',
+          voiceMemos: [_memo('Call the DENTIST')]),
+      _entry(3,
+          title: 'Dentist',
+          description: 'dentist',
+          todos: [Todo(id: 'todo', title: 'dentist')],
+          tags: ['dentist', 'DENTIST'],
+          voiceMemos: [_memo('dentist'), _memo('Another dentist')]),
+      _entry(4, voiceMemos: [_memo(null), _memo(''), _memo('  ')]),
+    ];
+    final matches = filterReminderAgenda(entries, '  dEnTiSt  ');
+    expect(matches, entries.take(3));
+    for (var i = 0; i < matches.length; i++) {
+      expect(matches[i], same(entries[i]));
+    }
+    expect(filterReminderAgenda(entries, '\t  '), same(entries));
+  });
+
+  test('metadata search supports literal punctuation and Unicode', () {
+    final entries = [
+      _entry(1, title: 'Errands', tags: ['C++ [2026]', '閱讀茶😀']),
+      _entry(2,
+          title: 'Appointments',
+          voiceMemos: [_memo('Review C++ [2026] and 閱讀茶😀')]),
+    ];
+    for (final query in [' c++ [2026] ', '[', '茶😀']) {
+      expect(filterReminderAgenda(entries, query), entries);
+    }
+    expect(filterReminderAgenda(entries, '.*'), isEmpty);
+  });
+
+  test('recording paths and IDs are not searchable content', () {
+    final entry = _entry(7654321,
+        title: 'Errands', voiceMemos: [_memo(null), _memo(''), _memo('  ')]);
+    for (final query in [
+      '7654321',
+      'private-recording-id',
+      'private-recording-path',
+      'note_audio',
+      '.m4a',
+    ]) {
+      expect(filterReminderAgenda([entry], query), isEmpty);
+    }
+  });
+
   testWidgets('search preserves agenda grouping, order, and matching actions',
       (tester) async {
     final entries = [
       _entry(1,
-          title: 'Call dentist', due: _now.subtract(const Duration(hours: 2))),
+          title: 'Phone call',
+          tags: ['Dentist'],
+          due: _now.subtract(const Duration(hours: 2))),
       _entry(2, title: 'Other errands'),
-      _entry(3, title: 'Book dentist', due: _now.add(const Duration(hours: 2))),
+      _entry(3,
+          title: 'Appointments',
+          voiceMemos: [_memo('Book dentist')],
+          due: _now.add(const Duration(hours: 2))),
       _entry(4,
-          title: 'Dentist checkup', due: _now.add(const Duration(days: 1))),
+          title: 'Checkup',
+          tags: ['Dentist'],
+          voiceMemos: [_memo('Confirm dentist')],
+          due: _now.add(const Duration(days: 1))),
     ];
     final opened = <int>[];
     final snoozed = <int>[];
@@ -137,7 +212,9 @@ void main() {
   testWidgets('no matches remains refreshable and clear recovers all notes',
       (tester) async {
     var refreshes = 0;
-    final entries = [_entry(1, title: 'Call dentist')];
+    final entries = [
+      _entry(1, title: 'Phone call', tags: ['Dentist'])
+    ];
     await _pumpAgenda(tester,
         entries: entries, onRefresh: () async => refreshes++);
     await tester.enterText(
@@ -159,14 +236,16 @@ void main() {
     await tester
         .tap(find.byKey(const ValueKey('reminders-empty-clear-search')));
     await tester.pump();
-    expect(find.text('Call dentist'), findsOneWidget);
+    expect(find.text('Phone call'), findsOneWidget);
     expect(find.byKey(const ValueKey('reminders-search-empty')), findsNothing);
     expect(find.byKey(const ValueKey('reminders-clear-search')), findsNothing);
   });
 
   testWidgets('query stays through loading, new data, and an empty schedule',
       (tester) async {
-    await _pumpAgenda(tester, entries: [_entry(1, title: 'Call dentist')]);
+    await _pumpAgenda(tester, entries: [
+      _entry(1, title: 'Phone call', tags: ['Dentist'])
+    ]);
     await tester.enterText(
         find.byKey(const ValueKey('reminders-search')), 'dentist');
     await tester.pump();
@@ -179,10 +258,11 @@ void main() {
             .text,
         'dentist');
     await _pumpAgenda(tester, entries: [
-      _entry(2, title: 'New dentist appointment'),
+      _entry(2,
+          title: 'New appointment', voiceMemos: [_memo('Call the dentist')]),
       _entry(3, title: 'Unrelated'),
     ]);
-    expect(find.text('New dentist appointment'), findsOneWidget);
+    expect(find.text('New appointment'), findsOneWidget);
     expect(find.text('Unrelated'), findsNothing);
     await _pumpAgenda(tester, entries: []);
     expect(find.text(S.current.Reminders_Search_Empty_Title), findsOneWidget);

@@ -64,6 +64,7 @@ CustomNoteTemplate _searchTemplate(String id, String name) =>
       title: 'Private content label',
       body: 'Private content body',
       items: const ['Private content task'],
+      tags: const ['projecttag'],
       imagePaths: const ['template_images/unavailable.jpg'],
       voiceMemos: [
         VoiceMemo(
@@ -207,7 +208,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('name search is literal, ordered and never searches note content',
+  testWidgets('template search is literal, ordered and includes stored content',
       (tester) async {
     final preferences = _SearchPreferences();
     final store = _searchStore(preferences, [
@@ -227,7 +228,8 @@ void main() {
       ('[2026]', ['literal']),
       ('研究茶😀', ['cjk']),
       ('.*', <String>[]),
-      ('Private content', <String>[]),
+      ('Private content', ['z-work', 'a-work', 'literal', 'cjk']),
+      ('unavailable', <String>[]),
     ]) {
       await _query(tester, query);
       final displayed = tester
@@ -289,6 +291,52 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets(
+      'stored template fields match without loading media or changing selection',
+      (tester) async {
+    final preferences = _SearchPreferences();
+    final store = _searchStore(preferences, [
+      _searchTemplate('chosen', 'Unique routine'),
+      CustomNoteTemplate(
+        id: 'other',
+        name: 'Other routine',
+        createdAt: DateTime.utc(2026, 10, 20),
+      ),
+    ]);
+    final saved = preferences.values[CustomNoteTemplateStore.storageKey];
+    final results = <NoteTemplateSelection?>[];
+    await _openPicker(tester, results, store: store);
+    final chosen = store.templates.first;
+    final reads = preferences.reads;
+    for (final query in [
+      'Unique routine',
+      ' content label ',
+      'CONTENT BODY',
+      'content task',
+      'projecttag',
+      'content transcript',
+    ]) {
+      await _query(tester, query);
+      expect(
+          find.byKey(const ValueKey('custom-template-chosen')), findsOneWidget);
+      expect(find.byKey(const ValueKey('custom-template-other')), findsNothing);
+      expect(_searchEmpty, findsNothing);
+      expect(preferences.reads, reads);
+      expect(preferences.writes, 0);
+      expect(preferences.values[CustomNoteTemplateStore.storageKey], saved);
+      expect(results, isEmpty);
+    }
+    final tile = find.byKey(const ValueKey('custom-template-chosen'));
+    await tester.ensureVisible(tile);
+    await tester.pumpAndSettle();
+    expect(tile.hitTestable(), findsOneWidget);
+    await tester.tap(tile);
+    await tester.pumpAndSettle();
+    expect(results.single!.custom, same(chosen));
+    expect(preferences.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
       'filtered custom selection keeps its identity and guards stale taps',

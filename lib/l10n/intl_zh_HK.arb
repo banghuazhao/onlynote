@@ -471,6 +471,8 @@
   "Today_Note": "今日筆記",
   "Today_Note_Open_Failed": "無法開啟今日筆記，請再試一次。",
   "Daily_Note_Calendar": "每日筆記",
+  "Daily_Note_Calendar_Month_Saved_Days": "本月已有 {count} 天的筆記",
+  "@Daily_Note_Calendar_Month_Saved_Days": {"placeholders": {"count": {"type": "int"}}},
   "Daily_Note_Calendar_Empty": "還沒有每日筆記，從今日筆記開始吧。",
   "Daily_Note_Calendar_No_Note": "這一天沒有每日筆記。",
   "Daily_Note_Calendar_Has_Note": "有每日筆記",

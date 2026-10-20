@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
@@ -33,7 +34,7 @@ void main() {
             reminderId: 42,
             noteId: 'note'),
       ];
-      final note = Note(id: 'note', title: 'Call the dentist');
+      final note = Note(id: 'note', title: 'Phone call', tags: ['Dentist']);
       Duration? selected;
       final controller = ReminderAgendaController(
         readReminders: () => reminders,
@@ -90,7 +91,14 @@ void main() {
       final now = DateTime(2026, 10, 6, 14);
       final original =
           Reminder(reminderDate: now, reminderId: 42, noteId: 'note');
-      final note = Note(id: 'note', title: 'Buy groceries');
+      final note = Note(id: 'note', title: 'Errands', voiceMemos: [
+        VoiceMemo(
+            id: 'errands',
+            path: 'note_audio/errands.m4a',
+            durationMs: 1000,
+            createdAt: now,
+            transcript: 'Buy groceries'),
+      ]);
       DateTime? attemptedDate;
       final controller = ReminderAgendaController(
         readReminders: () => [original],
@@ -141,7 +149,7 @@ void main() {
     final now = DateTime(2026, 10, 20, 14);
     final reminder =
         Reminder(reminderDate: now, reminderId: 42, noteId: 'note');
-    var note = Note(id: 'note', title: 'Errands', description: 'Call dentist');
+    var note = Note(id: 'note', title: 'Errands', tags: ['Dentist']);
     var fail = false;
     final controller = ReminderAgendaController(
       readReminders: () => [reminder],
@@ -168,10 +176,22 @@ void main() {
     expect(find.text(S.current.Reminders_Load_Failed), findsOneWidget);
     expect(find.text('Errands'), findsOneWidget);
     fail = false;
-    note = Note(id: 'note', title: 'Other task');
+    note = Note(id: 'note', title: 'New appointment', voiceMemos: [
+      VoiceMemo(
+          id: 'appointment',
+          path: 'note_audio/appointment.m4a',
+          durationMs: 1000,
+          createdAt: now,
+          transcript: 'Call the dentist'),
+    ]);
     await tester.tap(find.text(S.current.Retry));
     await tester.pumpAndSettle();
     expect(find.text(S.current.Reminders_Load_Failed), findsNothing);
+    expect(find.text('New appointment'), findsOneWidget);
+    expect(find.text(S.current.Reminders_Search_Empty_Title), findsNothing);
+    note = Note(id: 'note', title: 'Other task');
+    await controller.refresh();
+    await tester.pumpAndSettle();
     expect(find.text('Other task'), findsNothing);
     expect(find.text(S.current.Reminders_Search_Empty_Title), findsOneWidget);
     expect(

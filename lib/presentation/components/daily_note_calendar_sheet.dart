@@ -153,6 +153,17 @@ class _DailyNoteCalendarSheetState extends State<DailyNoteCalendarSheet> {
                 icon: const Icon(Icons.chevron_right_rounded),
               ),
             ]),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                s.Daily_Note_Calendar_Month_Saved_Days(
+                    index.savedDayCountForMonth(_month)),
+                key: const ValueKey('daily-calendar-month-saved-days'),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
             Align(
               alignment: AlignmentDirectional.centerEnd,
               child: TextButton(

@@ -471,6 +471,8 @@
   "Today_Note": "Today’s note",
   "Today_Note_Open_Failed": "Could not open today’s note. Try again.",
   "Daily_Note_Calendar": "Daily notes",
+  "Daily_Note_Calendar_Month_Saved_Days": "{count, plural, one{1 saved day this month} other{{count} saved days this month}}",
+  "@Daily_Note_Calendar_Month_Saved_Days": {"placeholders": {"count": {"type": "int"}}},
   "Daily_Note_Calendar_Empty": "No daily notes yet. Start with today's note.",
   "Daily_Note_Calendar_No_Note": "No daily note for this date.",
   "Daily_Note_Calendar_Has_Note": "Daily note available",

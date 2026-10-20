@@ -6,7 +6,7 @@ import 'package:onlynote/services/reminder_agenda.dart';
 import 'reminders_agenda_list.dart';
 
 /// Filters the loaded notes without changing reminder order or schedule.
-/// Checklist labels are included because they can be the agenda's note title.
+/// Only stored text is searched; recording files and photo text stay unloaded.
 List<ReminderAgendaEntry> filterReminderAgenda(
     List<ReminderAgendaEntry> entries, String query) {
   final pattern = searchPattern(query);
@@ -15,7 +15,9 @@ List<ReminderAgendaEntry> filterReminderAgenda(
     final note = entry.note;
     return pattern.hasMatch(note.title ?? '') ||
         pattern.hasMatch(note.description ?? '') ||
-        note.todo.any((todo) => pattern.hasMatch(todo.title ?? ''));
+        note.todo.any((todo) => pattern.hasMatch(todo.title ?? '')) ||
+        note.tags.any(pattern.hasMatch) ||
+        note.voiceMemos.any((memo) => pattern.hasMatch(memo.transcript ?? ''));
   }).toList(growable: false);
 }
 

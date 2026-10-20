@@ -3913,6 +3913,18 @@ class S {
     );
   }
 
+  /// `{count, plural, one{1 saved day this month} other{{count} saved days this month}}`
+  String Daily_Note_Calendar_Month_Saved_Days(int count) {
+    return Intl.plural(
+      count,
+      one: '1 saved day this month',
+      other: '$count saved days this month',
+      name: 'Daily_Note_Calendar_Month_Saved_Days',
+      desc: '',
+      args: [count],
+    );
+  }
+
   /// `No daily notes yet. Start with today's note.`
   String get Daily_Note_Calendar_Empty {
     return Intl.message(

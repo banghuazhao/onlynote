@@ -130,6 +130,56 @@ void main() {
     expect(empty.lastDay, isNull);
   });
 
+  test('monthly totals count saved days once and include archived dates', () {
+    final index = DailyNoteCalendarIndex.fromNotes([
+      Note(id: 'active', dailyNoteDateKey: '2026-10-03'),
+      Note(
+          id: 'duplicate-archive',
+          isArchived: true,
+          dailyNoteDateKey: '2026-10-03'),
+      Note(
+          id: 'archive-only', isArchived: true, dailyNoteDateKey: '2026-10-20'),
+      Note(
+          id: 'trash',
+          dailyNoteDateKey: '2026-10-21',
+          deletedAt: DateTime(2026, 10, 22)),
+      Note(id: 'ordinary', dateTime: DateTime(2026, 10, 22)),
+      Note(id: 'invalid', dailyNoteDateKey: '2026-10-32'),
+      Note(id: ' ', dailyNoteDateKey: '2026-10-23'),
+      Note(id: 'september', dailyNoteDateKey: '2026-09-30'),
+      Note(id: 'november', dailyNoteDateKey: '2026-11-01'),
+      Note(id: 'last-year', dailyNoteDateKey: '2025-10-03'),
+    ]);
+    expect(index.savedDayCountForMonth(DateTime(2026, 10)), 2);
+    expect(index.savedDayCountForMonth(DateTime(2026, 10, 31, 23, 59)), 2);
+    expect(index.savedDayCountForMonth(DateTime(2026, 9)), 1);
+    expect(index.savedDayCountForMonth(DateTime(2026, 11)), 1);
+    expect(index.savedDayCountForMonth(DateTime(2025, 10)), 1);
+    expect(index.savedDayCountForMonth(DateTime(2027, 10)), 0);
+  });
+
+  test('monthly totals support leap dates, year extremes and empty months', () {
+    final index = DailyNoteCalendarIndex.fromNotes([
+      Note(id: 'first', dailyNoteDateKey: '0001-01-01'),
+      Note(id: 'leap', dailyNoteDateKey: '2024-02-29'),
+      Note(id: 'march', dailyNoteDateKey: '2024-03-01'),
+      Note(id: 'invalid-leap', dailyNoteDateKey: '2026-02-29'),
+      Note(id: 'last', dailyNoteDateKey: '9999-12-31'),
+    ]);
+    expect(index.savedDayCountForMonth(DateTime(1)), 1);
+    expect(index.savedDayCountForMonth(DateTime(1, 2)), 0);
+    expect(index.savedDayCountForMonth(DateTime(2024, 2)), 1);
+    expect(index.savedDayCountForMonth(DateTime(2024, 3)), 1);
+    expect(index.savedDayCountForMonth(DateTime(2026, 2)), 0);
+    expect(index.savedDayCountForMonth(DateTime(9999, 12, 31)), 1);
+    final local = DateTime(2024, 3, 1, 0, 30);
+    expect(index.savedDayCountForMonth(local.toUtc()),
+        index.savedDayCountForMonth(local));
+    final empty = DailyNoteCalendarIndex.fromNotes([]);
+    expect(empty.savedDayCountForMonth(DateTime(1)), 0);
+    expect(empty.savedDayCountForMonth(DateTime(9999, 12, 31)), 0);
+  });
+
   test('saved-day navigation skips gaps across leap dates, months and years',
       () {
     final index = DailyNoteCalendarIndex.fromNotes([

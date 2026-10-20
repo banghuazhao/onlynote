@@ -19,6 +19,9 @@ Widget dailyNoteCalendarChinesePreview() => _preview(chinese: true);
 @Preview(name: 'Daily note calendar — narrow large text', size: Size(320, 760))
 Widget dailyNoteCalendarLargeTextPreview() => _preview(largeText: true);
 
+@Preview(name: 'Daily note calendar — empty month', size: Size(390, 844))
+Widget dailyNoteCalendarEmptyMonthPreview() => _preview(emptyMonth: true);
+
 @Preview(
     name: 'Daily note calendar — dark tablet',
     size: Size(760, 900),
@@ -26,7 +29,10 @@ Widget dailyNoteCalendarLargeTextPreview() => _preview(largeText: true);
 Widget dailyNoteCalendarTabletPreview() => _preview(dark: true);
 
 Widget _preview(
-        {bool chinese = false, bool dark = false, bool largeText = false}) =>
+        {bool chinese = false,
+        bool dark = false,
+        bool largeText = false,
+        bool emptyMonth = false}) =>
     MaterialApp(
       theme: dark ? AppTheme.dark : AppTheme.light,
       locale: chinese ? const Locale('zh', 'HK') : const Locale('en'),
@@ -59,7 +65,7 @@ Widget _preview(
                     const BorderRadius.vertical(top: Radius.circular(28)),
                 clipBehavior: Clip.antiAlias,
                 child: DailyNoteCalendarSheet(
-                  today: DateTime(2026, 10, 6),
+                  today: DateTime(2026, emptyMonth ? 11 : 10, 6),
                   notes: [
                     Note(
                       id: 'today',

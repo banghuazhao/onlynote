@@ -44,6 +44,13 @@ class DailyNoteCalendarIndex {
 
   Note? noteForDay(DateTime day) => notesByDay[dailyNoteDateKey(day)];
 
+  /// Counts saved calendar days in [month], including archived notes.
+  /// The index already resolves duplicates and excludes trash/invalid dates.
+  int savedDayCountForMonth(DateTime month) {
+    final monthPrefix = '${dailyNoteDateKey(month).substring(0, 7)}-';
+    return notesByDay.keys.where((key) => key.startsWith(monthPrefix)).length;
+  }
+
   /// The nearest saved day strictly before [day], skipping empty dates.
   DateTime? previousSavedDay(DateTime day) {
     final target = dailyNoteDateKey(day);

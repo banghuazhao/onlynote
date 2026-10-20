@@ -73,6 +73,14 @@ void main() {
   Finder day(DateTime value) =>
       find.byKey(ValueKey('daily-calendar-day-${dailyNoteDateKey(value)}'));
 
+  Finder getMonthlySavedDays() =>
+      find.byKey(const ValueKey('daily-calendar-month-saved-days'));
+
+  void expectMonthlySavedDays(WidgetTester tester, int count) {
+    expect(tester.widget<Text>(getMonthlySavedDays()).data,
+        S.current.Daily_Note_Calendar_Month_Saved_Days(count));
+  }
+
   Future<void> tap(WidgetTester tester, Finder target) async {
     await tester.ensureVisible(target);
     await tester.pumpAndSettle();
@@ -128,6 +136,69 @@ void main() {
     expect(openedToday, 0);
   });
 
+  testWidgets('monthly saved-day totals follow the displayed month and Today',
+      (tester) async {
+    final opened = <DateTime>[];
+    var openedToday = 0;
+    await pump(tester,
+        notes: [
+          october,
+          october.copyWith(id: 'duplicate', isArchived: true),
+          september,
+          Note(id: 'second', dailyNoteDateKey: '2026-10-20', isArchived: true),
+          Note(id: 'trash', dailyNoteDateKey: '2026-10-21', deletedAt: today),
+          Note(id: 'invalid', dailyNoteDateKey: '2026-10-32'),
+        ],
+        onOpenDay: opened.add,
+        onOpenToday: () => openedToday++);
+    expectMonthlySavedDays(tester, 2);
+    expect(find.text('2 saved days this month'), findsOneWidget);
+    await tap(tester, day(DateTime(2026, 10, 4)));
+    expectMonthlySavedDays(tester, 2);
+    await tap(tester, find.byKey(const ValueKey('daily-calendar-next-month')));
+    expectMonthlySavedDays(tester, 0);
+    expect(find.text('0 saved days this month'), findsOneWidget);
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-previous-month')));
+    await tap(
+        tester, find.byKey(const ValueKey('daily-calendar-previous-month')));
+    expectMonthlySavedDays(tester, 1);
+    expect(find.text('1 saved day this month'), findsOneWidget);
+    await tap(tester, find.byKey(const ValueKey('daily-calendar-show-today')));
+    expectMonthlySavedDays(tester, 2);
+    expect(opened, isEmpty);
+    expect(openedToday, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('monthly totals follow saved-day jumps and live note updates',
+      (tester) async {
+    final second = Note(id: 'second', dailyNoteDateKey: '2026-10-05');
+    await pump(tester, notes: [october, second, september]);
+    expectMonthlySavedDays(tester, 2);
+    final previous =
+        find.byKey(const ValueKey('daily-calendar-previous-saved'));
+    await tap(tester, previous);
+    expectMonthlySavedDays(tester, 2);
+    await tap(tester, previous);
+    expectMonthlySavedDays(tester, 2);
+    await tap(tester, previous);
+    expect(find.text('September 2026'), findsOneWidget);
+    expectMonthlySavedDays(tester, 1);
+    await pump(tester, notes: [
+      october,
+      second,
+      september,
+      Note(id: 'new', dailyNoteDateKey: '2026-09-25'),
+    ]);
+    expect(find.text('September 2026'), findsOneWidget);
+    expectMonthlySavedDays(tester, 2);
+    await pump(tester, notes: [october, second]);
+    expect(find.text('September 2026'), findsOneWidget);
+    expectMonthlySavedDays(tester, 0);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Today returns to this month and the explicit CTA opens today',
       (tester) async {
     final opened = <DateTime>[];
@@ -161,6 +232,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('September 2026'), findsOneWidget);
     expect(find.text('September 23, 2026'), findsOneWidget);
+    expectMonthlySavedDays(tester, 1);
     expect(opened, isEmpty);
     await tap(tester, day(DateTime(2026, 9, 23)));
     expect(opened, [DateTime(2026, 9, 23)]);
@@ -356,6 +428,10 @@ void main() {
     size(tester, const Size(320, 760));
     await pump(tester,
         locale: const Locale('zh', 'HK'), textScale: 2.2, reduceMotion: true);
+    expectMonthlySavedDays(tester, 1);
+    final countBounds = tester.getRect(getMonthlySavedDays());
+    expect(countBounds.left, greaterThanOrEqualTo(0));
+    expect(countBounds.right, lessThanOrEqualTo(320));
     final first = tester.getRect(day(DateTime(2026, 10, 4)));
     final last = tester.getRect(day(DateTime(2026, 10, 10)));
     expect(first.left, greaterThanOrEqualTo(0));

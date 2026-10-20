@@ -10,6 +10,7 @@ import 'package:onlynote/presentation/components/template_name_search.dart';
 import 'package:onlynote/presentation/components/template_content_snippet.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_templates.dart';
+import 'package:onlynote/services/template_content_search.dart';
 
 Future<NoteTemplateSelection?> showNoteTemplatePickerSheet(BuildContext context,
     {CustomNoteTemplateStore? store}) async {
@@ -162,11 +163,9 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
     final strings = S.of(context);
     final theme = Theme.of(context);
     final templates = _store.templates;
-    final customMatches = filterTemplateNames(templates, _searchController.text,
-        displayName: (template) => template.name);
-    final starterMatches = filterTemplateNames(
-        NoteTemplate.values, _searchController.text,
-        displayName: (template) => template.content(strings).title);
+    final search = TemplateContentSearch(_searchController.text);
+    final customMatches = search.filterCustom(templates);
+    final starterMatches = search.filterBuiltIn(NoteTemplate.values, strings);
     final noMatches = !_loading &&
         !_loadFailed &&
         _searchController.text.trim().isNotEmpty &&

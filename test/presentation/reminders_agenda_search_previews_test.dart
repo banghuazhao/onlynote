@@ -103,11 +103,13 @@ void main() {
       final field = find.byKey(const ValueKey('reminders-search'));
       expect(Localizations.localeOf(tester.element(field)), locale);
       expect(Theme.of(tester.element(field)).brightness, brightness);
-      await tester.enterText(field, 'dentist');
+      final chinese = locale.languageCode == 'zh';
+      await tester.enterText(field, chinese ? '茶😀' : '  FOLLOW-UP [2026]  ');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
-      expect(find.text('Call dentist'), findsOneWidget);
-      expect(find.text('Errands'), findsOneWidget);
+      expect(find.text(chinese ? '閱讀清單' : 'Call dentist'), findsOneWidget);
+      expect(find.text(chinese ? 'Review C++ [2026] notes' : 'Errands'),
+          findsOneWidget);
       await _capture(tester, name);
       await tester.enterText(field, 'not found');
       await tester.testTextInput.receiveAction(TextInputAction.search);
