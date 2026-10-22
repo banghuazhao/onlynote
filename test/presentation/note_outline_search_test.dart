@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_outline_preview.dart';
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
 import 'package:onlynote/services/note_outline.dart';
+
+import '../support/search_highlight_text.dart';
 
 const _searchKey = ValueKey('note-outline-search');
 const _clearKey = ValueKey('note-outline-search-clear');
@@ -70,13 +73,78 @@ void main() {
 
     await _search(tester, '  CAFÉ  ');
     expect(_visibleOffsets(tester), [0, 40]);
+    expect(highlightedSearchText(tester, _entry(0)), ['Café']);
+    expect(highlightedSearchText(tester, _entry(40)), ['CAFÉ']);
     await _search(tester, '[plan].*');
     expect(_visibleOffsets(tester), [0]);
+    expect(highlightedSearchText(tester, _entry(0)), ['[plan].*']);
     await _search(tester, '\u3000計劃\u3000');
     expect(_visibleOffsets(tester), [80]);
+    expect(highlightedSearchText(tester, _entry(80)), ['計劃']);
     await _search(tester, '  \n\t\u3000');
     expect(_visibleOffsets(tester), [0, 40, 80, 120]);
+    expect(highlightedSearchText(tester, _entry(0)), isEmpty);
     expect(find.byKey(_emptyKey), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('highlighted Unicode headings keep original UTF-16 navigation',
+      (tester) async {
+    const heading = 'C++ [plan].* 茶室😀 👩🏽‍💻';
+    const prefix = '🙂 Preamble\n';
+    const separator = '\nInterlude😀\n';
+    const body = '$prefix$heading$separator$heading';
+    final firstOffset = prefix.length;
+    final lastOffset = body.lastIndexOf(heading);
+    final entries = buildNoteOutline(body, [
+      for (final offset in [firstOffset, lastOffset])
+        NoteTextStyleRange(
+            start: offset,
+            end: offset + heading.length,
+            kind: NoteTextStyleKind.heading),
+    ]);
+    NoteOutlineEntry? selected;
+    await _pump(
+        tester,
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () async => selected = await showNoteOutlineSheet(
+                context: context, entries: entries, currentOffset: lastOffset),
+            child: const Text('Open outline'),
+          ),
+        ),
+        size: const Size(280, 700),
+        textScale: 2);
+    await tester.tap(find.text('Open outline'));
+    await tester.pumpAndSettle();
+    for (final (query, highlighted) in [
+      (' [PLAN].* ', '[plan].*'),
+      ('茶室😀', '茶室😀'),
+      ('👩', '👩🏽‍💻'),
+    ]) {
+      await _search(tester, query);
+      expect(_visibleOffsets(tester), [firstOffset, lastOffset]);
+      expect(highlightedSearchText(tester, _entry(lastOffset)), [highlighted]);
+      expect(tester.widget<ListTile>(_entry(lastOffset)).selected, isTrue);
+      expect(selected, isNull);
+      expect(tester.takeException(), isNull);
+    }
+    await tester.ensureVisible(find.byKey(_clearKey));
+    await tester.tap(find.byKey(_clearKey));
+    await tester.pumpAndSettle();
+    expect(highlightedSearchText(tester, _entry(lastOffset)), isEmpty);
+    expect(tester.widget<ListTile>(_entry(lastOffset)).selected, isTrue);
+    await _search(tester, '茶室😀');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.ensureVisible(_entry(lastOffset));
+    await tester.pumpAndSettle();
+    await tester.tap(_entry(lastOffset));
+    await tester.pumpAndSettle();
+    expect(selected, same(entries.last));
+    expect(selected!.start, lastOffset);
+    expect(selected!.end, lastOffset + heading.length);
+    expect(body.substring(selected!.start, selected!.end), heading);
+    expect(find.byType(NoteOutlineSheet), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

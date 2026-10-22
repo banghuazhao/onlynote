@@ -482,6 +482,15 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("Format"),
     "Export_Notes_Incomplete": m12,
+    "Export_Notes_Markdown_Hint": MessageLookupByLibrary.simpleMessage(
+      "Editable notes with checklist formatting. Photos and recordings are saved as separate files beside each Markdown note.",
+    ),
+    "Export_Notes_PDF_Hint": MessageLookupByLibrary.simpleMessage(
+      "Printable pages with text, checklists, transcripts and photos. Audio files are not included.",
+    ),
+    "Export_Notes_Plain_Text_Hint": MessageLookupByLibrary.simpleMessage(
+      "Text, checklists and transcripts in .txt files. Photo and audio files are not included.",
+    ),
     "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
       "Notes exported. This device could not confirm whether they were shared.",
     ),

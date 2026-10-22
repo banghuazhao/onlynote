@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'search_highlight.dart';
+
 /// A version summary using display values only, independent of stored media.
 class NoteHistoryVersionTile extends StatelessWidget {
   const NoteHistoryVersionTile({
@@ -9,6 +11,7 @@ class NoteHistoryVersionTile extends StatelessWidget {
     required this.snippet,
     required this.mediaCounts,
     required this.onPressed,
+    this.query = '',
   });
 
   final String title;
@@ -16,12 +19,14 @@ class NoteHistoryVersionTile extends StatelessWidget {
   final String snippet;
   final Widget mediaCounts;
   final VoidCallback? onPressed;
+  final String query;
 
   @override
   Widget build(BuildContext context) => ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         leading: const Icon(Icons.restore_page_outlined),
-        title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        title: SearchHighlight(title,
+            query: query, maxLines: 2, overflow: TextOverflow.ellipsis),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,7 +34,8 @@ class NoteHistoryVersionTile extends StatelessWidget {
             Text(dateLabel),
             if (snippet.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(snippet, maxLines: 2, overflow: TextOverflow.ellipsis),
+              SearchHighlight(snippet,
+                  query: query, maxLines: 2, overflow: TextOverflow.ellipsis),
             ],
             mediaCounts,
           ],

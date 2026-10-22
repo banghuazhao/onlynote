@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added localized export-format hints explaining Markdown attachments, plain-text contents, and printable PDF contents before exporting.
+- Highlighted matching headings in outline search and matching titles and excerpts in note history, preserving jump and restore targets.
+
 - Added folder names to library note cards, omitting missing folders and redundant labels in a selected folder, and keeping folder names out of shared images.
 - Highlighted matching text in folder, template, and saved-view searches, including displayed template snippets and saved-view criteria.
 - Added the last backup saved or shared status directly to Settings, refreshing after returning from Backup & Restore.

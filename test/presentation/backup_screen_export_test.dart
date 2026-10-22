@@ -909,6 +909,18 @@ void main() {
         await tester.pumpAndSettle();
         expect(_visibleFormat(tester), format);
         expect(tester.widget<ChoiceChip>(_formatChip(format)).selected, isTrue);
+        final hint = tester
+            .widget<Text>(find.byKey(const ValueKey('note-export-format-hint')))
+            .data!;
+        expect(
+            hint,
+            switch (format) {
+              NoteBulkExportFormat.markdown =>
+                S.current.Export_Notes_Markdown_Hint,
+              NoteBulkExportFormat.plainText =>
+                S.current.Export_Notes_Plain_Text_Hint,
+              NoteBulkExportFormat.pdf => S.current.Export_Notes_PDF_Hint,
+            });
         await tester.tap(_exportNotesButton);
         await tester.pumpAndSettle();
         expect(formats, [format]);

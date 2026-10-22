@@ -381,6 +381,15 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Export_Notes_Format": MessageLookupByLibrary.simpleMessage("格式"),
     "Export_Notes_Incomplete": m12,
+    "Export_Notes_Markdown_Hint": MessageLookupByLibrary.simpleMessage(
+      "可編輯的筆記，保留清單格式。照片和錄音作為獨立檔案，與 Markdown 筆記儲存在一起。",
+    ),
+    "Export_Notes_PDF_Hint": MessageLookupByLibrary.simpleMessage(
+      "適合列印的頁面，包含文字、清單、轉錄文字和照片。不包含音訊檔案。",
+    ),
+    "Export_Notes_Plain_Text_Hint": MessageLookupByLibrary.simpleMessage(
+      "將文字、清單和轉錄文字儲存為 .txt 檔案。不包含照片或音訊檔案。",
+    ),
     "Export_Notes_Prepared": MessageLookupByLibrary.simpleMessage(
       "筆記已匯出。此裝置無法確認是否已分享。",
     ),

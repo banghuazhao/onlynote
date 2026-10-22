@@ -3,6 +3,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/note_outline.dart';
 
 import 'app_sheet.dart';
+import 'search_highlight.dart';
 
 Future<NoteOutlineEntry?> showNoteOutlineSheet({
   required BuildContext context,
@@ -142,7 +143,8 @@ class _NoteOutlineSheetState extends State<NoteOutlineSheet> {
                 selectedTileColor: colors.primaryContainer,
                 selectedColor: colors.onPrimaryContainer,
                 leading: const Icon(Icons.short_text_rounded),
-                title: Text(entry.text),
+                title: SearchHighlight(entry.text,
+                    query: _search.text, overflow: TextOverflow.clip),
                 subtitle: identical(entry, current)
                     ? Text(strings.Note_Outline_Current)
                     : null,

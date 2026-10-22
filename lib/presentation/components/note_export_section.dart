@@ -12,6 +12,13 @@ String noteBulkExportFormatLabel(NoteBulkExportFormat format, S strings) =>
       NoteBulkExportFormat.pdf => strings.Share_PDF,
     };
 
+String noteBulkExportFormatHint(NoteBulkExportFormat format, S strings) =>
+    switch (format) {
+      NoteBulkExportFormat.markdown => strings.Export_Notes_Markdown_Hint,
+      NoteBulkExportFormat.plainText => strings.Export_Notes_Plain_Text_Hint,
+      NoteBulkExportFormat.pdf => strings.Export_Notes_PDF_Hint,
+    };
+
 /// Readable-export controls shared by the screen and previews without native
 /// I/O, so the format choice and its button states are testable on their own.
 class NoteExportSection extends StatelessWidget {
@@ -52,6 +59,14 @@ class NoteExportSection extends StatelessWidget {
           keyOf: (value) => ValueKey('note-export-format-${value.name}'),
           label: (value) => noteBulkExportFormatLabel(value, strings),
           onSelected: onExport == null ? (_) {} : onFormatChanged,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          noteBulkExportFormatHint(format, strings),
+          key: const ValueKey('note-export-format-hint'),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
         const SizedBox(height: 16),
         SizedBox(

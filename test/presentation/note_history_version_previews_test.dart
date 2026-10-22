@@ -9,6 +9,8 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_history_version_previews.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 
+import '../support/search_highlight_text.dart';
+
 const _transcript =
     'Recorded thought 茶😀 — a longer first line to recognize this version\n'
     'Keep the reviewed transcript ready for the next release. 第二行記錄。';
@@ -44,6 +46,56 @@ void main() {
       loader.addFont(rootBundle.load(asset));
       await loader.load();
     }
+  });
+
+  testWidgets('query highlights content only and preserves the supplied action',
+      (tester) async {
+    const text = 'C++ [draft].* 茶室😀 👩🏽‍💻';
+    const metadata = 'C++ [draft].* 茶室😀 👩🏽‍💻 metadata';
+    var selections = 0;
+    final query = ValueNotifier('');
+    addTearDown(query.dispose);
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: ValueListenableBuilder<String>(
+          valueListenable: query,
+          builder: (_, value, __) => NoteHistoryVersionTile(
+            key: const ValueKey('highlighted-version'),
+            title: text,
+            dateLabel: metadata,
+            snippet: text,
+            query: value,
+            mediaCounts: const Text(metadata),
+            onPressed: () => selections++,
+          ),
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    final row = find.byKey(const ValueKey('highlighted-version'));
+    for (final (value, expected) in [
+      (' c++ ', 'C++'),
+      ('[DRAFT].*', '[draft].*'),
+      ('茶室😀', '茶室😀'),
+      ('👩', '👩🏽‍💻'),
+    ]) {
+      query.value = value;
+      await tester.pumpAndSettle();
+      expect(highlightedSearchText(tester, row), [expected, expected]);
+      expect(find.text(metadata), findsNWidgets(2));
+      for (final label in tester.widgetList<Text>(find.text(metadata))) {
+        expect(label.textSpan, isNull);
+      }
+      expect(selections, 0);
+      expect(tester.takeException(), isNull);
+    }
+    query.value = '';
+    await tester.pumpAndSettle();
+    expect(highlightedSearchText(tester, row), isEmpty);
+    expect(find.text(text), findsNWidgets(2));
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(selections, 1);
   });
 
   for (final (name, preview, size, locale, brightness) in [

@@ -11,6 +11,8 @@ import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 import 'package:onlynote/services/note_history.dart';
 
+import '../support/search_highlight_text.dart';
+
 class _HistoryChanges extends ChangeNotifier {
   bool get hasHistoryListeners => hasListeners;
 }
@@ -136,7 +138,17 @@ void main() {
       await tester.enterText(field, query);
       await tester.pumpAndSettle();
       expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
-      expect(find.byKey(ValueKey('history-version-$id')), findsOneWidget);
+      final row = find.byKey(ValueKey('history-version-$id'));
+      expect(row, findsOneWidget);
+      expect(tester.widget<NoteHistoryVersionTile>(row).query, query);
+      expect(highlightedSearchText(tester, row), [
+        switch (id) {
+          'title' => '[draft].*',
+          'body' => '茶室😀',
+          'checklist' => 'REVIEW',
+          _ => 'café',
+        }
+      ]);
       expect(tester.takeException(), isNull);
     }
     await tester.enterText(field, r'[]()\\^$+?');
@@ -149,6 +161,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, isEmpty);
     expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
+    expect(highlightedSearchText(tester, find.byType(NoteHistoryVersionTile)),
+        isEmpty);
     await tester.enterText(field, ' \n\t ');
     await tester.pumpAndSettle();
     expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
@@ -188,6 +202,7 @@ void main() {
     final row = find.byKey(const ValueKey('history-version-chosen-match'));
     expect(
         tester.widget<NoteHistoryVersionTile>(row).snippet, '…Chosen detail');
+    expect(highlightedSearchText(tester, row), ['Chosen']);
     await tester
         .tap(find.byKey(const ValueKey('history-version-chosen-match')));
     await tester.pumpAndSettle();

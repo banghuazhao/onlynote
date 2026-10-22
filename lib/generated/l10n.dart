@@ -5815,6 +5815,36 @@ class S {
     );
   }
 
+  /// `Editable notes with checklist formatting. Photos and recordings are saved as separate files beside each Markdown note.`
+  String get Export_Notes_Markdown_Hint {
+    return Intl.message(
+      'Editable notes with checklist formatting. Photos and recordings are saved as separate files beside each Markdown note.',
+      name: 'Export_Notes_Markdown_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text, checklists and transcripts in .txt files. Photo and audio files are not included.`
+  String get Export_Notes_Plain_Text_Hint {
+    return Intl.message(
+      'Text, checklists and transcripts in .txt files. Photo and audio files are not included.',
+      name: 'Export_Notes_Plain_Text_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Printable pages with text, checklists, transcripts and photos. Audio files are not included.`
+  String get Export_Notes_PDF_Hint {
+    return Intl.message(
+      'Printable pages with text, checklists, transcripts and photos. Audio files are not included.',
+      name: 'Export_Notes_PDF_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Save notes…`
   String get Export_Notes_Save_As {
     return Intl.message(

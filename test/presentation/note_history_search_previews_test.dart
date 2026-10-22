@@ -9,6 +9,8 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_history_search_previews.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
 
+import '../support/search_highlight_text.dart';
+
 Future<void> _capture(WidgetTester tester, String name) async {
   if (!const bool.fromEnvironment('CAPTURE_UI')) return;
   final boundary = tester.renderObject<RenderRepaintBoundary>(
@@ -86,11 +88,13 @@ void main() {
           tester.widget<NoteHistoryVersionTile>(matchingRow).snippet, '…茶😀');
       expect(tester.widget<NoteHistoryVersionTile>(matchingRow).title,
           'Release review [draft]');
+      expect(highlightedSearchText(tester, matchingRow), ['茶😀']);
       await _capture(tester, '$name-match');
       await tester.enterText(field, '[DRAFT]');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+      expect(highlightedSearchText(tester, matchingRow), ['[draft]']);
       await _capture(tester, name);
       final row = find.byKey(const ValueKey('history-search-version-review'));
       await tester.ensureVisible(row);
@@ -118,6 +122,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(field).controller!.text, isEmpty);
       expect(find.byType(NoteHistoryVersionTile), findsNWidgets(2));
+      expect(highlightedSearchText(tester, find.byType(NoteHistoryVersionTile)),
+          isEmpty);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     });

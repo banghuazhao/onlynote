@@ -219,6 +219,7 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
                     for (final version in matches)
                       NoteHistoryVersionTile(
                         key: ValueKey('history-version-${version.id}'),
+                        query: _search.text,
                         title: _title(version.note, s),
                         dateLabel: _date(version.savedAt),
                         snippet: noteHistoryContentSnippet(version.note,

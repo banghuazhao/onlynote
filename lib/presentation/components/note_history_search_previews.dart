@@ -118,6 +118,7 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
                               NoteHistoryVersionTile(
                                 key: ValueKey(
                                     'history-search-version-${version.id}'),
+                                query: _search.text,
                                 title: version.title,
                                 dateLabel: widget.chinese
                                     ? '2026年10月20日 上午10:00'
