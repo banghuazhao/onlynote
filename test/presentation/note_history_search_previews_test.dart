@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_history_search_previews.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
@@ -57,6 +58,13 @@ void main() {
       Brightness.dark,
     ),
     (
+      '24-hour',
+      noteHistorySearch24HourPreview,
+      const Size(390, 700),
+      const Locale('en'),
+      Brightness.light,
+    ),
+    (
       'chinese',
       noteHistorySearchChinesePreview,
       const Size(280, 700),
@@ -87,6 +95,15 @@ void main() {
       expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
       final matchingRow =
           find.byKey(const ValueKey('history-search-version-review'));
+      final formatter = DateFormat.yMMMd(locale.toString());
+      if (name == '24-hour') {
+        formatter.add_Hm();
+      } else {
+        formatter.add_jm();
+      }
+      final expectedDate = formatter.format(DateTime(2026, 10, 20, 17, 45));
+      expect(tester.widget<NoteHistoryVersionTile>(matchingRow).dateLabel,
+          expectedDate);
       expect(
           tester.widget<NoteHistoryVersionTile>(matchingRow).snippet, '…茶😀');
       expect(tester.widget<NoteHistoryVersionTile>(matchingRow).title,
@@ -119,6 +136,7 @@ void main() {
       await tester.tap(row);
       await tester.pumpAndSettle();
       expect(find.byType(SelectableText), findsNWidgets(2));
+      expect(find.text(expectedDate), findsOneWidget);
       expect(count, findsNothing);
       final back = find.byKey(const ValueKey('history-search-preview-back'));
       await tester.ensureVisible(back);

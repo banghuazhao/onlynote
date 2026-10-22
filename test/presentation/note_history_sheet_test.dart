@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/generated/l10n.dart';
@@ -54,6 +56,7 @@ Future<void> _open(WidgetTester tester,
     void Function(bool?)? onClosed,
     VoidCallback? onRestored,
     Listenable? changes,
+    ValueListenable<bool>? clock,
     Locale locale = const Locale('en'),
     double textScale = 1}) async {
   await tester.pumpWidget(MaterialApp(
@@ -65,10 +68,19 @@ Future<void> _open(WidgetTester tester,
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: TextScaler.linear(textScale)),
-        child: child!),
+    builder: (context, child) {
+      Widget frame(bool? use24HourFormat) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(textScale),
+              alwaysUse24HourFormat: use24HourFormat),
+          child: child!);
+      return clock == null
+          ? frame(null)
+          : ValueListenableBuilder<bool>(
+              valueListenable: clock,
+              builder: (_, use24HourFormat, __) => frame(use24HourFormat),
+            );
+    },
     home: Scaffold(
         body: Builder(
             builder: (context) => TextButton(
@@ -93,6 +105,76 @@ Future<void> _open(WidgetTester tester,
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('history list and preview follow live clock changes in $locale',
+        (tester) async {
+      final clock = ValueNotifier(false);
+      addTearDown(clock.dispose);
+      final savedAt = DateTime.utc(2026, 10, 11, 23, 45);
+      final version = NoteHistoryVersion(
+          id: 'original-version-id',
+          savedAt: savedAt,
+          note: NoteDto(title: 'Saved version', description: 'Original body'));
+      final restored = <String>[];
+      await _open(tester, versions: [version], clock: clock, locale: locale,
+          restore: (id) async {
+        restored.add(id);
+        return NoteHistoryRestoreResult.restored;
+      });
+      final field = find.byKey(const ValueKey('history-search'));
+      final row =
+          find.byKey(const ValueKey('history-version-original-version-id'));
+      await tester.enterText(field, 'saved');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      String expected(bool use24HourFormat) {
+        final formatter = DateFormat.yMMMd(locale.toString());
+        if (use24HourFormat) {
+          formatter.add_Hm();
+        } else {
+          formatter.add_jm();
+        }
+        return formatter.format(savedAt.toLocal());
+      }
+
+      for (final use24HourFormat in [false, true, false]) {
+        clock.value = use24HourFormat;
+        await tester.pumpAndSettle();
+        expect(tester.widget<NoteHistoryVersionTile>(row).dateLabel,
+            expected(use24HourFormat));
+        expect(tester.widget<TextField>(field).controller!.text, 'saved');
+        expect(restored, isEmpty);
+      }
+      await tester.ensureVisible(row);
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      for (final use24HourFormat in [true, false, true]) {
+        clock.value = use24HourFormat;
+        await tester.pumpAndSettle();
+        expect(find.byType(NoteHistoryVersionTile), findsNothing);
+        expect(find.text(expected(use24HourFormat)), findsOneWidget);
+        expect(find.text('Original body'), findsOneWidget);
+        expect(restored, isEmpty);
+        expect(savedAt, DateTime.utc(2026, 10, 11, 23, 45));
+        expect(savedAt.isUtc, isTrue);
+        expect(tester.takeException(), isNull);
+      }
+      await tester
+          .tap(find.widgetWithText(TextButton, S.current.History_Title));
+      await tester.pumpAndSettle();
+      expect(
+          tester.widget<NoteHistoryVersionTile>(row).dateLabel, expected(true));
+      expect(tester.widget<TextField>(field).controller!.text, 'saved');
+      await tester.ensureVisible(row);
+      await tester.tap(row);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('history-restore-action')));
+      await tester.pumpAndSettle();
+      expect(restored, ['original-version-id']);
+      expect(find.byType(NoteHistorySheet), findsNothing);
+    });
+  }
 
   testWidgets('history search matches saved fields literally without writes',
       (tester) async {

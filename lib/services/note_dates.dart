@@ -45,5 +45,7 @@ String? noteCardDateLabel({
 }
 
 /// The full stored deletion timestamp for the read-only note summary.
-String noteTrashDateTimeLabel(DateTime deletedAt, String locale) =>
-    DateFormat.yMMMd(locale).add_jm().format(deletedAt.toLocal());
+String noteTrashDateTimeLabel(DateTime deletedAt, String locale,
+        {bool use24HourFormat = false}) =>
+    noteReaderDateTimeLabel(
+        dateTime: deletedAt, locale: locale, use24HourFormat: use24HourFormat);

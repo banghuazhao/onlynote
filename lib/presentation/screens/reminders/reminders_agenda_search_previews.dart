@@ -12,14 +12,14 @@ import 'package:onlynote/services/reminder_agenda.dart';
 import 'reminders_agenda_search.dart';
 
 @Preview(
-    name: 'Reminder search snippets — light',
+    name: 'Reminder search counts and snippets — light',
     group: 'Library',
     size: Size(390, 780))
 Widget reminderSearchLightPreview({ThemeData? theme}) =>
     _ReminderSearchPreview(theme: theme);
 
 @Preview(
-  name: 'Reminder search snippets — dark',
+  name: 'Reminder search counts and snippets — dark',
   group: 'Library',
   size: Size(390, 780),
   brightness: Brightness.dark,
@@ -28,7 +28,7 @@ Widget reminderSearchDarkPreview({ThemeData? theme}) =>
     _ReminderSearchPreview(dark: true, theme: theme);
 
 @Preview(
-  name: 'Reminder search snippets — Chinese 2× narrow',
+  name: 'Reminder search counts and snippets — Chinese 2× narrow',
   group: 'Library',
   size: Size(320, 640),
 )

@@ -179,6 +179,8 @@ void main() {
       );
       expect(noteTrashDateTimeLabel(deleted, locale),
           DateFormat.yMMMd(locale).add_jm().format(local));
+      expect(noteTrashDateTimeLabel(deleted, locale, use24HourFormat: true),
+          DateFormat.yMMMd(locale).add_Hm().format(local));
     }
     expect(deleted.isUtc, isTrue);
   });

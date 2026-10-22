@@ -305,6 +305,8 @@
   "Reminders_Empty_Title": "Nothing on your schedule",
   "Reminders_Empty_Message": "Add a reminder to a note to see it here.",
   "Reminders_Search": "Search reminders",
+  "Reminders_Search_Count": "{matched} of {total, plural, one{1 reminder} other{{total} reminders}}",
+  "@Reminders_Search_Count": {"placeholders": {"matched": {"type": "int"}, "total": {"type": "int"}}},
   "Reminders_Search_Empty_Title": "No matching reminders",
   "Reminders_Search_Empty_Message": "Try another search or clear it to see all reminders.",
   "Reminders_Load_Failed": "Could not load reminders. Try again.",

@@ -3,6 +3,7 @@ import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/services/note_dates.dart';
 
 import 'app_sheet.dart';
 import 'note_history_content_snippet.dart';
@@ -12,6 +13,11 @@ import 'search_result_summary.dart';
 
 @Preview(name: 'History search — light', group: 'Note', size: Size(390, 700))
 Widget noteHistorySearchLightPreview() => const _HistorySearchPreview();
+
+@Preview(
+    name: 'History search — 24-hour clock', group: 'Note', size: Size(390, 700))
+Widget noteHistorySearch24HourPreview() =>
+    const _HistorySearchPreview(use24HourFormat: true);
 
 @Preview(
   name: 'History search — dark',
@@ -36,11 +42,13 @@ class _HistorySearchPreview extends StatefulWidget {
     this.dark = false,
     this.chinese = false,
     this.textScale = 1,
+    this.use24HourFormat = false,
   });
 
   final bool dark;
   final bool chinese;
   final double textScale;
+  final bool use24HourFormat;
 
   @override
   State<_HistorySearchPreview> createState() => _HistorySearchPreviewState();
@@ -86,12 +94,17 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.linear(widget.textScale),
             disableAnimations: true,
+            alwaysUse24HourFormat: widget.use24HourFormat,
           ),
           child: child!,
         ),
         home: Scaffold(
           body: Builder(builder: (context) {
             final strings = S.of(context);
+            final dateLabel = noteReaderDateTimeLabel(
+                dateTime: DateTime(2026, 10, 20, 17, 45),
+                locale: Localizations.localeOf(context).toString(),
+                use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context));
             final matches = filterNoteHistoryVersions(_versions, _search.text,
                 searchableText: (version) => [version.title, version.text]);
             final selected = _selected;
@@ -127,9 +140,7 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
                                     'history-search-version-${version.id}'),
                                 query: _search.text,
                                 title: version.title,
-                                dateLabel: widget.chinese
-                                    ? '2026年10月20日 上午10:00'
-                                    : 'Oct 20, 2026, 10:00 AM',
+                                dateLabel: dateLabel,
                                 snippet: noteHistoryContentSnippet(
                                   NoteDto(description: version.text),
                                   query: _search.text,
@@ -154,6 +165,8 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
                               icon: const Icon(Icons.arrow_back_rounded),
                               label: Text(strings.History_Title),
                             ),
+                            Text(dateLabel),
+                            const SizedBox(height: 12),
                             SelectableText(selected.title),
                             const SizedBox(height: 12),
                             SelectableText(selected.text),

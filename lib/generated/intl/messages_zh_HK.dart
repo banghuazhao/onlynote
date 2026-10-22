@@ -85,31 +85,33 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m31(date) => "提醒我：${date}";
 
-  static String m32(price) => "支付 ${price} 永久移除廣告。";
+  static String m32(matched, total) => "${total} 個提醒中符合 ${matched} 個";
 
-  static String m33(criterion) => "移除${criterion}";
+  static String m33(price) => "支付 ${price} 永久移除廣告。";
 
-  static String m34(limit) => "最多可儲存 ${limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。";
+  static String m34(criterion) => "移除${criterion}";
 
-  static String m35(query) => "搜尋：${query}";
+  static String m35(limit) => "最多可儲存 ${limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。";
 
-  static String m36(tags) => "標籤：${tags}";
+  static String m36(query) => "搜尋：${query}";
 
-  static String m37(count) => "${count} 則筆記";
+  static String m37(tags) => "標籤：${tags}";
 
-  static String m38(count) => "已加入 ${count} 項清單";
+  static String m38(count) => "${count} 則筆記";
 
-  static String m39(count, formattedCount) => "${formattedCount} 則筆記";
+  static String m39(count) => "已加入 ${count} 項清單";
 
-  static String m40(count) => "搜尋隱藏了 ${count} 個已選標籤";
+  static String m40(count, formattedCount) => "${formattedCount} 則筆記";
 
-  static String m41(count) => "已選取 ${count} 個標籤";
+  static String m41(count) => "搜尋隱藏了 ${count} 個已選標籤";
 
-  static String m42(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+  static String m42(count) => "已選取 ${count} 個標籤";
 
-  static String m43(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m43(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
 
-  static String m44(date) => "錄製於 ${date}";
+  static String m44(items, photos) => "${items} 項 · ${photos} 張照片";
+
+  static String m45(date) => "錄製於 ${date}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -805,6 +807,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已過期"),
     "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
     "Reminders_Search": MessageLookupByLibrary.simpleMessage("搜尋提醒"),
+    "Reminders_Search_Count": m32,
     "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
       "請嘗試其他搜尋詞，或清除搜尋以查看所有提醒。",
     ),
@@ -820,8 +823,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m32,
-    "Remove_Library_Criterion": m33,
+    "Remove_Ads_Price": m33,
+    "Remove_Library_Criterion": m34,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重新命名檢視"),
@@ -846,10 +849,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("刪除此檢視？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("儲存搜尋或篩選，下次快速開啟。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("無法儲存此檢視，請再試一次。"),
-    "Saved_View_Limit_Reached": m34,
+    "Saved_View_Limit_Reached": m35,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("檢視名稱"),
-    "Saved_View_Search": m35,
-    "Saved_View_Tags": m36,
+    "Saved_View_Search": m36,
+    "Saved_View_Tags": m37,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "沒有符合搜尋條件的已儲存檢視。",
@@ -858,12 +861,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜尋資料夾"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
-    "Search_Results_Count": m37,
+    "Search_Results_Count": m38,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜尋已儲存的檢視"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜尋標籤"),
     "Search_Templates": MessageLookupByLibrary.simpleMessage("搜尋範本"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m38,
+    "Selection_Checklist_Added": m39,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
@@ -931,7 +934,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
       "沒有符合條件的標籤建議。你可以新增標籤。",
     ),
-    "Tag_Usage_Count": m39,
+    "Tag_Usage_Count": m40,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
       "數量包括所有資料夾中未封存和已封存的筆記，不受搜尋和篩選條件影響。",
     ),
@@ -939,10 +942,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "數量包括回收站中所有資料夾的筆記，不受搜尋和篩選條件影響。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("標籤"),
-    "Tags_Hidden_By_Search_Count": m40,
+    "Tags_Hidden_By_Search_Count": m41,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("沒有符合搜尋條件的標籤"),
-    "Tags_Selected_Count": m41,
-    "Tags_Selection_Limit_Reached": m42,
+    "Tags_Selected_Count": m42,
+    "Tags_Selection_Limit_Reached": m43,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "無法更新範本，請重試。",
@@ -967,7 +970,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m43,
+    "Template_Details": m44,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -1053,7 +1056,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage("無法播放此錄音。請重試。"),
     "Voice_Record": MessageLookupByLibrary.simpleMessage("錄音"),
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage("無法錄音，請重試。"),
-    "Voice_Recorded_At": m44,
+    "Voice_Recorded_At": m45,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "最多錄製 5 分鐘，可選擇轉成文字。",
     ),

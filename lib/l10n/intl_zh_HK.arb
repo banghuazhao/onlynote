@@ -305,6 +305,8 @@
   "Reminders_Empty_Title": "暫無提醒日程",
   "Reminders_Empty_Message": "為筆記加入提醒，即可在這裡查看。",
   "Reminders_Search": "搜尋提醒",
+  "Reminders_Search_Count": "{total} 個提醒中符合 {matched} 個",
+  "@Reminders_Search_Count": {"placeholders": {"matched": {"type": "int"}, "total": {"type": "int"}}},
   "Reminders_Search_Empty_Title": "沒有符合條件的提醒",
   "Reminders_Search_Empty_Message": "請嘗試其他搜尋詞，或清除搜尋以查看所有提醒。",
   "Reminders_Load_Failed": "無法載入提醒，請重試。",

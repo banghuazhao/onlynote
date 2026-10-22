@@ -1,6 +1,5 @@
 import 'package:onlynote/presentation/components/note_document_view.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
@@ -10,6 +9,7 @@ import 'package:onlynote/presentation/components/note_history_version_tile.dart'
 import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_dates.dart';
 
 Future<bool?> showNoteHistorySheet(BuildContext context,
         {required String noteId,
@@ -268,10 +268,11 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
     );
   }
 
-  String _date(DateTime date) =>
-      DateFormat.yMMMd(Localizations.localeOf(context).toString())
-          .add_jm()
-          .format(date.toLocal());
+  String _date(DateTime date) => noteReaderDateTimeLabel(
+        dateTime: date,
+        locale: Localizations.localeOf(context).toString(),
+        use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+      );
 
   String _title(NoteDto note, S s) {
     if (note.title?.trim().isNotEmpty ?? false) return note.title!;
@@ -303,9 +304,11 @@ class _HistoryPreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-            DateFormat.yMMMd(Localizations.localeOf(context).toString())
-                .add_jm()
-                .format(version.savedAt.toLocal()),
+            noteReaderDateTimeLabel(
+              dateTime: version.savedAt,
+              locale: Localizations.localeOf(context).toString(),
+              use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+            ),
             style: Theme.of(context).textTheme.labelLarge),
         if (note.title?.isNotEmpty ?? false) ...[
           const SizedBox(height: 16),

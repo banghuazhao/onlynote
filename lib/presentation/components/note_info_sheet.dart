@@ -104,7 +104,10 @@ class NoteInfoSheet extends StatelessWidget {
                 id: 'moved-to-trash',
                 label: strings.Note_Info_Moved_To_Trash,
                 value: noteTrashDateTimeLabel(
-                    deletedAt!, Localizations.localeOf(context).toString()),
+                  deletedAt!,
+                  Localizations.localeOf(context).toString(),
+                  use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+                ),
               ),
             _StatisticRow(
               id: 'words',

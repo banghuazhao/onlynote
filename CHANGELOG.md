@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added matching and total reminder counts while searching the agenda, including empty results.
+- Made note history and Trash note information respect the device's 24-hour clock preference.
+
 - Added matching and total heading/version counts while searching outlines and note history, including empty results.
 - Added one-tap copying of a recording's full saved transcript, with clipboard failure feedback and protection against stale recording actions.
 

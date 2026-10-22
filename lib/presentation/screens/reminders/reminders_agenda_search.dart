@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/reminder_agenda.dart';
 
@@ -69,6 +70,7 @@ class _SearchableRemindersAgendaState extends State<SearchableRemindersAgenda> {
     final l10n = S.of(context);
     final query = _search.text;
     final matches = filterReminderAgenda(widget.entries, query);
+    final initiallyLoading = widget.loading && widget.entries.isEmpty;
     return Column(children: [
       Center(
         child: ConstrainedBox(
@@ -98,7 +100,21 @@ class _SearchableRemindersAgendaState extends State<SearchableRemindersAgenda> {
           ),
         ),
       ),
-      if (widget.loading && widget.entries.isEmpty)
+      if (query.trim().isNotEmpty && !initiallyLoading)
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: SearchResultSummary(
+                key: const ValueKey('reminders-search-count'),
+                label: l10n.Reminders_Search_Count(
+                    matches.length, widget.entries.length),
+              ),
+            ),
+          ),
+        ),
+      if (initiallyLoading)
         const Expanded(child: Center(child: CircularProgressIndicator()))
       else
         Expanded(

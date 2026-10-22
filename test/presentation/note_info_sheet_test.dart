@@ -297,14 +297,74 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('Trash info follows live device clock changes in $locale',
+        (tester) async {
+      final clock = ValueNotifier(false);
+      addTearDown(clock.dispose);
+      final semantics = tester.ensureSemantics();
+      final deleted = DateTime.utc(2026, 10, 11, 23, 30);
+      final modified = DateTime.utc(2020, 1, 2, 14, 45);
+      final statistics = NoteStatistics.fromNote(Note(title: 'Saved note'));
+      try {
+        await tester.pumpWidget(_host(
+          ValueListenableBuilder<bool>(
+            valueListenable: clock,
+            builder: (context, use24HourFormat, _) => MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(alwaysUse24HourFormat: use24HourFormat),
+              child: NoteInfoSheet(
+                statistics: statistics,
+                modifiedAt: modified,
+                deletedAt: deleted,
+              ),
+            ),
+          ),
+          locale: locale,
+        ));
+        for (final use24HourFormat in [false, true, false]) {
+          clock.value = use24HourFormat;
+          await tester.pumpAndSettle();
+          final formatter = DateFormat.yMMMd(locale.toString());
+          if (use24HourFormat) {
+            formatter.add_Hm();
+          } else {
+            formatter.add_jm();
+          }
+          final expected = formatter.format(deleted.toLocal());
+          final value =
+              find.byKey(const ValueKey('note-info-moved-to-trash-value'));
+          expect(tester.widget<Text>(value).data, expected);
+          expect(
+              find.bySemanticsLabel(
+                  '${S.current.Note_Info_Moved_To_Trash}: $expected'),
+              findsOneWidget);
+          expect(
+              tester
+                  .widget<Text>(find
+                      .byKey(const ValueKey('note-info-last-modified-value')))
+                  .data,
+              formatter.format(modified.toLocal()));
+          expect(deleted, DateTime.utc(2026, 10, 11, 23, 30));
+          expect(deleted.isUtc, isTrue);
+          expect(tester.takeException(), isNull);
+        }
+      } finally {
+        semantics.dispose();
+      }
+    });
+  }
+
   testWidgets('isolated Trash info previews fit light, dark and Chinese 2×',
       (tester) async {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    for (final (preview, size, locale) in [
-      (trashNoteInfoLightPreview, const Size(390, 620), 'en'),
-      (trashNoteInfoDarkPreview, const Size(390, 620), 'en'),
-      (trashNoteInfoChinesePreview, const Size(280, 700), 'zh_HK'),
+    for (final (preview, size, locale, use24HourFormat) in [
+      (trashNoteInfoLightPreview, const Size(390, 620), 'en', false),
+      (trashNoteInfoDarkPreview, const Size(390, 620), 'en', false),
+      (trashNoteInfoChinesePreview, const Size(280, 700), 'zh_HK', false),
+      (trashNoteInfo24HourPreview, const Size(390, 620), 'en', true),
+      (trashNoteInfoChinese24HourPreview, const Size(280, 700), 'zh_HK', true),
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(preview());
@@ -312,19 +372,19 @@ void main() {
       final date = find.byKey(const ValueKey('note-info-moved-to-trash-value'));
       await tester.ensureVisible(date);
       await tester.pumpAndSettle();
-      expect(
-          tester.widget<Text>(date).data,
-          DateFormat.yMMMd(locale)
-              .add_jm()
-              .format(DateTime(2026, 10, 11, 14, 30)));
+      final formatter = DateFormat.yMMMd(locale);
+      if (use24HourFormat) {
+        formatter.add_Hm();
+      } else {
+        formatter.add_jm();
+      }
+      expect(tester.widget<Text>(date).data,
+          formatter.format(DateTime(2026, 10, 11, 14, 30)));
       expect(find.text(S.current.Note_Info_Moved_To_Trash), findsOneWidget);
       final modified =
           find.byKey(const ValueKey('note-info-last-modified-value'));
-      expect(
-          tester.widget<Text>(modified).data,
-          DateFormat.yMMMd(locale)
-              .add_jm()
-              .format(DateTime(2026, 10, 7, 14, 15)));
+      expect(tester.widget<Text>(modified).data,
+          formatter.format(DateTime(2026, 10, 7, 14, 15)));
       await tester.ensureVisible(
           find.byKey(const ValueKey('note-info-recording-duration-value')));
       await tester.pumpAndSettle();

@@ -85,31 +85,33 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m31(date) => "提醒我：${date}";
 
-  static String m32(price) => "支付 ${price} 永久移除广告。";
+  static String m32(matched, total) => "${total} 个提醒中匹配 ${matched} 个";
 
-  static String m33(criterion) => "移除${criterion}";
+  static String m33(price) => "支付 ${price} 永久移除广告。";
 
-  static String m34(limit) => "最多可保存 ${limit} 个视图。删除一个已保存的视图后可添加新视图。";
+  static String m34(criterion) => "移除${criterion}";
 
-  static String m35(query) => "搜索：${query}";
+  static String m35(limit) => "最多可保存 ${limit} 个视图。删除一个已保存的视图后可添加新视图。";
 
-  static String m36(tags) => "标签：${tags}";
+  static String m36(query) => "搜索：${query}";
 
-  static String m37(count) => "${count} 条笔记";
+  static String m37(tags) => "标签：${tags}";
 
-  static String m38(count) => "已添加 ${count} 项清单";
+  static String m38(count) => "${count} 条笔记";
 
-  static String m39(count, formattedCount) => "${formattedCount} 条笔记";
+  static String m39(count) => "已添加 ${count} 项清单";
 
-  static String m40(count) => "搜索隐藏了 ${count} 个已选标签";
+  static String m40(count, formattedCount) => "${formattedCount} 条笔记";
 
-  static String m41(count) => "已选 ${count} 个标签";
+  static String m41(count) => "搜索隐藏了 ${count} 个已选标签";
 
-  static String m42(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
+  static String m42(count) => "已选 ${count} 个标签";
 
-  static String m43(items, photos) => "${items} 项 · ${photos} 张照片";
+  static String m43(limit) => "最多可选择 ${limit} 个标签。取消选择一个标签后可选择其他标签。";
 
-  static String m44(date) => "录制于 ${date}";
+  static String m44(items, photos) => "${items} 项 · ${photos} 张照片";
+
+  static String m45(date) => "录制于 ${date}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -805,6 +807,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已过期"),
     "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
     "Reminders_Search": MessageLookupByLibrary.simpleMessage("搜索提醒"),
+    "Reminders_Search_Count": m32,
     "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
       "请尝试其他搜索词，或清除搜索以查看所有提醒。",
     ),
@@ -820,8 +823,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即将到来"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除广告"),
-    "Remove_Ads_Price": m32,
-    "Remove_Library_Criterion": m33,
+    "Remove_Ads_Price": m33,
+    "Remove_Library_Criterion": m34,
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重命名文件夹"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重命名模板"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重命名视图"),
@@ -846,10 +849,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("删除此视图？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("保存搜索或筛选，下次快速打开。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("无法保存此视图，请重试。"),
-    "Saved_View_Limit_Reached": m34,
+    "Saved_View_Limit_Reached": m35,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("视图名称"),
-    "Saved_View_Search": m35,
-    "Saved_View_Tags": m36,
+    "Saved_View_Search": m36,
+    "Saved_View_Tags": m37,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已保存的视图"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "没有符合搜索条件的已保存视图。",
@@ -858,12 +861,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜索"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜索文件夹"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜索备忘录"),
-    "Search_Results_Count": m37,
+    "Search_Results_Count": m38,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜索已保存的视图"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜索标签"),
     "Search_Templates": MessageLookupByLibrary.simpleMessage("搜索模板"),
     "Select": MessageLookupByLibrary.simpleMessage("选择"),
-    "Selection_Checklist_Added": m38,
+    "Selection_Checklist_Added": m39,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "无法保存清单项。",
     ),
@@ -931,7 +934,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
       "没有匹配的标签建议。你可以添加新标签。",
     ),
-    "Tag_Usage_Count": m39,
+    "Tag_Usage_Count": m40,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
       "数量包括所有文件夹中的未归档和已归档笔记，不受搜索和筛选条件影响。",
     ),
@@ -939,10 +942,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "数量包括回收站中所有文件夹的笔记，不受搜索和筛选条件影响。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("标签"),
-    "Tags_Hidden_By_Search_Count": m40,
+    "Tags_Hidden_By_Search_Count": m41,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("没有符合搜索条件的标签"),
-    "Tags_Selected_Count": m41,
-    "Tags_Selection_Limit_Reached": m42,
+    "Tags_Selected_Count": m42,
+    "Tags_Selection_Limit_Reached": m43,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "无法更新模板，请重试。",
@@ -967,7 +970,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "删除模板？",
     ),
-    "Template_Details": m43,
+    "Template_Details": m44,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("无法加载模板，请重试。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理模板"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -1053,7 +1056,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage("无法播放此录音。请重试。"),
     "Voice_Record": MessageLookupByLibrary.simpleMessage("录音"),
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage("无法录音，请重试。"),
-    "Voice_Recorded_At": m44,
+    "Voice_Recorded_At": m45,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "最多录制 5 分钟，可选择转成文字。",
     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/note_dates.dart';
 
 import 'app_sheet.dart';
 import 'note_history_version_tile.dart';
@@ -76,6 +77,10 @@ class _HistoryTranscriptPreviewState extends State<_HistoryTranscriptPreview> {
         home: Scaffold(
           body: Builder(builder: (context) {
             final strings = S.of(context);
+            final dateLabel = noteReaderDateTimeLabel(
+                dateTime: DateTime(2026, 10, 13, 10),
+                locale: Localizations.localeOf(context).toString(),
+                use24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context));
             final counts = Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Text(strings.History_Recordings(1)),
@@ -107,9 +112,7 @@ class _HistoryTranscriptPreviewState extends State<_HistoryTranscriptPreview> {
                         key: const ValueKey(
                             'history-version-transcript-preview'),
                         title: _transcript.split('\n').first,
-                        dateLabel: widget.chinese
-                            ? '2026年10月13日 上午10:00'
-                            : 'Oct 13, 2026, 10:00 AM',
+                        dateLabel: dateLabel,
                         snippet: _transcript,
                         mediaCounts: counts,
                         onPressed: () => setState(() => _selected = true),

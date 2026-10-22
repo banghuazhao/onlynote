@@ -74,6 +74,13 @@ Widget dailyNoteInfoChinesePreview() =>
 Widget trashNoteInfoLightPreview() => const _NoteInfoPreview(trashed: true);
 
 @Preview(
+    name: 'Trash note info — 24-hour clock',
+    group: 'Note',
+    size: Size(390, 620))
+Widget trashNoteInfo24HourPreview() =>
+    const _NoteInfoPreview(trashed: true, use24HourFormat: true);
+
+@Preview(
   name: 'Trash note info — dark',
   group: 'Note',
   size: Size(390, 620),
@@ -89,6 +96,14 @@ Widget trashNoteInfoDarkPreview() =>
 )
 Widget trashNoteInfoChinesePreview() =>
     const _NoteInfoPreview(trashed: true, chinese: true, textScale: 2);
+
+@Preview(
+  name: 'Trash note info — Chinese 24-hour clock 2×',
+  group: 'Note',
+  size: Size(280, 700),
+)
+Widget trashNoteInfoChinese24HourPreview() => const _NoteInfoPreview(
+    trashed: true, chinese: true, textScale: 2, use24HourFormat: true);
 
 /// Content and themes are local fixtures; no native plugins or saved state.
 class _NoteInfoPreview extends StatelessWidget {

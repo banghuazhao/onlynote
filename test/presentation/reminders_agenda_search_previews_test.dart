@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_agenda_search_previews.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 
@@ -104,12 +105,16 @@ void main() {
       expect(Localizations.localeOf(tester.element(field)), locale);
       expect(Theme.of(tester.element(field)).brightness, brightness);
       final chinese = locale.languageCode == 'zh';
+      final summary = find.byKey(const ValueKey('reminders-search-count'));
+      expect(summary, findsNothing);
       await tester.enterText(field, chinese ? '茶😀' : '  FOLLOW-UP [2026]  ');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(find.text(chinese ? '閱讀清單' : 'Call dentist'), findsOneWidget);
       expect(find.text(chinese ? 'Review C++ [2026] notes' : 'Errands'),
           findsOneWidget);
+      expect(tester.widget<SearchResultSummary>(summary).label,
+          S.current.Reminders_Search_Count(2, 4));
       final firstId = chinese ? 3 : 1;
       final secondId = chinese ? 4 : 2;
       for (final id in [firstId, secondId]) {
@@ -123,6 +128,8 @@ void main() {
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(find.text(S.current.Reminders_Search_Empty_Title), findsOneWidget);
+      expect(tester.widget<SearchResultSummary>(summary).label,
+          S.current.Reminders_Search_Count(0, 4));
       await _capture(tester, '$name-empty');
       final clear = find.byKey(const ValueKey('reminders-empty-clear-search'));
       await tester.ensureVisible(clear);
@@ -130,6 +137,7 @@ void main() {
       await tester.tap(clear);
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(field).controller!.text, isEmpty);
+      expect(summary, findsNothing);
       expect(
           find.byKey(const ValueKey('reminders-search-empty')), findsNothing);
       expect(find.byKey(ValueKey('reminder-search-snippet-$firstId')),

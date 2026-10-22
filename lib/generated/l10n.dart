@@ -2695,6 +2695,16 @@ class S {
     );
   }
 
+  /// `{matched} of {total, plural, one{1 reminder} other{{total} reminders}}`
+  String Reminders_Search_Count(int matched, int total) {
+    return Intl.message(
+      '$matched of ${Intl.plural(total, one: '1 reminder', other: '$total reminders')}',
+      name: 'Reminders_Search_Count',
+      desc: '',
+      args: [matched, total],
+    );
+  }
+
   /// `No matching reminders`
   String get Reminders_Search_Empty_Title {
     return Intl.message(
