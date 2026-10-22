@@ -7,6 +7,7 @@ import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_content_snippet.dart';
 import 'package:onlynote/presentation/components/note_history_search.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
 import 'package:onlynote/services/note_history.dart';
 
@@ -201,6 +202,12 @@ class _NoteHistorySheetState extends State<NoteHistorySheet> {
                     ),
                     const SizedBox(height: 12),
                   ],
+                  if (_search.text.trim().isNotEmpty)
+                    SearchResultSummary(
+                      key: const ValueKey('history-search-count'),
+                      label: s.History_Search_Count(
+                          matches.length, versions.length),
+                    ),
                   if (matches.isEmpty && _search.text.trim().isNotEmpty)
                     NoteHistorySearchEmpty(onClear: _clearSearch)
                   else if (versions.isEmpty)

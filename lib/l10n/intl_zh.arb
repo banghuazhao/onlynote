@@ -341,6 +341,8 @@
   "History_Empty": "保存的修改会显示在这里。",
   "History_Search": "搜索笔记历史",
   "History_Search_Empty": "没有匹配的版本。",
+  "History_Search_Count": "{total} 个版本中匹配 {matched} 个",
+  "@History_Search_Count": {"placeholders": {"matched": {"type": "int"}, "total": {"type": "int"}}},
   "History_Version": "保存于 {date}",
   "History_Restore": "恢复此版本",
   "History_Restored": "已恢复版本",
@@ -377,6 +379,9 @@
   "Voice_Language_Chinese": "中文（简体）",
   "Voice_Language_Chinese_Traditional": "中文（繁体）",
   "Voice_Edit_Transcript": "编辑转录文字",
+  "Voice_Copy_Transcript": "复制转录文本",
+  "Voice_Transcript_Copied": "转录文本已复制",
+  "Voice_Transcript_Copy_Failed": "无法复制转录文本。请重试。",
   "@Photo_Text_Photo": {
     "placeholders": {
       "number": {
@@ -501,6 +506,8 @@
   "Note_Outline_Current": "当前部分",
   "Note_Outline_Search": "搜索标题",
   "Note_Outline_Search_Empty": "没有匹配的标题。",
+  "Note_Outline_Search_Count": "{total} 个标题中匹配 {matched} 个",
+  "@Note_Outline_Search_Count": {"placeholders": {"matched": {"type": "int"}, "total": {"type": "int"}}},
   "Note_Undo": "撤销",
   "Note_Redo": "重做",
   "Web_Link_Open_Failed": "无法打开此网站。",

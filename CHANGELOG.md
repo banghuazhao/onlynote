@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added matching and total heading/version counts while searching outlines and note history, including empty results.
+- Added one-tap copying of a recording's full saved transcript, with clipboard failure feedback and protection against stale recording actions.
+
 - Added localized export-format hints explaining Markdown attachments, plain-text contents, and printable PDF contents before exporting.
 - Highlighted matching headings in outline search and matching titles and excerpts in note history, preserving jump and restore targets.
 

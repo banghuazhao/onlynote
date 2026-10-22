@@ -8,6 +8,7 @@ import 'app_sheet.dart';
 import 'note_history_content_snippet.dart';
 import 'note_history_search.dart';
 import 'note_history_version_tile.dart';
+import 'search_result_summary.dart';
 
 @Preview(name: 'History search — light', group: 'Note', size: Size(390, 700))
 Widget noteHistorySearchLightPreview() => const _HistorySearchPreview();
@@ -110,6 +111,12 @@ class _HistorySearchPreviewState extends State<_HistorySearchPreview> {
                               onChanged: (_) => setState(() {}),
                             ),
                           ),
+                          if (_search.text.trim().isNotEmpty)
+                            SearchResultSummary(
+                              key: const ValueKey('history-search-count'),
+                              label: strings.History_Search_Count(
+                                  matches.length, _versions.length),
+                            ),
                           if (matches.isEmpty)
                             NoteHistorySearchEmpty(
                                 onClear: () => setState(_search.clear))

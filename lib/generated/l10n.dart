@@ -3050,6 +3050,16 @@ class S {
     );
   }
 
+  /// `{matched} of {total, plural, one{1 version} other{{total} versions}}`
+  String History_Search_Count(int matched, int total) {
+    return Intl.message(
+      '$matched of ${Intl.plural(total, one: '1 version', other: '$total versions')}',
+      name: 'History_Search_Count',
+      desc: '',
+      args: [matched, total],
+    );
+  }
+
   /// `Saved {date}`
   String History_Version(String date) {
     return Intl.message(
@@ -3374,6 +3384,36 @@ class S {
     return Intl.message(
       'Edit transcript',
       name: 'Voice_Edit_Transcript',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy transcript`
+  String get Voice_Copy_Transcript {
+    return Intl.message(
+      'Copy transcript',
+      name: 'Voice_Copy_Transcript',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Transcript copied`
+  String get Voice_Transcript_Copied {
+    return Intl.message(
+      'Transcript copied',
+      name: 'Voice_Transcript_Copied',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not copy the transcript. Please try again.`
+  String get Voice_Transcript_Copy_Failed {
+    return Intl.message(
+      'Could not copy the transcript. Please try again.',
+      name: 'Voice_Transcript_Copy_Failed',
       desc: '',
       args: [],
     );
@@ -4187,6 +4227,16 @@ class S {
       name: 'Note_Outline_Search_Empty',
       desc: '',
       args: [],
+    );
+  }
+
+  /// `{matched} of {total, plural, one{1 heading} other{{total} headings}}`
+  String Note_Outline_Search_Count(int matched, int total) {
+    return Intl.message(
+      '$matched of ${Intl.plural(total, one: '1 heading', other: '$total headings')}',
+      name: 'Note_Outline_Search_Count',
+      desc: '',
+      args: [matched, total],
     );
   }
 

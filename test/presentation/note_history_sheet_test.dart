@@ -9,9 +9,18 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_sheet.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/services/note_history.dart';
 
 import '../support/search_highlight_text.dart';
+
+const _countKey = ValueKey('history-search-count');
+
+void _expectCount(WidgetTester tester, int matched, int total) {
+  final summary = find.byKey(_countKey);
+  expect(tester.widget<SearchResultSummary>(summary).label,
+      S.of(tester.element(summary)).History_Search_Count(matched, total));
+}
 
 class _HistoryChanges extends ChangeNotifier {
   bool get hasHistoryListeners => hasListeners;
@@ -128,6 +137,7 @@ void main() {
       restores++;
       return NoteHistoryRestoreResult.restored;
     });
+    expect(find.byKey(_countKey), findsNothing);
     final field = find.byKey(const ValueKey('history-search'));
     for (final (query, id) in [
       (' [DRAFT].* ', 'title'),
@@ -138,6 +148,7 @@ void main() {
       await tester.enterText(field, query);
       await tester.pumpAndSettle();
       expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+      _expectCount(tester, 1, 4);
       final row = find.byKey(ValueKey('history-version-$id'));
       expect(row, findsOneWidget);
       expect(tester.widget<NoteHistoryVersionTile>(row).query, query);
@@ -154,6 +165,7 @@ void main() {
     await tester.enterText(field, r'[]()\\^$+?');
     await tester.pumpAndSettle();
     expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    _expectCount(tester, 0, 4);
     expect(find.text(S.current.History_Empty), findsNothing);
     await tester.testTextInput.receiveAction(TextInputAction.search);
     await tester.pumpAndSettle();
@@ -161,11 +173,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, isEmpty);
     expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
+    expect(find.byKey(_countKey), findsNothing);
     expect(highlightedSearchText(tester, find.byType(NoteHistoryVersionTile)),
         isEmpty);
     await tester.enterText(field, ' \n\t ');
     await tester.pumpAndSettle();
     expect(find.byType(NoteHistoryVersionTile), findsNWidgets(4));
+    expect(find.byKey(_countKey), findsNothing);
     expect(restores, 0);
     for (var index = 0; index < versions.length; index++) {
       expect(versions[index].note, same(originalNotes[index]));
@@ -199,6 +213,7 @@ void main() {
     changes.notifyListeners();
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, 'chosen');
+    _expectCount(tester, 1, 2);
     final row = find.byKey(const ValueKey('history-version-chosen-match'));
     expect(
         tester.widget<NoteHistoryVersionTile>(row).snippet, '…Chosen detail');
@@ -210,13 +225,16 @@ void main() {
     changes.notifyListeners();
     await tester.pumpAndSettle();
     expect(find.text(savedBody), findsOneWidget);
+    expect(find.byKey(_countKey), findsNothing);
     await tester.tap(find.widgetWithText(TextButton, S.current.History_Title));
     await tester.pumpAndSettle();
     expect(tester.widget<TextField>(field).controller!.text, 'chosen');
     expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    _expectCount(tester, 0, 1);
     versions.add(chosen);
     changes.notifyListeners();
     await tester.pumpAndSettle();
+    _expectCount(tester, 1, 2);
     await tester
         .tap(find.byKey(const ValueKey('history-version-chosen-match')));
     await tester.pumpAndSettle();
@@ -284,15 +302,18 @@ void main() {
     final field = find.byKey(const ValueKey('history-search'));
     await tester.enterText(field, 'missing');
     await tester.pumpAndSettle();
+    _expectCount(tester, 0, 1);
     versions.clear();
     changes.notifyListeners();
     await tester.pumpAndSettle();
     expect(field, findsOneWidget);
     expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+    _expectCount(tester, 0, 0);
     await tester.tap(find.byKey(const ValueKey('history-clear-search')));
     await tester.pumpAndSettle();
     expect(find.text(S.current.History_Empty), findsOneWidget);
     expect(find.text(S.current.History_Search_Empty), findsNothing);
+    expect(find.byKey(_countKey), findsNothing);
     expect(find.byKey(const ValueKey('history-restore-action')), findsNothing);
     await tester.pumpWidget(const SizedBox.shrink());
     changes.notifyListeners();

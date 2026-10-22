@@ -4,6 +4,7 @@ import 'package:onlynote/services/note_outline.dart';
 
 import 'app_sheet.dart';
 import 'search_highlight.dart';
+import 'search_result_summary.dart';
 
 Future<NoteOutlineEntry?> showNoteOutlineSheet({
   required BuildContext context,
@@ -116,6 +117,12 @@ class _NoteOutlineSheetState extends State<NoteOutlineSheet> {
               ),
             ),
           ),
+          if (query.isNotEmpty)
+            SearchResultSummary(
+              key: const ValueKey('note-outline-search-count'),
+              label: strings.Note_Outline_Search_Count(
+                  entries.length, widget.entries.length),
+            ),
           if (query.isNotEmpty && entries.isEmpty)
             Padding(
               padding: const EdgeInsets.all(12),

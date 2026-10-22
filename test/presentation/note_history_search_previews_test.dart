@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_history_search_previews.dart';
 import 'package:onlynote/presentation/components/note_history_version_tile.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 
 import '../support/search_highlight_text.dart';
 
@@ -78,6 +79,8 @@ void main() {
       expect(Localizations.localeOf(tester.element(field)), locale);
       expect(Theme.of(tester.element(field)).brightness, brightness);
       expect(find.byType(NoteHistoryVersionTile), findsNWidgets(2));
+      final count = find.byKey(const ValueKey('history-search-count'));
+      expect(count, findsNothing);
       await tester.enterText(field, '茶😀');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
@@ -89,6 +92,20 @@ void main() {
       expect(tester.widget<NoteHistoryVersionTile>(matchingRow).title,
           'Release review [draft]');
       expect(highlightedSearchText(tester, matchingRow), ['茶😀']);
+      expect(tester.widget<SearchResultSummary>(count).label,
+          S.current.History_Search_Count(1, 2));
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pump();
+        final data = tester
+            .getSemantics(
+                find.descendant(of: count, matching: find.byType(Semantics)))
+            .getSemanticsData();
+        expect(data.label, S.current.History_Search_Count(1, 2));
+        expect(data.flagsCollection.isLiveRegion, isTrue);
+      } finally {
+        semantics.dispose();
+      }
       await _capture(tester, '$name-match');
       await tester.enterText(field, '[DRAFT]');
       await tester.testTextInput.receiveAction(TextInputAction.search);
@@ -102,6 +119,7 @@ void main() {
       await tester.tap(row);
       await tester.pumpAndSettle();
       expect(find.byType(SelectableText), findsNWidgets(2));
+      expect(count, findsNothing);
       final back = find.byKey(const ValueKey('history-search-preview-back'));
       await tester.ensureVisible(back);
       await tester.pumpAndSettle();
@@ -109,11 +127,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(field).controller!.text, '[DRAFT]');
       expect(find.byType(NoteHistoryVersionTile), findsOneWidget);
+      expect(tester.widget<SearchResultSummary>(count).label,
+          S.current.History_Search_Count(1, 2));
       await tester.ensureVisible(field);
       await tester.enterText(field, 'missing');
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
       expect(find.text(S.current.History_Search_Empty), findsOneWidget);
+      expect(tester.widget<SearchResultSummary>(count).label,
+          S.current.History_Search_Count(0, 2));
       await _capture(tester, '$name-empty');
       final clear = find.byKey(const ValueKey('history-search-reset'));
       await tester.ensureVisible(clear);
@@ -122,6 +144,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.widget<TextField>(field).controller!.text, isEmpty);
       expect(find.byType(NoteHistoryVersionTile), findsNWidgets(2));
+      expect(count, findsNothing);
       expect(highlightedSearchText(tester, find.byType(NoteHistoryVersionTile)),
           isEmpty);
       expect(tester.takeException(), isNull);

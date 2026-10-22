@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/voice_memo_date_label.dart';
+import 'package:onlynote/presentation/components/toast.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/voice_memo_service.dart';
 import 'package:onlynote/Tools/share_helper.dart';
@@ -17,6 +18,7 @@ class VoiceMemoPlayer extends StatefulWidget {
       this.onRemove,
       this.onTranscriptChanged,
       this.onShare,
+      this.clipboardWriter,
       this.transcriptBuilder,
       this.service});
   final VoiceMemo memo;
@@ -24,6 +26,9 @@ class VoiceMemoPlayer extends StatefulWidget {
   final Future<void> Function()? onRemove;
   final Future<void> Function(String?)? onTranscriptChanged;
   final Future<void> Function()? onShare;
+
+  /// Lets previews and tests copy text without invoking a platform clipboard.
+  final Future<void> Function(String)? clipboardWriter;
   final VoiceMemoService? service;
   final Widget Function(String text)? transcriptBuilder;
   @override
@@ -34,12 +39,18 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   late final VoiceMemoService _service;
   String? _absolutePath;
   bool _busy = false;
+  bool _copyingTranscript = false;
   String? _error;
   final _menuKey = GlobalKey();
   int _memoRevision = 0;
   int _menuRevision = 0;
+  int _transcriptRevision = 0;
+  int _menuTranscriptRevision = 0;
 
   bool _isCurrent(int revision) => mounted && revision == _memoRevision;
+
+  bool _isCurrentTranscript(int revision, int transcriptRevision) =>
+      _isCurrent(revision) && transcriptRevision == _transcriptRevision;
 
   void _releasePath(String? path) {
     if (path == null) return;
@@ -149,6 +160,46 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
     }
   }
 
+  Future<void> _copyTranscript() async {
+    if (!mounted ||
+        _busy ||
+        _copyingTranscript ||
+        ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    final transcript = widget.memo.transcript;
+    if (transcript == null || transcript.trim().isEmpty) return;
+    final revision = _memoRevision;
+    final transcriptRevision = _transcriptRevision;
+    final writer = widget.clipboardWriter;
+    setState(() {
+      _copyingTranscript = true;
+    });
+    try {
+      if (writer == null) {
+        await Clipboard.setData(ClipboardData(text: transcript));
+      } else {
+        await writer(transcript);
+      }
+      if (mounted &&
+          _isCurrentTranscript(revision, transcriptRevision) &&
+          ModalRoute.of(context)?.isCurrent != false) {
+        context.showToast(S.of(context).Voice_Transcript_Copied);
+      }
+    } catch (_) {
+      if (mounted &&
+          _isCurrentTranscript(revision, transcriptRevision) &&
+          ModalRoute.of(context)?.isCurrent != false) {
+        context.showToast(S.of(context).Voice_Transcript_Copy_Failed,
+            isError: true);
+      }
+    } finally {
+      if (_isCurrentTranscript(revision, transcriptRevision)) {
+        setState(() => _copyingTranscript = false);
+      }
+    }
+  }
+
   Future<void> _editTranscript({String? initial, int? expectedRevision}) async {
     final revision = expectedRevision ?? _memoRevision;
     final onTranscriptChanged = widget.onTranscriptChanged;
@@ -205,6 +256,13 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
   @override
   void didUpdateWidget(covariant VoiceMemoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.memo.id != oldWidget.memo.id ||
+        widget.memo.path != oldWidget.memo.path ||
+        widget.memo.transcript != oldWidget.memo.transcript) {
+      // Transcript edits invalidate only copy actions, leaving audio work alone.
+      _transcriptRevision++;
+      _copyingTranscript = false;
+    }
     if (widget.memo.id != oldWidget.memo.id ||
         widget.memo.path != oldWidget.memo.path) {
       _memoRevision++;
@@ -264,17 +322,31 @@ class _VoiceMemoPlayerState extends State<VoiceMemoPlayer> {
               ])),
           PopupMenuButton<String>(
               key: _menuKey,
-              enabled: !_busy,
-              onOpened: () => _menuRevision = _memoRevision,
+              enabled: !_busy && !_copyingTranscript,
+              onOpened: () {
+                _menuRevision = _memoRevision;
+                _menuTranscriptRevision = _transcriptRevision;
+              },
               onSelected: (value) {
-                if (_busy || !_isCurrent(_menuRevision)) return;
+                if (_busy || _copyingTranscript || !_isCurrent(_menuRevision)) {
+                  return;
+                }
+                if (value == 'copyTranscript' &&
+                    _menuTranscriptRevision != _transcriptRevision) {
+                  return;
+                }
                 if (value == 'share') unawaited(_share());
                 if (value == 'remove') unawaited(_remove());
                 if (value == 'transcript') unawaited(_editTranscript());
                 if (value == 'transcribe') unawaited(_transcribe());
+                if (value == 'copyTranscript') unawaited(_copyTranscript());
               },
               itemBuilder: (_) => [
                     PopupMenuItem(value: 'share', child: Text(l10n.Share)),
+                    if (widget.memo.transcript?.trim().isNotEmpty == true)
+                      PopupMenuItem(
+                          value: 'copyTranscript',
+                          child: Text(l10n.Voice_Copy_Transcript)),
                     if (widget.onTranscriptChanged != null)
                       PopupMenuItem(
                           value: 'transcribe',

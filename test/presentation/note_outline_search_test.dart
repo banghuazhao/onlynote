@@ -5,6 +5,7 @@ import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/note_outline_preview.dart';
 import 'package:onlynote/presentation/components/note_outline_sheet.dart';
+import 'package:onlynote/presentation/components/search_result_summary.dart';
 import 'package:onlynote/services/note_outline.dart';
 
 import '../support/search_highlight_text.dart';
@@ -12,6 +13,7 @@ import '../support/search_highlight_text.dart';
 const _searchKey = ValueKey('note-outline-search');
 const _clearKey = ValueKey('note-outline-search-clear');
 const _emptyKey = ValueKey('note-outline-search-empty');
+const _countKey = ValueKey('note-outline-search-count');
 
 Future<void> _pump(
   WidgetTester tester,
@@ -53,6 +55,12 @@ Future<void> _search(WidgetTester tester, String query) async {
   await tester.pumpAndSettle();
 }
 
+void _expectCount(WidgetTester tester, int matched, int total) {
+  final summary = find.byKey(_countKey);
+  expect(tester.widget<SearchResultSummary>(summary).label,
+      S.of(tester.element(summary)).Note_Outline_Search_Count(matched, total));
+}
+
 List<int> _visibleOffsets(WidgetTester tester) => tester
     .widgetList<ListTile>(find.byType(ListTile))
     .map((tile) => int.parse((tile.key! as ValueKey<String>)
@@ -70,21 +78,26 @@ void main() {
       NoteOutlineEntry(text: 'Plan without punctuation', start: 120, end: 144),
     ];
     await _pump(tester, const NoteOutlineSheet(entries: entries));
+    expect(find.byKey(_countKey), findsNothing);
 
     await _search(tester, '  CAFÉ  ');
     expect(_visibleOffsets(tester), [0, 40]);
+    _expectCount(tester, 2, 4);
     expect(highlightedSearchText(tester, _entry(0)), ['Café']);
     expect(highlightedSearchText(tester, _entry(40)), ['CAFÉ']);
     await _search(tester, '[plan].*');
     expect(_visibleOffsets(tester), [0]);
+    _expectCount(tester, 1, 4);
     expect(highlightedSearchText(tester, _entry(0)), ['[plan].*']);
     await _search(tester, '\u3000計劃\u3000');
     expect(_visibleOffsets(tester), [80]);
+    _expectCount(tester, 1, 4);
     expect(highlightedSearchText(tester, _entry(80)), ['計劃']);
     await _search(tester, '  \n\t\u3000');
     expect(_visibleOffsets(tester), [0, 40, 80, 120]);
     expect(highlightedSearchText(tester, _entry(0)), isEmpty);
     expect(find.byKey(_emptyKey), findsNothing);
+    expect(find.byKey(_countKey), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -195,6 +208,7 @@ void main() {
     await tester.pumpAndSettle();
     await _search(tester, 'same');
     expect(_visibleOffsets(tester), [8, 140]);
+    _expectCount(tester, 2, 3);
     expect(tester.widget<ListTile>(_entry(140)).selected, isTrue);
     await tester.tap(_entry(140));
     await tester.pumpAndSettle();
@@ -254,6 +268,7 @@ void main() {
       return NoteOutlineSheet(entries: entries, currentOffset: offset);
     }));
     await _search(tester, 'target');
+    _expectCount(tester, 1, 2);
     expect(find.text(S.current.Note_Outline_Current), findsNothing);
     rebuild(() {
       entries = replacement;
@@ -261,6 +276,7 @@ void main() {
     });
     await tester.pumpAndSettle();
     expect(_visibleOffsets(tester), [20, 90]);
+    _expectCount(tester, 2, 2);
     expect(tester.widget<ListTile>(_entry(20)).selected, isFalse);
     expect(tester.widget<ListTile>(_entry(90)).selected, isTrue);
     expect(tester.widget<TextField>(find.byKey(_searchKey)).controller!.text,
@@ -269,7 +285,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.widget<ListTile>(_entry(20)).selected, isTrue);
     expect(tester.widget<ListTile>(_entry(90)).selected, isFalse);
+    rebuild(() => entries = const []);
+    await tester.pumpAndSettle();
+    _expectCount(tester, 0, 0);
+    expect(find.byKey(_emptyKey), findsOneWidget);
   });
+
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('outline result count is localized and announced in $locale',
+        (tester) async {
+      const entries = [
+        NoteOutlineEntry(text: 'Target', start: 4, end: 10),
+        NoteOutlineEntry(text: 'Other', start: 24, end: 29),
+      ];
+      await _pump(tester, const NoteOutlineSheet(entries: entries),
+          locale: locale, size: const Size(280, 700), textScale: 2);
+      await _search(tester, 'target');
+      _expectCount(tester, 1, 2);
+      final summary = find.byKey(_countKey);
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pump();
+        final data = tester
+            .getSemantics(
+                find.descendant(of: summary, matching: find.byType(Semantics)))
+            .getSemanticsData();
+        expect(data.label, S.current.Note_Outline_Search_Count(1, 2));
+        expect(data.flagsCollection.isLiveRegion, isTrue);
+      } finally {
+        semantics.dispose();
+      }
+      final text = tester.widget<Text>(
+          find.descendant(of: summary, matching: find.byType(Text)));
+      expect(text.maxLines, isNull);
+      await _search(tester, 'missing');
+      _expectCount(tester, 0, 2);
+      expect(find.byKey(_emptyKey), findsOneWidget);
+      await tester.ensureVisible(find.byKey(_clearKey));
+      await tester.tap(find.byKey(_clearKey));
+      await tester.pumpAndSettle();
+      expect(summary, findsNothing);
+      expect(_visibleOffsets(tester), [4, 24]);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('no results is localized and clear restores the complete outline',
       (tester) async {
