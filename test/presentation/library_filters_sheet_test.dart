@@ -5,11 +5,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/library_filters_sheet.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/saved_note_views.dart';
+
+import '../support/search_highlight_text.dart';
 
 Future<Completer<LibraryFilterResult?>> open(
   WidgetTester tester, {
@@ -304,6 +307,8 @@ void main() {
     expect(tester.getTopLeft(key('saved-view-z')).dy,
         lessThan(tester.getTopLeft(key('saved-view-a')).dy));
     expect(tester.widget<ListTile>(key('saved-view-z')).selected, isTrue);
+    expect(highlightedSearchText(tester, key('saved-view-z')), ['Work']);
+    expect(highlightedSearchText(tester, key('saved-view-a')), ['WORK']);
 
     for (final (query, id) in [
       ('++', 'literal'),
@@ -313,6 +318,9 @@ void main() {
     ]) {
       await searchViews(tester, query);
       expect(key('saved-view-$id'), findsOneWidget);
+      expect(highlightedSearchText(tester, key('saved-view-$id')), [
+        query.trim() == 'ångström' ? 'Ångström' : query.trim(),
+      ]);
       expect(key('library-saved-views-search-empty'), findsNothing);
     }
     await searchViews(tester, '.*');
@@ -322,6 +330,8 @@ void main() {
     expect(key('library-saved-views-search-empty'), findsNothing);
     expect(key('saved-view-z'), findsOneWidget);
     expect(key('saved-view-a'), findsNothing);
+    expect(highlightedSearchText(tester, key('saved-view-z')),
+        ['only-search-query']);
     expect(result.isCompleted, isFalse);
 
     final clear = key('library-clear-saved-view-search');
@@ -334,12 +344,54 @@ void main() {
       expect(key('saved-view-${view.id}'), findsOneWidget);
     }
     expect(tester.widget<ListTile>(key('saved-view-z')).selected, isTrue);
+    expect(highlightedSearchText(tester, key('saved-view-z')), isEmpty);
     expect(views.map((view) => view.id),
         ['z', 'a', 'literal', 'chinese', 'unicode']);
     await searchViews(tester, ' \t ');
     expect(key('library-saved-views-search-empty'), findsNothing);
     expect(key('saved-view-z'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+      'long Unicode saved-view highlights retain selection and identity',
+      (tester) async {
+    tester.view.physicalSize = const Size(280, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final target = SavedNoteView(
+      id: 'original-id',
+      name: '研究茶😀 👨‍👩‍👧‍👦 ${'閱讀與研究 ' * 24}',
+      query: 'Call [2026]',
+      folderId: 'work',
+    );
+    final stored = target.toJson();
+    final result = await open(tester,
+        views: [target],
+        selectedViewId: target.id,
+        folderNames: {'work': 'C++ [2026]'},
+        textScale: 2);
+    final row = key('saved-view-original-id');
+    for (final (query, highlights) in [
+      ('茶😀', ['茶😀']),
+      ('👩', ['👨‍👩‍👧‍👦']),
+      (' c++ ', ['C++']),
+      ('[2026]', ['[2026]', '[2026]']),
+    ]) {
+      await searchViews(tester, query);
+      expect(highlightedSearchText(tester, row), highlights);
+      expect(tester.widget<ListTile>(row).selected, isTrue);
+      expect(target.toJson(), stored);
+      expect(result.isCompleted, isFalse);
+      expect(tester.takeException(), isNull);
+    }
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+    expect(((await result.future) as ApplySavedNoteView).view, same(target));
+    expect(target.toJson(), stored);
   });
 
   for (final locale in [
@@ -436,7 +488,10 @@ void main() {
     expect(key('library-saved-views-search-empty'), findsOneWidget);
     await searchViews(tester, S.current.All_Notes);
     expect(key('saved-view-target'), findsOneWidget);
-    expect(tester.widget<Text>(key('saved-view-target-description')).data,
+    expect(
+        tester
+            .widget<SearchHighlight>(key('saved-view-target-description'))
+            .text,
         S.current.All_Notes);
     expect(target.folderId, 'private-folder-id');
     expect(tester.takeException(), isNull);
@@ -1302,7 +1357,7 @@ void main() {
     final description = key('saved-view-media-description');
     final strings = S.of(tester.element(description));
     expect(
-        tester.widget<Text>(description).data,
+        tester.widget<SearchHighlight>(description).text,
         [
           'Project notes',
           strings.Saved_View_Search('call'),
@@ -1338,7 +1393,7 @@ void main() {
     await open(tester, views: [view], folderNames: {'other-id': 'Other notes'});
     final description = key('saved-view-deleted-folder-description');
     final strings = S.of(tester.element(description));
-    expect(tester.widget<Text>(description).data,
+    expect(tester.widget<SearchHighlight>(description).text,
         '${strings.All_Notes} · ${strings.Filter_Scans} · ${strings.Archive}');
     expect(view.folderId, 'deleted-id');
     expect(view.withAvailableFolders({'other-id'}).folderId, isNull);
@@ -1503,7 +1558,7 @@ void main() {
       final description = key('saved-view-long-description');
       await tester.ensureVisible(description);
       await tester.pumpAndSettle();
-      final text = tester.widget<Text>(description).data!;
+      final text = tester.widget<SearchHighlight>(description).text;
       final strings = S.of(tester.element(description));
       expect(text, contains('本週重要工作項目及會議記錄'));
       expect(text, contains(strings.Filter_Recordings));

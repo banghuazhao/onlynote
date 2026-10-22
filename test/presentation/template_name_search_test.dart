@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/template_name_search.dart';
 import 'package:onlynote/presentation/components/template_name_search_previews.dart';
 
@@ -316,7 +317,10 @@ void main() {
           expect(_key('custom-template-literal'), findsNothing);
           expect(_key('custom-template-cjk'), findsNothing);
           expect(
-              tester.widget<Text>(_key('template-content-snippet-work')).data,
+              tester
+                  .widget<SearchHighlight>(
+                      _key('template-content-snippet-work'))
+                  .text,
               expected);
           expect(tester.widget<Text>(_key('template-search-selected')).data,
               'C++ [2026]');
@@ -335,7 +339,10 @@ void main() {
         expect(_key('template-packing'), findsOneWidget);
         expect(_key('custom-template-work'), findsNothing);
         expect(
-            tester.widget<Text>(_key('template-starter-snippet-packing')).data,
+            tester
+                .widget<SearchHighlight>(
+                    _key('template-starter-snippet-packing'))
+                .text,
             S.current.Template_Packing_Summary);
         final starterName = S.current.Template_Meeting_Title;
         await _search(tester, starterName);

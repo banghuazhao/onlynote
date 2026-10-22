@@ -3,6 +3,7 @@ import 'package:onlynote/domain/model/folder.dart';
 import 'package:onlynote/generated/l10n.dart';
 
 import 'app_sheet.dart';
+import 'search_highlight.dart';
 
 /// Literal, case-insensitive name search that retains original folder objects
 /// and their order. Search never changes a folder or the selected scope.
@@ -138,7 +139,10 @@ class _MoveToFolderSheetState extends State<MoveToFolderSheet> {
           selectedTileColor: colors.primaryContainer,
           selectedColor: colors.onPrimaryContainer,
           leading: Icon(icon),
-          title: Text(label),
+          title: folderId == null
+              ? Text(label)
+              : SearchHighlight(label,
+                  query: _searchController.text, overflow: TextOverflow.clip),
           trailing: selected ? const Icon(Icons.check_rounded) : null,
           onTap: () => _select(folderId),
         ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:onlynote/presentation/components/note_search_filters.dart';
 import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/note_search_feedback.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/note_active_criteria_summary.dart';
 import 'package:onlynote/presentation/components/photo_search_status.dart';
 import 'package:onlynote/services/photo_search_index.dart';
@@ -926,6 +927,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       .contains(NoteSearchFilter
                                                           .unfinished),
                                                   folders: data.folders,
+                                                  selectedFolderId:
+                                                      data.selectedFolderId,
                                                   showTrash: data.showTrash,
                                                   showWidgetDiscovery:
                                                       !_isSearchVisible &&
@@ -1667,6 +1670,7 @@ class _BuildNotesList extends StatefulWidget {
     required this.searchQuery,
     required this.unfinishedOnly,
     required this.folders,
+    required this.selectedFolderId,
     required this.showTrash,
     required this.showWidgetDiscovery,
     required this.isReorderMode,
@@ -1684,6 +1688,7 @@ class _BuildNotesList extends StatefulWidget {
   final String searchQuery;
   final bool unfinishedOnly;
   final List<Folder> folders;
+  final String? selectedFolderId;
   final bool showTrash;
   final Future<void> Function(List<String>, bool) onArchive;
   final Future<void> Function(Note) onEditTags;
@@ -2014,6 +2019,13 @@ class __BuildNotesListState extends State<_BuildNotesList> {
     MultipleDeleteBloc multipleDeleteBloc,
     List<int> cardColumns,
   ) {
+    // Resolve once from the loaded snapshot, avoiding repository reads per card.
+    final folderNames = {
+      for (final folder in widget.folders)
+        if (folder.id != widget.selectedFolderId &&
+            folder.name.trim().isNotEmpty)
+          folder.id: folder.name.trim(),
+    };
     final isSelectionMode = multipleDeleteBloc.state.maybeMap(
       selected: (_) => true,
       orElse: () => false,
@@ -2042,6 +2054,7 @@ class __BuildNotesListState extends State<_BuildNotesList> {
               final card = NoteCard(
                 key: _cardKeyFor(noteId),
                 note: note,
+                folderName: folderNames[note.folderId],
                 searchQuery: widget.searchQuery,
                 photoSearchText: PhotoSearchIndex.initializedInstance
                     ?.matchingText(note, widget.searchQuery),
@@ -2418,6 +2431,7 @@ class _FolderPickerSheetState extends State<_FolderPickerSheet> {
               key: ValueKey('folder-picker-folder-${folder.id}'),
               icon: Icons.folder_rounded,
               label: folder.name,
+              searchQuery: _searchController.text,
               count: scope.folderCounts[folder.id] ?? 0,
               selected: !scope.showTrash &&
                   !scope.showArchive &&
@@ -2476,12 +2490,14 @@ class _PickerTile extends StatelessWidget {
     required this.count,
     required this.selected,
     required this.onTap,
+    this.searchQuery = '',
     this.onRename,
     this.onDelete,
   });
 
   final IconData icon;
   final String label;
+  final String searchQuery;
   final int count;
   final bool selected;
   final VoidCallback onTap;
@@ -2501,8 +2517,9 @@ class _PickerTile extends StatelessWidget {
         icon,
         color: selected ? context.colors.primary : null,
       ),
-      title: Text(
+      title: SearchHighlight(
         label,
+        query: searchQuery,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: context.textStyles.bodyLarge?.copyWith(

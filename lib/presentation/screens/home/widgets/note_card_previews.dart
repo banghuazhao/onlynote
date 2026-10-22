@@ -163,6 +163,11 @@ class _NoteCardsPreviewState extends State<_NoteCardsPreview> {
                   itemBuilder: (context, index) => NoteCard(
                     key: ValueKey(_notes[index].id),
                     note: _notes[index],
+                    folderName: index.isEven
+                        ? widget.chinese
+                            ? '生活與旅行靈感'
+                            : 'Personal & travel ideas'
+                        : null,
                     // The entire fixture stays in memory on the web previewer.
                     onTap: () {},
                     onLongPress: () => showDialog<void>(

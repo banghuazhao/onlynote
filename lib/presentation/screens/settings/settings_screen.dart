@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:onlynote/presentation/components/appearance_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -6,10 +8,12 @@ import 'package:onlynote/common/constants.dart';
 import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/backup_settings_tile.dart';
 import 'package:onlynote/presentation/screens/card_appearance/card_appearance_screen.dart';
 import 'package:onlynote/presentation/screens/home/more_apps_page.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/purchase_service.dart';
+import 'package:onlynote/services/backup/backup_export_status.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'manage_folders_screen.dart';
@@ -22,10 +26,12 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
     this.purchases,
+    this.backupStatusStore,
     this.returnFolderSelection = false,
   });
 
   final PurchaseService? purchases;
+  final BackupExportStatusStore? backupStatusStore;
   final bool returnFolderSelection;
 
   @override
@@ -37,6 +43,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _purchaseActionStarted = false;
   bool _restoringPurchase = false;
   bool _openingFolders = false;
+  bool _openingBackup = false;
+  late final BackupExportStatusStore _backupStatusStore;
+  BackupExportRecord? _lastBackupExport;
+  var _backupStatusRevision = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _backupStatusStore =
+        widget.backupStatusStore ?? BackupExportStatusStore.instance;
+    unawaited(_loadBackupStatus());
+  }
+
+  Future<void> _loadBackupStatus() async {
+    final revision = ++_backupStatusRevision;
+    try {
+      final record = await _backupStatusStore.read();
+      if (mounted && revision == _backupStatusRevision) {
+        setState(() => _lastBackupExport = record);
+      }
+    } catch (_) {
+      // Optional metadata cannot prevent opening Settings or making a backup.
+    }
+  }
+
+  Future<void> _openBackup() async {
+    if (!mounted ||
+        _openingBackup ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingBackup = true;
+    // A read started before navigation must not overwrite the returned status.
+    _backupStatusRevision++;
+    try {
+      await Navigator.push<void>(
+        context,
+        MaterialPageRoute<void>(
+          builder: (_) => BackupScreen(backupStatusStore: _backupStatusStore),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        _openingBackup = false;
+        unawaited(_loadBackupStatus());
+      }
+    }
+  }
 
   Future<void> _openManageFolders() async {
     if (!mounted ||
@@ -182,19 +236,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                               SizedBox(height: tokens.space4),
-                              Card(
-                                child: ListTile(
-                                  leading:
-                                      const Icon(Icons.inventory_2_outlined),
-                                  title: Text(S.of(context).Backup_Title),
-                                  trailing:
-                                      const Icon(Icons.chevron_right_rounded),
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute<void>(
-                                          builder: (_) =>
-                                              const BackupScreen())),
-                                ),
+                              BackupSettingsTile(
+                                lastExport: _lastBackupExport,
+                                onTap: _openBackup,
                               ),
                               if (purchase.isSupported) ...[
                                 SizedBox(height: tokens.space4),

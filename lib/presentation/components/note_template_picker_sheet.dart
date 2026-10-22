@@ -5,6 +5,7 @@ import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/confirm_dialog.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/template_name_dialog.dart';
 import 'package:onlynote/presentation/components/template_name_search.dart';
 import 'package:onlynote/presentation/components/template_content_snippet.dart';
@@ -229,7 +230,9 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   key: ValueKey('custom-template-${template.id}'),
                   minVerticalPadding: 16,
                   leading: _icon(Icons.notes_outlined),
-                  title: Text(template.name),
+                  title: SearchHighlight(template.name,
+                      query: _searchController.text,
+                      overflow: TextOverflow.clip),
                   subtitle: TemplateContentSubtitle(
                       template: template, query: _searchController.text),
                   trailing: IconButton(
@@ -268,11 +271,13 @@ class _NoteTemplatePickerSheetState extends State<NoteTemplatePickerSheet> {
                   NoteTemplate.dailyPlan => Icons.today_outlined,
                   NoteTemplate.meeting => Icons.groups_outlined,
                 }),
-                title: Text(template.content(strings).title),
-                subtitle: Text(
+                title: SearchHighlight(template.content(strings).title,
+                    query: _searchController.text, overflow: TextOverflow.clip),
+                subtitle: SearchHighlight(
                   starterTemplateContentSnippet(template.content(strings),
                       query: _searchController.text),
                   key: ValueKey('template-starter-snippet-${template.name}'),
+                  query: _searchController.text,
                   maxLines: _searchController.text.trim().isEmpty ? null : 2,
                   overflow: TextOverflow.ellipsis,
                 ),

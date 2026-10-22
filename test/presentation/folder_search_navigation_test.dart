@@ -22,6 +22,7 @@ import 'package:onlynote/domain/usecase/usecase.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/folder_name_dialog.dart';
 import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
@@ -468,6 +469,68 @@ void main() {
   }
 
   testWidgets(
+    'Home cards refresh folder labels and hide redundant scope labels',
+    (tester) async {
+      final fixture = await open(tester);
+      Finder card(String id) => find.byWidgetPredicate(
+            (widget) => widget is NoteCard && widget.note.id == id,
+          );
+      Finder label(String id) =>
+          find.descendant(of: card(id), matching: _key('card-folder'));
+      expect(
+        find.descendant(
+          of: label('active-work'),
+          matching: find.text('Work [draft]'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: label('active-personal'),
+          matching: find.text('Personal'),
+        ),
+        findsOneWidget,
+      );
+
+      await _send(tester, fixture.home, const HomeEvent.selectFolder('work'));
+      expect(card('active-work'), findsOneWidget);
+      expect(label('active-work'), findsNothing);
+      await _send(tester, fixture.home, const HomeEvent.selectFolder(null));
+      await _send(
+        tester,
+        fixture.home,
+        const HomeEvent.searchChanged('Release'),
+      );
+      expect(label('active-work'), findsOneWidget);
+
+      await tester.runAsync(() async {
+        await foldersBox.put(
+          'work',
+          FolderDto(id: 'work', name: '工作與研究 👩🏽‍💻', sortOrder: 3),
+        );
+      });
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: label('active-work'),
+          matching: find.text('工作與研究 👩🏽‍💻'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.runAsync(() => foldersBox.delete('work'));
+      await tester.pumpAndSettle();
+      expect(card('active-work'), findsOneWidget);
+      expect(label('active-work'), findsNothing);
+      expect(label('active-personal'), findsOneWidget);
+      expect(fixture.notes.values['active-work']!.folderId, 'work');
+      expect(fixture.notes.writes, 0);
+      expect(fixture.folders.writes, 0);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
       'Home picker searches literal names while retaining fixed actions and counts',
       (tester) async {
     final fixture = await open(tester);
@@ -508,6 +571,11 @@ void main() {
     await _search(tester, 'folder-picker', '[draft]');
     expect(_key('folder-picker-folder-work'), findsOneWidget);
     expect(_key('folder-picker-folder-workshop'), findsNothing);
+    final highlight = tester.widget<SearchHighlight>(find.descendant(
+        of: _key('folder-picker-folder-work'),
+        matching: find.byType(SearchHighlight)));
+    expect(highlight.text, 'Work [draft]');
+    expect(highlight.query, '[draft]');
     await _search(tester, 'folder-picker', ' 工作💡 ');
     expect(_key('folder-picker-folder-unicode'), findsOneWidget);
     expect(_key('folder-picker-folder-work'), findsNothing);
@@ -580,6 +648,11 @@ void main() {
       final stored = Map<String, String>.of(preferences.values);
       await _openManagement(tester, entry);
       await _search(tester, 'managed-folders', ' work ');
+      final highlight = tester.widget<SearchHighlight>(find.descendant(
+          of: _key('managed-folder-work'),
+          matching: find.byType(SearchHighlight)));
+      expect(highlight.text, 'Work [draft]');
+      expect(highlight.query, ' work ');
       expect(_key('managed-folder-personal'), findsNothing);
       expect(_key('managed-folder-work'), findsOneWidget);
       expect(_key('managed-folder-workshop'), findsOneWidget);

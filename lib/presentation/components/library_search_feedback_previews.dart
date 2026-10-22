@@ -10,6 +10,7 @@ import 'app_sheet.dart';
 import 'library_filter_labels.dart';
 import 'library_tag_selection_feedback.dart';
 import 'saved_view_name_search.dart';
+import 'search_highlight.dart';
 
 @Preview(name: 'Library search feedback — light', size: Size(390, 700))
 Widget librarySearchFeedbackLightPreview() => const _LibrarySearchPreview();
@@ -187,10 +188,12 @@ class _LibrarySearchPreviewState extends State<_LibrarySearchPreview> {
                     ListTile(
                       key: ValueKey('preview-saved-view-${view.id}'),
                       leading: const Icon(Icons.bookmark_border_rounded),
-                      title: Text(view.name),
-                      subtitle: Text(
+                      title: SearchHighlight(view.name,
+                          query: _viewSearch.text, overflow: TextOverflow.clip),
+                      subtitle: SearchHighlight(
                         savedNoteViewDescription(view,
                             strings: strings, folderNames: folderNames),
+                        query: _viewSearch.text,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),

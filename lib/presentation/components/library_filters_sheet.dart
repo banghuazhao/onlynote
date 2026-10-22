@@ -13,6 +13,7 @@ import 'library_filter_labels.dart';
 import 'library_tag_selection_feedback.dart';
 import 'saved_view_name_search.dart';
 import 'saved_view_save_action.dart';
+import 'search_highlight.dart';
 
 sealed class LibraryFilterResult {
   const LibraryFilterResult();
@@ -340,12 +341,15 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             ListTile(
               key: ValueKey('saved-view-${view.id}'),
               leading: const Icon(Icons.bookmark_border_rounded),
-              title:
-                  Text(view.name, maxLines: 2, overflow: TextOverflow.ellipsis),
-              subtitle: Text(
+              title: SearchHighlight(view.name,
+                  query: _savedViewSearchController.text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis),
+              subtitle: SearchHighlight(
                 savedNoteViewDescription(view,
                     strings: s, folderNames: widget.folderNames),
                 key: ValueKey('saved-view-${view.id}-description'),
+                query: _savedViewSearchController.text,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),

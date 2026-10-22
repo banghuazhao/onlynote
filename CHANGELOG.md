@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added folder names to library note cards, omitting missing folders and redundant labels in a selected folder, and keeping folder names out of shared images.
+- Highlighted matching text in folder, template, and saved-view searches, including displayed template snippets and saved-view criteria.
+- Added the last backup saved or shared status directly to Settings, refreshing after returning from Backup & Restore.
+
 - Prevented repeated or delayed sheet and note actions from navigating twice or dismissing a different page.
 - Refreshed restored note content even when its history sheet closes before the restore finishes.
 - Rejected stale reminder and recording actions when their note, schedule, or recording changes during an asynchronous operation.

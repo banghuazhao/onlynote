@@ -30,6 +30,7 @@ class NoteCard extends StatefulWidget {
     this.cardStyle,
     this.selected = false,
     this.searchQuery = '',
+    this.folderName,
     this.photoSearchText,
     this.photoSearchImagePath,
     this.selectionMode = false,
@@ -46,6 +47,9 @@ class NoteCard extends StatefulWidget {
   /// A staged style for the live preview; saved cards use note.cardStyle.
   final NoteCardStyle? cardStyle;
   final String searchQuery;
+
+  /// Resolved by the library from loaded folders; excluded from shared images.
+  final String? folderName;
 
   /// Derived text that explains a photo search result without changing the note.
   final String? photoSearchText;
@@ -131,6 +135,7 @@ class NoteCardState extends State<NoteCard> {
     final typography = NoteCardTypography(style);
     final cardSize = style.cardSize!;
     final strings = S.of(context);
+    final folderName = _exportingImage ? null : widget.folderName?.trim();
     final title = note.title?.trim() ?? '';
     final body = note.description?.trim() ?? '';
     final hasTitle = title.isNotEmpty;
@@ -421,6 +426,35 @@ class NoteCardState extends State<NoteCard> {
                                 ),
                               ),
                             ),
+                        ],
+                        if (folderName != null && folderName.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacings.m),
+                          Row(
+                            key: const ValueKey('card-folder'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ExcludeSemantics(
+                                child: Icon(
+                                  Icons.folder_outlined,
+                                  size: 16,
+                                  color: AppColors.ink.withValues(alpha: .65),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  folderName,
+                                  semanticsLabel:
+                                      '${strings.Note_Info_Folder}: $folderName',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: typography.description.copyWith(
+                                    color: AppColors.ink.withValues(alpha: .7),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                         if (note.hasVoiceMemos) ...[
                           const SizedBox(height: AppSpacings.m),

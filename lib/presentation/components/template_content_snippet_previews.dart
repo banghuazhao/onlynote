@@ -9,6 +9,7 @@ import 'package:onlynote/services/template_content_search.dart';
 import 'app_sheet.dart';
 import 'template_content_snippet.dart';
 import 'template_name_search.dart';
+import 'search_highlight.dart';
 
 @Preview(name: 'Template snippets — light', group: 'Note', size: Size(390, 700))
 Widget templateContentSnippetsLightPreview() =>
@@ -165,7 +166,8 @@ class _TemplateContentSnippetsPreviewState
                               'template-snippet-select-${template.id}'),
                           minVerticalPadding: 16,
                           leading: const Icon(Icons.notes_outlined),
-                          title: Text(template.name),
+                          title: SearchHighlight(template.name,
+                              query: _search.text, overflow: TextOverflow.clip),
                           subtitle: TemplateContentSubtitle(
                               template: template, query: _search.text),
                           selected: _selected == template.id,

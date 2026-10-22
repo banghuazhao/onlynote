@@ -5,6 +5,8 @@ import 'package:onlynote/services/recording_duration.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/note_templates.dart';
 
+import 'search_highlight.dart';
+
 const _snippetLength = 160;
 
 /// A display-only prefix from stored text; it never opens template media.
@@ -100,9 +102,10 @@ class TemplateContentSubtitle extends StatelessWidget {
         if (snippet.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 6),
-            child: Text(
+            child: SearchHighlight(
               snippet,
               key: ValueKey('template-content-snippet-${template.id}'),
+              query: query,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

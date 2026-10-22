@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/template_content_snippet.dart';
 import 'package:onlynote/presentation/components/template_content_snippet_previews.dart';
 import 'package:onlynote/services/note_templates.dart';
@@ -362,7 +363,7 @@ void main() {
           findsOneWidget);
       expect(find.text('閱讀筆記：觀察、問題與下一步 👨‍👩‍👧‍👦'), findsOneWidget);
       final snippet =
-          tester.widget<Text>(_key('template-content-snippet-body'));
+          tester.widget<SearchHighlight>(_key('template-content-snippet-body'));
       expect(snippet.maxLines, 2);
       expect(snippet.overflow, TextOverflow.ellipsis);
       await _capture(tester, name);
@@ -381,7 +382,10 @@ void main() {
       expect(_key('template-name-search-empty'), findsNothing);
       expect(_key('template-snippet-select-checklist'), findsOneWidget);
       expect(
-          tester.widget<Text>(_key('template-content-snippet-checklist')).data,
+          tester
+              .widget<SearchHighlight>(
+                  _key('template-content-snippet-checklist'))
+              .text,
           '…vegetables');
       for (final (query, expected) in [
         ('deepbody [2026]', '…Deepbody [2026]'),
@@ -395,7 +399,8 @@ void main() {
         await tester.pumpAndSettle();
         expect(tester.widget<ListTile>(body).selected, isTrue);
         final match = _key('template-content-snippet-body');
-        expect(tester.widget<Text>(match).data, startsWith(expected));
+        expect(
+            tester.widget<SearchHighlight>(match).text, startsWith(expected));
         expect(find.text('${S.current.History_Recordings(2)} · 8:42'),
             findsOneWidget);
         await tester.ensureVisible(match);

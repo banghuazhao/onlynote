@@ -9,12 +9,14 @@ import 'package:onlynote/domain/model/custom_note_template.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/components/note_template_picker_sheet.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_templates.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 
 import '../support/memory_preferences.dart';
+import '../support/search_highlight_text.dart';
 import '../support/template_images.dart';
 
 class _WriteCheckedPreferences extends MemoryPreferences {
@@ -215,7 +217,7 @@ void main() {
       _searchTemplate('z-work', 'Work routine'),
       _searchTemplate('a-work', 'WORK projects'),
       _searchTemplate('literal', 'C++ [2026]'),
-      _searchTemplate('cjk', '閱讀與研究茶😀'),
+      _searchTemplate('cjk', '閱讀與研究茶😀 👨‍👩‍👧‍👦'),
     ]);
     final saved = preferences.values[CustomNoteTemplateStore.storageKey];
     final results = <NoteTemplateSelection?>[];
@@ -227,6 +229,7 @@ void main() {
       ('C++', ['literal']),
       ('[2026]', ['literal']),
       ('研究茶😀', ['cjk']),
+      ('👩', ['cjk']),
       ('.*', <String>[]),
       ('Private content', ['z-work', 'a-work', 'literal', 'cjk']),
       ('unavailable', <String>[]),
@@ -239,6 +242,17 @@ void main() {
           .where((key) => key.value.startsWith('custom-template-'))
           .map((key) => key.value.replaceFirst('custom-template-', ''));
       expect(displayed, ids);
+      for (final id in ids) {
+        final expected = switch (query.trim()) {
+          'wOrK' => id == 'z-work' ? 'Work' : 'WORK',
+          '👩' => '👨‍👩‍👧‍👦',
+          _ => query.trim(),
+        };
+        expect(
+            highlightedSearchText(
+                tester, find.byKey(ValueKey('custom-template-$id'))),
+            contains(expected));
+      }
       expect(_searchEmpty, ids.isEmpty ? findsOneWidget : findsNothing);
       expect(find.text(S.current.My_Templates), findsOneWidget);
       expect(find.text(S.current.Starter_Templates), findsOneWidget);
@@ -283,6 +297,8 @@ void main() {
       expect(_searchEmpty, findsNothing);
       expect(find.text(S.current.Search_Templates), findsOneWidget);
       final meeting = find.byKey(const ValueKey('template-meeting'));
+      expect(highlightedSearchText(tester, meeting),
+          contains(S.current.Template_Meeting_Title));
       await tester.ensureVisible(meeting);
       await tester.tap(meeting);
       await tester.pumpAndSettle();
@@ -324,9 +340,9 @@ void main() {
       expect(_searchEmpty, findsNothing);
       expect(
           tester
-              .widget<Text>(
+              .widget<SearchHighlight>(
                   find.byKey(const ValueKey('template-content-snippet-chosen')))
-              .data,
+              .text,
           snippet);
       expect(preferences.reads, reads);
       expect(preferences.writes, 0);
@@ -365,16 +381,18 @@ void main() {
       expect(snippet, findsOneWidget);
       await tester.ensureVisible(snippet);
       await tester.pumpAndSettle();
-      expect(tester.widget<Text>(snippet).data,
+      expect(tester.widget<SearchHighlight>(snippet).text,
           content.body.trim().split(RegExp(r'\s+')).join(' '));
+      expect(highlightedSearchText(tester, snippet), [bodyHeading]);
       await _query(tester, content.items.last);
       await tester.ensureVisible(snippet);
       await tester.pumpAndSettle();
-      expect(tester.widget<Text>(snippet).data, content.items.last);
+      expect(tester.widget<SearchHighlight>(snippet).text, content.items.last);
+      expect(highlightedSearchText(tester, snippet), [content.items.last]);
       await _query(tester, content.title);
       await tester.ensureVisible(snippet);
       await tester.pumpAndSettle();
-      expect(tester.widget<Text>(snippet).data, content.summary);
+      expect(tester.widget<SearchHighlight>(snippet).text, content.summary);
       final meeting = find.byKey(const ValueKey('template-meeting'));
       await tester.ensureVisible(meeting);
       await tester.tap(meeting);

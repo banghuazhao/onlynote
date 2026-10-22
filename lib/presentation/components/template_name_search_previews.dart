@@ -10,6 +10,7 @@ import 'package:onlynote/services/template_content_search.dart';
 import 'app_sheet.dart';
 import 'template_name_search.dart';
 import 'template_content_snippet.dart';
+import 'search_highlight.dart';
 
 @Preview(
     name: 'Template content search — light',
@@ -137,7 +138,8 @@ class _TemplateNameSearchPreviewState
                   key: ValueKey(key),
                   minVerticalPadding: 16,
                   leading: const Icon(Icons.notes_outlined),
-                  title: Text(name),
+                  title: SearchHighlight(name,
+                      query: _controller.text, overflow: TextOverflow.clip),
                   subtitle: subtitle,
                   onTap: () => setState(() => _selected = name),
                 );
@@ -172,12 +174,13 @@ class _TemplateNameSearchPreviewState
                       row(
                           'template-${template.name}',
                           template.content(strings).title,
-                          Text(
+                          SearchHighlight(
                               starterTemplateContentSnippet(
                                   template.content(strings),
                                   query: _controller.text),
                               key: ValueKey(
                                   'template-starter-snippet-${template.name}'),
+                              query: _controller.text,
                               maxLines:
                                   _controller.text.trim().isEmpty ? null : 2,
                               overflow: TextOverflow.ellipsis)),

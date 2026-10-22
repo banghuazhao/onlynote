@@ -9,6 +9,7 @@ import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
 import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/premium_feature_gate.dart';
+import 'package:onlynote/presentation/components/search_highlight.dart';
 import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/premium_access.dart';
@@ -134,7 +135,9 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                                             onTap: () => _openFolder(folder),
                                             leading: const Icon(
                                                 Icons.folder_outlined),
-                                            title: Text(folder.name),
+                                            title: SearchHighlight(folder.name,
+                                                query: _searchController.text,
+                                                overflow: TextOverflow.clip),
                                             subtitle: Text(S
                                                 .of(context)
                                                 .Folder_Notes_Count(noteCount)),

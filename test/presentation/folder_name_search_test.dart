@@ -12,6 +12,8 @@ import 'package:onlynote/presentation/components/app_sheet.dart';
 import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/folder_name_search_previews.dart';
 
+import '../support/search_highlight_text.dart';
+
 Finder _key(String value) => find.byKey(ValueKey(value));
 
 Future<void> _capture(WidgetTester tester, String name) async {
@@ -90,6 +92,53 @@ void main() {
     expect(filterFoldersByName(_folders, 'ångström').single.id, 'unicode');
     expect(_folders.map((folder) => folder.id),
         ['z', 'a', 'duplicate', 'cjk', 'unicode']);
+  });
+
+  testWidgets('folder matches highlight literal and complete Unicode text',
+      (tester) async {
+    tester.view.physicalSize = const Size(280, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final selected = <String?>[];
+    final folder = Folder(
+        id: 'original-id',
+        name: 'C++ [2026] 閱讀與研究茶😀 👨‍👩‍👧‍👦 ${'Long folder name ' * 12}');
+    await tester.pumpWidget(_host(Builder(
+      builder: (context) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: const TextScaler.linear(2)),
+        child: MoveToFolderSheet(
+          folders: [folder],
+          selectedFolderId: folder.id,
+          onSelected: selected.add,
+        ),
+      ),
+    )));
+    await tester.pumpAndSettle();
+    final row = _key('move-to-folder-folder-original-id');
+    for (final (query, highlight) in [
+      (' c++ ', 'C++'),
+      ('[2026]', '[2026]'),
+      ('研究茶😀', '研究茶😀'),
+      ('👩', '👨‍👩‍👧‍👦'),
+    ]) {
+      await tester.enterText(_key('move-to-folder-search'), query);
+      await tester.pumpAndSettle();
+      expect(highlightedSearchText(tester, row), [highlight]);
+      expect(tester.widget<ListTile>(row).selected, isTrue);
+      expect(selected, isEmpty);
+      expect(tester.takeException(), isNull);
+    }
+    await tester.enterText(_key('move-to-folder-search'), '.*');
+    await tester.pumpAndSettle();
+    expect(row, findsNothing);
+    await tester.ensureVisible(_key('move-to-folder-clear-search'));
+    await tester.tap(_key('move-to-folder-clear-search'));
+    await tester.pumpAndSettle();
+    expect(highlightedSearchText(tester, row), isEmpty);
+    expect(tester.widget<ListTile>(row).selected, isTrue);
+    tester.widget<ListTile>(row).onTap!();
+    expect(selected, [folder.id]);
   });
 
   testWidgets('search and clear leave selection alone; fixed choices remain',
