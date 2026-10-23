@@ -93,6 +93,15 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
   late NoteSortOrder _sort = widget.sort;
   final _tagSearchController = TextEditingController();
   final _savedViewSearchController = TextEditingController();
+  bool _closing = false;
+
+  void _finish(LibraryFilterResult result) {
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _closing = true;
+    Navigator.pop(context, result);
+  }
 
   @override
   void dispose() {
@@ -299,10 +308,9 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             child: Wrap(spacing: 12, runSpacing: 8, children: [
               FilledButton(
                 key: const ValueKey('library-apply-filters'),
-                onPressed: () => Navigator.pop(
-                    context,
-                    ApplyLibraryFilters(Set.of(_filters), Set.of(_tags), _scope,
-                        sort: _sort)),
+                onPressed: () => _finish(ApplyLibraryFilters(
+                    Set.of(_filters), Set.of(_tags), _scope,
+                    sort: _sort)),
                 child: Text(s.Done),
               ),
               TextButton(
@@ -354,14 +362,12 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
                 overflow: TextOverflow.ellipsis,
               ),
               selected: widget.selectedViewId == view.id,
-              onTap: () => Navigator.pop(context, ApplySavedNoteView(view)),
+              onTap: () => _finish(ApplySavedNoteView(view)),
               trailing: PopupMenuButton<String>(
                 tooltip: s.Edit,
-                onSelected: (action) => Navigator.pop(
-                    context,
-                    action == 'rename'
-                        ? RenameSavedNoteView(view)
-                        : DeleteSavedNoteView(view)),
+                onSelected: (action) => _finish(action == 'rename'
+                    ? RenameSavedNoteView(view)
+                    : DeleteSavedNoteView(view)),
                 itemBuilder: (_) => [
                   PopupMenuItem(value: 'rename', child: Text(s.Rename_View)),
                   PopupMenuItem(value: 'delete', child: Text(s.Delete_View)),
@@ -372,10 +378,9 @@ class _LibraryFiltersSheetState extends State<LibraryFiltersSheet> {
             SavedViewSaveAction(
               viewCount: widget.savedViews.length,
               maxViews: SavedNoteViewStore.maxViews,
-              onSave: () => Navigator.pop(
-                  context,
-                  CreateSavedNoteView(Set.of(_filters), Set.of(_tags), _scope,
-                      sort: _sort)),
+              onSave: () => _finish(CreateSavedNoteView(
+                  Set.of(_filters), Set.of(_tags), _scope,
+                  sort: _sort)),
             ),
         ],
       ),

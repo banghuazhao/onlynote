@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Prevented repeated or stale folder, filter, and reminder picker actions from closing another route or applying a second result.
+- Protected photo editing from repeated Save or Cancel callbacks, preventing duplicate copies and unintended navigation.
+- Fixed enlarged-text and short-screen layouts in shared sheets, the photo editor, and Find in note, preserving draft focus when sheets adapt to the keyboard.
+- Kept a recording's transcript unchanged during a pending save, restoring editing after a failed save.
+- Disabled export-format choices while backup exports run, including their accessibility actions.
+- Handled privacy-link launch failures with retryable feedback and protected against repeated or delayed launches.
+
 - Polished the empty library with welcoming guidance and clear note/template actions.
 - Grouped note menus into Editing, Organization, Sharing, and Details sections while preserving existing actions.
 - Added real paper-theme samples and feature-specific explanations to Premium, with the one-time purchase action above detailed benefits.

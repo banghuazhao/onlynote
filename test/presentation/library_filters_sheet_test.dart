@@ -14,6 +14,16 @@ import 'package:onlynote/services/saved_note_views.dart';
 
 import '../support/search_highlight_text.dart';
 
+class _FilterObserver extends NavigatorObserver {
+  int pops = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pops++;
+    super.didPop(route, previousRoute);
+  }
+}
+
 Future<Completer<LibraryFilterResult?>> open(
   WidgetTester tester, {
   Set<NoteSearchFilter> filters = const {},
@@ -31,6 +41,7 @@ Future<Completer<LibraryFilterResult?>> open(
   Locale locale = const Locale('en'),
   double textScale = 1,
   double keyboardInset = 0,
+  NavigatorObserver? observer,
 }) async {
   final result = Completer<LibraryFilterResult?>();
   LibraryFiltersSheet sheet(List<SavedNoteView> currentViews) =>
@@ -47,6 +58,7 @@ Future<Completer<LibraryFilterResult?>> open(
           showTrash: trash,
           viewsUnavailable: unavailable);
   await tester.pumpWidget(MaterialApp(
+    navigatorObservers: [if (observer != null) observer],
     locale: locale,
     supportedLocales: S.delegate.supportedLocales,
     localizationsDelegates: const [
@@ -137,6 +149,80 @@ void expectTagCounts(WidgetTester tester, int selected, int hidden) {
 }
 
 void main() {
+  for (final action in ['apply', 'view', 'rename', 'save']) {
+    testWidgets(
+        'library $action returns once without popping the underlying route',
+        (tester) async {
+      final observer = _FilterObserver();
+      final view = SavedNoteView(id: 'original', name: 'Work');
+      final result = await open(tester, views: [view], observer: observer);
+      final VoidCallback choose;
+      switch (action) {
+        case 'apply':
+          choose = tester
+              .widget<FilledButton>(key('library-apply-filters'))
+              .onPressed!;
+        case 'view':
+          choose = tester.widget<ListTile>(key('saved-view-original')).onTap!;
+        case 'rename':
+          final menu = tester.widget<PopupMenuButton<String>>(find.descendant(
+              of: key('saved-view-original'),
+              matching: find.byType(PopupMenuButton<String>)));
+          choose = () => menu.onSelected!('rename');
+        default:
+          choose = tester.widget<ListTile>(key('library-save-view')).onTap!;
+      }
+      choose();
+      choose();
+      await tester.pumpAndSettle();
+      choose();
+      expect(observer.pops, 1);
+      expect(find.text('Open'), findsOneWidget);
+      final selection = await result.future;
+      expect(
+          selection.runtimeType,
+          switch (action) {
+            'apply' => ApplyLibraryFilters,
+            'view' => ApplySavedNoteView,
+            'rename' => RenameSavedNoteView,
+            _ => CreateSavedNoteView,
+          });
+      if (selection is ApplySavedNoteView) expect(selection.view, same(view));
+      if (selection is RenameSavedNoteView) expect(selection.view, same(view));
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('covered and cancelled filter result cannot close another route',
+      (tester) async {
+    final observer = _FilterObserver();
+    final result = await open(tester, observer: observer);
+    final choose =
+        tester.widget<FilledButton>(key('library-apply-filters')).onPressed!;
+    unawaited(showDialog<void>(
+      context: tester.element(find.byType(LibraryFiltersSheet)),
+      builder: (_) => const AlertDialog(title: Text('Another action')),
+    ));
+    await tester.pumpAndSettle();
+    choose();
+    await tester.pumpAndSettle();
+    expect(find.text('Another action'), findsOneWidget);
+    expect(result.isCompleted, isFalse);
+    expect(observer.pops, 0);
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+    tester
+        .widget<IconButton>(find.byWidgetPredicate(
+            (widget) => widget is IconButton && widget.tooltip == 'Close'))
+        .onPressed!();
+    choose();
+    await tester.pumpAndSettle();
+    expect(await result.future, isNull);
+    expect(observer.pops, 2);
+    expect(find.text('Open'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('callers without count data retain plain tag labels',
       (tester) async {
     await open(tester, tags: ['Work'], selectedTags: {'Removed tag'});

@@ -11,6 +11,16 @@ import 'package:onlynote/presentation/theme/spacing.dart';
 
 import '../support/premium_test_fakes.dart';
 
+class _PickerObserver extends NavigatorObserver {
+  int pops = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pops++;
+    super.didPop(route, previousRoute);
+  }
+}
+
 Future<void> _openPicker(
   WidgetTester tester,
   List<ReminderPickerResult?> results, {
@@ -20,12 +30,14 @@ Future<void> _openPicker(
   double textScale = 1,
   bool allowDelete = true,
   PremiumAccess? premiumAccess,
+  NavigatorObserver? observer,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
   await tester.pumpWidget(MaterialApp(
+    navigatorObservers: [if (observer != null) observer],
     locale: locale,
     supportedLocales: S.delegate.supportedLocales,
     localizationsDelegates: const [
@@ -85,6 +97,89 @@ DateTime _nextScheduledTime(ReminderPickerResult result) => Reminder(
     ).nextOccurrence(DateTime.now());
 
 void main() {
+  for (final action in ['shortcut', 'repeat', 'delete', 'cancel']) {
+    testWidgets('reminder $action accepts one dismissal and rejects stale taps',
+        (tester) async {
+      final results = <ReminderPickerResult?>[];
+      final observer = _PickerObserver();
+      await _openPicker(tester, results,
+          observer: observer,
+          current: Reminder(
+            noteId: 'note',
+            reminderId: 42,
+            reminderDate: DateTime(2024, 1, 1, 9, 30),
+            repeat:
+                action == 'repeat' ? ReminderRepeat.daily : ReminderRepeat.none,
+          ));
+      final VoidCallback choose;
+      switch (action) {
+        case 'shortcut':
+          choose = tester
+              .widget<ListTile>(
+                  find.widgetWithText(ListTile, S.current.Reminder_In_One_Hour))
+              .onTap!;
+        case 'repeat':
+          choose = tester
+              .widget<FilledButton>(
+                  find.widgetWithText(FilledButton, S.current.Reminder_Set))
+              .onPressed!;
+        case 'delete':
+          choose = tester
+              .widget<ListTile>(find.widgetWithText(ListTile, S.current.Delete))
+              .onTap!;
+        default:
+          choose = tester
+              .widget<OutlinedButton>(
+                  find.widgetWithText(OutlinedButton, S.current.Cancel))
+              .onPressed!;
+      }
+      choose();
+      choose();
+      await tester.pumpAndSettle();
+      choose();
+      expect(observer.pops, 1);
+      expect(results, hasLength(1));
+      expect(find.text('Open picker'), findsOneWidget);
+      if (action == 'cancel') {
+        expect(results.single, isNull);
+      } else {
+        expect(results.single!.delete, action == 'delete');
+        expect(results.single!.repeat,
+            action == 'repeat' ? ReminderRepeat.daily : ReminderRepeat.none);
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('covered reminder shortcut leaves the covering dialog in place',
+      (tester) async {
+    final results = <ReminderPickerResult?>[];
+    final observer = _PickerObserver();
+    await _openPicker(tester, results, observer: observer);
+    final choose = tester
+        .widget<ListTile>(
+            find.widgetWithText(ListTile, S.current.Reminder_In_One_Hour))
+        .onTap!;
+    showDialog<void>(
+      context: tester.element(find.byType(ReminderPickerSheet)),
+      builder: (_) => const AlertDialog(title: Text('Another action')),
+    );
+    await tester.pumpAndSettle();
+    choose();
+    await tester.pumpAndSettle();
+    expect(find.text('Another action'), findsOneWidget);
+    expect(results, isEmpty);
+    expect(observer.pops, 0);
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+    choose();
+    await tester.pumpAndSettle();
+    expect(results.single!.delete, isFalse);
+    expect(observer.pops, 2);
+    expect(find.text('Open picker'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
       'free repeating option explains Premium and cancel keeps selection',
       (tester) async {

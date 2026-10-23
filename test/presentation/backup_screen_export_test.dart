@@ -1264,6 +1264,10 @@ void main() {
       expect(tester.widget<FilledButton>(_exportButton).onPressed, isNull);
       expect(tester.widget<OutlinedButton>(_restoreButton).onPressed, isNull);
       expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+      for (final format in NoteBulkExportFormat.values) {
+        expect(
+            tester.widget<ChoiceChip>(_formatChip(format)).onSelected, isNull);
+      }
       await tester.tap(_exportButton, warnIfMissed: false);
       await tester.pump();
       expect(backups, 0);
@@ -1271,6 +1275,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(S.current.Export_Notes_Shared), findsOneWidget);
       expect(tester.widget<FilledButton>(_exportButton).onPressed, isNotNull);
+      for (final format in NoteBulkExportFormat.values) {
+        expect(tester.widget<ChoiceChip>(_formatChip(format)).onSelected,
+            isNotNull);
+      }
       await _drainFeedback(tester);
     });
 

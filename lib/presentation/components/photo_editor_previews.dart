@@ -14,13 +14,20 @@ Widget photoEditorPhonePreview() => _preview();
 @Preview(name: 'Simple photo crop — narrow Chinese', size: Size(320, 540))
 Widget photoEditorChinesePreview() => _preview(chinese: true);
 
+@Preview(name: 'Simple photo crop — landscape 2×', size: Size(812, 300))
+Widget photoEditorLandscapePreview() => _preview(scale: 2);
+
+@Preview(name: 'Simple photo crop — narrow Chinese 2×', size: Size(280, 360))
+Widget photoEditorLargeTextPreview() => _preview(chinese: true, scale: 2);
+
 @Preview(
     name: 'Simple photo crop — dark tablet',
     size: Size(760, 900),
     brightness: Brightness.dark)
 Widget photoEditorTabletPreview() => _preview(dark: true);
 
-Widget _preview({bool chinese = false, bool dark = false}) => MaterialApp(
+Widget _preview({bool chinese = false, bool dark = false, double scale = 1}) =>
+    MaterialApp(
       locale: chinese ? const Locale('zh', 'HK') : const Locale('en'),
       supportedLocales: S.delegate.supportedLocales,
       localizationsDelegates: const [
@@ -30,6 +37,11 @@ Widget _preview({bool chinese = false, bool dark = false}) => MaterialApp(
         GlobalCupertinoLocalizations.delegate
       ],
       theme: dark ? AppTheme.dark : AppTheme.light,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: TextScaler.linear(scale)),
+        child: child!,
+      ),
       home: const _PhotoPreview(),
     );
 

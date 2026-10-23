@@ -68,6 +68,82 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
 
+  for (final (name, size) in [
+    ('narrow', const Size(280, 360)),
+    ('landscape', const Size(640, 300)),
+  ]) {
+    testWidgets('reader Find stays usable above the keyboard at 2× in $name',
+        (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final note = Note(
+          id: 'note',
+          title: 'Tea note',
+          description: 'Tea note body and more tea',
+          dateTime: DateTime(2026, 10, 6));
+      final repository = _Notes(NoteDto.fromNote(note));
+      final detail = NoteDetailBloc(
+          GetNoteUsecase(repository), UpdateNoteUsecase(repository));
+      final router = _Router();
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        router.dispose();
+        await detail.close();
+      });
+      await tester.pumpWidget(BlocProvider.value(
+          value: detail,
+          child: MaterialApp.router(
+            routerConfig: router.config(),
+            theme: AppTheme.light,
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(2),
+                viewInsets: const EdgeInsets.only(bottom: 180),
+                disableAnimations: true,
+              ),
+              child: child!,
+            ),
+          )));
+      await tester.pumpAndSettle();
+      expect(
+          DesktopCommands.instance.invoke(DesktopCommand.findInNote), isTrue);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      final query = find.byKey(const ValueKey('note-find-query'));
+      expect(tester.widget<TextField>(query).focusNode!.hasFocus, isTrue);
+      await tester.enterText(query, 'tea');
+      await tester.pumpAndSettle();
+      expect(find.text('1 / 3'), findsOneWidget);
+      final next = find.byKey(const ValueKey('note-find-next'));
+      await tester.ensureVisible(next);
+      await tester.pumpAndSettle();
+      expect(next.hitTestable(), findsOneWidget);
+      await tester.tap(next);
+      await tester.pumpAndSettle();
+      expect(find.text('2 / 3'), findsOneWidget);
+      final close = find.byKey(const ValueKey('note-find-close'));
+      await tester.ensureVisible(close);
+      await tester.pumpAndSettle();
+      expect(close.hitTestable(), findsOneWidget);
+      await tester.tap(close);
+      await tester.pumpAndSettle();
+      expect(query, findsNothing);
+      expect(repository.writes, 0);
+      expect(
+          tester.widget<LoadedView>(find.byType(LoadedView)).note.description,
+          note.description);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets(
       'detail menu finds collapsed completed tasks and search never saves content',
       (tester) async {

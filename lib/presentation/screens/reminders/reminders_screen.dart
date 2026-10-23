@@ -93,8 +93,23 @@ class _RemindersScreenState extends State<RemindersScreen>
   }
 
   Future<void> _snooze(ReminderAgendaEntry entry) async {
-    if (_controller!.busyReminderId != null) return;
+    if (!mounted ||
+        _controller!.busyReminderId != null ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     final l10n = S.of(context);
+    bool chosen = false;
+    void choose(BuildContext sheetContext, Duration delay) {
+      if (chosen ||
+          !sheetContext.mounted ||
+          ModalRoute.of(sheetContext)?.isCurrent != true) {
+        return;
+      }
+      chosen = true;
+      Navigator.pop(sheetContext, delay);
+    }
+
     final delay = await showAppSheet<Duration>(
       context: context,
       builder: (context) => AppSheet(
@@ -104,36 +119,50 @@ class _RemindersScreenState extends State<RemindersScreen>
             minVerticalPadding: 14,
             leading: const Icon(Icons.snooze_rounded),
             title: Text(l10n.Reminder_Snooze_10_Minutes),
-            onTap: () => Navigator.pop(context, const Duration(minutes: 10)),
+            onTap: () => choose(context, const Duration(minutes: 10)),
           ),
           ListTile(
             minVerticalPadding: 14,
             leading: const Icon(Icons.schedule_outlined),
             title: Text(l10n.Reminder_Snooze_1_Hour),
-            onTap: () => Navigator.pop(context, const Duration(hours: 1)),
+            onTap: () => choose(context, const Duration(hours: 1)),
           ),
         ]),
       ),
     );
-    if (delay == null || !mounted) return;
+    if (delay == null ||
+        !mounted ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     final result = await _controller!.snooze(entry, delay);
     if (mounted) _showResult(result, snooze: true);
   }
 
   Future<void> _reschedule(ReminderAgendaEntry entry) async {
-    if (_controller!.busyReminderId != null) return;
+    if (!mounted ||
+        _controller!.busyReminderId != null ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     final selection = await showAppSheet<ReminderPickerResult>(
       context: context,
       builder: (_) =>
           ReminderPickerSheet(current: entry.reminder, allowDelete: false),
     );
-    if (selection == null || selection.delete || !mounted) return;
+    if (selection == null ||
+        selection.delete ||
+        !mounted ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
     final result =
         await _controller!.reschedule(entry, selection.date!, selection.repeat);
     if (mounted) _showResult(result);
   }
 
   void _showResult(ReminderAgendaActionResult result, {bool snooze = false}) {
+    if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
     final l10n = S.of(context);
     switch (result) {
       case ReminderAgendaActionResult.saved:

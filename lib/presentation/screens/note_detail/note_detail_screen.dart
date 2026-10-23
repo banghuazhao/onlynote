@@ -1155,65 +1155,82 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                       },
                     ),
                   ),
-                  body: Column(children: [
-                    if (_findOpen && note != null)
-                      NoteFindBar(
-                        controller: _findController,
-                        hintText: S.of(context).Find_In_Note,
-                        noMatchesText: S.of(context).Find_No_Matches,
-                        previousTooltip: S.of(context).Find_Previous,
-                        nextTooltip: S.of(context).Find_Next,
-                        closeTooltip: S.of(context).Find_Close,
-                        onClose: _closeFind,
-                      ),
-                    Expanded(
-                        child: DeskSurface(
-                      child: state.maybeMap(
-                        error: (error) => ErrorText(error.message ?? ''),
-                        success: (data) =>
-                            NotificationListener<ScrollNotification>(
-                          onNotification: _readerScrollChanged,
-                          child: LoadedView(
-                            note: data.note,
-                            screenshotController: _screenshotController,
-                            exportMode: _exportingImage,
-                            searchController: _findOpen && !_exportingImage
-                                ? _findController
-                                : null,
-                            outlineController:
-                                _exportingImage ? null : _outlineController,
-                            scrollController: _readerScrollController,
-                            readerPositionController: data.note.isDeleted ||
-                                    _exportingImage ||
-                                    _findOpen
-                                ? null
-                                : _readerPositionController,
-                            onCopySelection:
-                                data.note.isDeleted || _exportingImage
-                                    ? null
-                                    : (selection) =>
-                                        _copySelection(data.note, selection),
-                            onAddSelectionToChecklist:
-                                data.note.isDeleted || _exportingImage
-                                    ? null
-                                    : (selection) => _addSelectionToChecklist(
-                                        data.note, selection),
-                            libraryNotes: _libraryNotes,
-                            onOpenLinkedNote: _openLinkedNote,
-                            onEditLinks: data.note.isDeleted
-                                ? null
-                                : () => _editLinks(data.note),
-                            onChecklistActionStart: () => _reviewGeneration++,
-                            checklistReadOnly: _changingLibrary,
-                            onReminderTap: data.note.isDeleted
-                                ? null
-                                : () => _showReminderPicker(data.note),
-                          ),
-                        ),
-                        orElse: () => const _DetailSkeleton(),
-                      ),
-                    )),
-                  ]),
+                  body: LayoutBuilder(
+                      builder: (context, viewport) => Column(children: [
+                            if (_findOpen && note != null)
+                              ConstrainedBox(
+                                key: const ValueKey('reader-find-viewport'),
+                                constraints: BoxConstraints(
+                                    maxHeight: viewport.maxHeight * .65),
+                                child: SingleChildScrollView(
+                                  primary: false,
+                                  child: NoteFindBar(
+                                    controller: _findController,
+                                    hintText: S.of(context).Find_In_Note,
+                                    noMatchesText:
+                                        S.of(context).Find_No_Matches,
+                                    previousTooltip:
+                                        S.of(context).Find_Previous,
+                                    nextTooltip: S.of(context).Find_Next,
+                                    closeTooltip: S.of(context).Find_Close,
+                                    onClose: _closeFind,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                                child: DeskSurface(
+                              child: state.maybeMap(
+                                error: (error) =>
+                                    ErrorText(error.message ?? ''),
+                                success: (data) =>
+                                    NotificationListener<ScrollNotification>(
+                                  onNotification: _readerScrollChanged,
+                                  child: LoadedView(
+                                    note: data.note,
+                                    screenshotController: _screenshotController,
+                                    exportMode: _exportingImage,
+                                    searchController:
+                                        _findOpen && !_exportingImage
+                                            ? _findController
+                                            : null,
+                                    outlineController: _exportingImage
+                                        ? null
+                                        : _outlineController,
+                                    scrollController: _readerScrollController,
+                                    readerPositionController:
+                                        data.note.isDeleted ||
+                                                _exportingImage ||
+                                                _findOpen
+                                            ? null
+                                            : _readerPositionController,
+                                    onCopySelection:
+                                        data.note.isDeleted || _exportingImage
+                                            ? null
+                                            : (selection) => _copySelection(
+                                                data.note, selection),
+                                    onAddSelectionToChecklist:
+                                        data.note.isDeleted || _exportingImage
+                                            ? null
+                                            : (selection) =>
+                                                _addSelectionToChecklist(
+                                                    data.note, selection),
+                                    libraryNotes: _libraryNotes,
+                                    onOpenLinkedNote: _openLinkedNote,
+                                    onEditLinks: data.note.isDeleted
+                                        ? null
+                                        : () => _editLinks(data.note),
+                                    onChecklistActionStart: () =>
+                                        _reviewGeneration++,
+                                    checklistReadOnly: _changingLibrary,
+                                    onReminderTap: data.note.isDeleted
+                                        ? null
+                                        : () => _showReminderPicker(data.note),
+                                  ),
+                                ),
+                                orElse: () => const _DetailSkeleton(),
+                              ),
+                            )),
+                          ])),
                 ),
               ),
             ),

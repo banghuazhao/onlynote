@@ -376,6 +376,9 @@ class _VoiceMemoComposerState extends State<VoiceMemoComposer> {
                     TextField(
                         controller: _transcript,
                         key: const ValueKey('voice-transcript'),
+                        // Save owns a transcript snapshot until persistence
+                        // finishes. Recognition still allows manual edits.
+                        readOnly: _busy,
                         minLines: 2,
                         maxLines: 6,
                         maxLength: 20000,

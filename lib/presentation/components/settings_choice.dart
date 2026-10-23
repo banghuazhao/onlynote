@@ -8,11 +8,13 @@ class SettingsChoice<T> extends StatelessWidget {
       required this.selected,
       required this.label,
       required this.onSelected,
+      this.enabled = true,
       this.keyOf});
   final List<T> values;
   final T selected;
   final String Function(T) label;
   final ValueChanged<T> onSelected;
+  final bool enabled;
 
   /// An optional per-option key, so a caller's tests can address one choice
   /// without depending on its label text.
@@ -30,7 +32,7 @@ class SettingsChoice<T> extends StatelessWidget {
               selected: value == selected,
               showCheckmark: true,
               materialTapTargetSize: MaterialTapTargetSize.padded,
-              onSelected: (_) => onSelected(value),
+              onSelected: enabled ? (_) => onSelected(value) : null,
             ),
         ],
       );

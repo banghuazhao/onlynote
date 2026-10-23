@@ -29,6 +29,13 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
   Offset _gestureOrigin = Offset.zero;
   bool _saving = false;
   bool _failed = false;
+  bool _closing = false;
+
+  bool get _canAct =>
+      mounted &&
+      !_saving &&
+      !_closing &&
+      ModalRoute.of(context)?.isCurrent == true;
 
   @override
   void initState() {
@@ -57,10 +64,13 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
   }
 
   Future<void> _save() async {
+    if (!_canAct) return;
     if (_transform.isIdentity) {
-      Navigator.of(context).pop();
+      _cancel();
       return;
     }
+    final route = ModalRoute.of(context)!;
+    final navigator = Navigator.of(context);
     setState(() {
       _saving = true;
       _failed = false;
@@ -68,7 +78,14 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
     final renderingImage = _image.clone();
     try {
       final photo = await widget.save(renderingImage, _transform);
-      if (mounted) Navigator.of(context).pop(photo);
+      if (!mounted || _closing || !route.isActive) return;
+      _closing = true;
+      if (route.isCurrent) {
+        navigator.pop(photo);
+      } else {
+        // Completion belongs to this editor, even if another route covers it.
+        navigator.removeRoute(route, photo);
+      }
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -81,6 +98,12 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
     }
   }
 
+  void _cancel() {
+    if (!_canAct) return;
+    _closing = true;
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = S.of(context);
@@ -89,134 +112,154 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
         ? _image.height / _image.width
         : _image.width / _image.height;
     return PopScope(
-      canPop: !_saving,
+      canPop: !_saving && !_closing,
       child: Dialog.fullscreen(
         child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  children: [
-                    IconButton(
-                      key: const ValueKey('photo-edit-cancel'),
-                      tooltip: strings.Cancel,
-                      onPressed:
-                          _saving ? null : () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close_rounded),
-                    ),
-                    Expanded(
-                      child: Text(strings.Photo_Edit,
-                          style: Theme.of(context).textTheme.titleLarge,
-                          maxLines: 2),
-                    ),
-                    TextButton(
-                      key: const ValueKey('photo-edit-save'),
-                      onPressed: _saving ? null : _save,
-                      child: _saving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(strings.Photo_Save),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                child: Text(strings.Photo_Edit_Hint,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    final width = math.min(
-                        constraints.maxWidth, constraints.maxHeight * ratio);
-                    final height = width / ratio;
-                    return Center(
-                      child: SizedBox(
-                        key: const ValueKey('photo-crop-canvas'),
-                        width: width,
-                        height: height,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned.fill(
-                              child: RotatedBox(
-                                quarterTurns: rotation,
-                                child:
-                                    RawImage(image: _image, fit: BoxFit.fill),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: IgnorePointer(
-                                child: CustomPaint(
-                                  painter: _CropPainter(
-                                      crop: _transform.crop,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                                ),
-                              ),
-                            ),
-                            _moveArea(width, height),
-                            for (final corner in _CropCorner.values)
-                              _handle(corner, width, height, strings),
-                          ],
-                        ),
+          child: LayoutBuilder(builder: (context, viewport) {
+            // Large instructions and wrapped actions need their natural height.
+            // Keep a usable crop area while allowing those controls to scroll.
+            final scrollable = viewport.maxHeight < 440 ||
+                MediaQuery.textScalerOf(context).scale(16) > 24;
+            Widget canvasArea(Widget child) => scrollable
+                ? SizedBox(
+                    height: math.max(180.0, viewport.maxHeight * .6),
+                    child: child,
+                  )
+                : Expanded(child: child);
+            final content = Column(
+              mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        key: const ValueKey('photo-edit-cancel'),
+                        tooltip: strings.Cancel,
+                        onPressed: _saving || _closing ? null : _cancel,
+                        icon: const Icon(Icons.close_rounded),
                       ),
-                    );
-                  }),
+                      Expanded(
+                        child: Text(strings.Photo_Edit,
+                            style: Theme.of(context).textTheme.titleLarge,
+                            maxLines: 2),
+                      ),
+                      TextButton(
+                        key: const ValueKey('photo-edit-save'),
+                        onPressed: _saving || _closing ? null : _save,
+                        child: _saving
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(strings.Photo_Save),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              if (_failed)
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  child: Text(strings.Photo_Edit_Failed,
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.error),
-                      textAlign: TextAlign.center),
+                  child: Text(strings.Photo_Edit_Hint,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium),
                 ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                child: Wrap(
-                  spacing: 16,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    OutlinedButton.icon(
-                      key: const ValueKey('photo-edit-rotate'),
-                      onPressed: _saving
-                          ? null
-                          : () => setState(() {
-                                _transform = _transform.rotateClockwise();
-                                _failed = false;
-                              }),
-                      icon: const Icon(Icons.rotate_right_rounded),
-                      label: Text(strings.Photo_Rotate),
-                    ),
-                    TextButton.icon(
-                      key: const ValueKey('photo-edit-reset'),
-                      onPressed: _saving || _transform.isIdentity
-                          ? null
-                          : () => setState(() {
-                                _transform = const NotePhotoTransform();
-                                _failed = false;
-                              }),
-                      icon: const Icon(Icons.restart_alt_rounded),
-                      label: Text(strings.Photo_Reset),
-                    ),
-                  ],
+                canvasArea(
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      final width = math.min(
+                          constraints.maxWidth, constraints.maxHeight * ratio);
+                      final height = width / ratio;
+                      return Center(
+                        child: SizedBox(
+                          key: const ValueKey('photo-crop-canvas'),
+                          width: width,
+                          height: height,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Positioned.fill(
+                                child: RotatedBox(
+                                  quarterTurns: rotation,
+                                  child:
+                                      RawImage(image: _image, fit: BoxFit.fill),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: CustomPaint(
+                                    painter: _CropPainter(
+                                        crop: _transform.crop,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                  ),
+                                ),
+                              ),
+                              _moveArea(width, height),
+                              for (final corner in _CropCorner.values)
+                                _handle(corner, width, height, strings),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
                 ),
-              ),
-            ],
-          ),
+                if (_failed)
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: Text(strings.Photo_Edit_Failed,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
+                        textAlign: TextAlign.center),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                  child: Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      OutlinedButton.icon(
+                        key: const ValueKey('photo-edit-rotate'),
+                        onPressed: _saving
+                            ? null
+                            : () => setState(() {
+                                  _transform = _transform.rotateClockwise();
+                                  _failed = false;
+                                }),
+                        icon: const Icon(Icons.rotate_right_rounded),
+                        label: Text(strings.Photo_Rotate),
+                      ),
+                      TextButton.icon(
+                        key: const ValueKey('photo-edit-reset'),
+                        onPressed: _saving || _transform.isIdentity
+                            ? null
+                            : () => setState(() {
+                                  _transform = const NotePhotoTransform();
+                                  _failed = false;
+                                }),
+                        icon: const Icon(Icons.restart_alt_rounded),
+                        label: Text(strings.Photo_Reset),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+            return scrollable
+                ? SingleChildScrollView(
+                    key: const ValueKey('photo-editor-scroll'),
+                    child: content,
+                  )
+                : content;
+          }),
         ),
       ),
     );
@@ -227,29 +270,33 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
     _gestureCrop = _transform.crop;
   }
 
-  Widget _moveArea(double width, double height) => Positioned(
-        left: _transform.crop.left * width,
-        top: _transform.crop.top * height,
-        width: _transform.crop.width * width,
-        height: _transform.crop.height * height,
-        child: GestureDetector(
-          key: const ValueKey('photo-crop-move'),
-          behavior: HitTestBehavior.opaque,
-          onPanStart: _saving ? null : _beginCrop,
-          onPanUpdate: _saving
-              ? null
-              : (details) {
-                  final delta = details.globalPosition - _gestureOrigin;
-                  final left = (_gestureCrop.left + delta.dx / width)
-                      .clamp(0.0, 1 - _gestureCrop.width);
-                  final top = (_gestureCrop.top + delta.dy / height)
-                      .clamp(0.0, 1 - _gestureCrop.height);
-                  setState(() => _transform = _transform.copyWith(
-                      crop: Rect.fromLTWH(
-                          left, top, _gestureCrop.width, _gestureCrop.height)));
-                },
-        ),
-      );
+  Widget _moveArea(double width, double height) {
+    void move(DragUpdateDetails details) {
+      final delta = details.globalPosition - _gestureOrigin;
+      final left = (_gestureCrop.left + delta.dx / width)
+          .clamp(0.0, 1 - _gestureCrop.width);
+      final top = (_gestureCrop.top + delta.dy / height)
+          .clamp(0.0, 1 - _gestureCrop.height);
+      setState(() => _transform = _transform.copyWith(
+          crop: Rect.fromLTWH(
+              left, top, _gestureCrop.width, _gestureCrop.height)));
+    }
+
+    return Positioned(
+      left: _transform.crop.left * width,
+      top: _transform.crop.top * height,
+      width: _transform.crop.width * width,
+      height: _transform.crop.height * height,
+      child: GestureDetector(
+        key: const ValueKey('photo-crop-move'),
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragStart: _saving ? null : _beginCrop,
+        onHorizontalDragUpdate: _saving ? null : move,
+        onVerticalDragStart: _saving ? null : _beginCrop,
+        onVerticalDragUpdate: _saving ? null : move,
+      ),
+    );
+  }
 
   Widget _handle(_CropCorner corner, double width, double height, S strings) {
     final crop = _transform.crop;
@@ -259,6 +306,11 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
         corner == _CropCorner.topLeft || corner == _CropCorner.topRight;
     final x = (leftSide ? crop.left : crop.right) * width;
     final y = (topSide ? crop.top : crop.bottom) * height;
+    void resize(DragUpdateDetails details) {
+      final delta = details.globalPosition - _gestureOrigin;
+      _resizeCrop(corner, Offset(delta.dx / width, delta.dy / height));
+    }
+
     return Positioned(
       left: (x - 24).clamp(0.0, math.max(0.0, width - 48)),
       top: (y - 24).clamp(0.0, math.max(0.0, height - 48)),
@@ -276,14 +328,12 @@ class _NotePhotoEditorState extends State<NotePhotoEditor> {
         child: GestureDetector(
           key: ValueKey('photo-crop-${corner.name}'),
           behavior: HitTestBehavior.opaque,
-          onPanStart: _saving ? null : _beginCrop,
-          onPanUpdate: _saving
-              ? null
-              : (details) {
-                  final delta = details.globalPosition - _gestureOrigin;
-                  _resizeCrop(
-                      corner, Offset(delta.dx / width, delta.dy / height));
-                },
+          // Axis recognizers keep crop drags ahead of the enclosing scroll
+          // view; global positions still resize freely in both directions.
+          onHorizontalDragStart: _saving ? null : _beginCrop,
+          onHorizontalDragUpdate: _saving ? null : resize,
+          onVerticalDragStart: _saving ? null : _beginCrop,
+          onVerticalDragUpdate: _saving ? null : resize,
           child: SizedBox(
             width: 48,
             height: 48,

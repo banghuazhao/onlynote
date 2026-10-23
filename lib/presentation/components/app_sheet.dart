@@ -26,7 +26,7 @@ Future<T?> showAppSheet<T>({
       ),
     );
 
-class AppSheet extends StatelessWidget {
+class AppSheet extends StatefulWidget {
   const AppSheet(
       {super.key, required this.title, required this.child, this.footer});
   final String title;
@@ -34,54 +34,93 @@ class AppSheet extends StatelessWidget {
   final Widget? footer;
 
   @override
+  State<AppSheet> createState() => _AppSheetState();
+}
+
+class _AppSheetState extends State<AppSheet> {
+  // Keep focused fields and pending actions mounted when the keyboard or
+  // window changes between the compact and stationary-footer layouts.
+  final _headerKey = GlobalKey();
+  final _contentKey = GlobalKey();
+  final _footerKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final header = KeyedSubtree(
+        key: _headerKey,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 12, 12),
+          child: Row(children: [
+            Expanded(
+              child: Semantics(
+                namesRoute: true,
+                header: true,
+                child: Text(widget.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleLarge),
+              ),
+            ),
+            IconButton(
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+              onPressed: () => _closeCurrentSheet(context),
+              icon: const Icon(Icons.close_rounded),
+            ),
+          ]),
+        ));
+    final divider = Divider(height: 1, color: theme.colorScheme.outlineVariant);
+    final content = KeyedSubtree(
+        key: _contentKey,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+          child: widget.child,
+        ));
+    final footerContent = widget.footer == null
+        ? null
+        : KeyedSubtree(
+            key: _footerKey,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+              child: widget.footer,
+            ));
     return SafeArea(
       top: false,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.sizeOf(context).height * .82,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 12, 12),
-              child: Row(children: [
-                Expanded(
-                  child: Semantics(
-                    namesRoute: true,
-                    header: true,
-                    child: Text(title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleLarge),
-                  ),
-                ),
-                IconButton(
-                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                  onPressed: () => _closeCurrentSheet(context),
-                  icon: const Icon(Icons.close_rounded),
-                ),
-              ]),
-            ),
-            Divider(height: 1, color: theme.colorScheme.outlineVariant),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-                child: child,
+        child: LayoutBuilder(builder: (context, constraints) {
+          // Keyboard and landscape layouts need the fixed controls to scroll
+          // with the content. Regular heights retain the stationary footer.
+          final compact = constraints.maxHeight <
+              MediaQuery.textScalerOf(context).scale(280);
+          if (compact) {
+            return SingleChildScrollView(
+              key: const ValueKey('compact-app-sheet-scroll'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  header,
+                  divider,
+                  content,
+                  if (footerContent != null) ...[divider, footerContent],
+                ],
               ),
-            ),
-            if (footer != null) ...[
-              Divider(height: 1, color: theme.colorScheme.outlineVariant),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
-                child: footer,
-              ),
+            );
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              divider,
+              Flexible(child: SingleChildScrollView(child: content)),
+              if (footerContent != null) ...[divider, footerContent],
             ],
-          ],
-        ),
+          );
+        }),
       ),
     );
   }

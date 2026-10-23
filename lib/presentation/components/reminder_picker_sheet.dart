@@ -48,6 +48,16 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
   late TimeOfDay _time;
   late int _weekday;
   bool _choosingRepeat = false;
+  bool _closing = false;
+
+  bool get _canInteract =>
+      mounted && !_closing && ModalRoute.of(context)?.isCurrent == true;
+
+  void _close([ReminderPickerResult? result]) {
+    if (!_canInteract) return;
+    _closing = true;
+    Navigator.pop(context, result);
+  }
 
   PremiumAccess get _access => widget.premiumAccess ?? PremiumAccess.instance;
 
@@ -57,7 +67,7 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
       !_access.allows(PremiumFeature.repeatingReminders);
 
   Future<void> _chooseRepeat(ReminderRepeat repeat) async {
-    if (_choosingRepeat || repeat == _repeat) return;
+    if (!_canInteract || _choosingRepeat || repeat == _repeat) return;
     _choosingRepeat = true;
     try {
       if (_requiresPremium(repeat) &&
@@ -65,7 +75,7 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
               access: _access)) {
         return;
       }
-      if (mounted) setState(() => _repeat = repeat);
+      if (_canInteract) setState(() => _repeat = repeat);
     } finally {
       _choosingRepeat = false;
     }
@@ -99,11 +109,13 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
       DateTime(2024, 1, _weekday, _time.hour, _time.minute);
 
   Future<void> _chooseTime() async {
+    if (!_canInteract) return;
     final time = await showTimePicker(context: context, initialTime: _time);
-    if (time != null && mounted) setState(() => _time = time);
+    if (time != null && _canInteract) setState(() => _time = time);
   }
 
   Future<void> _chooseDateAndTime() async {
+    if (!_canInteract) return;
     final now = DateTime.now();
     final seed = widget.suggestedDate ?? widget.current?.reminderDate;
     final initial = seed != null && seed.isAfter(now)
@@ -116,13 +128,13 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
       firstDate: now,
       lastDate: DateTime(now.year + 100),
     );
-    if (date == null || !mounted) return;
+    if (date == null || !mounted || !_canInteract) return;
     final time = await showTimePicker(
       context: context,
       helpText: S.of(context).Reminder,
       initialTime: TimeOfDay.fromDateTime(initial),
     );
-    if (time == null || !mounted) return;
+    if (time == null || !mounted || !_canInteract) return;
     final selected =
         DateTime(date.year, date.month, date.day, time.hour, time.minute);
     if (!selected.isAfter(DateTime.now())) {
@@ -130,8 +142,7 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
           context, SnackBar(content: Text(S.of(context).Reminder_Future_Time)));
       return;
     }
-    Navigator.pop(
-        context, ReminderPickerResult.schedule(selected, ReminderRepeat.none));
+    _close(ReminderPickerResult.schedule(selected, ReminderRepeat.none));
   }
 
   @override
@@ -191,7 +202,7 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
                         SnackBar(content: Text(l10n.Reminder_Future_Time)));
                     return;
                   }
-                  Navigator.pop(context,
+                  _close(
                       ReminderPickerResult.schedule(date, ReminderRepeat.none));
                 },
                 icon: const Icon(Icons.notifications_active_outlined),
@@ -214,10 +225,8 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
                 }),
                 subtitle: Text(formatReminderTime(
                     context, shortcut.resolve(DateTime.now()))),
-                onTap: () => Navigator.pop(
-                    context,
-                    ReminderPickerResult.schedule(
-                        shortcut.resolve(DateTime.now()), ReminderRepeat.none)),
+                onTap: () => _close(ReminderPickerResult.schedule(
+                    shortcut.resolve(DateTime.now()), ReminderRepeat.none)),
               ),
             ListTile(
               minVerticalPadding: 14,
@@ -270,8 +279,8 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
               ),
             ),
             FilledButton.icon(
-              onPressed: () => Navigator.pop(
-                  context, ReminderPickerResult.schedule(_pattern, _repeat)),
+              onPressed: () =>
+                  _close(ReminderPickerResult.schedule(_pattern, _repeat)),
               icon: const Icon(Icons.notifications_active_outlined),
               label: Text(l10n.Reminder_Set),
             ),
@@ -283,13 +292,12 @@ class _ReminderPickerSheetState extends State<ReminderPickerSheet> {
               title: Text(l10n.Delete),
               textColor: colors.error,
               iconColor: colors.error,
-              onTap: () =>
-                  Navigator.pop(context, const ReminderPickerResult.delete()),
+              onTap: () => _close(const ReminderPickerResult.delete()),
             ),
           ],
           const SizedBox(height: 12),
           OutlinedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => _close(),
             child: Text(l10n.Cancel),
           ),
         ],

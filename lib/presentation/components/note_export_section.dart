@@ -58,7 +58,8 @@ class NoteExportSection extends StatelessWidget {
           selected: format,
           keyOf: (value) => ValueKey('note-export-format-${value.name}'),
           label: (value) => noteBulkExportFormatLabel(value, strings),
-          onSelected: onExport == null ? (_) {} : onFormatChanged,
+          enabled: onExport != null,
+          onSelected: onFormatChanged,
         ),
         const SizedBox(height: 8),
         Text(

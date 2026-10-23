@@ -111,7 +111,8 @@ void main() {
       {double scale = 1,
       Locale? locale,
       bool denied = false,
-      bool unsupported = false}) async {
+      bool unsupported = false,
+      Future<VoiceMemo> Function(VoiceMemo)? saveDraft}) async {
     createService();
     platform.denied = denied;
     platform.unsupported = unsupported;
@@ -128,10 +129,11 @@ void main() {
                     retainDraft: (memo) async {
                       retained.add(memo);
                     },
-                    saveDraft: (memo) async {
-                      saved.add(memo);
-                      return memo;
-                    },
+                    saveDraft: saveDraft ??
+                        (memo) async {
+                          saved.add(memo);
+                          return memo;
+                        },
                     discardDraft: (_) async {
                       discarded++;
                     }),
@@ -175,6 +177,82 @@ void main() {
     expect(saved.single.transcript, 'My corrected transcript');
     expect(retained.last, saved.single);
     expect(discarded, 0);
+  });
+  for (final fails in [false, true]) {
+    testWidgets(
+        'pending recording save freezes the reviewed transcript${fails ? ' and failure unlocks retry' : ''}',
+        (tester) async {
+      final pending = Completer<VoiceMemo>();
+      var attempts = 0;
+      await open(tester, saveDraft: (memo) {
+        saved.add(memo);
+        attempts++;
+        return attempts == 1 ? pending.future : Future.value(memo);
+      });
+      await recordStop(tester);
+      final input = find.byKey(const ValueKey('voice-transcript'));
+      await tester.enterText(input, 'Reviewed transcript');
+      final save = find.byKey(const ValueKey('voice-save'));
+      await tester.ensureVisible(save);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(saved.single.transcript, 'Reviewed transcript');
+      expect(tester.widget<TextField>(input).readOnly, isTrue);
+      expect(tester.widget<FilledButton>(save).onPressed, isNull);
+
+      // A late platform edit must not diverge from the snapshot being saved.
+      final editable = tester.state<EditableTextState>(
+          find.descendant(of: input, matching: find.byType(EditableText)));
+      editable.updateEditingValue(const TextEditingValue(
+        text: 'Unsubmitted edit',
+        selection: TextSelection.collapsed(offset: 16),
+      ));
+      await tester.pump();
+      expect(tester.widget<TextField>(input).controller!.text,
+          'Reviewed transcript');
+      expect(retained.last.transcript, 'Reviewed transcript');
+
+      if (fails) {
+        pending.completeError(StateError('Disk full'));
+        await tester.pumpAndSettle();
+        expect(tester.widget<TextField>(input).readOnly, isFalse);
+        expect(find.byKey(const ValueKey('voice-error')), findsOneWidget);
+        await tester.enterText(input, 'Corrected after retry');
+        await tester.ensureVisible(save);
+        await tester.tap(save);
+        await tester.pumpAndSettle();
+        expect(saved.last.transcript, 'Corrected after retry');
+        expect(attempts, 2);
+      } else {
+        pending.complete(saved.single);
+        await tester.pumpAndSettle();
+      }
+      expect(find.byType(VoiceMemoComposer), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('recognition keeps manual transcript edits available',
+      (tester) async {
+    await open(tester);
+    await recordStop(tester);
+    platform.recognition = Completer<Object?>();
+    await tester.tap(find.byKey(const ValueKey('voice-transcribe')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(platform.calls, contains('transcribe'));
+    final input = find.byKey(const ValueKey('voice-transcript'));
+    expect(tester.widget<TextField>(input).readOnly, isFalse);
+    await tester.enterText(input, 'Keep these manual corrections');
+    platform.recognition!.complete('Late recognized words');
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(input).controller!.text,
+        'Keep these manual corrections');
+    final save = find.byKey(const ValueKey('voice-save'));
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(saved.single.transcript, 'Keep these manual corrections');
+    expect(tester.takeException(), isNull);
   });
   testWidgets('permission denial cleans the prepared draft and allows retry',
       (tester) async {

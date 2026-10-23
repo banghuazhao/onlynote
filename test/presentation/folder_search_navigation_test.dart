@@ -469,6 +469,63 @@ void main() {
   }
 
   testWidgets(
+      'folder picker accepts one selection and ignores disposed callbacks',
+      (tester) async {
+    final fixture = await open(tester);
+    await _openFolderPicker(tester);
+    final choose = _rowTile(tester, 'folder-picker-folder-work').onTap!;
+    final pops = fixture.observer.popped.length;
+    choose();
+    choose();
+    await tester.pumpAndSettle();
+    choose();
+    expect(fixture.observer.popped.length, pops + 1);
+    expect(find.byType(HomeScreen), findsOneWidget);
+    fixture.home.state.mapOrNull(loaded: (state) {
+      expect(state.selectedFolderId, 'work');
+    });
+    expect(fixture.notes.writes, 0);
+    expect(fixture.folders.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('covered or cancelled folder picker cannot dismiss another route',
+      (tester) async {
+    final fixture = await open(tester);
+    await _openFolderPicker(tester);
+    final choose = _rowTile(tester, 'folder-picker-folder-work').onTap!;
+    final sheetContext = tester.element(find.byType(AppSheet));
+    showDialog<void>(
+      context: sheetContext,
+      builder: (_) => const AlertDialog(title: Text('Another action')),
+    );
+    await tester.pumpAndSettle();
+    final pops = fixture.observer.popped.length;
+    choose();
+    await tester.pumpAndSettle();
+    expect(find.text('Another action'), findsOneWidget);
+    expect(fixture.observer.popped.length, pops);
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await tester.pumpAndSettle();
+    final close = tester
+        .widget<IconButton>(find.byWidgetPredicate(
+            (widget) => widget is IconButton && widget.tooltip == 'Close'))
+        .onPressed!;
+    close();
+    choose();
+    await tester.pumpAndSettle();
+    choose();
+    expect(fixture.observer.popped.length, pops + 2);
+    expect(find.byType(HomeScreen), findsOneWidget);
+    fixture.home.state.mapOrNull(loaded: (state) {
+      expect(state.selectedFolderId, isNull);
+    });
+    expect(fixture.notes.writes, 0);
+    expect(fixture.folders.writes, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
     'Home cards refresh folder labels and hide redundant scope labels',
     (tester) async {
       final fixture = await open(tester);

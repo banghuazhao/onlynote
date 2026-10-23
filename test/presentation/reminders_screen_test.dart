@@ -7,14 +7,18 @@ import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/reminder_picker_sheet.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_screen.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
 
 Future<void> _pumpScreen(
-        WidgetTester tester, ReminderAgendaController controller) async =>
+        WidgetTester tester, ReminderAgendaController controller,
+        {NavigatorObserver? observer}) async =>
     tester.pumpWidget(MaterialApp(
+      navigatorObservers: [if (observer != null) observer],
       theme: AppTheme.light,
       localizationsDelegates: const [
         S.delegate,
@@ -24,6 +28,16 @@ Future<void> _pumpScreen(
       ],
       home: RemindersScreen(controller: controller),
     ));
+
+class _AgendaObserver extends NavigatorObserver {
+  int pops = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pops++;
+    super.didPop(route, previousRoute);
+  }
+}
 
 class _AgendaRouter extends RootStackRouter {
   _AgendaRouter(this.controller);
@@ -44,6 +58,157 @@ class _AgendaRouter extends RootStackRouter {
 }
 
 void main() {
+  for (final action in ['snooze', 'reschedule']) {
+    testWidgets(
+        'agenda $action ignores covered, duplicate and disposed callbacks',
+        (tester) async {
+      final now = DateTime(2026, 10, 20, 14);
+      final note = Note(id: 'note', title: 'Appointment');
+      var writes = 0;
+      final controller = ReminderAgendaController(
+        readReminders: () =>
+            [Reminder(reminderDate: now, reminderId: 42, noteId: 'note')],
+        readNotes: () async => [note],
+        readNote: (_) async => note,
+        readPendingSnoozes: (_) async => {},
+        now: () => now,
+        snoozeReminder: (_, __) async {
+          writes++;
+          return true;
+        },
+        rescheduleReminder: (_, __, ___) async {
+          writes++;
+          return true;
+        },
+      );
+      addTearDown(controller.dispose);
+      await _pumpScreen(tester, controller);
+      await tester.pumpAndSettle();
+      final callback = tester
+          .widget<TextButton>(find.byKey(ValueKey('$action-reminder-42')))
+          .onPressed!;
+      unawaited(showDialog<void>(
+        context: tester.element(find.byType(RemindersScreen)),
+        builder: (_) => const AlertDialog(title: Text('Another action')),
+      ));
+      await tester.pumpAndSettle();
+      callback();
+      callback();
+      await tester.pumpAndSettle();
+      expect(find.text('Another action'), findsOneWidget);
+      expect(find.byType(AppSheet), findsNothing);
+      expect(writes, 0);
+      Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+      await tester.pumpAndSettle();
+      callback();
+      callback();
+      await tester.pumpAndSettle();
+      expect(find.byType(AppSheet), findsOneWidget);
+      expect(find.byType(ReminderPickerSheet),
+          action == 'reschedule' ? findsOneWidget : findsNothing);
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(writes, 0);
+      await tester.pumpWidget(const SizedBox.shrink());
+      callback();
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final covered in [false, true]) {
+    testWidgets(
+        'snooze choice rejects repeated and covered callbacks: $covered',
+        (tester) async {
+      final now = DateTime(2026, 10, 20, 14);
+      final note = Note(id: 'note', title: 'Appointment');
+      final selected = <Duration>[];
+      final observer = _AgendaObserver();
+      final controller = ReminderAgendaController(
+        readReminders: () =>
+            [Reminder(reminderDate: now, reminderId: 42, noteId: 'note')],
+        readNotes: () async => [note],
+        readNote: (_) async => note,
+        readPendingSnoozes: (_) async => {},
+        now: () => now,
+        snoozeReminder: (_, delay) async {
+          selected.add(delay);
+          return true;
+        },
+        rescheduleReminder: (_, __, ___) async => false,
+      );
+      addTearDown(controller.dispose);
+      await _pumpScreen(tester, controller, observer: observer);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('snooze-reminder-42')));
+      await tester.pumpAndSettle();
+      final choose = tester
+          .widget<ListTile>(find.widgetWithText(
+              ListTile, S.current.Reminder_Snooze_10_Minutes))
+          .onTap!;
+      if (covered) {
+        unawaited(showDialog<void>(
+          context: tester.element(find.byType(AppSheet)),
+          builder: (_) => const AlertDialog(title: Text('Another action')),
+        ));
+        await tester.pumpAndSettle();
+        choose();
+        await tester.pumpAndSettle();
+        expect(find.text('Another action'), findsOneWidget);
+        expect(selected, isEmpty);
+        expect(observer.pops, 0);
+        Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+        await tester.pumpAndSettle();
+      }
+      choose();
+      choose();
+      await tester.pumpAndSettle();
+      choose();
+      expect(selected, [const Duration(minutes: 10)]);
+      expect(observer.pops, covered ? 2 : 1);
+      expect(find.byType(RemindersScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
+  testWidgets('late snooze error does not show feedback on a covering route',
+      (tester) async {
+    final now = DateTime(2026, 10, 20, 14);
+    final note = Note(id: 'note', title: 'Appointment');
+    final pending = Completer<bool>();
+    final controller = ReminderAgendaController(
+      readReminders: () =>
+          [Reminder(reminderDate: now, reminderId: 42, noteId: 'note')],
+      readNotes: () async => [note],
+      readNote: (_) async => note,
+      readPendingSnoozes: (_) async => {},
+      now: () => now,
+      snoozeReminder: (_, __) => pending.future,
+      rescheduleReminder: (_, __, ___) async => false,
+    );
+    addTearDown(controller.dispose);
+    await _pumpScreen(tester, controller);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('snooze-reminder-42')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(S.current.Reminder_Snooze_10_Minutes));
+    await tester.pump(const Duration(milliseconds: 400));
+    unawaited(showDialog<void>(
+      context: tester.element(find.byType(RemindersScreen)),
+      builder: (_) => const AlertDialog(title: Text('Another action')),
+    ));
+    await tester.pump(const Duration(milliseconds: 400));
+    pending.complete(false);
+    await tester.pumpAndSettle();
+    expect(find.text('Another action'), findsOneWidget);
+    expect(find.text(S.current.Reminders_Snooze_Failed), findsNothing);
+    expect(controller.busyReminderId, isNull);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   for (final covered in [false, true]) {
     testWidgets(
         'slow note lookup ${covered ? 'cannot navigate under another sheet' : 'opens one reader after repeated taps'}',

@@ -2397,6 +2397,15 @@ class _FolderPickerSheet extends StatefulWidget {
 
 class _FolderPickerSheetState extends State<_FolderPickerSheet> {
   final _searchController = TextEditingController();
+  bool _closing = false;
+
+  void _select(_FolderPickerResult result) {
+    if (!mounted || _closing || ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _closing = true;
+    Navigator.pop(context, result);
+  }
 
   @override
   void dispose() {
@@ -2429,7 +2438,7 @@ class _FolderPickerSheetState extends State<_FolderPickerSheet> {
             selected: !scope.showTrash &&
                 !scope.showArchive &&
                 scope.selectedFolderId == null,
-            onTap: () => Navigator.pop(context, const _SelectAll()),
+            onTap: () => _select(const _SelectAll()),
           ),
           if (folders.isEmpty && _searchController.text.trim().isNotEmpty)
             const FolderNameSearchEmpty(keyPrefix: 'folder-picker'),
@@ -2443,23 +2452,23 @@ class _FolderPickerSheetState extends State<_FolderPickerSheet> {
               selected: !scope.showTrash &&
                   !scope.showArchive &&
                   scope.selectedFolderId == folder.id,
-              onTap: () => Navigator.pop(context, _SelectFolder(folder.id)),
-              onRename: () => Navigator.pop(context, _RenameFolder(folder)),
-              onDelete: () => Navigator.pop(context, _DeleteFolder(folder)),
+              onTap: () => _select(_SelectFolder(folder.id)),
+              onRename: () => _select(_RenameFolder(folder)),
+              onDelete: () => _select(_DeleteFolder(folder)),
             ),
           _PickerTile(
             icon: Icons.archive_outlined,
             label: l10n.Archive,
             count: scope.archiveCount,
             selected: scope.showArchive,
-            onTap: () => Navigator.pop(context, const _SelectArchive()),
+            onTap: () => _select(const _SelectArchive()),
           ),
           _PickerTile(
             icon: Icons.delete_outline_rounded,
             label: l10n.Trash,
             count: scope.trashCount,
             selected: scope.showTrash,
-            onTap: () => Navigator.pop(context, const _SelectTrash()),
+            onTap: () => _select(const _SelectTrash()),
           ),
           const Divider(height: 1),
           ListTile(
@@ -2474,14 +2483,14 @@ class _FolderPickerSheetState extends State<_FolderPickerSheet> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            onTap: () => Navigator.pop(context, const _CreateFolder()),
+            onTap: () => _select(const _CreateFolder()),
           ),
           if (scope.folders.isNotEmpty)
             ListTile(
               key: const ValueKey('home-manage-folders'),
               leading: const Icon(Icons.tune_rounded),
               title: Text(l10n.Manage_Folders),
-              onTap: () => Navigator.pop(context, const _ManageFolders()),
+              onTap: () => _select(const _ManageFolders()),
             ),
         ],
       ),

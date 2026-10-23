@@ -44,6 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _restoringPurchase = false;
   bool _openingFolders = false;
   bool _openingBackup = false;
+  bool _openingPrivacyPolicy = false;
   late final BackupExportStatusStore _backupStatusStore;
   BackupExportRecord? _lastBackupExport;
   var _backupStatusRevision = 0;
@@ -307,12 +308,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 icon: Icons.privacy_tip_outlined,
                                 children: [
                                   ListTile(
+                                    key: const ValueKey(
+                                        'settings-privacy-policy'),
                                     contentPadding: EdgeInsets.zero,
                                     leading:
                                         const Icon(Icons.description_outlined),
                                     title: Text(S.of(context).Privacy_Policy),
-                                    trailing:
-                                        const Icon(Icons.open_in_new_rounded),
+                                    trailing: _openingPrivacyPolicy
+                                        ? const SizedBox.square(
+                                            dimension: 20,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
+                                          )
+                                        : const Icon(Icons.open_in_new_rounded),
+                                    enabled: !_openingPrivacyPolicy,
                                     onTap: _openPrivacyPolicy,
                                   ),
                                   // Only offered where Google reports a withdrawal path
@@ -365,11 +374,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _openPrivacyPolicy() async {
-    final opened = await launchUrl(
-      Uri.parse(kPrivacyPolicyUrl),
-      mode: LaunchMode.externalApplication,
-    );
-    if (!opened && mounted) {
+    if (!mounted ||
+        _openingPrivacyPolicy ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    setState(() => _openingPrivacyPolicy = true);
+    var opened = false;
+    try {
+      opened = await launchUrl(
+        Uri.parse(kPrivacyPolicyUrl),
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (_) {
+      // A missing browser or platform error uses the same retryable feedback.
+    } finally {
+      if (mounted) setState(() => _openingPrivacyPolicy = false);
+    }
+    if (!opened && mounted && ModalRoute.of(context)?.isCurrent == true) {
       showTransientSnackBar(
         context,
         SnackBar(content: Text(S.of(context).Privacy_Policy_Failed)),

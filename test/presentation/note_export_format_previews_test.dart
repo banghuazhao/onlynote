@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:ui' show SemanticsAction, Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -151,26 +152,63 @@ void main() {
   }
 
   testWidgets(
-      'busy export retains its selected hint when another choice is tapped',
+      'busy export disables format choice semantics and can enable them again',
       (tester) async {
-    var changes = 0;
-    await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.light,
-      localizationsDelegates: const [S.delegate],
-      home: Scaffold(
-          body: NoteExportSection(
-        saveToFile: false,
-        format: NoteBulkExportFormat.plainText,
-        onFormatChanged: (_) => changes++,
-      )),
-    ));
-    await tester.pumpAndSettle();
-    final original = _hintText(tester);
-    await tester.tap(find.byKey(const ValueKey('note-export-format-pdf')));
-    await tester.pump();
-    expect(changes, 0);
-    expect(_hintText(tester), original);
-    expect(tester.takeException(), isNull);
+    final semantics = tester.ensureSemantics();
+    try {
+      final enabled = ValueNotifier(false);
+      addTearDown(enabled.dispose);
+      var format = NoteBulkExportFormat.plainText;
+      var changes = 0;
+      await tester.pumpWidget(MaterialApp(
+        theme: AppTheme.light,
+        localizationsDelegates: const [S.delegate],
+        home: ValueListenableBuilder<bool>(
+          valueListenable: enabled,
+          builder: (context, value, _) => Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) => NoteExportSection(
+                saveToFile: false,
+                format: format,
+                onFormatChanged: (value) => setState(() {
+                  changes++;
+                  format = value;
+                }),
+                onExport: value ? () {} : null,
+              ),
+            ),
+          ),
+        ),
+      ));
+      await tester.pumpAndSettle();
+      final original = _hintText(tester);
+      for (final choice in NoteBulkExportFormat.values) {
+        final chip = find.byKey(ValueKey('note-export-format-${choice.name}'));
+        expect(tester.widget<ChoiceChip>(chip).onSelected, isNull);
+        final node = tester.getSemantics(chip);
+        expect(node.flagsCollection.isEnabled, Tristate.isFalse);
+        expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
+        await tester.tap(chip);
+        await tester.pump();
+      }
+      expect(changes, 0);
+      expect(_hintText(tester), original);
+      enabled.value = true;
+      await tester.pumpAndSettle();
+      final pdfChip = find.byKey(const ValueKey('note-export-format-pdf'));
+      expect(tester.widget<ChoiceChip>(pdfChip).onSelected, isNotNull);
+      expect(tester.getSemantics(pdfChip).flagsCollection.isEnabled,
+          Tristate.isTrue);
+      await tester.tap(pdfChip);
+      await tester.pumpAndSettle();
+      expect(changes, 1);
+      expect(format, NoteBulkExportFormat.pdf);
+      expect(tester.widget<ChoiceChip>(pdfChip).selected, isTrue);
+      expect(_hintText(tester), isNot(original));
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('restored format controls fit and remain interactive in previews',
