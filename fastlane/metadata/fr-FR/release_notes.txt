@@ -1,3 +1,4 @@
-- Triez votre bibliothèque et exportez toutes vos notes en Markdown, en texte brut ou en PDF.
-- Trouvez vos notes plus vite grâce à des aperçus de recherche plus complets, aux détails des enregistrements et aux résumés des notes quotidiennes.
-- Des messages de sauvegarde plus clairs, une meilleure mise en page avec le texte agrandi et une navigation plus fiable.
+- Retrouvez vos notes plus vite grâce aux noms des dossiers, aux correspondances surlignées et au nombre de résultats.
+- Copiez les transcriptions et consultez plus clairement l’état des sauvegardes et les indications d’export.
+- Profitez de menus plus clairs, d’une prise en main améliorée et d’une bibliothèque repensée.
+- Amélioration de l’affichage avec texte agrandi ou clavier, de la retouche photo et de la fiabilité lors de l’enregistrement des notes.

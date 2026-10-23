@@ -1,0 +1,4 @@
+- Find notes faster with folder labels, highlighted matches and search result counts.
+- Copy recording transcripts and see clearer backup status and export guidance.
+- Enjoy clearer note menus, improved onboarding and a refreshed library.
+- Improved large-text and keyboard layouts, photo editing and save reliability.

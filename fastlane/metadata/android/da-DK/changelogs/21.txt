@@ -1,0 +1,4 @@
+- Find noter hurtigere med mappenavne, fremhævede søgetræffere og antal søgeresultater.
+- Kopiér transskriptioner af optagelser, og få tydeligere backupstatus og eksportvejledning.
+- Nyd tydeligere notemenuer, en bedre introduktion og en opdateret noteoversigt.
+- Bedre layout ved stor tekst og brug af tastatur samt bedre fotoredigering og mere pålidelig lagring.

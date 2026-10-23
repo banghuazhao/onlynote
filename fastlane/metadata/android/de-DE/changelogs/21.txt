@@ -1,0 +1,4 @@
+- Notizen schneller finden: Ordnernamen, hervorgehobene Treffer und Anzahl der Suchergebnisse.
+- Aufnahmetranskripte kopieren, den Backup-Status klarer erkennen und verständlichere Exporthinweise erhalten.
+- Klarere Notizmenüs, ein verbesserter Einstieg und eine überarbeitete Notizübersicht.
+- Bessere Layouts bei großer Schrift und Tastaturnutzung sowie bessere Fotobearbeitung und zuverlässigeres Speichern.

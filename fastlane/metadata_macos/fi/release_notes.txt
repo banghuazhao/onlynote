@@ -1,4 +1,4 @@
-- Järjestä muistiinpanokirjastosi ja vie kaikki muistiinpanot Markdown-, teksti- tai PDF-tiedostoina.
-- Löydä muistiinpanot nopeammin monipuolisempien hakuesikatselujen, tallenteiden tietojen ja päivittäisten muistiinpanojen yhteenvetojen avulla.
-- Selkeämmät varmuuskopioinnin ilmoitukset, parempi asettelu suurella tekstillä ja luotettavampi navigointi.
-- Onlynote on nyt saatavilla Macille työpöytäwidgeteillä ja pikanäppäimillä.
+- Löydä muistiinpanot nopeammin kansioiden nimien, korostettujen osumien ja hakutulosmäärien avulla.
+- Kopioi tallenteiden litteroinnit ja näe selkeämmät varmuuskopioinnin tilatiedot ja vientiohjeet.
+- Selkeämmät muistiinpanovalikot, parannettu käyttöönotto ja uudistettu muistiinpanoluettelo.
+- Suuren tekstin ja näppäimistön asetteluja, kuvien muokkausta ja tallennuksen luotettavuutta on parannettu.

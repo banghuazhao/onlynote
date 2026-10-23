@@ -1,4 +1,4 @@
-- Sortér dit bibliotek, og eksportér alle noter som Markdown, ren tekst eller PDF.
-- Find noter hurtigere med mere udførlige forhåndsvisninger i søgninger, oplysninger om optagelser og oversigter over daglige noter.
-- Tydeligere beskeder om sikkerhedskopiering, bedre layout med stor tekst og mere pålidelig navigation.
-- Onlynote er nu tilgængelig på Mac med skrivebordswidgets og tastaturgenveje.
+- Find noter hurtigere med mappenavne, fremhævede søgetræffere og antal søgeresultater.
+- Kopiér transskriptioner af optagelser, og få tydeligere backupstatus og eksportvejledning.
+- Nyd tydeligere notemenuer, en bedre introduktion og en opdateret noteoversigt.
+- Bedre layout ved stor tekst og brug af tastatur samt bedre fotoredigering og mere pålidelig lagring.

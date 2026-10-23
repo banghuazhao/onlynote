@@ -1,4 +1,4 @@
-- Ordena tu biblioteca y exporta todas las notas como Markdown, texto sin formato o PDF.
-- Encuentra notas más rápido con vistas previas de búsqueda más completas, detalles de las grabaciones y resúmenes de notas diarias.
-- Información más clara sobre las copias de seguridad, mejor distribución con texto grande y una navegación más confiable.
-- Onlynote ya está en Mac, con widgets de escritorio y atajos de teclado.
+- Encuentra notas más rápido con nombres de carpetas, coincidencias resaltadas y recuentos de resultados.
+- Copia transcripciones de grabaciones y consulta con más claridad el estado de las copias de seguridad y cómo exportar.
+- Disfruta de menús más claros, una mejor experiencia inicial y una biblioteca renovada.
+- Mejoras en los diseños con texto grande y teclado, la edición de fotos y la fiabilidad al guardar.

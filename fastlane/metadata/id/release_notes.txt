@@ -1,3 +1,4 @@
-- Urutkan koleksi catatan dan ekspor semua catatan sebagai Markdown, teks biasa, atau PDF.
-- Temukan catatan lebih cepat dengan pratinjau pencarian yang lebih lengkap, detail rekaman, dan ringkasan catatan harian.
-- Informasi pencadangan lebih jelas, tata letak lebih baik untuk teks besar, dan navigasi lebih andal.
+- Temukan catatan lebih cepat dengan nama folder, sorotan hasil pencarian, dan jumlah hasil.
+- Salin transkrip rekaman serta lihat status cadangan dan panduan ekspor yang lebih jelas.
+- Nikmati menu catatan yang lebih jelas, panduan awal yang lebih baik, dan daftar catatan yang diperbarui.
+- Tampilan teks besar dan saat memakai papan ketik, pengeditan foto, dan keandalan penyimpanan kini lebih baik.

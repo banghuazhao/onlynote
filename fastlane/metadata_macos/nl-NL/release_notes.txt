@@ -1,4 +1,4 @@
-- Sorteer je bibliotheek en exporteer alle notities als Markdown, platte tekst of PDF.
-- Vind notities sneller met uitgebreidere zoekvoorbeelden, opnamegegevens en samenvattingen van dagelijkse notities.
-- Duidelijkere meldingen over back-ups, betere lay-outs bij grote tekst en betrouwbaardere navigatie.
-- Onlynote is nu beschikbaar op Mac, met bureaubladwidgets en sneltoetsen.
+- Vind notities sneller met mapnamen, gemarkeerde overeenkomsten en aantallen zoekresultaten.
+- Kopieer transcripties van opnamen en bekijk een duidelijkere back-upstatus en exportinstructies.
+- Ontdek duidelijkere notitiemenu’s, een verbeterde introductie en een vernieuwd notitieoverzicht.
+- Verbeterde indeling bij grote tekst en toetsenbordgebruik, betere fotobewerking en betrouwbaarder opslaan.

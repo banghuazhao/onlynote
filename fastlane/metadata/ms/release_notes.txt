@@ -1,3 +1,4 @@
-- Susun pustaka anda dan eksport semua nota sebagai Markdown, teks biasa atau PDF.
-- Cari nota dengan lebih pantas melalui pratonton carian yang lebih lengkap, butiran rakaman dan ringkasan nota harian.
-- Maklumat sandaran yang lebih jelas, susun atur teks besar yang lebih baik dan navigasi yang lebih andal.
+- Cari nota lebih cepat dengan nama folder, padanan diserlahkan dan jumlah hasil carian.
+- Salin transkrip rakaman serta lihat status sandaran dan panduan eksport yang lebih jelas.
+- Nikmati menu nota lebih jelas, panduan permulaan yang ditambah baik dan koleksi nota yang diperbaharui.
+- Susun atur teks besar dan papan kekunci, penyuntingan foto serta kebolehpercayaan penyimpanan ditambah baik.
