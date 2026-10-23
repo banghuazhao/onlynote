@@ -28,6 +28,7 @@ import 'package:onlynote/presentation/screens/home/widgets/note_card.dart';
 import 'package:onlynote/presentation/screens/home/widgets/note_reorder_card.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_search.dart';
+import 'package:onlynote/services/note_sort.dart';
 import 'package:onlynote/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // The preference plugin exposes its test platform in a separate package.
@@ -272,6 +273,56 @@ void main() {
     }
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
+
+  testWidgets('empty library welcome preserves scopes and opens the editor',
+      (tester) async {
+    final home = await _openHome(tester);
+    home.notes.values.clear();
+    home.bloc.add(const HomeEvent.getAllNotes());
+    await tester.pumpAndSettle();
+    final welcome = find.byKey(const ValueKey('empty-library-description'));
+    expect(welcome, findsOneWidget);
+    expect(find.byKey(const ValueKey('empty-library-add')), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('empty-library-templates')), findsOneWidget);
+
+    home.bloc.add(const HomeEvent.sortChanged(NoteSortOrder.titleAsc));
+    home.bloc.add(const HomeEvent.includeArchived(true));
+    await tester.pumpAndSettle();
+    expect(welcome, findsOneWidget);
+    expect(find.byKey(const ValueKey('active-sort-order')), findsOneWidget);
+    expect(find.byKey(const ValueKey('active-scope-include-archived')),
+        findsOneWidget);
+    home.bloc.add(const HomeEvent.sortChanged(NoteSortOrder.manual));
+    home.bloc.add(const HomeEvent.includeArchived(false));
+    await tester.pumpAndSettle();
+
+    home.bloc.add(const HomeEvent.searchChanged('missing'));
+    await tester.pumpAndSettle();
+    expect(welcome, findsNothing);
+    expect(find.text(S.current.No_Search_Results), findsOneWidget);
+    home.bloc.add(const HomeEvent.searchChanged(''));
+    home.bloc.add(const HomeEvent.selectFolder('work'));
+    await tester.pumpAndSettle();
+    expect(welcome, findsNothing);
+    expect(find.text(S.current.No_Notes_In_Folder), findsOneWidget);
+    home.bloc.add(const HomeEvent.selectFolder(null));
+    home.bloc.add(const HomeEvent.showArchive(true));
+    await tester.pumpAndSettle();
+    expect(welcome, findsNothing);
+    expect(find.text(S.current.Archive_Empty), findsOneWidget);
+    home.bloc.add(const HomeEvent.showTrash(true));
+    await tester.pumpAndSettle();
+    expect(welcome, findsNothing);
+    expect(find.text(S.current.Trash_Empty), findsOneWidget);
+    home.bloc.add(const HomeEvent.showTrash(false));
+    home.bloc.add(const HomeEvent.showArchive(false));
+    await tester.pumpAndSettle();
+    expect(welcome, findsOneWidget);
+    await _tap(tester, find.byKey(const ValueKey('empty-library-add')));
+    expect(find.text('New note editor'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   for (final width in [180.0, 320.0]) {
     testWidgets('home actions and Trash selection remain usable at $width px',

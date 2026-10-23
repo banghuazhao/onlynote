@@ -169,7 +169,8 @@ void main() {
         purchases: fixture.purchases, feature: PremiumFeature.voiceMemos)));
     await tester.pumpAndSettle();
     expect(find.text(r'Unlock forever for $2.99'), findsOneWidget);
-    expect(find.text('Unlock this feature with Premium.'), findsOneWidget);
+    expect(
+        find.text(S.current.Premium_Voice_Memos_Description), findsOneWidget);
     await _tap(tester, find.byKey(_buyKey));
     expect(fixture.purchases.isPremium, isTrue);
     expect(fixture.storage.value, isTrue);

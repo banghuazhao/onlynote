@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/components/components.dart';
+import 'package:onlynote/presentation/components/premium_theme_showcase.dart';
 import 'package:onlynote/presentation/theme/spacing.dart';
 import 'package:onlynote/services/premium_access.dart';
 import 'package:onlynote/services/purchase_service.dart';
@@ -114,10 +115,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
           strings.Premium_Folder_Limit(PremiumAccess.freeFolderLimit),
         PremiumFeature.templates =>
           strings.Premium_Template_Limit(PremiumAccess.freeTemplateLimit),
-        PremiumFeature.repeatingReminders ||
-        PremiumFeature.voiceMemos ||
+        PremiumFeature.repeatingReminders =>
+          strings.Premium_Repeating_Reminders_Description,
+        PremiumFeature.voiceMemos => strings.Premium_Voice_Memos_Description,
         PremiumFeature.individualCardStyle =>
-          strings.Premium_Feature_Required,
+          strings.Premium_Card_Style_Description,
         PremiumFeature.noteThemes => strings.Premium_Note_Themes_Description,
         null => null,
       };
@@ -159,6 +161,75 @@ class _PremiumScreenState extends State<PremiumScreen> {
                               ? strings.Premium_Description
                               : strings.Premium_Desktop_Description
                           : explanation ?? strings.Premium_One_Time_Description,
+                      children: [
+                        if (!purchase.isPremium)
+                          SizedBox(
+                            width: double.infinity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (purchase.isSupported)
+                                  FilledButton.icon(
+                                    key: const ValueKey('premium-buy'),
+                                    onPressed: busy ||
+                                            purchase.premiumProduct == null
+                                        ? null
+                                        : () => _runAction(purchase.buyPremium),
+                                    icon: busy && !_restoring
+                                        ? const SizedBox.square(
+                                            dimension: 20,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2))
+                                        : const Icon(
+                                            Icons.workspace_premium_outlined),
+                                    label: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: tokens.space2),
+                                      child: Text(
+                                        price == null
+                                            ? strings.Upgrade_To_Premium
+                                            : strings.Premium_One_Time_Price(
+                                                price),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                SizedBox(height: tokens.space2),
+                                Text(
+                                  purchase.state == PurchaseState.pending
+                                      ? strings.Purchase_Pending
+                                      : purchase.state == PurchaseState.loading
+                                          ? strings.Purchase_Loading
+                                          : price == null
+                                              ? strings.Purchase_Unavailable
+                                              : strings
+                                                  .Premium_One_Time_Description,
+                                  textAlign: TextAlign.center,
+                                  style: context.textStyles.bodySmall?.copyWith(
+                                      color: context.colors.onSurfaceVariant),
+                                ),
+                                if (purchase.isSupported &&
+                                    purchase.premiumProduct == null &&
+                                    !busy) ...[
+                                  SizedBox(height: tokens.space2),
+                                  TextButton.icon(
+                                    key: const ValueKey('premium-retry'),
+                                    onPressed: purchase.loadProducts,
+                                    icon: const Icon(Icons.refresh_rounded),
+                                    label: Text(strings.Retry),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: tokens.space5),
+                    const PremiumThemeShowcase(),
+                    SizedBox(height: tokens.space5),
+                    SectionCard(
+                      title: strings.Premium_Benefits_Title,
+                      icon: Icons.workspace_premium_outlined,
                       children: [
                         _Benefit(
                           feature: PremiumFeature.notes,
@@ -217,54 +288,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       Text(strings.Premium_Free_Limits,
                           style: context.textStyles.bodyMedium?.copyWith(
                               color: context.colors.onSurfaceVariant)),
-                      SizedBox(height: tokens.space5),
-                      if (purchase.isSupported)
-                        FilledButton.icon(
-                          key: const ValueKey('premium-buy'),
-                          onPressed: busy || purchase.premiumProduct == null
-                              ? null
-                              : () => _runAction(purchase.buyPremium),
-                          icon: busy && !_restoring
-                              ? const SizedBox.square(
-                                  dimension: 20,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2))
-                              : const Icon(Icons.workspace_premium_outlined),
-                          label: Padding(
-                            padding:
-                                EdgeInsets.symmetric(vertical: tokens.space2),
-                            child: Text(
-                              price == null
-                                  ? strings.Upgrade_To_Premium
-                                  : strings.Premium_One_Time_Price(price),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      SizedBox(height: tokens.space2),
-                      Text(
-                        purchase.state == PurchaseState.pending
-                            ? strings.Purchase_Pending
-                            : purchase.state == PurchaseState.loading
-                                ? strings.Purchase_Loading
-                                : price == null
-                                    ? strings.Purchase_Unavailable
-                                    : strings.Premium_One_Time_Description,
-                        textAlign: TextAlign.center,
-                        style: context.textStyles.bodySmall
-                            ?.copyWith(color: context.colors.onSurfaceVariant),
-                      ),
-                      if (purchase.isSupported &&
-                          purchase.premiumProduct == null &&
-                          !busy) ...[
-                        SizedBox(height: tokens.space2),
-                        TextButton.icon(
-                          key: const ValueKey('premium-retry'),
-                          onPressed: purchase.loadProducts,
-                          icon: const Icon(Icons.refresh_rounded),
-                          label: Text(strings.Retry),
-                        ),
-                      ],
                     ],
                     if (purchase.isSupported) ...[
                       SizedBox(height: tokens.space4),

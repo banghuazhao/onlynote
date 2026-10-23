@@ -10,27 +10,49 @@ import 'package:onlynote/services/purchase_service.dart';
 import 'premium_screen.dart';
 
 @Preview(name: 'Upgrade', group: 'Premium', size: Size(390, 844))
-Widget premiumUpgradePreview() => const _PremiumPreview();
+Widget premiumUpgradePreview({ThemeData? theme}) =>
+    _PremiumPreview(theme: theme);
 
 @Preview(
     name: 'Premium unlocked, dark',
     group: 'Premium',
     size: Size(390, 844),
     brightness: Brightness.dark)
-Widget premiumUnlockedPreview() =>
-    const _PremiumPreview(premium: true, dark: true);
+Widget premiumUnlockedPreview({ThemeData? theme}) =>
+    _PremiumPreview(premium: true, dark: true, theme: theme);
 
 @Preview(
     name: 'Upgrade, narrow Chinese 2×', group: 'Premium', size: Size(320, 760))
-Widget premiumChinesePreview() =>
-    const _PremiumPreview(chinese: true, scale: 2);
+Widget premiumChinesePreview({ThemeData? theme}) =>
+    _PremiumPreview(chinese: true, scale: 2, theme: theme);
+
+@Preview(
+    name: 'Upgrade, Simplified Chinese 2×',
+    group: 'Premium',
+    size: Size(320, 760))
+Widget premiumSimplifiedChinesePreview({ThemeData? theme}) =>
+    _PremiumPreview(locale: const Locale('zh'), scale: 2, theme: theme);
+
+@Preview(
+    name: 'Upgrade, narrow English 2×', group: 'Premium', size: Size(280, 760))
+Widget premiumLargeTextPreview({ThemeData? theme}) =>
+    _PremiumPreview(scale: 2, theme: theme);
+
+@Preview(
+    name: 'Upgrade, dark',
+    group: 'Premium',
+    size: Size(390, 844),
+    brightness: Brightness.dark)
+Widget premiumDarkUpgradePreview({ThemeData? theme}) =>
+    _PremiumPreview(dark: true, theme: theme);
 
 @Preview(name: 'Mac upgrade', group: 'Premium', size: Size(1100, 720))
-Widget premiumDesktopPreview() => const _PremiumPreview(desktop: true);
+Widget premiumDesktopPreview({ThemeData? theme}) =>
+    _PremiumPreview(desktop: true, theme: theme);
 
 @Preview(name: 'Mac Premium unlocked', group: 'Premium', size: Size(1100, 720))
-Widget premiumDesktopUnlockedPreview() =>
-    const _PremiumPreview(desktop: true, premium: true);
+Widget premiumDesktopUnlockedPreview({ThemeData? theme}) =>
+    _PremiumPreview(desktop: true, premium: true, theme: theme);
 
 class _PremiumPreview extends StatefulWidget {
   const _PremiumPreview(
@@ -38,13 +60,17 @@ class _PremiumPreview extends StatefulWidget {
       this.dark = false,
       this.chinese = false,
       this.desktop = false,
-      this.scale = 1});
+      this.scale = 1,
+      this.locale,
+      this.theme});
 
   final bool premium;
   final bool dark;
   final bool chinese;
   final bool desktop;
   final double scale;
+  final Locale? locale;
+  final ThemeData? theme;
 
   @override
   State<_PremiumPreview> createState() => _PremiumPreviewState();
@@ -63,13 +89,15 @@ class _PremiumPreviewState extends State<_PremiumPreview> {
   @override
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: widget.desktop
-            ? (widget.dark ? AppTheme.dark : AppTheme.light)
-                .copyWith(platform: TargetPlatform.macOS)
-            : widget.dark
-                ? AppTheme.dark
-                : AppTheme.light,
-        locale: widget.chinese ? const Locale('zh', 'HK') : const Locale('en'),
+        theme: widget.theme ??
+            (widget.desktop
+                ? (widget.dark ? AppTheme.dark : AppTheme.light)
+                    .copyWith(platform: TargetPlatform.macOS)
+                : widget.dark
+                    ? AppTheme.dark
+                    : AppTheme.light),
+        locale: widget.locale ??
+            (widget.chinese ? const Locale('zh', 'HK') : const Locale('en')),
         supportedLocales: S.delegate.supportedLocales,
         localizationsDelegates: const [
           S.delegate,

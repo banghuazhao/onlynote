@@ -360,11 +360,181 @@ class S {
     return Intl.message('Delete', name: 'Delete', desc: '', args: []);
   }
 
-  /// `No notes found..\nclick  +  to add new one.`
+  /// `Your ideas start here`
   String get No_notes_found {
     return Intl.message(
-      'No notes found..\nclick  +  to add new one.',
+      'Your ideas start here',
       name: 'No_notes_found',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Write your first note or start with a template.`
+  String get Empty_Library_Description {
+    return Intl.message(
+      'Write your first note or start with a template.',
+      name: 'Empty_Library_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Photo unavailable`
+  String get Photo_Unavailable {
+    return Intl.message(
+      'Photo unavailable',
+      name: 'Photo_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Editing`
+  String get Note_Menu_Editing {
+    return Intl.message(
+      'Editing',
+      name: 'Note_Menu_Editing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Organization`
+  String get Note_Menu_Organization {
+    return Intl.message(
+      'Organization',
+      name: 'Note_Menu_Organization',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sharing`
+  String get Note_Menu_Sharing {
+    return Intl.message(
+      'Sharing',
+      name: 'Note_Menu_Sharing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Details`
+  String get Note_Menu_Details {
+    return Intl.message(
+      'Details',
+      name: 'Note_Menu_Details',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Getting ready…`
+  String get Onboarding_Starting {
+    return Intl.message(
+      'Getting ready…',
+      name: 'Onboarding_Starting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not finish setup. Please try again.`
+  String get Onboarding_Start_Failed {
+    return Intl.message(
+      'Could not finish setup. Please try again.',
+      name: 'Onboarding_Start_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Record ideas and keep audio with your notes.`
+  String get Premium_Voice_Memos_Description {
+    return Intl.message(
+      'Record ideas and keep audio with your notes.',
+      name: 'Premium_Voice_Memos_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep routines on track with daily and weekly reminders.`
+  String get Premium_Repeating_Reminders_Description {
+    return Intl.message(
+      'Keep routines on track with daily and weekly reminders.',
+      name: 'Premium_Repeating_Reminders_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a different font, size, and paper style for each note.`
+  String get Premium_Card_Style_Description {
+    return Intl.message(
+      'Choose a different font, size, and paper style for each note.',
+      name: 'Premium_Card_Style_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Make room for your ideas`
+  String get Premium_Showcase_Title {
+    return Intl.message(
+      'Make room for your ideas',
+      name: 'Premium_Showcase_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A little inspiration`
+  String get Premium_Showcase_Note_Title {
+    return Intl.message(
+      'A little inspiration',
+      name: 'Premium_Showcase_Note_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Leave space for the next good idea.`
+  String get Premium_Showcase_Note_Body {
+    return Intl.message(
+      'Leave space for the next good idea.',
+      name: 'Premium_Showcase_Note_Body',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today’s little wins`
+  String get Premium_Showcase_Checklist_Title {
+    return Intl.message(
+      'Today’s little wins',
+      name: 'Premium_Showcase_Checklist_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Make time for what matters`
+  String get Premium_Showcase_Checklist_Item {
+    return Intl.message(
+      'Make time for what matters',
+      name: 'Premium_Showcase_Checklist_Item',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Everything in Premium`
+  String get Premium_Benefits_Title {
+    return Intl.message(
+      'Everything in Premium',
+      name: 'Premium_Benefits_Title',
       desc: '',
       args: [],
     );
@@ -680,10 +850,10 @@ class S {
     );
   }
 
-  /// `No notes in this folder yet.\nTap + to add one.`
+  /// `No notes in this folder yet.`
   String get No_Notes_In_Folder {
     return Intl.message(
-      'No notes in this folder yet.\nTap + to add one.',
+      'No notes in this folder yet.',
       name: 'No_Notes_In_Folder',
       desc: '',
       args: [],

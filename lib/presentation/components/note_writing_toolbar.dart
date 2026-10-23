@@ -47,16 +47,14 @@ class NoteWritingToolbar extends StatelessWidget {
                       ),
                     ),
                   ),
-                IgnorePointer(
-                  ignoring: !enabled,
-                  child: ExcludeFocus(
-                    child: NoteFormattingToolbar(
-                      key: const ValueKey('editor-keyboard-formatting'),
-                      controller: controller,
-                      focusNode: focusNode,
-                      beforeApply: beforeApply,
-                      useSurfaceColors: true,
-                    ),
+                ExcludeFocus(
+                  child: NoteFormattingToolbar(
+                    key: const ValueKey('editor-keyboard-formatting'),
+                    controller: controller,
+                    focusNode: focusNode,
+                    beforeApply: beforeApply,
+                    useSurfaceColors: true,
+                    enabled: enabled,
                   ),
                 ),
               ],

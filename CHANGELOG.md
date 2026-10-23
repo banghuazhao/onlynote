@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Polished the empty library with welcoming guidance and clear note/template actions.
+- Grouped note menus into Editing, Organization, Sharing, and Details sections while preserving existing actions.
+- Added real paper-theme samples and feature-specific explanations to Premium, with the one-time purchase action above detailed benefits.
+- Added onboarding progress and retry feedback, and made blocked formatting controls visibly and accessibly disabled.
+- Added localized, accessible missing-photo descriptions with theme-aware placeholders and visible labels where space allows.
+
 - Added matching and total reminder counts while searching the agenda, including empty results.
 - Made note history and Trash note information respect the device's 24-hour clock preference.
 

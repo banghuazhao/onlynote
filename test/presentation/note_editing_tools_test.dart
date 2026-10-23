@@ -1873,6 +1873,12 @@ void main() {
     expect(find.text(S.current.Find_In_Note), findsOneWidget);
     expect(find.text(S.current.Note_Info), findsOneWidget);
     expect(find.text(S.current.Done), findsOneWidget);
+    expect(find.text(S.current.Note_Menu_Editing), findsOneWidget);
+    expect(find.text(S.current.Note_Menu_Details), findsOneWidget);
+    expect(find.text(S.current.Note_Menu_Organization), findsNothing);
+    expect(find.text(S.current.Note_Menu_Sharing), findsNothing);
+    expect(tester.getTopLeft(find.text(S.current.Done)).dy,
+        lessThan(tester.getTopLeft(find.text(S.current.Note_Info)).dy));
     expect(editor.store.saved, isEmpty);
     await _tap(tester, find.text(S.current.Done));
     expect(editor.router.current.name, HomeRoute.name);

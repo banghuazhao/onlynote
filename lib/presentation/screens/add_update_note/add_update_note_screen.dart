@@ -547,58 +547,59 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
 
   void _showEditorMore() {
     var openingStyle = false;
-    showAppActionSheet(
-        context: context,
-        title: S.of(context).More_Options,
-        actions: [
-          AppSheetAction(
-              leading: const Icon(Icons.palette_outlined),
-              title: Text(S.of(context).Card_Style),
-              onPressed: (sheetContext) async {
-                if (openingStyle) return;
-                openingStyle = true;
-                final route = ModalRoute.of(sheetContext);
-                Navigator.pop(sheetContext);
-                await route?.completed;
-                if (mounted) await _openCardStyle();
-              }),
-          if (MediaQuery.sizeOf(context).width < 260)
-            AppSheetAction(
-                leading: const Icon(Icons.search_rounded),
-                title: Text(S.of(context).Find_In_Note),
-                onPressed: (sheetContext) {
-                  Navigator.pop(sheetContext);
-                  _openFind();
-                }),
-          AppSheetAction(
-              leading: const Icon(Icons.info_outline_rounded),
-              title: Text(S.of(context).Note_Info),
-              onPressed: (sheetContext) {
-                Navigator.pop(sheetContext);
-                final draft = _currentDraft(_form.state);
-                // A new blank editor seeds its clock on opening; only show
-                // existing metadata, seeded content, or an actual draft edit.
-                final hasModificationMetadata = widget.note != null ||
-                    widget.template != null ||
-                    widget.customTemplateNote != null ||
-                    _hadUserChange;
-                showNoteInfoSheet(
-                    context: context,
-                    statistics: NoteStatistics.fromNote(draft),
-                    folderName: noteFolderInfoName(draft.folderId),
-                    dailyNoteDateKey: draft.dailyNoteDateKey,
-                    modifiedAt:
-                        hasModificationMetadata ? draft.dateTime : null);
-              }),
-          if (MediaQuery.sizeOf(context).width < 260)
-            AppSheetAction(
-                leading: const Icon(Icons.check_rounded),
-                title: Text(S.of(context).Done),
-                onPressed: (sheetContext) {
-                  Navigator.pop(sheetContext);
-                  _finish();
-                }),
-        ]);
+    final strings = S.of(context);
+    showAppActionSheet(context: context, title: strings.More_Options, actions: [
+      AppSheetAction(
+          section: strings.Note_Menu_Editing,
+          leading: const Icon(Icons.palette_outlined),
+          title: Text(S.of(context).Card_Style),
+          onPressed: (sheetContext) async {
+            if (openingStyle) return;
+            openingStyle = true;
+            final route = ModalRoute.of(sheetContext);
+            Navigator.pop(sheetContext);
+            await route?.completed;
+            if (mounted) await _openCardStyle();
+          }),
+      if (MediaQuery.sizeOf(context).width < 260)
+        AppSheetAction(
+            section: strings.Note_Menu_Editing,
+            leading: const Icon(Icons.search_rounded),
+            title: Text(S.of(context).Find_In_Note),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _openFind();
+            }),
+      if (MediaQuery.sizeOf(context).width < 260)
+        AppSheetAction(
+            section: strings.Note_Menu_Editing,
+            leading: const Icon(Icons.check_rounded),
+            title: Text(S.of(context).Done),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _finish();
+            }),
+      AppSheetAction(
+          section: strings.Note_Menu_Details,
+          leading: const Icon(Icons.info_outline_rounded),
+          title: Text(S.of(context).Note_Info),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            final draft = _currentDraft(_form.state);
+            // A new blank editor seeds its clock on opening; only show
+            // existing metadata, seeded content, or an actual draft edit.
+            final hasModificationMetadata = widget.note != null ||
+                widget.template != null ||
+                widget.customTemplateNote != null ||
+                _hadUserChange;
+            showNoteInfoSheet(
+                context: context,
+                statistics: NoteStatistics.fromNote(draft),
+                folderName: noteFolderInfoName(draft.folderId),
+                dailyNoteDateKey: draft.dailyNoteDateKey,
+                modifiedAt: hasModificationMetadata ? draft.dateTime : null);
+          }),
+    ]);
   }
 
   Future<void> _openCardStyle() async {

@@ -15,14 +15,17 @@ class NoteFormattingToolbar extends StatelessWidget {
     required this.focusNode,
     this.beforeApply,
     this.useSurfaceColors = false,
+    this.enabled = true,
   });
 
   final SimpleFormattingController controller;
   final FocusNode focusNode;
   final VoidCallback? beforeApply;
   final bool useSurfaceColors;
+  final bool enabled;
 
   void _apply(VoidCallback action) {
+    if (!enabled) return;
     beforeApply?.call();
     // A new, unfocused field starts with an invalid selection. Establish its
     // cursor before a typing mode so the first focus update keeps that mode.
@@ -68,7 +71,9 @@ class NoteFormattingToolbar extends StatelessWidget {
                         foregroundColor: foreground,
                         selectedColor: selectedColor,
                         selectedForegroundColor: selectedForeground,
-                        onPressed: () => _apply(controller.toggleBold),
+                        onPressed: enabled
+                            ? () => _apply(controller.toggleBold)
+                            : null,
                       ),
                       _FormattingButton(
                         key: const ValueKey('format-heading'),
@@ -78,7 +83,9 @@ class NoteFormattingToolbar extends StatelessWidget {
                         foregroundColor: foreground,
                         selectedColor: selectedColor,
                         selectedForegroundColor: selectedForeground,
-                        onPressed: () => _apply(controller.toggleHeading),
+                        onPressed: enabled
+                            ? () => _apply(controller.toggleHeading)
+                            : null,
                       ),
                       _FormattingButton(
                         key: const ValueKey('format-bullets'),
@@ -88,7 +95,9 @@ class NoteFormattingToolbar extends StatelessWidget {
                         foregroundColor: foreground,
                         selectedColor: selectedColor,
                         selectedForegroundColor: selectedForeground,
-                        onPressed: () => _apply(controller.toggleBullets),
+                        onPressed: enabled
+                            ? () => _apply(controller.toggleBullets)
+                            : null,
                       ),
                       _FormattingButton(
                         key: const ValueKey('format-highlight'),
@@ -102,7 +111,7 @@ class NoteFormattingToolbar extends StatelessWidget {
                         foregroundColor: foreground,
                         selectedColor: noteHighlightColor,
                         selectedForegroundColor: noteHighlightedTextColor,
-                        onPressed: controller.canHighlight
+                        onPressed: enabled && controller.canHighlight
                             ? () => _apply(controller.toggleHighlight)
                             : null,
                       ),
@@ -161,8 +170,10 @@ class _FormattingButton extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: selected
-                        ? selectedColor ??
-                            foregroundColor.withValues(alpha: .12)
+                        ? selectedColor?.withValues(
+                                alpha: onPressed == null ? .3 : 1) ??
+                            foregroundColor.withValues(
+                                alpha: onPressed == null ? .04 : .12)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(7),
                   ),

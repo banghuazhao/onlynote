@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/image_storage.dart';
-import 'package:onlynote/presentation/theme/colors.dart';
+import 'missing_note_photo.dart';
 
 /// A note's photo, loaded from its stored (relative) path.
 ///
@@ -42,36 +42,10 @@ class NoteImage extends StatelessWidget {
       semanticLabel: semanticLabel,
       excludeFromSemantics: semanticLabel == null,
       gaplessPlayback: true,
-      errorBuilder: (context, _, __) => _MissingImage(
+      errorBuilder: (context, _, __) => MissingNotePhoto(
         width: width,
         height: height,
-      ),
-    );
-  }
-}
-
-class _MissingImage extends StatelessWidget {
-  const _MissingImage({this.width, this.height});
-
-  final double? width;
-  final double? height;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = width == null || height == null
-        ? 24.0
-        : (width! < height! ? width! : height!) * 0.42;
-
-    return Container(
-      width: width,
-      height: height,
-      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-      color: AppColors.ink.withValues(alpha: 0.06),
-      alignment: Alignment.center,
-      child: Icon(
-        Icons.image_not_supported_outlined,
-        size: size.clamp(14.0, 40.0),
-        color: AppColors.ink.withValues(alpha: 0.35),
+        semanticLabel: semanticLabel,
       ),
     );
   }

@@ -369,6 +369,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Editor_Tip_Image_Layout": MessageLookupByLibrary.simpleMessage(
       "點按照片可調整大小，長按可移動位置。",
     ),
+    "Empty_Library_Description": MessageLookupByLibrary.simpleMessage(
+      "寫下第一則備忘錄，或從範本開始。",
+    ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
     "Expand_Section": m11,
     "Export_Notes": MessageLookupByLibrary.simpleMessage("匯出筆記"),
@@ -550,13 +553,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "New_Folder": MessageLookupByLibrary.simpleMessage("新增資料夾"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("無資料夾"),
     "No_Folders": MessageLookupByLibrary.simpleMessage("暫無資料夾。建立資料夾來整理備忘錄。"),
-    "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
-      "此資料夾暫無備忘錄。\n點擊 + 新增。",
-    ),
+    "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage("此資料夾還沒有備忘錄。"),
     "No_Search_Results": MessageLookupByLibrary.simpleMessage("沒有符合的備忘錄。"),
-    "No_notes_found": MessageLookupByLibrary.simpleMessage(
-      "目前沒有備忘錄..\n點擊  +  添加",
-    ),
+    "No_notes_found": MessageLookupByLibrary.simpleMessage("從這裡記錄靈感"),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加備忘錄"),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("筆記已封存"),
     "Note_Color": m21,
@@ -593,6 +592,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Recordings": MessageLookupByLibrary.simpleMessage("錄音"),
     "Note_Info_Scanned_Pages": MessageLookupByLibrary.simpleMessage("掃描頁數"),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("字數"),
+    "Note_Menu_Details": MessageLookupByLibrary.simpleMessage("詳情"),
+    "Note_Menu_Editing": MessageLookupByLibrary.simpleMessage("編輯工具"),
+    "Note_Menu_Organization": MessageLookupByLibrary.simpleMessage("整理"),
+    "Note_Menu_Sharing": MessageLookupByLibrary.simpleMessage("分享選項"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("已移動備忘錄"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("大綱"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage("目前部分"),
@@ -646,6 +649,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Make_Checklist": MessageLookupByLibrary.simpleMessage("建立待辦清單"),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("下一步"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("略過"),
+    "Onboarding_Start_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法完成設定。請重試。",
+    ),
+    "Onboarding_Starting": MessageLookupByLibrary.simpleMessage("正在準備…"),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage("隨時記錄"),
     "Onboarding_Title_2": MessageLookupByLibrary.simpleMessage("輕鬆整理"),
     "Onboarding_Title_3": MessageLookupByLibrary.simpleMessage("不再遺忘"),
@@ -702,6 +709,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_Unsupported": MessageLookupByLibrary.simpleMessage(
       "此裝置不支援提取文字。",
     ),
+    "Photo_Unavailable": MessageLookupByLibrary.simpleMessage("照片無法顯示"),
     "Pin": MessageLookupByLibrary.simpleMessage("置頂"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("純色紙張"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -709,7 +717,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium": MessageLookupByLibrary.simpleMessage("進階版"),
     "Premium_Active": MessageLookupByLibrary.simpleMessage("進階版已解鎖"),
+    "Premium_Benefits_Title": MessageLookupByLibrary.simpleMessage("進階版的全部功能"),
     "Premium_Card_Style": MessageLookupByLibrary.simpleMessage("獨立設定卡片樣式"),
+    "Premium_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
+      "為每則備忘錄選擇不同的字體、字號和紙張樣式。",
+    ),
     "Premium_Description": MessageLookupByLibrary.simpleMessage(
       "所有進階功能已解鎖，並且無廣告。",
     ),
@@ -745,9 +757,27 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium_One_Time_Price": m28,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage("重複提醒"),
+    "Premium_Repeating_Reminders_Description":
+        MessageLookupByLibrary.simpleMessage("用每日和每週提醒，輕鬆維持日常安排。"),
+    "Premium_Showcase_Checklist_Item": MessageLookupByLibrary.simpleMessage(
+      "為重要的事留出時間",
+    ),
+    "Premium_Showcase_Checklist_Title": MessageLookupByLibrary.simpleMessage(
+      "今天的小收穫",
+    ),
+    "Premium_Showcase_Note_Body": MessageLookupByLibrary.simpleMessage(
+      "為下一個好點子留一點空間。",
+    ),
+    "Premium_Showcase_Note_Title": MessageLookupByLibrary.simpleMessage(
+      "一點小靈感",
+    ),
+    "Premium_Showcase_Title": MessageLookupByLibrary.simpleMessage("為靈感留一點空間"),
     "Premium_Template_Limit": m29,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage("無限自訂範本"),
     "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("語音備忘錄"),
+    "Premium_Voice_Memos_Description": MessageLookupByLibrary.simpleMessage(
+      "錄下靈感，將錄音與備忘錄保存在一起。",
+    ),
     "Privacy": MessageLookupByLibrary.simpleMessage("私隱"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("私隱政策"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(

@@ -504,28 +504,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   void _showMoreOptions(Note note) {
+    final strings = S.of(context);
     showAppActionSheet(
       context: context,
-      title: S.of(context).More_Options,
+      title: strings.More_Options,
       actions: [
-        if (_compactToolbar) ...[
+        if (_compactToolbar)
           AppSheetAction(
-            leading: const Icon(Icons.alarm_add_outlined),
-            title: Text(S.of(context).Reminder),
-            onPressed: (sheetContext) {
-              Navigator.pop(sheetContext);
-              _showReminderPicker(note);
-            },
-          ),
-          AppSheetAction(
-            leading: const Icon(Icons.share_outlined),
-            title: Text(S.of(context).Share),
-            onPressed: (sheetContext) {
-              Navigator.pop(sheetContext);
-              _shareNoteAsImage(note);
-            },
-          ),
-          AppSheetAction(
+            section: strings.Note_Menu_Editing,
             leading: const Icon(Icons.edit_outlined),
             title: Text(S.of(context).Edit),
             onPressed: (sheetContext) {
@@ -533,10 +519,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
               _editNote(note);
             },
           ),
-        ],
         if (shouldShowNoteOutline(note.description ?? '',
             buildNoteOutline(note.description ?? '', note.textStyles)))
           AppSheetAction(
+            section: strings.Note_Menu_Editing,
             leading: const Icon(Icons.format_list_bulleted_rounded),
             title: Text(S.of(context).Note_Outline),
             onPressed: (sheetContext) {
@@ -545,6 +531,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
             },
           ),
         AppSheetAction(
+          section: strings.Note_Menu_Editing,
           leading: const Icon(Icons.manage_search_rounded),
           title: Text(S.of(context).Find_In_Note),
           onPressed: (sheetContext) {
@@ -552,13 +539,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
             _openFind();
           },
         ),
+        if (_compactToolbar)
+          AppSheetAction(
+            section: strings.Note_Menu_Organization,
+            leading: const Icon(Icons.alarm_add_outlined),
+            title: Text(S.of(context).Reminder),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _showReminderPicker(note);
+            },
+          ),
         AppSheetAction(
-          leading: const Icon(Icons.info_outline_rounded),
-          title: Text(S.of(context).Note_Info),
-          onPressed: (sheetContext) =>
-              _showNoteInfo(note, sheetContext: sheetContext),
-        ),
-        AppSheetAction(
+          section: strings.Note_Menu_Organization,
           leading: Icon(note.isArchived
               ? Icons.unarchive_outlined
               : Icons.archive_outlined),
@@ -571,6 +563,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           },
         ),
         AppSheetAction(
+          section: strings.Note_Menu_Organization,
           leading: const Icon(Icons.sell_outlined),
           title: Text(S.of(context).Edit_Tags),
           onPressed: (sheetContext) {
@@ -579,6 +572,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           },
         ),
         AppSheetAction(
+          section: strings.Note_Menu_Organization,
           leading: const Icon(Icons.link_rounded),
           title: Text(S.of(context).Link_Note),
           onPressed: (sheetContext) {
@@ -587,19 +581,38 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           },
         ),
         AppSheetAction(
-          leading: const Icon(Icons.history_rounded),
-          title: Text(S.of(context).History_Title),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            _showHistory(note);
-          },
-        ),
-        AppSheetAction(
+          section: strings.Note_Menu_Organization,
           leading: const Icon(Icons.bookmarks_outlined),
           title: Text(S.of(context).Save_As_Template),
           onPressed: (sheetContext) {
             Navigator.pop(sheetContext);
             _saveAsTemplate(note);
+          },
+        ),
+        if (_compactToolbar)
+          AppSheetAction(
+            section: strings.Note_Menu_Sharing,
+            leading: const Icon(Icons.share_outlined),
+            title: Text(S.of(context).Share),
+            onPressed: (sheetContext) {
+              Navigator.pop(sheetContext);
+              _shareNoteAsImage(note);
+            },
+          ),
+        AppSheetAction(
+          section: strings.Note_Menu_Details,
+          leading: const Icon(Icons.info_outline_rounded),
+          title: Text(S.of(context).Note_Info),
+          onPressed: (sheetContext) =>
+              _showNoteInfo(note, sheetContext: sheetContext),
+        ),
+        AppSheetAction(
+          section: strings.Note_Menu_Details,
+          leading: const Icon(Icons.history_rounded),
+          title: Text(S.of(context).History_Title),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _showHistory(note);
           },
         ),
         AppSheetAction(
@@ -986,11 +999,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   void _showTrashOptions(Note note) {
+    final strings = S.of(context);
     showAppActionSheet(
       context: context,
-      title: S.of(context).More_Options,
+      title: strings.More_Options,
       actions: [
         AppSheetAction(
+          section: strings.Note_Menu_Organization,
+          leading: const Icon(Icons.restore_outlined),
+          title: Text(S.of(context).Restore),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _restoreNote(note);
+          },
+        ),
+        AppSheetAction(
+          section: strings.Note_Menu_Sharing,
           leading: const Icon(Icons.share_outlined),
           title: Text(S.of(context).Share),
           onPressed: (sheetContext) {
@@ -999,18 +1023,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           },
         ),
         AppSheetAction(
+          section: strings.Note_Menu_Details,
           leading: const Icon(Icons.info_outline_rounded),
           title: Text(S.of(context).Note_Info),
           onPressed: (sheetContext) =>
               _showNoteInfo(note, sheetContext: sheetContext),
-        ),
-        AppSheetAction(
-          leading: const Icon(Icons.restore_outlined),
-          title: Text(S.of(context).Restore),
-          onPressed: (sheetContext) {
-            Navigator.pop(sheetContext);
-            _restoreNote(note);
-          },
         ),
         AppSheetAction(
           destructive: true,

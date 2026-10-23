@@ -369,6 +369,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Editor_Tip_Image_Layout": MessageLookupByLibrary.simpleMessage(
       "点按照片可调整大小，长按可移动位置。",
     ),
+    "Empty_Library_Description": MessageLookupByLibrary.simpleMessage(
+      "写下第一条备忘录，或从模板开始。",
+    ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("清空回收站"),
     "Expand_Section": m11,
     "Export_Notes": MessageLookupByLibrary.simpleMessage("导出笔记"),
@@ -548,13 +551,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "New_Folder": MessageLookupByLibrary.simpleMessage("新建文件夹"),
     "No_Folder": MessageLookupByLibrary.simpleMessage("无文件夹"),
     "No_Folders": MessageLookupByLibrary.simpleMessage("暂无文件夹。创建文件夹来整理备忘录。"),
-    "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
-      "此文件夹暂无备忘录。\n点击 + 添加。",
-    ),
+    "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage("此文件夹还没有备忘录。"),
     "No_Search_Results": MessageLookupByLibrary.simpleMessage("没有匹配的备忘录。"),
-    "No_notes_found": MessageLookupByLibrary.simpleMessage(
-      "目前没有备忘录..\n点击  +  添加",
-    ),
+    "No_notes_found": MessageLookupByLibrary.simpleMessage("从这里记录灵感"),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加备忘录"),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("笔记已封存"),
     "Note_Color": m21,
@@ -591,6 +590,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Note_Info_Recordings": MessageLookupByLibrary.simpleMessage("录音"),
     "Note_Info_Scanned_Pages": MessageLookupByLibrary.simpleMessage("扫描页数"),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("字数"),
+    "Note_Menu_Details": MessageLookupByLibrary.simpleMessage("详情"),
+    "Note_Menu_Editing": MessageLookupByLibrary.simpleMessage("编辑工具"),
+    "Note_Menu_Organization": MessageLookupByLibrary.simpleMessage("整理"),
+    "Note_Menu_Sharing": MessageLookupByLibrary.simpleMessage("分享选项"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("已移动备忘录"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("大纲"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage("当前部分"),
@@ -644,6 +647,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Make_Checklist": MessageLookupByLibrary.simpleMessage("创建待办清单"),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("下一步"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("跳过"),
+    "Onboarding_Start_Failed": MessageLookupByLibrary.simpleMessage(
+      "无法完成设置。请重试。",
+    ),
+    "Onboarding_Starting": MessageLookupByLibrary.simpleMessage("正在准备…"),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage("随时记录"),
     "Onboarding_Title_2": MessageLookupByLibrary.simpleMessage("轻松整理"),
     "Onboarding_Title_3": MessageLookupByLibrary.simpleMessage("不再遗忘"),
@@ -702,6 +709,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_Unsupported": MessageLookupByLibrary.simpleMessage(
       "此设备不支持提取文字。",
     ),
+    "Photo_Unavailable": MessageLookupByLibrary.simpleMessage("照片不可用"),
     "Pin": MessageLookupByLibrary.simpleMessage("置顶"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("纯色纸张"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -709,7 +717,11 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium": MessageLookupByLibrary.simpleMessage("高级版"),
     "Premium_Active": MessageLookupByLibrary.simpleMessage("高级版已解锁"),
+    "Premium_Benefits_Title": MessageLookupByLibrary.simpleMessage("高级版的全部功能"),
     "Premium_Card_Style": MessageLookupByLibrary.simpleMessage("单独设置卡片样式"),
+    "Premium_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
+      "为每条备忘录选择不同的字体、字号和纸张样式。",
+    ),
     "Premium_Description": MessageLookupByLibrary.simpleMessage(
       "全部高级功能已解锁，且无广告。",
     ),
@@ -745,9 +757,27 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium_One_Time_Price": m28,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage("重复提醒"),
+    "Premium_Repeating_Reminders_Description":
+        MessageLookupByLibrary.simpleMessage("用每日和每周提醒，轻松坚持日常安排。"),
+    "Premium_Showcase_Checklist_Item": MessageLookupByLibrary.simpleMessage(
+      "为重要的事留出时间",
+    ),
+    "Premium_Showcase_Checklist_Title": MessageLookupByLibrary.simpleMessage(
+      "今天的小收获",
+    ),
+    "Premium_Showcase_Note_Body": MessageLookupByLibrary.simpleMessage(
+      "为下一个好点子留一点空间。",
+    ),
+    "Premium_Showcase_Note_Title": MessageLookupByLibrary.simpleMessage(
+      "一点小灵感",
+    ),
+    "Premium_Showcase_Title": MessageLookupByLibrary.simpleMessage("为灵感留一点空间"),
     "Premium_Template_Limit": m29,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage("无限自定义模板"),
     "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("语音备忘录"),
+    "Premium_Voice_Memos_Description": MessageLookupByLibrary.simpleMessage(
+      "录下灵感，将录音与备忘录保存在一起。",
+    ),
     "Privacy": MessageLookupByLibrary.simpleMessage("隐私"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("隐私政策"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(

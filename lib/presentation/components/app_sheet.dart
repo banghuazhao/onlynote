@@ -95,6 +95,7 @@ class AppSheetAction {
     this.subtitle,
     this.destructive = false,
     this.selected = false,
+    this.section,
   });
   final Widget title;
   final Widget? leading;
@@ -102,6 +103,10 @@ class AppSheetAction {
   final void Function(BuildContext) onPressed;
   final bool destructive;
   final bool selected;
+
+  /// Consecutive actions with the same label share one section heading.
+  /// Omit it to retain the ordinary, ungrouped action-sheet layout.
+  final String? section;
 }
 
 Future<void> showAppActionSheet({
@@ -111,15 +116,50 @@ Future<void> showAppActionSheet({
 }) async {
   await showAppSheet<void>(
     context: context,
-    builder: (context) => AppSheet(
+    builder: (context) => AppActionSheet(title: title, actions: actions),
+  );
+}
+
+/// Shared action content, also usable with local callbacks in widget previews.
+class AppActionSheet extends StatelessWidget {
+  const AppActionSheet({super.key, required this.title, required this.actions});
+
+  final String title;
+  final List<AppSheetAction> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final sections = actions.map((action) {
+      final label = action.section?.trim();
+      return label == null || label.isEmpty ? null : label;
+    }).toList(growable: false);
+    return AppSheet(
       title: title,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final (index, action) in actions.indexed) ...[
-            if (action.destructive && index > 0)
+            if (index > 0 &&
+                (action.destructive ||
+                    (sections[index] != null &&
+                        sections[index] != sections[index - 1])))
               const Divider(indent: 12, endIndent: 12, height: 16),
+            if (sections[index] != null &&
+                (index == 0 || sections[index] != sections[index - 1]))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                child: Semantics(
+                  header: true,
+                  child: Text(
+                    sections[index]!,
+                    key: ValueKey('app-sheet-section-$index'),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ),
+              ),
             Builder(builder: (context) {
               final colors = Theme.of(context).colorScheme;
               final foreground =
@@ -150,6 +190,6 @@ Future<void> showAppActionSheet({
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }

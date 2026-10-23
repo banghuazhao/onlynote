@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_search_filters.dart';
+import 'package:onlynote/presentation/components/empty_note_library.dart';
 import 'package:onlynote/presentation/components/folder_name_search.dart';
 import 'package:onlynote/presentation/components/note_search_feedback.dart';
 import 'package:onlynote/presentation/components/search_highlight.dart';
@@ -1570,6 +1571,12 @@ class _EmptyNotes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = S.of(context);
+    if (!showTrash && !showArchive && !hasSearch && !hasTags && !hasFolder) {
+      return EmptyNoteLibrary(
+          onAdd: onAdd,
+          onTemplates: onTemplates,
+          criteriaSummary: criteriaSummary);
+    }
     final message = hasSearch || hasTags
         ? l10n.No_Search_Results
         : showTrash

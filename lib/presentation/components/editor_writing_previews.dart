@@ -19,6 +19,29 @@ Widget editorWritingLightPreview() => const _WritingPreviewApp();
 Widget editorWritingDarkPreview() => const _WritingPreviewApp(dark: true);
 
 @Preview(
+    name: 'Writing tools — blocked', group: 'Writing', size: Size(320, 740))
+Widget editorWritingBlockedPreview({ThemeData? theme}) =>
+    _WritingPreviewApp(blocked: true, theme: theme);
+
+@Preview(
+    name: 'Writing tools — blocked dark',
+    group: 'Writing',
+    size: Size(320, 740))
+Widget editorWritingBlockedDarkPreview({ThemeData? theme}) =>
+    _WritingPreviewApp(dark: true, blocked: true, theme: theme);
+
+@Preview(
+    name: 'Writing tools — blocked Chinese 2×',
+    group: 'Writing',
+    size: Size(280, 700))
+Widget editorWritingBlockedChinesePreview({ThemeData? theme}) =>
+    _WritingPreviewApp(
+        locale: const Locale('zh', 'HK'),
+        textScale: 2,
+        blocked: true,
+        theme: theme);
+
+@Preview(
     name: 'Writing tools — large Chinese',
     group: 'Writing',
     size: Size(320, 740))
@@ -55,6 +78,8 @@ class _WritingPreviewApp extends StatelessWidget {
     this.textScale = 1,
     this.insertOnly = false,
     this.imageTipOnly = false,
+    this.blocked = false,
+    this.theme,
   });
 
   final bool dark;
@@ -62,11 +87,13 @@ class _WritingPreviewApp extends StatelessWidget {
   final double textScale;
   final bool insertOnly;
   final bool imageTipOnly;
+  final bool blocked;
+  final ThemeData? theme;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: dark ? AppTheme.dark : AppTheme.light,
+        theme: theme ?? (dark ? AppTheme.dark : AppTheme.light),
         locale: locale,
         localizationsDelegates: const [
           S.delegate,
@@ -91,6 +118,7 @@ class _WritingPreviewApp extends StatelessWidget {
             : _WritingPreview(
                 imageTipOnly: imageTipOnly,
                 chinese: locale.languageCode == 'zh',
+                blocked: blocked,
               ),
       );
 }
@@ -98,9 +126,11 @@ class _WritingPreviewApp extends StatelessWidget {
 /// Uses only in-memory text and UI components. The preview never records,
 /// picks photos, persists tips or invokes a platform keyboard API.
 class _WritingPreview extends StatefulWidget {
-  const _WritingPreview({this.imageTipOnly = false, this.chinese = false});
+  const _WritingPreview(
+      {this.imageTipOnly = false, this.chinese = false, this.blocked = false});
   final bool imageTipOnly;
   final bool chinese;
+  final bool blocked;
 
   @override
   State<_WritingPreview> createState() => _WritingPreviewState();
@@ -225,6 +255,7 @@ class _WritingPreviewState extends State<_WritingPreview> {
         ],
       ),
       bottomNavigationBar: NoteWritingToolbar(
+        enabled: !widget.blocked,
         controller: body,
         focusNode: bodyFocus,
         tip: showTip ? strings.Editor_Tip_Formatting : null,

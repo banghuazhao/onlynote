@@ -463,6 +463,18 @@ void main() {
     expect(find.text(S.current.Share), findsOneWidget);
     expect(find.text(S.current.Note_Info), findsOneWidget);
     expect(find.text(S.current.Edit), findsOneWidget);
+    for (final label in [
+      S.current.Note_Menu_Editing,
+      S.current.Note_Menu_Organization,
+      S.current.Note_Menu_Sharing,
+      S.current.Note_Menu_Details,
+    ]) {
+      expect(find.text(label), findsOneWidget);
+    }
+    expect(tester.getTopLeft(find.text(S.current.Edit)).dy,
+        lessThan(tester.getTopLeft(find.text(S.current.Reminder)).dy));
+    expect(tester.getTopLeft(find.text(S.current.Share)).dy,
+        lessThan(tester.getTopLeft(find.text(S.current.Note_Info)).dy));
     await tester.ensureVisible(find.text(S.current.Edit));
     await tester.tap(find.text(S.current.Edit));
     await tester.pumpAndSettle();

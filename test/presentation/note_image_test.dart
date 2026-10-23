@@ -6,26 +6,37 @@ import 'package:onlynote/presentation/components/note_image.dart';
 void main() {
   testWidgets('a missing image file renders a placeholder, not a crash',
       (tester) async {
-    // Image.file reports a missing file through real async file I/O, which
-    // only runs outside the fake-async test zone.
-    await tester.runAsync(() async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: NoteImage(
-              path: 'note_images/does-not-exist.jpg',
-              width: 64,
-              height: 52,
+    final semantics = tester.ensureSemantics();
+    try {
+      // Image.file reports a missing file through real async file I/O, which
+      // only runs outside the fake-async test zone.
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: NoteImage(
+                path: 'note_images/does-not-exist.jpg',
+                width: 64,
+                height: 52,
+                semanticLabel: 'Holiday album',
+              ),
             ),
           ),
-        ),
-      );
-      await Future<void>.delayed(const Duration(milliseconds: 100));
-    });
-    await tester.pump();
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      });
+      await tester.pump();
 
-    expect(tester.takeException(), isNull);
-    expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
+      expect(find.bySemanticsLabel('Photo unavailable. Holiday album'),
+          findsOneWidget);
+      expect(
+          find.byTooltip('Photo unavailable. Holiday album'), findsOneWidget);
+      expect(tester.getSize(find.byType(NoteImage)), const Size(64, 52));
+    } finally {
+      semantics.dispose();
+    }
   });
 
   test('note timestamps pad the minutes', () {

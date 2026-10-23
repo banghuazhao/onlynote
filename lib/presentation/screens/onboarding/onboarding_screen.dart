@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:onlynote/Tools/onboarding_settings.dart';
-import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/routes/routes.dart';
 import 'package:onlynote/presentation/screens/add_update_note/add_update_note_screen.dart';
-import 'package:onlynote/presentation/theme/spacing.dart';
+
+import 'onboarding_content.dart';
 
 @RoutePage(name: 'OnboardingRoute')
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  const OnboardingScreen({super.key, this.completeOnboarding});
+
+  /// Allows isolated interaction tests without writing platform preferences.
+  final Future<void> Function()? completeOnboarding;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -15,12 +18,35 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _starting = false;
+  bool _failed = false;
+  NoteEditorStart? _retryStart;
 
   Future<void> _finish({NoteEditorStart? start}) async {
-    if (_starting) return;
-    setState(() => _starting = true);
-    await OnboardingSettings.instance.complete();
+    if (!mounted || _starting || ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    setState(() {
+      _starting = true;
+      _failed = false;
+      _retryStart = start;
+    });
+    try {
+      await (widget.completeOnboarding?.call() ??
+          OnboardingSettings.instance.complete());
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _starting = false;
+          _failed = true;
+        });
+      }
+      return;
+    }
     if (!mounted) return;
+    if (ModalRoute.of(context)?.isCurrent == false) {
+      setState(() => _starting = false);
+      return;
+    }
 
     if (start == null) {
       context.router.replace(const HomeRoute());
@@ -34,93 +60,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = S.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Padding(
-              padding: EdgeInsets.all(context.tokens.space5),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _starting ? null : () => _finish(),
-                      child: Text(l10n.Onboarding_Skip),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: colorScheme.primaryContainer,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.edit_note_rounded,
-                                size: 56,
-                                color: colorScheme.onPrimaryContainer,
-                              ),
-                            ),
-                            SizedBox(height: context.tokens.space5),
-                            Text(
-                              l10n.Onboarding_Title_1,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                            SizedBox(height: context.tokens.space3),
-                            Text(
-                              l10n.Onboarding_Body_1,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: colorScheme.onSurfaceVariant),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: _starting
-                          ? null
-                          : () => _finish(start: NoteEditorStart.quickNote),
-                      icon: const Icon(Icons.edit_outlined),
-                      label: Text(l10n.Onboarding_Write_Note),
-                    ),
-                  ),
-                  SizedBox(height: context.tokens.space2),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _starting
-                          ? null
-                          : () => _finish(start: NoteEditorStart.checklist),
-                      icon: const Icon(Icons.checklist_rounded),
-                      label: Text(l10n.Onboarding_Make_Checklist),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => OnboardingContent(
+        starting: _starting,
+        failed: _failed,
+        onSkip: () => _finish(),
+        onWriteNote: () => _finish(start: NoteEditorStart.quickNote),
+        onMakeChecklist: () => _finish(start: NoteEditorStart.checklist),
+        onRetry: () => _finish(start: _retryStart),
+      );
 }

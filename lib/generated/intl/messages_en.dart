@@ -471,6 +471,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Editor_Tip_Image_Layout": MessageLookupByLibrary.simpleMessage(
       "Tap a photo to resize it. Press and hold to move it.",
     ),
+    "Empty_Library_Description": MessageLookupByLibrary.simpleMessage(
+      "Write your first note or start with a template.",
+    ),
     "Empty_Trash": MessageLookupByLibrary.simpleMessage("Empty Trash"),
     "Expand_Section": m11,
     "Export_Notes": MessageLookupByLibrary.simpleMessage("Export notes"),
@@ -703,13 +706,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "No folders yet. Create one to organize your notes.",
     ),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage(
-      "No notes in this folder yet.\nTap + to add one.",
+      "No notes in this folder yet.",
     ),
     "No_Search_Results": MessageLookupByLibrary.simpleMessage(
       "No notes match your search.",
     ),
     "No_notes_found": MessageLookupByLibrary.simpleMessage(
-      "No notes found..\nclick  +  to add new one.",
+      "Your ideas start here",
     ),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage(
       "Note Added Successfully",
@@ -759,6 +762,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Scanned pages",
     ),
     "Note_Info_Words": MessageLookupByLibrary.simpleMessage("Words"),
+    "Note_Menu_Details": MessageLookupByLibrary.simpleMessage("Details"),
+    "Note_Menu_Editing": MessageLookupByLibrary.simpleMessage("Editing"),
+    "Note_Menu_Organization": MessageLookupByLibrary.simpleMessage(
+      "Organization",
+    ),
+    "Note_Menu_Sharing": MessageLookupByLibrary.simpleMessage("Sharing"),
     "Note_Moved": MessageLookupByLibrary.simpleMessage("Note moved"),
     "Note_Outline": MessageLookupByLibrary.simpleMessage("Outline"),
     "Note_Outline_Current": MessageLookupByLibrary.simpleMessage(
@@ -834,6 +843,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Onboarding_Next": MessageLookupByLibrary.simpleMessage("Next"),
     "Onboarding_Skip": MessageLookupByLibrary.simpleMessage("Skip"),
+    "Onboarding_Start_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not finish setup. Please try again.",
+    ),
+    "Onboarding_Starting": MessageLookupByLibrary.simpleMessage(
+      "Getting ready…",
+    ),
     "Onboarding_Title_1": MessageLookupByLibrary.simpleMessage(
       "Capture anything",
     ),
@@ -910,6 +925,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_Unsupported": MessageLookupByLibrary.simpleMessage(
       "Text extraction is not available on this device.",
     ),
+    "Photo_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "Photo unavailable",
+    ),
     "Pin": MessageLookupByLibrary.simpleMessage("Pin"),
     "Plain_Paper": MessageLookupByLibrary.simpleMessage("Plain paper"),
     "Plain_Paper_Description": MessageLookupByLibrary.simpleMessage(
@@ -917,8 +935,14 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "Premium": MessageLookupByLibrary.simpleMessage("Premium"),
     "Premium_Active": MessageLookupByLibrary.simpleMessage("Premium unlocked"),
+    "Premium_Benefits_Title": MessageLookupByLibrary.simpleMessage(
+      "Everything in Premium",
+    ),
     "Premium_Card_Style": MessageLookupByLibrary.simpleMessage(
       "Individual card styles",
+    ),
+    "Premium_Card_Style_Description": MessageLookupByLibrary.simpleMessage(
+      "Choose a different font, size, and paper style for each note.",
     ),
     "Premium_Description": MessageLookupByLibrary.simpleMessage(
       "All Premium features are unlocked, with no ads.",
@@ -961,11 +985,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage(
       "Repeating reminders",
     ),
+    "Premium_Repeating_Reminders_Description":
+        MessageLookupByLibrary.simpleMessage(
+          "Keep routines on track with daily and weekly reminders.",
+        ),
+    "Premium_Showcase_Checklist_Item": MessageLookupByLibrary.simpleMessage(
+      "Make time for what matters",
+    ),
+    "Premium_Showcase_Checklist_Title": MessageLookupByLibrary.simpleMessage(
+      "Today’s little wins",
+    ),
+    "Premium_Showcase_Note_Body": MessageLookupByLibrary.simpleMessage(
+      "Leave space for the next good idea.",
+    ),
+    "Premium_Showcase_Note_Title": MessageLookupByLibrary.simpleMessage(
+      "A little inspiration",
+    ),
+    "Premium_Showcase_Title": MessageLookupByLibrary.simpleMessage(
+      "Make room for your ideas",
+    ),
     "Premium_Template_Limit": m29,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage(
       "Unlimited saved templates",
     ),
     "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("Voice memos"),
+    "Premium_Voice_Memos_Description": MessageLookupByLibrary.simpleMessage(
+      "Record ideas and keep audio with your notes.",
+    ),
     "Privacy": MessageLookupByLibrary.simpleMessage("Privacy"),
     "Privacy_Policy": MessageLookupByLibrary.simpleMessage("Privacy Policy"),
     "Privacy_Policy_Failed": MessageLookupByLibrary.simpleMessage(
