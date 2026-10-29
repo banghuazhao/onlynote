@@ -1,4 +1,4 @@
-- Vind notities sneller met mapnamen, gemarkeerde overeenkomsten en aantallen zoekresultaten.
-- Kopieer transcripties van opnamen en bekijk een duidelijkere back-upstatus en exportinstructies.
-- Ontdek duidelijkere notitiemenu’s, een verbeterde introductie en een vernieuwd notitieoverzicht.
-- Verbeterde indeling bij grote tekst en toetsenbordgebruik, betere fotobewerking en betrouwbaarder opslaan.
+- Breng je dagelijkse notitie, herinneringen en openstaande taken samen in Today, met zoeken en Undo.
+- Link rechtstreeks naar koppen en structureer langere notities met scheidingslijnen.
+- Importeer Markdown-bestanden en ZIP-archieven met voorvertoning en lokale afbeeldingen.
+- Gebruik Siri en Shortcuts om tekst toe te voegen aan een notitie, Today of Inbox.

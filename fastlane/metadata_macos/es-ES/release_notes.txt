@@ -1,4 +1,4 @@
-- Encuentra notas más rápido con nombres de carpetas, coincidencias resaltadas y recuentos de resultados.
-- Copia transcripciones de grabaciones y consulta con más claridad el estado de las copias de seguridad y cómo exportar.
-- Disfruta de menús más claros, una mejor experiencia inicial y una biblioteca renovada.
-- Mejoras en los diseños con texto grande y teclado, la edición de fotos y la fiabilidad al guardar.
+- Reúne tu nota diaria, recordatorios y tareas pendientes en Today, con búsqueda y Undo.
+- Enlaza directamente a encabezados y organiza notas largas con separadores.
+- Importa archivos Markdown y archivos comprimidos ZIP con vistas previas e imágenes locales.
+- Usa Siri y Shortcuts para añadir texto a una nota, a Today o a Inbox.

@@ -1,0 +1,4 @@
+- Retrouvez votre note du jour, vos rappels et tâches inachevées dans Today, avec recherche et Undo.
+- Créez des liens directs vers les titres et structurez les longues notes avec des séparateurs.
+- Importez des fichiers Markdown et des archives ZIP avec aperçu et images locales.
+- Profitez d'un enregistrement, d'une récupération et d'une restauration des sauvegardes plus fiables.

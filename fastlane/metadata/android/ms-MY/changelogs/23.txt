@@ -1,0 +1,4 @@
+- Satukan nota harian, peringatan dan tugasan belum selesai dalam Today, dengan carian dan Undo.
+- Pautkan terus ke tajuk bahagian dan susun nota panjang dengan garis pemisah.
+- Import fail Markdown dan arkib ZIP dengan pratonton serta imej setempat.
+- Nikmati penyimpanan, pemulihan nota dan pemulihan sandaran yang lebih stabil.

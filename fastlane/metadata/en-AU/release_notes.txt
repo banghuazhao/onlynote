@@ -1,4 +1,4 @@
-- Find notes faster with folder labels, highlighted matches and search result counts.
-- Copy recording transcripts and see clearer backup status and export guidance.
-- Enjoy clearer note menus, improved onboarding and a refreshed library.
-- Improved large-text and keyboard layouts, photo editing and save reliability.
+- Keep your daily note, reminders and unfinished tasks together in Today, with search and Undo.
+- Link directly to headings and organize longer notes with dividers.
+- Import Markdown files and ZIP archives with previews and local images.
+- Use Siri and Shortcuts to append text to a note, Today or Inbox.

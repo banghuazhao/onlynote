@@ -1,0 +1,4 @@
+- Samla dagens anteckning, påminnelser och oavslutade uppgifter i Today, med sökning och Undo.
+- Länka direkt till rubriker och ordna längre anteckningar med avdelare.
+- Importera Markdown-filer och ZIP-arkiv med förhandsvisning och lokala bilder.
+- Tillförlitligare sparande, återställning och återläsning av säkerhetskopior.

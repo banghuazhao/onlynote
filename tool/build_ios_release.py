@@ -145,6 +145,9 @@ def run_xcode(stage: str, arguments: list[str], secrets: tuple[str, ...], log) -
         stderr=subprocess.STDOUT,
         text=True,
         errors="replace",
+        # Distribution payloads must remain readable to installed-app users,
+        # even when a credential-safe caller uses a private parent umask.
+        umask=0o022,
     )
     assert process.stdout is not None
     for line in process.stdout:

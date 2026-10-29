@@ -1,0 +1,4 @@
+- Behalte Tagesnotiz, Erinnerungen und offene Aufgaben in Today im Blick, mit Suche und Undo.
+- Verlinke direkt auf Überschriften und gliedere längere Notizen mit Trennlinien.
+- Importiere Markdown-Dateien und ZIP-Archive mit Vorschau und lokalen Bildern.
+- Zuverlässigeres Speichern, Wiederherstellen und Einspielen von Backups.

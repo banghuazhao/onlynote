@@ -1,4 +1,4 @@
-- Find noter hurtigere med mappenavne, fremhævede søgetræffere og antal søgeresultater.
-- Kopiér transskriptioner af optagelser, og få tydeligere backupstatus og eksportvejledning.
-- Nyd tydeligere notemenuer, en bedre introduktion og en opdateret noteoversigt.
-- Bedre layout ved stor tekst og brug af tastatur samt bedre fotoredigering og mere pålidelig lagring.
+- Hold din daglige note, påmindelser og ufærdige opgaver samlet i Today med søgning og Undo.
+- Link direkte til overskrifter, og organiser længere noter med skillelinjer.
+- Importer Markdown-filer og ZIP-arkiver med forhåndsvisning og lokale billeder.
+- Brug Siri og Shortcuts til at føje tekst til en note, Today eller Inbox.

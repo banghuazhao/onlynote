@@ -1,0 +1,4 @@
+- Kumpulkan catatan harian, pengingat, dan tugas yang belum selesai di Today, dengan pencarian dan Undo.
+- Tautkan langsung ke judul bagian dan atur catatan panjang dengan pemisah.
+- Impor file Markdown dan arsip ZIP dengan pratinjau serta gambar lokal.
+- Nikmati penyimpanan, pemulihan catatan, dan pemulihan cadangan yang lebih andal.

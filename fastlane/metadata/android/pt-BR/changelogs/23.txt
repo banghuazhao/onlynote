@@ -1,0 +1,4 @@
+- Reúna sua nota diária, lembretes e tarefas pendentes no Today, com busca e Undo.
+- Crie links diretos para títulos e organize notas longas com divisórias.
+- Importe arquivos Markdown e ZIP com prévias e imagens locais.
+- Aproveite o salvamento, a recuperação e a restauração de backups mais confiáveis.

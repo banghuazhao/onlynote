@@ -1,0 +1,4 @@
+- Keep your daily note, reminders and unfinished tasks together in Today, with search and Undo.
+- Link directly to headings and organize longer notes with dividers.
+- Import Markdown files and ZIP archives with previews and local images.
+- Enjoy more reliable saving, recovery and backup restore.

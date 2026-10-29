@@ -1,0 +1,4 @@
+- Saml dagens note, påmindelser og ufærdige opgaver i Today med søgning og Undo.
+- Link direkte til overskrifter, og organiser lange noter med skillelinjer.
+- Importer Markdown-filer og ZIP-arkiver med forhåndsvisning og lokale billeder.
+- Mere pålidelig lagring, gendannelse og gendannelse fra sikkerhedskopier.

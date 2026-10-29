@@ -1,0 +1,4 @@
+- Houd je dagnotitie, herinneringen en onafgeronde taken samen in Today, met een zoekfunctie en Undo.
+- Link rechtstreeks naar koppen en orden langere notities met scheidingslijnen.
+- Importeer Markdown-bestanden en ZIP-archieven met voorbeelden en lokale afbeeldingen.
+- Betrouwbaarder opslaan, herstellen en terugzetten van back-ups.

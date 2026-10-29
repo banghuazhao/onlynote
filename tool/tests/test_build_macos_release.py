@@ -124,6 +124,7 @@ class MacReleaseTest(unittest.TestCase):
         output = self.root / "output"
         exported = output / "export"
         exported.mkdir(parents=True)
+        (output / "Onlynote.xcarchive/Products/Applications/Onlynote.app").mkdir(parents=True)
         (exported / "Onlynote.pkg").touch()
         with patch.object(release, "REPO", self.root), patch.object(release, "credentials") as credentials, \
                 patch.object(release, "signing_secrets", return_value=()), \

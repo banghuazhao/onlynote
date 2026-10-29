@@ -1,4 +1,4 @@
-- Hitta anteckningar snabbare med mappnamn, markerade träffar och antal sökresultat.
-- Kopiera transkriptioner av inspelningar och få tydligare status för säkerhetskopior och hjälp med export.
-- Tydligare anteckningsmenyer, en bättre introduktion och en uppdaterad anteckningsvy.
-- Bättre layout för stor text och tangentbord samt bättre fotoredigering och mer tillförlitlig lagring.
+- Samla din dagliga anteckning, påminnelser och oavslutade uppgifter i Today, med sökning och Undo.
+- Länka direkt till rubriker och strukturera längre anteckningar med avdelare.
+- Importera Markdown-filer och ZIP-arkiv med förhandsvisning och lokala bilder.
+- Använd Siri och Shortcuts för att lägga till text i en anteckning, Today eller Inbox.

@@ -68,6 +68,87 @@ void main() {
   });
   tearDown(() => kAppFontFamilies.addAll(fonts));
 
+  testWidgets(
+      'reader and Find avoid either side inset while resizing preserves search',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    void resize(Size size, {double left = 0, double right = 0}) {
+      tester.view.physicalSize = size;
+      final padding = FakeViewPadding(left: left, right: right, bottom: 34);
+      tester.view.viewPadding = padding;
+      tester.view.padding = padding;
+    }
+
+    resize(const Size(402, 874), right: 64);
+    final note = Note(
+        id: 'note',
+        title: 'Tea note',
+        description: 'Tea note body and more tea',
+        dateTime: DateTime(2026, 10, 6));
+    final repository = _Notes(NoteDto.fromNote(note));
+    final detail = NoteDetailBloc(
+        GetNoteUsecase(repository), UpdateNoteUsecase(repository));
+    final router = _Router();
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+      await detail.close();
+    });
+    await tester.pumpWidget(BlocProvider.value(
+        value: detail,
+        child: MaterialApp.router(
+          routerConfig: router.config(),
+          theme: AppTheme.light,
+          localizationsDelegates: const [
+            S.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate
+          ],
+          supportedLocales: S.delegate.supportedLocales,
+        )));
+    await tester.pumpAndSettle();
+    final screenState = tester.state(find.byType(NoteDetailScreen));
+    expect(DesktopCommands.instance.invoke(DesktopCommand.findInNote), isTrue);
+    await tester.pumpAndSettle();
+    final query = find.byKey(const ValueKey('note-find-query'));
+    await tester.tap(query);
+    await tester.enterText(query, 'tea');
+    await tester.pumpAndSettle();
+    final focus = tester.widget<TextField>(query).focusNode;
+    expect(focus!.hasFocus, isTrue, reason: 'Find is focused before resizing');
+
+    for (final (size, left, right) in [
+      (const Size(402, 874), 0.0, 64.0),
+      (const Size(960, 720), 12.0, 76.0),
+      (const Size(720, 960), 76.0, 12.0),
+      (const Size(402, 874), 64.0, 0.0),
+    ]) {
+      resize(size, left: left, right: right);
+      await tester.pumpAndSettle();
+      final reader = find.descendant(
+          of: find.byType(LoadedView), matching: find.byType(ListView));
+      for (final target in [reader, query]) {
+        final rect = tester.getRect(target);
+        expect(rect.left, greaterThanOrEqualTo(left));
+        expect(rect.right, lessThanOrEqualTo(size.width - right));
+        expect(rect.bottom, lessThanOrEqualTo(size.height - 34));
+      }
+      final field = tester.widget<TextField>(query);
+      expect(field.controller!.text, 'tea');
+      expect(field.focusNode, same(focus));
+      expect(field.focusNode!.hasFocus, isTrue,
+          reason: 'Find retains focus at $size with insets $left/$right');
+      expect(tester.state(find.byType(NoteDetailScreen)), same(screenState));
+      expect(find.text('1 / 3'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+    expect(repository.writes, 0);
+    expect(tester.widget<LoadedView>(find.byType(LoadedView)).note.description,
+        note.description);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
+
   for (final (name, size) in [
     ('narrow', const Size(280, 360)),
     ('landscape', const Size(640, 300)),

@@ -1,0 +1,4 @@
+- Kokoa päivän muistiinpano, muistutukset ja keskeneräiset tehtävät Today-näkymään. Mukana haku ja Undo.
+- Linkitä suoraan otsikoihin ja jäsennä pidempiä muistiinpanoja jakoviivoilla.
+- Tuo Markdown-tiedostoja ja ZIP-arkistoja esikatseluineen ja paikallisine kuvineen.
+- Luotettavampi tallennus sekä muistiinpanojen ja varmuuskopioiden palautus.

@@ -1,4 +1,4 @@
-- Notizen schneller finden: Ordnernamen, hervorgehobene Treffer und Anzahl der Suchergebnisse.
-- Aufnahmetranskripte kopieren, den Backup-Status klarer erkennen und verständlichere Exporthinweise erhalten.
-- Klarere Notizmenüs, ein verbesserter Einstieg und eine überarbeitete Notizübersicht.
-- Bessere Layouts bei großer Schrift und Tastaturnutzung sowie bessere Fotobearbeitung und zuverlässigeres Speichern.
+- Behalte deine tägliche Notiz, Erinnerungen und offenen Aufgaben in Today im Blick – mit Suche und Undo.
+- Verlinke direkt auf Überschriften und gliedere längere Notizen mit Trennlinien.
+- Importiere Markdown-Dateien und ZIP-Archive mit Vorschau und lokalen Bildern.
+- Nutze Siri und Shortcuts, um Text an eine Notiz, Today oder Inbox anzuhängen.

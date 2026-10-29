@@ -1,0 +1,4 @@
+- Reúne tu nota diaria, recordatorios y tareas pendientes en Today, con búsqueda y Undo.
+- Enlaza directamente a encabezados y organiza notas largas con separadores.
+- Importa archivos Markdown y ZIP con vistas previas e imágenes locales.
+- Disfruta de mayor fiabilidad al guardar, recuperar y restaurar copias de seguridad.

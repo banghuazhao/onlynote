@@ -24,6 +24,7 @@ import fnmatch
 from pathlib import Path
 import plistlib
 import re
+import stat
 import subprocess
 import sys
 import tempfile
@@ -209,6 +210,35 @@ def inspect_bundle(app: Path, version: str, build: str, *, distribution: bool) -
               f"store profile={'verified' if has_profile else 'not required for current Mac entitlements'}.", flush=True)
 
 
+def bundle_permission_entries(app: Path):
+    if app.is_symlink() or not app.is_dir() or app.suffix != ".app":
+        raise BuildError("Expected a built application bundle for permission repair.")
+    for path in (app, *app.rglob("*")):
+        if not path.is_symlink():
+            yield path, path.stat()
+
+
+def normalize_bundle_permissions(app: Path) -> int:
+    """Repair only the archived app payload; export signs it again afterward."""
+    changed = 0
+    for path, metadata in bundle_permission_entries(app):
+        mode = stat.S_IMODE(metadata.st_mode)
+        readable = mode | 0o444
+        if stat.S_ISDIR(metadata.st_mode) or mode & 0o111:
+            readable |= 0o111
+        if readable != mode:
+            path.chmod(readable)
+            changed += 1
+    return changed
+
+
+def require_readable_bundle(app: Path) -> None:
+    for _, metadata in bundle_permission_entries(app):
+        mode = stat.S_IMODE(metadata.st_mode)
+        if mode & 0o444 != 0o444 or (stat.S_ISDIR(metadata.st_mode) and mode & 0o111 != 0o111):
+            raise BuildError("Exported app contains files unreadable by non-root users (Apple 90255).")
+
+
 def inspect_package(path: Path, version: str, build: str) -> None:
     signed = command(["pkgutil", "--check-signature", str(path)])
     signature = (signed.stdout + signed.stderr).decode(errors="replace")
@@ -220,6 +250,7 @@ def inspect_package(path: Path, version: str, build: str) -> None:
         candidates = [candidate for candidate in expanded.rglob("Onlynote.app") if candidate.is_dir()]
         if len(candidates) != 1:
             raise BuildError("Exported package must contain exactly one Onlynote application.")
+        require_readable_bundle(candidates[0])
         inspect_bundle(candidates[0], version, build, distribution=True)
     print(f"Package: {path}\nSize: {path.stat().st_size / 1024 / 1024:.1f} MiB\n"
           "Mac App Store installer signature verified. No upload was performed.", flush=True)
@@ -230,6 +261,7 @@ def flutter_config(version: str, build: str, secrets: tuple[str, ...], log) -> N
     result = subprocess.run(
         ["flutter", "build", "macos", "--release", "--config-only", f"--build-name={version}", f"--build-number={build}"],
         cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="replace",
+        umask=0o022,
     )
     log.write(redact(result.stdout, secrets))
     log.flush()
@@ -296,6 +328,9 @@ def main(argv: list[str] | None = None) -> int:
                 ], secrets, log):
                     return 1
             inspect_bundle(archive / "Products/Applications/Onlynote.app", version, build, distribution=False)
+            repaired = normalize_bundle_permissions(archive / "Products/Applications/Onlynote.app")
+            if repaired:
+                print(f"Restored readable permissions on {repaired} archived app entries before export.", flush=True)
             if args.manual_export:
                 options_path = installed_manual_export_options(options, output)
             if not run_xcode("Mac export", [

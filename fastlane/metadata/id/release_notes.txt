@@ -1,4 +1,4 @@
-- Temukan catatan lebih cepat dengan nama folder, sorotan hasil pencarian, dan jumlah hasil.
-- Salin transkrip rekaman serta lihat status cadangan dan panduan ekspor yang lebih jelas.
-- Nikmati menu catatan yang lebih jelas, panduan awal yang lebih baik, dan daftar catatan yang diperbarui.
-- Tampilan teks besar dan saat memakai papan ketik, pengeditan foto, dan keandalan penyimpanan kini lebih baik.
+- Satukan catatan harian, pengingat, dan tugas yang belum selesai di Today, dengan pencarian dan Undo.
+- Tautkan langsung ke judul bagian dan rapikan catatan panjang dengan pemisah.
+- Impor file Markdown dan arsip ZIP dengan pratinjau serta gambar lokal.
+- Gunakan Siri dan Shortcuts untuk menambahkan teks ke catatan, Today, atau Inbox.

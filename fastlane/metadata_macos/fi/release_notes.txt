@@ -1,4 +1,4 @@
-- Löydä muistiinpanot nopeammin kansioiden nimien, korostettujen osumien ja hakutulosmäärien avulla.
-- Kopioi tallenteiden litteroinnit ja näe selkeämmät varmuuskopioinnin tilatiedot ja vientiohjeet.
-- Selkeämmät muistiinpanovalikot, parannettu käyttöönotto ja uudistettu muistiinpanoluettelo.
-- Suuren tekstin ja näppäimistön asetteluja, kuvien muokkausta ja tallennuksen luotettavuutta on parannettu.
+- Kokoa päivän muistiinpano, muistutukset ja keskeneräiset tehtävät Today-näkymään, jossa on haku ja Undo.
+- Linkitä suoraan otsikoihin ja jäsennä pitkiä muistiinpanoja erottimilla.
+- Esikatsele ja tuo Markdown-tiedostoja ja ZIP-arkistoja paikallisine kuvineen.
+- Lisää Siri- ja Shortcuts-toiminnoilla tekstiä muistiinpanoon, Today-näkymään tai Inbox-kansioon.
