@@ -286,6 +286,7 @@ class _BackupScreenState extends State<BackupScreen> {
   /// photos are all that is ever in memory at once.
   Future<Uint8List> _notePdf(
       Note note, String? reminder, List<ByteData> fonts) async {
+    final sectionLinksLabel = S.of(context).Section_Links;
     final paths = <String>[];
     final photos = <Uint8List>[];
     for (final stored in note.imagePaths) {
@@ -295,7 +296,7 @@ class _BackupScreenState extends State<BackupScreen> {
       photos.add(await file.readAsBytes());
     }
     final glyphImages = await renderMissingPdfGlyphs(
-        '${NoteExport.plainText(note, reminder: reminder)}\n${note.dateWithTime}',
+        '${NoteExport.plainText(note, reminder: reminder, sectionLinksLabel: sectionLinksLabel)}\n${note.dateWithTime}',
         fonts);
     final glyphs = <String, Uint8List>{};
     try {
@@ -313,6 +314,8 @@ class _BackupScreenState extends State<BackupScreen> {
         buildNotePdf,
         NotePdfData(
           title: note.title ?? '',
+          sectionLinkTitles: NoteExport.sectionLinkTitles(note),
+          sectionLinksLabel: sectionLinksLabel,
           description: note.description ?? '',
           textStyles: note.textStyles,
           imagePaths: paths,
@@ -365,6 +368,7 @@ class _BackupScreenState extends State<BackupScreen> {
         write: archive.add,
         onProgress: onProgress,
         recordingLabel: strings.Voice_Memo,
+        sectionLinksLabel: strings.Section_Links,
         reminderFor: (note) {
           final reminder = ReminderData.shared.getCurrentReminder(note);
           return reminder == null

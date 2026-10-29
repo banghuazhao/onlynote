@@ -3,7 +3,7 @@ import 'package:onlynote/common/platform_capabilities.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'app_sheet.dart';
 
-enum NoteInsertAction { checklist, gallery, camera, scan, voice }
+enum NoteInsertAction { checklist, gallery, camera, scan, voice, divider }
 
 /// All additions share one entry point, leaving an empty note ready to write.
 class NoteInsertSheet extends StatelessWidget {
@@ -16,6 +16,13 @@ class NoteInsertSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = S.of(context);
     final actions = [
+      (
+        NoteInsertAction.divider,
+        'editor-add-divider',
+        Icons.horizontal_rule_rounded,
+        strings.Editor_Divider,
+        null
+      ),
       (
         NoteInsertAction.checklist,
         'editor-add-checklist',

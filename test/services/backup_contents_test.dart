@@ -39,7 +39,7 @@ void main() {
 
     final bytes = encodeBackup(contents);
     final serialized = jsonDecode(utf8.decode(bytes)) as Map;
-    expect(serialized['version'], 8);
+    expect(serialized['version'], 9);
     expect((serialized['savedViews'] as List).single['filters'], [
       'checklists',
       'photos',

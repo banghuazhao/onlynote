@@ -5,6 +5,9 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_edit_history.dart';
+import 'package:onlynote/services/note_section_link_capture.dart';
+import 'package:onlynote/services/note_section_links.dart';
+import 'package:onlynote/services/note_outline.dart';
 
 void main() {
   late DateTime now;
@@ -260,6 +263,110 @@ void main() {
     expect(value.current.note.title, 'After');
     final latest = externallyUpdated.copyWith(folderId: 'latest');
     expect(value.current.applyTo(latest).folderId, 'latest');
+  });
+
+  test('self links survive undo and redo of text written before linking', () {
+    final original = Note(id: 'note', description: 'Plan\nBody');
+    final value = history(original);
+    final formatted = original.copyWith(textStyles: const [
+      NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.heading)
+    ]);
+    value.record(snapshot(formatted));
+    final written = formatted.copyWith(description: 'Plan\nBody revised');
+    value.record(snapshot(written), kind: NoteEditKind.bodyTyping);
+    final capture = captureNoteSectionLink(written,
+        buildNoteOutline(written.description!, written.textStyles).single)!;
+    final linked = capture.target.copyWith(sectionLinks: [capture.link]);
+    expect(value.record(snapshot(linked)), isFalse);
+    expect(value.undoCount, 2);
+    final undoneText = value.undo()!.note;
+    expect(undoneText.description, 'Plan\nBody');
+    expect(undoneText.sectionLinks, [capture.link]);
+    expect(resolveNoteSectionLink(capture.link, [undoneText])?.heading.text,
+        'Plan');
+    final undoneStyle = value.undo()!.note;
+    expect(undoneStyle.textStyles, isEmpty);
+    expect(undoneStyle.sectionLinks, [capture.link]);
+    expect(resolveNoteSectionLink(capture.link, [undoneStyle]), isNull);
+    final redoneStyle = value.redo()!.note;
+    expect(resolveNoteSectionLink(capture.link, [redoneStyle])?.heading.text,
+        'Plan');
+    final redoneText = value.redo()!.note;
+    expect(redoneText.description, 'Plan\nBody revised');
+    expect(resolveNoteSectionLink(capture.link, [redoneText])?.heading.anchorId,
+        capture.link.headingId);
+  });
+
+  test('linking after a rename retains heading identity across undo and redo',
+      () {
+    final original = Note(
+        id: 'note',
+        description: 'Plan\nBody',
+        textStyles: const [
+          NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.heading)
+        ]);
+    final value = history(original);
+    final renamed = original.copyWith(
+        description: 'Launch plan\nBody',
+        textStyles: const [
+          NoteTextStyleRange(start: 0, end: 11, kind: NoteTextStyleKind.heading)
+        ]);
+    value.record(snapshot(renamed), kind: NoteEditKind.bodyTyping);
+    final capture = captureNoteSectionLink(renamed,
+        buildNoteOutline(renamed.description!, renamed.textStyles).single)!;
+    expect(
+        value.record(
+            snapshot(capture.target.copyWith(sectionLinks: [capture.link]))),
+        isFalse);
+    final undone = value.undo()!.note;
+    expect(
+        resolveNoteSectionLink(capture.link, [undone])?.heading.text, 'Plan');
+    final redone = value.redo()!.note;
+    expect(resolveNoteSectionLink(capture.link, [redone])?.heading.text,
+        'Launch plan');
+  });
+
+  test('link metadata preserves an existing redo stack and its destination',
+      () {
+    final original = Note(id: 'note', description: 'Plan', textStyles: const [
+      NoteTextStyleRange(start: 0, end: 4, kind: NoteTextStyleKind.heading)
+    ]);
+    final value = history(original);
+    value.record(
+        snapshot(original
+            .copyWith(description: 'Plan revised', textStyles: const [
+          NoteTextStyleRange(start: 0, end: 12, kind: NoteTextStyleKind.heading)
+        ])),
+        kind: NoteEditKind.bodyTyping);
+    final restored = value.undo()!.note;
+    final capture = captureNoteSectionLink(restored,
+        buildNoteOutline(restored.description!, restored.textStyles).single)!;
+    expect(
+        value.record(
+            snapshot(capture.target.copyWith(sectionLinks: [capture.link]))),
+        isFalse);
+    expect(value.redoCount, 1);
+    final redone = value.redo()!.note;
+    expect(resolveNoteSectionLink(capture.link, [redone])?.heading.text,
+        'Plan revised');
+    expect(redone.sectionLinks, [capture.link]);
+  });
+
+  test('restoring heading metadata preserves explicit historical identities',
+      () {
+    final historical = Note(id: 'note', description: 'Plan', textStyles: const [
+      NoteTextStyleRange(
+          start: 0,
+          end: 4,
+          kind: NoteTextStyleKind.heading,
+          anchorId: 'historical')
+    ]);
+    final latest = historical.copyWith(textStyles: const [
+      NoteTextStyleRange(
+          start: 0, end: 4, kind: NoteTextStyleKind.heading, anchorId: 'latest')
+    ]);
+    final restored = snapshot(historical).applyTo(latest);
+    expect(restored.textStyles.single.anchorId, 'historical');
   });
 
   test('photo geometry change cannot join a body typing run', () {

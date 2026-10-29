@@ -3,3 +3,4 @@ export 'home/home_screen.dart';
 export 'note_detail/note_detail_screen.dart';
 export 'onboarding/onboarding_screen.dart';
 export 'reminders/reminders_screen.dart';
+export 'today/today_screen.dart';

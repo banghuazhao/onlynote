@@ -79,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _savedViews = SavedNoteViewStore.instance;
   bool _viewsUnavailable = false;
   bool _openingDailyNote = false;
+  bool _presentingToday = false;
   bool _openingTemplate = false;
   bool _presentingDailyCalendar = false;
   bool _presentingLibraryFilters = false;
@@ -569,6 +570,23 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } finally {
       _openingTemplate = false;
+    }
+  }
+
+  Future<void> _openTodayWorkspace() async {
+    if (!mounted ||
+        _presentingToday ||
+        ModalRoute.of(context)?.isCurrent == false) {
+      return;
+    }
+    _cancelChecklistReview();
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _presentingToday = true);
+    try {
+      await context.router.push(TodayRoute());
+      if (mounted) context.read<HomeBloc>().add(const HomeEvent.getAllNotes());
+    } finally {
+      if (mounted) setState(() => _presentingToday = false);
     }
   }
 
@@ -1234,6 +1252,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   badgeKey: const ValueKey('home-direct-search-active-dot'),
                 ),
               ),
+            if (MediaQuery.sizeOf(context).width >= 360)
+              AppButton(
+                key: const ValueKey('home-today-button'),
+                tooltip: S.of(context).Today_Title,
+                onPressed: _presentingToday ? null : _openTodayWorkspace,
+                child: const Icon(Icons.today_outlined),
+              ),
             PopupMenuButton<String>(
               key: const ValueKey('home-more'),
               tooltip: _isSearchVisible &&
@@ -1251,6 +1276,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     _openCurrentFolderPicker();
                   case 'daily-calendar':
                     _openDailyNoteCalendar();
+                  case 'today':
+                    _openTodayWorkspace();
                   case 'reminders':
                     _cancelChecklistReview();
                     context.router.push(RemindersRoute());
@@ -1277,6 +1304,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       searchDotKey: const ValueKey('home-search-menu-dot'),
                     ),
                   ),
+                PopupMenuItem(
+                  key: const ValueKey('home-today-menu'),
+                  value: 'today',
+                  enabled: !_presentingToday,
+                  child: HomeMenuItemLabel(S.of(context).Today_Title,
+                      icon: Icons.today_outlined),
+                ),
                 PopupMenuItem(
                   key: const ValueKey('home-reminders-menu'),
                   value: 'reminders',

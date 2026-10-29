@@ -110,7 +110,8 @@ class NoteAutosave extends ChangeNotifier {
       note.todo.any((todo) => todo.title?.trim().isNotEmpty ?? false) ||
       note.imagePaths.isNotEmpty ||
       note.voiceMemos.isNotEmpty ||
-      note.linkedNoteIds.isNotEmpty;
+      note.linkedNoteIds.isNotEmpty ||
+      note.sectionLinks.isNotEmpty;
 
   /// Refresh a clean editor after a child route has edited the same note.
   /// Pending user edits must be flushed first; this never queues an extra save.

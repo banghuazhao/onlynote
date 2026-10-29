@@ -45,7 +45,7 @@ NoteReaderDocument buildNoteReaderSections(
   Iterable<NoteImageLayout> layouts,
 ) {
   final outline = buildNoteOutline(text, styles);
-  final parts = noteDocumentParts(text, layouts);
+  final parts = noteDocumentParts(text, layouts, styles: styles);
   if (outline.isEmpty) {
     return NoteReaderDocument(introParts: parts, sections: const []);
   }
@@ -70,6 +70,12 @@ NoteReaderDocument buildNoteReaderSections(
       // Strict inequality preserves a photo's position before a next heading.
       while (imageSection + 1 < headings.length &&
           headings[imageSection + 1].start < part.layout.textOffset) {
+        imageSection++;
+      }
+      (imageSection < 0 ? intro : bodies[imageSection]).add(part);
+    } else if (part is NoteDividerPart) {
+      while (imageSection + 1 < headings.length &&
+          headings[imageSection + 1].start < part.start) {
         imageSection++;
       }
       (imageSection < 0 ? intro : bodies[imageSection]).add(part);

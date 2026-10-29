@@ -14,6 +14,7 @@ class AddUpdateFormState with _$AddUpdateFormState {
       @Default([]) List<VoiceMemo> voiceMemos,
       @Default([]) List<String> tags,
       @Default([]) List<String> linkedNoteIds,
+      @Default([]) List<NoteSectionLink> sectionLinks,
       String? dailyNoteDateKey,
       @Default(NoteCardStyle()) NoteCardStyle cardStyle,
       DateTime? reminderDate,

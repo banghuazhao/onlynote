@@ -6,6 +6,7 @@ import 'package:onlynote/services/note_editor_tips.dart';
 import 'package:onlynote/services/note_selection_transfer.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/reminder_agenda_controller.dart';
+import 'package:onlynote/services/today_agenda.dart';
 import 'package:onlynote/services/note_photo_capture.dart';
 import 'package:onlynote/services/document_scan_capture.dart';
 import 'package:onlynote/services/note_photo_edit.dart';
@@ -36,6 +37,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: OnboardingRoute.page),
         AutoRoute(page: HomeRoute.page, initial: true),
         AutoRoute(path: '/reminders', page: RemindersRoute.page),
+        AutoRoute(path: '/today', page: TodayRoute.page),
         AutoRoute(path: '/notes/:noteId', page: NoteDetailRoute.page),
         AutoRoute(path: '/add-update-note', page: AddUpdateNoteRoute.page),
       ];

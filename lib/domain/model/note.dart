@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'voice_memo.dart';
+import 'note_section_link.dart';
 import 'note_text_style.dart';
 import 'note_image_layout.dart';
 import 'note_card_style.dart';
@@ -30,6 +31,7 @@ class Note with _$Note {
     @Default(false) bool isArchived,
     @Default([]) List<String> tags,
     @Default([]) List<String> linkedNoteIds,
+    @Default([]) List<NoteSectionLink> sectionLinks,
     @Default([]) List<NoteTextStyleRange> textStyles,
     @Default([]) List<NoteImageLayout> imageLayouts,
     String? dailyNoteDateKey,

@@ -59,7 +59,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     _documentScanner.addListener(_recoverDocumentScans);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!OnboardingSettings.instance.completed) {
-        await _router.replaceAll([const OnboardingRoute()]);
+        await _router.replaceAll([OnboardingRoute()]);
       }
       if (!mounted) return;
       AppShortcutLaunch.instance.attach(_router);

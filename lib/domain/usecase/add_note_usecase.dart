@@ -26,9 +26,17 @@ class AddNoteUsecase {
         ..removeWhere((todo) => todo.title.isEmptyString);
       // New notes sort to the top: more negative than any existing sortOrder
       // and than any note added later (since -now() keeps decreasing).
+      final newId = _uuid.v4();
       final noteDto = NoteDto.fromNote(
         note.copyWith(
-            todo: todo, sortOrder: -DateTime.now().millisecondsSinceEpoch),
+          id: newId,
+          todo: todo,
+          sortOrder: -DateTime.now().millisecondsSinceEpoch,
+          sectionLinks: [
+            for (final link in note.sectionLinks)
+              link.noteId == note.id ? link.copyWith(noteId: newId) : link,
+          ],
+        ),
       );
 
       if (!noteDto.validNote) {
@@ -37,9 +45,7 @@ class AddNoteUsecase {
         );
       }
 
-      await NoteCreationLimit.save(
-          _repository, noteDto.copyWith(id: _uuid.v4()),
-          access: premiumAccess);
+      await NoteCreationLimit.save(_repository, noteDto, access: premiumAccess);
       return right(unit);
     } on PremiumRequired {
       return left(NoteError(

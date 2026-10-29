@@ -854,5 +854,31 @@
         "type": "int"
       }
     }
-  }
+  },
+  "Today_Title": "Today",
+  "Today_Description": "Your note, reminders, and unfinished tasks in one place.",
+  "Today_Create_Note": "Start today’s note",
+  "Today_Open_Note": "Open note",
+  "Today_Daily_Empty": "Capture a thought or make a plan for today.",
+  "Today_Reminders": "Due reminders",
+  "Today_No_Reminders": "No reminders due today.",
+  "Today_All_Reminders": "All reminders",
+  "Today_Tasks": "Unfinished tasks",
+  "Today_Tasks_Hint": "Across your active notes",
+  "Today_No_Tasks": "No unfinished tasks.",
+  "Today_Load_Failed": "Could not refresh Today. Try again.",
+  "Today_Task_Save_Failed": "Could not complete this task. Try again.",
+  "Today_Task_Changed": "This task changed. Review the latest version and try again.",
+  "Editor_Divider": "Divider line",
+  "Section_Links": "Heading links",
+  "Section_Link_Add": "Link to heading",
+  "Section_Link_Choose": "Choose a heading",
+  "Section_Link_Search": "Search notes and headings",
+  "Section_Link_Empty": "Format a paragraph as a heading to link to it here.",
+  "Section_Link_No_Results": "No matching headings.",
+  "Section_Link_This_Note": "This note",
+  "Section_Link_Unavailable": "Heading unavailable. It may have been removed.",
+  "Section_Link_Remove": "Remove heading link",
+  "Section_Link_Failed": "Could not save this heading link. Try again.",
+  "Section_Link_Limit": "You can add up to 100 heading links per note."
 }

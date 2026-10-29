@@ -12,6 +12,7 @@ import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_theme.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/backup/backup_contents.dart';
@@ -123,7 +124,7 @@ void main() {
         readReminders: () => reminders,
         writeReminders: (values) async => reminders = values);
     final portable = decodeBackup(await restoredService.export());
-    expect(portable.toJson()['version'], 8);
+    expect(portable.toJson()['version'], 9);
     expect(portable.notes.single.dailyNoteDateKey, '2026-10-06');
     expect(portable.notes.single.toDomain().cardStyle, style);
     await notes.clear();
@@ -134,6 +135,52 @@ void main() {
     expect(restored.title, 'Renamed daily note');
     expect(restored.description, 'Keep my thoughts');
     expect(restored.toDomain().cardStyle, style);
+  });
+
+  test('section destinations remap in imported notes, history and templates',
+      () async {
+    const self = NoteSectionLink(
+        noteId: 'source', headingId: 'plan', headingText: 'Plan');
+    final original = NoteDto.fromNote(Note(
+        id: 'source',
+        title: 'Before',
+        description: 'Plan',
+        textStyles: const [
+          NoteTextStyleRange(
+              start: 0,
+              end: 4,
+              kind: NoteTextStyleKind.heading,
+              anchorId: 'plan')
+        ],
+        sectionLinks: const [
+          self
+        ]));
+    await notes.put(original.id, original);
+    final template =
+        await templates.saveFromNote(original.toDomain(), name: 'Planning');
+    final changed = original.copyWith(title: 'After');
+    await history.recordBeforeSave(original, changed);
+    await notes.put(changed.id, changed);
+    final portable = decodeBackup(await service.export());
+    expect(portable.histories['source']!.single.note.toDomain().sectionLinks,
+        [self]);
+    await service.restore(portable);
+    final imported = notes.values
+        .cast<NoteDto>()
+        .singleWhere((note) => note.id != 'source')
+        .toDomain();
+    expect(imported.sectionLinks.single.noteId, imported.id);
+    final importedHistory = history.versionsFor(imported.id!).single;
+    expect(importedHistory.note.toDomain().sectionLinks.single.noteId,
+        imported.id);
+    expect(importedHistory.note.toDomain().textStyles.single.anchorId, 'plan');
+    final importedTemplate =
+        templates.templates.singleWhere((value) => value.id != template.id);
+    expect(importedTemplate.sourceNoteId, imported.id);
+    expect(importedTemplate.sectionLinks.single.noteId, imported.id);
+    final reused = importedTemplate.createNote(imageCopies: []);
+    expect(reused.sectionLinks.single.noteId, reused.id);
+    expect((notes.get('source') as NoteDto).toDomain().sectionLinks, [self]);
   });
 
   test('highlight survives Hive reopen and portable note restore', () async {
@@ -269,7 +316,7 @@ void main() {
         folderId: 'folder',
         archiveScope: NoteArchiveScope.all);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 8);
+    expect(backup.toJson()['version'], 9);
     await service.restore(backup);
     final imported = notes.values
         .cast<NoteDto>()
@@ -339,7 +386,7 @@ void main() {
       archiveScope: NoteArchiveScope.archived,
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 8);
+    expect(backup.toJson()['version'], 9);
     expect(backup.savedViews.singleWhere((v) => v.id == mediaView.id).filters,
         mediaFilters);
     expect(backup.savedViews.singleWhere((v) => v.id == legacyView.id).filters,
@@ -447,7 +494,7 @@ void main() {
         await templates.saveFromNote(before.toDomain(), name: 'Photo');
     expect(template.imageLayouts.single.path, template.imagePaths.single);
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 8);
+    expect(backup.toJson()['version'], 9);
     final archivedLayout = backup.notes.single.toDomain().imageLayouts.single;
     expect(archivedLayout.path, backup.notes.single.imagePaths!.single);
     expect(archivedLayout.textOffset, 0);
@@ -541,7 +588,7 @@ void main() {
     final template =
         await templates.saveFromNote(before.toDomain(), name: 'Formatted');
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 8);
+    expect(backup.toJson()['version'], 9);
     expect(backup.notes.single.toDomain().textStyles, isEmpty);
     expect(backup.histories['formatted']!.single.note.toDomain().textStyles,
         styles);
@@ -975,7 +1022,7 @@ void main() {
       name: 'Weekly list',
     );
     final backup = decodeBackup(await service.export());
-    expect(backup.toJson()['version'], 8);
+    expect(backup.toJson()['version'], 9);
     expect(backup.templates.single.name, 'Weekly list');
     expect(backup.templates.single.items, ['Read']);
     await service.restore(backup);

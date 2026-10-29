@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_history.dart';
@@ -101,6 +102,25 @@ void main() {
     expect(repository.notes['note']!.linkedNoteIds, ['one']);
     expect(repository.notes['note']!.isArchived, isTrue);
     expect(repository.notes['note']!.tags, ['New']);
+  });
+
+  test(
+      'section link edits make recoverable history with stable destination IDs',
+      () async {
+    const first = NoteSectionLink(
+        noteId: 'target', headingId: 'first', headingText: 'First');
+    const next = NoteSectionLink(
+        noteId: 'target', headingId: 'next', headingText: 'Next');
+    final before =
+        NoteDto(id: 'note', title: 'Hub', sectionLinks: [first.toMap()]);
+    repository.notes['note'] = before;
+    await repository
+        .addUpdateNote(before.copyWith(sectionLinks: [next.toMap()]));
+    final version = history.versionsFor('note').single;
+    expect(version.note.toDomain().sectionLinks, [first]);
+    expect(await history.restore('note', version.id),
+        NoteHistoryRestoreResult.restored);
+    expect(repository.notes['note']!.toDomain().sectionLinks, [first]);
   });
 
   test('history restores content while retaining the current daily association',

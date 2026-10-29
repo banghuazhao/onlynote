@@ -10,6 +10,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_section_links.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/daily_note.dart';
@@ -278,6 +279,12 @@ class BackupService {
           for (final id in note.linkedNoteIds ?? const <String>[])
             if (noteIds.containsKey(id) && id != note.id) noteIds[id]!
         ],
+        sectionLinks: [
+          for (final link
+              in parseNoteSectionLinks(note.sectionLinks ?? const []))
+            if (noteIds.containsKey(link.noteId))
+              link.copyWith(noteId: noteIds[link.noteId]!).toMap(),
+        ],
         folderId: folderIds[note.folderId],
         clearFolderId: !folderIds.containsKey(note.folderId),
         todoList: [
@@ -366,6 +373,14 @@ class BackupService {
                 for (final id in template.linkedNoteIds)
                   if (noteIds.containsKey(id)) noteIds[id]!
               ],
+              sectionLinks: [
+                for (final link in template.sectionLinks)
+                  if (noteIds.containsKey(link.noteId))
+                    link.copyWith(noteId: noteIds[link.noteId]!)
+                  else if (link.noteId == template.sourceNoteId)
+                    link,
+              ],
+              sourceNoteId: noteIds[template.sourceNoteId],
               imagePaths: [
                 for (final key in template.imagePaths) templatePaths[key]!,
               ],

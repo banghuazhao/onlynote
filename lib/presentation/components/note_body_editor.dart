@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/presentation/theme/colors.dart';
 import 'package:onlynote/presentation/theme/typography.dart';
@@ -14,6 +15,7 @@ import 'note_document_view.dart';
 import 'note_body_formatting_controller.dart';
 import 'note_formatting_toolbar.dart';
 import 'note_image_block.dart';
+import 'note_divider_block.dart';
 import 'note_outline_navigation_controller.dart';
 import 'paper_note.dart';
 import 'simple_formatting_controller.dart';
@@ -88,7 +90,16 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     _attachFormatting();
   }
 
-  FocusNode get _activeFormattingFocus => _layouts.isEmpty
+  bool get _hasBlocks =>
+      _layouts.isNotEmpty ||
+      widget.controller.styles
+          .any((range) => range.kind == NoteTextStyleKind.divider);
+
+  List<NoteDocumentPart> get _documentParts =>
+      noteDocumentParts(widget.controller.text, _layouts,
+          styles: widget.controller.styles);
+
+  FocusNode get _activeFormattingFocus => !_hasBlocks
       ? widget.focusNode
       : _segments[_activeKey]?.focus ?? widget.focusNode;
 
@@ -137,14 +148,14 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
         (!requestFocus && _bodyBusyForRestore)) {
       return false;
     }
-    final part = _layouts.isEmpty
+    final part = !_hasBlocks
         ? null
         : _textParts()
             .where(
                 (item) => item.part.start <= offset && item.part.end >= offset)
             .lastOrNull;
     final segment = part == null ? null : _segments[part.key];
-    if (_layouts.isNotEmpty && segment == null) return false;
+    if (_hasBlocks && segment == null) return false;
     // An outline tap commits composition as a native field tap does. A silent
     // resume positions an inactive caret without focusing or changing the IME.
     if (segment != null) _activeKey = segment.key;
@@ -199,6 +210,10 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   void _masterChanged() {
     if (_syncing || !mounted) return;
     final text = widget.controller.text;
+    final changed = text != _lastText;
+    final originalFocus = FocusManager.instance.primaryFocus;
+    final hadFocus = widget.focusNode.hasFocus ||
+        _segments.values.any((segment) => segment.focus.hasFocus);
     final documentReplaced =
         _documentRevision != widget.controller.documentRevision;
     _documentRevision = widget.controller.documentRevision;
@@ -217,8 +232,32 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
       ));
     }
     _lastText = text;
+    if (changed) _activeKey = null;
     _syncSegments();
     setState(() {});
+    final targetFocus =
+        _hasBlocks ? _segments[_activeKey]?.focus : widget.focusNode;
+    // Transfer focus only when inserting/removing a block replaces the active
+    // native field. Ordinary typing must never reclaim focus from a checklist
+    // or another control explicitly selected before the next frame.
+    if (changed &&
+        hadFocus &&
+        targetFocus != null &&
+        targetFocus != originalFocus) {
+      final selection = widget.controller.selection;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || selection != widget.controller.selection) return;
+        final current = FocusManager.instance.primaryFocus;
+        if (current != null &&
+            current != originalFocus &&
+            current is! FocusScopeNode) {
+          return;
+        }
+        final active =
+            _hasBlocks ? _segments[_activeKey]?.focus : widget.focusNode;
+        if (active == targetFocus) targetFocus.requestFocus();
+      });
+    }
   }
 
   void _publishLayouts(List<NoteImageLayout> layouts) {
@@ -231,10 +270,11 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   /// the IME's composing field alive as preceding text changes length.
   List<({String key, NoteTextPart part, Set<String> precedingImages})>
       _textParts() {
-    final parts = noteDocumentParts(widget.controller.text, _layouts);
+    final parts = _documentParts;
     final result =
         <({String key, NoteTextPart part, Set<String> precedingImages})>[];
     final precedingImages = <String>{};
+    var dividerIndex = 0;
     for (var index = 0; index < parts.length; index++) {
       final part = parts[index];
       if (part is NoteImagePart) precedingImages.add(part.layout.path);
@@ -243,7 +283,9 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
       result.add((
         key: following is NoteImagePart
             ? 'before:${following.layout.path}'
-            : 'end',
+            : following is NoteDividerPart
+                ? 'before-divider:${dividerIndex++}'
+                : 'end',
         part: part,
         precedingImages: Set.of(precedingImages),
       ));
@@ -265,7 +307,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
               ?.key
           : parts.firstOrNull?.key;
     }
-    if (_layouts.isNotEmpty && !widget.controller.selection.isValid) {
+    if (_hasBlocks && !widget.controller.selection.isValid) {
       widget.controller.selection =
           TextSelection.collapsed(offset: parts.first.part.start);
     }
@@ -449,7 +491,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   }
 
   void _moveOne(String path, int direction) {
-    final displayOrder = noteDocumentParts(widget.controller.text, _layouts)
+    final displayOrder = _documentParts
         .whereType<NoteImagePart>()
         .map((part) => part.layout)
         .toList();
@@ -479,7 +521,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   }
 
   void _prepareFormattingSelection() {
-    if (_layouts.isEmpty) return;
+    if (!_hasBlocks) return;
     final segment = _segments[_activeKey];
     if (segment == null) return;
     _forwardSelection(segment);
@@ -575,7 +617,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
                 : 'image-drop-$offset'),
         onAcceptWithDetails: (details) {
           if (beforeImagePath == details.data.path) return;
-          final ordered = noteDocumentParts(widget.controller.text, _layouts)
+          final ordered = _documentParts
               .whereType<NoteImagePart>()
               .map((part) => part.layout)
               .toList();
@@ -634,6 +676,15 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
       if (index + 1 < offsets.length) {
         final end = offsets[index + 1];
         if (end > offset) {
+          final divider = widget.controller.styles
+              .where((range) =>
+                  range.kind == NoteTextStyleKind.divider &&
+                  range.start == offset)
+              .firstOrNull;
+          if (divider != null) {
+            result.add(NoteDividerBlock(key: ValueKey('drag-divider-$offset')));
+            continue;
+          }
           result.add(FormattedNoteText(
             text: body.substring(offset, end),
             styles:
@@ -701,7 +752,7 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
   @override
   Widget build(BuildContext context) {
     final active = _segments[_activeKey];
-    if (_layouts.isEmpty) {
+    if (!_hasBlocks) {
       return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         if (widget.showFormattingToolbar) ...[
           NoteFormattingToolbar(
@@ -758,9 +809,14 @@ class _NoteBodyEditorState extends State<NoteBodyEditor> {
     if (_dragging) {
       children.addAll(_dragDocument());
     } else {
-      for (final part in noteDocumentParts(widget.controller.text, _layouts)) {
+      for (final part in _documentParts) {
         if (part is NoteImagePart) {
           children.add(_image(part.layout));
+        } else if (part is NoteDividerPart) {
+          children.add(NoteDividerBlock(
+            key: ValueKey('editor-divider-${part.start}'),
+            onRemove: () => widget.controller.removeDivider(part.start),
+          ));
         } else if (part is NoteTextPart) {
           final segment = _segments[textParts[textIndex].key]!;
           children.add(_textField(segment, textIndex));

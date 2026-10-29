@@ -1,3 +1,8 @@
+import 'package:onlynote/domain/model/note_section_link.dart';
+import 'package:onlynote/services/note_section_links.dart';
+import 'package:onlynote/services/note_section_link_capture.dart';
+import 'package:onlynote/presentation/components/note_section_link_picker_sheet.dart';
+import 'package:onlynote/presentation/components/note_section_links_section.dart';
 import 'package:onlynote/presentation/theme/button_styles.dart';
 import 'dart:async';
 import 'dart:ui' as ui;
@@ -304,6 +309,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           voiceMemos: initial.voiceMemos,
           tags: initial.tags,
           linkedNoteIds: initial.linkedNoteIds,
+          sectionLinks: initial.sectionLinks,
           dailyNoteDateKey: initial.dailyNoteDateKey,
           cardStyle: initial.cardStyle,
         ));
@@ -420,6 +426,15 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     );
     if (!mounted || _mediaBlocked || action == null) return;
     switch (action) {
+      case NoteInsertAction.divider:
+        _formattingController.prepareFormattingSelection();
+        if (_descriptionController.insertDivider()) {
+          await WidgetsBinding.instance.endOfFrame;
+          if (mounted) {
+            await _outlineController
+                .jumpTo(_descriptionController.selection.extentOffset);
+          }
+        }
       case NoteInsertAction.checklist:
         _todoNavigationKey.currentState?.addItem();
       case NoteInsertAction.gallery:
@@ -819,6 +834,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           voiceMemos: updated.voiceMemos,
           tags: updated.tags,
           linkedNoteIds: updated.linkedNoteIds,
+          sectionLinks: updated.sectionLinks,
           dailyNoteDateKey: updated.dailyNoteDateKey,
           cardStyle: updated.cardStyle,
         ));
@@ -1031,6 +1047,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         voiceMemos: state.voiceMemos,
         tags: state.tags,
         linkedNoteIds: state.linkedNoteIds,
+        sectionLinks: state.sectionLinks,
         cardStyle: state.cardStyle,
       );
 
@@ -1218,6 +1235,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
         voiceMemos: next.voiceMemos,
         tags: next.tags,
         linkedNoteIds: next.linkedNoteIds,
+        sectionLinks: next.sectionLinks,
         dailyNoteDateKey: next.dailyNoteDateKey,
         cardStyle: next.cardStyle);
     if (_form.state != state) {
@@ -1233,6 +1251,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           voiceMemos: next.voiceMemos,
           tags: next.tags,
           linkedNoteIds: next.linkedNoteIds,
+          sectionLinks: next.sectionLinks,
           dailyNoteDateKey: next.dailyNoteDateKey,
           cardStyle: next.cardStyle));
       await applied;
@@ -1747,7 +1766,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
     return [
       for (final note in notes)
         if (note.id != _autosave.note.id) note,
-      _autosave.note
+      _currentDraft(_form.state)
     ];
   }
 
@@ -2023,7 +2042,82 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                 })));
   }
 
-  Future<void> _openLinkedNote(Note note) async {
+  Future<void> _setSectionLinks(List<NoteSectionLink> links) async {
+    final normalized = normalizeNoteSectionLinks(links);
+    if (listEquals(normalized, _form.state.sectionLinks)) return;
+    final applied = _form.stream
+        .firstWhere((state) => listEquals(state.sectionLinks, normalized));
+    _form.add(AddUpdateFormEvent.sectionLinksChanged(normalized));
+    await applied;
+  }
+
+  Future<void> _addSectionLink() async {
+    if (_mediaBlocked) return;
+    setState(() => _presentingMedia = true);
+    try {
+      await Future<void>.delayed(Duration.zero);
+      if (!mounted) return;
+      final selected = await showNoteSectionLinkPickerSheet(context,
+          notes: _libraryNotes, currentNoteId: _autosave.note.id!);
+      if (!mounted ||
+          selected == null ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final self = selected.noteId == _autosave.note.id;
+      final repository = getIt<NoteRepository>();
+      final target = self
+          ? _currentDraft(_form.state)
+          : (await repository.getNote(selected.noteId)).toDomain();
+      final captured = captureNoteSectionLink(target, selected.heading);
+      if (captured == null) throw StateError('Heading changed');
+      final links = normalizeNoteSectionLinks(
+          [..._form.state.sectionLinks, captured.link]);
+      if (self) {
+        _descriptionController.setDocument(
+            captured.target.description ?? '', captured.target.textStyles);
+      } else {
+        await repository.addUpdateNote(NoteDto.fromNote(captured.target));
+      }
+      if (!mounted) return;
+      await _setSectionLinks(links);
+      _capture(_form.state);
+      if (!await _autosave.flush() && mounted) {
+        showTransientSnackBar(
+            context, SnackBar(content: Text(S.of(context).Autosave_Failed)));
+      }
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Section_Link_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _presentingMedia = false);
+    }
+  }
+
+  Future<void> _removeSectionLink(NoteSectionLink link) async {
+    if (_mediaBlocked) return;
+    await _setSectionLinks(
+        _form.state.sectionLinks.where((value) => value != link).toList());
+  }
+
+  Future<void> _openSectionLink(NoteSectionLink link) async {
+    if (_mediaBlocked) return;
+    final target = resolveNoteSectionLink(link, _libraryNotes);
+    if (target == null) {
+      showTransientSnackBar(context,
+          SnackBar(content: Text(S.of(context).Section_Link_Unavailable)));
+      return;
+    }
+    if (target.note.id == _autosave.note.id) {
+      await _outlineController.jumpTo(target.heading.start);
+    } else {
+      await _openLinkedNote(target.note, headingId: link.headingId);
+    }
+  }
+
+  Future<void> _openLinkedNote(Note note, {String? headingId}) async {
     if (_mediaBlocked || note.id == null) return;
     await _rememberWritingPosition();
     if (!mounted) return;
@@ -2050,7 +2144,8 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
       }
       _unregisterWidgetEditor?.call();
       _unregisterWidgetEditor = null;
-      await context.router.push(NoteDetailRoute(noteId: target.id!));
+      await context.router.push(
+          NoteDetailRoute(noteId: target.id!, initialHeadingId: headingId));
       await _editorWidgetCommands?.importPending();
       await _refreshSavedNoteFromLibrary();
     } finally {
@@ -2153,6 +2248,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
           voiceMemos: refreshed.voiceMemos,
           tags: refreshed.tags,
           linkedNoteIds: refreshed.linkedNoteIds,
+          sectionLinks: refreshed.sectionLinks,
           dailyNoteDateKey: refreshed.dailyNoteDateKey,
           cardStyle: refreshed.cardStyle);
       if (_form.state != state) {
@@ -2168,6 +2264,7 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
             voiceMemos: refreshed.voiceMemos,
             tags: refreshed.tags,
             linkedNoteIds: refreshed.linkedNoteIds,
+            sectionLinks: refreshed.sectionLinks,
             dailyNoteDateKey: refreshed.dailyNoteDateKey,
             cardStyle: refreshed.cardStyle));
         await applied;
@@ -2609,6 +2706,9 @@ class _AddUpdateNoteScreenState extends State<AddUpdateNoteScreen>
                     libraryNotes: _libraryNotes,
                     onEditTags: _editTags,
                     onEditLinks: _editLinks,
+                    onAddSectionLink: _addSectionLink,
+                    onRemoveSectionLink: _removeSectionLink,
+                    onOpenSectionLink: _openSectionLink,
                     onOpenLinkedNote: _openLinkedNote,
                     reminderSuggestion: _reminderSuggestion,
                     savingReminder: _savingReminder,
@@ -2679,6 +2779,9 @@ class _BuildForm extends StatelessWidget {
     required this.libraryNotes,
     required this.onEditTags,
     required this.onEditLinks,
+    required this.onAddSectionLink,
+    required this.onRemoveSectionLink,
+    required this.onOpenSectionLink,
     required this.onOpenLinkedNote,
     required this.reminderSuggestion,
     required this.savingReminder,
@@ -2739,6 +2842,9 @@ class _BuildForm extends StatelessWidget {
   final List<Note> libraryNotes;
   final VoidCallback onEditTags;
   final VoidCallback onEditLinks;
+  final VoidCallback onAddSectionLink;
+  final ValueChanged<NoteSectionLink> onRemoveSectionLink;
+  final ValueChanged<NoteSectionLink> onOpenSectionLink;
   final ValueChanged<Note> onOpenLinkedNote;
   final ReminderDateSuggestion? reminderSuggestion;
   final bool savingReminder;
@@ -3072,6 +3178,19 @@ class _BuildForm extends StatelessWidget {
                                           onEdit: mediaBusy || addingPhoto
                                               ? null
                                               : onEditLinks,
+                                        ),
+                                        NoteSectionLinksSection(
+                                          links: state.sectionLinks,
+                                          notes: libraryNotes,
+                                          onAdd: mediaBusy || addingPhoto
+                                              ? null
+                                              : onAddSectionLink,
+                                          onRemove: mediaBusy || addingPhoto
+                                              ? null
+                                              : onRemoveSectionLink,
+                                          onOpen: mediaBusy || addingPhoto
+                                              ? null
+                                              : onOpenSectionLink,
                                         ),
                                         suggestionSection,
                                       ],

@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/services/note_outline.dart';
+import 'package:onlynote/services/note_text_format.dart';
 
 /// Text input is grouped into short, continuous runs. All other actions are
 /// separate undo steps, including formatting, checklist structure and photos.
@@ -40,7 +43,7 @@ class NoteEditSnapshot {
         todo: note.todo,
         imagePaths: note.imagePaths,
         voiceMemos: note.voiceMemos,
-        textStyles: note.textStyles,
+        textStyles: _restoreHeadingAnchors(note, latest),
         imageLayouts: note.imageLayouts,
       );
 
@@ -59,7 +62,7 @@ class NoteEditSnapshot {
       listEquals(note.todo, other.note.todo) &&
       listEquals(note.imagePaths, other.note.imagePaths) &&
       listEquals(note.voiceMemos, other.note.voiceMemos) &&
-      listEquals(note.textStyles, other.note.textStyles) &&
+      _sameVisibleTextStyles(note, other.note) &&
       listEquals(note.imageLayouts, other.note.imageLayouts);
 
   bool _sameSelection(NoteEditSnapshot other) =>
@@ -170,6 +173,7 @@ class NoteEditHistory extends ChangeNotifier {
       reset(next);
       return false;
     }
+    _backfillHeadingAnchors(next.note);
     if (_current.sameContent(next)) {
       if (!_current._sameSelection(next) && !_selectionAtTypingCaret(next)) {
         _coalescing = false;
@@ -218,6 +222,41 @@ class NoteEditHistory extends ChangeNotifier {
     _coalescing = typing != null;
     notifyListeners();
     return true;
+  }
+
+  /// Heading identities are library metadata created after earlier edits may
+  /// already exist. Backfill that metadata into surviving styled paragraphs so
+  /// an undo that temporarily removes a heading can still redo its identity.
+  /// This changes no written text, formatting coverage or history boundaries.
+  void _backfillHeadingAnchors(Note next) {
+    final known = _current.note.textStyles
+        .map((range) => range.anchorId)
+        .whereType<String>()
+        .toSet();
+    if (!next.textStyles.any(
+        (range) => range.anchorId != null && !known.contains(range.anchorId))) {
+      return;
+    }
+    NoteEditSnapshot adopt(NoteEditSnapshot snapshot) {
+      final styles = _restoreHeadingAnchors(snapshot.note, next);
+      if (listEquals(styles, snapshot.note.textStyles)) return snapshot;
+      return snapshot.withNote(snapshot.note.copyWith(textStyles: styles));
+    }
+
+    _EditStep adoptStep(_EditStep step) => _EditStep(
+        before: adopt(step.before),
+        after: adopt(step.after),
+        kind: step.kind,
+        fieldId: step.fieldId,
+        time: step.time,
+        typing: step.typing);
+    _current = adopt(_current);
+    for (var index = 0; index < _past.length; index++) {
+      _past[index] = adoptStep(_past[index]);
+    }
+    for (var index = 0; index < _future.length; index++) {
+      _future[index] = adoptStep(_future[index]);
+    }
   }
 
   NoteEditSnapshot? undo() {
@@ -283,6 +322,83 @@ class NoteEditHistory extends ChangeNotifier {
     _future.clear();
     super.dispose();
   }
+}
+
+/// Restore the snapshot's exact visible formatting while retaining identities
+/// on headings that survive the text change. A snapshot's own explicit ID wins.
+List<NoteTextStyleRange> _restoreHeadingAnchors(Note snapshot, Note latest) {
+  final text = snapshot.description ?? '';
+  final restored = normalizeNoteTextStyles(snapshot.textStyles, text);
+  if (!restored.any((range) =>
+      range.kind == NoteTextStyleKind.heading && range.anchorId == null)) {
+    return restored;
+  }
+  final anchored =
+      rebaseNoteTextStyles(latest.description ?? '', text, latest.textStyles)
+          .where((range) =>
+              range.kind == NoteTextStyleKind.heading && range.anchorId != null)
+          .toList();
+  if (anchored.isEmpty) return restored;
+  final used =
+      restored.map((range) => range.anchorId).whereType<String>().toSet();
+  final additions = <(int, int, String)>[];
+  for (final heading in buildNoteOutline(text, restored)) {
+    if (heading.anchorId != null) continue;
+    final candidate = anchored
+        .where((range) =>
+            range.start < heading.end &&
+            range.end > heading.start &&
+            !used.contains(range.anchorId))
+        .firstOrNull;
+    if (candidate == null) continue;
+    final start =
+        heading.start == 0 ? 0 : text.lastIndexOf('\n', heading.start - 1) + 1;
+    final lineBreak = text.indexOf('\n', heading.end);
+    final end = lineBreak < 0 ? text.length : lineBreak;
+    additions.add((start, end, candidate.anchorId!));
+    used.add(candidate.anchorId!);
+  }
+  if (additions.isEmpty) return restored;
+  final result = <NoteTextStyleRange>[];
+  for (final range in restored) {
+    if (range.kind != NoteTextStyleKind.heading || range.anchorId != null) {
+      result.add(range);
+      continue;
+    }
+    final points = <int>{range.start, range.end};
+    for (final (start, end, _) in additions) {
+      if (start > range.start && start < range.end) points.add(start);
+      if (end > range.start && end < range.end) points.add(end);
+    }
+    final boundaries = points.toList()..sort();
+    for (var index = 0; index + 1 < boundaries.length; index++) {
+      final start = boundaries[index];
+      final end = boundaries[index + 1];
+      final target = additions
+          .where((anchor) => anchor.$1 <= start && anchor.$2 >= end)
+          .firstOrNull;
+      result.add(NoteTextStyleRange(
+          start: start, end: end, kind: range.kind, anchorId: target?.$3));
+    }
+  }
+  return normalizeNoteTextStyles(result, text);
+}
+
+/// IDs do not affect the visible result and must never consume an undo step.
+bool _sameVisibleTextStyles(Note a, Note b) {
+  if (a.textStyles.length == b.textStyles.length &&
+      a.textStyles.indexed.every((item) =>
+          item.$2.start == b.textStyles[item.$1].start &&
+          item.$2.end == b.textStyles[item.$1].end &&
+          item.$2.kind == b.textStyles[item.$1].kind)) {
+    return true;
+  }
+  List<NoteTextStyleRange> withoutIds(Note note) => normalizeNoteTextStyles([
+        for (final range in note.textStyles)
+          NoteTextStyleRange(
+              start: range.start, end: range.end, kind: range.kind)
+      ], note.description ?? '');
+  return listEquals(withoutIds(a), withoutIds(b));
 }
 
 class _EditStep {

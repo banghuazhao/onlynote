@@ -29,6 +29,7 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -59,6 +60,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -74,6 +76,7 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -102,6 +105,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -117,6 +121,7 @@ mixin _$AddUpdateFormEvent {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -145,6 +150,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -171,6 +177,7 @@ mixin _$AddUpdateFormEvent {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -196,6 +203,7 @@ mixin _$AddUpdateFormEvent {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -221,6 +229,7 @@ mixin _$AddUpdateFormEvent {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -261,6 +270,7 @@ abstract class _$$InitializeImplCopyWith<$Res> {
       List<VoiceMemo>? voiceMemos,
       List<String>? tags,
       List<String>? linkedNoteIds,
+      List<NoteSectionLink>? sectionLinks,
       String? dailyNoteDateKey,
       NoteCardStyle cardStyle});
 }
@@ -286,6 +296,7 @@ class __$$InitializeImplCopyWithImpl<$Res>
     Object? voiceMemos = freezed,
     Object? tags = freezed,
     Object? linkedNoteIds = freezed,
+    Object? sectionLinks = freezed,
     Object? dailyNoteDateKey = freezed,
     Object? cardStyle = null,
   }) {
@@ -330,6 +341,10 @@ class __$$InitializeImplCopyWithImpl<$Res>
           ? _value._linkedNoteIds
           : linkedNoteIds // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      sectionLinks: freezed == sectionLinks
+          ? _value._sectionLinks
+          : sectionLinks // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>?,
       dailyNoteDateKey: freezed == dailyNoteDateKey
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
@@ -356,6 +371,7 @@ class _$InitializeImpl implements _Initialize {
       final List<VoiceMemo>? voiceMemos,
       final List<String>? tags,
       final List<String>? linkedNoteIds,
+      final List<NoteSectionLink>? sectionLinks,
       this.dailyNoteDateKey,
       this.cardStyle = const NoteCardStyle()})
       : _textStyles = textStyles,
@@ -364,7 +380,8 @@ class _$InitializeImpl implements _Initialize {
         _imageLayouts = imageLayouts,
         _voiceMemos = voiceMemos,
         _tags = tags,
-        _linkedNoteIds = linkedNoteIds;
+        _linkedNoteIds = linkedNoteIds,
+        _sectionLinks = sectionLinks;
 
   @override
   final String? title;
@@ -442,6 +459,16 @@ class _$InitializeImpl implements _Initialize {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<NoteSectionLink>? _sectionLinks;
+  @override
+  List<NoteSectionLink>? get sectionLinks {
+    final value = _sectionLinks;
+    if (value == null) return null;
+    if (_sectionLinks is EqualUnmodifiableListView) return _sectionLinks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   @override
   final String? dailyNoteDateKey;
   @override
@@ -450,7 +477,7 @@ class _$InitializeImpl implements _Initialize {
 
   @override
   String toString() {
-    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, textStyles: $textStyles, color: $color, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
+    return 'AddUpdateFormEvent.initialize(title: $title, description: $description, textStyles: $textStyles, color: $color, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, sectionLinks: $sectionLinks, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
   }
 
   @override
@@ -474,6 +501,8 @@ class _$InitializeImpl implements _Initialize {
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality()
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
+            const DeepCollectionEquality()
+                .equals(other._sectionLinks, _sectionLinks) &&
             (identical(other.dailyNoteDateKey, dailyNoteDateKey) ||
                 other.dailyNoteDateKey == dailyNoteDateKey) &&
             (identical(other.cardStyle, cardStyle) ||
@@ -493,6 +522,7 @@ class _$InitializeImpl implements _Initialize {
       const DeepCollectionEquality().hash(_voiceMemos),
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_linkedNoteIds),
+      const DeepCollectionEquality().hash(_sectionLinks),
       dailyNoteDateKey,
       cardStyle);
 
@@ -516,6 +546,7 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -546,6 +577,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return initialize(
         title,
@@ -558,6 +590,7 @@ class _$InitializeImpl implements _Initialize {
         voiceMemos,
         tags,
         linkedNoteIds,
+        sectionLinks,
         dailyNoteDateKey,
         cardStyle);
   }
@@ -576,6 +609,7 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -604,6 +638,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return initialize?.call(
         title,
@@ -616,6 +651,7 @@ class _$InitializeImpl implements _Initialize {
         voiceMemos,
         tags,
         linkedNoteIds,
+        sectionLinks,
         dailyNoteDateKey,
         cardStyle);
   }
@@ -634,6 +670,7 @@ class _$InitializeImpl implements _Initialize {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -662,6 +699,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (initialize != null) {
@@ -676,6 +714,7 @@ class _$InitializeImpl implements _Initialize {
           voiceMemos,
           tags,
           linkedNoteIds,
+          sectionLinks,
           dailyNoteDateKey,
           cardStyle);
     }
@@ -706,6 +745,7 @@ class _$InitializeImpl implements _Initialize {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return initialize(this);
   }
@@ -734,6 +774,7 @@ class _$InitializeImpl implements _Initialize {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return initialize?.call(this);
   }
@@ -762,6 +803,7 @@ class _$InitializeImpl implements _Initialize {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (initialize != null) {
@@ -783,6 +825,7 @@ abstract class _Initialize implements AddUpdateFormEvent {
       final List<VoiceMemo>? voiceMemos,
       final List<String>? tags,
       final List<String>? linkedNoteIds,
+      final List<NoteSectionLink>? sectionLinks,
       final String? dailyNoteDateKey,
       final NoteCardStyle cardStyle}) = _$InitializeImpl;
 
@@ -796,6 +839,7 @@ abstract class _Initialize implements AddUpdateFormEvent {
   List<VoiceMemo>? get voiceMemos;
   List<String>? get tags;
   List<String>? get linkedNoteIds;
+  List<NoteSectionLink>? get sectionLinks;
   String? get dailyNoteDateKey;
   NoteCardStyle get cardStyle;
   @JsonKey(ignore: true)
@@ -878,6 +922,7 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -908,6 +953,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return titleChanged(value);
   }
@@ -926,6 +972,7 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -954,6 +1001,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return titleChanged?.call(value);
   }
@@ -972,6 +1020,7 @@ class _$TitleChangedImpl implements _TitleChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1000,6 +1049,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -1032,6 +1082,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return titleChanged(this);
   }
@@ -1060,6 +1111,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return titleChanged?.call(this);
   }
@@ -1088,6 +1140,7 @@ class _$TitleChangedImpl implements _TitleChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (titleChanged != null) {
@@ -1182,6 +1235,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -1212,6 +1266,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return descriptionChanged(value);
   }
@@ -1230,6 +1285,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1258,6 +1314,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return descriptionChanged?.call(value);
   }
@@ -1276,6 +1333,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1304,6 +1362,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -1336,6 +1395,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return descriptionChanged(this);
   }
@@ -1364,6 +1424,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return descriptionChanged?.call(this);
   }
@@ -1392,6 +1453,7 @@ class _$DescriptionChangedImpl implements _DescriptionChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (descriptionChanged != null) {
@@ -1523,6 +1585,7 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -1553,6 +1616,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return bodyChanged(text, styles, layouts);
   }
@@ -1571,6 +1635,7 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1599,6 +1664,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return bodyChanged?.call(text, styles, layouts);
   }
@@ -1617,6 +1683,7 @@ class _$BodyChangedImpl implements _BodyChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1645,6 +1712,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (bodyChanged != null) {
@@ -1677,6 +1745,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return bodyChanged(this);
   }
@@ -1705,6 +1774,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return bodyChanged?.call(this);
   }
@@ -1733,6 +1803,7 @@ class _$BodyChangedImpl implements _BodyChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (bodyChanged != null) {
@@ -1839,6 +1910,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -1869,6 +1941,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return imageLayoutsChanged(value);
   }
@@ -1887,6 +1960,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1915,6 +1989,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return imageLayoutsChanged?.call(value);
   }
@@ -1933,6 +2008,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -1961,6 +2037,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (imageLayoutsChanged != null) {
@@ -1993,6 +2070,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return imageLayoutsChanged(this);
   }
@@ -2021,6 +2099,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return imageLayoutsChanged?.call(this);
   }
@@ -2049,6 +2128,7 @@ class _$ImageLayoutsChangedImpl implements _ImageLayoutsChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (imageLayoutsChanged != null) {
@@ -2143,6 +2223,7 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -2173,6 +2254,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return colorChanged(value);
   }
@@ -2191,6 +2273,7 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2219,6 +2302,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return colorChanged?.call(value);
   }
@@ -2237,6 +2321,7 @@ class _$ColorChangedImpl implements _ColorChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2265,6 +2350,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -2297,6 +2383,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return colorChanged(this);
   }
@@ -2325,6 +2412,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return colorChanged?.call(this);
   }
@@ -2353,6 +2441,7 @@ class _$ColorChangedImpl implements _ColorChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (colorChanged != null) {
@@ -2455,6 +2544,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -2485,6 +2575,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return appearanceChanged(style, color);
   }
@@ -2503,6 +2594,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2531,6 +2623,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return appearanceChanged?.call(style, color);
   }
@@ -2549,6 +2642,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2577,6 +2671,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (appearanceChanged != null) {
@@ -2609,6 +2704,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return appearanceChanged(this);
   }
@@ -2637,6 +2733,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return appearanceChanged?.call(this);
   }
@@ -2665,6 +2762,7 @@ class _$AppearanceChangedImpl implements _AppearanceChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (appearanceChanged != null) {
@@ -2821,6 +2919,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -2851,6 +2950,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return addOrUpdateNote(
         id, folderId, isPinned, isArchived, sortOrder, deletedAt);
@@ -2870,6 +2970,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2898,6 +2999,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return addOrUpdateNote?.call(
         id, folderId, isPinned, isArchived, sortOrder, deletedAt);
@@ -2917,6 +3019,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -2945,6 +3048,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
@@ -2978,6 +3082,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return addOrUpdateNote(this);
   }
@@ -3006,6 +3111,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return addOrUpdateNote?.call(this);
   }
@@ -3034,6 +3140,7 @@ class _$AddOrUpdateNoteImpl implements _AddOrUpdateNote {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addOrUpdateNote != null) {
@@ -3138,6 +3245,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -3168,6 +3276,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return addEmptyTodo(afterId);
   }
@@ -3186,6 +3295,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3214,6 +3324,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return addEmptyTodo?.call(afterId);
   }
@@ -3232,6 +3343,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3260,6 +3372,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -3292,6 +3405,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return addEmptyTodo(this);
   }
@@ -3320,6 +3434,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return addEmptyTodo?.call(this);
   }
@@ -3348,6 +3463,7 @@ class _$AddEmptyTodoImpl implements _AddEmptyTodo {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addEmptyTodo != null) {
@@ -3441,6 +3557,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -3471,6 +3588,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return deleteTodo(id);
   }
@@ -3489,6 +3607,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3517,6 +3636,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return deleteTodo?.call(id);
   }
@@ -3535,6 +3655,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3563,6 +3684,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -3595,6 +3717,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return deleteTodo(this);
   }
@@ -3623,6 +3746,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return deleteTodo?.call(this);
   }
@@ -3651,6 +3775,7 @@ class _$DeleteTodoImpl implements _DeleteTodo {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (deleteTodo != null) {
@@ -3753,6 +3878,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -3783,6 +3909,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return todoValueChanged(value, id);
   }
@@ -3801,6 +3928,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3829,6 +3957,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return todoValueChanged?.call(value, id);
   }
@@ -3847,6 +3976,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -3875,6 +4005,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -3907,6 +4038,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return todoValueChanged(this);
   }
@@ -3935,6 +4067,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return todoValueChanged?.call(this);
   }
@@ -3963,6 +4096,7 @@ class _$TodoValueChangedImpl implements _TodoValueChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (todoValueChanged != null) {
@@ -4060,6 +4194,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -4090,6 +4225,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return toggleTodoCheckbox(id);
   }
@@ -4108,6 +4244,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4136,6 +4273,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return toggleTodoCheckbox?.call(id);
   }
@@ -4154,6 +4292,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4182,6 +4321,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -4214,6 +4354,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return toggleTodoCheckbox(this);
   }
@@ -4242,6 +4383,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return toggleTodoCheckbox?.call(this);
   }
@@ -4270,6 +4412,7 @@ class _$ToggleTodoCheckboxImpl implements _ToggleTodoCheckbox {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (toggleTodoCheckbox != null) {
@@ -4373,6 +4516,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -4403,6 +4547,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return setTodoCompleted(id, completed);
   }
@@ -4421,6 +4566,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4449,6 +4595,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return setTodoCompleted?.call(id, completed);
   }
@@ -4467,6 +4614,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4495,6 +4643,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (setTodoCompleted != null) {
@@ -4527,6 +4676,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return setTodoCompleted(this);
   }
@@ -4555,6 +4705,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return setTodoCompleted?.call(this);
   }
@@ -4583,6 +4734,7 @@ class _$SetTodoCompletedImpl implements _SetTodoCompleted {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (setTodoCompleted != null) {
@@ -4696,6 +4848,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -4726,6 +4879,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return replaceTodoLines(id, lines);
   }
@@ -4744,6 +4898,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4772,6 +4927,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return replaceTodoLines?.call(id, lines);
   }
@@ -4790,6 +4946,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -4818,6 +4975,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (replaceTodoLines != null) {
@@ -4850,6 +5008,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return replaceTodoLines(this);
   }
@@ -4878,6 +5037,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return replaceTodoLines?.call(this);
   }
@@ -4906,6 +5066,7 @@ class _$ReplaceTodoLinesImpl implements _ReplaceTodoLines {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (replaceTodoLines != null) {
@@ -5012,6 +5173,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -5042,6 +5204,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return reorderTodo(oldIndex, newIndex);
   }
@@ -5060,6 +5223,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5088,6 +5252,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return reorderTodo?.call(oldIndex, newIndex);
   }
@@ -5106,6 +5271,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5134,6 +5300,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (reorderTodo != null) {
@@ -5166,6 +5333,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return reorderTodo(this);
   }
@@ -5194,6 +5362,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return reorderTodo?.call(this);
   }
@@ -5222,6 +5391,7 @@ class _$ReorderTodoImpl implements _ReorderTodo {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (reorderTodo != null) {
@@ -5327,6 +5497,7 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -5357,6 +5528,7 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return addImage(path, textOffset);
   }
@@ -5375,6 +5547,7 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5403,6 +5576,7 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return addImage?.call(path, textOffset);
   }
@@ -5421,6 +5595,7 @@ class _$AddImageImpl implements _AddImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5449,6 +5624,7 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addImage != null) {
@@ -5481,6 +5657,7 @@ class _$AddImageImpl implements _AddImage {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return addImage(this);
   }
@@ -5509,6 +5686,7 @@ class _$AddImageImpl implements _AddImage {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return addImage?.call(this);
   }
@@ -5537,6 +5715,7 @@ class _$AddImageImpl implements _AddImage {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (addImage != null) {
@@ -5632,6 +5811,7 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -5662,6 +5842,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return removeImage(path);
   }
@@ -5680,6 +5861,7 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5708,6 +5890,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return removeImage?.call(path);
   }
@@ -5726,6 +5909,7 @@ class _$RemoveImageImpl implements _RemoveImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -5754,6 +5938,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (removeImage != null) {
@@ -5786,6 +5971,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return removeImage(this);
   }
@@ -5814,6 +6000,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return removeImage?.call(this);
   }
@@ -5842,6 +6029,7 @@ class _$RemoveImageImpl implements _RemoveImage {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (removeImage != null) {
@@ -5955,6 +6143,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -5985,6 +6174,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return replaceImage(oldPath, newPath, aspectRatio);
   }
@@ -6003,6 +6193,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6031,6 +6222,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return replaceImage?.call(oldPath, newPath, aspectRatio);
   }
@@ -6049,6 +6241,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6077,6 +6270,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (replaceImage != null) {
@@ -6109,6 +6303,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return replaceImage(this);
   }
@@ -6137,6 +6332,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return replaceImage?.call(this);
   }
@@ -6165,6 +6361,7 @@ class _$ReplaceImageImpl implements _ReplaceImage {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (replaceImage != null) {
@@ -6270,6 +6467,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -6300,6 +6498,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return voiceMemosChanged(value);
   }
@@ -6318,6 +6517,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6346,6 +6546,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return voiceMemosChanged?.call(value);
   }
@@ -6364,6 +6565,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6392,6 +6594,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (voiceMemosChanged != null) {
@@ -6424,6 +6627,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return voiceMemosChanged(this);
   }
@@ -6452,6 +6656,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return voiceMemosChanged?.call(this);
   }
@@ -6480,6 +6685,7 @@ class _$VoiceMemosChangedImpl implements _VoiceMemosChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (voiceMemosChanged != null) {
@@ -6580,6 +6786,7 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -6610,6 +6817,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return tagsChanged(value);
   }
@@ -6628,6 +6836,7 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6656,6 +6865,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return tagsChanged?.call(value);
   }
@@ -6674,6 +6884,7 @@ class _$TagsChangedImpl implements _TagsChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6702,6 +6913,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (tagsChanged != null) {
@@ -6734,6 +6946,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return tagsChanged(this);
   }
@@ -6762,6 +6975,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return tagsChanged?.call(this);
   }
@@ -6790,6 +7004,7 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (tagsChanged != null) {
@@ -6889,6 +7104,7 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)
         initialize,
@@ -6919,6 +7135,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
     required TResult Function(List<String> value) tagsChanged,
     required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
   }) {
     return linksChanged(value);
   }
@@ -6937,6 +7154,7 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -6965,6 +7183,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult? Function(List<String> value)? tagsChanged,
     TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
   }) {
     return linksChanged?.call(value);
   }
@@ -6983,6 +7202,7 @@ class _$LinksChangedImpl implements _LinksChanged {
             List<VoiceMemo>? voiceMemos,
             List<String>? tags,
             List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
             String? dailyNoteDateKey,
             NoteCardStyle cardStyle)?
         initialize,
@@ -7011,6 +7231,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
     TResult Function(List<String> value)? tagsChanged,
     TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (linksChanged != null) {
@@ -7043,6 +7264,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
     required TResult Function(_TagsChanged value) tagsChanged,
     required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
   }) {
     return linksChanged(this);
   }
@@ -7071,6 +7293,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult? Function(_TagsChanged value)? tagsChanged,
     TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
   }) {
     return linksChanged?.call(this);
   }
@@ -7099,6 +7322,7 @@ class _$LinksChangedImpl implements _LinksChanged {
     TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
     TResult Function(_TagsChanged value)? tagsChanged,
     TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
     required TResult orElse(),
   }) {
     if (linksChanged != null) {
@@ -7118,6 +7342,327 @@ abstract class _LinksChanged implements AddUpdateFormEvent {
 }
 
 /// @nodoc
+abstract class _$$SectionLinksChangedImplCopyWith<$Res> {
+  factory _$$SectionLinksChangedImplCopyWith(_$SectionLinksChangedImpl value,
+          $Res Function(_$SectionLinksChangedImpl) then) =
+      __$$SectionLinksChangedImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({List<NoteSectionLink> value});
+}
+
+/// @nodoc
+class __$$SectionLinksChangedImplCopyWithImpl<$Res>
+    extends _$AddUpdateFormEventCopyWithImpl<$Res, _$SectionLinksChangedImpl>
+    implements _$$SectionLinksChangedImplCopyWith<$Res> {
+  __$$SectionLinksChangedImplCopyWithImpl(_$SectionLinksChangedImpl _value,
+      $Res Function(_$SectionLinksChangedImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? value = null,
+  }) {
+    return _then(_$SectionLinksChangedImpl(
+      null == value
+          ? _value._value
+          : value // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SectionLinksChangedImpl implements _SectionLinksChanged {
+  const _$SectionLinksChangedImpl(final List<NoteSectionLink> value)
+      : _value = value;
+
+  final List<NoteSectionLink> _value;
+  @override
+  List<NoteSectionLink> get value {
+    if (_value is EqualUnmodifiableListView) return _value;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_value);
+  }
+
+  @override
+  String toString() {
+    return 'AddUpdateFormEvent.sectionLinksChanged(value: $value)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SectionLinksChangedImpl &&
+            const DeepCollectionEquality().equals(other._value, _value));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_value));
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SectionLinksChangedImplCopyWith<_$SectionLinksChangedImpl> get copyWith =>
+      __$$SectionLinksChangedImplCopyWithImpl<_$SectionLinksChangedImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<NoteImageLayout>? imageLayouts,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)
+        initialize,
+    required TResult Function(String value) titleChanged,
+    required TResult Function(String value) descriptionChanged,
+    required TResult Function(String text, List<NoteTextStyleRange> styles,
+            List<NoteImageLayout> layouts)
+        bodyChanged,
+    required TResult Function(List<NoteImageLayout> value) imageLayoutsChanged,
+    required TResult Function(Color value) colorChanged,
+    required TResult Function(NoteCardStyle style, Color? color)
+        appearanceChanged,
+    required TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)
+        addOrUpdateNote,
+    required TResult Function(String? afterId) addEmptyTodo,
+    required TResult Function(String id) deleteTodo,
+    required TResult Function(String value, String id) todoValueChanged,
+    required TResult Function(String id) toggleTodoCheckbox,
+    required TResult Function(String id, bool completed) setTodoCompleted,
+    required TResult Function(String id, List<String> lines) replaceTodoLines,
+    required TResult Function(int oldIndex, int newIndex) reorderTodo,
+    required TResult Function(String path, int? textOffset) addImage,
+    required TResult Function(String path) removeImage,
+    required TResult Function(
+            String oldPath, String newPath, double aspectRatio)
+        replaceImage,
+    required TResult Function(List<VoiceMemo> value) voiceMemosChanged,
+    required TResult Function(List<String> value) tagsChanged,
+    required TResult Function(List<String> value) linksChanged,
+    required TResult Function(List<NoteSectionLink> value) sectionLinksChanged,
+  }) {
+    return sectionLinksChanged(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<NoteImageLayout>? imageLayouts,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
+        initialize,
+    TResult? Function(String value)? titleChanged,
+    TResult? Function(String value)? descriptionChanged,
+    TResult? Function(String text, List<NoteTextStyleRange> styles,
+            List<NoteImageLayout> layouts)?
+        bodyChanged,
+    TResult? Function(List<NoteImageLayout> value)? imageLayoutsChanged,
+    TResult? Function(Color value)? colorChanged,
+    TResult? Function(NoteCardStyle style, Color? color)? appearanceChanged,
+    TResult? Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult? Function(String? afterId)? addEmptyTodo,
+    TResult? Function(String id)? deleteTodo,
+    TResult? Function(String value, String id)? todoValueChanged,
+    TResult? Function(String id)? toggleTodoCheckbox,
+    TResult? Function(String id, bool completed)? setTodoCompleted,
+    TResult? Function(String id, List<String> lines)? replaceTodoLines,
+    TResult? Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult? Function(String path, int? textOffset)? addImage,
+    TResult? Function(String path)? removeImage,
+    TResult? Function(String oldPath, String newPath, double aspectRatio)?
+        replaceImage,
+    TResult? Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult? Function(List<String> value)? tagsChanged,
+    TResult? Function(List<String> value)? linksChanged,
+    TResult? Function(List<NoteSectionLink> value)? sectionLinksChanged,
+  }) {
+    return sectionLinksChanged?.call(value);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String? title,
+            String? description,
+            List<NoteTextStyleRange>? textStyles,
+            Color? color,
+            List<Todo>? todos,
+            List<String>? imagePaths,
+            List<NoteImageLayout>? imageLayouts,
+            List<VoiceMemo>? voiceMemos,
+            List<String>? tags,
+            List<String>? linkedNoteIds,
+            List<NoteSectionLink>? sectionLinks,
+            String? dailyNoteDateKey,
+            NoteCardStyle cardStyle)?
+        initialize,
+    TResult Function(String value)? titleChanged,
+    TResult Function(String value)? descriptionChanged,
+    TResult Function(String text, List<NoteTextStyleRange> styles,
+            List<NoteImageLayout> layouts)?
+        bodyChanged,
+    TResult Function(List<NoteImageLayout> value)? imageLayoutsChanged,
+    TResult Function(Color value)? colorChanged,
+    TResult Function(NoteCardStyle style, Color? color)? appearanceChanged,
+    TResult Function(String? id, String? folderId, bool isPinned,
+            bool isArchived, int? sortOrder, DateTime? deletedAt)?
+        addOrUpdateNote,
+    TResult Function(String? afterId)? addEmptyTodo,
+    TResult Function(String id)? deleteTodo,
+    TResult Function(String value, String id)? todoValueChanged,
+    TResult Function(String id)? toggleTodoCheckbox,
+    TResult Function(String id, bool completed)? setTodoCompleted,
+    TResult Function(String id, List<String> lines)? replaceTodoLines,
+    TResult Function(int oldIndex, int newIndex)? reorderTodo,
+    TResult Function(String path, int? textOffset)? addImage,
+    TResult Function(String path)? removeImage,
+    TResult Function(String oldPath, String newPath, double aspectRatio)?
+        replaceImage,
+    TResult Function(List<VoiceMemo> value)? voiceMemosChanged,
+    TResult Function(List<String> value)? tagsChanged,
+    TResult Function(List<String> value)? linksChanged,
+    TResult Function(List<NoteSectionLink> value)? sectionLinksChanged,
+    required TResult orElse(),
+  }) {
+    if (sectionLinksChanged != null) {
+      return sectionLinksChanged(value);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Initialize value) initialize,
+    required TResult Function(_TitleChanged value) titleChanged,
+    required TResult Function(_DescriptionChanged value) descriptionChanged,
+    required TResult Function(_BodyChanged value) bodyChanged,
+    required TResult Function(_ImageLayoutsChanged value) imageLayoutsChanged,
+    required TResult Function(_ColorChanged value) colorChanged,
+    required TResult Function(_AppearanceChanged value) appearanceChanged,
+    required TResult Function(_AddOrUpdateNote value) addOrUpdateNote,
+    required TResult Function(_AddEmptyTodo value) addEmptyTodo,
+    required TResult Function(_DeleteTodo value) deleteTodo,
+    required TResult Function(_TodoValueChanged value) todoValueChanged,
+    required TResult Function(_ToggleTodoCheckbox value) toggleTodoCheckbox,
+    required TResult Function(_SetTodoCompleted value) setTodoCompleted,
+    required TResult Function(_ReplaceTodoLines value) replaceTodoLines,
+    required TResult Function(_ReorderTodo value) reorderTodo,
+    required TResult Function(_AddImage value) addImage,
+    required TResult Function(_RemoveImage value) removeImage,
+    required TResult Function(_ReplaceImage value) replaceImage,
+    required TResult Function(_VoiceMemosChanged value) voiceMemosChanged,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_LinksChanged value) linksChanged,
+    required TResult Function(_SectionLinksChanged value) sectionLinksChanged,
+  }) {
+    return sectionLinksChanged(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Initialize value)? initialize,
+    TResult? Function(_TitleChanged value)? titleChanged,
+    TResult? Function(_DescriptionChanged value)? descriptionChanged,
+    TResult? Function(_BodyChanged value)? bodyChanged,
+    TResult? Function(_ImageLayoutsChanged value)? imageLayoutsChanged,
+    TResult? Function(_ColorChanged value)? colorChanged,
+    TResult? Function(_AppearanceChanged value)? appearanceChanged,
+    TResult? Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult? Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult? Function(_DeleteTodo value)? deleteTodo,
+    TResult? Function(_TodoValueChanged value)? todoValueChanged,
+    TResult? Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult? Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult? Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult? Function(_ReorderTodo value)? reorderTodo,
+    TResult? Function(_AddImage value)? addImage,
+    TResult? Function(_RemoveImage value)? removeImage,
+    TResult? Function(_ReplaceImage value)? replaceImage,
+    TResult? Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_LinksChanged value)? linksChanged,
+    TResult? Function(_SectionLinksChanged value)? sectionLinksChanged,
+  }) {
+    return sectionLinksChanged?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Initialize value)? initialize,
+    TResult Function(_TitleChanged value)? titleChanged,
+    TResult Function(_DescriptionChanged value)? descriptionChanged,
+    TResult Function(_BodyChanged value)? bodyChanged,
+    TResult Function(_ImageLayoutsChanged value)? imageLayoutsChanged,
+    TResult Function(_ColorChanged value)? colorChanged,
+    TResult Function(_AppearanceChanged value)? appearanceChanged,
+    TResult Function(_AddOrUpdateNote value)? addOrUpdateNote,
+    TResult Function(_AddEmptyTodo value)? addEmptyTodo,
+    TResult Function(_DeleteTodo value)? deleteTodo,
+    TResult Function(_TodoValueChanged value)? todoValueChanged,
+    TResult Function(_ToggleTodoCheckbox value)? toggleTodoCheckbox,
+    TResult Function(_SetTodoCompleted value)? setTodoCompleted,
+    TResult Function(_ReplaceTodoLines value)? replaceTodoLines,
+    TResult Function(_ReorderTodo value)? reorderTodo,
+    TResult Function(_AddImage value)? addImage,
+    TResult Function(_RemoveImage value)? removeImage,
+    TResult Function(_ReplaceImage value)? replaceImage,
+    TResult Function(_VoiceMemosChanged value)? voiceMemosChanged,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_LinksChanged value)? linksChanged,
+    TResult Function(_SectionLinksChanged value)? sectionLinksChanged,
+    required TResult orElse(),
+  }) {
+    if (sectionLinksChanged != null) {
+      return sectionLinksChanged(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SectionLinksChanged implements AddUpdateFormEvent {
+  const factory _SectionLinksChanged(final List<NoteSectionLink> value) =
+      _$SectionLinksChangedImpl;
+
+  List<NoteSectionLink> get value;
+  @JsonKey(ignore: true)
+  _$$SectionLinksChangedImplCopyWith<_$SectionLinksChangedImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$AddUpdateFormState {
   String? get title => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
@@ -7129,6 +7674,7 @@ mixin _$AddUpdateFormState {
   List<VoiceMemo> get voiceMemos => throw _privateConstructorUsedError;
   List<String> get tags => throw _privateConstructorUsedError;
   List<String> get linkedNoteIds => throw _privateConstructorUsedError;
+  List<NoteSectionLink> get sectionLinks => throw _privateConstructorUsedError;
   String? get dailyNoteDateKey => throw _privateConstructorUsedError;
   NoteCardStyle get cardStyle => throw _privateConstructorUsedError;
   DateTime? get reminderDate => throw _privateConstructorUsedError;
@@ -7156,6 +7702,7 @@ abstract class $AddUpdateFormStateCopyWith<$Res> {
       List<VoiceMemo> voiceMemos,
       List<String> tags,
       List<String> linkedNoteIds,
+      List<NoteSectionLink> sectionLinks,
       String? dailyNoteDateKey,
       NoteCardStyle cardStyle,
       DateTime? reminderDate,
@@ -7185,6 +7732,7 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
     Object? voiceMemos = null,
     Object? tags = null,
     Object? linkedNoteIds = null,
+    Object? sectionLinks = null,
     Object? dailyNoteDateKey = freezed,
     Object? cardStyle = null,
     Object? reminderDate = freezed,
@@ -7231,6 +7779,10 @@ class _$AddUpdateFormStateCopyWithImpl<$Res, $Val extends AddUpdateFormState>
           ? _value.linkedNoteIds
           : linkedNoteIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sectionLinks: null == sectionLinks
+          ? _value.sectionLinks
+          : sectionLinks // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>,
       dailyNoteDateKey: freezed == dailyNoteDateKey
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
@@ -7270,6 +7822,7 @@ abstract class _$$AddUpdateFormStateImplCopyWith<$Res>
       List<VoiceMemo> voiceMemos,
       List<String> tags,
       List<String> linkedNoteIds,
+      List<NoteSectionLink> sectionLinks,
       String? dailyNoteDateKey,
       NoteCardStyle cardStyle,
       DateTime? reminderDate,
@@ -7297,6 +7850,7 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
     Object? voiceMemos = null,
     Object? tags = null,
     Object? linkedNoteIds = null,
+    Object? sectionLinks = null,
     Object? dailyNoteDateKey = freezed,
     Object? cardStyle = null,
     Object? reminderDate = freezed,
@@ -7343,6 +7897,10 @@ class __$$AddUpdateFormStateImplCopyWithImpl<$Res>
           ? _value._linkedNoteIds
           : linkedNoteIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sectionLinks: null == sectionLinks
+          ? _value._sectionLinks
+          : sectionLinks // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>,
       dailyNoteDateKey: freezed == dailyNoteDateKey
           ? _value.dailyNoteDateKey
           : dailyNoteDateKey // ignore: cast_nullable_to_non_nullable
@@ -7377,6 +7935,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       final List<VoiceMemo> voiceMemos = const [],
       final List<String> tags = const [],
       final List<String> linkedNoteIds = const [],
+      final List<NoteSectionLink> sectionLinks = const [],
       this.dailyNoteDateKey,
       this.cardStyle = const NoteCardStyle(),
       this.reminderDate,
@@ -7388,6 +7947,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
         _voiceMemos = voiceMemos,
         _tags = tags,
         _linkedNoteIds = linkedNoteIds,
+        _sectionLinks = sectionLinks,
         super._();
 
   @override
@@ -7459,6 +8019,15 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
     return EqualUnmodifiableListView(_linkedNoteIds);
   }
 
+  final List<NoteSectionLink> _sectionLinks;
+  @override
+  @JsonKey()
+  List<NoteSectionLink> get sectionLinks {
+    if (_sectionLinks is EqualUnmodifiableListView) return _sectionLinks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sectionLinks);
+  }
+
   @override
   final String? dailyNoteDateKey;
   @override
@@ -7471,7 +8040,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
 
   @override
   String toString() {
-    return 'AddUpdateFormState(title: $title, description: $description, textStyles: $textStyles, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle, reminderDate: $reminderDate, reminderId: $reminderId)';
+    return 'AddUpdateFormState(title: $title, description: $description, textStyles: $textStyles, selectedColor: $selectedColor, todos: $todos, imagePaths: $imagePaths, imageLayouts: $imageLayouts, voiceMemos: $voiceMemos, tags: $tags, linkedNoteIds: $linkedNoteIds, sectionLinks: $sectionLinks, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle, reminderDate: $reminderDate, reminderId: $reminderId)';
   }
 
   @override
@@ -7496,6 +8065,8 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
             const DeepCollectionEquality().equals(other._tags, _tags) &&
             const DeepCollectionEquality()
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
+            const DeepCollectionEquality()
+                .equals(other._sectionLinks, _sectionLinks) &&
             (identical(other.dailyNoteDateKey, dailyNoteDateKey) ||
                 other.dailyNoteDateKey == dailyNoteDateKey) &&
             (identical(other.cardStyle, cardStyle) ||
@@ -7519,6 +8090,7 @@ class _$AddUpdateFormStateImpl extends _AddUpdateFormState {
       const DeepCollectionEquality().hash(_voiceMemos),
       const DeepCollectionEquality().hash(_tags),
       const DeepCollectionEquality().hash(_linkedNoteIds),
+      const DeepCollectionEquality().hash(_sectionLinks),
       dailyNoteDateKey,
       cardStyle,
       reminderDate,
@@ -7544,6 +8116,7 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
       final List<VoiceMemo> voiceMemos,
       final List<String> tags,
       final List<String> linkedNoteIds,
+      final List<NoteSectionLink> sectionLinks,
       final String? dailyNoteDateKey,
       final NoteCardStyle cardStyle,
       final DateTime? reminderDate,
@@ -7570,6 +8143,8 @@ abstract class _AddUpdateFormState extends AddUpdateFormState {
   List<String> get tags;
   @override
   List<String> get linkedNoteIds;
+  @override
+  List<NoteSectionLink> get sectionLinks;
   @override
   String? get dailyNoteDateKey;
   @override

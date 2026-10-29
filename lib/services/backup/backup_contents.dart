@@ -13,6 +13,7 @@ import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/services/note_section_links.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_document.dart';
@@ -67,7 +68,7 @@ class BackupContents {
 
   Map<String, dynamic> toJson() => {
         'format': 'onlynote-backup',
-        'version': 8,
+        'version': 9,
         'createdAt': createdAt.toIso8601String(),
         'folders': [
           for (final folder in folders)
@@ -128,6 +129,7 @@ class BackupContents {
         'isArchived': note.isArchived,
         'tags': note.tags ?? [],
         'linkedNoteIds': note.linkedNoteIds ?? [],
+        'sectionLinks': note.sectionLinks ?? [],
         'textStyles': note.textStyles ?? [],
         'imageLayouts': note.imageLayouts ?? [],
         'dailyNoteDateKey': note.dailyNoteDateKey,
@@ -154,7 +156,8 @@ class BackupContents {
             version != 5 &&
             version != 6 &&
             version != 7 &&
-            version != 8)) {
+            version != 8 &&
+            version != 9)) {
       throw const FormatException('Unsupported backup');
     }
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -274,6 +277,13 @@ class BackupContents {
                 _list(map['linkedNoteIds'], max: maxLinkedNotes).cast<String>(),
                 noteId: id)
             : const [],
+        sectionLinks: version >= 9
+            ? [
+                for (final link
+                    in parseNoteSectionLinks(map['sectionLinks'] ?? const []))
+                  link.toMap(),
+              ]
+            : const [],
         imagePaths: paths,
         voiceMemos: [for (final memo in memos) memo.toMap()],
         todoList: todos,
@@ -320,6 +330,8 @@ class BackupContents {
         if (version < 5) 'textStyles': [],
         if (version < 6) 'imageLayouts': [],
         if (version < 8) 'cardStyle': null,
+        if (version < 9) 'sectionLinks': [],
+        if (version < 9) 'sourceNoteId': null,
       }).copyWith(voiceMemos: memos);
       _id(template.id);
       if (!templateIds.add(template.id)) {

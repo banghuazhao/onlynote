@@ -6226,6 +6226,95 @@ class S {
       args: [date],
     );
   }
+
+  String get Today_Title =>
+      Intl.message("Today", name: "Today_Title", desc: "", args: []);
+
+  String get Today_Description =>
+      Intl.message("Your note, reminders, and unfinished tasks in one place.",
+          name: "Today_Description", desc: "", args: []);
+
+  String get Today_Create_Note => Intl.message("Start today’s note",
+      name: "Today_Create_Note", desc: "", args: []);
+
+  String get Today_Open_Note =>
+      Intl.message("Open note", name: "Today_Open_Note", desc: "", args: []);
+
+  String get Today_Daily_Empty =>
+      Intl.message("Capture a thought or make a plan for today.",
+          name: "Today_Daily_Empty", desc: "", args: []);
+
+  String get Today_Reminders => Intl.message("Due reminders",
+      name: "Today_Reminders", desc: "", args: []);
+
+  String get Today_No_Reminders => Intl.message("No reminders due today.",
+      name: "Today_No_Reminders", desc: "", args: []);
+
+  String get Today_All_Reminders => Intl.message("All reminders",
+      name: "Today_All_Reminders", desc: "", args: []);
+
+  String get Today_Tasks =>
+      Intl.message("Unfinished tasks", name: "Today_Tasks", desc: "", args: []);
+
+  String get Today_Tasks_Hint => Intl.message("Across your active notes",
+      name: "Today_Tasks_Hint", desc: "", args: []);
+
+  String get Today_No_Tasks => Intl.message("No unfinished tasks.",
+      name: "Today_No_Tasks", desc: "", args: []);
+
+  String get Today_Load_Failed =>
+      Intl.message("Could not refresh Today. Try again.",
+          name: "Today_Load_Failed", desc: "", args: []);
+
+  String get Today_Task_Save_Failed =>
+      Intl.message("Could not complete this task. Try again.",
+          name: "Today_Task_Save_Failed", desc: "", args: []);
+
+  String get Today_Task_Changed => Intl.message(
+      "This task changed. Review the latest version and try again.",
+      name: "Today_Task_Changed",
+      desc: "",
+      args: []);
+
+  String get Editor_Divider =>
+      Intl.message("Divider line", name: "Editor_Divider", desc: "", args: []);
+
+  String get Section_Links =>
+      Intl.message("Heading links", name: "Section_Links", desc: "", args: []);
+
+  String get Section_Link_Add => Intl.message("Link to heading",
+      name: "Section_Link_Add", desc: "", args: []);
+
+  String get Section_Link_Choose => Intl.message("Choose a heading",
+      name: "Section_Link_Choose", desc: "", args: []);
+
+  String get Section_Link_Search => Intl.message("Search notes and headings",
+      name: "Section_Link_Search", desc: "", args: []);
+
+  String get Section_Link_Empty =>
+      Intl.message("Format a paragraph as a heading to link to it here.",
+          name: "Section_Link_Empty", desc: "", args: []);
+
+  String get Section_Link_No_Results => Intl.message("No matching headings.",
+      name: "Section_Link_No_Results", desc: "", args: []);
+
+  String get Section_Link_This_Note => Intl.message("This note",
+      name: "Section_Link_This_Note", desc: "", args: []);
+
+  String get Section_Link_Unavailable =>
+      Intl.message("Heading unavailable. It may have been removed.",
+          name: "Section_Link_Unavailable", desc: "", args: []);
+
+  String get Section_Link_Remove => Intl.message("Remove heading link",
+      name: "Section_Link_Remove", desc: "", args: []);
+
+  String get Section_Link_Failed =>
+      Intl.message("Could not save this heading link. Try again.",
+          name: "Section_Link_Failed", desc: "", args: []);
+
+  String get Section_Link_Limit =>
+      Intl.message("You can add up to 100 heading links per note.",
+          name: "Section_Link_Limit", desc: "", args: []);
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

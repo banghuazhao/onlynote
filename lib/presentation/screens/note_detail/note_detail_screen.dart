@@ -1,3 +1,8 @@
+import 'package:onlynote/domain/model/note_section_link.dart';
+import 'package:onlynote/services/note_section_links.dart';
+import 'package:onlynote/services/note_section_link_capture.dart';
+import 'package:onlynote/presentation/components/note_section_link_picker_sheet.dart';
+import 'package:onlynote/presentation/components/note_section_links_section.dart';
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/note_document_view.dart';
@@ -76,8 +81,10 @@ class NoteDetailScreen extends StatefulWidget implements AutoRouteWrapper {
       @PathParam('noteId') required this.noteId,
       this.templateStore,
       this.positionStore,
-      this.selectionTransfer});
+      this.selectionTransfer,
+      this.initialHeadingId});
   final String noteId;
+  final String? initialHeadingId;
   final CustomNoteTemplateStore? templateStore;
   final NotePositionStore? positionStore;
   final NoteSelectionTransfer? selectionTransfer;
@@ -203,6 +210,24 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   Future<void> _loadReadingPosition(String noteId, int generation) async {
+    if (widget.initialHeadingId != null) {
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted || generation != _readingGeneration) return;
+      final note = _positionNote;
+      final heading = note == null
+          ? null
+          : buildNoteOutline(note.description ?? '', note.textStyles)
+              .where((entry) => entry.anchorId == widget.initialHeadingId)
+              .firstOrNull;
+      if (heading == null) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Section_Link_Unavailable)));
+      } else {
+        await _outlineController.jumpTo(heading.start);
+        if (mounted) _rememberReadingPosition();
+      }
+      return;
+    }
     final saved = await _positions.read(noteId);
     if (!mounted ||
         generation != _readingGeneration ||
@@ -582,6 +607,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         ),
         AppSheetAction(
           section: strings.Note_Menu_Organization,
+          leading: const Icon(Icons.segment_rounded),
+          title: Text(strings.Section_Link_Add),
+          onPressed: (sheetContext) {
+            Navigator.pop(sheetContext);
+            _addSectionLink(note);
+          },
+        ),
+        AppSheetAction(
+          section: strings.Note_Menu_Organization,
           leading: const Icon(Icons.bookmarks_outlined),
           title: Text(S.of(context).Save_As_Template),
           onPressed: (sheetContext) {
@@ -732,7 +766,79 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     });
   }
 
-  Future<void> _openLinkedNote(Note note) async {
+  Future<void> _addSectionLink(Note source) async {
+    if (_changingLibrary || source.isDeleted || source.id == null) return;
+    setState(() => _changingLibrary = true);
+    try {
+      final selected = await showNoteSectionLinkPickerSheet(context,
+          notes: _libraryNotes, currentNoteId: source.id!);
+      if (!mounted ||
+          selected == null ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        return;
+      }
+      final repository = getIt<NoteRepository>();
+      final target = (await repository.getNote(selected.noteId)).toDomain();
+      final captured = captureNoteSectionLink(target, selected.heading);
+      if (captured == null) throw StateError('Heading changed');
+      if (target.id != source.id) {
+        await repository.addUpdateNote(NoteDto.fromNote(captured.target));
+      }
+      final current = target.id == source.id
+          ? captured.target
+          : (await repository.getNote(source.id!)).toDomain();
+      if (current.isDeleted) throw StateError('Note unavailable');
+      final links =
+          normalizeNoteSectionLinks([...current.sectionLinks, captured.link]);
+      await repository.addUpdateNote(
+          NoteDto.fromNote(current.copyWith(sectionLinks: links)));
+      if (mounted) _reload();
+    } catch (_) {
+      if (mounted) {
+        showTransientSnackBar(context,
+            SnackBar(content: Text(S.of(context).Section_Link_Failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _changingLibrary = false);
+    }
+  }
+
+  Future<void> _removeSectionLink(Note source, NoteSectionLink link) =>
+      _changeLibrary((repository) async {
+        final current = (await repository.getNote(source.id!)).toDomain();
+        if (current.isDeleted) throw StateError('Note unavailable');
+        await repository.addUpdateNote(NoteDto.fromNote(current.copyWith(
+            sectionLinks: current.sectionLinks
+                .where((value) => value != link)
+                .toList())));
+      });
+
+  Future<void> _openSectionLink(NoteSectionLink link) async {
+    if (_changingLibrary ||
+        _openingNoteRoute ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    final target = resolveNoteSectionLink(link, _libraryNotes);
+    if (target == null) {
+      showTransientSnackBar(context,
+          SnackBar(content: Text(S.of(context).Section_Link_Unavailable)));
+      return;
+    }
+    if (target.note.id == widget.noteId) {
+      _cancelReadingRestore();
+      if (_findOpen) {
+        _findController.setQuery('');
+        setState(() => _findOpen = false);
+        await WidgetsBinding.instance.endOfFrame;
+      }
+      if (mounted) await _outlineController.jumpTo(target.heading.start);
+    } else {
+      await _openLinkedNote(target.note, headingId: link.headingId);
+    }
+  }
+
+  Future<void> _openLinkedNote(Note note, {String? headingId}) async {
     if (_changingLibrary ||
         _openingNoteRoute ||
         note.id == null ||
@@ -749,7 +855,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     try {
       await _saveReadingPosition();
       if (!mounted || ModalRoute.of(context)?.isCurrent != true) return;
-      await context.router.push(NoteDetailRoute(noteId: current.id!));
+      await context.router.push(
+          NoteDetailRoute(noteId: current.id!, initialHeadingId: headingId));
       _reload();
     } finally {
       _openingNoteRoute = false;
@@ -1216,6 +1323,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                                                     data.note, selection),
                                     libraryNotes: _libraryNotes,
                                     onOpenLinkedNote: _openLinkedNote,
+                                    onOpenSectionLink: _openSectionLink,
+                                    onRemoveSectionLink: data.note.isDeleted ||
+                                            _changingLibrary
+                                        ? null
+                                        : (link) =>
+                                            _removeSectionLink(data.note, link),
                                     onEditLinks: data.note.isDeleted
                                         ? null
                                         : () => _editLinks(data.note),
@@ -1251,6 +1364,8 @@ class LoadedView extends StatelessWidget {
     this.exportMode = false,
     this.libraryNotes = const [],
     this.onOpenLinkedNote,
+    this.onOpenSectionLink,
+    this.onRemoveSectionLink,
     this.onEditLinks,
     this.searchController,
     this.outlineController,
@@ -1268,6 +1383,8 @@ class LoadedView extends StatelessWidget {
   final bool exportMode;
   final List<Note> libraryNotes;
   final ValueChanged<Note>? onOpenLinkedNote;
+  final ValueChanged<NoteSectionLink>? onOpenSectionLink;
+  final ValueChanged<NoteSectionLink>? onRemoveSectionLink;
   final VoidCallback? onEditLinks;
   final NoteSearchController? searchController;
   final NoteOutlineNavigationController? outlineController;
@@ -1516,6 +1633,13 @@ class LoadedView extends StatelessWidget {
                         exportMode: exportMode,
                       ),
                     ],
+                    NoteSectionLinksSection(
+                      links: note.sectionLinks,
+                      notes: libraryNotes,
+                      onOpen: note.isDeleted ? null : onOpenSectionLink,
+                      onRemove: note.isDeleted ? null : onRemoveSectionLink,
+                      exportMode: exportMode,
+                    ),
                     if (note.hasVoiceMemos) ...[
                       const SizedBox(height: AppSpacings.xxl),
                       for (final memo in note.voiceMemos)

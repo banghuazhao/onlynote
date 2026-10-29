@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added Today, bringing together today's daily note, overdue and today reminders, and unfinished checklist tasks with direct completion and source-note navigation.
+- Added links to specific headings in the same note or another note, preserving heading identities through text edits and retaining links in backups, history, and templates.
+- Added divider lines to the editor's Insert menu, with matching reader, image-share, Markdown, plain-text, and PDF output.
+- Localized the new Today and heading-link controls in English, Simplified Chinese, and Traditional Chinese.
+
 - Prevented repeated or stale folder, filter, and reminder picker actions from closing another route or applying a second result.
 - Protected photo editing from repeated Save or Cancel callbacks, preventing duplicate copies and unintended navigation.
 - Fixed enlarged-text and short-screen layouts in shared sheets, the photo editor, and Find in note, preserving draft focus when sheets adapt to the keyboard.

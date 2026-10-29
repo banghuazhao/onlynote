@@ -31,6 +31,7 @@ mixin _$Note {
   bool get isArchived => throw _privateConstructorUsedError;
   List<String> get tags => throw _privateConstructorUsedError;
   List<String> get linkedNoteIds => throw _privateConstructorUsedError;
+  List<NoteSectionLink> get sectionLinks => throw _privateConstructorUsedError;
   List<NoteTextStyleRange> get textStyles => throw _privateConstructorUsedError;
   List<NoteImageLayout> get imageLayouts => throw _privateConstructorUsedError;
   String? get dailyNoteDateKey => throw _privateConstructorUsedError;
@@ -61,6 +62,7 @@ abstract class $NoteCopyWith<$Res> {
       bool isArchived,
       List<String> tags,
       List<String> linkedNoteIds,
+      List<NoteSectionLink> sectionLinks,
       List<NoteTextStyleRange> textStyles,
       List<NoteImageLayout> imageLayouts,
       String? dailyNoteDateKey,
@@ -95,6 +97,7 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
     Object? isArchived = null,
     Object? tags = null,
     Object? linkedNoteIds = null,
+    Object? sectionLinks = null,
     Object? textStyles = null,
     Object? imageLayouts = null,
     Object? dailyNoteDateKey = freezed,
@@ -161,6 +164,10 @@ class _$NoteCopyWithImpl<$Res, $Val extends Note>
           ? _value.linkedNoteIds
           : linkedNoteIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sectionLinks: null == sectionLinks
+          ? _value.sectionLinks
+          : sectionLinks // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>,
       textStyles: null == textStyles
           ? _value.textStyles
           : textStyles // ignore: cast_nullable_to_non_nullable
@@ -204,6 +211,7 @@ abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
       bool isArchived,
       List<String> tags,
       List<String> linkedNoteIds,
+      List<NoteSectionLink> sectionLinks,
       List<NoteTextStyleRange> textStyles,
       List<NoteImageLayout> imageLayouts,
       String? dailyNoteDateKey,
@@ -235,6 +243,7 @@ class __$$NoteImplCopyWithImpl<$Res>
     Object? isArchived = null,
     Object? tags = null,
     Object? linkedNoteIds = null,
+    Object? sectionLinks = null,
     Object? textStyles = null,
     Object? imageLayouts = null,
     Object? dailyNoteDateKey = freezed,
@@ -301,6 +310,10 @@ class __$$NoteImplCopyWithImpl<$Res>
           ? _value._linkedNoteIds
           : linkedNoteIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      sectionLinks: null == sectionLinks
+          ? _value._sectionLinks
+          : sectionLinks // ignore: cast_nullable_to_non_nullable
+              as List<NoteSectionLink>,
       textStyles: null == textStyles
           ? _value._textStyles
           : textStyles // ignore: cast_nullable_to_non_nullable
@@ -340,6 +353,7 @@ class _$NoteImpl extends _Note {
       this.isArchived = false,
       final List<String> tags = const [],
       final List<String> linkedNoteIds = const [],
+      final List<NoteSectionLink> sectionLinks = const [],
       final List<NoteTextStyleRange> textStyles = const [],
       final List<NoteImageLayout> imageLayouts = const [],
       this.dailyNoteDateKey,
@@ -349,6 +363,7 @@ class _$NoteImpl extends _Note {
         _voiceMemos = voiceMemos,
         _tags = tags,
         _linkedNoteIds = linkedNoteIds,
+        _sectionLinks = sectionLinks,
         _textStyles = textStyles,
         _imageLayouts = imageLayouts,
         super._();
@@ -420,6 +435,15 @@ class _$NoteImpl extends _Note {
     return EqualUnmodifiableListView(_linkedNoteIds);
   }
 
+  final List<NoteSectionLink> _sectionLinks;
+  @override
+  @JsonKey()
+  List<NoteSectionLink> get sectionLinks {
+    if (_sectionLinks is EqualUnmodifiableListView) return _sectionLinks;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sectionLinks);
+  }
+
   final List<NoteTextStyleRange> _textStyles;
   @override
   @JsonKey()
@@ -446,7 +470,7 @@ class _$NoteImpl extends _Note {
 
   @override
   String toString() {
-    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, textStyles: $textStyles, imageLayouts: $imageLayouts, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
+    return 'Note(id: $id, title: $title, description: $description, color: $color, dateTime: $dateTime, todo: $todo, imagePaths: $imagePaths, voiceMemos: $voiceMemos, sortOrder: $sortOrder, isPinned: $isPinned, deletedAt: $deletedAt, folderId: $folderId, isArchived: $isArchived, tags: $tags, linkedNoteIds: $linkedNoteIds, sectionLinks: $sectionLinks, textStyles: $textStyles, imageLayouts: $imageLayouts, dailyNoteDateKey: $dailyNoteDateKey, cardStyle: $cardStyle)';
   }
 
   @override
@@ -480,6 +504,8 @@ class _$NoteImpl extends _Note {
             const DeepCollectionEquality()
                 .equals(other._linkedNoteIds, _linkedNoteIds) &&
             const DeepCollectionEquality()
+                .equals(other._sectionLinks, _sectionLinks) &&
+            const DeepCollectionEquality()
                 .equals(other._textStyles, _textStyles) &&
             const DeepCollectionEquality()
                 .equals(other._imageLayouts, _imageLayouts) &&
@@ -507,6 +533,7 @@ class _$NoteImpl extends _Note {
         isArchived,
         const DeepCollectionEquality().hash(_tags),
         const DeepCollectionEquality().hash(_linkedNoteIds),
+        const DeepCollectionEquality().hash(_sectionLinks),
         const DeepCollectionEquality().hash(_textStyles),
         const DeepCollectionEquality().hash(_imageLayouts),
         dailyNoteDateKey,
@@ -537,6 +564,7 @@ abstract class _Note extends Note {
       final bool isArchived,
       final List<String> tags,
       final List<String> linkedNoteIds,
+      final List<NoteSectionLink> sectionLinks,
       final List<NoteTextStyleRange> textStyles,
       final List<NoteImageLayout> imageLayouts,
       final String? dailyNoteDateKey,
@@ -573,6 +601,8 @@ abstract class _Note extends Note {
   List<String> get tags;
   @override
   List<String> get linkedNoteIds;
+  @override
+  List<NoteSectionLink> get sectionLinks;
   @override
   List<NoteTextStyleRange> get textStyles;
   @override

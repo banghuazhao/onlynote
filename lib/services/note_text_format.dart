@@ -1,12 +1,124 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:uuid/uuid.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_numbered_list.dart';
 
 /// One familiar marker color, shared by writing, reading and image sharing.
 const noteHighlightColor = Color(0xFFFFE7A0);
 const noteHighlightedTextColor = Color(0xFF29251C);
+
+/// A visible rule glyph with an explicit saved block style. A user-typed glyph
+/// or a run of hyphens remains ordinary text.
+const noteDividerText = '─';
+
+bool isNoteDividerRange(NoteTextStyleRange range, String text) =>
+    range.kind == NoteTextStyleKind.divider &&
+    range.start >= 0 &&
+    range.end == range.start + noteDividerText.length &&
+    range.end <= text.length &&
+    text.substring(range.start, range.end) == noteDividerText &&
+    (range.start == 0 || text.codeUnitAt(range.start - 1) == 10) &&
+    (range.end == text.length || text.codeUnitAt(range.end) == 10);
+
+/// Assign identities only when a caller deliberately makes a section linkable.
+/// Rendering and ordinary normalization never generate random metadata. Each
+/// heading paragraph receives its own ID; existing IDs survive subsequent edits.
+List<NoteTextStyleRange> ensureNoteHeadingAnchors(
+  Iterable<NoteTextStyleRange> styles,
+  String text,
+) {
+  final clean = normalizeNoteTextStyles(styles, text);
+  final headings =
+      clean.where((range) => range.kind == NoteTextStyleKind.heading);
+  if (headings.isEmpty) return clean;
+  final result =
+      clean.where((range) => range.kind != NoteTextStyleKind.heading).toList();
+  final used = <String>{};
+  var start = 0;
+  for (final paragraph in text.split('\n')) {
+    final end = start + paragraph.length;
+    final matching = headings
+        .where((range) => range.start < end && range.end > start)
+        .toList();
+    if (paragraph.trim().isNotEmpty && matching.isNotEmpty) {
+      final preserved = matching
+          .map((range) => range.anchorId)
+          .whereType<String>()
+          .where((id) => !used.contains(id))
+          .firstOrNull;
+      final id = preserved ?? const Uuid().v4();
+      used.add(id);
+      result.add(NoteTextStyleRange(
+          start: start,
+          end: end,
+          kind: NoteTextStyleKind.heading,
+          anchorId: id));
+    }
+    start = end + 1;
+  }
+  return normalizeNoteTextStyles(result, text);
+}
+
+/// Portable plain text represents a saved divider with three familiar dashes.
+String noteTextToPlainText(String text, Iterable<NoteTextStyleRange> styles) {
+  var result = text;
+  final dividers = normalizeNoteTextStyles(styles, text)
+      .where((range) => range.kind == NoteTextStyleKind.divider)
+      .toList();
+  for (final range in dividers.reversed) {
+    result = result.replaceRange(range.start, range.end, '---');
+  }
+  return result;
+}
+
+/// A linked heading has one owning paragraph. An overlapping unlinked style
+/// must not hide that ID, and a multiline paste must not duplicate it. During
+/// editing the caller supplies the position of surviving original heading text.
+List<NoteTextStyleRange> _normalizeHeadingAnchorOwnership(
+  Iterable<NoteTextStyleRange> styles,
+  String text, {
+  Map<String, int> preferredOffsets = const {},
+}) {
+  final all = styles.toList();
+  final headings =
+      all.where((range) => range.kind == NoteTextStyleKind.heading).toList();
+  if (!headings.any((range) => range.anchorId != null)) return all;
+  final owners = <String, int>{};
+  for (final range in headings) {
+    final id = range.anchorId;
+    if (id == null || owners.containsKey(id)) continue;
+    final offset = (preferredOffsets[id] ?? range.start).clamp(0, text.length);
+    owners[id] = offset == 0 ? 0 : text.lastIndexOf('\n', offset - 1) + 1;
+  }
+  final result =
+      all.where((range) => range.kind != NoteTextStyleKind.heading).toList();
+  var start = 0;
+  for (final paragraph in text.split('\n')) {
+    final end = start + paragraph.length;
+    final matching = headings
+        .where((range) => range.start < end && range.end > start)
+        .toList();
+    final ids = matching
+        .map((range) => range.anchorId)
+        .whereType<String>()
+        .where((id) => owners[id] == start)
+        .toSet();
+    for (final range in matching) {
+      final id = range.anchorId;
+      result.add(NoteTextStyleRange(
+          start: math.max(start, range.start),
+          end: math.min(end, range.end),
+          kind: NoteTextStyleKind.heading,
+          anchorId: id == null
+              ? (ids.length == 1 ? ids.single : null)
+              : (owners[id] == start ? id : null)));
+    }
+    start = end + 1;
+  }
+  return result;
+}
 
 /// Cleans saved formatting without cutting an emoji or combining character.
 /// Same-kind overlaps are merged so equality is stable across saves.
@@ -26,12 +138,18 @@ List<NoteTextStyleRange> normalizeNoteTextStyles(
     final start = _floorBoundary(boundaries, range.start.clamp(0, text.length));
     final end = _ceilBoundary(boundaries, range.end.clamp(0, text.length));
     if (start < end) {
-      clean.add(NoteTextStyleRange(start: start, end: end, kind: range.kind));
+      final normalized = NoteTextStyleRange(
+          start: start, end: end, kind: range.kind, anchorId: range.anchorId);
+      if (range.kind != NoteTextStyleKind.divider ||
+          isNoteDividerRange(normalized, text)) {
+        clean.add(normalized);
+      }
     }
   }
+  final anchorSafe = _normalizeHeadingAnchorOwnership(clean, text);
   final merged = <NoteTextStyleRange>[];
   for (final kind in NoteTextStyleKind.values) {
-    final matching = clean.where((range) => range.kind == kind).toList()
+    final matching = anchorSafe.where((range) => range.kind == kind).toList()
       ..sort((a, b) {
         final byStart = a.start.compareTo(b.start);
         return byStart != 0 ? byStart : a.end.compareTo(b.end);
@@ -39,12 +157,14 @@ List<NoteTextStyleRange> normalizeNoteTextStyles(
     for (final range in matching) {
       if (merged.isNotEmpty &&
           merged.last.kind == kind &&
-          range.start <= merged.last.end) {
+          range.start <= merged.last.end &&
+          range.anchorId == merged.last.anchorId) {
         final previous = merged.removeLast();
         merged.add(NoteTextStyleRange(
           start: previous.start,
           end: math.max(previous.end, range.end),
           kind: kind,
+          anchorId: previous.anchorId,
         ));
       } else {
         merged.add(range);
@@ -72,7 +192,9 @@ bool areValidNoteTextStyles(
       range.end > range.start &&
       range.end <= text.length &&
       boundaries.contains(range.start) &&
-      boundaries.contains(range.end));
+      boundaries.contains(range.end) &&
+      (range.kind != NoteTextStyleKind.divider ||
+          isNoteDividerRange(range, text)));
 }
 
 /// Moves formatting with a plain text edit. Newly typed text inherits the style
@@ -92,13 +214,25 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
   final delta = newText.length - oldText.length;
   final insertEnd = change.start + change.inserted.length;
   final result = <NoteTextStyleRange>[];
+  final anchorOffsets = <String, int>{};
   for (final range in clean) {
+    final id = range.anchorId;
+    if (range.kind == NoteTextStyleKind.heading && id != null) {
+      if (range.start < change.start) {
+        anchorOffsets[id] = range.start;
+      } else if (range.end > change.oldEnd) {
+        anchorOffsets[id] = math.max(range.start, change.oldEnd) + delta;
+      } else if (change.inserted.isNotEmpty) {
+        anchorOffsets[id] = change.start;
+      }
+    }
     final leftEnd = math.min(range.end, change.start);
     if (range.start < leftEnd) {
       result.add(NoteTextStyleRange(
         start: range.start,
         end: leftEnd,
         kind: range.kind,
+        anchorId: range.anchorId,
       ));
     }
     final rightStart = math.max(range.start, change.oldEnd);
@@ -107,6 +241,7 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
         start: rightStart + delta,
         end: range.end + delta,
         kind: range.kind,
+        anchorId: range.anchorId,
       ));
     }
   }
@@ -147,6 +282,14 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
         start: change.start,
         end: insertEnd,
         kind: NoteTextStyleKind.heading,
+        anchorId: clean
+            .where((range) =>
+                range.kind == NoteTextStyleKind.heading &&
+                range.start <= change.start &&
+                range.end >= change.start)
+            .map((range) => range.anchorId)
+            .whereType<String>()
+            .firstOrNull,
       ));
     }
     if (highlight) {
@@ -181,10 +324,16 @@ List<NoteTextStyleRange> rebaseNoteTextStyles(
           NoteTextStyleKind.bold,
         );
       }
-      return normalizeNoteTextStyles(nextStyles, newText);
+      return normalizeNoteTextStyles(
+          _normalizeHeadingAnchorOwnership(nextStyles, newText,
+              preferredOffsets: anchorOffsets),
+          newText);
     }
   }
-  return normalizeNoteTextStyles(result, newText);
+  return normalizeNoteTextStyles(
+      _normalizeHeadingAnchorOwnership(result, newText,
+          preferredOffsets: anchorOffsets),
+      newText);
 }
 
 /// The smallest changed region whose ends are safe character boundaries in
@@ -279,11 +428,15 @@ List<NoteTextStyleRange> removeNoteTextStyle(
       continue;
     }
     if (range.start < start) {
-      result
-          .add(NoteTextStyleRange(start: range.start, end: start, kind: kind));
+      result.add(NoteTextStyleRange(
+          start: range.start,
+          end: start,
+          kind: kind,
+          anchorId: range.anchorId));
     }
     if (range.end > end) {
-      result.add(NoteTextStyleRange(start: end, end: range.end, kind: kind));
+      result.add(NoteTextStyleRange(
+          start: end, end: range.end, kind: kind, anchorId: range.anchorId));
     }
   }
   return result;
@@ -378,6 +531,15 @@ String noteTextToMarkdown(
   for (var index = 0; index < lines.length; index++) {
     final line = lines[index];
     final lineEnd = lineStart + line.length;
+    if (clean.any((range) =>
+        range.kind == NoteTextStyleKind.divider &&
+        range.start == lineStart &&
+        range.end == lineEnd)) {
+      result.write('---');
+      if (index != lines.length - 1) result.write('\n');
+      lineStart = lineEnd + 1;
+      continue;
+    }
     final bullet = line.startsWith('• ');
     final numbered = noteNumberedListMarker(line);
     final contentStart =

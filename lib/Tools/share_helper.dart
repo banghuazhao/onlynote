@@ -40,7 +40,8 @@ class ShareHelper {
       final reminderText =
           reminder == null ? null : '${s.Reminder}: ${reminder.timeString}';
       if (format == NoteShareFormat.copyText) {
-        final text = NoteExport.plainText(note, reminder: reminderText);
+        final text = NoteExport.plainText(note,
+            reminder: reminderText, sectionLinksLabel: s.Section_Links);
         if (text.trim().isEmpty) {
           context.showToast(s.Share_No_Text);
           return;
@@ -61,7 +62,8 @@ class ShareHelper {
       }
       final stem = NoteExport.fileStem(note);
       if (format == NoteShareFormat.plainText) {
-        final text = NoteExport.plainText(note, reminder: reminderText);
+        final text = NoteExport.plainText(note,
+            reminder: reminderText, sectionLinksLabel: s.Section_Links);
         if (text.isEmpty) {
           context.showToast(s.Share_No_Text);
           return;
@@ -168,7 +170,8 @@ class ShareHelper {
             reminder: reminderText,
             photos: photoNames,
             recordings: recordingNames,
-            recordingLabel: s.Voice_Memo);
+            recordingLabel: s.Voice_Memo,
+            sectionLinksLabel: s.Section_Links);
         names.add('$stem.md');
         files.add(XFile.fromData(Uint8List.fromList(utf8.encode(md)),
             mimeType: 'text/markdown', name: names.first));
@@ -186,7 +189,7 @@ class ShareHelper {
           'DroidSansFallback.ttf'
         ].map((name) => rootBundle.load('assets/fonts/$name')));
         final glyphImages = await renderMissingPdfGlyphs(
-            '${NoteExport.plainText(note, reminder: reminderText)}\n${note.dateWithTime}',
+            '${NoteExport.plainText(note, reminder: reminderText, sectionLinksLabel: s.Section_Links)}\n${note.dateWithTime}',
             fonts);
         final glyphs = <String, Uint8List>{};
         try {
@@ -204,6 +207,8 @@ class ShareHelper {
             buildNotePdf,
             NotePdfData(
               title: note.title ?? '',
+              sectionLinkTitles: NoteExport.sectionLinkTitles(note),
+              sectionLinksLabel: s.Section_Links,
               description: note.description ?? '',
               textStyles: note.textStyles,
               imagePaths: note.imagePaths,

@@ -131,6 +131,66 @@ class SimpleFormattingController extends TextEditingController {
         editedPartEnd: _editedPartEnd,
       );
 
+  /// Inserts an explicit divider block and leaves a native caret after it.
+  /// The visible glyph belongs to the stored body; the divider style makes it
+  /// a full-width rule in the editor, reader, image share and document exports.
+  bool insertDivider() {
+    if (_isComposing) return false;
+    final selected = _selectionRange;
+    final paragraph = _paragraphAt(text, selected.start);
+    final prefix = text.substring(0, selected.start);
+    final suffix = text.substring(selected.end);
+    final leading = prefix.isNotEmpty && !prefix.endsWith('\n') ? '\n' : '';
+    final trailing = suffix.startsWith('\n') ? '' : '\n';
+    final inserted = '$leading$noteDividerText$trailing';
+    final next = text.replaceRange(selected.start, selected.end, inserted);
+    final dividerStart = selected.start + leading.length;
+    final dividerEnd = dividerStart + noteDividerText.length;
+    var updated = rebaseNoteTextStyles(text, next, _styles,
+        insertedBold: false,
+        insertedHeading: false,
+        insertedHighlight: false,
+        changeOverride: NoteTextChange(
+            start: selected.start, oldEnd: selected.end, inserted: inserted));
+    // Splitting a heading starts ordinary writing after the divider. A divider
+    // inserted at the beginning simply moves the original heading intact.
+    if (selected.start > paragraph.start && selected.start < paragraph.end) {
+      updated = removeNoteTextStyle(updated, dividerStart,
+          paragraph.end + next.length - text.length, NoteTextStyleKind.heading);
+    }
+    _remember();
+    _redo.clear();
+    _styles = normalizeNoteTextStyles([
+      ...updated,
+      NoteTextStyleRange(
+          start: dividerStart,
+          end: dividerEnd,
+          kind: NoteTextStyleKind.divider),
+    ], next);
+    _typingBold = null;
+    _typingBoldExplicit = false;
+    _emptyHeadingAt = null;
+    super.value = TextEditingValue(
+        text: next, selection: TextSelection.collapsed(offset: dividerEnd + 1));
+    return true;
+  }
+
+  bool removeDivider(int offset) {
+    if (_isComposing) return false;
+    final divider = _styles
+        .where((range) =>
+            range.kind == NoteTextStyleKind.divider && range.start == offset)
+        .firstOrNull;
+    if (divider == null) return false;
+    final end = divider.end < text.length && text.codeUnitAt(divider.end) == 10
+        ? divider.end + 1
+        : divider.end;
+    value = TextEditingValue(
+        text: text.replaceRange(divider.start, end, ''),
+        selection: TextSelection.collapsed(offset: divider.start));
+    return true;
+  }
+
   void toggleBold() {
     if (_isComposing) return;
     final selected = _selectionRange;

@@ -139,6 +139,54 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Today_Title": MessageLookupByLibrary.simpleMessage("Today"),
+        "Today_Description": MessageLookupByLibrary.simpleMessage(
+            "Your note, reminders, and unfinished tasks in one place."),
+        "Today_Create_Note":
+            MessageLookupByLibrary.simpleMessage("Start today’s note"),
+        "Today_Open_Note": MessageLookupByLibrary.simpleMessage("Open note"),
+        "Today_Daily_Empty": MessageLookupByLibrary.simpleMessage(
+            "Capture a thought or make a plan for today."),
+        "Today_Reminders":
+            MessageLookupByLibrary.simpleMessage("Due reminders"),
+        "Today_No_Reminders":
+            MessageLookupByLibrary.simpleMessage("No reminders due today."),
+        "Today_All_Reminders":
+            MessageLookupByLibrary.simpleMessage("All reminders"),
+        "Today_Tasks": MessageLookupByLibrary.simpleMessage("Unfinished tasks"),
+        "Today_Tasks_Hint":
+            MessageLookupByLibrary.simpleMessage("Across your active notes"),
+        "Today_No_Tasks":
+            MessageLookupByLibrary.simpleMessage("No unfinished tasks."),
+        "Today_Load_Failed": MessageLookupByLibrary.simpleMessage(
+            "Could not refresh Today. Try again."),
+        "Today_Task_Save_Failed": MessageLookupByLibrary.simpleMessage(
+            "Could not complete this task. Try again."),
+        "Today_Task_Changed": MessageLookupByLibrary.simpleMessage(
+            "This task changed. Review the latest version and try again."),
+        "Editor_Divider": MessageLookupByLibrary.simpleMessage("Divider line"),
+        "Section_Links": MessageLookupByLibrary.simpleMessage("Heading links"),
+        "Section_Link_Add":
+            MessageLookupByLibrary.simpleMessage("Link to heading"),
+        "Section_Link_Choose":
+            MessageLookupByLibrary.simpleMessage("Choose a heading"),
+        "Section_Link_Search":
+            MessageLookupByLibrary.simpleMessage("Search notes and headings"),
+        "Section_Link_Empty": MessageLookupByLibrary.simpleMessage(
+            "Format a paragraph as a heading to link to it here."),
+        "Section_Link_No_Results":
+            MessageLookupByLibrary.simpleMessage("No matching headings."),
+        "Section_Link_This_Note":
+            MessageLookupByLibrary.simpleMessage("This note"),
+        "Section_Link_Unavailable": MessageLookupByLibrary.simpleMessage(
+            "Heading unavailable. It may have been removed."),
+        "Section_Link_Remove":
+            MessageLookupByLibrary.simpleMessage("Remove heading link"),
+        "Section_Link_Failed": MessageLookupByLibrary.simpleMessage(
+            "Could not save this heading link. Try again."),
+        "Section_Link_Limit": MessageLookupByLibrary.simpleMessage(
+            "You can add up to 100 heading links per note."),
+
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),

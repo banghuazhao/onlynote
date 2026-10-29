@@ -115,6 +115,43 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Today_Title": MessageLookupByLibrary.simpleMessage("今天"),
+        "Today_Description":
+            MessageLookupByLibrary.simpleMessage("在一处查看今天的笔记、提醒和未完成任务。"),
+        "Today_Create_Note": MessageLookupByLibrary.simpleMessage("开始今天的笔记"),
+        "Today_Open_Note": MessageLookupByLibrary.simpleMessage("打开笔记"),
+        "Today_Daily_Empty":
+            MessageLookupByLibrary.simpleMessage("记录灵感，或为今天做个计划。"),
+        "Today_Reminders": MessageLookupByLibrary.simpleMessage("到期提醒"),
+        "Today_No_Reminders": MessageLookupByLibrary.simpleMessage("今天没有到期提醒。"),
+        "Today_All_Reminders": MessageLookupByLibrary.simpleMessage("所有提醒"),
+        "Today_Tasks": MessageLookupByLibrary.simpleMessage("未完成任务"),
+        "Today_Tasks_Hint": MessageLookupByLibrary.simpleMessage("来自使用中的笔记"),
+        "Today_No_Tasks": MessageLookupByLibrary.simpleMessage("没有未完成任务。"),
+        "Today_Load_Failed":
+            MessageLookupByLibrary.simpleMessage("无法刷新今天视图，请重试。"),
+        "Today_Task_Save_Failed":
+            MessageLookupByLibrary.simpleMessage("无法完成此任务，请重试。"),
+        "Today_Task_Changed":
+            MessageLookupByLibrary.simpleMessage("此任务已更改，请查看最新内容后重试。"),
+        "Editor_Divider": MessageLookupByLibrary.simpleMessage("分隔线"),
+        "Section_Links": MessageLookupByLibrary.simpleMessage("标题链接"),
+        "Section_Link_Add": MessageLookupByLibrary.simpleMessage("链接到标题"),
+        "Section_Link_Choose": MessageLookupByLibrary.simpleMessage("选择标题"),
+        "Section_Link_Search": MessageLookupByLibrary.simpleMessage("搜索笔记和标题"),
+        "Section_Link_Empty":
+            MessageLookupByLibrary.simpleMessage("将段落设为标题，即可在此链接到它。"),
+        "Section_Link_No_Results":
+            MessageLookupByLibrary.simpleMessage("没有匹配的标题。"),
+        "Section_Link_This_Note": MessageLookupByLibrary.simpleMessage("当前笔记"),
+        "Section_Link_Unavailable":
+            MessageLookupByLibrary.simpleMessage("标题不可用，可能已被删除。"),
+        "Section_Link_Remove": MessageLookupByLibrary.simpleMessage("移除标题链接"),
+        "Section_Link_Failed":
+            MessageLookupByLibrary.simpleMessage("无法保存标题链接，请重试。"),
+        "Section_Link_Limit":
+            MessageLookupByLibrary.simpleMessage("每篇笔记最多可添加100个标题链接。"),
+
     "Add_Image": MessageLookupByLibrary.simpleMessage("添加照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("添加备忘录"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),

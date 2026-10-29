@@ -5,6 +5,8 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_card_style.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
+import 'package:onlynote/services/note_section_links.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:uuid/uuid.dart';
 import 'package:onlynote/services/note_tags.dart';
@@ -27,6 +29,8 @@ class CustomNoteTemplate {
     List<VoiceMemo> voiceMemos = const [],
     List<String> tags = const [],
     List<String> linkedNoteIds = const [],
+    List<NoteSectionLink> sectionLinks = const [],
+    this.sourceNoteId,
     List<NoteTextStyleRange> textStyles = const [],
     List<NoteImageLayout> imageLayouts = const [],
     this.cardStyle = const NoteCardStyle(),
@@ -36,6 +40,7 @@ class CustomNoteTemplate {
         voiceMemos = List.unmodifiable(voiceMemos),
         tags = normalizeNoteTags(tags),
         linkedNoteIds = normalizeLinkedNoteIds(linkedNoteIds),
+        sectionLinks = normalizeNoteSectionLinks(sectionLinks),
         textStyles = normalizeNoteTextStyles(textStyles, body),
         imageLayouts =
             normalizeNoteImageLayouts(imageLayouts, imagePaths, body);
@@ -51,6 +56,10 @@ class CustomNoteTemplate {
   final DateTime createdAt;
   final List<String> tags;
   final List<String> linkedNoteIds;
+  final List<NoteSectionLink> sectionLinks;
+
+  /// Allows section links within the source to follow a newly created note.
+  final String? sourceNoteId;
   final List<NoteTextStyleRange> textStyles;
   final List<NoteImageLayout> imageLayouts;
   final NoteCardStyle cardStyle;
@@ -71,6 +80,8 @@ class CustomNoteTemplate {
         voiceMemos: voiceCopies,
         tags: note.tags,
         linkedNoteIds: note.linkedNoteIds,
+        sectionLinks: note.sectionLinks,
+        sourceNoteId: note.id,
         textStyles: note.textStyles,
         imageLayouts: _remapImages(note.imageLayouts, note.imagePaths,
             imageCopies, note.description ?? ''),
@@ -85,8 +96,9 @@ class CustomNoteTemplate {
   }) {
     final created = now ?? DateTime.now();
     const uuid = Uuid();
+    final noteId = uuid.v4();
     return Note(
-      id: uuid.v4(),
+      id: noteId,
       title: title,
       description: body,
       todo: [for (final item in items) Todo(id: uuid.v4(), title: item)],
@@ -96,6 +108,10 @@ class CustomNoteTemplate {
       voiceMemos: voiceCopies,
       tags: tags,
       linkedNoteIds: linkedNoteIds,
+      sectionLinks: [
+        for (final link in sectionLinks)
+          link.noteId == sourceNoteId ? link.copyWith(noteId: noteId) : link,
+      ],
       textStyles: textStyles,
       imageLayouts: _remapImages(imageLayouts, imagePaths, imageCopies, body),
       folderId: folderId,
@@ -111,6 +127,8 @@ class CustomNoteTemplate {
     List<VoiceMemo>? voiceMemos,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    List<NoteSectionLink>? sectionLinks,
+    String? sourceNoteId,
     List<NoteTextStyleRange>? textStyles,
     List<NoteImageLayout>? imageLayouts,
     NoteCardStyle? cardStyle,
@@ -127,6 +145,8 @@ class CustomNoteTemplate {
         voiceMemos: voiceMemos ?? this.voiceMemos,
         tags: tags ?? this.tags,
         linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
+        sectionLinks: sectionLinks ?? this.sectionLinks,
+        sourceNoteId: sourceNoteId ?? this.sourceNoteId,
         textStyles: textStyles ?? this.textStyles,
         imageLayouts: imageLayouts ??
             (imagePaths == null
@@ -148,6 +168,8 @@ class CustomNoteTemplate {
         'createdAt': createdAt.toIso8601String(),
         'tags': tags,
         'linkedNoteIds': linkedNoteIds,
+        'sectionLinks': [for (final link in sectionLinks) link.toMap()],
+        if (sourceNoteId != null) 'sourceNoteId': sourceNoteId,
         'textStyles': [for (final style in textStyles) style.toMap()],
         'imageLayouts': [for (final layout in imageLayouts) layout.toMap()],
         if (!cardStyle.isDefault) 'cardStyle': cardStyle.toMap(),
@@ -174,6 +196,13 @@ class CustomNoteTemplate {
     }
 
     final id = text('id');
+    final sourceNoteId = json['sourceNoteId'];
+    if (sourceNoteId != null &&
+        (sourceNoteId is! String ||
+            sourceNoteId.trim().isEmpty ||
+            sourceNoteId.length > 512)) {
+      throw const FormatException('Invalid template source note');
+    }
     final name = validatedTemplateName(text('name'));
     final createdAt = DateTime.tryParse(text('createdAt'));
     final color = json['color'];
@@ -242,6 +271,8 @@ class CustomNoteTemplate {
       voiceMemos: memos,
       tags: metadataList('tags'),
       linkedNoteIds: metadataList('linkedNoteIds'),
+      sectionLinks: parseNoteSectionLinks(json['sectionLinks'] ?? const []),
+      sourceNoteId: sourceNoteId as String?,
       createdAt: createdAt,
     );
   }

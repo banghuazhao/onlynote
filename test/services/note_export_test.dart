@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_export.dart';
 
@@ -129,6 +130,56 @@ Future<NotePdfData> _documentPdfData({
     );
 
 void main() {
+  test(
+      'divider PDF uses a drawn rule and heading links export current self titles',
+      () async {
+    final note = Note(id: 'self', description: 'Before\n─\nAfter', textStyles: [
+      const NoteTextStyleRange(
+          start: 7, end: 8, kind: NoteTextStyleKind.divider),
+      const NoteTextStyleRange(
+          start: 9,
+          end: 14,
+          kind: NoteTextStyleKind.heading,
+          anchorId: 'after-heading'),
+    ], sectionLinks: [
+      const NoteSectionLink(
+          noteId: 'self', headingId: 'after-heading', headingText: 'Old title'),
+      const NoteSectionLink(
+          noteId: 'another',
+          headingId: 'external',
+          headingText: 'External section'),
+    ]);
+    expect(NoteExport.sectionLinkTitles(note), ['After', 'External section']);
+    expect(NoteExport.plainText(note, sectionLinksLabel: 'Sections'),
+        contains('Sections\n• After\n• External section'));
+    expect(NoteExport.markdown(note, sectionLinksLabel: 'Sections'),
+        contains('## Sections\n- After\n- External section'));
+    final bytes = await buildNotePdf(NotePdfData(
+      title: 'Divider sample',
+      description: note.description!,
+      date: '',
+      todos: const [],
+      photos: const [],
+      textStyles: note.textStyles,
+      sectionLinkTitles: NoteExport.sectionLinkTitles(note),
+      sectionLinksLabel: 'Sections',
+      regular: await File('assets/fonts/Roboto-Regular.ttf').readAsBytes(),
+      bold: await File('assets/fonts/Roboto-Bold.ttf').readAsBytes(),
+      fallback: await File('assets/fonts/DroidSansFallback.ttf').readAsBytes(),
+    ));
+    final objects = _pdfObjects(bytes);
+    final page = _pdfPages(objects).single;
+    final text = _pdfPageText(page, objects);
+    expect(text, contains('Before'));
+    expect(text, contains('After'));
+    expect(text, contains('Sections'));
+    expect(text, contains('External section'));
+    expect(text, isNot(contains('─')));
+    final content = _pdfStream(objects[
+        int.parse(RegExp(r'/Contents\s*(\d+) 0 R').firstMatch(page)![1]!)]!);
+    expect(content, contains('0.7 w'));
+    await File('/tmp/onlynote-divider-preview.pdf').writeAsBytes(bytes);
+  });
   test(
       'plain text exports full content and checklist states without local paths',
       () {

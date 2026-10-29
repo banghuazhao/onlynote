@@ -1,4 +1,5 @@
 import 'package:onlynote/domain/model/note_image_layout.dart';
+import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 
 /// Locations at which a photo can sit between text paragraphs, including an
@@ -202,12 +203,27 @@ class NoteImagePart extends NoteDocumentPart {
   String toString() => 'NoteImagePart($layout)';
 }
 
+/// An explicitly inserted rule, with offsets into the unchanged stored body.
+class NoteDividerPart extends NoteDocumentPart {
+  const NoteDividerPart({required this.start, required this.end});
+  final int start;
+  final int end;
+
+  @override
+  bool operator ==(Object other) =>
+      other is NoteDividerPart && other.start == start && other.end == end;
+
+  @override
+  int get hashCode => Object.hash(start, end);
+}
+
 /// Interleaves photos and exact slices of the plain body for editing, reading
 /// and export. Empty text parts let the editor type before or after a photo.
 List<NoteDocumentPart> noteDocumentParts(
   String body,
-  Iterable<NoteImageLayout> layouts,
-) {
+  Iterable<NoteImageLayout> layouts, {
+  Iterable<NoteTextStyleRange> styles = const [],
+}) {
   final supplied = layouts.toList();
   final clean = normalizeNoteImageLayouts(
     supplied,
@@ -229,7 +245,28 @@ List<NoteDocumentPart> noteDocumentParts(
     cursor = layout.textOffset;
   }
   result.add(NoteTextPart(start: cursor, end: body.length));
-  return List.unmodifiable(result);
+  final dividers = normalizeNoteTextStyles(styles, body)
+      .where((range) => range.kind == NoteTextStyleKind.divider)
+      .toList();
+  if (dividers.isEmpty) return List.unmodifiable(result);
+  final blocks = <NoteDocumentPart>[];
+  for (final part in result) {
+    if (part is! NoteTextPart) {
+      blocks.add(part);
+      continue;
+    }
+    var start = part.start;
+    for (final divider in dividers) {
+      if (divider.start < part.start || divider.end > part.end) continue;
+      blocks.add(NoteTextPart(start: start, end: divider.start));
+      blocks.add(NoteDividerPart(start: divider.start, end: divider.end));
+      start = divider.end < part.end && body.codeUnitAt(divider.end) == 10
+          ? divider.end + 1
+          : divider.end;
+    }
+    blocks.add(NoteTextPart(start: start, end: part.end));
+  }
+  return List.unmodifiable(blocks);
 }
 
 double _finiteClamp(double value, double min, double max, double fallback) =>

@@ -7,6 +7,8 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/note_links.dart';
+import 'package:onlynote/services/note_section_links.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
@@ -66,6 +68,7 @@ class NoteDto implements Comparable {
     this.isArchived = false,
     this.tags = const [],
     this.linkedNoteIds = const [],
+    this.sectionLinks = const [],
     this.textStyles = const [],
     this.imageLayouts = const [],
     this.dailyNoteDateKey,
@@ -104,6 +107,10 @@ class NoteDto implements Comparable {
       tags: normalizeNoteTags(note.tags),
       linkedNoteIds:
           normalizeLinkedNoteIds(note.linkedNoteIds, noteId: note.id),
+      sectionLinks: [
+        for (final link in normalizeNoteSectionLinks(note.sectionLinks))
+          link.toMap(),
+      ],
     );
   }
 
@@ -133,6 +140,12 @@ class NoteDto implements Comparable {
       isArchived: isArchived,
       tags: tags ?? [],
       linkedNoteIds: linkedNoteIds ?? [],
+      sectionLinks: normalizeNoteSectionLinks(
+        (sectionLinks ?? [])
+            .map(NoteSectionLink.tryFromMap)
+            .whereType<NoteSectionLink>()
+            .take(maxNoteSectionLinks),
+      ),
       textStyles: normalizeNoteTextStyles(
           (textStyles ?? [])
               .map(NoteTextStyleRange.tryFromMap)
@@ -152,7 +165,8 @@ class NoteDto implements Comparable {
       (todoList?.isNotEmpty ?? false) ||
       (imagePaths?.isNotEmpty ?? false) ||
       (voiceMemos?.isNotEmpty ?? false) ||
-      (linkedNoteIds?.isNotEmpty ?? false);
+      (linkedNoteIds?.isNotEmpty ?? false) ||
+      (sectionLinks?.isNotEmpty ?? false);
 
   bool get isDeleted => deletedAt != null && deletedAt!.isNotEmpty;
 
@@ -170,6 +184,7 @@ class NoteDto implements Comparable {
     bool? isArchived,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    List<Map<dynamic, dynamic>>? sectionLinks,
     List<Map<dynamic, dynamic>>? textStyles,
     List<Map<dynamic, dynamic>>? imageLayouts,
     String? dailyNoteDateKey,
@@ -194,6 +209,7 @@ class NoteDto implements Comparable {
       isArchived: isArchived ?? this.isArchived,
       tags: tags ?? this.tags,
       linkedNoteIds: linkedNoteIds ?? this.linkedNoteIds,
+      sectionLinks: sectionLinks ?? this.sectionLinks,
       textStyles: textStyles ?? this.textStyles,
       imageLayouts: imageLayouts ?? this.imageLayouts,
       cardStyle: clearCardStyle ? null : (cardStyle ?? this.cardStyle),
@@ -244,6 +260,8 @@ class NoteDto implements Comparable {
   final String? dailyNoteDateKey;
   @HiveField(18)
   final Map<dynamic, dynamic>? cardStyle;
+  @HiveField(19)
+  final List<Map<dynamic, dynamic>>? sectionLinks;
 
   @override
   int compareTo(other) {

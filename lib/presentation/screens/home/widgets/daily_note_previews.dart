@@ -121,6 +121,13 @@ class _LibraryTopNavigationState extends State<_LibraryTopNavigation> {
                   active: _searching),
               onPressed: () => setState(() => _searching = !_searching),
             ),
+          if (width >= 360)
+            AppButton(
+              tooltip: strings.Today_Title,
+              child: const Icon(Icons.today_outlined),
+              onPressed: () =>
+                  setState(() => _selectedAction = strings.Today_Title),
+            ),
           PopupMenuButton<String>(
             tooltip: _searching && width < 440
                 ? '${strings.More_Options}, ${strings.Search_Active}'
@@ -139,6 +146,10 @@ class _LibraryTopNavigationState extends State<_LibraryTopNavigation> {
                             : strings.Search_Notes,
                         icon: _searching ? Icons.search_off : Icons.search,
                         activeSearch: _searching)),
+              PopupMenuItem(
+                  value: 'today',
+                  child: HomeMenuItemLabel(strings.Today_Title,
+                      icon: Icons.today_outlined)),
               PopupMenuItem(
                   value: 'reminders',
                   child: HomeMenuItemLabel(strings.Reminders_Title,
@@ -159,6 +170,7 @@ class _LibraryTopNavigationState extends State<_LibraryTopNavigation> {
                 return;
               }
               _selectedAction = switch (action) {
+                'today' => strings.Today_Title,
                 'reminders' => strings.Reminders_Title,
                 'templates' => strings.Templates,
                 'daily-calendar' => strings.Daily_Note_Calendar,

@@ -171,7 +171,7 @@ void main() {
       ),
     ));
     await tester.pumpAndSettle();
-    await router.replaceAll([const OnboardingRoute(), const HomeRoute()]);
+    await router.replaceAll([OnboardingRoute(), const HomeRoute()]);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Open packing template'));
     await tester.pumpAndSettle();

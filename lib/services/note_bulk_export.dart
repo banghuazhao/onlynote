@@ -62,6 +62,7 @@ class NoteBulkExport {
     this.resolvePhoto,
     this.resolveRecording,
     this.recordingLabel = 'Recording',
+    this.sectionLinksLabel = 'Heading links',
     this.onProgress,
   });
 
@@ -87,6 +88,7 @@ class NoteBulkExport {
   final Future<String?> Function(VoiceMemo memo)? resolveRecording;
 
   final String recordingLabel;
+  final String sectionLinksLabel;
   final void Function(int done, int total)? onProgress;
 
   // Zip entries are case-sensitive, but the filesystems these archives are
@@ -122,7 +124,9 @@ class NoteBulkExport {
   }
 
   Future<bool> _writePlainText(Note note) async {
-    final text = NoteExport.plainText(note, reminder: reminderFor?.call(note));
+    final text = NoteExport.plainText(note,
+        reminder: reminderFor?.call(note),
+        sectionLinksLabel: sectionLinksLabel);
     if (text.trim().isEmpty) return false;
     await _add(NoteExportBytes('${_stem(note)}.txt', _utf8(text)));
     return true;
@@ -146,7 +150,8 @@ class NoteBulkExport {
         reminder: reminderFor?.call(note),
         photos: photos.map((photo) => photo.$1).toList(),
         recordings: recordings.map((recording) => recording.$1).toList(),
-        recordingLabel: recordingLabel);
+        recordingLabel: recordingLabel,
+        sectionLinksLabel: sectionLinksLabel);
     if (markdown.trim().isEmpty) return false;
     await _add(NoteExportBytes('$stem.md', _utf8(markdown)));
     // Attachments keep their note's stem, so one flat archive still reads as

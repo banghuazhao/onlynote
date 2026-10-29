@@ -180,6 +180,7 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
     CustomNoteTemplateStore? templateStore,
     NotePositionStore? positionStore,
     NoteSelectionTransfer? selectionTransfer,
+    String? initialHeadingId,
     List<PageRouteInfo>? children,
   }) : super(
           NoteDetailRoute.name,
@@ -189,6 +190,7 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
             templateStore: templateStore,
             positionStore: positionStore,
             selectionTransfer: selectionTransfer,
+            initialHeadingId: initialHeadingId,
           ),
           rawPathParams: {'noteId': noteId},
           initialChildren: children,
@@ -210,6 +212,7 @@ class NoteDetailRoute extends PageRouteInfo<NoteDetailRouteArgs> {
         templateStore: args.templateStore,
         positionStore: args.positionStore,
         selectionTransfer: args.selectionTransfer,
+        initialHeadingId: args.initialHeadingId,
       ));
     },
   );
@@ -222,6 +225,7 @@ class NoteDetailRouteArgs {
     this.templateStore,
     this.positionStore,
     this.selectionTransfer,
+    this.initialHeadingId,
   });
 
   final Key? key;
@@ -234,18 +238,27 @@ class NoteDetailRouteArgs {
 
   final NoteSelectionTransfer? selectionTransfer;
 
+  final String? initialHeadingId;
+
   @override
   String toString() {
-    return 'NoteDetailRouteArgs{key: $key, noteId: $noteId, templateStore: $templateStore, positionStore: $positionStore, selectionTransfer: $selectionTransfer}';
+    return 'NoteDetailRouteArgs{key: $key, noteId: $noteId, templateStore: $templateStore, positionStore: $positionStore, selectionTransfer: $selectionTransfer, initialHeadingId: $initialHeadingId}';
   }
 }
 
 /// generated route for
 /// [OnboardingScreen]
-class OnboardingRoute extends PageRouteInfo<void> {
-  const OnboardingRoute({List<PageRouteInfo>? children})
-      : super(
+class OnboardingRoute extends PageRouteInfo<OnboardingRouteArgs> {
+  OnboardingRoute({
+    Key? key,
+    Future<void> Function()? completeOnboarding,
+    List<PageRouteInfo>? children,
+  }) : super(
           OnboardingRoute.name,
+          args: OnboardingRouteArgs(
+            key: key,
+            completeOnboarding: completeOnboarding,
+          ),
           initialChildren: children,
         );
 
@@ -254,9 +267,30 @@ class OnboardingRoute extends PageRouteInfo<void> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      return const OnboardingScreen();
+      final args = data.argsAs<OnboardingRouteArgs>(
+          orElse: () => const OnboardingRouteArgs());
+      return OnboardingScreen(
+        key: args.key,
+        completeOnboarding: args.completeOnboarding,
+      );
     },
   );
+}
+
+class OnboardingRouteArgs {
+  const OnboardingRouteArgs({
+    this.key,
+    this.completeOnboarding,
+  });
+
+  final Key? key;
+
+  final Future<void> Function()? completeOnboarding;
+
+  @override
+  String toString() {
+    return 'OnboardingRouteArgs{key: $key, completeOnboarding: $completeOnboarding}';
+  }
 }
 
 /// generated route for
@@ -303,5 +337,52 @@ class RemindersRouteArgs {
   @override
   String toString() {
     return 'RemindersRouteArgs{key: $key, controller: $controller}';
+  }
+}
+
+/// generated route for
+/// [TodayScreen]
+class TodayRoute extends PageRouteInfo<TodayRouteArgs> {
+  TodayRoute({
+    Key? key,
+    TodayAgendaController? controller,
+    List<PageRouteInfo>? children,
+  }) : super(
+          TodayRoute.name,
+          args: TodayRouteArgs(
+            key: key,
+            controller: controller,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'TodayRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args =
+          data.argsAs<TodayRouteArgs>(orElse: () => const TodayRouteArgs());
+      return TodayScreen(
+        key: args.key,
+        controller: args.controller,
+      );
+    },
+  );
+}
+
+class TodayRouteArgs {
+  const TodayRouteArgs({
+    this.key,
+    this.controller,
+  });
+
+  final Key? key;
+
+  final TodayAgendaController? controller;
+
+  @override
+  String toString() {
+    return 'TodayRouteArgs{key: $key, controller: $controller}';
   }
 }

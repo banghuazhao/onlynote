@@ -115,6 +115,43 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Today_Title": MessageLookupByLibrary.simpleMessage("今天"),
+        "Today_Description":
+            MessageLookupByLibrary.simpleMessage("在同一處查看今天的筆記、提醒和未完成事項。"),
+        "Today_Create_Note": MessageLookupByLibrary.simpleMessage("開始今天的筆記"),
+        "Today_Open_Note": MessageLookupByLibrary.simpleMessage("開啟筆記"),
+        "Today_Daily_Empty":
+            MessageLookupByLibrary.simpleMessage("記錄靈感，或為今天訂個計劃。"),
+        "Today_Reminders": MessageLookupByLibrary.simpleMessage("到期提醒"),
+        "Today_No_Reminders": MessageLookupByLibrary.simpleMessage("今天沒有到期提醒。"),
+        "Today_All_Reminders": MessageLookupByLibrary.simpleMessage("所有提醒"),
+        "Today_Tasks": MessageLookupByLibrary.simpleMessage("未完成事項"),
+        "Today_Tasks_Hint": MessageLookupByLibrary.simpleMessage("來自使用中的筆記"),
+        "Today_No_Tasks": MessageLookupByLibrary.simpleMessage("沒有未完成事項。"),
+        "Today_Load_Failed":
+            MessageLookupByLibrary.simpleMessage("無法重新整理今天檢視，請重試。"),
+        "Today_Task_Save_Failed":
+            MessageLookupByLibrary.simpleMessage("無法完成此事項，請重試。"),
+        "Today_Task_Changed":
+            MessageLookupByLibrary.simpleMessage("此事項已變更，請查看最新內容後重試。"),
+        "Editor_Divider": MessageLookupByLibrary.simpleMessage("分隔線"),
+        "Section_Links": MessageLookupByLibrary.simpleMessage("標題連結"),
+        "Section_Link_Add": MessageLookupByLibrary.simpleMessage("連結至標題"),
+        "Section_Link_Choose": MessageLookupByLibrary.simpleMessage("選擇標題"),
+        "Section_Link_Search": MessageLookupByLibrary.simpleMessage("搜尋筆記及標題"),
+        "Section_Link_Empty":
+            MessageLookupByLibrary.simpleMessage("將段落設為標題，即可在此連結至該段落。"),
+        "Section_Link_No_Results":
+            MessageLookupByLibrary.simpleMessage("沒有相符的標題。"),
+        "Section_Link_This_Note": MessageLookupByLibrary.simpleMessage("目前筆記"),
+        "Section_Link_Unavailable":
+            MessageLookupByLibrary.simpleMessage("標題無法使用，可能已被刪除。"),
+        "Section_Link_Remove": MessageLookupByLibrary.simpleMessage("移除標題連結"),
+        "Section_Link_Failed":
+            MessageLookupByLibrary.simpleMessage("無法儲存標題連結，請重試。"),
+        "Section_Link_Limit":
+            MessageLookupByLibrary.simpleMessage("每篇筆記最多可加入100個標題連結。"),
+
     "Add_Image": MessageLookupByLibrary.simpleMessage("加入照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("新增備忘錄"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),

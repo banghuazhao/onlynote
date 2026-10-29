@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/common/extension/string.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
@@ -38,6 +39,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: event.voiceMemos ?? [],
           tags: event.tags ?? [],
           linkedNoteIds: event.linkedNoteIds ?? [],
+          sectionLinks: event.sectionLinks ?? [],
           dailyNoteDateKey: event.dailyNoteDateKey,
           cardStyle: event.cardStyle,
         ),
@@ -76,6 +78,9 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
       if (event is _LinksChanged) {
         emit(state.copyWith(linkedNoteIds: event.value));
       }
+      if (event is _SectionLinksChanged) {
+        emit(state.copyWith(sectionLinks: event.value));
+      }
       if (event is _VoiceMemosChanged) {
         emit(state.copyWith(voiceMemos: event.value));
       }
@@ -96,6 +101,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
+          sectionLinks: state.sectionLinks,
           dailyNoteDateKey: state.dailyNoteDateKey,
           cardStyle: state.cardStyle,
           isArchived: event.isArchived,
@@ -118,6 +124,7 @@ class AddUpdateFormBloc extends Bloc<AddUpdateFormEvent, AddUpdateFormState> {
           voiceMemos: state.voiceMemos,
           tags: state.tags,
           linkedNoteIds: state.linkedNoteIds,
+          sectionLinks: state.sectionLinks,
           dailyNoteDateKey: state.dailyNoteDateKey,
           cardStyle: state.cardStyle,
           isArchived: event.isArchived,

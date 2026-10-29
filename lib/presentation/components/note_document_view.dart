@@ -8,6 +8,7 @@ import 'package:onlynote/services/note_reader_sections.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_web_links.dart';
 import 'formatted_note_text.dart';
+import 'note_divider_block.dart';
 import 'note_image_block.dart';
 import 'note_outline_navigation_controller.dart';
 import 'note_reader_position_controller.dart';
@@ -78,7 +79,7 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
   void _updateDocument() {
     final layouts = normalizeNoteImageLayouts(
         widget.imageLayouts, widget.imagePaths, widget.text);
-    _parts = noteDocumentParts(widget.text, layouts);
+    _parts = noteDocumentParts(widget.text, layouts, styles: widget.styles);
     _readerDocument =
         buildNoteReaderSections(widget.text, widget.styles, layouts);
     _collapsedSections.clear();
@@ -291,6 +292,8 @@ class _NoteDocumentViewState extends State<NoteDocumentView> {
         for (final part in parts)
           if (part is NoteTextPart && part.end > part.start)
             _buildText(part)
+          else if (part is NoteDividerPart)
+            NoteDividerBlock(key: ValueKey('document-divider-${part.start}'))
           else if (part is NoteImagePart)
             KeyedSubtree(
               key: _imageKeys.putIfAbsent(part.layout.path, GlobalKey.new),
@@ -416,5 +419,6 @@ List<NoteTextStyleRange> noteTextStylesForPart(
             start: (style.start - start).clamp(0, end - start),
             end: (style.end - start).clamp(0, end - start),
             kind: style.kind,
+            anchorId: style.anchorId,
           ),
     ];

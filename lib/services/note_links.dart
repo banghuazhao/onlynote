@@ -22,7 +22,8 @@ List<Note> noteBacklinks(Note target, Iterable<Note> notes) => [
         for (final note in notes)
           if (!note.isDeleted &&
               note.id != target.id &&
-              note.linkedNoteIds.contains(target.id))
+              (note.linkedNoteIds.contains(target.id) ||
+                  note.sectionLinks.any((link) => link.noteId == target.id)))
             note,
     ];
 

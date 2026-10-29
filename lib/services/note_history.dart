@@ -167,6 +167,7 @@ class NoteHistory extends ChangeNotifier {
               : Map.unmodifiable(current.cardStyle!),
           tags: List.of(current.tags ?? []),
           linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
+          sectionLinks: _cloneMemos(snapshot.sectionLinks),
           textStyles: _cloneMemos(snapshot.textStyles),
           imageLayouts: _cloneMemos(snapshot.imageLayouts),
         );
@@ -322,7 +323,8 @@ class NoteHistory extends ChangeNotifier {
           false) ||
       (note.imagePaths?.isNotEmpty ?? false) ||
       (note.voiceMemos?.isNotEmpty ?? false) ||
-      (note.linkedNoteIds?.isNotEmpty ?? false);
+      (note.linkedNoteIds?.isNotEmpty ?? false) ||
+      (note.sectionLinks?.isNotEmpty ?? false);
 
   static bool _sameContent(NoteDto a, NoteDto b) =>
       (a.title ?? '') == (b.title ?? '') &&
@@ -343,6 +345,7 @@ class NoteHistory extends ChangeNotifier {
         a.imagePaths ?? const <String>[],
         a.voiceMemos ?? const <Map>[],
         a.linkedNoteIds ?? const <String>[],
+        a.sectionLinks ?? const <Map>[],
       ], [
         b.colorValue,
         [
@@ -352,6 +355,7 @@ class NoteHistory extends ChangeNotifier {
         b.imagePaths ?? const <String>[],
         b.voiceMemos ?? const <Map>[],
         b.linkedNoteIds ?? const <String>[],
+        b.sectionLinks ?? const <Map>[],
       ]);
 
   static bool _sameFormatting(NoteDto a, NoteDto b) {
@@ -459,6 +463,7 @@ class NoteHistory extends ChangeNotifier {
         tags: List.unmodifiable(note.tags ?? const <String>[]),
         linkedNoteIds:
             List.unmodifiable(note.linkedNoteIds ?? const <String>[]),
+        sectionLinks: _cloneMemos(note.sectionLinks),
         textStyles: _cloneMemos(note.textStyles),
         imageLayouts: _cloneMemos(note.imageLayouts),
       );

@@ -246,7 +246,7 @@ void main() {
       },
     );
     final portable = decodeBackup(encodeBackup(contents));
-    expect(portable.toJson()['version'], 8);
+    expect(portable.toJson()['version'], 9);
     expect(portable.notes.single.toDomain().cardStyle, style);
     expect(portable.templates.single.cardStyle, style);
     expect(

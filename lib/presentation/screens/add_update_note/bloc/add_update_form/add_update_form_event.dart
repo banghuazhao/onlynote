@@ -13,6 +13,7 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
     List<VoiceMemo>? voiceMemos,
     List<String>? tags,
     List<String>? linkedNoteIds,
+    List<NoteSectionLink>? sectionLinks,
     String? dailyNoteDateKey,
     @Default(NoteCardStyle()) NoteCardStyle cardStyle,
   }) = _Initialize;
@@ -87,4 +88,6 @@ class AddUpdateFormEvent with _$AddUpdateFormEvent {
       _TagsChanged;
   const factory AddUpdateFormEvent.linksChanged(List<String> value) =
       _LinksChanged;
+  const factory AddUpdateFormEvent.sectionLinksChanged(
+      List<NoteSectionLink> value) = _SectionLinksChanged;
 }

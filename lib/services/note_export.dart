@@ -7,6 +7,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/services/note_outline.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -21,9 +22,28 @@ class NoteExport {
     return safe.isEmpty ? 'note' : String.fromCharCodes(safe.runes.take(50));
   }
 
-  static String plainText(Note note, {String? reminder}) => [
+  /// Export a readable snapshot of heading relationships. Self links use the
+  /// current heading title; other notes retain the label saved with the link.
+  static List<String> sectionLinkTitles(Note note) {
+    final outline = buildNoteOutline(note.description ?? '', note.textStyles);
+    return [
+      for (final link in note.sectionLinks)
+        link.noteId == note.id
+            ? outline
+                    .where((entry) => entry.anchorId == link.headingId)
+                    .map((entry) => entry.text)
+                    .firstOrNull ??
+                link.headingText
+            : link.headingText,
+    ];
+  }
+
+  static String plainText(Note note,
+          {String? reminder, String sectionLinksLabel = 'Heading links'}) =>
+      [
         if (note.title?.isNotEmpty == true) note.title!,
-        if (note.description?.isNotEmpty == true) note.description!,
+        if (note.description?.isNotEmpty == true)
+          noteTextToPlainText(note.description!, note.textStyles),
         ...note.voiceMemos
             .map((memo) => memo.transcript ?? '')
             .where((text) => text.isNotEmpty),
@@ -33,6 +53,8 @@ class NoteExport {
                   '${todo.completed ? '[x]' : '[ ]'} ${todo.title ?? ''}')
               .join('\n'),
         if (reminder != null) reminder,
+        if (note.sectionLinks.isNotEmpty)
+          '$sectionLinksLabel\n${sectionLinkTitles(note).map((title) => '• $title').join('\n')}',
       ].join('\n\n');
 
   static String _escape(String text) => text.replaceAllMapped(
@@ -42,7 +64,8 @@ class NoteExport {
           {String? reminder,
           List<String> photos = const [],
           List<String> recordings = const [],
-          String recordingLabel = 'Recording'}) =>
+          String recordingLabel = 'Recording',
+          String sectionLinksLabel = 'Heading links'}) =>
       [
         if (note.title?.isNotEmpty == true)
           '# ${_escape(note.title!).replaceAll('\n', ' ')}',
@@ -58,6 +81,8 @@ class NoteExport {
                   '- [${todo.completed ? 'x' : ' '}] ${_escape(todo.title ?? '').replaceAll('\n', '\n  ')}')
               .join('\n'),
         if (reminder != null) _escape(reminder),
+        if (note.sectionLinks.isNotEmpty)
+          '## ${_escape(sectionLinksLabel)}\n${sectionLinkTitles(note).map((title) => '- ${_escape(title).replaceAll('\n', ' ')}').join('\n')}',
         for (var i = 0; i < recordings.length; i++)
           '[${_escape(recordingLabel)} ${i + 1}](${Uri.encodeComponent(recordings[i])})',
       ].join('\n\n');
@@ -72,10 +97,13 @@ class NoteExport {
     };
     final used = <int>{};
     return [
-      for (final part in noteDocumentParts(body, layouts))
+      for (final part
+          in noteDocumentParts(body, layouts, styles: note.textStyles))
         if (part is NoteTextPart && part.end > part.start)
           noteTextToMarkdown(body.substring(part.start, part.end),
               _partStyles(note.textStyles, part))
+        else if (part is NoteDividerPart)
+          '---'
         else if (part is NoteImagePart &&
             imageIndices.containsKey(part.layout.path) &&
             imageIndices[part.layout.path]! < photos.length)
@@ -107,7 +135,8 @@ List<NoteTextStyleRange> _partStyles(
           NoteTextStyleRange(
               start: math.max(style.start, part.start) - part.start,
               end: math.min(style.end, part.end) - part.start,
-              kind: style.kind),
+              kind: style.kind,
+              anchorId: style.anchorId),
     ];
 
 /// Pure PDF generation runs in an isolate; the UI loads fonts and photos first.
@@ -240,6 +269,7 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
       layouts.every((layout) => layout.isDocumentPage) &&
       data.description.trim().isEmpty &&
       data.todos.isEmpty &&
+      data.sectionLinkTitles.isEmpty &&
       data.transcripts.every((value) => value.trim().isEmpty) &&
       (data.reminder?.trim().isEmpty ?? true);
   final content = <pw.Widget>[];
@@ -296,12 +326,18 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
       content.addAll([text(data.date), pw.SizedBox(height: 16)]);
     }
   }
-  for (final part in noteDocumentParts(data.description, layouts)) {
+  for (final part in noteDocumentParts(data.description, layouts,
+      styles: data.textStyles)) {
     if (part is NoteTextPart && part.end > part.start && !scanOnly) {
       content.addAll([
         text(data.description.substring(part.start, part.end),
             textStyles: _partStyles(data.textStyles, part)),
         pw.SizedBox(height: 16),
+      ]);
+    } else if (part is NoteDividerPart && !scanOnly) {
+      content.addAll([
+        pw.Divider(color: PdfColors.grey500, thickness: .7),
+        pw.SizedBox(height: 12),
       ]);
     } else if (part is NoteImagePart) {
       if (part.layout.isDocumentPage) {
@@ -322,6 +358,12 @@ Future<Uint8List> buildNotePdf(NotePdfData data) async {
   }
   if (data.reminder != null && !scanOnly) {
     content.addAll([pw.SizedBox(height: 12), text(data.reminder!)]);
+  }
+  if (data.sectionLinkTitles.isNotEmpty) {
+    content.addAll([pw.SizedBox(height: 12), text(data.sectionLinksLabel)]);
+    for (final title in data.sectionLinkTitles) {
+      content.addAll([text('• $title'), pw.SizedBox(height: 6)]);
+    }
   }
   flushContent(allowEmpty: !addedPages);
   return document.save();
@@ -371,6 +413,8 @@ class NotePdfData {
       this.imagePaths = const [],
       this.imageLayouts = const [],
       this.transcripts = const [],
+      this.sectionLinkTitles = const [],
+      this.sectionLinksLabel = 'Heading links',
       this.glyphs = const {}});
   final String title, description, date;
   final List<(bool, String)> todos;
@@ -381,5 +425,7 @@ class NotePdfData {
   final List<String> imagePaths;
   final List<NoteImageLayout> imageLayouts;
   final List<String> transcripts;
+  final List<String> sectionLinkTitles;
+  final String sectionLinksLabel;
   final Map<String, Uint8List> glyphs;
 }

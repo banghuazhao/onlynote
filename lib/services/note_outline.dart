@@ -6,11 +6,13 @@ class NoteOutlineEntry {
     required this.text,
     required this.start,
     required this.end,
+    this.anchorId,
   });
 
   final String text;
   final int start;
   final int end;
+  final String? anchorId;
 }
 
 /// Only paragraphs with saved heading formatting belong in the outline.
@@ -49,6 +51,7 @@ List<NoteOutlineEntry> buildNoteOutline(
       final trailing = paragraph.length - paragraph.trimRight().length;
       entries.add(NoteOutlineEntry(
         text: trimmed,
+        anchorId: headings[headingIndex].anchorId,
         start: start + leading,
         end: end - trailing,
       ));

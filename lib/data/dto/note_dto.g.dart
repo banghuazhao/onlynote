@@ -74,6 +74,9 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       isArchived: fields[12] == null ? false : fields[12] as bool,
       tags: (fields[13] as List?)?.cast<String>(),
       linkedNoteIds: (fields[14] as List?)?.cast<String>(),
+      sectionLinks: (fields[19] as List?)
+          ?.map((dynamic e) => (e as Map).cast<dynamic, dynamic>())
+          ?.toList(),
       textStyles: (fields[15] as List?)
           ?.map((dynamic e) => (e as Map).cast<dynamic, dynamic>())
           ?.toList(),
@@ -88,7 +91,7 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
   @override
   void write(BinaryWriter writer, NoteDto obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -126,7 +129,9 @@ class NoteDtoAdapter extends TypeAdapter<NoteDto> {
       ..writeByte(17)
       ..write(obj.dailyNoteDateKey)
       ..writeByte(18)
-      ..write(obj.cardStyle);
+      ..write(obj.cardStyle)
+      ..writeByte(19)
+      ..write(obj.sectionLinks);
   }
 
   @override

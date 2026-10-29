@@ -8,6 +8,9 @@ A minimalist notes & checklist app built with Flutter.
 
 - Quick note-taking with rich colors to organize at a glance
 - Checklist / todo items inside any note
+- Today view with today's daily note, due reminders, and unfinished tasks across active notes
+- Links to specific headings, with stable destinations when headings move or are renamed
+- Divider lines for organizing longer notes, preserved in backups and document exports
 - One-time, daily, and weekly reminders that open their note when tapped
 - Mobile Home Screen widgets and native Mac paper widgets for notes and checklists
 - One-tap image sharing — turn a note into a shareable image

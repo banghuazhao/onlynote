@@ -164,18 +164,21 @@ List<NoteTextStyleRange> _replaceBodyStyles(
         NoteTextStyleRange(
             start: range.start,
             end: range.end.clamp(range.start, match.start),
-            kind: range.kind),
+            kind: range.kind,
+            anchorId: range.anchorId),
       if (range.end > match.end)
         NoteTextStyleRange(
             start: range.start.clamp(match.end, range.end) + delta,
             end: range.end + delta,
-            kind: range.kind),
+            kind: range.kind,
+            anchorId: range.anchorId),
     ],
     for (final range in rebased)
       if (range.start < insertEnd && range.end > match.start)
         NoteTextStyleRange(
             start: range.start.clamp(match.start, insertEnd),
             end: range.end.clamp(match.start, insertEnd),
-            kind: range.kind),
+            kind: range.kind,
+            anchorId: range.anchorId),
   ], after);
 }
