@@ -5,6 +5,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
 import 'package:onlynote/services/daily_note.dart';
+import 'package:onlynote/services/note_mutations.dart';
 
 /// Keeps reminder metadata intact for Undo, while silencing notes in Trash.
 class NoteTrash {
@@ -30,7 +31,12 @@ class NoteTrash {
   final Future<void> Function(Reminder) cancel;
   final Future<bool> Function(NoteDto, Reminder) schedule;
 
-  Future<bool> setDeleted(List<String> ids, {required bool deleted}) async {
+  Future<bool> setDeleted(List<String> ids, {required bool deleted}) {
+    final selectedIds = List<String>.unmodifiable(ids.toSet());
+    return NoteMutations.run(() => _setDeleted(selectedIds, deleted: deleted));
+  }
+
+  Future<bool> _setDeleted(List<String> ids, {required bool deleted}) async {
     final originals = <NoteDto>[];
     for (final id in ids.toSet()) {
       final note = await repository.getNote(id);

@@ -7,6 +7,7 @@ import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/services/shortcuts_append_journal.dart';
 
 const draftDatabaseBox = 'note_recovery_drafts';
 
@@ -40,9 +41,14 @@ class HiveNoteAutosaveStore implements NoteAutosaveStore {
   /// Replay interrupted saves before image cleanup or the first library read.
   /// Failed drafts stay on disk and retain their photo references for retry.
   Future<void> recover() async {
-    for (final entry in drafts.toMap().entries) {
+    final entries = drafts.toMap();
+    final shortcutNotes = shortcutAppendPendingNoteIds(entries);
+    for (final entry in entries.entries) {
       final draft = entry.value;
       if (draft is! NoteDto || draft.id == null) continue;
+      // Shortcuts retain before/after snapshots and may conflict with newer
+      // checklist or editor changes. Their own recovery must decide what saves.
+      if (shortcutNotes.contains(draft.id)) continue;
       try {
         final matches =
             repository.getAllNotes().where((note) => note.id == draft.id);

@@ -20,6 +20,7 @@ class MainFlutterWindow: NSWindow {
     PhotoTextBridge.register(messenger: flutterViewController.engine.binaryMessenger)
     VoiceMemoBridge.register(messenger: flutterViewController.engine.binaryMessenger)
     MacWidgetBridge.register(messenger: flutterViewController.engine.binaryMessenger)
+    ShortcutsAppendBridge.register(messenger: flutterViewController.engine.binaryMessenger)
 
     title = "Onlynote"
     minSize = NSSize(width: 560, height: 440)

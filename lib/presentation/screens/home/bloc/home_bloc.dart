@@ -8,6 +8,7 @@ import 'package:onlynote/services/photo_search_index.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/audio_storage.dart';
 import 'package:onlynote/services/note_archive.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/saved_note_views.dart';
 import 'package:onlynote/services/premium_access.dart';
@@ -200,6 +201,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _handleEvent(HomeEvent event, Emitter<HomeState> emit) async {
+    if (event is _UpdateTodo || event is _SetCardStyle) {
+      await WidgetCommands.initializedInstance?.importPending();
+    }
+    final writesNotes = event is _DuplicateNote ||
+        event is _ReorderNotes ||
+        event is _SetArchived ||
+        event is _SetTags ||
+        event is _SetCardStyle ||
+        event is _TogglePin ||
+        event is _RestoreNotes ||
+        event is _PermanentDelete ||
+        event is _DeleteFolder ||
+        event is _MoveNoteToFolder ||
+        event is _UpdateTodo;
+    if (writesNotes) {
+      await NoteMutations.run(() => _handleSynchronizedEvent(event, emit));
+    } else {
+      // A covered route can still be loading. Reads and view changes must not
+      // reserve another route's writes or delay its visible content.
+      await _handleSynchronizedEvent(event, emit);
+    }
+  }
+
+  Future<void> _handleSynchronizedEvent(
+      HomeEvent event, Emitter<HomeState> emit) async {
     if (event is _GetAllNotes) {
       await _onGetAllNotes(event, emit);
     } else if (event is _DuplicateNote) {
@@ -301,7 +327,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _onUpdateTodo(_UpdateTodo event, Emitter<HomeState> emit) async {
-    await WidgetCommands.initializedInstance?.importPending();
     // Cards are excerpts and may have become stale while another screen edits
     // the note. Start with the latest saved note instead of the card snapshot.
     final fetched = await _getNoteUsecase(event.noteId);
@@ -872,7 +897,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _onSetCardStyle(
       _SetCardStyle event, Emitter<HomeState> emit) async {
     try {
-      await WidgetCommands.initializedInstance?.importPending();
       final fetched = await _getNoteUsecase(event.noteId);
       final note = fetched.fold<Note?>((_) => null, (note) => note);
       if (note == null || note.isDeleted) {

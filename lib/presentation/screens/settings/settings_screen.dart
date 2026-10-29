@@ -1,3 +1,7 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:onlynote/presentation/screens/home/bloc/home_bloc.dart';
+import 'package:onlynote/presentation/screens/import_notes/markdown_import_screen.dart';
+import 'siri_shortcuts_screen.dart';
 import 'dart:async';
 
 import 'package:onlynote/presentation/components/appearance_section.dart';
@@ -28,11 +32,15 @@ class SettingsScreen extends StatefulWidget {
     this.purchases,
     this.backupStatusStore,
     this.returnFolderSelection = false,
+    this.markdownImportBuilder,
+    this.shortcutsBuilder,
   });
 
   final PurchaseService? purchases;
   final BackupExportStatusStore? backupStatusStore;
   final bool returnFolderSelection;
+  final WidgetBuilder? markdownImportBuilder;
+  final WidgetBuilder? shortcutsBuilder;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -45,6 +53,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _openingFolders = false;
   bool _openingBackup = false;
   bool _openingPrivacyPolicy = false;
+  bool _openingMarkdownImport = false;
+  bool _openingShortcuts = false;
   late final BackupExportStatusStore _backupStatusStore;
   BackupExportRecord? _lastBackupExport;
   var _backupStatusRevision = 0;
@@ -90,6 +100,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _openingBackup = false;
         unawaited(_loadBackupStatus());
       }
+    }
+  }
+
+  Future<void> _openMarkdownImport() async {
+    if (!mounted ||
+        _openingMarkdownImport ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingMarkdownImport = true;
+    try {
+      await Navigator.push<bool>(
+          context,
+          MaterialPageRoute<bool>(
+              builder: widget.markdownImportBuilder ??
+                  (_) => const MarkdownImportScreen()));
+    } finally {
+      if (mounted) {
+        _openingMarkdownImport = false;
+        // A partially successful import may have saved notes before returning.
+        context.read<HomeBloc?>()?.add(const HomeEvent.getAllNotes());
+      }
+    }
+  }
+
+  Future<void> _openShortcuts() async {
+    if (!mounted ||
+        _openingShortcuts ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingShortcuts = true;
+    try {
+      await Navigator.push<void>(
+          context,
+          MaterialPageRoute<void>(
+              builder: widget.shortcutsBuilder ??
+                  (_) => const SiriShortcutsScreen()));
+    } finally {
+      if (mounted) _openingShortcuts = false;
     }
   }
 
@@ -241,6 +291,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 lastExport: _lastBackupExport,
                                 onTap: _openBackup,
                               ),
+                              SizedBox(height: tokens.space4),
+                              Card(
+                                  child: ListTile(
+                                key: const ValueKey('settings-import-markdown'),
+                                leading:
+                                    const Icon(Icons.file_download_outlined),
+                                title: Text(S.of(context).Markdown_Import),
+                                subtitle: Text(
+                                    S.of(context).Markdown_Import_Description),
+                                trailing:
+                                    const Icon(Icons.chevron_right_rounded),
+                                onTap: _openMarkdownImport,
+                              )),
+                              if (!kIsWeb &&
+                                  (defaultTargetPlatform ==
+                                          TargetPlatform.iOS ||
+                                      defaultTargetPlatform ==
+                                          TargetPlatform.macOS)) ...[
+                                SizedBox(height: tokens.space4),
+                                Card(
+                                    child: ListTile(
+                                  key:
+                                      const ValueKey('settings-siri-shortcuts'),
+                                  leading:
+                                      const Icon(Icons.auto_awesome_outlined),
+                                  title:
+                                      Text(S.of(context).Siri_Shortcuts_Title),
+                                  subtitle: Text(
+                                      S.of(context).Siri_Shortcuts_Description),
+                                  trailing:
+                                      const Icon(Icons.chevron_right_rounded),
+                                  onTap: _openShortcuts,
+                                )),
+                              ],
                               if (purchase.isSupported) ...[
                                 SizedBox(height: tokens.space4),
                                 SectionCard(

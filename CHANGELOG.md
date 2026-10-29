@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Added Markdown file and ZIP import with previews, note selection, local images, supported formatting, Premium limits, and safe partial-import retries.
+- Added unfinished-task search to Today and Undo for task completion, preserving unrelated edits and providing retry feedback.
+- Added Siri and Shortcuts actions on iOS 16+ and macOS 13+ for appending to a saved note, today's daily note, or Inbox.
+- Added a Siri & Shortcuts guide and a pending-text review with copy, retry, and explicit discard for interrupted appends.
+- Protected overlapping Shortcuts, checklist, history, organization, and backup writes from losing content or undoing deletion.
+- Fixed Shortcuts recovery after app reattachment and kept malformed native queue files from blocking valid captures.
+- Prevented pending or discarded Shortcuts recovery drafts from overwriting newer saved edits after a restart.
+- Preserved literal code and URL syntax during Markdown import and bounded preview photo decoding.
+- Kept Today errors and pending Shortcuts controls scrollable at accessibility text sizes in short windows.
+
 - Added Today, bringing together today's daily note, overdue and today reminders, and unfinished checklist tasks with direct completion and source-note navigation.
 - Added links to specific headings in the same note or another note, preserving heading identities through text edits and retaining links in backups, history, and templates.
 - Added divider lines to the editor's Insert menu, with matching reader, image-share, Markdown, plain-text, and PDF output.

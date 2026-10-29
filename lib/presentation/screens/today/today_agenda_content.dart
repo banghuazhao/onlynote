@@ -9,17 +9,19 @@ import 'package:onlynote/services/reminder_agenda.dart';
 import 'package:onlynote/services/today_agenda.dart';
 
 enum _TodayRow {
+  loadFailure,
   date,
   dailyNote,
   reminderHeading,
   noReminders,
   taskHeading,
+  taskSearch,
   noTasks
 }
 
 /// Storage-free content used by the live screen and isolated widget previews.
 /// A single virtualized list keeps long checklists responsive on small devices.
-class TodayAgendaContent extends StatelessWidget {
+class TodayAgendaContent extends StatefulWidget {
   const TodayAgendaContent({
     super.key,
     required this.agenda,
@@ -33,6 +35,7 @@ class TodayAgendaContent extends StatelessWidget {
     this.loadFailed = false,
     this.navigating = false,
     this.busyTaskKey,
+    this.initialTaskQuery = '',
   });
 
   final TodayAgenda agenda;
@@ -46,14 +49,42 @@ class TodayAgendaContent extends StatelessWidget {
   final bool loadFailed;
   final bool navigating;
   final String? busyTaskKey;
+  final String initialTaskQuery;
 
-  bool get _actionsEnabled => !navigating && busyTaskKey == null;
+  @override
+  State<TodayAgendaContent> createState() => _TodayAgendaContentState();
+}
+
+class _TodayAgendaContentState extends State<TodayAgendaContent> {
+  late final _search = TextEditingController(text: widget.initialTaskQuery);
+
+  bool get _canChangeSearch =>
+      mounted && ModalRoute.of(context)?.isCurrent != false;
+
+  void _searchChanged(String _) {
+    if (_canChangeSearch) setState(() {});
+  }
+
+  void _clearSearch() {
+    if (_canChangeSearch) setState(_search.clear);
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  bool get _actionsEnabled => !widget.navigating && widget.busyTaskKey == null;
 
   @override
   Widget build(BuildContext context) {
     final strings = S.of(context);
     final theme = Theme.of(context);
+    final query = _search.text.trim();
+    final tasks = searchTodayTasks(widget.agenda.tasks, query);
     final rows = <Object>[
+      if (widget.loadFailed) _TodayRow.loadFailure,
       _TodayRow.date,
       _TodayRow.dailyNote,
       _TodayRow.reminderHeading,
@@ -61,26 +92,45 @@ class TodayAgendaContent extends StatelessWidget {
         ReminderAgendaGroup.overdue,
         ReminderAgendaGroup.today
       ])
-        if (agenda.reminders.any((entry) => entry.groupAt(now) == group)) ...[
+        if (widget.agenda.reminders
+            .any((entry) => entry.groupAt(widget.now) == group)) ...[
           group,
-          ...agenda.reminders.where((entry) => entry.groupAt(now) == group),
+          ...widget.agenda.reminders
+              .where((entry) => entry.groupAt(widget.now) == group),
         ],
-      if (agenda.reminders.isEmpty) _TodayRow.noReminders,
+      if (widget.agenda.reminders.isEmpty) _TodayRow.noReminders,
       _TodayRow.taskHeading,
-      if (agenda.tasks.isEmpty) _TodayRow.noTasks,
-      ...agenda.tasks,
+      _TodayRow.taskSearch,
+      if (tasks.isEmpty) _TodayRow.noTasks,
+      ...tasks,
     ];
+    final rowIds = [for (final row in rows) _rowId(row)];
+    final positions = {
+      for (var index = 0; index < rowIds.length; index++) rowIds[index]: index
+    };
     final list = ListView.builder(
       key: const ValueKey('today-agenda-list'),
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       itemCount: rows.length,
+      findChildIndexCallback: (key) =>
+          key is ValueKey<String> ? positions[key.value] : null,
       itemBuilder: (context, index) => Center(
+        key: ValueKey(rowIds[index]),
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
           child: SizedBox(
             width: double.infinity,
             child: switch (rows[index]) {
+              _TodayRow.loadFailure => MaterialBanner(
+                  content: Text(strings.Today_Load_Failed),
+                  leading: const Icon(Icons.info_outline_rounded),
+                  actions: [
+                    TextButton(
+                        onPressed: widget.loading ? null : widget.onRefresh,
+                        child: Text(strings.Retry)),
+                  ],
+                ),
               _TodayRow.date => Padding(
                   padding: const EdgeInsets.fromLTRB(4, 4, 4, 20),
                   child: Column(
@@ -89,7 +139,7 @@ class TodayAgendaContent extends StatelessWidget {
                       Text(
                         DateFormat.yMMMMEEEEd(
                                 Localizations.localeOf(context).toString())
-                            .format(now.toLocal()),
+                            .format(widget.now.toLocal()),
                         key: const ValueKey('today-date'),
                         style: theme.textTheme.titleMedium,
                       ),
@@ -101,16 +151,16 @@ class TodayAgendaContent extends StatelessWidget {
                   ),
                 ),
               _TodayRow.dailyNote => _DailyNoteCard(
-                  note: agenda.dailyNote,
+                  note: widget.agenda.dailyNote,
                   enabled: _actionsEnabled,
-                  onOpen: onOpenDailyNote,
+                  onOpen: widget.onOpenDailyNote,
                 ),
               _TodayRow.reminderHeading => _SectionHeading(
                   title: strings.Today_Reminders,
-                  count: agenda.reminders.length,
+                  count: widget.agenda.reminders.length,
                   action: TextButton.icon(
                     key: const ValueKey('today-all-reminders'),
-                    onPressed: _actionsEnabled ? onOpenReminders : null,
+                    onPressed: _actionsEnabled ? widget.onOpenReminders : null,
                     icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                     label: Text(strings.Today_All_Reminders),
                   ),
@@ -121,12 +171,57 @@ class TodayAgendaContent extends StatelessWidget {
                 ),
               _TodayRow.taskHeading => _SectionHeading(
                   title: strings.Today_Tasks,
-                  count: agenda.tasks.length,
+                  count: widget.agenda.tasks.length,
                   subtitle: strings.Today_Tasks_Hint,
                 ),
+              _TodayRow.taskSearch => Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextField(
+                          key: const ValueKey('today-task-search'),
+                          controller: _search,
+                          onChanged: _searchChanged,
+                          textInputAction: TextInputAction.search,
+                          decoration: InputDecoration(
+                            labelText: strings.Today_Task_Search,
+                            prefixIcon: const Icon(Icons.search_rounded),
+                            suffixIcon: _search.text.isEmpty
+                                ? null
+                                : IconButton(
+                                    key: const ValueKey(
+                                        'today-task-search-clear'),
+                                    tooltip: strings.Clear_Search,
+                                    onPressed: _clearSearch,
+                                    icon: const Icon(Icons.close_rounded),
+                                  ),
+                          ),
+                        ),
+                        if (query.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+                            child: Semantics(
+                                liveRegion: true,
+                                child: Text(
+                                    strings.Today_Task_Search_Count(
+                                        tasks.length,
+                                        widget.agenda.tasks.length),
+                                    key: const ValueKey(
+                                        'today-task-search-count'),
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                        color: theme
+                                            .colorScheme.onSurfaceVariant))),
+                          ),
+                      ]),
+                ),
               _TodayRow.noTasks => _EmptySection(
-                  icon: Icons.task_alt_rounded,
-                  text: strings.Today_No_Tasks,
+                  icon: query.isEmpty
+                      ? Icons.task_alt_rounded
+                      : Icons.search_off_rounded,
+                  text: query.isEmpty
+                      ? strings.Today_No_Tasks
+                      : strings.Today_Task_No_Matches,
                 ),
               final ReminderAgendaGroup group => Padding(
                   padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
@@ -145,17 +240,20 @@ class TodayAgendaContent extends StatelessWidget {
                 ),
               final ReminderAgendaEntry entry => _ReminderRow(
                   entry: entry,
-                  overdue: entry.groupAt(now) == ReminderAgendaGroup.overdue,
-                  onOpen:
-                      _actionsEnabled ? () => onOpenNote(entry.note.id!) : null,
+                  overdue:
+                      entry.groupAt(widget.now) == ReminderAgendaGroup.overdue,
+                  onOpen: _actionsEnabled
+                      ? () => widget.onOpenNote(entry.note.id!)
+                      : null,
                 ),
               final TodayTaskEntry entry => _TaskRow(
                   entry: entry,
-                  busy: busyTaskKey == entry.key,
-                  onOpen:
-                      _actionsEnabled ? () => onOpenNote(entry.note.id!) : null,
+                  busy: widget.busyTaskKey == entry.key,
+                  onOpen: _actionsEnabled
+                      ? () => widget.onOpenNote(entry.note.id!)
+                      : null,
                   onComplete: _actionsEnabled && entry.canComplete
-                      ? () => onCompleteTask(entry)
+                      ? () => widget.onCompleteTask(entry)
                       : null,
                 ),
               _ => const SizedBox.shrink(),
@@ -166,27 +264,26 @@ class TodayAgendaContent extends StatelessWidget {
     );
     return Column(
       children: [
-        if (loading)
+        if (widget.loading)
           const LinearProgressIndicator(key: ValueKey('today-loading')),
-        if (loadFailed)
-          MaterialBanner(
-            content: Text(strings.Today_Load_Failed),
-            leading: const Icon(Icons.info_outline_rounded),
-            actions: [
-              TextButton(
-                  onPressed: loading ? null : onRefresh,
-                  child: Text(strings.Retry)),
-            ],
-          ),
         Expanded(
-          child: onRefresh == null
+          child: widget.onRefresh == null
               ? list
-              : RefreshIndicator(onRefresh: onRefresh!, child: list),
+              : RefreshIndicator(onRefresh: widget.onRefresh!, child: list),
         ),
       ],
     );
   }
 }
+
+String _rowId(Object row) => switch (row) {
+      final _TodayRow kind => 'section:${kind.name}',
+      final ReminderAgendaGroup group => 'group:${group.name}',
+      final ReminderAgendaEntry entry =>
+        'reminder:${entry.reminder.reminderId}',
+      final TodayTaskEntry entry => 'task:${entry.key}',
+      _ => row.toString(),
+    };
 
 class _DailyNoteCard extends StatelessWidget {
   const _DailyNoteCard(

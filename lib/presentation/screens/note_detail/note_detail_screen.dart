@@ -20,6 +20,7 @@ import 'package:onlynote/services/note_position_store.dart';
 import 'package:onlynote/services/note_statistics.dart';
 import 'package:onlynote/services/note_folder_info.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/presentation/components/note_copy_destination_sheet.dart';
@@ -699,10 +700,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   Future<void> _changeLibrary(
       Future<void> Function(NoteRepository) operation) async {
-    if (_changingLibrary || !getIt.isRegistered<NoteRepository>()) return;
+    if (!mounted || _changingLibrary || !getIt.isRegistered<NoteRepository>()) {
+      return;
+    }
     setState(() => _changingLibrary = true);
     try {
-      await operation(getIt<NoteRepository>());
+      await NoteMutations.run(() async {
+        if (mounted) await operation(getIt<NoteRepository>());
+      });
       _reload();
     } catch (_) {
       if (mounted) {
@@ -777,21 +782,24 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
           ModalRoute.of(context)?.isCurrent != true) {
         return;
       }
-      final repository = getIt<NoteRepository>();
-      final target = (await repository.getNote(selected.noteId)).toDomain();
-      final captured = captureNoteSectionLink(target, selected.heading);
-      if (captured == null) throw StateError('Heading changed');
-      if (target.id != source.id) {
-        await repository.addUpdateNote(NoteDto.fromNote(captured.target));
-      }
-      final current = target.id == source.id
-          ? captured.target
-          : (await repository.getNote(source.id!)).toDomain();
-      if (current.isDeleted) throw StateError('Note unavailable');
-      final links =
-          normalizeNoteSectionLinks([...current.sectionLinks, captured.link]);
-      await repository.addUpdateNote(
-          NoteDto.fromNote(current.copyWith(sectionLinks: links)));
+      await NoteMutations.run(() async {
+        if (!mounted) return;
+        final repository = getIt<NoteRepository>();
+        final target = (await repository.getNote(selected.noteId)).toDomain();
+        final captured = captureNoteSectionLink(target, selected.heading);
+        if (captured == null) throw StateError('Heading changed');
+        if (target.id != source.id) {
+          await repository.addUpdateNote(NoteDto.fromNote(captured.target));
+        }
+        final current = target.id == source.id
+            ? captured.target
+            : (await repository.getNote(source.id!)).toDomain();
+        if (current.isDeleted) throw StateError('Note unavailable');
+        final links =
+            normalizeNoteSectionLinks([...current.sectionLinks, captured.link]);
+        await repository.addUpdateNote(
+            NoteDto.fromNote(current.copyWith(sectionLinks: links)));
+      });
       if (mounted) _reload();
     } catch (_) {
       if (mounted) {

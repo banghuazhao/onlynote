@@ -143,4 +143,96 @@ void main() {
     stuck.complete(true);
     commands.dispose();
   });
+  test('external writes coalesce flushes and wait for every editor', () async {
+    final commands = DesktopCommands();
+    final pending = Completer<bool>();
+    final flushed = <String>[];
+    commands.registerEditor(() {
+      flushed.add('covered');
+      return pending.future;
+    });
+    commands.registerEditor(() async {
+      flushed.add('current');
+      return true;
+    });
+    final first = commands.prepareForExternalWrite();
+    final repeated = commands.prepareForExternalWrite();
+    expect(identical(first, repeated), isTrue);
+    expect(flushed, ['covered']);
+    pending.complete(true);
+    expect(await first, isTrue);
+    expect(flushed, ['covered', 'current']);
+    commands.dispose();
+  });
+
+  test('external writes reject failed or thrown flushes and can retry',
+      () async {
+    final commands = DesktopCommands();
+    var failing = true;
+    var calls = 0;
+    commands.registerEditor(() async {
+      if (failing) throw StateError('Storage unavailable');
+      return true;
+    });
+    commands.registerEditor(() async {
+      calls++;
+      return !failing;
+    });
+    expect(await commands.prepareForExternalWrite(), isFalse);
+    expect(calls, 1);
+    failing = false;
+    expect(await commands.prepareForExternalWrite(), isTrue);
+    expect(calls, 2);
+    commands.dispose();
+  });
+
+  test('hung editors block external writes while quit keeps its timeout policy',
+      () async {
+    final commands =
+        DesktopCommands(saveBudget: const Duration(milliseconds: 20));
+    final pending = Completer<bool>();
+    var calls = 0;
+    commands.registerEditor(() {
+      calls++;
+      return pending.future;
+    });
+    final external = commands.prepareForExternalWrite();
+    final quit = commands.prepareToExit();
+    expect(await external, isFalse);
+    expect(await quit, AppExitResponse.exit);
+    expect(calls, 2);
+    pending.complete(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(await commands.prepareForExternalWrite(), isTrue);
+    commands.dispose();
+  });
+
+  test(
+      'removed-route pending save timeout blocks external writes and remains tracked',
+      () async {
+    final commands =
+        DesktopCommands(saveBudget: const Duration(milliseconds: 20));
+    final pending = Completer<bool>();
+    final unregister = commands.registerEditor(() async => true);
+    commands.trackSave(pending.future);
+    unregister();
+    expect(await commands.prepareForExternalWrite(), isFalse);
+    expect(await commands.prepareToExit(), AppExitResponse.exit);
+    // A timed out external check never cancels the original durable save.
+    pending.complete(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(await commands.prepareForExternalWrite(), isTrue);
+    commands.dispose();
+  });
+
+  test('a removed-route pending failure blocks an external write', () async {
+    final commands = DesktopCommands();
+    final pending = Completer<bool>();
+    commands.trackSave(pending.future);
+    final external = commands.prepareForExternalWrite();
+    pending.complete(false);
+    expect(await external, isFalse);
+    expect(await commands.prepareForExternalWrite(), isTrue);
+    commands.dispose();
+  });
 }

@@ -7,6 +7,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/services/note_text_format.dart';
 import 'package:onlynote/services/note_document.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -120,71 +121,78 @@ class NoteHistory extends ChangeNotifier {
                 forceNext: true));
       });
 
+  /// Reserve the full restore transaction after earlier restores for this note.
+  /// The repository's snapshot hook stays outside this gate so it can be called
+  /// by any mutation that already owns the reservation.
   Future<NoteHistoryRestoreResult> restore(String noteId, String versionId) {
     var result = NoteHistoryRestoreResult.failed;
-    final operation = _serialized(_restores, noteId, () async {
-      try {
-        final matching = versionsFor(noteId).where((v) => v.id == versionId);
-        if (matching.isEmpty) {
-          result = NoteHistoryRestoreResult.unavailable;
-          return;
-        }
-        final snapshot = matching.first.note;
-        var current = _activeNote(noteId);
-        if (current == null) {
-          result = NoteHistoryRestoreResult.unavailable;
-          return;
-        }
-        if (_sameContent(current, snapshot)) {
-          result = NoteHistoryRestoreResult.unchanged;
-          return;
-        }
-        await forceNextSave(noteId);
-        // Resolve again after history I/O so recently changed library metadata
-        // is retained, and a note removed while waiting cannot be resurrected.
-        current = _activeNote(noteId);
-        if (current == null) {
-          result = NoteHistoryRestoreResult.unavailable;
-          return;
-        }
-        final restored = NoteDto(
-          id: current.id,
-          title: snapshot.title,
-          description: snapshot.description,
-          colorValue: snapshot.colorValue,
-          todoList: _cloneTodos(snapshot.todoList),
-          imagePaths: List.of(snapshot.imagePaths ?? const []),
-          voiceMemos: _cloneMemos(snapshot.voiceMemos),
-          dateTime: _now().toUtc().toIso8601String(),
-          sortOrder: current.sortOrder,
-          isPinned: current.isPinned,
-          folderId: current.folderId,
-          deletedAt: current.deletedAt,
-          isArchived: current.isArchived,
-          dailyNoteDateKey: current.dailyNoteDateKey,
-          cardStyle: current.cardStyle == null
-              ? null
-              : Map.unmodifiable(current.cardStyle!),
-          tags: List.of(current.tags ?? []),
-          linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
-          sectionLinks: _cloneMemos(snapshot.sectionLinks),
-          textStyles: _cloneMemos(snapshot.textStyles),
-          imageLayouts: _cloneMemos(snapshot.imageLayouts),
-        );
-        // Repository hook captures current content before replacing it. The
-        // restore queue is separate from the snapshot queue to allow that hook.
-        _restoreBoundaries.add(noteId);
-        try {
-          await repository.addUpdateNote(restored);
-        } finally {
-          _restoreBoundaries.remove(noteId);
-        }
-        notifyListeners();
-        result = NoteHistoryRestoreResult.restored;
-      } catch (error) {
-        debugPrint('Note history restore failed: $error');
-      }
-    });
+    final operation = _serialized(
+        _restores,
+        noteId,
+        () => NoteMutations.run(() async {
+              try {
+                final matching =
+                    versionsFor(noteId).where((v) => v.id == versionId);
+                if (matching.isEmpty) {
+                  result = NoteHistoryRestoreResult.unavailable;
+                  return;
+                }
+                final snapshot = matching.first.note;
+                var current = _activeNote(noteId);
+                if (current == null) {
+                  result = NoteHistoryRestoreResult.unavailable;
+                  return;
+                }
+                if (_sameContent(current, snapshot)) {
+                  result = NoteHistoryRestoreResult.unchanged;
+                  return;
+                }
+                await forceNextSave(noteId);
+                // Resolve again after history I/O so recently changed library metadata
+                // is retained, and a note removed while waiting cannot be resurrected.
+                current = _activeNote(noteId);
+                if (current == null) {
+                  result = NoteHistoryRestoreResult.unavailable;
+                  return;
+                }
+                final restored = NoteDto(
+                  id: current.id,
+                  title: snapshot.title,
+                  description: snapshot.description,
+                  colorValue: snapshot.colorValue,
+                  todoList: _cloneTodos(snapshot.todoList),
+                  imagePaths: List.of(snapshot.imagePaths ?? const []),
+                  voiceMemos: _cloneMemos(snapshot.voiceMemos),
+                  dateTime: _now().toUtc().toIso8601String(),
+                  sortOrder: current.sortOrder,
+                  isPinned: current.isPinned,
+                  folderId: current.folderId,
+                  deletedAt: current.deletedAt,
+                  isArchived: current.isArchived,
+                  dailyNoteDateKey: current.dailyNoteDateKey,
+                  cardStyle: current.cardStyle == null
+                      ? null
+                      : Map.unmodifiable(current.cardStyle!),
+                  tags: List.of(current.tags ?? []),
+                  linkedNoteIds: List.of(snapshot.linkedNoteIds ?? []),
+                  sectionLinks: _cloneMemos(snapshot.sectionLinks),
+                  textStyles: _cloneMemos(snapshot.textStyles),
+                  imageLayouts: _cloneMemos(snapshot.imageLayouts),
+                );
+                // Repository hook captures current content before replacing it. The
+                // restore queue is separate from the snapshot queue to allow that hook.
+                _restoreBoundaries.add(noteId);
+                try {
+                  await repository.addUpdateNote(restored);
+                } finally {
+                  _restoreBoundaries.remove(noteId);
+                }
+                notifyListeners();
+                result = NoteHistoryRestoreResult.restored;
+              } catch (error) {
+                debugPrint('Note history restore failed: $error');
+              }
+            }));
     return operation.then((_) => result);
   }
 

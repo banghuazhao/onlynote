@@ -6,6 +6,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/usecase/usecase.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/presentation/components/toast.dart';
 
 part 'note_detail_bloc.freezed.dart';
@@ -43,6 +44,17 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
   Future<void> _handleEvent(
       NoteDetailEvent event, Emitter<NoteDetailState> emit) async {
     if (event is _ShowNote) {
+      // A slow hidden reader must not block a different visible reader.
+      await _handleSynchronizedEvent(event, emit);
+      return;
+    }
+    await WidgetCommands.initializedInstance?.importPending();
+    await NoteMutations.run(() => _handleSynchronizedEvent(event, emit));
+  }
+
+  Future<void> _handleSynchronizedEvent(
+      NoteDetailEvent event, Emitter<NoteDetailState> emit) async {
+    if (event is _ShowNote) {
       _lastSaveWasTodoToggle = false;
       final current = state;
       // Keep the note visible when returning from the editor.
@@ -62,7 +74,6 @@ class NoteDetailBloc extends Bloc<NoteDetailEvent, NoteDetailState> {
       if (event is _ResetChecklist) event.completion?.complete(null);
       return;
     }
-    await WidgetCommands.initializedInstance?.importPending();
     final fetched = await _usecase(current.note.id!);
     final note = fetched.fold<Note?>((_) => null, (note) => note);
     if (note == null || note.isDeleted) {

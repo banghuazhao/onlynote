@@ -6315,6 +6315,192 @@ class S {
   String get Section_Link_Limit =>
       Intl.message("You can add up to 100 heading links per note.",
           name: "Section_Link_Limit", desc: "", args: []);
+  String get Today_Task_Search => Intl.message("Search unfinished tasks",
+      name: "Today_Task_Search", desc: "", args: []);
+
+  String get Today_Task_No_Matches =>
+      Intl.message("No matching unfinished tasks.",
+          name: "Today_Task_No_Matches", desc: "", args: []);
+
+  String get Today_Task_Undo_Failed =>
+      Intl.message("Could not undo task completion. Try again.",
+          name: "Today_Task_Undo_Failed", desc: "", args: []);
+
+  String get Today_Task_Undo_Unavailable =>
+      Intl.message("This task changed. Its completion could not be undone.",
+          name: "Today_Task_Undo_Unavailable", desc: "", args: []);
+
+  String get Today_Task_Undone => Intl.message("Task marked unfinished.",
+      name: "Today_Task_Undone", desc: "", args: []);
+
+  String get Markdown_Import => Intl.message("Import Markdown",
+      name: "Markdown_Import", desc: "", args: []);
+
+  String get Markdown_Import_Description => Intl.message(
+      "Bring in .md files or a ZIP with local images. Review notes before importing.",
+      name: "Markdown_Import_Description",
+      desc: "",
+      args: []);
+
+  String get Markdown_Import_Choose => Intl.message("Choose files",
+      name: "Markdown_Import_Choose", desc: "", args: []);
+
+  String get Markdown_Import_Review => Intl.message("Review import",
+      name: "Markdown_Import_Review", desc: "", args: []);
+
+  String get Markdown_Import_Import => Intl.message("Import notes",
+      name: "Markdown_Import_Import", desc: "", args: []);
+
+  String get Markdown_Import_Empty => Intl.message("No notes ready to import.",
+      name: "Markdown_Import_Empty", desc: "", args: []);
+
+  String get Markdown_Import_Failed => Intl.message(
+      "Could not read these files. Choose Markdown files or a ZIP and try again.",
+      name: "Markdown_Import_Failed",
+      desc: "",
+      args: []);
+
+  String get Markdown_Import_Save_Failed => Intl.message(
+      "Some notes could not be imported. Your imported notes are saved; retry the remaining notes.",
+      name: "Markdown_Import_Save_Failed",
+      desc: "",
+      args: []);
+
+  String get Markdown_Import_Done => Intl.message("Notes imported.",
+      name: "Markdown_Import_Done", desc: "", args: []);
+
+  String get Markdown_Import_Unsupported =>
+      Intl.message("Some formatting is kept as plain text.",
+          name: "Markdown_Import_Unsupported", desc: "", args: []);
+
+  String get Markdown_Import_Missing_Images => Intl.message(
+      "Some images were unavailable. Their original references are kept in the note.",
+      name: "Markdown_Import_Missing_Images",
+      desc: "",
+      args: []);
+
+  String get Markdown_Import_Limit => Intl.message(
+      "This import would exceed your free note limit. Upgrade or select fewer notes.",
+      name: "Markdown_Import_Limit",
+      desc: "",
+      args: []);
+
+  String get Markdown_Import_Skipped =>
+      Intl.message("Empty files were skipped.",
+          name: "Markdown_Import_Skipped", desc: "", args: []);
+
+  String get Markdown_Import_Select_All => Intl.message("Select all",
+      name: "Markdown_Import_Select_All", desc: "", args: []);
+
+  String get Markdown_Import_Deselect_All => Intl.message("Deselect all",
+      name: "Markdown_Import_Deselect_All", desc: "", args: []);
+
+  String get Siri_Shortcuts_Title => Intl.message("Siri & Shortcuts",
+      name: "Siri_Shortcuts_Title", desc: "", args: []);
+
+  String get Siri_Shortcuts_Description =>
+      Intl.message("Add text to your notes with Siri or the Shortcuts app.",
+          name: "Siri_Shortcuts_Description", desc: "", args: []);
+
+  String get Siri_Shortcuts_Setup => Intl.message(
+      "In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append.",
+      name: "Siri_Shortcuts_Setup",
+      desc: "",
+      args: []);
+
+  String get Siri_Shortcuts_Requirements =>
+      Intl.message("Requires iOS 16 or later, or macOS 13 or later.",
+          name: "Siri_Shortcuts_Requirements", desc: "", args: []);
+
+  String get Siri_Shortcuts_Save => Intl.message(
+      "Actions open Onlynote to finish saving. Keep the app open until the text is saved.",
+      name: "Siri_Shortcuts_Save",
+      desc: "",
+      args: []);
+
+  String get Siri_Shortcuts_Today => Intl.message("Append to Today’s Note",
+      name: "Siri_Shortcuts_Today", desc: "", args: []);
+
+  String get Siri_Shortcuts_Today_Description => Intl.message(
+      "Add text to today’s daily note. A daily note is created if needed.",
+      name: "Siri_Shortcuts_Today_Description",
+      desc: "",
+      args: []);
+
+  String get Siri_Shortcuts_Note => Intl.message("Append to Note",
+      name: "Siri_Shortcuts_Note", desc: "", args: []);
+
+  String get Siri_Shortcuts_Note_Description => Intl.message(
+      "Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected.",
+      name: "Siri_Shortcuts_Note_Description",
+      desc: "",
+      args: []);
+
+  String get Siri_Shortcuts_Inbox => Intl.message("Save Text to Inbox",
+      name: "Siri_Shortcuts_Inbox", desc: "", args: []);
+
+  String get Siri_Shortcuts_Inbox_Description => Intl.message(
+      "Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note.",
+      name: "Siri_Shortcuts_Inbox_Description",
+      desc: "",
+      args: []);
+
+  String get Siri_Shortcuts_Open => Intl.message("Open Shortcuts",
+      name: "Siri_Shortcuts_Open", desc: "", args: []);
+
+  String get Siri_Shortcuts_Open_Failed => Intl.message(
+      "Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions.",
+      name: "Siri_Shortcuts_Open_Failed",
+      desc: "",
+      args: []);
+
+  String Today_Task_Search_Count(int matching, int total) =>
+      Intl.message("$matching of $total unfinished tasks",
+          name: "Today_Task_Search_Count", desc: "", args: [matching, total]);
+  String get Shortcuts_Append_Failed =>
+      Intl.message("Could not append this text. It is saved for retry.",
+          name: "Shortcuts_Append_Failed", desc: "", args: []);
+
+  String get Shortcuts_Append_Unavailable => Intl.message(
+      "The destination note is unavailable. Restore it or choose another note in Shortcuts.",
+      name: "Shortcuts_Append_Unavailable",
+      desc: "",
+      args: []);
+
+  String get Shortcuts_Append_Conflict => Intl.message(
+      "This note changed while an append was interrupted. The saved request needs review.",
+      name: "Shortcuts_Append_Conflict",
+      desc: "",
+      args: []);
+
+  String get Shortcuts_Append_Saved => Intl.message("Text added to note.",
+      name: "Shortcuts_Append_Saved", desc: "", args: []);
+
+  String get Shortcuts_Inbox_Title =>
+      Intl.message("Inbox", name: "Shortcuts_Inbox_Title", desc: "", args: []);
+
+  String get Shortcuts_Requests => Intl.message("Pending shortcut text",
+      name: "Shortcuts_Requests", desc: "", args: []);
+
+  String get Shortcuts_Review =>
+      Intl.message("Review", name: "Shortcuts_Review", desc: "", args: []);
+
+  String get Shortcuts_Request_Hint => Intl.message(
+      "This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request.",
+      name: "Shortcuts_Request_Hint",
+      desc: "",
+      args: []);
+
+  String get Shortcuts_Request_Discard => Intl.message("Discard pending text",
+      name: "Shortcuts_Request_Discard", desc: "", args: []);
+
+  String get Shortcuts_Request_Discard_Failed =>
+      Intl.message("Could not discard this request. Try again.",
+          name: "Shortcuts_Request_Discard_Failed", desc: "", args: []);
+
+  String get Shortcuts_Request_Empty =>
+      Intl.message("No pending shortcut text.",
+          name: "Shortcuts_Request_Empty", desc: "", args: []);
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

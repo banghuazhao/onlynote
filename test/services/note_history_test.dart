@@ -1,30 +1,47 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onlynote/data/dto/note_dto.dart';
+import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/model/note_section_link.dart';
 import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/shortcuts_append.dart';
 
 class _HistoryNotes implements NoteRepository {
   final notes = <String, NoteDto>{};
   NoteHistory? history;
   bool failSave = false;
   int writes = 0;
+  int reads = 0;
+  Completer<void>? saveStarted;
+  Future<void>? pauseNextSave;
   @override
   Future<void> addUpdateNote(NoteDto note) async {
     final previous = notes[note.id];
     if (previous != null) await history?.recordBeforeSave(previous, note);
+    final pause = pauseNextSave;
+    pauseNextSave = null;
+    if (pause != null) {
+      saveStarted!.complete();
+      await pause;
+    }
     if (failSave) throw StateError('Disk unavailable');
     writes++;
     notes[note.id!] = note;
   }
 
   @override
-  List<NoteDto> getAllNotes() => notes.values.toList();
+  List<NoteDto> getAllNotes() {
+    reads++;
+    return notes.values.toList();
+  }
+
   @override
   Future<NoteDto> getNote(String id) async => notes[id]!;
   @override
@@ -35,6 +52,32 @@ class _HistoryNotes implements NoteRepository {
       notes.remove(id);
     }
   }
+}
+
+class _HistoryAppendStore implements NoteAutosaveStore {
+  _HistoryAppendStore(this.repository);
+  final _HistoryNotes repository;
+  final drafts = <String, Note>{};
+
+  @override
+  Future<void> writeDraft(Note note) async => drafts[note.id!] = note;
+  @override
+  Future<void> removeDraft(String id) async => drafts.remove(id);
+  @override
+  Future<void> saveNote(Note note) =>
+      repository.addUpdateNote(NoteDto.fromNote(note));
+}
+
+class _HistoryAppendJournal implements ShortcutAppendJournal {
+  final values = <String, Object>{};
+  @override
+  Iterable<String> get keys => values.keys;
+  @override
+  Object? read(String key) => values[key];
+  @override
+  Future<void> write(String key, Object value) async => values[key] = value;
+  @override
+  Future<void> remove(String key) async => values.remove(key);
 }
 
 class _FailingHistoryBox extends Fake implements Box {
@@ -86,6 +129,66 @@ void main() {
     await box.close();
     await directory.delete(recursive: true);
   });
+
+  for (final restoreFirst in [true, false]) {
+    test(
+        'history restore and Siri serialize when '
+        '${restoreFirst ? 'restore' : 'Siri'} starts first', () async {
+      final original = NoteDto(
+          id: 'note', title: 'Journal', description: 'Original version');
+      repository.notes['note'] = original;
+      await repository
+          .addUpdateNote(original.copyWith(description: 'Current version'));
+      final version = history.versionsFor('note').single;
+      final store = _HistoryAppendStore(repository);
+      final service = ShortcutsAppendService(
+          repository: repository,
+          store: store,
+          journal: _HistoryAppendJournal(),
+          readDraft: (id) => store.drafts[id]);
+      Future<Note?> append() => service.apply(
+          const ShortcutAppendRequest(
+              id: '12345678-1234-1234-1234-000000000001',
+              text: 'Siri capture',
+              destination: ShortcutAppendDestination.note,
+              noteId: 'note',
+              createdAt: 1793221200000),
+          acknowledge: (_) async {},
+          titleForDay: (_) => 'Today',
+          inboxTitle: 'Inbox');
+      Future<NoteHistoryRestoreResult> restore() =>
+          history.restore('note', version.id);
+      final release = Completer<void>();
+      repository.saveStarted = Completer<void>();
+      repository.pauseNextSave = release.future;
+      final first = restoreFirst ? restore() : append();
+      await repository.saveStarted!.future;
+      final readsBefore = repository.reads;
+      var secondCompleted = false;
+      final second = (restoreFirst ? append() : restore()).whenComplete(() {
+        secondCompleted = true;
+      });
+      await Future<void>.delayed(Duration.zero);
+      final readsWhileFirstSaves = repository.reads;
+      final completedWhileFirstSaves = secondCompleted;
+      release.complete();
+      final results = await Future.wait([first, second]);
+      expect(results[restoreFirst ? 0 : 1], NoteHistoryRestoreResult.restored);
+      expect(readsWhileFirstSaves, readsBefore);
+      expect(completedWhileFirstSaves, isFalse);
+      expect(
+          repository.notes['note']!.description,
+          restoreFirst
+              ? 'Original version\n\nSiri capture'
+              : 'Original version');
+      if (!restoreFirst) {
+        expect(
+            history.versionsFor('note').map((entry) => entry.note.description),
+            contains('Current version\n\nSiri capture'));
+      }
+      expect(store.drafts, isEmpty);
+    });
+  }
 
   test('link edits make versions and restore keeps current archive and tags',
       () async {

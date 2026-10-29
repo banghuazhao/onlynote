@@ -27,16 +27,27 @@ Widget todayLargeChinesePreview() =>
 @Preview(name: 'Today, empty', group: 'Today', size: Size(390, 740))
 Widget todayEmptyPreview() => const _TodayPreview(empty: true);
 
+@Preview(name: 'Today, task search', group: 'Today', size: Size(390, 844))
+Widget todaySearchPreview() => const _TodayPreview(query: 'draft');
+
+@Preview(name: 'Today, load failure 320', group: 'Today', size: Size(320, 280))
+Widget todayLoadFailurePreview() =>
+    const _TodayPreview(loadFailed: true, textScale: 3.2);
+
 class _TodayPreview extends StatefulWidget {
   const _TodayPreview(
       {this.dark = false,
       this.chinese = false,
       this.textScale = 1,
-      this.empty = false});
+      this.empty = false,
+      this.loadFailed = false,
+      this.query = ''});
   final bool dark;
   final bool chinese;
   final double textScale;
   final bool empty;
+  final bool loadFailed;
+  final String query;
 
   @override
   State<_TodayPreview> createState() => _TodayPreviewState();
@@ -44,6 +55,7 @@ class _TodayPreview extends StatefulWidget {
 
 class _TodayPreviewState extends State<_TodayPreview> {
   final _now = DateTime(2026, 10, 29, 10);
+  late bool _loadFailed = widget.loadFailed;
   late List<Note> _notes = widget.empty
       ? []
       : [
@@ -74,6 +86,22 @@ class _TodayPreviewState extends State<_TodayPreview> {
               ])
             else
               note,
+        ];
+      });
+
+  void _undo(TodayTaskEntry entry) => setState(() {
+        _notes = [
+          for (final note in _notes)
+            if (note.id == entry.note.id)
+              note.copyWith(todo: [
+                for (final todo in note.todo)
+                  if (todo.id == entry.todo.id)
+                    todo.copyWith(completed: false)
+                  else
+                    todo
+              ])
+            else
+              note
         ];
       });
 
@@ -130,6 +158,9 @@ class _TodayPreviewState extends State<_TodayPreview> {
                       now: _now,
                     ),
                     now: _now,
+                    loadFailed: _loadFailed,
+                    onRefresh: () async => setState(() => _loadFailed = false),
+                    initialTaskQuery: widget.query,
                     onOpenDailyNote: _openDaily,
                     onOpenNote: (id) => ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(
@@ -138,7 +169,15 @@ class _TodayPreviewState extends State<_TodayPreview> {
                                     .title ??
                                 ''))),
                     onOpenReminders: () {},
-                    onCompleteTask: _complete,
+                    onCompleteTask: (entry) {
+                      _complete(entry);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(S.of(context).Checklist_Item_Completed),
+                          duration: const Duration(seconds: 6),
+                          action: SnackBarAction(
+                              label: S.of(context).Undo,
+                              onPressed: () => _undo(entry))));
+                    },
                   )),
                 )),
       );

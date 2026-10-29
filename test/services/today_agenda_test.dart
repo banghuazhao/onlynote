@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/services/today_agenda.dart';
 
 void main() {
@@ -230,6 +231,217 @@ void main() {
     ]);
     await pending;
     expect(controller.agenda.tasks.single.todo.title, 'New task');
+  });
+
+  for (final undo in [false, true]) {
+    test(
+        'disposed queued ${undo ? 'Undo' : 'completion'} does not read or write',
+        () async {
+      var note = Note(id: 'note', todo: [Todo(id: 'task', title: 'Task')]);
+      var flushes = 0;
+      var writes = 0;
+      var reads = 0;
+      final controller = TodayAgendaController(
+        readNotes: () async => [note],
+        readNote: (_) async {
+          reads++;
+          return note;
+        },
+        readReminders: () => [],
+        readPendingSnoozes: (_) async => {},
+        beforeTaskWrite: () async => flushes++,
+        saveNote: (value) async {
+          writes++;
+          note = value;
+        },
+        now: () => now,
+      );
+      await controller.refresh();
+      final entry = controller.agenda.tasks.single;
+      if (undo) {
+        expect(
+            await controller.completeTask(entry), TodayTaskActionResult.saved);
+      }
+      final entered = Completer<void>();
+      final release = Completer<void>();
+      final blocker = NoteMutations.run(() async {
+        entered.complete();
+        await release.future;
+      });
+      await entered.future;
+      final pending = undo
+          ? controller.undoTaskCompletion(controller.lastCompletionUndo!)
+          : controller.completeTask(entry);
+      // Let the pre-write flush finish while the mutation reservation is held.
+      await Future<void>.delayed(Duration.zero);
+      controller.dispose();
+      release.complete();
+      await blocker;
+      expect(await pending, TodayTaskActionResult.busy);
+      expect(flushes, undo ? 2 : 1);
+      expect(reads, undo ? 1 : 0);
+      expect(writes, undo ? 1 : 0);
+    });
+  }
+
+  test('task search matches words across task and note titles without mutation',
+      () {
+    final agenda = buildTodayAgenda(notes: [
+      Note(id: 'work', title: 'Website Project', todo: [
+        Todo(id: 'draft', title: 'Write first draft'),
+        Todo(id: 'photos', title: 'Choose photos'),
+      ]),
+      Note(id: 'home', title: 'Home', todo: [Todo(id: 'plants', title: '浇花')]),
+    ], reminders: [], now: now);
+    expect(searchTodayTasks(agenda.tasks, ' PROJECT  draft ').single.todo.id,
+        'draft');
+    expect(searchTodayTasks(agenda.tasks, 'website').length, 2);
+    expect(searchTodayTasks(agenda.tasks, '浇花').single.note.id, 'home');
+    expect(searchTodayTasks(agenda.tasks, 'missing'), isEmpty);
+    expect(searchTodayTasks(agenda.tasks, ' '), agenda.tasks);
+    expect(agenda.tasks.every((task) => !task.todo.completed), isTrue);
+  });
+
+  test('Undo reads latest note and clears only its intended completion flag',
+      () async {
+    final initial = Note(id: 'note', description: 'Earlier', todo: [
+      Todo(id: 'task', title: 'Write draft'),
+      Todo(id: 'other', title: 'Other'),
+    ]);
+    final store = _Store([initial]);
+    final controller = store.controller(now);
+    addTearDown(controller.dispose);
+    await controller.refresh();
+    expect(await controller.completeTask(controller.agenda.tasks.first),
+        TodayTaskActionResult.saved);
+    final receipt = controller.lastCompletionUndo!;
+    final completed = store.notes['note']!;
+    store.notes['note'] = completed
+        .copyWith(description: 'Newer writing', folderId: 'work', tags: [
+      'important'
+    ], todo: [
+      completed.todo[1].copyWith(completed: true),
+      completed.todo[0],
+      Todo(id: 'new', title: 'Added later'),
+    ]);
+    expect(await controller.undoTaskCompletion(receipt),
+        TodayTaskActionResult.saved);
+    final saved = store.notes['note']!;
+    expect(saved.description, 'Newer writing');
+    expect(saved.folderId, 'work');
+    expect(saved.tags, ['important']);
+    expect(saved.todo.map((value) => (value.id, value.completed)),
+        [('other', true), ('task', false), ('new', false)]);
+    expect(controller.lastCompletionUndo, isNull);
+    expect(await controller.undoTaskCompletion(receipt),
+        TodayTaskActionResult.changed);
+    expect(store.writes, 2);
+  });
+
+  for (final change in [
+    'renamed',
+    'unfinished',
+    'archived',
+    'deleted',
+    'removed',
+    'duplicate'
+  ]) {
+    test('Undo rejects $change tasks without replacing newer data', () async {
+      final initial =
+          Note(id: 'note', todo: [Todo(id: 'task', title: 'Original')]);
+      final store = _Store([initial]);
+      final controller = store.controller(now);
+      addTearDown(controller.dispose);
+      await controller.refresh();
+      await controller.completeTask(controller.agenda.tasks.single);
+      final receipt = controller.lastCompletionUndo!;
+      final current = store.notes['note']!;
+      store.notes['note'] = switch (change) {
+        'renamed' => current
+            .copyWith(todo: [current.todo.single.copyWith(title: 'New name')]),
+        'unfinished' => current
+            .copyWith(todo: [current.todo.single.copyWith(completed: false)]),
+        'archived' => current.copyWith(isArchived: true),
+        'deleted' => current.copyWith(deletedAt: now),
+        'duplicate' =>
+          current.copyWith(todo: [current.todo.single, current.todo.single]),
+        _ => current.copyWith(todo: []),
+      };
+      final changed = store.notes['note'];
+      expect(
+          await controller.undoTaskCompletion(receipt),
+          ['renamed', 'unfinished'].contains(change)
+              ? TodayTaskActionResult.changed
+              : TodayTaskActionResult.unavailable);
+      expect(store.notes['note'], same(changed));
+      expect(store.writes, 1);
+      expect(controller.lastCompletionUndo, isNull);
+    });
+  }
+
+  test('a newer completion replaces the old Undo receipt', () async {
+    final store = _Store([
+      Note(id: 'note', todo: [
+        Todo(id: 'first', title: 'First'),
+        Todo(id: 'second', title: 'Second'),
+      ])
+    ]);
+    final controller = store.controller(now);
+    addTearDown(controller.dispose);
+    await controller.refresh();
+    await controller.completeTask(controller.agenda.tasks.first);
+    final older = controller.lastCompletionUndo!;
+    await controller.completeTask(controller.agenda.tasks.single);
+    final newer = controller.lastCompletionUndo!;
+    expect(await controller.undoTaskCompletion(older),
+        TodayTaskActionResult.changed);
+    expect(await controller.undoTaskCompletion(newer),
+        TodayTaskActionResult.saved);
+    expect(store.notes['note']!.todo.map((value) => value.completed),
+        [true, false]);
+  });
+
+  test(
+      'a failed Undo preserves its receipt for retry and leaves storage unchanged',
+      () async {
+    final store = _Store([
+      Note(id: 'note', todo: [Todo(id: 'task', title: 'Task')])
+    ]);
+    final controller = store.controller(now);
+    addTearDown(controller.dispose);
+    await controller.refresh();
+    await controller.completeTask(controller.agenda.tasks.single);
+    final receipt = controller.lastCompletionUndo!;
+    store.failWrite = true;
+    expect(await controller.undoTaskCompletion(receipt),
+        TodayTaskActionResult.failed);
+    expect(controller.lastCompletionUndo, same(receipt));
+    expect(store.notes['note']!.todo.single.completed, isTrue);
+    store.failWrite = false;
+    expect(await controller.undoTaskCompletion(receipt),
+        TodayTaskActionResult.saved);
+    expect(store.notes['note']!.todo.single.completed, isFalse);
+  });
+
+  test(
+      'duplicate Undo requests serialize and disposal cancels its pending read',
+      () async {
+    final store = _Store([
+      Note(id: 'note', todo: [Todo(id: 'task', title: 'Task')])
+    ]);
+    final controller = store.controller(now);
+    await controller.refresh();
+    await controller.completeTask(controller.agenda.tasks.single);
+    final receipt = controller.lastCompletionUndo!;
+    store.readGate = Completer<void>();
+    final first = controller.undoTaskCompletion(receipt);
+    expect(await controller.undoTaskCompletion(receipt),
+        TodayTaskActionResult.busy);
+    controller.dispose();
+    store.readGate!.complete();
+    expect(await first, TodayTaskActionResult.busy);
+    expect(store.notes['note']!.todo.single.completed, isTrue);
+    expect(store.writes, 1);
   });
 }
 

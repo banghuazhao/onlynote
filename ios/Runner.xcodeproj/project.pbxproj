@@ -35,6 +35,11 @@
 		7696CFA95C7D4D4680D53E1F /* PhotoTextBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF3D48CA36C7412D9606D867 /* PhotoTextBridge.swift */; };
 		0A1AC1E610D240D994D5022A /* VoiceMemoBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A84D19C219C4CEBB7CD2E05 /* VoiceMemoBridge.swift */; };
 		768072FF3C094B6C9FB17D80 /* DocumentScanBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E218D717854F06880312EF /* DocumentScanBridge.swift */; };
+		35444C20916E63328B6646D3 /* ShortcutsAppendStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F29704EB5E3182483921677 /* ShortcutsAppendStore.swift */; };
+		448F44CAB38886C9D9660624 /* OnlynoteAppendIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FFFCF7AD506E0C2C18357D8 /* OnlynoteAppendIntents.swift */; };
+		386CD5A6A6BFAF84DCE39596 /* ShortcutsAppendBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADD626ACD2A9A566AEB3D7E /* ShortcutsAppendBridge.swift */; };
+		6974FFDBD1F0004ACACAD404 /* ShortcutActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = A50125645FDCD3DC545CBCFB /* ShortcutActions.strings */; };
+		BD8B083370E3005BE9C0C91E /* Shortcut AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = AE06196D099A804D067D54CC /* Shortcut AppShortcuts.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +133,15 @@
 		DF3D48CA36C7412D9606D867 /* PhotoTextBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoTextBridge.swift; sourceTree = "<group>"; };
 		4A84D19C219C4CEBB7CD2E05 /* VoiceMemoBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMemoBridge.swift; sourceTree = "<group>"; };
 		79E218D717854F06880312EF /* DocumentScanBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentScanBridge.swift; sourceTree = "<group>"; };
+		9F29704EB5E3182483921677 /* ShortcutsAppendStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShortcutsAppendStore.swift; path = "../Shared/ShortcutsAppendStore.swift"; sourceTree = "<group>"; };
+		4FFFCF7AD506E0C2C18357D8 /* OnlynoteAppendIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OnlynoteAppendIntents.swift; path = "../Shared/OnlynoteAppendIntents.swift"; sourceTree = "<group>"; };
+		BADD626ACD2A9A566AEB3D7E /* ShortcutsAppendBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShortcutsAppendBridge.swift; path = "../Shared/ShortcutsAppendBridge.swift"; sourceTree = "<group>"; };
+		0EEF4E142C26376D6B887177 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
+		B49113CEAB311345EE7F6BEB /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
+		1DBBB1EBAFCE3289AFF0498B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
+		2D6CD27DDEBF11F12C8E92BD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
+		C5C624C314FCF63E87839405 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
+		BEFFA96C7D5549B4D1B18073 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -237,6 +251,11 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				AE06196D099A804D067D54CC /* Shortcut AppShortcuts.strings */,
+				A50125645FDCD3DC545CBCFB /* ShortcutActions.strings */,
+				9F29704EB5E3182483921677 /* ShortcutsAppendStore.swift */,
+				4FFFCF7AD506E0C2C18357D8 /* OnlynoteAppendIntents.swift */,
+				BADD626ACD2A9A566AEB3D7E /* ShortcutsAppendBridge.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				4178031927BFC6A4002D2861 /* InfoPlist.strings */,
 				6B698A6026C78F21041D2617 /* Runner.entitlements */,
@@ -398,6 +417,8 @@
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				BD8B083370E3005BE9C0C91E /* Shortcut AppShortcuts.strings in Resources */,
+				6974FFDBD1F0004ACACAD404 /* ShortcutActions.strings in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				4178031727BFC6A4002D2861 /* InfoPlist.strings in Resources */,
 			);
@@ -465,6 +486,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				35444C20916E63328B6646D3 /* ShortcutsAppendStore.swift in Sources */,
+				448F44CAB38886C9D9660624 /* OnlynoteAppendIntents.swift in Sources */,
+				386CD5A6A6BFAF84DCE39596 /* ShortcutsAppendBridge.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				D40BE6431149781B167B734E /* ShareInbox.swift in Sources */,
 				0AB0099ECE1A2A3F26C8DED9 /* ShareInboxBridge.swift in Sources */,
@@ -550,6 +574,26 @@
 				4178031427BFC664002D2861 /* zh-Hant */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A50125645FDCD3DC545CBCFB /* ShortcutActions.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0EEF4E142C26376D6B887177 /* en */,
+				B49113CEAB311345EE7F6BEB /* zh-Hans */,
+				1DBBB1EBAFCE3289AFF0498B /* zh-Hant */,
+			);
+			name = ShortcutActions.strings;
+			sourceTree = "<group>";
+		};
+		AE06196D099A804D067D54CC /* Shortcut AppShortcuts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2D6CD27DDEBF11F12C8E92BD /* en */,
+				C5C624C314FCF63E87839405 /* zh-Hans */,
+				BEFFA96C7D5549B4D1B18073 /* zh-Hant */,
+			);
+			name = AppShortcuts.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

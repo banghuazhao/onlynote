@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:onlynote/Tools/reminder.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/services/daily_note_calendar.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/services/reminder_agenda.dart';
 
 /// One unfinished checklist item, with its source note and stable saved ID.
@@ -88,7 +89,39 @@ TodayAgenda buildTodayAgenda({
   );
 }
 
+/// Searches unfinished task text and its source note title only. Calendar
+/// sections stay independent of this query.
+List<TodayTaskEntry> searchTodayTasks(
+    Iterable<TodayTaskEntry> tasks, String query) {
+  final words = query
+      .toLowerCase()
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((word) => word.isNotEmpty)
+      .toList();
+  if (words.isEmpty) return List.unmodifiable(tasks);
+  return List.unmodifiable(tasks.where((entry) {
+    final text =
+        '${entry.todo.title ?? ''}\n${entry.note.title ?? ''}'.toLowerCase();
+    return words.every(text.contains);
+  }));
+}
+
 enum TodayTaskActionResult { saved, unavailable, changed, failed, busy }
+
+/// A single-use in-session receipt. It never stores a whole note snapshot,
+/// so Undo cannot overwrite edits made after the completion.
+class TodayTaskCompletionUndo {
+  const TodayTaskCompletionUndo._(
+      {required this.noteId,
+      required this.todoId,
+      required this.title,
+      required this.generation});
+  final String noteId;
+  final String todoId;
+  final String? title;
+  final int generation;
+}
 
 /// Injectable state shared by the live screen and interaction tests. Every
 /// checklist action starts from current storage, preserving unrelated edits.
@@ -126,6 +159,10 @@ class TodayAgendaController extends ChangeNotifier {
   String? busyTaskKey;
   int _loadRevision = 0;
   bool _disposed = false;
+  int _completionGeneration = 0;
+  TodayTaskCompletionUndo? _lastCompletionUndo;
+
+  TodayTaskCompletionUndo? get lastCompletionUndo => _lastCompletionUndo;
 
   void _changed() => unawaited(refresh());
 
@@ -171,31 +208,95 @@ class TodayAgendaController extends ChangeNotifier {
     try {
       await beforeTaskWrite?.call();
       if (_disposed) return TodayTaskActionResult.busy;
-      final note = await resolveNote(entry.note.id!);
-      if (_disposed) return TodayTaskActionResult.busy;
-      if (note == null || note.isArchived) {
+      return await NoteMutations.run(() async {
+        if (_disposed) return TodayTaskActionResult.busy;
+        final note = await resolveNote(entry.note.id!);
+        if (_disposed) return TodayTaskActionResult.busy;
+        if (note == null || note.isArchived) {
+          await refresh();
+          return TodayTaskActionResult.unavailable;
+        }
+        final matches =
+            note.todo.where((todo) => todo.id == entry.todo.id).toList();
+        if (matches.length != 1) {
+          await refresh();
+          return TodayTaskActionResult.unavailable;
+        }
+        final current = matches.single;
+        if (current.title != entry.todo.title || current.completed) {
+          await refresh();
+          return TodayTaskActionResult.changed;
+        }
+        final updated = note.copyWith(todo: [
+          for (final todo in note.todo)
+            if (todo.id == current.id) todo.copyWith(completed: true) else todo,
+        ]);
+        await saveNote(updated);
+        if (!_disposed) {
+          _lastCompletionUndo = TodayTaskCompletionUndo._(
+              noteId: note.id!,
+              todoId: current.id!,
+              title: current.title,
+              generation: ++_completionGeneration);
+        }
         await refresh();
-        return TodayTaskActionResult.unavailable;
-      }
-      final matches =
-          note.todo.where((todo) => todo.id == entry.todo.id).toList();
-      if (matches.length != 1) {
-        await refresh();
-        return TodayTaskActionResult.unavailable;
-      }
-      final current = matches.single;
-      if (current.title != entry.todo.title || current.completed) {
-        await refresh();
-        return TodayTaskActionResult.changed;
-      }
-      final updated = note.copyWith(todo: [
-        for (final todo in note.todo)
-          if (todo.id == current.id) todo.copyWith(completed: true) else todo,
-      ]);
-      await saveNote(updated);
-      await refresh();
-      return TodayTaskActionResult.saved;
+        return TodayTaskActionResult.saved;
+      });
     } catch (_) {
+      return TodayTaskActionResult.failed;
+    } finally {
+      busyTaskKey = null;
+      _notify();
+    }
+  }
+
+  Future<TodayTaskActionResult> undoTaskCompletion(
+      TodayTaskCompletionUndo receipt) async {
+    if (_disposed || busyTaskKey != null) return TodayTaskActionResult.busy;
+    if (!identical(receipt, _lastCompletionUndo)) {
+      return TodayTaskActionResult.changed;
+    }
+    busyTaskKey = 'undo:${receipt.generation}';
+    _notify();
+    try {
+      await beforeTaskWrite?.call();
+      if (_disposed) return TodayTaskActionResult.busy;
+      return await NoteMutations.run(() async {
+        if (_disposed) return TodayTaskActionResult.busy;
+        final note = await resolveNote(receipt.noteId);
+        if (_disposed) return TodayTaskActionResult.busy;
+        if (note == null || note.isArchived) {
+          _lastCompletionUndo = null;
+          await refresh();
+          return TodayTaskActionResult.unavailable;
+        }
+        final matches =
+            note.todo.where((todo) => todo.id == receipt.todoId).toList();
+        if (matches.length != 1) {
+          _lastCompletionUndo = null;
+          await refresh();
+          return TodayTaskActionResult.unavailable;
+        }
+        final task = matches.single;
+        if (task.title != receipt.title || !task.completed) {
+          _lastCompletionUndo = null;
+          await refresh();
+          return TodayTaskActionResult.changed;
+        }
+        await saveNote(note.copyWith(todo: [
+          for (final value in note.todo)
+            if (value.id == receipt.todoId)
+              value.copyWith(completed: false)
+            else
+              value,
+        ]));
+        _lastCompletionUndo = null;
+        await refresh();
+        return TodayTaskActionResult.saved;
+      });
+    } catch (_) {
+      // Retain this receipt after a failed write so Retry can use the same
+      // identity, while every attempt still reads current storage afresh.
       return TodayTaskActionResult.failed;
     } finally {
       busyTaskKey = null;
@@ -210,6 +311,7 @@ class TodayAgendaController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _lastCompletionUndo = null;
     _loadRevision++;
     reminderChanges?.removeListener(_changed);
     unawaited(_notesSubscription?.cancel());

@@ -6,6 +6,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/domain/model/error.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/generated/l10n.dart';
+import 'package:onlynote/services/note_mutations.dart';
 
 final S _i10n = locator<S>();
 
@@ -15,7 +16,12 @@ class PermanentDeleteNotesUsecase {
   const PermanentDeleteNotesUsecase(this._repository);
   final NoteRepository _repository;
 
-  Future<Either<NoteError, Unit>> call(List<String> ids) async {
+  Future<Either<NoteError, Unit>> call(List<String> ids) {
+    final selectedIds = List<String>.unmodifiable(ids);
+    return NoteMutations.run(() => _delete(selectedIds));
+  }
+
+  Future<Either<NoteError, Unit>> _delete(List<String> ids) async {
     try {
       final notes = <NoteDto>[];
       for (final id in ids) {

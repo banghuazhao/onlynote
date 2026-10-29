@@ -1,0 +1,16 @@
+// Siri and Shortcuts append actions.
+"Note" = "Note";
+"Text" = "Text";
+"Append to Today’s Note" = "Append to Today’s Note";
+"Append to Note" = "Append to Note";
+"Save Text to Inbox" = "Save Text to Inbox";
+"Append to Today" = "Append to Today";
+"Save to Inbox" = "Save to Inbox";
+"Open Onlynote and append text to today’s daily note." = "Open Onlynote and append text to today’s daily note.";
+"Choose a note, then open Onlynote to append text." = "Choose a note, then open Onlynote to append text.";
+"Pass text or the Clipboard variable to Onlynote’s Inbox note." = "Pass text or the Clipboard variable to Onlynote’s Inbox note.";
+"Opening Onlynote to finish adding your text." = "Opening Onlynote to finish adding your text.";
+"shortcut.storageUnavailable" = "Open Onlynote once to finish setting up Shortcuts.";
+"shortcut.invalidText" = "Enter text between 1 and 100,000 characters.";
+"shortcut.invalidRequest" = "This shortcut request could not be read.";
+"shortcut.inboxFull" = "Open Onlynote to finish the pending shortcut requests.";

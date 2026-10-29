@@ -1,0 +1,7 @@
+// Siri and Shortcuts append actions.
+"Append to today’s note in ${applicationName}" = "Append to today’s note in ${applicationName}";
+"Add to today’s note in ${applicationName}" = "Add to today’s note in ${applicationName}";
+"Append to a note in ${applicationName}" = "Append to a note in ${applicationName}";
+"Add to a note in ${applicationName}" = "Add to a note in ${applicationName}";
+"Save to Inbox in ${applicationName}" = "Save to Inbox in ${applicationName}";
+"Capture text in ${applicationName}" = "Capture text in ${applicationName}";

@@ -74,6 +74,11 @@
 		CD2000000000000000000056 /* MacWidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000020 /* MacWidgetStore.swift */; };
 		CD2000000000000000000057 /* MacWidgetBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000021 /* MacWidgetBridge.swift */; };
 		CD2000000000000000000058 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CD2000000000000000000026 /* Localizable.strings */; };
+		A1C44BB9AC93F5B75057EEF3 /* ShortcutsAppendStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0D2C76039E0AB735588943 /* ShortcutsAppendStore.swift */; };
+		DCC6575DFC438EA4BF169D3D /* OnlynoteAppendIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B85FFFC74DADB3D99DAF651 /* OnlynoteAppendIntents.swift */; };
+		93D7C14E55B22CD8BE2C1F7B /* ShortcutsAppendBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4D61C2EE8ADA47D889B8DE /* ShortcutsAppendBridge.swift */; };
+		82E8AD24B88C967D47B9A4F3 /* Shortcut AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = AF3D233DD43841312187AF6D /* Shortcut AppShortcuts.strings */; };
+		D049A77F887B62A82A9B9B6D /* ShortcutActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = 39F6ED02DFFEBFE340A81C0A /* ShortcutActions.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -176,6 +181,15 @@
 		CD2000000000000000000027 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CD2000000000000000000028 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CD2000000000000000000029 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		EA0D2C76039E0AB735588943 /* ShortcutsAppendStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShortcutsAppendStore.swift; path = "../../ios/Shared/ShortcutsAppendStore.swift"; sourceTree = "<group>"; };
+		4B85FFFC74DADB3D99DAF651 /* OnlynoteAppendIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OnlynoteAppendIntents.swift; path = "../../ios/Shared/OnlynoteAppendIntents.swift"; sourceTree = "<group>"; };
+		DF4D61C2EE8ADA47D889B8DE /* ShortcutsAppendBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShortcutsAppendBridge.swift; path = "../../ios/Shared/ShortcutsAppendBridge.swift"; sourceTree = "<group>"; };
+		DAFA300B0A1959EF40E4D40C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
+		AF34595F1CB0E4DDD6D6F217 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
+		CF8EC960C68FCBAF1AFF3449 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppShortcuts.strings"; sourceTree = "<group>"; };
+		76B5112FDAD1C983180D442F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "en"; path = "en.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
+		B2D5274C68540FD924EEB6E4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
+		FE825CEC12DFB8D2216ADA2D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/ShortcutActions.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +292,11 @@
 				CD1000010000000000000002 /* PhotoTextBridge.swift */,
 				CD1000010000000000000004 /* VoiceMemoBridge.swift */,
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
+				39F6ED02DFFEBFE340A81C0A /* ShortcutActions.strings */,
+				AF3D233DD43841312187AF6D /* Shortcut AppShortcuts.strings */,
+				EA0D2C76039E0AB735588943 /* ShortcutsAppendStore.swift */,
+				4B85FFFC74DADB3D99DAF651 /* OnlynoteAppendIntents.swift */,
+				DF4D61C2EE8ADA47D889B8DE /* ShortcutsAppendBridge.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
@@ -476,6 +495,8 @@
 			files = (
 				CD2000000000000000000058 /* Localizable.strings in Resources */,
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
+				D049A77F887B62A82A9B9B6D /* ShortcutActions.strings in Resources */,
+				82E8AD24B88C967D47B9A4F3 /* Shortcut AppShortcuts.strings in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -569,6 +590,9 @@
 				CD1000010000000000000003 /* VoiceMemoBridge.swift in Sources */,
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
+				A1C44BB9AC93F5B75057EEF3 /* ShortcutsAppendStore.swift in Sources */,
+				DCC6575DFC438EA4BF169D3D /* OnlynoteAppendIntents.swift in Sources */,
+				93D7C14E55B22CD8BE2C1F7B /* ShortcutsAppendBridge.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -638,6 +662,26 @@
 				CD2000000000000000000029 /* zh-Hant */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		AF3D233DD43841312187AF6D /* Shortcut AppShortcuts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAFA300B0A1959EF40E4D40C /* en */,
+				AF34595F1CB0E4DDD6D6F217 /* zh-Hans */,
+				CF8EC960C68FCBAF1AFF3449 /* zh-Hant */,
+			);
+			name = AppShortcuts.strings;
+			sourceTree = "<group>";
+		};
+		39F6ED02DFFEBFE340A81C0A /* ShortcutActions.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				76B5112FDAD1C983180D442F /* en */,
+				B2D5274C68540FD924EEB6E4 /* zh-Hans */,
+				FE825CEC12DFB8D2216ADA2D /* zh-Hant */,
+			);
+			name = ShortcutActions.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

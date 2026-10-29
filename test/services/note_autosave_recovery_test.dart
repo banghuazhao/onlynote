@@ -8,6 +8,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/note_text_style.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/shortcuts_append.dart';
 
 class _RecoveryNotes implements NoteRepository {
   _RecoveryNotes(this.box);
@@ -65,6 +66,117 @@ void main() {
   }
 
   Future<void> recover() => HiveNoteAutosaveStore(repository, drafts).recover();
+
+  const shortcutRequest = ShortcutAppendRequest(
+      id: '12345678-1234-1234-1234-000000000001',
+      text: 'Captured text',
+      destination: ShortcutAppendDestination.note,
+      createdAt: 0,
+      noteId: 'shortcut-target');
+
+  ShortcutsAppendService shortcuts() => ShortcutsAppendService(
+      repository: repository,
+      journal: HiveShortcutAppendJournal(drafts),
+      store: HiveNoteAutosaveStore(repository, drafts),
+      readDraft: (id) => (drafts.get(id) as NoteDto?)?.toDomain());
+
+  Future<Note?> append(ShortcutsAppendService service) =>
+      service.apply(shortcutRequest,
+          acknowledge: (_) async {},
+          titleForDay: (_) => 'Today',
+          inboxTitle: 'Inbox');
+
+  Future<Note> failShortcut() async {
+    final original = Note(
+        id: 'shortcut-target',
+        title: 'Shopping',
+        description: 'Before',
+        todo: [Todo(id: 'task', title: 'Keep completion')]);
+    await notes.put(original.id, NoteDto.fromNote(original));
+    repository.failSave = true;
+    await expectLater(
+        append(shortcuts()), throwsA(isA<ShortcutAppendException>()));
+    repository.failSave = false;
+    expect((drafts.get(original.id) as NoteDto).description,
+        'Before\n\nCaptured text');
+    return original;
+  }
+
+  test('restart defers failed shortcut draft before newer checklist state',
+      () async {
+    final original = await failShortcut();
+    final newer = original.copyWith(
+        todo: [Todo(id: 'task', title: 'Keep completion', completed: true)]);
+    await notes.put(newer.id, NoteDto.fromNote(newer));
+    await stage(Note(id: 'unrelated', description: 'Normal typing recovery'));
+
+    await recover();
+
+    expect((notes.get(newer.id) as NoteDto).toDomain(), newer);
+    expect((notes.get('unrelated') as NoteDto).description,
+        'Normal typing recovery');
+    expect(drafts.get(newer.id), isA<NoteDto>());
+    expect(shortcuts().retainedRequests.single.text, 'Captured text');
+    await expectLater(
+        append(shortcuts()),
+        throwsA(isA<ShortcutAppendException>().having((error) => error.failure,
+            'reason', ShortcutAppendFailure.conflict)));
+    expect((notes.get(newer.id) as NoteDto).toDomain(), newer);
+  });
+
+  test('discarded failed existing-note append cannot replay on restart',
+      () async {
+    final original = await failShortcut();
+    await shortcuts().discard(shortcutRequest.id, acknowledge: (_) async {});
+    await drafts.close();
+    drafts = await Hive.openBox('autosave_recovery_drafts');
+
+    await recover();
+
+    expect((notes.get(original.id) as NoteDto).toDomain(), original);
+    expect(drafts.get(original.id), isNull);
+    expect(shortcuts().retainedRequests, isEmpty);
+  });
+
+  for (final linksOnly in [false, true]) {
+    test(
+        'discard preserves a newer ${linksOnly ? 'links-only' : 'typing'} draft for recovery',
+        () async {
+      final original = await failShortcut();
+      final edited = linksOnly
+          ? (drafts.get(original.id) as NoteDto)
+              .toDomain()
+              .copyWith(linkedNoteIds: ['new-independent-link'])
+          : original.copyWith(
+              title: 'My newer title',
+              description: 'Keep these independent edits');
+      await stage(edited);
+      await shortcuts().discard(shortcutRequest.id, acknowledge: (_) async {});
+      expect((drafts.get(original.id) as NoteDto).toDomain(), edited);
+      await recover();
+      expect((notes.get(original.id) as NoteDto).toDomain(), edited);
+      expect(drafts.get(original.id), isNull);
+    });
+  }
+
+  test('unacknowledged discard protects its owned draft across restart',
+      () async {
+    final original = await failShortcut();
+    await expectLater(
+        shortcuts().discard(shortcutRequest.id, acknowledge: (_) async {
+          throw StateError('Native acknowledgement failed');
+        }),
+        throwsStateError);
+    await drafts.close();
+    drafts = await Hive.openBox('autosave_recovery_drafts');
+    await recover();
+    expect((notes.get(original.id) as NoteDto).toDomain(), original);
+    expect(drafts.get(original.id), isA<NoteDto>());
+    await shortcuts().discard(shortcutRequest.id, acknowledge: (_) async {});
+    await recover();
+    expect((notes.get(original.id) as NoteDto).toDomain(), original);
+    expect(drafts.get(original.id), isNull);
+  });
 
   test('an older active draft cannot restore a note now in Trash', () async {
     final draft = Note(

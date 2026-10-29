@@ -1,0 +1,16 @@
+// Siri and Shortcuts append actions.
+"Note" = "筆記";
+"Text" = "文字";
+"Append to Today’s Note" = "附加至今日筆記";
+"Append to Note" = "附加至筆記";
+"Save Text to Inbox" = "儲存文字至收集箱";
+"Append to Today" = "附加至今天";
+"Save to Inbox" = "儲存至收集箱";
+"Open Onlynote and append text to today’s daily note." = "開啟 Onlynote，將文字附加至今天的每日筆記。";
+"Choose a note, then open Onlynote to append text." = "選擇筆記，然後開啟 Onlynote 附加文字。";
+"Pass text or the Clipboard variable to Onlynote’s Inbox note." = "將文字或「剪貼簿」變數傳入 Onlynote 的收集箱筆記。";
+"Opening Onlynote to finish adding your text." = "正在開啟 Onlynote，以完成加入文字。";
+"shortcut.storageUnavailable" = "請先開啟一次 Onlynote，完成捷徑設定。";
+"shortcut.invalidText" = "請輸入 1 至 100,000 個字元的文字。";
+"shortcut.invalidRequest" = "無法讀取此捷徑要求。";
+"shortcut.inboxFull" = "請開啟 Onlynote，完成待處理的捷徑要求。";

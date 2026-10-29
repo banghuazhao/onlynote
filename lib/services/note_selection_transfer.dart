@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart';
 import 'package:onlynote/domain/model/note.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/services/note_selection.dart';
 import 'package:onlynote/services/note_selection_checklist.dart';
 import 'package:uuid/uuid.dart';
@@ -35,7 +35,6 @@ class NoteSelectionTransfer {
   final Note? Function(String id) readDraft;
   static final _editors = <String, List<NoteSelectionEditorApply>>{};
   static final _checklistEditors = <String, List<_ChecklistEditor>>{};
-  static Future<void>? _writes;
 
   static VoidCallback registerEditor(
       String noteId, NoteSelectionEditorApply apply) {
@@ -149,21 +148,12 @@ class NoteSelectionTransfer {
             deletedAt: latest.deletedAt);
   }
 
-  /// Release the idle queue before resolving callers. This also avoids keeping
-  /// a completed future and its originating widget/test zone alive forever.
   static Future<T> _serialize<T>(Future<T> Function() operation,
       {required T onError}) async {
-    final previous = _writes;
-    final completion = Completer<void>();
-    _writes = completion.future;
     try {
-      if (previous != null) await previous;
-      return await operation();
+      return await NoteMutations.run(operation);
     } catch (_) {
       return onError;
-    } finally {
-      if (identical(_writes, completion.future)) _writes = null;
-      completion.complete();
     }
   }
 

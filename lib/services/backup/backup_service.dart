@@ -10,6 +10,7 @@ import 'package:onlynote/domain/model/note_image_layout.dart';
 import 'package:onlynote/domain/model/voice_memo.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
+import 'package:onlynote/services/note_mutations.dart';
 import 'package:onlynote/services/note_section_links.dart';
 import 'package:onlynote/services/note_document.dart';
 import 'package:onlynote/services/saved_note_views.dart';
@@ -167,7 +168,12 @@ class BackupService {
 
   /// Restore only creates new IDs. The journal rolls back a partial import on
   /// I/O failure or on next launch, without ever deleting pre-existing data.
-  Future<List<Reminder>> restore(BackupContents backup) async {
+  Future<List<Reminder>> restore(BackupContents backup) =>
+      // Published imported notes remain provisional until every store commits.
+      // Keep append actions from acknowledging text a rollback could delete.
+      NoteMutations.run(() => _restore(backup));
+
+  Future<List<Reminder>> _restore(BackupContents backup) async {
     // Validate even callers that construct contents directly, before any writes.
     backup = BackupContents.fromJson(backup.toJson());
     if (backup.templates.isNotEmpty && templateStore == null) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -22,8 +23,10 @@ import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/note_history.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/saved_note_views.dart';
+import 'package:onlynote/services/shortcuts_append.dart';
 
 import '../support/memory_preferences.dart';
+import '../support/premium_test_fakes.dart';
 
 class BoxRepository implements NoteRepository {
   BoxRepository(this.box);
@@ -1164,6 +1167,96 @@ void main() {
     expect(await Directory('${directory.path}/note_images').list().length, 1);
     expect(journal.isEmpty, isTrue);
   });
+
+  for (final rollback in [false, true]) {
+    test('Siri Today append waits for backup restore rollback=$rollback',
+        () async {
+      final access = PremiumTestFixture(premium: true);
+      await access.init();
+      addTearDown(access.dispose);
+      final reminderWriteStarted = Completer<void>();
+      final releaseReminderWrite = Completer<void>();
+      var reminderWrites = 0;
+      final restoring = BackupService(
+          notes: notes,
+          folders: folders,
+          journal: journal,
+          documents: directory,
+          readReminders: () => reminders,
+          writeReminders: (values) async {
+            if (reminderWrites++ == 0) {
+              reminderWriteStarted.complete();
+              await releaseReminderWrite.future;
+              if (rollback) throw const FileSystemException('Disk full');
+            }
+            reminders = values;
+          });
+      final day = DateTime(2026, 10, 29, 12);
+      final backup = BackupContents(createdAt: day, notes: [
+        NoteDto(
+            id: 'incoming',
+            title: 'Imported today',
+            description: 'Imported thoughts',
+            dailyNoteDateKey: '2026-10-29')
+      ], folders: [], photos: {}, reminders: []);
+      final restore = restoring.restore(backup);
+      final restoreExpectation = expectLater(
+          restore, rollback ? throwsA(isA<FileSystemException>()) : completes);
+      await reminderWriteStarted.future;
+      final importedId = notes.values.cast<NoteDto>().single.id!;
+      final repository = BoxRepository(notes);
+      final acknowledgements = <String>[];
+      var draftReads = 0;
+      final append = ShortcutsAppendService(
+          repository: repository,
+          journal: HiveShortcutAppendJournal(drafts),
+          store: HiveNoteAutosaveStore(repository, drafts,
+              premiumAccess: access.access),
+          premiumAccess: access.access,
+          readDraft: (id) {
+            draftReads++;
+            return (drafts.get(id) as NoteDto?)?.toDomain();
+          });
+      final request = ShortcutAppendRequest(
+          id: '12345678-1234-1234-1234-000000000001',
+          destination: ShortcutAppendDestination.today,
+          text: 'Added by Siri',
+          createdAt: day.millisecondsSinceEpoch);
+      final appended = append.apply(request,
+          acknowledge: (id) async => acknowledgements.add(id),
+          titleForDay: (_) => 'Today',
+          inboxTitle: 'Inbox');
+      Object? appendError;
+      final completedAppend = appended.catchError((Object error) {
+        appendError = error;
+        return null;
+      });
+      try {
+        // All microtasks may run, but the restore has not committed. An append
+        // must not take a snapshot of a note its rollback could still delete.
+        await Future<void>.delayed(Duration.zero);
+        expect(draftReads, 0);
+        expect(acknowledgements, isEmpty);
+      } finally {
+        releaseReminderWrite.complete();
+        await restoreExpectation;
+        await completedAppend;
+      }
+      expect(appendError, isNull);
+      final result = await completedAppend;
+      expect(result, isNotNull);
+      expect(notes.values.cast<NoteDto>(), hasLength(1));
+      final saved = notes.get(result!.id) as NoteDto;
+      expect(saved.id, rollback ? isNot(importedId) : importedId);
+      expect(saved.dailyNoteDateKey, '2026-10-29');
+      expect(saved.description,
+          rollback ? 'Added by Siri' : 'Imported thoughts\n\nAdded by Siri');
+      expect(acknowledgements, [request.id]);
+      expect(append.retainedRequests, isEmpty);
+      expect(drafts.values.whereType<NoteDto>(), isEmpty);
+      expect(journal.isEmpty, isTrue);
+    });
+  }
 
   test('startup rolls back an interrupted import from its journal', () async {
     await seed();

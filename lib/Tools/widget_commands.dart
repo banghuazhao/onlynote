@@ -8,6 +8,7 @@ import 'package:onlynote/data/dto/note_dto.dart';
 import 'package:onlynote/di/di.dart';
 import 'package:onlynote/domain/repository/note_repository.dart';
 import 'package:onlynote/services/note_autosave.dart';
+import 'package:onlynote/services/note_mutations.dart';
 
 /// An explicit state change, rather than a toggle: replaying a native journal
 /// after an interrupted acknowledgement cannot undo the user's action.
@@ -178,7 +179,10 @@ class WidgetCommands {
     }
   }
 
-  Future<bool> _apply(WidgetTodoCommand command) async {
+  Future<bool> _apply(WidgetTodoCommand command) =>
+      NoteMutations.run(() => _applyMutation(command));
+
+  Future<bool> _applyMutation(WidgetTodoCommand command) async {
     final notes = repository.getAllNotes();
     final matches = notes.where((note) => note.id == command.noteId);
     if (matches.isEmpty) return true; // Never recreate a removed note.

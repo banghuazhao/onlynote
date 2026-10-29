@@ -31,6 +31,60 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
       widget.controller ?? createLiveTodayAgendaController();
   Timer? _clockRefresh;
   bool _navigating = false;
+  TodayTaskCompletionUndo? _undoReceipt;
+  Timer? _undoExpiry;
+  int _feedbackGeneration = 0;
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _undoFeedback;
+  ScaffoldMessengerState? _undoMessenger;
+
+  void _clearUndoFeedback({bool dismiss = true}) {
+    _undoReceipt = null;
+    _undoExpiry?.cancel();
+    _feedbackGeneration++;
+    final feedback = _undoFeedback;
+    final messenger = _undoMessenger;
+    _undoFeedback = null;
+    _undoMessenger = null;
+    if (dismiss && messenger?.mounted == true) feedback?.close();
+  }
+
+  void _showUndoFeedback(TodayTaskCompletionUndo receipt, String message,
+      {bool retry = false}) {
+    _clearUndoFeedback();
+    _undoReceipt = receipt;
+    final generation = _feedbackGeneration;
+    const duration = Duration(seconds: 6);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    final feedback = messenger.showSnackBar(SnackBar(
+      // A failed Undo becomes a new Retry action, with fresh native button
+      // state even though both messages belong to the same completion.
+      key: ValueKey('today-task-undo-feedback-$generation'),
+      content: Text(message),
+      duration: duration,
+      action: SnackBarAction(
+        key: const ValueKey('today-task-undo-action'),
+        label: retry ? S.of(context).Retry : S.of(context).Undo,
+        onPressed: () => _undoTask(receipt),
+      ),
+    ));
+    _undoFeedback = feedback;
+    _undoMessenger = messenger;
+    // Action feedback remains available to accessibility users until they
+    // dismiss or use it. Ordinary feedback also has a route-owned timeout,
+    // canceled on replacement or disposal so it cannot close a later bar.
+    if (!MediaQuery.accessibleNavigationOf(context)) {
+      _undoExpiry = Timer(duration, () {
+        if (!mounted || generation != _feedbackGeneration) return;
+        _clearUndoFeedback();
+      });
+    }
+    unawaited(feedback.closed.then((_) {
+      if (mounted && generation == _feedbackGeneration) {
+        _clearUndoFeedback(dismiss: false);
+      }
+    }));
+  }
 
   bool get _canAct => mounted && ModalRoute.of(context)?.isCurrent != false;
 
@@ -53,6 +107,7 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
 
   Future<void> _openDailyNote() async {
     if (!_canAct || _navigating || _controller.busyTaskKey != null) return;
+    _clearUndoFeedback();
     setState(() => _navigating = true);
     final strings = S.of(context);
     try {
@@ -90,6 +145,7 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
 
   Future<void> _openNote(String id) async {
     if (!_canAct || _navigating || _controller.busyTaskKey != null) return;
+    _clearUndoFeedback();
     setState(() => _navigating = true);
     final strings = S.of(context);
     try {
@@ -113,6 +169,7 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
 
   Future<void> _openReminders() async {
     if (!_canAct || _navigating || _controller.busyTaskKey != null) return;
+    _clearUndoFeedback();
     setState(() => _navigating = true);
     try {
       await context.router.push(RemindersRoute());
@@ -123,13 +180,21 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _completeTask(TodayTaskEntry entry) async {
-    if (!_canAct || _navigating) return;
+    if (!_canAct || _navigating || _controller.busyTaskKey != null) return;
+    if (!_controller.agenda.tasks.any((value) =>
+        value.key == entry.key && value.todo.title == entry.todo.title)) {
+      return;
+    }
+    _clearUndoFeedback();
     final strings = S.of(context);
     final result = await _controller.completeTask(entry);
     if (!mounted || !_canAct) return;
     switch (result) {
       case TodayTaskActionResult.saved:
-        context.showToast(strings.Checklist_Item_Completed);
+        final receipt = _controller.lastCompletionUndo;
+        if (receipt != null) {
+          _showUndoFeedback(receipt, strings.Checklist_Item_Completed);
+        }
       case TodayTaskActionResult.unavailable:
         context.showToast(strings.Checklist_Item_Unavailable, isError: true);
       case TodayTaskActionResult.changed:
@@ -141,9 +206,29 @@ class _TodayScreenState extends State<TodayScreen> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _undoTask(TodayTaskCompletionUndo receipt) async {
+    if (!_canAct || _navigating || !identical(_undoReceipt, receipt)) return;
+    _clearUndoFeedback();
+    final strings = S.of(context);
+    final result = await _controller.undoTaskCompletion(receipt);
+    if (!mounted || !_canAct) return;
+    switch (result) {
+      case TodayTaskActionResult.saved:
+        context.showToast(strings.Today_Task_Undone);
+      case TodayTaskActionResult.failed:
+        _showUndoFeedback(receipt, strings.Today_Task_Undo_Failed, retry: true);
+      case TodayTaskActionResult.changed:
+      case TodayTaskActionResult.unavailable:
+        context.showToast(strings.Today_Task_Undo_Unavailable, isError: true);
+      case TodayTaskActionResult.busy:
+        break;
+    }
+  }
+
   @override
   void dispose() {
     _clockRefresh?.cancel();
+    _clearUndoFeedback();
     WidgetsBinding.instance.removeObserver(this);
     if (widget.controller == null) _controller.dispose();
     super.dispose();

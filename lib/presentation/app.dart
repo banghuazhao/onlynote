@@ -1,3 +1,10 @@
+import 'package:intl/intl.dart';
+import 'package:onlynote/Tools/shortcuts_append_launch.dart';
+import 'package:onlynote/presentation/components/app_sheet.dart';
+import 'package:onlynote/presentation/components/shortcut_append_review_sheet.dart';
+import 'package:onlynote/presentation/components/premium_feature_gate.dart';
+import 'package:onlynote/services/premium_access.dart';
+import 'package:onlynote/services/note_creation_limit.dart';
 import 'package:onlynote/Tools/app_appearance_settings.dart';
 import 'package:onlynote/Tools/app_card_style_settings.dart';
 import 'dart:async';
@@ -45,6 +52,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   AppLifecycleListener? _exitListener;
   bool _openingDesktopNote = false;
   bool _openingDesktopSettings = false;
+  bool _openingShortcutReview = false;
+  bool _openingShortcutUpgrade = false;
 
   @override
   void initState() {
@@ -77,6 +86,30 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         },
       );
       unawaited(SharedNoteLaunch.instance.init());
+      ShortcutsAppendLaunch.instance.attach(_router,
+          onApplied: () {
+            _refreshLibrary();
+            final navigatorContext = _router.navigatorKey.currentContext;
+            if (mounted &&
+                navigatorContext != null &&
+                navigatorContext.mounted) {
+              showTransientSnackBar(
+                  navigatorContext,
+                  SnackBar(
+                      content:
+                          Text(S.of(navigatorContext).Shortcuts_Append_Saved)));
+            }
+          },
+          onFailure: _shortcutAppendFailed,
+          titleForDay: (day) {
+            final navigatorContext = _router.navigatorKey.currentContext;
+            final locale = navigatorContext == null
+                ? Intl.getCurrentLocale()
+                : Localizations.localeOf(navigatorContext).toString();
+            return DateFormat.yMMMMd(locale).format(day);
+          },
+          inboxTitle: () => S.current.Shortcuts_Inbox_Title);
+      unawaited(ShortcutsAppendLaunch.instance.init());
       // Subscribed unconditionally, and only once the router is live: a widget
       // tap can arrive at any point in this process's life, and finishing
       // onboarding doesn't restart the process. Skipping it here would leave
@@ -89,6 +122,84 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         reminders: () => ReminderData.shared.reminders,
       );
     });
+  }
+
+  void _shortcutAppendFailed(ShortcutAppendFailure failure) {
+    final navigatorContext = _router.navigatorKey.currentContext;
+    if (!mounted || navigatorContext == null || !navigatorContext.mounted) {
+      return;
+    }
+    final strings = S.of(navigatorContext);
+    final message = switch (failure) {
+      ShortcutAppendFailure.saveBlocked => strings.Autosave_Failed,
+      ShortcutAppendFailure.premiumRequired =>
+        strings.Premium_Note_Limit(PremiumAccess.freeNoteLimit),
+      ShortcutAppendFailure.unavailable => strings.Shortcuts_Append_Unavailable,
+      ShortcutAppendFailure.conflict => strings.Shortcuts_Append_Conflict,
+      ShortcutAppendFailure.failed => strings.Shortcuts_Append_Failed,
+    };
+    showTransientSnackBar(
+        navigatorContext,
+        SnackBar(
+          content: Text(message),
+          action: failure == ShortcutAppendFailure.premiumRequired
+              ? SnackBarAction(
+                  label: strings.Upgrade_To_Premium,
+                  onPressed: _upgradeShortcutAppend)
+              : failure == ShortcutAppendFailure.saveBlocked
+                  ? SnackBarAction(
+                      label: strings.Retry,
+                      onPressed: ShortcutsAppendLaunch.instance.retry)
+                  : SnackBarAction(
+                      label: strings.Shortcuts_Review,
+                      onPressed: _reviewShortcutRequests),
+        ));
+  }
+
+  Future<void> _upgradeShortcutAppend() async {
+    final navigatorContext = _router.navigatorKey.currentContext;
+    if (!mounted ||
+        navigatorContext == null ||
+        !navigatorContext.mounted ||
+        _openingShortcutUpgrade) {
+      return;
+    }
+    _openingShortcutUpgrade = true;
+    try {
+      final allowed = await ensurePremiumAccess(
+          navigatorContext, PremiumFeature.notes,
+          currentCount: NoteCreationLimit.count(getIt<NoteRepository>()));
+      if (mounted && allowed) ShortcutsAppendLaunch.instance.retry();
+    } finally {
+      _openingShortcutUpgrade = false;
+    }
+  }
+
+  Future<void> _reviewShortcutRequests() async {
+    final navigatorContext = _router.navigatorKey.currentContext;
+    if (!mounted ||
+        navigatorContext == null ||
+        !navigatorContext.mounted ||
+        _openingShortcutReview) {
+      return;
+    }
+    _openingShortcutReview = true;
+    final launch = ShortcutsAppendLaunch.instance;
+    try {
+      await showAppSheet<void>(
+          context: navigatorContext,
+          builder: (_) => ShortcutAppendReviewSheet(
+              pending: launch.pending,
+              onDiscard: launch.discard,
+              onRetry: launch.retry,
+              noteTitle: (id) => getIt<NoteRepository>()
+                  .getAllNotes()
+                  .where((note) => note.id == id && !note.isDeleted)
+                  .map((note) => note.title)
+                  .firstOrNull));
+    } finally {
+      _openingShortcutReview = false;
+    }
   }
 
   void _refreshLibrary() {
@@ -175,6 +286,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     _widgetCommands?.updates.removeListener(_refreshLibrary);
     _documentScanner.removeListener(_recoverDocumentScans);
     SharedNoteLaunch.instance.detach();
+    ShortcutsAppendLaunch.instance.detach();
     AppShortcutLaunch.instance.detach();
     ReminderLaunch.instance.detach();
     super.dispose();

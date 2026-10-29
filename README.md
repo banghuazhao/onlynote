@@ -8,7 +8,9 @@ A minimalist notes & checklist app built with Flutter.
 
 - Quick note-taking with rich colors to organize at a glance
 - Checklist / todo items inside any note
-- Today view with today's daily note, due reminders, and unfinished tasks across active notes
+- Today view with today's daily note, due reminders, unfinished-task search, and task completion with Undo
+- Markdown file and ZIP import with a note preview, selection, and local photo attachments
+- Siri and Shortcuts actions to append to a saved note, today's note, or Inbox on iOS 16+ and macOS 13+
 - Links to specific headings, with stable destinations when headings move or are renamed
 - Divider lines for organizing longer notes, preserved in backups and document exports
 - One-time, daily, and weekly reminders that open their note when tapped
@@ -28,6 +30,20 @@ voice recording, individual card styling, and removes ads with a one-time purcha
 Existing Remove Ads purchases also unlock Premium. Existing folders, templates,
 card styles, voice memos, and recurring reminders remain usable; backup restores are never
 blocked by plan limits. Platforms without purchase support remain unrestricted.
+
+## Import and capture
+
+Open Settings > Import Markdown to choose `.md`, `.markdown`, or ZIP files.
+Review and select notes before importing. Supported formatting and local PNG/JPEG images
+are retained; unsupported formatting and missing image references remain readable
+as text. Imports create new notes and follow the normal free-note limit.
+
+Open Settings > Siri & Shortcuts for setup instructions. The app offers Append
+to Today's Note, Append to Note, and Save Text to Inbox actions. To save the
+clipboard, pass the output of Shortcuts' Get Clipboard action into Save Text to
+Inbox. Actions open Onlynote to finish saving through its editor and autosave
+path. If saving is blocked or interrupted, pending text stays available for
+retry, copying, or explicit discard in the Siri & Shortcuts guide.
 
 Before release, update the App Store display name and description for the existing
 `com.appsbay.onlynote.remove_ads` product to describe Premium and its benefits.

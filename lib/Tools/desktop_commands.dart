@@ -31,6 +31,7 @@ class DesktopCommands extends ChangeNotifier {
   final _editorRefreshes = <Future<void> Function()>[];
   final _pendingSaves = <Future<bool>>{};
   Future<AppExitResponse>? _exitRequest;
+  Future<bool>? _externalWriteRequest;
   bool _refreshQueued = false;
 
   VoidCallback registerCommand(
@@ -91,6 +92,16 @@ class DesktopCommands extends ChangeNotifier {
     });
     _pendingSaves.add(tracked);
   }
+
+  /// External writes may proceed only after every editor and removed-route
+  /// save reports success. Quit's timeout policy deliberately permits exit;
+  /// using it here would mistake a hung save for permission to change content.
+  Future<bool> prepareForExternalWrite() =>
+      _externalWriteRequest ??= _flushEditors()
+          .then<bool>((response) => response == AppExitResponse.exit,
+              onError: (Object _) => false)
+          .timeout(saveBudget, onTimeout: () => false)
+          .whenComplete(() => _externalWriteRequest = null);
 
   Future<AppExitResponse> prepareToExit() => _exitRequest ??= _flushEditors()
       // The budget covers the whole flush, not each save: only a bound on the

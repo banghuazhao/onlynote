@@ -1,0 +1,7 @@
+// Siri and Shortcuts append actions.
+"Append to today’s note in ${applicationName}" = "在 ${applicationName} 中附加至今日筆記";
+"Add to today’s note in ${applicationName}" = "在 ${applicationName} 中加入今日筆記";
+"Append to a note in ${applicationName}" = "在 ${applicationName} 中附加至筆記";
+"Add to a note in ${applicationName}" = "在 ${applicationName} 中加入筆記";
+"Save to Inbox in ${applicationName}" = "儲存至 ${applicationName} 的收集箱";
+"Capture text in ${applicationName}" = "在 ${applicationName} 中收集文字";
