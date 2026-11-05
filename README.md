@@ -16,7 +16,8 @@ A minimalist notes & checklist app built with Flutter.
 - One-time, daily, and weekly reminders that open their note when tapped
 - Mobile Home Screen widgets and native Mac paper widgets for notes and checklists
 - One-tap image sharing — turn a note into a shareable image
-- Multi-select to bulk-delete notes
+- Multi-select to move, tag, pin, archive, or delete notes together
+- Manage tags to rename, merge, or remove a tag across the whole library
 - Localized in English, Simplified Chinese, and Traditional Chinese
 - Local-first storage (no account or sign-in required)
 

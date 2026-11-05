@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added Manage tags in Settings to rename, merge, and remove a tag across every note, including archived notes and Trash, plus saved views and templates.
+- Renaming a tag onto one that already exists asks first and then joins them, keeping one entry per note.
+- Carried a library tag filter through a rename or removal, so the library never sits empty under a tag no note has.
+- Added Move to Folder, Add tags, and Pin or Unpin to the selected-notes menu, applying one change to the whole selection and reporting a single count.
+- Kept notes that already match a bulk change unwritten, and reported notes already holding the tag limit instead of dropping their tags.
+
 - Added Markdown file and ZIP import with previews, note selection, local images, supported formatting, Premium limits, and safe partial-import retries.
 - Added unfinished-task search to Today and Undo for task completion, preserving unrelated edits and providing retry feedback.
 - Added Siri and Shortcuts actions on iOS 16+ and macOS 13+ for appending to a saved note, today's daily note, or Inbox.

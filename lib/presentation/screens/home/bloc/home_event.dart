@@ -56,4 +56,19 @@ class HomeEvent with _$HomeEvent {
     required String noteId,
     String? folderId,
   }) = _MoveNoteToFolder;
+  const factory HomeEvent.moveNotesToFolder({
+    required List<String> noteIds,
+    String? folderId,
+    Completer<HomeBulkResult>? completion,
+  }) = _MoveNotesToFolder;
+  const factory HomeEvent.setPinnedNotes({
+    required List<String> noteIds,
+    required bool pinned,
+    Completer<HomeBulkResult>? completion,
+  }) = _SetPinnedNotes;
+  const factory HomeEvent.addTagsToNotes({
+    required List<String> noteIds,
+    required List<String> tags,
+    Completer<HomeBulkResult>? completion,
+  }) = _AddTagsToNotes;
 }

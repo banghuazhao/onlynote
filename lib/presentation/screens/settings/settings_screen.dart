@@ -21,6 +21,7 @@ import 'package:onlynote/services/backup/backup_export_status.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'manage_folders_screen.dart';
+import 'manage_tags_screen.dart';
 import 'backup_screen.dart';
 import 'keyboard_shortcuts_screen.dart';
 import 'premium_screen.dart';
@@ -51,6 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _purchaseActionStarted = false;
   bool _restoringPurchase = false;
   bool _openingFolders = false;
+  bool _openingTags = false;
   bool _openingBackup = false;
   bool _openingPrivacyPolicy = false;
   bool _openingMarkdownImport = false;
@@ -165,6 +167,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (navigator.canPop()) await navigator.maybePop<String>(folderId);
     } finally {
       if (mounted) _openingFolders = false;
+    }
+  }
+
+  Future<void> _openManageTags() async {
+    if (!mounted ||
+        _openingTags ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    _openingTags = true;
+    try {
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(builder: (_) => const ManageTagsScreen()),
+      );
+    } finally {
+      if (mounted) _openingTags = false;
     }
   }
 
@@ -284,6 +303,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   trailing:
                                       const Icon(Icons.chevron_right_rounded),
                                   onTap: _openManageFolders,
+                                ),
+                              ),
+                              SizedBox(height: tokens.space4),
+                              Card(
+                                child: ListTile(
+                                  key: const ValueKey('settings-manage-tags'),
+                                  leading: const Icon(Icons.sell_outlined),
+                                  title: Text(S.of(context).Manage_Tags),
+                                  trailing:
+                                      const Icon(Icons.chevron_right_rounded),
+                                  onTap: _openManageTags,
                                 ),
                               ),
                               SizedBox(height: tokens.space4),

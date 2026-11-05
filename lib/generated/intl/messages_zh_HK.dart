@@ -69,140 +69,82 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m23(matched, total) => "${total} 個標題中符合 ${matched} 個";
 
-  static String m24(name) => "在筆記庫中開啟${name}";
+  static String m24(count) =>
+      "${Intl.plural(count, other: '已移動 ${count} 則筆記')}";
 
-  static String m25(number) => "照片 ${number}";
+  static String m25(count) =>
+      "${Intl.plural(count, other: '已置頂 ${count} 則筆記')}";
 
-  static String m26(limit) => "免費版包含 ${limit} 個資料夾。升級即可建立無限資料夾。";
+  static String m26(count) =>
+      "${Intl.plural(count, other: '已取消置頂 ${count} 則筆記')}";
 
-  static String m27(limit) => "免費版包含 ${limit} 則筆記。升級即可建立無限筆記。";
+  static String m27(name) => "在筆記庫中開啟${name}";
 
-  static String m28(price) => "支付 ${price} 永久解鎖";
+  static String m28(number) => "照片 ${number}";
 
-  static String m29(limit) => "免費版包含 ${limit} 個自訂範本。升級即可儲存無限範本。";
+  static String m29(limit) => "免費版包含 ${limit} 個資料夾。升級即可建立無限資料夾。";
 
-  static String m30(time) => "下次提醒：${time}";
+  static String m30(limit) => "免費版包含 ${limit} 則筆記。升級即可建立無限筆記。";
 
-  static String m31(date) => "提醒我：${date}";
+  static String m31(price) => "支付 ${price} 永久解鎖";
 
-  static String m32(matched, total) => "${total} 個提醒中符合 ${matched} 個";
+  static String m32(limit) => "免費版包含 ${limit} 個自訂範本。升級即可儲存無限範本。";
 
-  static String m33(price) => "支付 ${price} 永久移除廣告。";
+  static String m33(time) => "下次提醒：${time}";
 
-  static String m34(criterion) => "移除${criterion}";
+  static String m34(date) => "提醒我：${date}";
 
-  static String m35(limit) => "最多可儲存 ${limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。";
+  static String m35(matched, total) => "${total} 個提醒中符合 ${matched} 個";
 
-  static String m36(query) => "搜尋：${query}";
+  static String m36(price) => "支付 ${price} 永久移除廣告。";
 
-  static String m37(tags) => "標籤：${tags}";
+  static String m37(criterion) => "移除${criterion}";
 
-  static String m38(count) => "${count} 則筆記";
+  static String m38(limit) => "最多可儲存 ${limit} 個檢視。刪除一個已儲存的檢視後可新增檢視。";
 
-  static String m39(count) => "已加入 ${count} 項清單";
+  static String m39(query) => "搜尋：${query}";
 
-  static String m40(count, formattedCount) => "${formattedCount} 則筆記";
+  static String m40(tags) => "標籤：${tags}";
 
-  static String m41(count) => "搜尋隱藏了 ${count} 個已選標籤";
+  static String m41(count) => "${count} 則筆記";
 
-  static String m42(count) => "已選取 ${count} 個標籤";
+  static String m42(count) => "已加入 ${count} 項清單";
 
-  static String m43(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+  static String m43(name) => "「${name}」已存在。兩個標籤將在所有使用其中任一標籤的筆記上合併為一個。";
 
-  static String m44(items, photos) => "${items} 項 · ${photos} 張照片";
+  static String m44(count) =>
+      "${Intl.plural(count, zero: '標籤已移除', other: '已從 ${count} 則筆記中移除標籤')}";
 
-  static String m45(date) => "錄製於 ${date}";
+  static String m45(count) =>
+      "${Intl.plural(count, zero: '標籤已重新命名', other: '已在 ${count} 則筆記中重新命名標籤')}";
 
-  static String mTodayTaskSearchCount(matching, total) => "${total} 個未完成事項中符合 ${matching} 個";
+  static String m46(count, formattedCount) => "${formattedCount} 則筆記";
+
+  static String m47(count) =>
+      "${Intl.plural(count, other: '${count} 則筆記已有 20 個標籤，保持不變')}";
+
+  static String m48(count) =>
+      "${Intl.plural(count, other: '已為 ${count} 則筆記加入標籤')}";
+
+  static String m49(count) => "搜尋隱藏了 ${count} 個已選標籤";
+
+  static String m50(count) => "已選取 ${count} 個標籤";
+
+  static String m51(limit) => "最多可選取 ${limit} 個標籤。取消選取一個標籤後可選取其他標籤。";
+
+  static String m52(items, photos) => "${items} 項 · ${photos} 張照片";
+
+  static String m53(matching, total) => "${total} 個未完成事項中符合 ${matching} 個";
+
+  static String m54(date) => "錄製於 ${date}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "Shortcuts_Append_Failed": MessageLookupByLibrary.simpleMessage("無法加入此文字，內容已保留以便重試。"),
-    "Shortcuts_Append_Unavailable": MessageLookupByLibrary.simpleMessage("目標筆記無法使用，請還原筆記，或在捷徑中選擇其他筆記。"),
-    "Shortcuts_Append_Conflict": MessageLookupByLibrary.simpleMessage("加入文字中斷期間筆記已變更，請檢視保留的要求。"),
-    "Shortcuts_Append_Saved": MessageLookupByLibrary.simpleMessage("文字已加入筆記。"),
-    "Shortcuts_Inbox_Title": MessageLookupByLibrary.simpleMessage("收件匣"),
-    "Shortcuts_Requests": MessageLookupByLibrary.simpleMessage("待處理的捷徑文字"),
-    "Shortcuts_Review": MessageLookupByLibrary.simpleMessage("檢視"),
-    "Shortcuts_Request_Hint": MessageLookupByLibrary.simpleMessage("此文字仍已保留。你可以複製至其他位置、重試儲存，或捨棄待處理的要求。"),
-    "Shortcuts_Request_Discard": MessageLookupByLibrary.simpleMessage("捨棄待處理的文字"),
-    "Shortcuts_Request_Discard_Failed": MessageLookupByLibrary.simpleMessage("無法捨棄此要求，請重試。"),
-    "Shortcuts_Request_Empty": MessageLookupByLibrary.simpleMessage("沒有待處理的捷徑文字。"),
-    "Today_Task_Search": MessageLookupByLibrary.simpleMessage("搜尋未完成事項"),
-    "Today_Task_No_Matches": MessageLookupByLibrary.simpleMessage("沒有相符的未完成事項。"),
-    "Today_Task_Undo_Failed": MessageLookupByLibrary.simpleMessage("無法還原事項完成狀態，請重試。"),
-    "Today_Task_Undo_Unavailable": MessageLookupByLibrary.simpleMessage("此事項已變更，無法還原完成狀態。"),
-    "Today_Task_Undone": MessageLookupByLibrary.simpleMessage("事項已標記為未完成。"),
-    "Markdown_Import": MessageLookupByLibrary.simpleMessage("匯入 Markdown"),
-    "Markdown_Import_Description": MessageLookupByLibrary.simpleMessage("匯入 .md 檔案或包含本機圖片的 ZIP，先預覽再儲存。"),
-    "Markdown_Import_Choose": MessageLookupByLibrary.simpleMessage("選擇檔案"),
-    "Markdown_Import_Review": MessageLookupByLibrary.simpleMessage("預覽匯入"),
-    "Markdown_Import_Import": MessageLookupByLibrary.simpleMessage("匯入筆記"),
-    "Markdown_Import_Empty": MessageLookupByLibrary.simpleMessage("沒有可匯入的筆記。"),
-    "Markdown_Import_Failed": MessageLookupByLibrary.simpleMessage("無法讀取這些檔案，請選擇 Markdown 檔案或 ZIP 後重試。"),
-    "Markdown_Import_Save_Failed": MessageLookupByLibrary.simpleMessage("部分筆記匯入失敗。已匯入的筆記已儲存，請重試其餘筆記。"),
-    "Markdown_Import_Done": MessageLookupByLibrary.simpleMessage("筆記已匯入。"),
-    "Markdown_Import_Unsupported": MessageLookupByLibrary.simpleMessage("部分格式會保留為純文字。"),
-    "Markdown_Import_Missing_Images": MessageLookupByLibrary.simpleMessage("部分圖片無法使用，原始參照會保留在筆記中。"),
-    "Markdown_Import_Limit": MessageLookupByLibrary.simpleMessage("此次匯入將超出免費筆記數量限制，請升級或減少所選筆記。"),
-    "Markdown_Import_Skipped": MessageLookupByLibrary.simpleMessage("已略過空檔案。"),
-    "Markdown_Import_Select_All": MessageLookupByLibrary.simpleMessage("全選"),
-    "Markdown_Import_Deselect_All": MessageLookupByLibrary.simpleMessage("取消全選"),
-    "Siri_Shortcuts_Title": MessageLookupByLibrary.simpleMessage("Siri 與捷徑"),
-    "Siri_Shortcuts_Description": MessageLookupByLibrary.simpleMessage("透過 Siri 或捷徑向筆記加入文字。"),
-    "Siri_Shortcuts_Setup": MessageLookupByLibrary.simpleMessage("在捷徑中建立捷徑並搜尋 Onlynote 動作，選擇動作並提供要加入的文字。"),
-    "Siri_Shortcuts_Requirements": MessageLookupByLibrary.simpleMessage("需要 iOS 16 或更新版本，或 macOS 13 或更新版本。"),
-    "Siri_Shortcuts_Save": MessageLookupByLibrary.simpleMessage("動作會開啟 Onlynote 完成儲存，請保持應用程式開啟，直到文字儲存完成。"),
-    "Siri_Shortcuts_Today": MessageLookupByLibrary.simpleMessage("加入今日筆記"),
-    "Siri_Shortcuts_Today_Description": MessageLookupByLibrary.simpleMessage("向今天的每日筆記加入文字，需要時會建立筆記。"),
-    "Siri_Shortcuts_Note": MessageLookupByLibrary.simpleMessage("加入筆記"),
-    "Siri_Shortcuts_Note_Description": MessageLookupByLibrary.simpleMessage("選擇已儲存的筆記，再提供要加入的文字。重新命名筆記不會影響連結。"),
-    "Siri_Shortcuts_Inbox": MessageLookupByLibrary.simpleMessage("將文字儲存至收件匣"),
-    "Siri_Shortcuts_Inbox_Description": MessageLookupByLibrary.simpleMessage("在捷徑中先加入「取得剪貼板」，將結果作為此動作的文字，Onlynote 會儲存至收件匣筆記。"),
-    "Siri_Shortcuts_Open": MessageLookupByLibrary.simpleMessage("開啟捷徑"),
-    "Siri_Shortcuts_Open_Failed": MessageLookupByLibrary.simpleMessage("無法開啟捷徑，請手動開啟並搜尋 Onlynote 動作。"),
-    "Today_Task_Search_Count": mTodayTaskSearchCount,
-        "Today_Title": MessageLookupByLibrary.simpleMessage("今天"),
-        "Today_Description":
-            MessageLookupByLibrary.simpleMessage("在同一處查看今天的筆記、提醒和未完成事項。"),
-        "Today_Create_Note": MessageLookupByLibrary.simpleMessage("開始今天的筆記"),
-        "Today_Open_Note": MessageLookupByLibrary.simpleMessage("開啟筆記"),
-        "Today_Daily_Empty":
-            MessageLookupByLibrary.simpleMessage("記錄靈感，或為今天訂個計劃。"),
-        "Today_Reminders": MessageLookupByLibrary.simpleMessage("到期提醒"),
-        "Today_No_Reminders": MessageLookupByLibrary.simpleMessage("今天沒有到期提醒。"),
-        "Today_All_Reminders": MessageLookupByLibrary.simpleMessage("所有提醒"),
-        "Today_Tasks": MessageLookupByLibrary.simpleMessage("未完成事項"),
-        "Today_Tasks_Hint": MessageLookupByLibrary.simpleMessage("來自使用中的筆記"),
-        "Today_No_Tasks": MessageLookupByLibrary.simpleMessage("沒有未完成事項。"),
-        "Today_Load_Failed":
-            MessageLookupByLibrary.simpleMessage("無法重新整理今天檢視，請重試。"),
-        "Today_Task_Save_Failed":
-            MessageLookupByLibrary.simpleMessage("無法完成此事項，請重試。"),
-        "Today_Task_Changed":
-            MessageLookupByLibrary.simpleMessage("此事項已變更，請查看最新內容後重試。"),
-        "Editor_Divider": MessageLookupByLibrary.simpleMessage("分隔線"),
-        "Section_Links": MessageLookupByLibrary.simpleMessage("標題連結"),
-        "Section_Link_Add": MessageLookupByLibrary.simpleMessage("連結至標題"),
-        "Section_Link_Choose": MessageLookupByLibrary.simpleMessage("選擇標題"),
-        "Section_Link_Search": MessageLookupByLibrary.simpleMessage("搜尋筆記及標題"),
-        "Section_Link_Empty":
-            MessageLookupByLibrary.simpleMessage("將段落設為標題，即可在此連結至該段落。"),
-        "Section_Link_No_Results":
-            MessageLookupByLibrary.simpleMessage("沒有相符的標題。"),
-        "Section_Link_This_Note": MessageLookupByLibrary.simpleMessage("目前筆記"),
-        "Section_Link_Unavailable":
-            MessageLookupByLibrary.simpleMessage("標題無法使用，可能已被刪除。"),
-        "Section_Link_Remove": MessageLookupByLibrary.simpleMessage("移除標題連結"),
-        "Section_Link_Failed":
-            MessageLookupByLibrary.simpleMessage("無法儲存標題連結，請重試。"),
-        "Section_Link_Limit":
-            MessageLookupByLibrary.simpleMessage("每篇筆記最多可加入100個標題連結。"),
-
     "Add_Image": MessageLookupByLibrary.simpleMessage("加入照片"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("新增備忘錄"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("添加日程提醒"),
     "Add_Selection_To_Checklist": MessageLookupByLibrary.simpleMessage("加入清單"),
+    "Add_Tags": MessageLookupByLibrary.simpleMessage("加入標籤"),
     "Add_todo": MessageLookupByLibrary.simpleMessage("新增項目"),
     "Ads_Removed": MessageLookupByLibrary.simpleMessage("廣告已移除"),
     "Ads_Removed_Description": MessageLookupByLibrary.simpleMessage(
@@ -446,6 +388,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Duplicate": MessageLookupByLibrary.simpleMessage("複製"),
     "Edit": MessageLookupByLibrary.simpleMessage("編輯"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("編輯標籤"),
+    "Editor_Divider": MessageLookupByLibrary.simpleMessage("分隔線"),
     "Editor_Insert": MessageLookupByLibrary.simpleMessage("插入"),
     "Editor_Tip_Formatting": MessageLookupByLibrary.simpleMessage(
       "使用下方按鈕為選取的文字設定格式。",
@@ -623,6 +566,39 @@ class MessageLookup extends MessageLookupByLibrary {
     "Linked_From": MessageLookupByLibrary.simpleMessage("引用此筆記"),
     "Linked_Notes": MessageLookupByLibrary.simpleMessage("連結筆記"),
     "Manage_Folders": MessageLookupByLibrary.simpleMessage("管理資料夾"),
+    "Manage_Tags": MessageLookupByLibrary.simpleMessage("管理標籤"),
+    "Manage_Tags_Hint": MessageLookupByLibrary.simpleMessage(
+      "重新命名或移除標籤會更新所有使用該標籤的筆記，包括已封存的筆記和垃圾桶中的筆記，以及已儲存的檢視和範本。",
+    ),
+    "Markdown_Import": MessageLookupByLibrary.simpleMessage("匯入 Markdown"),
+    "Markdown_Import_Choose": MessageLookupByLibrary.simpleMessage("選擇檔案"),
+    "Markdown_Import_Description": MessageLookupByLibrary.simpleMessage(
+      "匯入 .md 檔案或包含本機圖片的 ZIP，先預覽再儲存。",
+    ),
+    "Markdown_Import_Deselect_All": MessageLookupByLibrary.simpleMessage(
+      "取消全選",
+    ),
+    "Markdown_Import_Done": MessageLookupByLibrary.simpleMessage("筆記已匯入。"),
+    "Markdown_Import_Empty": MessageLookupByLibrary.simpleMessage("沒有可匯入的筆記。"),
+    "Markdown_Import_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法讀取這些檔案，請選擇 Markdown 檔案或 ZIP 後重試。",
+    ),
+    "Markdown_Import_Import": MessageLookupByLibrary.simpleMessage("匯入筆記"),
+    "Markdown_Import_Limit": MessageLookupByLibrary.simpleMessage(
+      "此次匯入將超出免費筆記數量限制，請升級或減少所選筆記。",
+    ),
+    "Markdown_Import_Missing_Images": MessageLookupByLibrary.simpleMessage(
+      "部分圖片無法使用，原始參照會保留在筆記中。",
+    ),
+    "Markdown_Import_Review": MessageLookupByLibrary.simpleMessage("預覽匯入"),
+    "Markdown_Import_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "部分筆記匯入失敗。已匯入的筆記已儲存，請重試其餘筆記。",
+    ),
+    "Markdown_Import_Select_All": MessageLookupByLibrary.simpleMessage("全選"),
+    "Markdown_Import_Skipped": MessageLookupByLibrary.simpleMessage("已略過空檔案。"),
+    "Markdown_Import_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "部分格式會保留為純文字。",
+    ),
     "Medium": MessageLookupByLibrary.simpleMessage("中"),
     "Metronome_Go": MessageLookupByLibrary.simpleMessage("打拍節拍器"),
     "Minesweeper_Go": MessageLookupByLibrary.simpleMessage("經典掃雷"),
@@ -639,6 +615,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "No_Folders": MessageLookupByLibrary.simpleMessage("暫無資料夾。建立資料夾來整理備忘錄。"),
     "No_Notes_In_Folder": MessageLookupByLibrary.simpleMessage("此資料夾還沒有備忘錄。"),
     "No_Search_Results": MessageLookupByLibrary.simpleMessage("沒有符合的備忘錄。"),
+    "No_Tags": MessageLookupByLibrary.simpleMessage("還沒有標籤。為筆記加入標籤即可歸類相關筆記。"),
     "No_notes_found": MessageLookupByLibrary.simpleMessage("從這裡記錄靈感"),
     "Note_Added_Successfully": MessageLookupByLibrary.simpleMessage("已成功添加備忘錄"),
     "Note_Archived": MessageLookupByLibrary.simpleMessage("筆記已封存"),
@@ -712,9 +689,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "Notes_Deleted_Successfully": MessageLookupByLibrary.simpleMessage(
       "已成功刪除備忘錄",
     ),
+    "Notes_Moved_Count": m24,
     "Notes_Moved_To_Trash": MessageLookupByLibrary.simpleMessage("已移至回收站"),
     "Notes_Permanently_Deleted": MessageLookupByLibrary.simpleMessage("已永久刪除"),
+    "Notes_Pinned_Count": m25,
     "Notes_Restored": MessageLookupByLibrary.simpleMessage("已還原備忘錄"),
+    "Notes_Unpinned_Count": m26,
     "Novels_Hub": MessageLookupByLibrary.simpleMessage("英文小說站"),
     "OK": MessageLookupByLibrary.simpleMessage("好的"),
     "Onboarding_Body_1": MessageLookupByLibrary.simpleMessage(
@@ -743,7 +723,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Onboarding_Title_4": MessageLookupByLibrary.simpleMessage("備忘錄放上主畫面"),
     "Onboarding_Write_Note": MessageLookupByLibrary.simpleMessage("寫備忘錄"),
     "Onlynote": MessageLookupByLibrary.simpleMessage("極簡備忘錄"),
-    "Open_Folder_In_Library": m24,
+    "Open_Folder_In_Library": m27,
     "Open_Linked_Note": MessageLookupByLibrary.simpleMessage("開啟連結筆記"),
     "Permanent_Delete_Confirm_Message": MessageLookupByLibrary.simpleMessage(
       "這些備忘錄及其照片、提醒將被永久刪除，且無法復原。",
@@ -785,7 +765,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "未找到文字。請嘗試文字更大、更清晰的照片。",
     ),
-    "Photo_Text_Photo": m25,
+    "Photo_Text_Photo": m28,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage("照片中的文字"),
     "Photo_Text_Review_Hint": MessageLookupByLibrary.simpleMessage(
       "加入備忘錄前，請檢查並編輯文字。",
@@ -821,7 +801,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
       "升級至進階版即可解鎖此功能。",
     ),
-    "Premium_Folder_Limit": m26,
+    "Premium_Folder_Limit": m29,
     "Premium_Folders": MessageLookupByLibrary.simpleMessage("無限資料夾"),
     "Premium_Free_Core": MessageLookupByLibrary.simpleMessage(
       "免費建立最多 10 則筆記，使用清單和基本提醒。",
@@ -830,7 +810,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "免費版包含 3 個資料夾和 3 個自訂範本。",
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("無廣告"),
-    "Premium_Note_Limit": m27,
+    "Premium_Note_Limit": m30,
     "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage("進階筆記主題"),
     "Premium_Note_Themes_Description": MessageLookupByLibrary.simpleMessage(
       "解鎖點陣手帳、牛皮紙筆記簿和羊皮紙。",
@@ -839,7 +819,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "一次性購買，無需訂閱。",
     ),
-    "Premium_One_Time_Price": m28,
+    "Premium_One_Time_Price": m31,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage("重複提醒"),
     "Premium_Repeating_Reminders_Description":
         MessageLookupByLibrary.simpleMessage("用每日和每週提醒，輕鬆維持日常安排。"),
@@ -856,7 +836,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "一點小靈感",
     ),
     "Premium_Showcase_Title": MessageLookupByLibrary.simpleMessage("為靈感留一點空間"),
-    "Premium_Template_Limit": m29,
+    "Premium_Template_Limit": m32,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage("無限自訂範本"),
     "Premium_Voice_Memos": MessageLookupByLibrary.simpleMessage("語音備忘錄"),
     "Premium_Voice_Memos_Description": MessageLookupByLibrary.simpleMessage(
@@ -886,7 +866,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "請選擇將來的時間來設定提醒。",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("1 小時後"),
-    "Reminder_Next_Time": m30,
+    "Reminder_Next_Time": m33,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("一星期後"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("重複"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("每天"),
@@ -899,7 +879,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "10 分鐘後提醒",
     ),
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage("1 小時後提醒"),
-    "Reminder_Suggestion": m31,
+    "Reminder_Suggestion": m34,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "使用建議時間",
     ),
@@ -921,7 +901,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Overdue": MessageLookupByLibrary.simpleMessage("已過期"),
     "Reminders_Reschedule": MessageLookupByLibrary.simpleMessage("重新安排"),
     "Reminders_Search": MessageLookupByLibrary.simpleMessage("搜尋提醒"),
-    "Reminders_Search_Count": m32,
+    "Reminders_Search_Count": m35,
     "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
       "請嘗試其他搜尋詞，或清除搜尋以查看所有提醒。",
     ),
@@ -937,9 +917,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("今天"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("即將到來"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("移除廣告"),
-    "Remove_Ads_Price": m33,
-    "Remove_Library_Criterion": m34,
+    "Remove_Ads_Price": m36,
+    "Remove_Library_Criterion": m37,
+    "Remove_Tag": MessageLookupByLibrary.simpleMessage("移除標籤"),
+    "Remove_Tag_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+      "此標籤將從所有使用它的筆記中移除，包括已封存的筆記和垃圾桶中的筆記，以及已儲存的檢視和範本。筆記內容不會被刪除。",
+    ),
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("重新命名資料夾"),
+    "Rename_Tag": MessageLookupByLibrary.simpleMessage("重新命名標籤"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("重新命名範本"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("重新命名檢視"),
     "Reorder": MessageLookupByLibrary.simpleMessage("排序"),
@@ -963,10 +948,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Delete_Confirm": MessageLookupByLibrary.simpleMessage("刪除此檢視？"),
     "Saved_View_Empty": MessageLookupByLibrary.simpleMessage("儲存搜尋或篩選，下次快速開啟。"),
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage("無法儲存此檢視，請再試一次。"),
-    "Saved_View_Limit_Reached": m35,
+    "Saved_View_Limit_Reached": m38,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("檢視名稱"),
-    "Saved_View_Search": m36,
-    "Saved_View_Tags": m37,
+    "Saved_View_Search": m39,
+    "Saved_View_Tags": m40,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("已儲存的檢視"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "沒有符合搜尋條件的已儲存檢視。",
@@ -975,17 +960,39 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("正在搜尋"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("搜尋資料夾"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("搜尋備忘錄"),
-    "Search_Results_Count": m38,
+    "Search_Results_Count": m41,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage("搜尋已儲存的檢視"),
     "Search_Tags": MessageLookupByLibrary.simpleMessage("搜尋標籤"),
     "Search_Templates": MessageLookupByLibrary.simpleMessage("搜尋範本"),
+    "Section_Link_Add": MessageLookupByLibrary.simpleMessage("連結至標題"),
+    "Section_Link_Choose": MessageLookupByLibrary.simpleMessage("選擇標題"),
+    "Section_Link_Empty": MessageLookupByLibrary.simpleMessage(
+      "將段落設為標題，即可在此連結至該段落。",
+    ),
+    "Section_Link_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法儲存標題連結，請重試。",
+    ),
+    "Section_Link_Limit": MessageLookupByLibrary.simpleMessage(
+      "每篇筆記最多可加入100個標題連結。",
+    ),
+    "Section_Link_No_Results": MessageLookupByLibrary.simpleMessage("沒有相符的標題。"),
+    "Section_Link_Remove": MessageLookupByLibrary.simpleMessage("移除標題連結"),
+    "Section_Link_Search": MessageLookupByLibrary.simpleMessage("搜尋筆記及標題"),
+    "Section_Link_This_Note": MessageLookupByLibrary.simpleMessage("目前筆記"),
+    "Section_Link_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "標題無法使用，可能已被刪除。",
+    ),
+    "Section_Links": MessageLookupByLibrary.simpleMessage("標題連結"),
     "Select": MessageLookupByLibrary.simpleMessage("選擇"),
-    "Selection_Checklist_Added": m39,
+    "Selection_Checklist_Added": m42,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "無法儲存清單項目。",
     ),
     "Selection_Checklist_Too_Long": MessageLookupByLibrary.simpleMessage(
       "有一行過長，無法作為清單項目。請選擇較短的行。",
+    ),
+    "Selection_Update_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法更新所有已選筆記，請重試。",
     ),
     "Settings": MessageLookupByLibrary.simpleMessage("設置"),
     "Settings_Save_Failed": MessageLookupByLibrary.simpleMessage("無法儲存設定，請重試。"),
@@ -1029,8 +1036,62 @@ class MessageLookup extends MessageLookupByLibrary {
     "Share_Text_Description": MessageLookupByLibrary.simpleMessage(
       "標題、全文、清單和提醒，不包含相片。",
     ),
+    "Shortcuts_Append_Conflict": MessageLookupByLibrary.simpleMessage(
+      "加入文字中斷期間筆記已變更，請檢視保留的要求。",
+    ),
+    "Shortcuts_Append_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法加入此文字，內容已保留以便重試。",
+    ),
+    "Shortcuts_Append_Saved": MessageLookupByLibrary.simpleMessage("文字已加入筆記。"),
+    "Shortcuts_Append_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "目標筆記無法使用，請還原筆記，或在捷徑中選擇其他筆記。",
+    ),
+    "Shortcuts_Inbox_Title": MessageLookupByLibrary.simpleMessage("收件匣"),
+    "Shortcuts_Request_Discard": MessageLookupByLibrary.simpleMessage(
+      "捨棄待處理的文字",
+    ),
+    "Shortcuts_Request_Discard_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法捨棄此要求，請重試。",
+    ),
+    "Shortcuts_Request_Empty": MessageLookupByLibrary.simpleMessage(
+      "沒有待處理的捷徑文字。",
+    ),
+    "Shortcuts_Request_Hint": MessageLookupByLibrary.simpleMessage(
+      "此文字仍已保留。你可以複製至其他位置、重試儲存，或捨棄待處理的要求。",
+    ),
+    "Shortcuts_Requests": MessageLookupByLibrary.simpleMessage("待處理的捷徑文字"),
+    "Shortcuts_Review": MessageLookupByLibrary.simpleMessage("檢視"),
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage("極簡計算器"),
+    "Siri_Shortcuts_Description": MessageLookupByLibrary.simpleMessage(
+      "透過 Siri 或捷徑向筆記加入文字。",
+    ),
+    "Siri_Shortcuts_Inbox": MessageLookupByLibrary.simpleMessage("將文字儲存至收件匣"),
+    "Siri_Shortcuts_Inbox_Description": MessageLookupByLibrary.simpleMessage(
+      "在捷徑中先加入「取得剪貼板」，將結果作為此動作的文字，Onlynote 會儲存至收件匣筆記。",
+    ),
+    "Siri_Shortcuts_Note": MessageLookupByLibrary.simpleMessage("加入筆記"),
+    "Siri_Shortcuts_Note_Description": MessageLookupByLibrary.simpleMessage(
+      "選擇已儲存的筆記，再提供要加入的文字。重新命名筆記不會影響連結。",
+    ),
+    "Siri_Shortcuts_Open": MessageLookupByLibrary.simpleMessage("開啟捷徑"),
+    "Siri_Shortcuts_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法開啟捷徑，請手動開啟並搜尋 Onlynote 動作。",
+    ),
+    "Siri_Shortcuts_Requirements": MessageLookupByLibrary.simpleMessage(
+      "需要 iOS 16 或更新版本，或 macOS 13 或更新版本。",
+    ),
+    "Siri_Shortcuts_Save": MessageLookupByLibrary.simpleMessage(
+      "動作會開啟 Onlynote 完成儲存，請保持應用程式開啟，直到文字儲存完成。",
+    ),
+    "Siri_Shortcuts_Setup": MessageLookupByLibrary.simpleMessage(
+      "在捷徑中建立捷徑並搜尋 Onlynote 動作，選擇動作並提供要加入的文字。",
+    ),
+    "Siri_Shortcuts_Title": MessageLookupByLibrary.simpleMessage("Siri 與捷徑"),
+    "Siri_Shortcuts_Today": MessageLookupByLibrary.simpleMessage("加入今日筆記"),
+    "Siri_Shortcuts_Today_Description": MessageLookupByLibrary.simpleMessage(
+      "向今天的每日筆記加入文字，需要時會建立筆記。",
+    ),
     "Small": MessageLookupByLibrary.simpleMessage("小"),
     "Sort_By": MessageLookupByLibrary.simpleMessage("排序方式"),
     "Sort_Manual": MessageLookupByLibrary.simpleMessage("手動排序"),
@@ -1041,14 +1102,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "Sort_Title_Desc": MessageLookupByLibrary.simpleMessage("標題 Z–A"),
     "Starter_Templates": MessageLookupByLibrary.simpleMessage("入門範本"),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("數獨迷"),
+    "Tag_Change_Failed": MessageLookupByLibrary.simpleMessage("無法更新此標籤，請重試。"),
+    "Tag_Change_Incomplete": MessageLookupByLibrary.simpleMessage(
+      "部分筆記或已儲存的檢視仍保留原標籤，請重試。",
+    ),
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("新增標籤"),
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "最多新增20個標籤，每個標籤不超過40個字元。",
     ),
+    "Tag_Merge_Confirm_Action": MessageLookupByLibrary.simpleMessage("合併"),
+    "Tag_Merge_Confirm_Message": m43,
+    "Tag_Merge_Confirm_Title": MessageLookupByLibrary.simpleMessage("合併標籤"),
+    "Tag_Name": MessageLookupByLibrary.simpleMessage("標籤名稱"),
+    "Tag_Name_Invalid": MessageLookupByLibrary.simpleMessage(
+      "請輸入不超過 40 個字元的標籤名稱。",
+    ),
+    "Tag_Removed_Count": m44,
+    "Tag_Renamed_Count": m45,
     "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
       "沒有符合條件的標籤建議。你可以新增標籤。",
     ),
-    "Tag_Usage_Count": m40,
+    "Tag_Usage_Count": m46,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
       "數量包括所有資料夾中未封存和已封存的筆記，不受搜尋和篩選條件影響。",
     ),
@@ -1056,10 +1130,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "數量包括回收站中所有資料夾的筆記，不受搜尋和篩選條件影響。",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("標籤"),
-    "Tags_Hidden_By_Search_Count": m41,
+    "Tags_Add_Skipped_Count": m47,
+    "Tags_Added_Count": m48,
+    "Tags_Hidden_By_Search_Count": m49,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage("沒有符合搜尋條件的標籤"),
-    "Tags_Selected_Count": m42,
-    "Tags_Selection_Limit_Reached": m43,
+    "Tags_Selected_Count": m50,
+    "Tags_Selection_Limit_Reached": m51,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("拍照"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "無法更新範本，請重試。",
@@ -1084,7 +1160,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "刪除範本？",
     ),
-    "Template_Details": m44,
+    "Template_Details": m52,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage("無法載入範本，請重試。"),
     "Template_Manage": MessageLookupByLibrary.simpleMessage("管理範本"),
     "Template_Meeting_Body": MessageLookupByLibrary.simpleMessage(
@@ -1133,10 +1209,44 @@ class MessageLookup extends MessageLookupByLibrary {
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "想要設置日程安排提醒，請前往設置打開通知",
     ),
+    "Today_All_Reminders": MessageLookupByLibrary.simpleMessage("所有提醒"),
+    "Today_Create_Note": MessageLookupByLibrary.simpleMessage("開始今天的筆記"),
+    "Today_Daily_Empty": MessageLookupByLibrary.simpleMessage("記錄靈感，或為今天訂個計劃。"),
+    "Today_Description": MessageLookupByLibrary.simpleMessage(
+      "在同一處查看今天的筆記、提醒和未完成事項。",
+    ),
+    "Today_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法重新整理今天檢視，請重試。",
+    ),
+    "Today_No_Reminders": MessageLookupByLibrary.simpleMessage("今天沒有到期提醒。"),
+    "Today_No_Tasks": MessageLookupByLibrary.simpleMessage("沒有未完成事項。"),
     "Today_Note": MessageLookupByLibrary.simpleMessage("今日筆記"),
     "Today_Note_Open_Failed": MessageLookupByLibrary.simpleMessage(
       "無法開啟今日筆記，請再試一次。",
     ),
+    "Today_Open_Note": MessageLookupByLibrary.simpleMessage("開啟筆記"),
+    "Today_Reminders": MessageLookupByLibrary.simpleMessage("到期提醒"),
+    "Today_Task_Changed": MessageLookupByLibrary.simpleMessage(
+      "此事項已變更，請查看最新內容後重試。",
+    ),
+    "Today_Task_No_Matches": MessageLookupByLibrary.simpleMessage(
+      "沒有相符的未完成事項。",
+    ),
+    "Today_Task_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法完成此事項，請重試。",
+    ),
+    "Today_Task_Search": MessageLookupByLibrary.simpleMessage("搜尋未完成事項"),
+    "Today_Task_Search_Count": m53,
+    "Today_Task_Undo_Failed": MessageLookupByLibrary.simpleMessage(
+      "無法還原事項完成狀態，請重試。",
+    ),
+    "Today_Task_Undo_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "此事項已變更，無法還原完成狀態。",
+    ),
+    "Today_Task_Undone": MessageLookupByLibrary.simpleMessage("事項已標記為未完成。"),
+    "Today_Tasks": MessageLookupByLibrary.simpleMessage("未完成事項"),
+    "Today_Tasks_Hint": MessageLookupByLibrary.simpleMessage("來自使用中的筆記"),
+    "Today_Title": MessageLookupByLibrary.simpleMessage("今天"),
     "Todo": MessageLookupByLibrary.simpleMessage("清單項目"),
     "Todo_list": MessageLookupByLibrary.simpleMessage("清單"),
     "Trash": MessageLookupByLibrary.simpleMessage("回收站"),
@@ -1170,7 +1280,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Play_Failed": MessageLookupByLibrary.simpleMessage("無法播放此錄音。請重試。"),
     "Voice_Record": MessageLookupByLibrary.simpleMessage("錄音"),
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage("無法錄音，請重試。"),
-    "Voice_Recorded_At": m45,
+    "Voice_Recorded_At": m54,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "最多錄製 5 分鐘，可選擇轉成文字。",
     ),

@@ -5,10 +5,21 @@ const maxNoteTagLength = 40;
 
 final _tagWhitespace = RegExp(r'[\s\u0085]+', unicode: true);
 
-String _normalizeTag(String tag) => tag.trim().replaceAll(_tagWhitespace, ' ');
+/// The visible spelling stored for a tag. Compare two spellings with [tagKey].
+String normalizeTagName(String tag) =>
+    tag.trim().replaceAll(_tagWhitespace, ' ');
 
 /// The comparison key used by tag editing, search, and filtering.
-String tagKey(String tag) => _normalizeTag(tag).toLowerCase();
+String tagKey(String tag) => normalizeTagName(tag).toLowerCase();
+
+/// True when two stored tag lists hold the same spellings in the same order.
+bool sameNoteTags(List<String> a, List<String> b) {
+  if (a.length != b.length) return false;
+  for (var index = 0; index < a.length; index++) {
+    if (a[index] != b[index]) return false;
+  }
+  return true;
+}
 
 /// Normalizes visible tags without changing the first spelling of duplicates.
 ///
@@ -18,7 +29,7 @@ List<String> normalizeNoteTags(Iterable<String> tags) {
   final normalized = <String>[];
   final keys = <String>{};
   for (final tag in tags) {
-    final value = _normalizeTag(tag);
+    final value = normalizeTagName(tag);
     if (value.isEmpty) continue;
     if (value.characters.length > maxNoteTagLength) {
       throw const FormatException('Tags must contain at most 40 characters.');

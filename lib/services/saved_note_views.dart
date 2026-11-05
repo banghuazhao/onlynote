@@ -210,6 +210,37 @@ class SavedNoteViewStore extends ChangeNotifier {
         await _write(_views.where((view) => view.id != id).toList());
       });
 
+  /// Applies a library-wide tag rename or removal to every saved view.
+  ///
+  /// A view that loses its last tag keeps its other criteria instead of
+  /// filtering on a tag no note carries, matching how a view drops a folder
+  /// that is no longer available. Returns how many views changed.
+  Future<int> rewriteTags(List<String> Function(List<String> tags) rewrite) =>
+      _serial(() async {
+        await _load();
+        var changed = 0;
+        final updated = <SavedNoteView>[];
+        for (final view in _views) {
+          final tags = rewrite(view.tags);
+          if (sameNoteTags(view.tags, tags)) {
+            updated.add(view);
+            continue;
+          }
+          changed++;
+          updated.add(SavedNoteView(
+            id: view.id,
+            name: view.name,
+            query: view.query,
+            filters: view.filters,
+            tags: tags,
+            folderId: view.folderId,
+            archiveScope: view.archiveScope,
+          ));
+        }
+        if (changed > 0) await _write(updated);
+        return changed;
+      });
+
   /// Backup restore supplies fresh identities and remapped folder IDs.
   Future<void> importViews(List<SavedNoteView> views) {
     final copies = [

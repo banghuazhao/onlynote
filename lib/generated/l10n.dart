@@ -6227,280 +6227,916 @@ class S {
     );
   }
 
-  String get Today_Title =>
-      Intl.message("Today", name: "Today_Title", desc: "", args: []);
-
-  String get Today_Description =>
-      Intl.message("Your note, reminders, and unfinished tasks in one place.",
-          name: "Today_Description", desc: "", args: []);
-
-  String get Today_Create_Note => Intl.message("Start today’s note",
-      name: "Today_Create_Note", desc: "", args: []);
-
-  String get Today_Open_Note =>
-      Intl.message("Open note", name: "Today_Open_Note", desc: "", args: []);
-
-  String get Today_Daily_Empty =>
-      Intl.message("Capture a thought or make a plan for today.",
-          name: "Today_Daily_Empty", desc: "", args: []);
-
-  String get Today_Reminders => Intl.message("Due reminders",
-      name: "Today_Reminders", desc: "", args: []);
-
-  String get Today_No_Reminders => Intl.message("No reminders due today.",
-      name: "Today_No_Reminders", desc: "", args: []);
-
-  String get Today_All_Reminders => Intl.message("All reminders",
-      name: "Today_All_Reminders", desc: "", args: []);
-
-  String get Today_Tasks =>
-      Intl.message("Unfinished tasks", name: "Today_Tasks", desc: "", args: []);
-
-  String get Today_Tasks_Hint => Intl.message("Across your active notes",
-      name: "Today_Tasks_Hint", desc: "", args: []);
-
-  String get Today_No_Tasks => Intl.message("No unfinished tasks.",
-      name: "Today_No_Tasks", desc: "", args: []);
-
-  String get Today_Load_Failed =>
-      Intl.message("Could not refresh Today. Try again.",
-          name: "Today_Load_Failed", desc: "", args: []);
-
-  String get Today_Task_Save_Failed =>
-      Intl.message("Could not complete this task. Try again.",
-          name: "Today_Task_Save_Failed", desc: "", args: []);
-
-  String get Today_Task_Changed => Intl.message(
-      "This task changed. Review the latest version and try again.",
-      name: "Today_Task_Changed",
-      desc: "",
-      args: []);
-
-  String get Editor_Divider =>
-      Intl.message("Divider line", name: "Editor_Divider", desc: "", args: []);
-
-  String get Section_Links =>
-      Intl.message("Heading links", name: "Section_Links", desc: "", args: []);
-
-  String get Section_Link_Add => Intl.message("Link to heading",
-      name: "Section_Link_Add", desc: "", args: []);
-
-  String get Section_Link_Choose => Intl.message("Choose a heading",
-      name: "Section_Link_Choose", desc: "", args: []);
-
-  String get Section_Link_Search => Intl.message("Search notes and headings",
-      name: "Section_Link_Search", desc: "", args: []);
-
-  String get Section_Link_Empty =>
-      Intl.message("Format a paragraph as a heading to link to it here.",
-          name: "Section_Link_Empty", desc: "", args: []);
-
-  String get Section_Link_No_Results => Intl.message("No matching headings.",
-      name: "Section_Link_No_Results", desc: "", args: []);
-
-  String get Section_Link_This_Note => Intl.message("This note",
-      name: "Section_Link_This_Note", desc: "", args: []);
-
-  String get Section_Link_Unavailable =>
-      Intl.message("Heading unavailable. It may have been removed.",
-          name: "Section_Link_Unavailable", desc: "", args: []);
-
-  String get Section_Link_Remove => Intl.message("Remove heading link",
-      name: "Section_Link_Remove", desc: "", args: []);
-
-  String get Section_Link_Failed =>
-      Intl.message("Could not save this heading link. Try again.",
-          name: "Section_Link_Failed", desc: "", args: []);
-
-  String get Section_Link_Limit =>
-      Intl.message("You can add up to 100 heading links per note.",
-          name: "Section_Link_Limit", desc: "", args: []);
-  String get Today_Task_Search => Intl.message("Search unfinished tasks",
-      name: "Today_Task_Search", desc: "", args: []);
-
-  String get Today_Task_No_Matches =>
-      Intl.message("No matching unfinished tasks.",
-          name: "Today_Task_No_Matches", desc: "", args: []);
-
-  String get Today_Task_Undo_Failed =>
-      Intl.message("Could not undo task completion. Try again.",
-          name: "Today_Task_Undo_Failed", desc: "", args: []);
-
-  String get Today_Task_Undo_Unavailable =>
-      Intl.message("This task changed. Its completion could not be undone.",
-          name: "Today_Task_Undo_Unavailable", desc: "", args: []);
-
-  String get Today_Task_Undone => Intl.message("Task marked unfinished.",
-      name: "Today_Task_Undone", desc: "", args: []);
-
-  String get Markdown_Import => Intl.message("Import Markdown",
-      name: "Markdown_Import", desc: "", args: []);
-
-  String get Markdown_Import_Description => Intl.message(
-      "Bring in .md files or a ZIP with local images. Review notes before importing.",
-      name: "Markdown_Import_Description",
-      desc: "",
-      args: []);
-
-  String get Markdown_Import_Choose => Intl.message("Choose files",
-      name: "Markdown_Import_Choose", desc: "", args: []);
-
-  String get Markdown_Import_Review => Intl.message("Review import",
-      name: "Markdown_Import_Review", desc: "", args: []);
-
-  String get Markdown_Import_Import => Intl.message("Import notes",
-      name: "Markdown_Import_Import", desc: "", args: []);
-
-  String get Markdown_Import_Empty => Intl.message("No notes ready to import.",
-      name: "Markdown_Import_Empty", desc: "", args: []);
-
-  String get Markdown_Import_Failed => Intl.message(
-      "Could not read these files. Choose Markdown files or a ZIP and try again.",
-      name: "Markdown_Import_Failed",
-      desc: "",
-      args: []);
-
-  String get Markdown_Import_Save_Failed => Intl.message(
-      "Some notes could not be imported. Your imported notes are saved; retry the remaining notes.",
-      name: "Markdown_Import_Save_Failed",
-      desc: "",
-      args: []);
-
-  String get Markdown_Import_Done => Intl.message("Notes imported.",
-      name: "Markdown_Import_Done", desc: "", args: []);
-
-  String get Markdown_Import_Unsupported =>
-      Intl.message("Some formatting is kept as plain text.",
-          name: "Markdown_Import_Unsupported", desc: "", args: []);
-
-  String get Markdown_Import_Missing_Images => Intl.message(
-      "Some images were unavailable. Their original references are kept in the note.",
-      name: "Markdown_Import_Missing_Images",
-      desc: "",
-      args: []);
-
-  String get Markdown_Import_Limit => Intl.message(
-      "This import would exceed your free note limit. Upgrade or select fewer notes.",
-      name: "Markdown_Import_Limit",
-      desc: "",
-      args: []);
-
-  String get Markdown_Import_Skipped =>
-      Intl.message("Empty files were skipped.",
-          name: "Markdown_Import_Skipped", desc: "", args: []);
-
-  String get Markdown_Import_Select_All => Intl.message("Select all",
-      name: "Markdown_Import_Select_All", desc: "", args: []);
-
-  String get Markdown_Import_Deselect_All => Intl.message("Deselect all",
-      name: "Markdown_Import_Deselect_All", desc: "", args: []);
-
-  String get Siri_Shortcuts_Title => Intl.message("Siri & Shortcuts",
-      name: "Siri_Shortcuts_Title", desc: "", args: []);
-
-  String get Siri_Shortcuts_Description =>
-      Intl.message("Add text to your notes with Siri or the Shortcuts app.",
-          name: "Siri_Shortcuts_Description", desc: "", args: []);
-
-  String get Siri_Shortcuts_Setup => Intl.message(
-      "In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append.",
-      name: "Siri_Shortcuts_Setup",
-      desc: "",
-      args: []);
-
-  String get Siri_Shortcuts_Requirements =>
-      Intl.message("Requires iOS 16 or later, or macOS 13 or later.",
-          name: "Siri_Shortcuts_Requirements", desc: "", args: []);
-
-  String get Siri_Shortcuts_Save => Intl.message(
-      "Actions open Onlynote to finish saving. Keep the app open until the text is saved.",
-      name: "Siri_Shortcuts_Save",
-      desc: "",
-      args: []);
-
-  String get Siri_Shortcuts_Today => Intl.message("Append to Today’s Note",
-      name: "Siri_Shortcuts_Today", desc: "", args: []);
-
-  String get Siri_Shortcuts_Today_Description => Intl.message(
-      "Add text to today’s daily note. A daily note is created if needed.",
-      name: "Siri_Shortcuts_Today_Description",
-      desc: "",
-      args: []);
-
-  String get Siri_Shortcuts_Note => Intl.message("Append to Note",
-      name: "Siri_Shortcuts_Note", desc: "", args: []);
-
-  String get Siri_Shortcuts_Note_Description => Intl.message(
-      "Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected.",
-      name: "Siri_Shortcuts_Note_Description",
-      desc: "",
-      args: []);
-
-  String get Siri_Shortcuts_Inbox => Intl.message("Save Text to Inbox",
-      name: "Siri_Shortcuts_Inbox", desc: "", args: []);
-
-  String get Siri_Shortcuts_Inbox_Description => Intl.message(
-      "Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note.",
-      name: "Siri_Shortcuts_Inbox_Description",
-      desc: "",
-      args: []);
-
-  String get Siri_Shortcuts_Open => Intl.message("Open Shortcuts",
-      name: "Siri_Shortcuts_Open", desc: "", args: []);
-
-  String get Siri_Shortcuts_Open_Failed => Intl.message(
-      "Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions.",
-      name: "Siri_Shortcuts_Open_Failed",
-      desc: "",
-      args: []);
-
-  String Today_Task_Search_Count(int matching, int total) =>
-      Intl.message("$matching of $total unfinished tasks",
-          name: "Today_Task_Search_Count", desc: "", args: [matching, total]);
-  String get Shortcuts_Append_Failed =>
-      Intl.message("Could not append this text. It is saved for retry.",
-          name: "Shortcuts_Append_Failed", desc: "", args: []);
-
-  String get Shortcuts_Append_Unavailable => Intl.message(
-      "The destination note is unavailable. Restore it or choose another note in Shortcuts.",
-      name: "Shortcuts_Append_Unavailable",
-      desc: "",
-      args: []);
-
-  String get Shortcuts_Append_Conflict => Intl.message(
-      "This note changed while an append was interrupted. The saved request needs review.",
-      name: "Shortcuts_Append_Conflict",
-      desc: "",
-      args: []);
-
-  String get Shortcuts_Append_Saved => Intl.message("Text added to note.",
-      name: "Shortcuts_Append_Saved", desc: "", args: []);
-
-  String get Shortcuts_Inbox_Title =>
-      Intl.message("Inbox", name: "Shortcuts_Inbox_Title", desc: "", args: []);
-
-  String get Shortcuts_Requests => Intl.message("Pending shortcut text",
-      name: "Shortcuts_Requests", desc: "", args: []);
-
-  String get Shortcuts_Review =>
-      Intl.message("Review", name: "Shortcuts_Review", desc: "", args: []);
-
-  String get Shortcuts_Request_Hint => Intl.message(
-      "This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request.",
-      name: "Shortcuts_Request_Hint",
-      desc: "",
-      args: []);
-
-  String get Shortcuts_Request_Discard => Intl.message("Discard pending text",
-      name: "Shortcuts_Request_Discard", desc: "", args: []);
-
-  String get Shortcuts_Request_Discard_Failed =>
-      Intl.message("Could not discard this request. Try again.",
-          name: "Shortcuts_Request_Discard_Failed", desc: "", args: []);
-
-  String get Shortcuts_Request_Empty =>
-      Intl.message("No pending shortcut text.",
-          name: "Shortcuts_Request_Empty", desc: "", args: []);
+  /// `Today`
+  String get Today_Title {
+    return Intl.message('Today', name: 'Today_Title', desc: '', args: []);
+  }
+
+  /// `Your note, reminders, and unfinished tasks in one place.`
+  String get Today_Description {
+    return Intl.message(
+      'Your note, reminders, and unfinished tasks in one place.',
+      name: 'Today_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start today’s note`
+  String get Today_Create_Note {
+    return Intl.message(
+      'Start today’s note',
+      name: 'Today_Create_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open note`
+  String get Today_Open_Note {
+    return Intl.message(
+      'Open note',
+      name: 'Today_Open_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Capture a thought or make a plan for today.`
+  String get Today_Daily_Empty {
+    return Intl.message(
+      'Capture a thought or make a plan for today.',
+      name: 'Today_Daily_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Due reminders`
+  String get Today_Reminders {
+    return Intl.message(
+      'Due reminders',
+      name: 'Today_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No reminders due today.`
+  String get Today_No_Reminders {
+    return Intl.message(
+      'No reminders due today.',
+      name: 'Today_No_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All reminders`
+  String get Today_All_Reminders {
+    return Intl.message(
+      'All reminders',
+      name: 'Today_All_Reminders',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unfinished tasks`
+  String get Today_Tasks {
+    return Intl.message(
+      'Unfinished tasks',
+      name: 'Today_Tasks',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Across your active notes`
+  String get Today_Tasks_Hint {
+    return Intl.message(
+      'Across your active notes',
+      name: 'Today_Tasks_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No unfinished tasks.`
+  String get Today_No_Tasks {
+    return Intl.message(
+      'No unfinished tasks.',
+      name: 'Today_No_Tasks',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not refresh Today. Try again.`
+  String get Today_Load_Failed {
+    return Intl.message(
+      'Could not refresh Today. Try again.',
+      name: 'Today_Load_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not complete this task. Try again.`
+  String get Today_Task_Save_Failed {
+    return Intl.message(
+      'Could not complete this task. Try again.',
+      name: 'Today_Task_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This task changed. Review the latest version and try again.`
+  String get Today_Task_Changed {
+    return Intl.message(
+      'This task changed. Review the latest version and try again.',
+      name: 'Today_Task_Changed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Divider line`
+  String get Editor_Divider {
+    return Intl.message(
+      'Divider line',
+      name: 'Editor_Divider',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Heading links`
+  String get Section_Links {
+    return Intl.message(
+      'Heading links',
+      name: 'Section_Links',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Link to heading`
+  String get Section_Link_Add {
+    return Intl.message(
+      'Link to heading',
+      name: 'Section_Link_Add',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a heading`
+  String get Section_Link_Choose {
+    return Intl.message(
+      'Choose a heading',
+      name: 'Section_Link_Choose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search notes and headings`
+  String get Section_Link_Search {
+    return Intl.message(
+      'Search notes and headings',
+      name: 'Section_Link_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Format a paragraph as a heading to link to it here.`
+  String get Section_Link_Empty {
+    return Intl.message(
+      'Format a paragraph as a heading to link to it here.',
+      name: 'Section_Link_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching headings.`
+  String get Section_Link_No_Results {
+    return Intl.message(
+      'No matching headings.',
+      name: 'Section_Link_No_Results',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note`
+  String get Section_Link_This_Note {
+    return Intl.message(
+      'This note',
+      name: 'Section_Link_This_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Heading unavailable. It may have been removed.`
+  String get Section_Link_Unavailable {
+    return Intl.message(
+      'Heading unavailable. It may have been removed.',
+      name: 'Section_Link_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove heading link`
+  String get Section_Link_Remove {
+    return Intl.message(
+      'Remove heading link',
+      name: 'Section_Link_Remove',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not save this heading link. Try again.`
+  String get Section_Link_Failed {
+    return Intl.message(
+      'Could not save this heading link. Try again.',
+      name: 'Section_Link_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You can add up to 100 heading links per note.`
+  String get Section_Link_Limit {
+    return Intl.message(
+      'You can add up to 100 heading links per note.',
+      name: 'Section_Link_Limit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search unfinished tasks`
+  String get Today_Task_Search {
+    return Intl.message(
+      'Search unfinished tasks',
+      name: 'Today_Task_Search',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching unfinished tasks.`
+  String get Today_Task_No_Matches {
+    return Intl.message(
+      'No matching unfinished tasks.',
+      name: 'Today_Task_No_Matches',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not undo task completion. Try again.`
+  String get Today_Task_Undo_Failed {
+    return Intl.message(
+      'Could not undo task completion. Try again.',
+      name: 'Today_Task_Undo_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This task changed. Its completion could not be undone.`
+  String get Today_Task_Undo_Unavailable {
+    return Intl.message(
+      'This task changed. Its completion could not be undone.',
+      name: 'Today_Task_Undo_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Task marked unfinished.`
+  String get Today_Task_Undone {
+    return Intl.message(
+      'Task marked unfinished.',
+      name: 'Today_Task_Undone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import Markdown`
+  String get Markdown_Import {
+    return Intl.message(
+      'Import Markdown',
+      name: 'Markdown_Import',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bring in .md files or a ZIP with local images. Review notes before importing.`
+  String get Markdown_Import_Description {
+    return Intl.message(
+      'Bring in .md files or a ZIP with local images. Review notes before importing.',
+      name: 'Markdown_Import_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose files`
+  String get Markdown_Import_Choose {
+    return Intl.message(
+      'Choose files',
+      name: 'Markdown_Import_Choose',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review import`
+  String get Markdown_Import_Review {
+    return Intl.message(
+      'Review import',
+      name: 'Markdown_Import_Review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import notes`
+  String get Markdown_Import_Import {
+    return Intl.message(
+      'Import notes',
+      name: 'Markdown_Import_Import',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No notes ready to import.`
+  String get Markdown_Import_Empty {
+    return Intl.message(
+      'No notes ready to import.',
+      name: 'Markdown_Import_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not read these files. Choose Markdown files or a ZIP and try again.`
+  String get Markdown_Import_Failed {
+    return Intl.message(
+      'Could not read these files. Choose Markdown files or a ZIP and try again.',
+      name: 'Markdown_Import_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some notes could not be imported. Your imported notes are saved; retry the remaining notes.`
+  String get Markdown_Import_Save_Failed {
+    return Intl.message(
+      'Some notes could not be imported. Your imported notes are saved; retry the remaining notes.',
+      name: 'Markdown_Import_Save_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notes imported.`
+  String get Markdown_Import_Done {
+    return Intl.message(
+      'Notes imported.',
+      name: 'Markdown_Import_Done',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some formatting is kept as plain text.`
+  String get Markdown_Import_Unsupported {
+    return Intl.message(
+      'Some formatting is kept as plain text.',
+      name: 'Markdown_Import_Unsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some images were unavailable. Their original references are kept in the note.`
+  String get Markdown_Import_Missing_Images {
+    return Intl.message(
+      'Some images were unavailable. Their original references are kept in the note.',
+      name: 'Markdown_Import_Missing_Images',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This import would exceed your free note limit. Upgrade or select fewer notes.`
+  String get Markdown_Import_Limit {
+    return Intl.message(
+      'This import would exceed your free note limit. Upgrade or select fewer notes.',
+      name: 'Markdown_Import_Limit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Empty files were skipped.`
+  String get Markdown_Import_Skipped {
+    return Intl.message(
+      'Empty files were skipped.',
+      name: 'Markdown_Import_Skipped',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select all`
+  String get Markdown_Import_Select_All {
+    return Intl.message(
+      'Select all',
+      name: 'Markdown_Import_Select_All',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Deselect all`
+  String get Markdown_Import_Deselect_All {
+    return Intl.message(
+      'Deselect all',
+      name: 'Markdown_Import_Deselect_All',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Siri & Shortcuts`
+  String get Siri_Shortcuts_Title {
+    return Intl.message(
+      'Siri & Shortcuts',
+      name: 'Siri_Shortcuts_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add text to your notes with Siri or the Shortcuts app.`
+  String get Siri_Shortcuts_Description {
+    return Intl.message(
+      'Add text to your notes with Siri or the Shortcuts app.',
+      name: 'Siri_Shortcuts_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append.`
+  String get Siri_Shortcuts_Setup {
+    return Intl.message(
+      'In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append.',
+      name: 'Siri_Shortcuts_Setup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Requires iOS 16 or later, or macOS 13 or later.`
+  String get Siri_Shortcuts_Requirements {
+    return Intl.message(
+      'Requires iOS 16 or later, or macOS 13 or later.',
+      name: 'Siri_Shortcuts_Requirements',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Actions open Onlynote to finish saving. Keep the app open until the text is saved.`
+  String get Siri_Shortcuts_Save {
+    return Intl.message(
+      'Actions open Onlynote to finish saving. Keep the app open until the text is saved.',
+      name: 'Siri_Shortcuts_Save',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Append to Today’s Note`
+  String get Siri_Shortcuts_Today {
+    return Intl.message(
+      'Append to Today’s Note',
+      name: 'Siri_Shortcuts_Today',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add text to today’s daily note. A daily note is created if needed.`
+  String get Siri_Shortcuts_Today_Description {
+    return Intl.message(
+      'Add text to today’s daily note. A daily note is created if needed.',
+      name: 'Siri_Shortcuts_Today_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Append to Note`
+  String get Siri_Shortcuts_Note {
+    return Intl.message(
+      'Append to Note',
+      name: 'Siri_Shortcuts_Note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected.`
+  String get Siri_Shortcuts_Note_Description {
+    return Intl.message(
+      'Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected.',
+      name: 'Siri_Shortcuts_Note_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save Text to Inbox`
+  String get Siri_Shortcuts_Inbox {
+    return Intl.message(
+      'Save Text to Inbox',
+      name: 'Siri_Shortcuts_Inbox',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note.`
+  String get Siri_Shortcuts_Inbox_Description {
+    return Intl.message(
+      'Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note.',
+      name: 'Siri_Shortcuts_Inbox_Description',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open Shortcuts`
+  String get Siri_Shortcuts_Open {
+    return Intl.message(
+      'Open Shortcuts',
+      name: 'Siri_Shortcuts_Open',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions.`
+  String get Siri_Shortcuts_Open_Failed {
+    return Intl.message(
+      'Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions.',
+      name: 'Siri_Shortcuts_Open_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{matching} of {total} unfinished tasks`
+  String Today_Task_Search_Count(int matching, int total) {
+    return Intl.message(
+      '$matching of $total unfinished tasks',
+      name: 'Today_Task_Search_Count',
+      desc: '',
+      args: [matching, total],
+    );
+  }
+
+  /// `Could not append this text. It is saved for retry.`
+  String get Shortcuts_Append_Failed {
+    return Intl.message(
+      'Could not append this text. It is saved for retry.',
+      name: 'Shortcuts_Append_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The destination note is unavailable. Restore it or choose another note in Shortcuts.`
+  String get Shortcuts_Append_Unavailable {
+    return Intl.message(
+      'The destination note is unavailable. Restore it or choose another note in Shortcuts.',
+      name: 'Shortcuts_Append_Unavailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This note changed while an append was interrupted. The saved request needs review.`
+  String get Shortcuts_Append_Conflict {
+    return Intl.message(
+      'This note changed while an append was interrupted. The saved request needs review.',
+      name: 'Shortcuts_Append_Conflict',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Text added to note.`
+  String get Shortcuts_Append_Saved {
+    return Intl.message(
+      'Text added to note.',
+      name: 'Shortcuts_Append_Saved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Inbox`
+  String get Shortcuts_Inbox_Title {
+    return Intl.message(
+      'Inbox',
+      name: 'Shortcuts_Inbox_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pending shortcut text`
+  String get Shortcuts_Requests {
+    return Intl.message(
+      'Pending shortcut text',
+      name: 'Shortcuts_Requests',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review`
+  String get Shortcuts_Review {
+    return Intl.message('Review', name: 'Shortcuts_Review', desc: '', args: []);
+  }
+
+  /// `This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request.`
+  String get Shortcuts_Request_Hint {
+    return Intl.message(
+      'This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request.',
+      name: 'Shortcuts_Request_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Discard pending text`
+  String get Shortcuts_Request_Discard {
+    return Intl.message(
+      'Discard pending text',
+      name: 'Shortcuts_Request_Discard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not discard this request. Try again.`
+  String get Shortcuts_Request_Discard_Failed {
+    return Intl.message(
+      'Could not discard this request. Try again.',
+      name: 'Shortcuts_Request_Discard_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No pending shortcut text.`
+  String get Shortcuts_Request_Empty {
+    return Intl.message(
+      'No pending shortcut text.',
+      name: 'Shortcuts_Request_Empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage tags`
+  String get Manage_Tags {
+    return Intl.message('Manage tags', name: 'Manage_Tags', desc: '', args: []);
+  }
+
+  /// `Renaming or removing a tag updates every note that uses it, including archived notes and notes in Trash, plus saved views and templates.`
+  String get Manage_Tags_Hint {
+    return Intl.message(
+      'Renaming or removing a tag updates every note that uses it, including archived notes and notes in Trash, plus saved views and templates.',
+      name: 'Manage_Tags_Hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No tags yet. Add tags to a note to group related notes.`
+  String get No_Tags {
+    return Intl.message(
+      'No tags yet. Add tags to a note to group related notes.',
+      name: 'No_Tags',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rename tag`
+  String get Rename_Tag {
+    return Intl.message('Rename tag', name: 'Rename_Tag', desc: '', args: []);
+  }
+
+  /// `Remove tag`
+  String get Remove_Tag {
+    return Intl.message('Remove tag', name: 'Remove_Tag', desc: '', args: []);
+  }
+
+  /// `Tag name`
+  String get Tag_Name {
+    return Intl.message('Tag name', name: 'Tag_Name', desc: '', args: []);
+  }
+
+  /// `Enter a tag name of up to 40 characters.`
+  String get Tag_Name_Invalid {
+    return Intl.message(
+      'Enter a tag name of up to 40 characters.',
+      name: 'Tag_Name_Invalid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Merge tags`
+  String get Tag_Merge_Confirm_Title {
+    return Intl.message(
+      'Merge tags',
+      name: 'Tag_Merge_Confirm_Title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{name} already exists. Both tags become one on every note that uses either of them.`
+  String Tag_Merge_Confirm_Message(String name) {
+    return Intl.message(
+      '$name already exists. Both tags become one on every note that uses either of them.',
+      name: 'Tag_Merge_Confirm_Message',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Merge`
+  String get Tag_Merge_Confirm_Action {
+    return Intl.message(
+      'Merge',
+      name: 'Tag_Merge_Confirm_Action',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This tag will be removed from every note that uses it, including archived notes and notes in Trash, and from saved views and templates. No note content is deleted.`
+  String get Remove_Tag_Confirm_Message {
+    return Intl.message(
+      'This tag will be removed from every note that uses it, including archived notes and notes in Trash, and from saved views and templates. No note content is deleted.',
+      name: 'Remove_Tag_Confirm_Message',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count, plural, zero{Tag renamed} one{Tag renamed in 1 note} other{Tag renamed in {count} notes}}`
+  String Tag_Renamed_Count(int count) {
+    return Intl.plural(
+      count,
+      zero: 'Tag renamed',
+      one: 'Tag renamed in 1 note',
+      other: 'Tag renamed in $count notes',
+      name: 'Tag_Renamed_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, zero{Tag removed} one{Tag removed from 1 note} other{Tag removed from {count} notes}}`
+  String Tag_Removed_Count(int count) {
+    return Intl.plural(
+      count,
+      zero: 'Tag removed',
+      one: 'Tag removed from 1 note',
+      other: 'Tag removed from $count notes',
+      name: 'Tag_Removed_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Some notes or saved views kept the old tag. Try again.`
+  String get Tag_Change_Incomplete {
+    return Intl.message(
+      'Some notes or saved views kept the old tag. Try again.',
+      name: 'Tag_Change_Incomplete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Could not update this tag. Please try again.`
+  String get Tag_Change_Failed {
+    return Intl.message(
+      'Could not update this tag. Please try again.',
+      name: 'Tag_Change_Failed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add tags`
+  String get Add_Tags {
+    return Intl.message('Add tags', name: 'Add_Tags', desc: '', args: []);
+  }
+
+  /// `{count, plural, one{Tags added to 1 note} other{Tags added to {count} notes}}`
+  String Tags_Added_Count(int count) {
+    return Intl.plural(
+      count,
+      one: 'Tags added to 1 note',
+      other: 'Tags added to $count notes',
+      name: 'Tags_Added_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 note already has 20 tags and kept its own} other{{count} notes already have 20 tags and kept their own}}`
+  String Tags_Add_Skipped_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note already has 20 tags and kept its own',
+      other: '$count notes already have 20 tags and kept their own',
+      name: 'Tags_Add_Skipped_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 note moved} other{{count} notes moved}}`
+  String Notes_Moved_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note moved',
+      other: '$count notes moved',
+      name: 'Notes_Moved_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 note pinned} other{{count} notes pinned}}`
+  String Notes_Pinned_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note pinned',
+      other: '$count notes pinned',
+      name: 'Notes_Pinned_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `{count, plural, one{1 note unpinned} other{{count} notes unpinned}}`
+  String Notes_Unpinned_Count(int count) {
+    return Intl.plural(
+      count,
+      one: '1 note unpinned',
+      other: '$count notes unpinned',
+      name: 'Notes_Unpinned_Count',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Could not update every selected note. Please try again.`
+  String get Selection_Update_Failed {
+    return Intl.message(
+      'Could not update every selected note. Please try again.',
+      name: 'Selection_Update_Failed',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

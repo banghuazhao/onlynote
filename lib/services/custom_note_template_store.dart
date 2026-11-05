@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_template_images.dart';
 import 'custom_template_images_factory.dart';
 import 'audio_storage.dart';
+import 'note_tags.dart';
 import 'premium_access.dart';
 
 class CustomNoteTemplateStore extends ChangeNotifier {
@@ -142,6 +143,28 @@ class CustomNoteTemplateStore extends ChangeNotifier {
           for (final template in _templates)
             template.id == id ? template.copyWith(name: name) : template,
         ]);
+      });
+
+  /// Applies a library-wide tag rename or removal to every saved template.
+  ///
+  /// Templates own no media here, so only stored tags change. Returns how
+  /// many templates changed.
+  Future<int> rewriteTags(List<String> Function(List<String> tags) rewrite) =>
+      _serial(() async {
+        await _load();
+        var changed = 0;
+        final updated = <CustomNoteTemplate>[];
+        for (final template in _templates) {
+          final tags = rewrite(template.tags);
+          if (sameNoteTags(template.tags, tags)) {
+            updated.add(template);
+            continue;
+          }
+          changed++;
+          updated.add(template.copyWith(tags: tags));
+        }
+        if (changed > 0) await _write(updated);
+        return changed;
       });
 
   Future<void> delete(String id) => deleteTemplates({id});

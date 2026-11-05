@@ -85,6 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _presentingLibraryFilters = false;
   bool _presentingSettings = false;
   bool _presentingManagedFolders = false;
+
+  /// Guards the selection's own actions: a second tap while one pass is
+  /// saving would read the same notes and write from a stale list.
+  bool _changingSelection = false;
   int _checklistReviewGeneration = 0;
   void _cancelChecklistReview() => _checklistReviewGeneration++;
 
@@ -1148,6 +1152,113 @@ class _HomeScreenState extends State<HomeScreen> {
         .add(const MultipleDeleteEvent.clearAll());
   }
 
+  /// Reads the selection's pin state from the library on screen, so one
+  /// action sets every selected note instead of flipping a mix apart.
+  bool _allSelectedPinned(List<String> ids) {
+    final selected = _selectedNotes(ids);
+    return selected.isNotEmpty && selected.every((note) => note.isPinned);
+  }
+
+  List<Note> _selectedNotes(List<String> ids) {
+    final notes = context.read<HomeBloc>().state.mapOrNull(
+              loaded: (state) => state.notes,
+            ) ??
+        const <Note>[];
+    return [
+      for (final note in notes)
+        if (note.id != null && ids.contains(note.id)) note,
+    ];
+  }
+
+  /// Applies one change to the whole selection. Returns null when nothing
+  /// ran or the write failed, having already reported it.
+  Future<HomeBulkResult?> _applyToSelection(
+    List<String> ids,
+    Future<HomeBulkResult> Function(HomeBloc bloc) change,
+  ) async {
+    if (_changingSelection || ids.isEmpty) return null;
+    setState(() => _changingSelection = true);
+    final bloc = context.read<HomeBloc>();
+    final selection = context.read<MultipleDeleteBloc>();
+    try {
+      final result = await change(bloc);
+      if (!mounted) return null;
+      selection.add(const MultipleDeleteEvent.clearAll());
+      if (result.error != null) {
+        context.showToast(result.error!, isError: true);
+        return null;
+      }
+      return result;
+    } catch (_) {
+      if (mounted) {
+        context.showToast(S.of(context).Selection_Update_Failed, isError: true);
+      }
+      return null;
+    } finally {
+      if (mounted) setState(() => _changingSelection = false);
+    }
+  }
+
+  Future<void> _moveSelected(List<String> ids) async {
+    if (_changingSelection || ids.isEmpty) return;
+    final folders = context.read<HomeBloc>().state.mapOrNull(
+              loaded: (state) => state.folders,
+            ) ??
+        const <Folder>[];
+    final current = _selectedNotes(ids).map((note) => note.folderId).toSet();
+    await showAppSheet<void>(
+      context: context,
+      builder: (sheetContext) => MoveToFolderSheet(
+        folders: folders,
+        // Only a selection that already shares one folder shows a current
+        // choice; a mixed selection must not look like it is all in one.
+        selectedFolderId: current.length == 1 ? current.single : null,
+        onSelected: (folderId) async {
+          Navigator.pop(sheetContext);
+          if (!mounted) return;
+          final result = await _applyToSelection(
+              ids, (bloc) => bloc.moveNotesToFolder(ids, folderId));
+          if (result == null || !mounted || result.changed == 0) return;
+          context.showToast(S.of(context).Notes_Moved_Count(result.changed));
+        },
+      ),
+    );
+  }
+
+  Future<void> _tagSelected(List<String> ids) async {
+    if (_changingSelection || ids.isEmpty) return;
+    final suggestions = context.read<HomeBloc>().state.mapOrNull(
+              loaded: (state) => state.availableTags,
+            ) ??
+        const <String>[];
+    // Bulk tagging only adds: the selected notes keep the tags they have, so
+    // the sheet starts empty rather than showing one note's tags as shared.
+    final tags = await showNoteTagsSheet(context,
+        tags: const [],
+        suggestions: suggestions,
+        title: S.of(context).Add_Tags);
+    if (tags == null || tags.isEmpty || !mounted) return;
+    final result =
+        await _applyToSelection(ids, (bloc) => bloc.addTagsToNotes(ids, tags));
+    if (result == null || !mounted) return;
+    if (result.skipped > 0) {
+      context.showToast(S.of(context).Tags_Add_Skipped_Count(result.skipped),
+          isError: true);
+      return;
+    }
+    if (result.changed == 0) return;
+    context.showToast(S.of(context).Tags_Added_Count(result.changed));
+  }
+
+  Future<void> _pinSelected(List<String> ids, bool pinned) async {
+    final result =
+        await _applyToSelection(ids, (bloc) => bloc.setPinnedNotes(ids, pinned));
+    if (result == null || !mounted || result.changed == 0) return;
+    context.showToast(pinned
+        ? S.of(context).Notes_Pinned_Count(result.changed)
+        : S.of(context).Notes_Unpinned_Count(result.changed));
+  }
+
   void _selectManagedFolder(String? folderId) {
     if (!mounted || folderId == null) return;
     _setReorderMode(false);
@@ -1363,24 +1474,58 @@ class _HomeScreenState extends State<HomeScreen> {
                 : S.of(context).Archive_Note;
             final deleteLabel =
                 showTrash ? S.of(context).Delete_Forever : S.of(context).Delete;
+            final compact = MediaQuery.sizeOf(context).width < 360;
+            final allPinned = _allSelectedPinned(ids);
+            final pinLabel =
+                allPinned ? S.of(context).Unpin : S.of(context).Pin;
+            // Trash holds restore and permanent delete only: organizing a
+            // deleted note would move something the library does not show.
+            final organizeItems = <PopupMenuEntry<String>>[
+              if (!showTrash) ...[
+                PopupMenuItem(
+                    value: 'move',
+                    child: HomeMenuItemLabel(S.of(context).Move_To_Folder,
+                        icon: Icons.drive_file_move_outline)),
+                PopupMenuItem(
+                    value: 'tags',
+                    child: HomeMenuItemLabel(S.of(context).Add_Tags,
+                        icon: Icons.sell_outlined)),
+                PopupMenuItem(
+                    value: 'pin',
+                    child: HomeMenuItemLabel(pinLabel,
+                        icon: allPinned
+                            ? Icons.push_pin
+                            : Icons.push_pin_outlined)),
+              ],
+            ];
+            void runSelectionAction(String action) {
+              switch (action) {
+                case 'move':
+                  _moveSelected(ids);
+                case 'tags':
+                  _tagSelected(ids);
+                case 'pin':
+                  _pinSelected(ids, !allPinned);
+                case 'archive':
+                  _archiveSelected(ids, !showArchive);
+                case 'delete':
+                  _deleteSelected(ids, forever: showTrash);
+                case 'restore':
+                  _restoreSelected(ids);
+              }
+            }
+
             return [
-              if (MediaQuery.sizeOf(context).width < 360)
+              if (compact)
                 PopupMenuButton<String>(
                   key: const ValueKey('home-selection-more'),
                   tooltip: S.of(context).More_Options,
+                  enabled: !_changingSelection,
                   style: AppButtonStyles.icon(Theme.of(context).colorScheme),
                   icon: const Icon(Icons.more_horiz_rounded),
-                  onSelected: (action) {
-                    switch (action) {
-                      case 'archive':
-                        _archiveSelected(ids, !showArchive);
-                      case 'delete':
-                        _deleteSelected(ids, forever: showTrash);
-                      case 'restore':
-                        _restoreSelected(ids);
-                    }
-                  },
+                  onSelected: runSelectionAction,
                   itemBuilder: (context) => [
+                    ...organizeItems,
                     if (!showTrash)
                       PopupMenuItem(
                           value: 'archive',
@@ -1402,6 +1547,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 )
               else ...[
+                if (organizeItems.isNotEmpty)
+                  PopupMenuButton<String>(
+                    key: const ValueKey('home-selection-organize'),
+                    tooltip: S.of(context).More_Options,
+                    enabled: !_changingSelection,
+                    style: AppButtonStyles.icon(Theme.of(context).colorScheme),
+                    icon: const Icon(Icons.more_horiz_rounded),
+                    onSelected: runSelectionAction,
+                    itemBuilder: (context) => organizeItems,
+                  ),
                 if (!showTrash)
                   AppButton(
                     tooltip: archiveLabel,

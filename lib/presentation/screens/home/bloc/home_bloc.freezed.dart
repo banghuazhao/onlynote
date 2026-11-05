@@ -56,6 +56,15 @@ mixin _$HomeEvent {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -97,6 +106,15 @@ mixin _$HomeEvent {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -137,6 +155,15 @@ mixin _$HomeEvent {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -170,6 +197,9 @@ mixin _$HomeEvent {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -201,6 +231,9 @@ mixin _$HomeEvent {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -232,6 +265,9 @@ mixin _$HomeEvent {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -391,6 +427,15 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return updateTodo(noteId, todoId, completed, completion);
   }
@@ -435,6 +480,15 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return updateTodo?.call(noteId, todoId, completed, completion);
   }
@@ -478,6 +532,15 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (updateTodo != null) {
@@ -517,6 +580,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return updateTodo(this);
   }
@@ -551,6 +617,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return updateTodo?.call(this);
   }
@@ -585,6 +654,9 @@ class _$UpdateTodoImpl implements _UpdateTodo {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (updateTodo != null) {
@@ -686,6 +758,15 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return getAllNotes();
   }
@@ -730,6 +811,15 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return getAllNotes?.call();
   }
@@ -773,6 +863,15 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -812,6 +911,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return getAllNotes(this);
   }
@@ -846,6 +948,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return getAllNotes?.call(this);
   }
@@ -880,6 +985,9 @@ class _$GetAllNotesImpl implements _GetAllNotes {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (getAllNotes != null) {
@@ -1005,6 +1113,15 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return duplicateNote(note);
   }
@@ -1049,6 +1166,15 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return duplicateNote?.call(note);
   }
@@ -1092,6 +1218,15 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (duplicateNote != null) {
@@ -1131,6 +1266,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return duplicateNote(this);
   }
@@ -1165,6 +1303,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return duplicateNote?.call(this);
   }
@@ -1199,6 +1340,9 @@ class _$DuplicateNoteImpl implements _DuplicateNote {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (duplicateNote != null) {
@@ -1336,6 +1480,15 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return reorderNotes(notes, completion);
   }
@@ -1380,6 +1533,15 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return reorderNotes?.call(notes, completion);
   }
@@ -1423,6 +1585,15 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (reorderNotes != null) {
@@ -1462,6 +1633,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return reorderNotes(this);
   }
@@ -1496,6 +1670,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return reorderNotes?.call(this);
   }
@@ -1530,6 +1707,9 @@ class _$ReorderNotesImpl implements _ReorderNotes {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (reorderNotes != null) {
@@ -1652,6 +1832,15 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return searchChanged(query);
   }
@@ -1696,6 +1885,15 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return searchChanged?.call(query);
   }
@@ -1739,6 +1937,15 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (searchChanged != null) {
@@ -1778,6 +1985,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return searchChanged(this);
   }
@@ -1812,6 +2022,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return searchChanged?.call(this);
   }
@@ -1846,6 +2059,9 @@ class _$SearchChangedImpl implements _SearchChanged {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (searchChanged != null) {
@@ -1974,6 +2190,15 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return filtersChanged(filters);
   }
@@ -2018,6 +2243,15 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return filtersChanged?.call(filters);
   }
@@ -2061,6 +2295,15 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (filtersChanged != null) {
@@ -2100,6 +2343,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return filtersChanged(this);
   }
@@ -2134,6 +2380,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return filtersChanged?.call(this);
   }
@@ -2168,6 +2417,9 @@ class _$FiltersChangedImpl implements _FiltersChanged {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (filtersChanged != null) {
@@ -2289,6 +2541,15 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return removeFilter(filter);
   }
@@ -2333,6 +2594,15 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return removeFilter?.call(filter);
   }
@@ -2376,6 +2646,15 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeFilter != null) {
@@ -2415,6 +2694,9 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return removeFilter(this);
   }
@@ -2449,6 +2731,9 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return removeFilter?.call(this);
   }
@@ -2483,6 +2768,9 @@ class _$RemoveFilterImpl implements _RemoveFilter {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeFilter != null) {
@@ -2615,6 +2903,15 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return selectFolder(folderId, preserveScope);
   }
@@ -2659,6 +2956,15 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return selectFolder?.call(folderId, preserveScope);
   }
@@ -2702,6 +3008,15 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (selectFolder != null) {
@@ -2741,6 +3056,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return selectFolder(this);
   }
@@ -2775,6 +3093,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return selectFolder?.call(this);
   }
@@ -2809,6 +3130,9 @@ class _$SelectFolderImpl implements _SelectFolder {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (selectFolder != null) {
@@ -2931,6 +3255,15 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return showTrash(show);
   }
@@ -2975,6 +3308,15 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return showTrash?.call(show);
   }
@@ -3018,6 +3360,15 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (showTrash != null) {
@@ -3057,6 +3408,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return showTrash(this);
   }
@@ -3091,6 +3445,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return showTrash?.call(this);
   }
@@ -3125,6 +3482,9 @@ class _$ShowTrashImpl implements _ShowTrash {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (showTrash != null) {
@@ -3245,6 +3605,15 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return showArchive(show);
   }
@@ -3289,6 +3658,15 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return showArchive?.call(show);
   }
@@ -3332,6 +3710,15 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (showArchive != null) {
@@ -3371,6 +3758,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return showArchive(this);
   }
@@ -3405,6 +3795,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return showArchive?.call(this);
   }
@@ -3439,6 +3832,9 @@ class _$ShowArchiveImpl implements _ShowArchive {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (showArchive != null) {
@@ -3560,6 +3956,15 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return includeArchived(include);
   }
@@ -3604,6 +4009,15 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return includeArchived?.call(include);
   }
@@ -3647,6 +4061,15 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (includeArchived != null) {
@@ -3686,6 +4109,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return includeArchived(this);
   }
@@ -3720,6 +4146,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return includeArchived?.call(this);
   }
@@ -3754,6 +4183,9 @@ class _$IncludeArchivedImpl implements _IncludeArchived {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (includeArchived != null) {
@@ -3850,6 +4282,15 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return removeIncludeArchived();
   }
@@ -3894,6 +4335,15 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return removeIncludeArchived?.call();
   }
@@ -3937,6 +4387,15 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeIncludeArchived != null) {
@@ -3976,6 +4435,9 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return removeIncludeArchived(this);
   }
@@ -4010,6 +4472,9 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return removeIncludeArchived?.call(this);
   }
@@ -4044,6 +4509,9 @@ class _$RemoveIncludeArchivedImpl implements _RemoveIncludeArchived {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeIncludeArchived != null) {
@@ -4165,6 +4633,15 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return tagsChanged(tags);
   }
@@ -4209,6 +4686,15 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return tagsChanged?.call(tags);
   }
@@ -4252,6 +4738,15 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (tagsChanged != null) {
@@ -4291,6 +4786,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return tagsChanged(this);
   }
@@ -4325,6 +4823,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return tagsChanged?.call(this);
   }
@@ -4359,6 +4860,9 @@ class _$TagsChangedImpl implements _TagsChanged {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (tagsChanged != null) {
@@ -4479,6 +4983,15 @@ class _$RemoveTagImpl implements _RemoveTag {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return removeTag(tag);
   }
@@ -4523,6 +5036,15 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return removeTag?.call(tag);
   }
@@ -4566,6 +5088,15 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeTag != null) {
@@ -4605,6 +5136,9 @@ class _$RemoveTagImpl implements _RemoveTag {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return removeTag(this);
   }
@@ -4639,6 +5173,9 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return removeTag?.call(this);
   }
@@ -4673,6 +5210,9 @@ class _$RemoveTagImpl implements _RemoveTag {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (removeTag != null) {
@@ -4793,6 +5333,15 @@ class _$SortChangedImpl implements _SortChanged {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return sortChanged(order);
   }
@@ -4837,6 +5386,15 @@ class _$SortChangedImpl implements _SortChanged {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return sortChanged?.call(order);
   }
@@ -4880,6 +5438,15 @@ class _$SortChangedImpl implements _SortChanged {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (sortChanged != null) {
@@ -4919,6 +5486,9 @@ class _$SortChangedImpl implements _SortChanged {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return sortChanged(this);
   }
@@ -4953,6 +5523,9 @@ class _$SortChangedImpl implements _SortChanged {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return sortChanged?.call(this);
   }
@@ -4987,6 +5560,9 @@ class _$SortChangedImpl implements _SortChanged {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (sortChanged != null) {
@@ -5115,6 +5691,15 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return savedViewsChanged(views);
   }
@@ -5159,6 +5744,15 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return savedViewsChanged?.call(views);
   }
@@ -5202,6 +5796,15 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (savedViewsChanged != null) {
@@ -5241,6 +5844,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return savedViewsChanged(this);
   }
@@ -5275,6 +5881,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return savedViewsChanged?.call(this);
   }
@@ -5309,6 +5918,9 @@ class _$SavedViewsChangedImpl implements _SavedViewsChanged {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (savedViewsChanged != null) {
@@ -5431,6 +6043,15 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return applySavedView(view);
   }
@@ -5475,6 +6096,15 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return applySavedView?.call(view);
   }
@@ -5518,6 +6148,15 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (applySavedView != null) {
@@ -5557,6 +6196,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return applySavedView(this);
   }
@@ -5591,6 +6233,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return applySavedView?.call(this);
   }
@@ -5625,6 +6270,9 @@ class _$ApplySavedViewImpl implements _ApplySavedView {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (applySavedView != null) {
@@ -5766,6 +6414,15 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return setArchived(noteId, archived, completion);
   }
@@ -5810,6 +6467,15 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return setArchived?.call(noteId, archived, completion);
   }
@@ -5853,6 +6519,15 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setArchived != null) {
@@ -5892,6 +6567,9 @@ class _$SetArchivedImpl implements _SetArchived {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return setArchived(this);
   }
@@ -5926,6 +6604,9 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return setArchived?.call(this);
   }
@@ -5960,6 +6641,9 @@ class _$SetArchivedImpl implements _SetArchived {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setArchived != null) {
@@ -6111,6 +6795,15 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return setTags(noteId, tags, completion);
   }
@@ -6155,6 +6848,15 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return setTags?.call(noteId, tags, completion);
   }
@@ -6198,6 +6900,15 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setTags != null) {
@@ -6237,6 +6948,9 @@ class _$SetTagsImpl implements _SetTags {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return setTags(this);
   }
@@ -6271,6 +6985,9 @@ class _$SetTagsImpl implements _SetTags {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return setTags?.call(this);
   }
@@ -6305,6 +7022,9 @@ class _$SetTagsImpl implements _SetTags {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setTags != null) {
@@ -6476,6 +7196,15 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return setCardStyle(noteId, style, color, updateColor, completion);
   }
@@ -6520,6 +7249,15 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return setCardStyle?.call(noteId, style, color, updateColor, completion);
   }
@@ -6563,6 +7301,15 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setCardStyle != null) {
@@ -6602,6 +7349,9 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return setCardStyle(this);
   }
@@ -6636,6 +7386,9 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return setCardStyle?.call(this);
   }
@@ -6670,6 +7423,9 @@ class _$SetCardStyleImpl implements _SetCardStyle {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (setCardStyle != null) {
@@ -6799,6 +7555,15 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return togglePin(noteId);
   }
@@ -6843,6 +7608,15 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return togglePin?.call(noteId);
   }
@@ -6886,6 +7660,15 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (togglePin != null) {
@@ -6925,6 +7708,9 @@ class _$TogglePinImpl implements _TogglePin {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return togglePin(this);
   }
@@ -6959,6 +7745,9 @@ class _$TogglePinImpl implements _TogglePin {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return togglePin?.call(this);
   }
@@ -6993,6 +7782,9 @@ class _$TogglePinImpl implements _TogglePin {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (togglePin != null) {
@@ -7119,6 +7911,15 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return restoreNotes(ids);
   }
@@ -7163,6 +7964,15 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return restoreNotes?.call(ids);
   }
@@ -7206,6 +8016,15 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (restoreNotes != null) {
@@ -7245,6 +8064,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return restoreNotes(this);
   }
@@ -7279,6 +8101,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return restoreNotes?.call(this);
   }
@@ -7313,6 +8138,9 @@ class _$RestoreNotesImpl implements _RestoreNotes {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (restoreNotes != null) {
@@ -7440,6 +8268,15 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return permanentDelete(ids);
   }
@@ -7484,6 +8321,15 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return permanentDelete?.call(ids);
   }
@@ -7527,6 +8373,15 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (permanentDelete != null) {
@@ -7566,6 +8421,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return permanentDelete(this);
   }
@@ -7600,6 +8458,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return permanentDelete?.call(this);
   }
@@ -7634,6 +8495,9 @@ class _$PermanentDeleteImpl implements _PermanentDelete {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (permanentDelete != null) {
@@ -7764,6 +8628,15 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return createFolder(name, completion);
   }
@@ -7808,6 +8681,15 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return createFolder?.call(name, completion);
   }
@@ -7851,6 +8733,15 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (createFolder != null) {
@@ -7890,6 +8781,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return createFolder(this);
   }
@@ -7924,6 +8818,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return createFolder?.call(this);
   }
@@ -7958,6 +8855,9 @@ class _$CreateFolderImpl implements _CreateFolder {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (createFolder != null) {
@@ -8088,6 +8988,15 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return renameFolder(id, name);
   }
@@ -8132,6 +9041,15 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return renameFolder?.call(id, name);
   }
@@ -8175,6 +9093,15 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (renameFolder != null) {
@@ -8214,6 +9141,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return renameFolder(this);
   }
@@ -8248,6 +9178,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return renameFolder?.call(this);
   }
@@ -8282,6 +9215,9 @@ class _$RenameFolderImpl implements _RenameFolder {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (renameFolder != null) {
@@ -8404,6 +9340,15 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return deleteFolder(id);
   }
@@ -8448,6 +9393,15 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return deleteFolder?.call(id);
   }
@@ -8491,6 +9445,15 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (deleteFolder != null) {
@@ -8530,6 +9493,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return deleteFolder(this);
   }
@@ -8564,6 +9530,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return deleteFolder?.call(this);
   }
@@ -8598,6 +9567,9 @@ class _$DeleteFolderImpl implements _DeleteFolder {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (deleteFolder != null) {
@@ -8728,6 +9700,15 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(String id, String name) renameFolder,
     required TResult Function(String id) deleteFolder,
     required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
   }) {
     return moveNoteToFolder(noteId, folderId);
   }
@@ -8772,6 +9753,15 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(String id, String name)? renameFolder,
     TResult? Function(String id)? deleteFolder,
     TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
   }) {
     return moveNoteToFolder?.call(noteId, folderId);
   }
@@ -8815,6 +9805,15 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(String id, String name)? renameFolder,
     TResult Function(String id)? deleteFolder,
     TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
     required TResult orElse(),
   }) {
     if (moveNoteToFolder != null) {
@@ -8854,6 +9853,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     required TResult Function(_RenameFolder value) renameFolder,
     required TResult Function(_DeleteFolder value) deleteFolder,
     required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
   }) {
     return moveNoteToFolder(this);
   }
@@ -8888,6 +9890,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult? Function(_RenameFolder value)? renameFolder,
     TResult? Function(_DeleteFolder value)? deleteFolder,
     TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
   }) {
     return moveNoteToFolder?.call(this);
   }
@@ -8922,6 +9927,9 @@ class _$MoveNoteToFolderImpl implements _MoveNoteToFolder {
     TResult Function(_RenameFolder value)? renameFolder,
     TResult Function(_DeleteFolder value)? deleteFolder,
     TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
     required TResult orElse(),
   }) {
     if (moveNoteToFolder != null) {
@@ -8940,6 +9948,1176 @@ abstract class _MoveNoteToFolder implements HomeEvent {
   String? get folderId;
   @JsonKey(ignore: true)
   _$$MoveNoteToFolderImplCopyWith<_$MoveNoteToFolderImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$MoveNotesToFolderImplCopyWith<$Res> {
+  factory _$$MoveNotesToFolderImplCopyWith(_$MoveNotesToFolderImpl value,
+          $Res Function(_$MoveNotesToFolderImpl) then) =
+      __$$MoveNotesToFolderImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {List<String> noteIds,
+      String? folderId,
+      Completer<HomeBulkResult>? completion});
+}
+
+/// @nodoc
+class __$$MoveNotesToFolderImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$MoveNotesToFolderImpl>
+    implements _$$MoveNotesToFolderImplCopyWith<$Res> {
+  __$$MoveNotesToFolderImplCopyWithImpl(_$MoveNotesToFolderImpl _value,
+      $Res Function(_$MoveNotesToFolderImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteIds = null,
+    Object? folderId = freezed,
+    Object? completion = freezed,
+  }) {
+    return _then(_$MoveNotesToFolderImpl(
+      noteIds: null == noteIds
+          ? _value._noteIds
+          : noteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      folderId: freezed == folderId
+          ? _value.folderId
+          : folderId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<HomeBulkResult>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$MoveNotesToFolderImpl implements _MoveNotesToFolder {
+  const _$MoveNotesToFolderImpl(
+      {required final List<String> noteIds, this.folderId, this.completion})
+      : _noteIds = noteIds;
+
+  final List<String> _noteIds;
+  @override
+  List<String> get noteIds {
+    if (_noteIds is EqualUnmodifiableListView) return _noteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_noteIds);
+  }
+
+  @override
+  final String? folderId;
+  @override
+  final Completer<HomeBulkResult>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.moveNotesToFolder(noteIds: $noteIds, folderId: $folderId, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MoveNotesToFolderImpl &&
+            const DeepCollectionEquality().equals(other._noteIds, _noteIds) &&
+            (identical(other.folderId, folderId) ||
+                other.folderId == folderId) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_noteIds), folderId, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MoveNotesToFolderImplCopyWith<_$MoveNotesToFolderImpl> get copyWith =>
+      __$$MoveNotesToFolderImplCopyWithImpl<_$MoveNotesToFolderImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(NoteSearchFilter filter) removeFilter,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function() removeIncludeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
+        setCardStyle,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
+  }) {
+    return moveNotesToFolder(noteIds, folderId, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(NoteSearchFilter filter)? removeFilter,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function()? removeIncludeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+  }) {
+    return moveNotesToFolder?.call(noteIds, folderId, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(NoteSearchFilter filter)? removeFilter,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function()? removeIncludeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (moveNotesToFolder != null) {
+      return moveNotesToFolder(noteIds, folderId, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_RemoveFilter value) removeFilter,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_RemoveIncludeArchived value)
+        removeIncludeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
+  }) {
+    return moveNotesToFolder(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_RemoveFilter value)? removeFilter,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
+  }) {
+    return moveNotesToFolder?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_RemoveFilter value)? removeFilter,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (moveNotesToFolder != null) {
+      return moveNotesToFolder(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _MoveNotesToFolder implements HomeEvent {
+  const factory _MoveNotesToFolder(
+      {required final List<String> noteIds,
+      final String? folderId,
+      final Completer<HomeBulkResult>? completion}) = _$MoveNotesToFolderImpl;
+
+  List<String> get noteIds;
+  String? get folderId;
+  Completer<HomeBulkResult>? get completion;
+  @JsonKey(ignore: true)
+  _$$MoveNotesToFolderImplCopyWith<_$MoveNotesToFolderImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SetPinnedNotesImplCopyWith<$Res> {
+  factory _$$SetPinnedNotesImplCopyWith(_$SetPinnedNotesImpl value,
+          $Res Function(_$SetPinnedNotesImpl) then) =
+      __$$SetPinnedNotesImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {List<String> noteIds,
+      bool pinned,
+      Completer<HomeBulkResult>? completion});
+}
+
+/// @nodoc
+class __$$SetPinnedNotesImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$SetPinnedNotesImpl>
+    implements _$$SetPinnedNotesImplCopyWith<$Res> {
+  __$$SetPinnedNotesImplCopyWithImpl(
+      _$SetPinnedNotesImpl _value, $Res Function(_$SetPinnedNotesImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteIds = null,
+    Object? pinned = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$SetPinnedNotesImpl(
+      noteIds: null == noteIds
+          ? _value._noteIds
+          : noteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      pinned: null == pinned
+          ? _value.pinned
+          : pinned // ignore: cast_nullable_to_non_nullable
+              as bool,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<HomeBulkResult>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SetPinnedNotesImpl implements _SetPinnedNotes {
+  const _$SetPinnedNotesImpl(
+      {required final List<String> noteIds,
+      required this.pinned,
+      this.completion})
+      : _noteIds = noteIds;
+
+  final List<String> _noteIds;
+  @override
+  List<String> get noteIds {
+    if (_noteIds is EqualUnmodifiableListView) return _noteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_noteIds);
+  }
+
+  @override
+  final bool pinned;
+  @override
+  final Completer<HomeBulkResult>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.setPinnedNotes(noteIds: $noteIds, pinned: $pinned, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SetPinnedNotesImpl &&
+            const DeepCollectionEquality().equals(other._noteIds, _noteIds) &&
+            (identical(other.pinned, pinned) || other.pinned == pinned) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType,
+      const DeepCollectionEquality().hash(_noteIds), pinned, completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SetPinnedNotesImplCopyWith<_$SetPinnedNotesImpl> get copyWith =>
+      __$$SetPinnedNotesImplCopyWithImpl<_$SetPinnedNotesImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(NoteSearchFilter filter) removeFilter,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function() removeIncludeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
+        setCardStyle,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
+  }) {
+    return setPinnedNotes(noteIds, pinned, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(NoteSearchFilter filter)? removeFilter,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function()? removeIncludeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+  }) {
+    return setPinnedNotes?.call(noteIds, pinned, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(NoteSearchFilter filter)? removeFilter,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function()? removeIncludeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (setPinnedNotes != null) {
+      return setPinnedNotes(noteIds, pinned, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_RemoveFilter value) removeFilter,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_RemoveIncludeArchived value)
+        removeIncludeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
+  }) {
+    return setPinnedNotes(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_RemoveFilter value)? removeFilter,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
+  }) {
+    return setPinnedNotes?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_RemoveFilter value)? removeFilter,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (setPinnedNotes != null) {
+      return setPinnedNotes(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _SetPinnedNotes implements HomeEvent {
+  const factory _SetPinnedNotes(
+      {required final List<String> noteIds,
+      required final bool pinned,
+      final Completer<HomeBulkResult>? completion}) = _$SetPinnedNotesImpl;
+
+  List<String> get noteIds;
+  bool get pinned;
+  Completer<HomeBulkResult>? get completion;
+  @JsonKey(ignore: true)
+  _$$SetPinnedNotesImplCopyWith<_$SetPinnedNotesImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$AddTagsToNotesImplCopyWith<$Res> {
+  factory _$$AddTagsToNotesImplCopyWith(_$AddTagsToNotesImpl value,
+          $Res Function(_$AddTagsToNotesImpl) then) =
+      __$$AddTagsToNotesImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call(
+      {List<String> noteIds,
+      List<String> tags,
+      Completer<HomeBulkResult>? completion});
+}
+
+/// @nodoc
+class __$$AddTagsToNotesImplCopyWithImpl<$Res>
+    extends _$HomeEventCopyWithImpl<$Res, _$AddTagsToNotesImpl>
+    implements _$$AddTagsToNotesImplCopyWith<$Res> {
+  __$$AddTagsToNotesImplCopyWithImpl(
+      _$AddTagsToNotesImpl _value, $Res Function(_$AddTagsToNotesImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? noteIds = null,
+    Object? tags = null,
+    Object? completion = freezed,
+  }) {
+    return _then(_$AddTagsToNotesImpl(
+      noteIds: null == noteIds
+          ? _value._noteIds
+          : noteIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      completion: freezed == completion
+          ? _value.completion
+          : completion // ignore: cast_nullable_to_non_nullable
+              as Completer<HomeBulkResult>?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$AddTagsToNotesImpl implements _AddTagsToNotes {
+  const _$AddTagsToNotesImpl(
+      {required final List<String> noteIds,
+      required final List<String> tags,
+      this.completion})
+      : _noteIds = noteIds,
+        _tags = tags;
+
+  final List<String> _noteIds;
+  @override
+  List<String> get noteIds {
+    if (_noteIds is EqualUnmodifiableListView) return _noteIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_noteIds);
+  }
+
+  final List<String> _tags;
+  @override
+  List<String> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  @override
+  final Completer<HomeBulkResult>? completion;
+
+  @override
+  String toString() {
+    return 'HomeEvent.addTagsToNotes(noteIds: $noteIds, tags: $tags, completion: $completion)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$AddTagsToNotesImpl &&
+            const DeepCollectionEquality().equals(other._noteIds, _noteIds) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            (identical(other.completion, completion) ||
+                other.completion == completion));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_noteIds),
+      const DeepCollectionEquality().hash(_tags),
+      completion);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$AddTagsToNotesImplCopyWith<_$AddTagsToNotesImpl> get copyWith =>
+      __$$AddTagsToNotesImplCopyWithImpl<_$AddTagsToNotesImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)
+        updateTodo,
+    required TResult Function() getAllNotes,
+    required TResult Function(Note note) duplicateNote,
+    required TResult Function(List<Note> notes, Completer<String?>? completion)
+        reorderNotes,
+    required TResult Function(String query) searchChanged,
+    required TResult Function(Set<NoteSearchFilter> filters) filtersChanged,
+    required TResult Function(NoteSearchFilter filter) removeFilter,
+    required TResult Function(String? folderId, bool preserveScope)
+        selectFolder,
+    required TResult Function(bool show) showTrash,
+    required TResult Function(bool show) showArchive,
+    required TResult Function(bool include) includeArchived,
+    required TResult Function() removeIncludeArchived,
+    required TResult Function(Set<String> tags) tagsChanged,
+    required TResult Function(String tag) removeTag,
+    required TResult Function(NoteSortOrder order) sortChanged,
+    required TResult Function(List<SavedNoteView> views) savedViewsChanged,
+    required TResult Function(SavedNoteView view) applySavedView,
+    required TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)
+        setArchived,
+    required TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)
+        setTags,
+    required TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)
+        setCardStyle,
+    required TResult Function(String noteId) togglePin,
+    required TResult Function(List<String> ids) restoreNotes,
+    required TResult Function(List<String> ids) permanentDelete,
+    required TResult Function(String name, Completer<String?>? completion)
+        createFolder,
+    required TResult Function(String id, String name) renameFolder,
+    required TResult Function(String id) deleteFolder,
+    required TResult Function(String noteId, String? folderId) moveNoteToFolder,
+    required TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)
+        moveNotesToFolder,
+    required TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)
+        setPinnedNotes,
+    required TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)
+        addTagsToNotes,
+  }) {
+    return addTagsToNotes(noteIds, tags, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult? Function()? getAllNotes,
+    TResult? Function(Note note)? duplicateNote,
+    TResult? Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult? Function(String query)? searchChanged,
+    TResult? Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult? Function(NoteSearchFilter filter)? removeFilter,
+    TResult? Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult? Function(bool show)? showTrash,
+    TResult? Function(bool show)? showArchive,
+    TResult? Function(bool include)? includeArchived,
+    TResult? Function()? removeIncludeArchived,
+    TResult? Function(Set<String> tags)? tagsChanged,
+    TResult? Function(String tag)? removeTag,
+    TResult? Function(NoteSortOrder order)? sortChanged,
+    TResult? Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult? Function(SavedNoteView view)? applySavedView,
+    TResult? Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult? Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult? Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult? Function(String noteId)? togglePin,
+    TResult? Function(List<String> ids)? restoreNotes,
+    TResult? Function(List<String> ids)? permanentDelete,
+    TResult? Function(String name, Completer<String?>? completion)?
+        createFolder,
+    TResult? Function(String id, String name)? renameFolder,
+    TResult? Function(String id)? deleteFolder,
+    TResult? Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult? Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult? Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult? Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+  }) {
+    return addTagsToNotes?.call(noteIds, tags, completion);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String noteId, String todoId, bool? completed,
+            Completer<HomeChecklistResult>? completion)?
+        updateTodo,
+    TResult Function()? getAllNotes,
+    TResult Function(Note note)? duplicateNote,
+    TResult Function(List<Note> notes, Completer<String?>? completion)?
+        reorderNotes,
+    TResult Function(String query)? searchChanged,
+    TResult Function(Set<NoteSearchFilter> filters)? filtersChanged,
+    TResult Function(NoteSearchFilter filter)? removeFilter,
+    TResult Function(String? folderId, bool preserveScope)? selectFolder,
+    TResult Function(bool show)? showTrash,
+    TResult Function(bool show)? showArchive,
+    TResult Function(bool include)? includeArchived,
+    TResult Function()? removeIncludeArchived,
+    TResult Function(Set<String> tags)? tagsChanged,
+    TResult Function(String tag)? removeTag,
+    TResult Function(NoteSortOrder order)? sortChanged,
+    TResult Function(List<SavedNoteView> views)? savedViewsChanged,
+    TResult Function(SavedNoteView view)? applySavedView,
+    TResult Function(String noteId, bool archived,
+            Completer<HomeArchiveResult>? completion)?
+        setArchived,
+    TResult Function(
+            String noteId, List<String> tags, Completer<String?>? completion)?
+        setTags,
+    TResult Function(String noteId, NoteCardStyle style, Color? color,
+            bool updateColor, Completer<String?>? completion)?
+        setCardStyle,
+    TResult Function(String noteId)? togglePin,
+    TResult Function(List<String> ids)? restoreNotes,
+    TResult Function(List<String> ids)? permanentDelete,
+    TResult Function(String name, Completer<String?>? completion)? createFolder,
+    TResult Function(String id, String name)? renameFolder,
+    TResult Function(String id)? deleteFolder,
+    TResult Function(String noteId, String? folderId)? moveNoteToFolder,
+    TResult Function(List<String> noteIds, String? folderId,
+            Completer<HomeBulkResult>? completion)?
+        moveNotesToFolder,
+    TResult Function(List<String> noteIds, bool pinned,
+            Completer<HomeBulkResult>? completion)?
+        setPinnedNotes,
+    TResult Function(List<String> noteIds, List<String> tags,
+            Completer<HomeBulkResult>? completion)?
+        addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (addTagsToNotes != null) {
+      return addTagsToNotes(noteIds, tags, completion);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_UpdateTodo value) updateTodo,
+    required TResult Function(_GetAllNotes value) getAllNotes,
+    required TResult Function(_DuplicateNote value) duplicateNote,
+    required TResult Function(_ReorderNotes value) reorderNotes,
+    required TResult Function(_SearchChanged value) searchChanged,
+    required TResult Function(_FiltersChanged value) filtersChanged,
+    required TResult Function(_RemoveFilter value) removeFilter,
+    required TResult Function(_SelectFolder value) selectFolder,
+    required TResult Function(_ShowTrash value) showTrash,
+    required TResult Function(_ShowArchive value) showArchive,
+    required TResult Function(_IncludeArchived value) includeArchived,
+    required TResult Function(_RemoveIncludeArchived value)
+        removeIncludeArchived,
+    required TResult Function(_TagsChanged value) tagsChanged,
+    required TResult Function(_RemoveTag value) removeTag,
+    required TResult Function(_SortChanged value) sortChanged,
+    required TResult Function(_SavedViewsChanged value) savedViewsChanged,
+    required TResult Function(_ApplySavedView value) applySavedView,
+    required TResult Function(_SetArchived value) setArchived,
+    required TResult Function(_SetTags value) setTags,
+    required TResult Function(_SetCardStyle value) setCardStyle,
+    required TResult Function(_TogglePin value) togglePin,
+    required TResult Function(_RestoreNotes value) restoreNotes,
+    required TResult Function(_PermanentDelete value) permanentDelete,
+    required TResult Function(_CreateFolder value) createFolder,
+    required TResult Function(_RenameFolder value) renameFolder,
+    required TResult Function(_DeleteFolder value) deleteFolder,
+    required TResult Function(_MoveNoteToFolder value) moveNoteToFolder,
+    required TResult Function(_MoveNotesToFolder value) moveNotesToFolder,
+    required TResult Function(_SetPinnedNotes value) setPinnedNotes,
+    required TResult Function(_AddTagsToNotes value) addTagsToNotes,
+  }) {
+    return addTagsToNotes(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_UpdateTodo value)? updateTodo,
+    TResult? Function(_GetAllNotes value)? getAllNotes,
+    TResult? Function(_DuplicateNote value)? duplicateNote,
+    TResult? Function(_ReorderNotes value)? reorderNotes,
+    TResult? Function(_SearchChanged value)? searchChanged,
+    TResult? Function(_FiltersChanged value)? filtersChanged,
+    TResult? Function(_RemoveFilter value)? removeFilter,
+    TResult? Function(_SelectFolder value)? selectFolder,
+    TResult? Function(_ShowTrash value)? showTrash,
+    TResult? Function(_ShowArchive value)? showArchive,
+    TResult? Function(_IncludeArchived value)? includeArchived,
+    TResult? Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult? Function(_TagsChanged value)? tagsChanged,
+    TResult? Function(_RemoveTag value)? removeTag,
+    TResult? Function(_SortChanged value)? sortChanged,
+    TResult? Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult? Function(_ApplySavedView value)? applySavedView,
+    TResult? Function(_SetArchived value)? setArchived,
+    TResult? Function(_SetTags value)? setTags,
+    TResult? Function(_SetCardStyle value)? setCardStyle,
+    TResult? Function(_TogglePin value)? togglePin,
+    TResult? Function(_RestoreNotes value)? restoreNotes,
+    TResult? Function(_PermanentDelete value)? permanentDelete,
+    TResult? Function(_CreateFolder value)? createFolder,
+    TResult? Function(_RenameFolder value)? renameFolder,
+    TResult? Function(_DeleteFolder value)? deleteFolder,
+    TResult? Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult? Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult? Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult? Function(_AddTagsToNotes value)? addTagsToNotes,
+  }) {
+    return addTagsToNotes?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_UpdateTodo value)? updateTodo,
+    TResult Function(_GetAllNotes value)? getAllNotes,
+    TResult Function(_DuplicateNote value)? duplicateNote,
+    TResult Function(_ReorderNotes value)? reorderNotes,
+    TResult Function(_SearchChanged value)? searchChanged,
+    TResult Function(_FiltersChanged value)? filtersChanged,
+    TResult Function(_RemoveFilter value)? removeFilter,
+    TResult Function(_SelectFolder value)? selectFolder,
+    TResult Function(_ShowTrash value)? showTrash,
+    TResult Function(_ShowArchive value)? showArchive,
+    TResult Function(_IncludeArchived value)? includeArchived,
+    TResult Function(_RemoveIncludeArchived value)? removeIncludeArchived,
+    TResult Function(_TagsChanged value)? tagsChanged,
+    TResult Function(_RemoveTag value)? removeTag,
+    TResult Function(_SortChanged value)? sortChanged,
+    TResult Function(_SavedViewsChanged value)? savedViewsChanged,
+    TResult Function(_ApplySavedView value)? applySavedView,
+    TResult Function(_SetArchived value)? setArchived,
+    TResult Function(_SetTags value)? setTags,
+    TResult Function(_SetCardStyle value)? setCardStyle,
+    TResult Function(_TogglePin value)? togglePin,
+    TResult Function(_RestoreNotes value)? restoreNotes,
+    TResult Function(_PermanentDelete value)? permanentDelete,
+    TResult Function(_CreateFolder value)? createFolder,
+    TResult Function(_RenameFolder value)? renameFolder,
+    TResult Function(_DeleteFolder value)? deleteFolder,
+    TResult Function(_MoveNoteToFolder value)? moveNoteToFolder,
+    TResult Function(_MoveNotesToFolder value)? moveNotesToFolder,
+    TResult Function(_SetPinnedNotes value)? setPinnedNotes,
+    TResult Function(_AddTagsToNotes value)? addTagsToNotes,
+    required TResult orElse(),
+  }) {
+    if (addTagsToNotes != null) {
+      return addTagsToNotes(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _AddTagsToNotes implements HomeEvent {
+  const factory _AddTagsToNotes(
+      {required final List<String> noteIds,
+      required final List<String> tags,
+      final Completer<HomeBulkResult>? completion}) = _$AddTagsToNotesImpl;
+
+  List<String> get noteIds;
+  List<String> get tags;
+  Completer<HomeBulkResult>? get completion;
+  @JsonKey(ignore: true)
+  _$$AddTagsToNotesImplCopyWith<_$AddTagsToNotesImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

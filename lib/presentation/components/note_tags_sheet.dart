@@ -11,10 +11,12 @@ Future<List<String>?> showNoteTagsSheet(
   BuildContext context, {
   required List<String> tags,
   List<String> suggestions = const [],
+  String? title,
 }) =>
     showAppSheet<List<String>>(
       context: context,
-      builder: (_) => NoteTagsSheet(tags: tags, suggestions: suggestions),
+      builder: (_) =>
+          NoteTagsSheet(tags: tags, suggestions: suggestions, title: title),
     );
 
 class NoteTagsSheet extends StatefulWidget {
@@ -22,10 +24,14 @@ class NoteTagsSheet extends StatefulWidget {
     super.key,
     required this.tags,
     this.suggestions = const [],
+    this.title,
   });
 
   final List<String> tags;
   final List<String> suggestions;
+
+  /// Defaults to editing one note's tags. A bulk action adds tags instead.
+  final String? title;
 
   @override
   State<NoteTagsSheet> createState() => _NoteTagsSheetState();
@@ -119,7 +125,7 @@ class _NoteTagsSheetState extends State<NoteTagsSheet> {
         : null;
 
     return AppSheet(
-      title: l10n.Edit_Tags,
+      title: widget.title ?? l10n.Edit_Tags,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Column(

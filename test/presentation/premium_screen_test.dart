@@ -120,9 +120,13 @@ void main() {
     await tester.pumpAndSettle();
     final folders = find.ancestor(
         of: find.text('Manage Folders'), matching: find.byType(Card));
+    final tags = find.ancestor(
+        of: find.text('Manage tags'), matching: find.byType(Card));
     final backup = find.ancestor(
         of: find.text('Backup & Restore'), matching: find.byType(Card));
-    expect(tester.getTopLeft(backup).dy - tester.getBottomLeft(folders).dy, 16);
+    // Every organizing row keeps the same gap, including the one between.
+    expect(tester.getTopLeft(tags).dy - tester.getBottomLeft(folders).dy, 16);
+    expect(tester.getTopLeft(backup).dy - tester.getBottomLeft(tags).dy, 16);
     expect(find.text('Remove Ads'), findsNothing);
     expect(find.text('Upgrade to Premium'), findsOneWidget);
     await _tap(tester, find.text('Upgrade to Premium'));

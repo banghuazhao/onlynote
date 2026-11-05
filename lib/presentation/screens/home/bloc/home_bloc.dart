@@ -138,6 +138,51 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return completion.future;
   }
 
+  /// Moves every selected note in one pass, so the library settles once and
+  /// reports a single outcome instead of a toast per note.
+  Future<HomeBulkResult> moveNotesToFolder(
+      List<String> noteIds, String? folderId) {
+    if (isClosed) {
+      return Future.value(
+          HomeBulkResult(error: _i10n.Selection_Update_Failed));
+    }
+    final completion = Completer<HomeBulkResult>();
+    add(HomeEvent.moveNotesToFolder(
+        noteIds: List.of(noteIds),
+        folderId: folderId,
+        completion: completion));
+    return completion.future;
+  }
+
+  /// Sets one pin state for every selected note. A mixed selection must not
+  /// be flipped apart, so callers pass the state they want.
+  Future<HomeBulkResult> setPinnedNotes(List<String> noteIds, bool pinned) {
+    if (isClosed) {
+      return Future.value(
+          HomeBulkResult(error: _i10n.Selection_Update_Failed));
+    }
+    final completion = Completer<HomeBulkResult>();
+    add(HomeEvent.setPinnedNotes(
+        noteIds: List.of(noteIds), pinned: pinned, completion: completion));
+    return completion.future;
+  }
+
+  /// Adds tags to every selected note, keeping the tags each note already
+  /// holds. Notes already at the tag limit keep their own and are reported.
+  Future<HomeBulkResult> addTagsToNotes(
+      List<String> noteIds, List<String> tags) {
+    if (isClosed) {
+      return Future.value(
+          HomeBulkResult(error: _i10n.Selection_Update_Failed));
+    }
+    final completion = Completer<HomeBulkResult>();
+    add(HomeEvent.addTagsToNotes(
+        noteIds: List.of(noteIds),
+        tags: List.of(tags),
+        completion: completion));
+    return completion.future;
+  }
+
   Future<String?> setCardStyle(String noteId, NoteCardStyle style) {
     if (isClosed) {
       return Future.value(_i10n.Card_Style_Save_Failed);
@@ -214,6 +259,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         event is _PermanentDelete ||
         event is _DeleteFolder ||
         event is _MoveNoteToFolder ||
+        event is _MoveNotesToFolder ||
+        event is _SetPinnedNotes ||
+        event is _AddTagsToNotes ||
         event is _UpdateTodo;
     if (writesNotes) {
       await NoteMutations.run(() => _handleSynchronizedEvent(event, emit));
@@ -321,6 +369,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       await _onDeleteFolder(event, emit);
     } else if (event is _MoveNoteToFolder) {
       await _onMoveNoteToFolder(event, emit);
+    } else if (event is _MoveNotesToFolder) {
+      await _onMoveNotesToFolder(event, emit);
+    } else if (event is _SetPinnedNotes) {
+      await _onSetPinnedNotes(event, emit);
+    } else if (event is _AddTagsToNotes) {
+      await _onAddTagsToNotes(event, emit);
     } else if (event is _UpdateTodo) {
       await _onUpdateTodo(event, emit);
     }
@@ -725,6 +779,112 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
+  Future<void> _onMoveNotesToFolder(
+      _MoveNotesToFolder event, Emitter<HomeState> emit) async {
+    var changed = 0;
+    var failed = 0;
+    for (final id in event.noteIds) {
+      final note = await _savedNote(id);
+      if (note == null) {
+        failed++;
+        continue;
+      }
+      // A note already in the chosen folder is left as it is, so the count
+      // reported is the number of notes that actually moved.
+      if (note.folderId == event.folderId) continue;
+      final result =
+          await _moveNoteToFolderUsecase(noteId: id, folderId: event.folderId);
+      result.fold((_) => failed++, (_) => changed++);
+    }
+    await _finishBulk(emit, event.completion, changed: changed, failed: failed);
+  }
+
+  Future<void> _onSetPinnedNotes(
+      _SetPinnedNotes event, Emitter<HomeState> emit) async {
+    var changed = 0;
+    var failed = 0;
+    for (final id in event.noteIds) {
+      final note = await _savedNote(id);
+      if (note == null) {
+        failed++;
+        continue;
+      }
+      if (note.isPinned == event.pinned) continue;
+      // The use case sets the state rather than flipping, so a note changed
+      // elsewhere between this read and the write cannot end up inverted.
+      final result = await _togglePinUsecase(id, pinned: event.pinned);
+      result.fold((_) => failed++, (_) => changed++);
+    }
+    await _finishBulk(emit, event.completion, changed: changed, failed: failed);
+  }
+
+  /// The latest saved note, or null when it is gone or in Trash. Cards are
+  /// excerpts, so a bulk action never decides from what is on screen.
+  Future<Note?> _savedNote(String id) async {
+    final fetched = await _getNoteUsecase(id);
+    final note = fetched.fold<Note?>((_) => null, (note) => note);
+    return note == null || note.isDeleted ? null : note;
+  }
+
+  Future<void> _onAddTagsToNotes(
+      _AddTagsToNotes event, Emitter<HomeState> emit) async {
+    var changed = 0;
+    var skipped = 0;
+    var failed = 0;
+    for (final id in event.noteIds) {
+      // Start from the latest saved tags so none of them are dropped.
+      final note = await _savedNote(id);
+      if (note == null) {
+        failed++;
+        continue;
+      }
+      final existing = note.tags.map(tagKey).toSet();
+      if (event.tags.every((tag) => existing.contains(tagKey(tag)))) continue;
+      final List<String> tags;
+      try {
+        tags = normalizeNoteTags([...note.tags, ...event.tags]);
+      } on FormatException {
+        // This note already holds as many tags as it can. Keep its own.
+        skipped++;
+        continue;
+      }
+      final saved = await _updateNoteUsecase(note.copyWith(tags: tags));
+      saved.fold((_) => failed++, (_) => changed++);
+    }
+    await _finishBulk(emit, event.completion,
+        changed: changed, skipped: skipped, failed: failed);
+  }
+
+  Future<void> _finishBulk(
+    Emitter<HomeState> emit,
+    Completer<HomeBulkResult>? completion, {
+    required int changed,
+    required int failed,
+    int skipped = 0,
+  }) async {
+    // One re-read settles pin order, folder counts and scopes together, where
+    // patching each note in place could disagree with what was stored.
+    if (changed > 0) {
+      await _reloadNotes();
+      if (!emit.isDone) emit(_buildLoaded());
+    }
+    completion?.complete(HomeBulkResult(
+      changed: changed,
+      skipped: skipped,
+      error: failed > 0 ? _i10n.Selection_Update_Failed : null,
+    ));
+  }
+
+  Future<void> _reloadNotes() async {
+    final bundle = await _showNotesUsecase();
+    bundle.fold((_) {}, (data) {
+      _activeNotes = data.activeNotes;
+      _trashedNotes = data.trashedNotes;
+      _archivedNotes = data.archivedNotes;
+      _folders = data.folders;
+    });
+  }
+
   HomeState _buildLoaded({List<Note>? overrideVisible}) {
     return HomeState.loaded(
       notes: overrideVisible ?? _visibleNotes(),
@@ -928,6 +1088,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 class HomeArchiveResult {
   const HomeArchiveResult({this.change, this.error});
   final NoteArchiveChange? change;
+  final String? error;
+}
+
+/// What a change applied to a whole selection reached.
+class HomeBulkResult {
+  const HomeBulkResult({this.changed = 0, this.skipped = 0, this.error});
+
+  /// Notes that were rewritten. Notes already in the wanted state are not
+  /// counted, because nothing about them changed.
+  final int changed;
+
+  /// Notes that could not take the change, such as a note already holding
+  /// the maximum number of tags.
+  final int skipped;
+
+  /// Set when at least one selected note could not be written.
   final String? error;
 }
 

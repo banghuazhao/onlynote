@@ -81,165 +81,98 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m23(matched, total) =>
       "${matched} of ${Intl.plural(total, one: '1 heading', other: '${total} headings')}";
 
-  static String m24(name) => "Open ${name} in library";
+  static String m24(count) =>
+      "${Intl.plural(count, one: '1 note moved', other: '${count} notes moved')}";
 
-  static String m25(number) => "Photo ${number}";
+  static String m25(count) =>
+      "${Intl.plural(count, one: '1 note pinned', other: '${count} notes pinned')}";
 
-  static String m26(limit) =>
-      "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
+  static String m26(count) =>
+      "${Intl.plural(count, one: '1 note unpinned', other: '${count} notes unpinned')}";
 
-  static String m27(limit) =>
-      "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
+  static String m27(name) => "Open ${name} in library";
 
-  static String m28(price) => "Unlock forever for ${price}";
+  static String m28(number) => "Photo ${number}";
 
   static String m29(limit) =>
+      "The free plan includes ${limit} folders. Upgrade for unlimited folders.";
+
+  static String m30(limit) =>
+      "The free plan includes ${limit} notes. Upgrade for unlimited notes.";
+
+  static String m31(price) => "Unlock forever for ${price}";
+
+  static String m32(limit) =>
       "The free plan includes ${limit} saved templates. Upgrade for unlimited templates.";
 
-  static String m30(time) => "Next reminder: ${time}";
+  static String m33(time) => "Next reminder: ${time}";
 
-  static String m31(date) => "Remind me: ${date}";
+  static String m34(date) => "Remind me: ${date}";
 
-  static String m32(matched, total) =>
+  static String m35(matched, total) =>
       "${matched} of ${Intl.plural(total, one: '1 reminder', other: '${total} reminders')}";
 
-  static String m33(price) => "Remove ads permanently for ${price}.";
+  static String m36(price) => "Remove ads permanently for ${price}.";
 
-  static String m34(criterion) => "Remove ${criterion}";
+  static String m37(criterion) => "Remove ${criterion}";
 
-  static String m35(limit) =>
+  static String m38(limit) =>
       "You can save up to ${limit} views. Delete a saved view to add another.";
 
-  static String m36(query) => "Search: ${query}";
+  static String m39(query) => "Search: ${query}";
 
-  static String m37(tags) => "Tags: ${tags}";
-
-  static String m38(count) =>
-      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
-
-  static String m39(count) =>
-      "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
-
-  static String m40(count, formattedCount) =>
-      "${Intl.plural(count, one: '${formattedCount} note', other: '${formattedCount} notes')}";
+  static String m40(tags) => "Tags: ${tags}";
 
   static String m41(count) =>
-      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+      "${Intl.plural(count, zero: '0 notes found', one: '1 note found', other: '${count} notes found')}";
 
   static String m42(count) =>
+      "Added ${Intl.plural(count, one: '1 checklist item', other: '${count} checklist items')}";
+
+  static String m43(name) =>
+      "${name} already exists. Both tags become one on every note that uses either of them.";
+
+  static String m44(count) =>
+      "${Intl.plural(count, zero: 'Tag removed', one: 'Tag removed from 1 note', other: 'Tag removed from ${count} notes')}";
+
+  static String m45(count) =>
+      "${Intl.plural(count, zero: 'Tag renamed', one: 'Tag renamed in 1 note', other: 'Tag renamed in ${count} notes')}";
+
+  static String m46(count, formattedCount) =>
+      "${Intl.plural(count, one: '${formattedCount} note', other: '${formattedCount} notes')}";
+
+  static String m47(count) =>
+      "${Intl.plural(count, one: '1 note already has 20 tags and kept its own', other: '${count} notes already have 20 tags and kept their own')}";
+
+  static String m48(count) =>
+      "${Intl.plural(count, one: 'Tags added to 1 note', other: 'Tags added to ${count} notes')}";
+
+  static String m49(count) =>
+      "${Intl.plural(count, one: '1 selected tag hidden by search', other: '${count} selected tags hidden by search')}";
+
+  static String m50(count) =>
       "${Intl.plural(count, one: '1 tag selected', other: '${count} tags selected')}";
 
-  static String m43(limit) =>
+  static String m51(limit) =>
       "You can select up to ${limit} tags. Deselect a tag to choose another.";
 
-  static String m44(items, photos) =>
+  static String m52(items, photos) =>
       "${Intl.plural(items, zero: '0 items', one: '1 item', other: '${items} items')} · ${Intl.plural(photos, zero: '0 photos', one: '1 photo', other: '${photos} photos')}";
 
-  static String m45(date) => "Recorded ${date}";
+  static String m53(matching, total) =>
+      "${matching} of ${total} unfinished tasks";
 
-  static String mTodayTaskSearchCount(matching, total) => "${matching} of ${total} unfinished tasks";
+  static String m54(date) => "Recorded ${date}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "Shortcuts_Append_Failed": MessageLookupByLibrary.simpleMessage("Could not append this text. It is saved for retry."),
-    "Shortcuts_Append_Unavailable": MessageLookupByLibrary.simpleMessage("The destination note is unavailable. Restore it or choose another note in Shortcuts."),
-    "Shortcuts_Append_Conflict": MessageLookupByLibrary.simpleMessage("This note changed while an append was interrupted. The saved request needs review."),
-    "Shortcuts_Append_Saved": MessageLookupByLibrary.simpleMessage("Text added to note."),
-    "Shortcuts_Inbox_Title": MessageLookupByLibrary.simpleMessage("Inbox"),
-    "Shortcuts_Requests": MessageLookupByLibrary.simpleMessage("Pending shortcut text"),
-    "Shortcuts_Review": MessageLookupByLibrary.simpleMessage("Review"),
-    "Shortcuts_Request_Hint": MessageLookupByLibrary.simpleMessage("This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request."),
-    "Shortcuts_Request_Discard": MessageLookupByLibrary.simpleMessage("Discard pending text"),
-    "Shortcuts_Request_Discard_Failed": MessageLookupByLibrary.simpleMessage("Could not discard this request. Try again."),
-    "Shortcuts_Request_Empty": MessageLookupByLibrary.simpleMessage("No pending shortcut text."),
-    "Today_Task_Search": MessageLookupByLibrary.simpleMessage("Search unfinished tasks"),
-    "Today_Task_No_Matches": MessageLookupByLibrary.simpleMessage("No matching unfinished tasks."),
-    "Today_Task_Undo_Failed": MessageLookupByLibrary.simpleMessage("Could not undo task completion. Try again."),
-    "Today_Task_Undo_Unavailable": MessageLookupByLibrary.simpleMessage("This task changed. Its completion could not be undone."),
-    "Today_Task_Undone": MessageLookupByLibrary.simpleMessage("Task marked unfinished."),
-    "Markdown_Import": MessageLookupByLibrary.simpleMessage("Import Markdown"),
-    "Markdown_Import_Description": MessageLookupByLibrary.simpleMessage("Bring in .md files or a ZIP with local images. Review notes before importing."),
-    "Markdown_Import_Choose": MessageLookupByLibrary.simpleMessage("Choose files"),
-    "Markdown_Import_Review": MessageLookupByLibrary.simpleMessage("Review import"),
-    "Markdown_Import_Import": MessageLookupByLibrary.simpleMessage("Import notes"),
-    "Markdown_Import_Empty": MessageLookupByLibrary.simpleMessage("No notes ready to import."),
-    "Markdown_Import_Failed": MessageLookupByLibrary.simpleMessage("Could not read these files. Choose Markdown files or a ZIP and try again."),
-    "Markdown_Import_Save_Failed": MessageLookupByLibrary.simpleMessage("Some notes could not be imported. Your imported notes are saved; retry the remaining notes."),
-    "Markdown_Import_Done": MessageLookupByLibrary.simpleMessage("Notes imported."),
-    "Markdown_Import_Unsupported": MessageLookupByLibrary.simpleMessage("Some formatting is kept as plain text."),
-    "Markdown_Import_Missing_Images": MessageLookupByLibrary.simpleMessage("Some images were unavailable. Their original references are kept in the note."),
-    "Markdown_Import_Limit": MessageLookupByLibrary.simpleMessage("This import would exceed your free note limit. Upgrade or select fewer notes."),
-    "Markdown_Import_Skipped": MessageLookupByLibrary.simpleMessage("Empty files were skipped."),
-    "Markdown_Import_Select_All": MessageLookupByLibrary.simpleMessage("Select all"),
-    "Markdown_Import_Deselect_All": MessageLookupByLibrary.simpleMessage("Deselect all"),
-    "Siri_Shortcuts_Title": MessageLookupByLibrary.simpleMessage("Siri & Shortcuts"),
-    "Siri_Shortcuts_Description": MessageLookupByLibrary.simpleMessage("Add text to your notes with Siri or the Shortcuts app."),
-    "Siri_Shortcuts_Setup": MessageLookupByLibrary.simpleMessage("In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append."),
-    "Siri_Shortcuts_Requirements": MessageLookupByLibrary.simpleMessage("Requires iOS 16 or later, or macOS 13 or later."),
-    "Siri_Shortcuts_Save": MessageLookupByLibrary.simpleMessage("Actions open Onlynote to finish saving. Keep the app open until the text is saved."),
-    "Siri_Shortcuts_Today": MessageLookupByLibrary.simpleMessage("Append to Today’s Note"),
-    "Siri_Shortcuts_Today_Description": MessageLookupByLibrary.simpleMessage("Add text to today’s daily note. A daily note is created if needed."),
-    "Siri_Shortcuts_Note": MessageLookupByLibrary.simpleMessage("Append to Note"),
-    "Siri_Shortcuts_Note_Description": MessageLookupByLibrary.simpleMessage("Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected."),
-    "Siri_Shortcuts_Inbox": MessageLookupByLibrary.simpleMessage("Save Text to Inbox"),
-    "Siri_Shortcuts_Inbox_Description": MessageLookupByLibrary.simpleMessage("Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note."),
-    "Siri_Shortcuts_Open": MessageLookupByLibrary.simpleMessage("Open Shortcuts"),
-    "Siri_Shortcuts_Open_Failed": MessageLookupByLibrary.simpleMessage("Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions."),
-    "Today_Task_Search_Count": mTodayTaskSearchCount,
-        "Today_Title": MessageLookupByLibrary.simpleMessage("Today"),
-        "Today_Description": MessageLookupByLibrary.simpleMessage(
-            "Your note, reminders, and unfinished tasks in one place."),
-        "Today_Create_Note":
-            MessageLookupByLibrary.simpleMessage("Start today’s note"),
-        "Today_Open_Note": MessageLookupByLibrary.simpleMessage("Open note"),
-        "Today_Daily_Empty": MessageLookupByLibrary.simpleMessage(
-            "Capture a thought or make a plan for today."),
-        "Today_Reminders":
-            MessageLookupByLibrary.simpleMessage("Due reminders"),
-        "Today_No_Reminders":
-            MessageLookupByLibrary.simpleMessage("No reminders due today."),
-        "Today_All_Reminders":
-            MessageLookupByLibrary.simpleMessage("All reminders"),
-        "Today_Tasks": MessageLookupByLibrary.simpleMessage("Unfinished tasks"),
-        "Today_Tasks_Hint":
-            MessageLookupByLibrary.simpleMessage("Across your active notes"),
-        "Today_No_Tasks":
-            MessageLookupByLibrary.simpleMessage("No unfinished tasks."),
-        "Today_Load_Failed": MessageLookupByLibrary.simpleMessage(
-            "Could not refresh Today. Try again."),
-        "Today_Task_Save_Failed": MessageLookupByLibrary.simpleMessage(
-            "Could not complete this task. Try again."),
-        "Today_Task_Changed": MessageLookupByLibrary.simpleMessage(
-            "This task changed. Review the latest version and try again."),
-        "Editor_Divider": MessageLookupByLibrary.simpleMessage("Divider line"),
-        "Section_Links": MessageLookupByLibrary.simpleMessage("Heading links"),
-        "Section_Link_Add":
-            MessageLookupByLibrary.simpleMessage("Link to heading"),
-        "Section_Link_Choose":
-            MessageLookupByLibrary.simpleMessage("Choose a heading"),
-        "Section_Link_Search":
-            MessageLookupByLibrary.simpleMessage("Search notes and headings"),
-        "Section_Link_Empty": MessageLookupByLibrary.simpleMessage(
-            "Format a paragraph as a heading to link to it here."),
-        "Section_Link_No_Results":
-            MessageLookupByLibrary.simpleMessage("No matching headings."),
-        "Section_Link_This_Note":
-            MessageLookupByLibrary.simpleMessage("This note"),
-        "Section_Link_Unavailable": MessageLookupByLibrary.simpleMessage(
-            "Heading unavailable. It may have been removed."),
-        "Section_Link_Remove":
-            MessageLookupByLibrary.simpleMessage("Remove heading link"),
-        "Section_Link_Failed": MessageLookupByLibrary.simpleMessage(
-            "Could not save this heading link. Try again."),
-        "Section_Link_Limit": MessageLookupByLibrary.simpleMessage(
-            "You can add up to 100 heading links per note."),
-
     "Add_Image": MessageLookupByLibrary.simpleMessage("Add Photo"),
     "Add_Note": MessageLookupByLibrary.simpleMessage("Add Note"),
     "Add_Reminder": MessageLookupByLibrary.simpleMessage("Add Reminder"),
     "Add_Selection_To_Checklist": MessageLookupByLibrary.simpleMessage(
       "Add to checklist",
     ),
+    "Add_Tags": MessageLookupByLibrary.simpleMessage("Add tags"),
     "Add_todo": MessageLookupByLibrary.simpleMessage("Add item"),
     "Ads_Removed": MessageLookupByLibrary.simpleMessage("Ads Removed"),
     "Ads_Removed_Description": MessageLookupByLibrary.simpleMessage(
@@ -559,6 +492,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Duplicate": MessageLookupByLibrary.simpleMessage("Duplicate"),
     "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
     "Edit_Tags": MessageLookupByLibrary.simpleMessage("Edit tags"),
+    "Editor_Divider": MessageLookupByLibrary.simpleMessage("Divider line"),
     "Editor_Insert": MessageLookupByLibrary.simpleMessage("Insert"),
     "Editor_Tip_Formatting": MessageLookupByLibrary.simpleMessage(
       "Use the buttons below to format selected text.",
@@ -784,6 +718,53 @@ class MessageLookup extends MessageLookupByLibrary {
     "Linked_From": MessageLookupByLibrary.simpleMessage("Linked from"),
     "Linked_Notes": MessageLookupByLibrary.simpleMessage("Linked notes"),
     "Manage_Folders": MessageLookupByLibrary.simpleMessage("Manage Folders"),
+    "Manage_Tags": MessageLookupByLibrary.simpleMessage("Manage tags"),
+    "Manage_Tags_Hint": MessageLookupByLibrary.simpleMessage(
+      "Renaming or removing a tag updates every note that uses it, including archived notes and notes in Trash, plus saved views and templates.",
+    ),
+    "Markdown_Import": MessageLookupByLibrary.simpleMessage("Import Markdown"),
+    "Markdown_Import_Choose": MessageLookupByLibrary.simpleMessage(
+      "Choose files",
+    ),
+    "Markdown_Import_Description": MessageLookupByLibrary.simpleMessage(
+      "Bring in .md files or a ZIP with local images. Review notes before importing.",
+    ),
+    "Markdown_Import_Deselect_All": MessageLookupByLibrary.simpleMessage(
+      "Deselect all",
+    ),
+    "Markdown_Import_Done": MessageLookupByLibrary.simpleMessage(
+      "Notes imported.",
+    ),
+    "Markdown_Import_Empty": MessageLookupByLibrary.simpleMessage(
+      "No notes ready to import.",
+    ),
+    "Markdown_Import_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not read these files. Choose Markdown files or a ZIP and try again.",
+    ),
+    "Markdown_Import_Import": MessageLookupByLibrary.simpleMessage(
+      "Import notes",
+    ),
+    "Markdown_Import_Limit": MessageLookupByLibrary.simpleMessage(
+      "This import would exceed your free note limit. Upgrade or select fewer notes.",
+    ),
+    "Markdown_Import_Missing_Images": MessageLookupByLibrary.simpleMessage(
+      "Some images were unavailable. Their original references are kept in the note.",
+    ),
+    "Markdown_Import_Review": MessageLookupByLibrary.simpleMessage(
+      "Review import",
+    ),
+    "Markdown_Import_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Some notes could not be imported. Your imported notes are saved; retry the remaining notes.",
+    ),
+    "Markdown_Import_Select_All": MessageLookupByLibrary.simpleMessage(
+      "Select all",
+    ),
+    "Markdown_Import_Skipped": MessageLookupByLibrary.simpleMessage(
+      "Empty files were skipped.",
+    ),
+    "Markdown_Import_Unsupported": MessageLookupByLibrary.simpleMessage(
+      "Some formatting is kept as plain text.",
+    ),
     "Medium": MessageLookupByLibrary.simpleMessage("Medium"),
     "Metronome_Go": MessageLookupByLibrary.simpleMessage("Metronome Go"),
     "Minesweeper_Go": MessageLookupByLibrary.simpleMessage("Minesweeper Go"),
@@ -805,6 +786,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "No_Search_Results": MessageLookupByLibrary.simpleMessage(
       "No notes match your search.",
+    ),
+    "No_Tags": MessageLookupByLibrary.simpleMessage(
+      "No tags yet. Add tags to a note to group related notes.",
     ),
     "No_notes_found": MessageLookupByLibrary.simpleMessage(
       "Your ideas start here",
@@ -909,13 +893,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "Notes_Deleted_Successfully": MessageLookupByLibrary.simpleMessage(
       "Notes Deleted Successfully",
     ),
+    "Notes_Moved_Count": m24,
     "Notes_Moved_To_Trash": MessageLookupByLibrary.simpleMessage(
       "Moved to Trash",
     ),
     "Notes_Permanently_Deleted": MessageLookupByLibrary.simpleMessage(
       "Notes permanently deleted",
     ),
+    "Notes_Pinned_Count": m25,
     "Notes_Restored": MessageLookupByLibrary.simpleMessage("Notes restored"),
+    "Notes_Unpinned_Count": m26,
     "Novels_Hub": MessageLookupByLibrary.simpleMessage("Novels Hub"),
     "OK": MessageLookupByLibrary.simpleMessage("OK"),
     "Onboarding_Body_1": MessageLookupByLibrary.simpleMessage(
@@ -960,7 +947,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Write a note",
     ),
     "Onlynote": MessageLookupByLibrary.simpleMessage("Onlynote"),
-    "Open_Folder_In_Library": m24,
+    "Open_Folder_In_Library": m27,
     "Open_Linked_Note": MessageLookupByLibrary.simpleMessage(
       "Open linked note",
     ),
@@ -1010,7 +997,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Photo_Text_No_Text": MessageLookupByLibrary.simpleMessage(
       "No text found. Try a clearer photo with larger text.",
     ),
-    "Photo_Text_Photo": m25,
+    "Photo_Text_Photo": m28,
     "Photo_Text_Review": MessageLookupByLibrary.simpleMessage(
       "Text from photo",
     ),
@@ -1054,7 +1041,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Feature_Required": MessageLookupByLibrary.simpleMessage(
       "Unlock this feature with Premium.",
     ),
-    "Premium_Folder_Limit": m26,
+    "Premium_Folder_Limit": m29,
     "Premium_Folders": MessageLookupByLibrary.simpleMessage(
       "Unlimited folders",
     ),
@@ -1065,7 +1052,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Free includes 3 folders and 3 saved templates.",
     ),
     "Premium_No_Ads": MessageLookupByLibrary.simpleMessage("No ads"),
-    "Premium_Note_Limit": m27,
+    "Premium_Note_Limit": m30,
     "Premium_Note_Themes": MessageLookupByLibrary.simpleMessage(
       "Premium note themes",
     ),
@@ -1076,7 +1063,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_One_Time_Description": MessageLookupByLibrary.simpleMessage(
       "One-time purchase. No subscription.",
     ),
-    "Premium_One_Time_Price": m28,
+    "Premium_One_Time_Price": m31,
     "Premium_Repeating_Reminders": MessageLookupByLibrary.simpleMessage(
       "Repeating reminders",
     ),
@@ -1099,7 +1086,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Premium_Showcase_Title": MessageLookupByLibrary.simpleMessage(
       "Make room for your ideas",
     ),
-    "Premium_Template_Limit": m29,
+    "Premium_Template_Limit": m32,
     "Premium_Templates": MessageLookupByLibrary.simpleMessage(
       "Unlimited saved templates",
     ),
@@ -1147,7 +1134,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Choose a time in the future for your reminder.",
     ),
     "Reminder_In_One_Hour": MessageLookupByLibrary.simpleMessage("In 1 hour"),
-    "Reminder_Next_Time": m30,
+    "Reminder_Next_Time": m33,
     "Reminder_Next_Week": MessageLookupByLibrary.simpleMessage("In a week"),
     "Reminder_Repeat": MessageLookupByLibrary.simpleMessage("Repeat"),
     "Reminder_Repeat_Daily": MessageLookupByLibrary.simpleMessage("Daily"),
@@ -1164,7 +1151,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminder_Snooze_1_Hour": MessageLookupByLibrary.simpleMessage(
       "Snooze 1 hour",
     ),
-    "Reminder_Suggestion": m31,
+    "Reminder_Suggestion": m34,
     "Reminder_Suggestion_Confirm": MessageLookupByLibrary.simpleMessage(
       "Use suggested time",
     ),
@@ -1196,7 +1183,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Search": MessageLookupByLibrary.simpleMessage(
       "Search reminders",
     ),
-    "Reminders_Search_Count": m32,
+    "Reminders_Search_Count": m35,
     "Reminders_Search_Empty_Message": MessageLookupByLibrary.simpleMessage(
       "Try another search or clear it to see all reminders.",
     ),
@@ -1212,9 +1199,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "Reminders_Today": MessageLookupByLibrary.simpleMessage("Today"),
     "Reminders_Upcoming": MessageLookupByLibrary.simpleMessage("Upcoming"),
     "Remove_Ads": MessageLookupByLibrary.simpleMessage("Remove Ads"),
-    "Remove_Ads_Price": m33,
-    "Remove_Library_Criterion": m34,
+    "Remove_Ads_Price": m36,
+    "Remove_Library_Criterion": m37,
+    "Remove_Tag": MessageLookupByLibrary.simpleMessage("Remove tag"),
+    "Remove_Tag_Confirm_Message": MessageLookupByLibrary.simpleMessage(
+      "This tag will be removed from every note that uses it, including archived notes and notes in Trash, and from saved views and templates. No note content is deleted.",
+    ),
     "Rename_Folder": MessageLookupByLibrary.simpleMessage("Rename Folder"),
+    "Rename_Tag": MessageLookupByLibrary.simpleMessage("Rename tag"),
     "Rename_Template": MessageLookupByLibrary.simpleMessage("Rename template"),
     "Rename_View": MessageLookupByLibrary.simpleMessage("Rename view"),
     "Reorder": MessageLookupByLibrary.simpleMessage("Reorder"),
@@ -1260,10 +1252,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "Saved_View_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save this view. Try again.",
     ),
-    "Saved_View_Limit_Reached": m35,
+    "Saved_View_Limit_Reached": m38,
     "Saved_View_Name": MessageLookupByLibrary.simpleMessage("View name"),
-    "Saved_View_Search": m36,
-    "Saved_View_Tags": m37,
+    "Saved_View_Search": m39,
+    "Saved_View_Tags": m40,
     "Saved_Views": MessageLookupByLibrary.simpleMessage("Saved views"),
     "Saved_Views_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No matching saved views.",
@@ -1272,7 +1264,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Active": MessageLookupByLibrary.simpleMessage("Searching"),
     "Search_Folders": MessageLookupByLibrary.simpleMessage("Search folders"),
     "Search_Notes": MessageLookupByLibrary.simpleMessage("Search notes"),
-    "Search_Results_Count": m38,
+    "Search_Results_Count": m41,
     "Search_Saved_Views": MessageLookupByLibrary.simpleMessage(
       "Search saved views",
     ),
@@ -1280,13 +1272,43 @@ class MessageLookup extends MessageLookupByLibrary {
     "Search_Templates": MessageLookupByLibrary.simpleMessage(
       "Search templates",
     ),
+    "Section_Link_Add": MessageLookupByLibrary.simpleMessage("Link to heading"),
+    "Section_Link_Choose": MessageLookupByLibrary.simpleMessage(
+      "Choose a heading",
+    ),
+    "Section_Link_Empty": MessageLookupByLibrary.simpleMessage(
+      "Format a paragraph as a heading to link to it here.",
+    ),
+    "Section_Link_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not save this heading link. Try again.",
+    ),
+    "Section_Link_Limit": MessageLookupByLibrary.simpleMessage(
+      "You can add up to 100 heading links per note.",
+    ),
+    "Section_Link_No_Results": MessageLookupByLibrary.simpleMessage(
+      "No matching headings.",
+    ),
+    "Section_Link_Remove": MessageLookupByLibrary.simpleMessage(
+      "Remove heading link",
+    ),
+    "Section_Link_Search": MessageLookupByLibrary.simpleMessage(
+      "Search notes and headings",
+    ),
+    "Section_Link_This_Note": MessageLookupByLibrary.simpleMessage("This note"),
+    "Section_Link_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "Heading unavailable. It may have been removed.",
+    ),
+    "Section_Links": MessageLookupByLibrary.simpleMessage("Heading links"),
     "Select": MessageLookupByLibrary.simpleMessage("Select"),
-    "Selection_Checklist_Added": m39,
+    "Selection_Checklist_Added": m42,
     "Selection_Checklist_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not save the checklist items.",
     ),
     "Selection_Checklist_Too_Long": MessageLookupByLibrary.simpleMessage(
       "One line is too long for a checklist item. Select shorter lines.",
+    ),
+    "Selection_Update_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not update every selected note. Please try again.",
     ),
     "Settings": MessageLookupByLibrary.simpleMessage("Settings"),
     "Settings_Save_Failed": MessageLookupByLibrary.simpleMessage(
@@ -1338,9 +1360,77 @@ class MessageLookup extends MessageLookupByLibrary {
     "Share_Text_Description": MessageLookupByLibrary.simpleMessage(
       "Title, full text, checklist, and reminder. No photos.",
     ),
+    "Shortcuts_Append_Conflict": MessageLookupByLibrary.simpleMessage(
+      "This note changed while an append was interrupted. The saved request needs review.",
+    ),
+    "Shortcuts_Append_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not append this text. It is saved for retry.",
+    ),
+    "Shortcuts_Append_Saved": MessageLookupByLibrary.simpleMessage(
+      "Text added to note.",
+    ),
+    "Shortcuts_Append_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "The destination note is unavailable. Restore it or choose another note in Shortcuts.",
+    ),
+    "Shortcuts_Inbox_Title": MessageLookupByLibrary.simpleMessage("Inbox"),
+    "Shortcuts_Request_Discard": MessageLookupByLibrary.simpleMessage(
+      "Discard pending text",
+    ),
+    "Shortcuts_Request_Discard_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not discard this request. Try again.",
+    ),
+    "Shortcuts_Request_Empty": MessageLookupByLibrary.simpleMessage(
+      "No pending shortcut text.",
+    ),
+    "Shortcuts_Request_Hint": MessageLookupByLibrary.simpleMessage(
+      "This text is still saved. You can copy it to keep elsewhere, retry saving, or discard the pending request.",
+    ),
+    "Shortcuts_Requests": MessageLookupByLibrary.simpleMessage(
+      "Pending shortcut text",
+    ),
+    "Shortcuts_Review": MessageLookupByLibrary.simpleMessage("Review"),
     "Shows": MessageLookupByLibrary.simpleMessage("Shows"),
     "Simple_Calculator": MessageLookupByLibrary.simpleMessage(
       "Simple Calculator",
+    ),
+    "Siri_Shortcuts_Description": MessageLookupByLibrary.simpleMessage(
+      "Add text to your notes with Siri or the Shortcuts app.",
+    ),
+    "Siri_Shortcuts_Inbox": MessageLookupByLibrary.simpleMessage(
+      "Save Text to Inbox",
+    ),
+    "Siri_Shortcuts_Inbox_Description": MessageLookupByLibrary.simpleMessage(
+      "Add Get Clipboard before this action in Shortcuts and pass its result as the text. Onlynote saves it in your Inbox note.",
+    ),
+    "Siri_Shortcuts_Note": MessageLookupByLibrary.simpleMessage(
+      "Append to Note",
+    ),
+    "Siri_Shortcuts_Note_Description": MessageLookupByLibrary.simpleMessage(
+      "Choose a saved note, then supply the text to append. Renaming the note keeps the shortcut connected.",
+    ),
+    "Siri_Shortcuts_Open": MessageLookupByLibrary.simpleMessage(
+      "Open Shortcuts",
+    ),
+    "Siri_Shortcuts_Open_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not open Shortcuts. Open the Shortcuts app and search for Onlynote actions.",
+    ),
+    "Siri_Shortcuts_Requirements": MessageLookupByLibrary.simpleMessage(
+      "Requires iOS 16 or later, or macOS 13 or later.",
+    ),
+    "Siri_Shortcuts_Save": MessageLookupByLibrary.simpleMessage(
+      "Actions open Onlynote to finish saving. Keep the app open until the text is saved.",
+    ),
+    "Siri_Shortcuts_Setup": MessageLookupByLibrary.simpleMessage(
+      "In Shortcuts, create a shortcut and search for Onlynote actions. Choose an action and supply the text to append.",
+    ),
+    "Siri_Shortcuts_Title": MessageLookupByLibrary.simpleMessage(
+      "Siri & Shortcuts",
+    ),
+    "Siri_Shortcuts_Today": MessageLookupByLibrary.simpleMessage(
+      "Append to Today’s Note",
+    ),
+    "Siri_Shortcuts_Today_Description": MessageLookupByLibrary.simpleMessage(
+      "Add text to today’s daily note. A daily note is created if needed.",
     ),
     "Small": MessageLookupByLibrary.simpleMessage("Small"),
     "Sort_By": MessageLookupByLibrary.simpleMessage("Sort by"),
@@ -1360,14 +1450,31 @@ class MessageLookup extends MessageLookupByLibrary {
       "Starter templates",
     ),
     "Sudoku_Lover": MessageLookupByLibrary.simpleMessage("Sudoku Lover"),
+    "Tag_Change_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not update this tag. Please try again.",
+    ),
+    "Tag_Change_Incomplete": MessageLookupByLibrary.simpleMessage(
+      "Some notes or saved views kept the old tag. Try again.",
+    ),
     "Tag_Hint": MessageLookupByLibrary.simpleMessage("Add a tag"),
     "Tag_Invalid": MessageLookupByLibrary.simpleMessage(
       "Use up to 20 tags, with 40 characters per tag.",
     ),
+    "Tag_Merge_Confirm_Action": MessageLookupByLibrary.simpleMessage("Merge"),
+    "Tag_Merge_Confirm_Message": m43,
+    "Tag_Merge_Confirm_Title": MessageLookupByLibrary.simpleMessage(
+      "Merge tags",
+    ),
+    "Tag_Name": MessageLookupByLibrary.simpleMessage("Tag name"),
+    "Tag_Name_Invalid": MessageLookupByLibrary.simpleMessage(
+      "Enter a tag name of up to 40 characters.",
+    ),
+    "Tag_Removed_Count": m44,
+    "Tag_Renamed_Count": m45,
     "Tag_Suggestions_Empty": MessageLookupByLibrary.simpleMessage(
       "No matching tag suggestions. You can add a new tag.",
     ),
-    "Tag_Usage_Count": m40,
+    "Tag_Usage_Count": m46,
     "Tag_Usage_Counts_Hint": MessageLookupByLibrary.simpleMessage(
       "Counts include active and archived notes across all folders. Search and filters do not change them.",
     ),
@@ -1375,12 +1482,14 @@ class MessageLookup extends MessageLookupByLibrary {
       "Counts include notes in Trash across all folders. Search and filters do not change them.",
     ),
     "Tags": MessageLookupByLibrary.simpleMessage("Tags"),
-    "Tags_Hidden_By_Search_Count": m41,
+    "Tags_Add_Skipped_Count": m47,
+    "Tags_Added_Count": m48,
+    "Tags_Hidden_By_Search_Count": m49,
     "Tags_Search_Empty": MessageLookupByLibrary.simpleMessage(
       "No tags match your search",
     ),
-    "Tags_Selected_Count": m42,
-    "Tags_Selection_Limit_Reached": m43,
+    "Tags_Selected_Count": m50,
+    "Tags_Selection_Limit_Reached": m51,
     "Take_Photo": MessageLookupByLibrary.simpleMessage("Take Photo"),
     "Template_Change_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t update the template. Please try again.",
@@ -1409,7 +1518,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Template_Delete_Confirm_Title": MessageLookupByLibrary.simpleMessage(
       "Delete template?",
     ),
-    "Template_Details": m44,
+    "Template_Details": m52,
     "Template_Load_Failed": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t load your templates. Please try again.",
     ),
@@ -1466,10 +1575,60 @@ class MessageLookup extends MessageLookupByLibrary {
     "To_get_notification": MessageLookupByLibrary.simpleMessage(
       "To get a reminder, please go to settings to open notification.",
     ),
+    "Today_All_Reminders": MessageLookupByLibrary.simpleMessage(
+      "All reminders",
+    ),
+    "Today_Create_Note": MessageLookupByLibrary.simpleMessage(
+      "Start today’s note",
+    ),
+    "Today_Daily_Empty": MessageLookupByLibrary.simpleMessage(
+      "Capture a thought or make a plan for today.",
+    ),
+    "Today_Description": MessageLookupByLibrary.simpleMessage(
+      "Your note, reminders, and unfinished tasks in one place.",
+    ),
+    "Today_Load_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not refresh Today. Try again.",
+    ),
+    "Today_No_Reminders": MessageLookupByLibrary.simpleMessage(
+      "No reminders due today.",
+    ),
+    "Today_No_Tasks": MessageLookupByLibrary.simpleMessage(
+      "No unfinished tasks.",
+    ),
     "Today_Note": MessageLookupByLibrary.simpleMessage("Today’s note"),
     "Today_Note_Open_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not open today’s note. Try again.",
     ),
+    "Today_Open_Note": MessageLookupByLibrary.simpleMessage("Open note"),
+    "Today_Reminders": MessageLookupByLibrary.simpleMessage("Due reminders"),
+    "Today_Task_Changed": MessageLookupByLibrary.simpleMessage(
+      "This task changed. Review the latest version and try again.",
+    ),
+    "Today_Task_No_Matches": MessageLookupByLibrary.simpleMessage(
+      "No matching unfinished tasks.",
+    ),
+    "Today_Task_Save_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not complete this task. Try again.",
+    ),
+    "Today_Task_Search": MessageLookupByLibrary.simpleMessage(
+      "Search unfinished tasks",
+    ),
+    "Today_Task_Search_Count": m53,
+    "Today_Task_Undo_Failed": MessageLookupByLibrary.simpleMessage(
+      "Could not undo task completion. Try again.",
+    ),
+    "Today_Task_Undo_Unavailable": MessageLookupByLibrary.simpleMessage(
+      "This task changed. Its completion could not be undone.",
+    ),
+    "Today_Task_Undone": MessageLookupByLibrary.simpleMessage(
+      "Task marked unfinished.",
+    ),
+    "Today_Tasks": MessageLookupByLibrary.simpleMessage("Unfinished tasks"),
+    "Today_Tasks_Hint": MessageLookupByLibrary.simpleMessage(
+      "Across your active notes",
+    ),
+    "Today_Title": MessageLookupByLibrary.simpleMessage("Today"),
     "Todo": MessageLookupByLibrary.simpleMessage("Checklist item"),
     "Todo_list": MessageLookupByLibrary.simpleMessage("Checklist"),
     "Trash": MessageLookupByLibrary.simpleMessage("Trash"),
@@ -1517,7 +1676,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "Voice_Record_Failed": MessageLookupByLibrary.simpleMessage(
       "Could not record. Please try again.",
     ),
-    "Voice_Recorded_At": m45,
+    "Voice_Recorded_At": m54,
     "Voice_Recording_Hint": MessageLookupByLibrary.simpleMessage(
       "Record up to 5 minutes. Transcription is optional.",
     ),
