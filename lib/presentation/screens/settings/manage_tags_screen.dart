@@ -78,7 +78,17 @@ class ManageTagsScreen extends StatefulWidget {
 
 class _ManageTagsScreenState extends State<ManageTagsScreen> {
   final _searchController = TextEditingController();
-  bool _editing = false;
+
+  /// The tag whose change is saving, so its own row shows the progress and
+  /// every row's menu stays disabled until it finishes.
+  String? _editingKey;
+
+  /// The catalog is a pass over every stored note. Holding it means typing in
+  /// the search field filters what is already built instead of reading the
+  /// whole library again for each keystroke.
+  List<ManagedTag>? _catalog;
+
+  bool get _editing => _editingKey != null;
 
   late final NoteTagEditor _editor =
       widget.editor ?? NoteTagEditor(notes: getIt<NoteRepository>());
@@ -93,10 +103,23 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
       Hive.box(databaseBox).values.whereType<NoteDto>().toList();
 
   @override
+  void initState() {
+    super.initState();
+    _revisions.addListener(_onRevision);
+  }
+
+  @override
   void dispose() {
+    _revisions.removeListener(_onRevision);
     _searchController.dispose();
     super.dispose();
   }
+
+  void _onRevision() {
+    if (mounted) setState(() => _catalog = null);
+  }
+
+  List<ManagedTag> _catalogue() => _catalog ??= managedTagsFromNotes(_notes());
 
   void _clearSearch() {
     _searchController.clear();
@@ -106,12 +129,13 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
   /// Runs one tag change at a time: a second menu tap while a rename is
   /// saving would read the same notes and rewrite them from a stale list.
   Future<void> _apply(
+    String key,
     Future<TagEditOutcome> Function() change,
     List<String> Function(List<String> tags) rewrite,
     String Function(S strings, int notes) message,
   ) async {
     if (_editing) return;
-    setState(() => _editing = true);
+    setState(() => _editingKey = key);
     try {
       final outcome = await change();
       if (!mounted) return;
@@ -131,7 +155,14 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
         context.showToast(S.of(context).Tag_Change_Failed, isError: true);
       }
     } finally {
-      if (mounted) setState(() => _editing = false);
+      // The notes box normally reports the change, but rebuild the catalog
+      // here too so a finished edit always shows, whatever the store did.
+      if (mounted) {
+        setState(() {
+          _catalog = null;
+          _editingKey = null;
+        });
+      }
     }
   }
 
@@ -184,6 +215,7 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
       if (!confirmed || !mounted) return;
     }
     await _apply(
+      tag.key,
       () => _editor.rename(from: tag.name, to: replacement),
       (tags) => renameTagIn(tags, from: tag.name, to: replacement),
       (strings, notes) => strings.Tag_Renamed_Count(notes),
@@ -201,6 +233,7 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
     );
     if (!confirmed || !mounted) return;
     await _apply(
+      tag.key,
       () => _editor.remove(tag.name),
       (tags) => removeTagIn(tags, tag.name),
       (strings, notes) => strings.Tag_Removed_Count(notes),
@@ -222,10 +255,9 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
             child: ConstrainedBox(
               constraints:
                   BoxConstraints(maxWidth: context.tokens.contentMaxWidth),
-              child: AnimatedBuilder(
-                animation: _revisions,
-                builder: (context, _) {
-                  final catalog = managedTagsFromNotes(_notes());
+              child: Builder(
+                builder: (context) {
+                  final catalog = _catalogue();
                   final tags =
                       filterManagedTags(catalog, _searchController.text);
                   return ListView.builder(
@@ -253,43 +285,52 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
                                 overflow: TextOverflow.clip),
                             subtitle: Text(strings.Tag_Usage_Count(
                                 tag.count, countFormat.format(tag.count))),
-                            trailing: PopupMenuButton<_TagAction>(
-                              key: ValueKey('managed-tag-${tag.key}-menu'),
-                              tooltip: strings.Edit,
-                              enabled: !_editing,
-                              onSelected: (action) {
-                                switch (action) {
-                                  case _TagAction.rename:
-                                    _rename(tag, catalog);
-                                  case _TagAction.remove:
-                                    _remove(tag);
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: _TagAction.rename,
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    leading: const Icon(
-                                        Icons.drive_file_rename_outline),
-                                    title: Text(strings.Rename_Tag),
+                            trailing: _editingKey == tag.key
+                                ? const SizedBox(
+                                    key: ValueKey('managed-tag-progress'),
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  )
+                                : PopupMenuButton<_TagAction>(
+                                    key:
+                                        ValueKey('managed-tag-${tag.key}-menu'),
+                                    tooltip: strings.Edit,
+                                    enabled: !_editing,
+                                    onSelected: (action) {
+                                      switch (action) {
+                                        case _TagAction.rename:
+                                          _rename(tag, catalog);
+                                        case _TagAction.remove:
+                                          _remove(tag);
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: _TagAction.rename,
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          leading: const Icon(
+                                              Icons.drive_file_rename_outline),
+                                          title: Text(strings.Rename_Tag),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: _TagAction.remove,
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          leading: Icon(Icons.delete_outline,
+                                              color: context.colors.error),
+                                          title: Text(
+                                            strings.Remove_Tag,
+                                            style: TextStyle(
+                                                color: context.colors.error),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                PopupMenuItem(
-                                  value: _TagAction.remove,
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    leading: Icon(Icons.delete_outline,
-                                        color: context.colors.error),
-                                    title: Text(
-                                      strings.Remove_Tag,
-                                      style:
-                                          TextStyle(color: context.colors.error),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                       );

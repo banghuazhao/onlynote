@@ -1241,18 +1241,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final result =
         await _applyToSelection(ids, (bloc) => bloc.addTagsToNotes(ids, tags));
     if (result == null || !mounted) return;
-    if (result.skipped > 0) {
-      context.showToast(S.of(context).Tags_Add_Skipped_Count(result.skipped),
-          isError: true);
-      return;
-    }
-    if (result.changed == 0) return;
-    context.showToast(S.of(context).Tags_Added_Count(result.changed));
+    // A selection can be part tagged and part already at the tag limit.
+    // Report both, so notes that were tagged are not hidden behind the
+    // limit notice, and only a selection that gained nothing reads as an
+    // error.
+    final strings = S.of(context);
+    final report = [
+      if (result.changed > 0) strings.Tags_Added_Count(result.changed),
+      if (result.skipped > 0) strings.Tags_Add_Skipped_Count(result.skipped),
+    ];
+    if (report.isEmpty) return;
+    context.showToast(report.join('\n'), isError: result.changed == 0);
   }
 
   Future<void> _pinSelected(List<String> ids, bool pinned) async {
-    final result =
-        await _applyToSelection(ids, (bloc) => bloc.setPinnedNotes(ids, pinned));
+    final result = await _applyToSelection(
+        ids, (bloc) => bloc.setPinnedNotes(ids, pinned));
     if (result == null || !mounted || result.changed == 0) return;
     context.showToast(pinned
         ? S.of(context).Notes_Pinned_Count(result.changed)

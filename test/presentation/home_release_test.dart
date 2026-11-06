@@ -29,6 +29,7 @@ import 'package:onlynote/presentation/screens/home/widgets/note_reorder_card.dar
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/note_search.dart';
 import 'package:onlynote/services/note_sort.dart';
+import 'package:onlynote/services/note_tags.dart';
 import 'package:onlynote/services/purchase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // The preference plugin exposes its test platform in a separate package.
@@ -745,8 +746,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('organize menu adds tags to the whole selection',
-      (tester) async {
+  testWidgets('organize menu adds tags to the whole selection', (tester) async {
     final home = await _openHome(tester);
     await selectBoth(tester, home);
 
@@ -809,12 +809,42 @@ void main() {
     final home = await _openHome(tester);
     await _openFolders(tester, 390);
     await _tap(tester, find.text(S.current.Trash));
-    expect(home.bloc.state.mapOrNull(loaded: (state) => state.showTrash),
-        isTrue);
+    expect(
+        home.bloc.state.mapOrNull(loaded: (state) => state.showTrash), isTrue);
     home.selection.add(const MultipleDeleteEvent.toggleSelect('trashed'));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('home-selection-organize')), findsNothing);
     expect(find.byTooltip(S.current.Restore), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('bulk tagging reports both what it added and what it kept',
+      (tester) async {
+    final home = await _openHome(tester);
+    // One note sits at the tag limit, so it keeps its own tags while the
+    // other is tagged. Reporting only the limit would hide that.
+    home.notes.values['second'] = NoteDto.fromNote(home.notes.values['second']!
+        .toDomain()
+        .copyWith(tags: [for (var i = 0; i < maxNoteTags; i++) 'tag$i']));
+    home.bloc.add(const HomeEvent.getAllNotes());
+    await tester.pumpAndSettle();
+    await selectBoth(tester, home);
+
+    await _tap(tester, find.byKey(const ValueKey('home-selection-organize')));
+    await _tap(tester, find.text(S.current.Add_Tags));
+    await tester.enterText(
+        find.byKey(const ValueKey('note-tag-input')), 'release');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-tags-add')));
+    await _tap(tester, find.byKey(const ValueKey('note-tags-save')));
+
+    expect(home.notes.values['first']!.tags, contains('release'));
+    expect(home.notes.values['second']!.tags, hasLength(maxNoteTags));
+    expect(home.notes.values['second']!.tags, isNot(contains('release')));
+    expect(find.textContaining(S.current.Tags_Added_Count(1)), findsOneWidget);
+    expect(find.textContaining(S.current.Tags_Add_Skipped_Count(1)),
+        findsOneWidget);
     await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);

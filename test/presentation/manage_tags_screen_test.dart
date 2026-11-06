@@ -114,8 +114,8 @@ void main() {
     }
     notes = _Notes();
     notes.seed({
-      'first': NoteDto.fromNote(Note(
-          id: 'first', title: 'Release plan', tags: ['Work', 'Research'])),
+      'first': NoteDto.fromNote(
+          Note(id: 'first', title: 'Release plan', tags: ['Work', 'Research'])),
       'second': NoteDto.fromNote(
           Note(id: 'second', title: 'Standup', tags: ['work'])),
       'archived': NoteDto.fromNote(Note(
@@ -148,7 +148,12 @@ void main() {
   /// so its queued work never runs and the screen waits on it forever.
   HomeBloc home() => openHome!;
 
-  Future<void> pump(WidgetTester tester) async {
+  Future<void> pump(WidgetTester tester,
+      {double width = 390, double textScale = 1, Locale? locale}) async {
+    tester.view.physicalSize = Size(width, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     openViews = SavedNoteViewStore(preferences: MemoryPreferences());
     openTemplates = CustomNoteTemplateStore(
         preferences: MemoryPreferences(), images: MemoryTemplateImages());
@@ -177,7 +182,14 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: S.delegate.supportedLocales,
+        locale: locale,
         theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+              disableAnimations: true,
+              textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         home: ManageTagsScreen(
           editor: NoteTagEditor(
               notes: notes, views: openViews!, templates: openTemplates!),
@@ -338,8 +350,8 @@ void main() {
     await _drainMessages(tester);
 
     // The filter follows the new name instead of emptying the library.
-    expect(home().state.mapOrNull(loaded: (state) => state.selectedTags),
-        {'Job'});
+    expect(
+        home().state.mapOrNull(loaded: (state) => state.selectedTags), {'Job'});
     expect(home().state.mapOrNull(loaded: (state) => state.notes.length), 2);
   });
 
@@ -383,4 +395,22 @@ void main() {
 
     await _drainMessages(tester);
   });
+  for (final locale in S.delegate.supportedLocales) {
+    testWidgets('tag rows stay usable at 320px and 2x text in $locale',
+        (tester) async {
+      await pump(tester, width: 320, textScale: 2, locale: locale);
+      final row = find.byKey(const ValueKey('managed-tag-work'));
+      await tester.ensureVisible(row);
+      await tester.pumpAndSettle();
+      expect(tester.getSize(row).height, greaterThanOrEqualTo(48));
+      // Enlarged text must not push the row's menu past the right edge.
+      final menu = find.byKey(const ValueKey('managed-tag-work-menu'));
+      expect(menu.hitTestable(), findsOneWidget);
+      await tester.tap(menu);
+      await tester.pumpAndSettle();
+      expect(find.text(S.current.Rename_Tag), findsOneWidget);
+      expect(find.text(S.current.Remove_Tag), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

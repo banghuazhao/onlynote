@@ -7,6 +7,8 @@
 - Carried a library tag filter through a rename or removal, so the library never sits empty under a tag no note has.
 - Added Move to Folder, Add tags, and Pin or Unpin to the selected-notes menu, applying one change to the whole selection and reporting a single count.
 - Kept notes that already match a bulk change unwritten, and reported notes already holding the tag limit instead of dropping their tags.
+- Reported the notes that gained tags alongside any left at the tag limit, so a part-applied bulk tagging no longer reads as a failure.
+- Showed progress on the tag being renamed or removed, and kept typing in the tag search responsive in a large library.
 
 - Added Markdown file and ZIP import with previews, note selection, local images, supported formatting, Premium limits, and safe partial-import retries.
 - Added unfinished-task search to Today and Undo for task completion, preserving unrelated edits and providing retry feedback.
