@@ -1,0 +1,1 @@
+- Compatibilidade aprimorada: a instalação do Onlynote não exige mais foco automático da câmera nem microfone. As funções de fotos e gravação de voz continuam disponíveis nos dispositivos compatíveis.

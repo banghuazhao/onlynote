@@ -1,0 +1,1 @@
+- Bedre enhedskompatibilitet: Onlynote kræver ikke længere kameraautofokus eller en mikrofon for at kunne installeres. Funktioner til billeder og stemmeoptagelser er stadig tilgængelige på understøttede enheder.

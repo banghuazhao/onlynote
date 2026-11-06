@@ -2,6 +2,7 @@
 // --dart-define=CAPTURE_STORE_SCREENSHOTS=true --concurrency=1
 // Optional comma-separated STORE_DEVICES, STORE_LOCALES and STORE_SCREENS
 // defines limit a review run without changing the complete capture sequence.
+// STORE_CAPTURE_APP_ONLY=true omits the store artwork frame for creative assets.
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -44,6 +45,7 @@ import 'package:onlynote/presentation/screens/home/home_screen.dart';
 import 'package:onlynote/presentation/screens/note_detail/bloc/detail/note_detail_bloc.dart';
 import 'package:onlynote/presentation/screens/note_detail/note_detail_screen.dart';
 import 'package:onlynote/presentation/screens/reminders/reminders_screen.dart';
+import 'package:onlynote/presentation/screens/settings/backup_screen.dart';
 import 'package:onlynote/presentation/theme/theme.dart';
 import 'package:onlynote/services/custom_note_template_store.dart';
 import 'package:onlynote/services/custom_template_images.dart';
@@ -62,6 +64,7 @@ import '../support/premium_test_fakes.dart';
 import '../support/store_screenshot_content.dart';
 
 const _captureEnabled = bool.fromEnvironment('CAPTURE_STORE_SCREENSHOTS');
+const _captureAppOnly = bool.fromEnvironment('STORE_CAPTURE_APP_ONLY');
 const _outputRoot = String.fromEnvironment('STORE_OUTPUT_ROOT',
     defaultValue: 'build/store_screenshots/2026-10-08');
 const _captureKey = ValueKey('store-screenshot');
@@ -86,10 +89,17 @@ class _Device {
 const _devices = [
   _Device('iphone6_9', Size(440, 956), 3, ios: true),
   _Device('iphone6_3', Size(402, 874), 3, ios: true),
+  _Device('iphone_duo_outer', Size(466, 678), 3, ios: true),
+  _Device('iphone_duo_inner', Size(669, 951), 3, ios: true),
   _Device('ipad13', Size(1032, 1376), 2, ios: true),
   _Device('playphone', Size(360, 640), 3),
   _Device('play7inch', Size(600, 960), 2),
   _Device('play10inch', Size(800, 1280), 2),
+  // Opt-in 9:16 tablet artwork. Keep legacy exports at their original sizes.
+  _Device('play7inch_9_16', Size(648, 1152), 2),
+  _Device('play10inch_9_16', Size(900, 1600), 2),
+  _Device('play7inch_16_9', Size(1152, 648), 2),
+  _Device('play10inch_16_9', Size(1280, 720), 2.5),
   _Device('macos', Size(1440, 900), 2, macos: true),
 ];
 
@@ -229,41 +239,46 @@ class _CaptureRouter extends AppRouter {
       required this.content,
       required this.fixture,
       required this.templates,
-      required this.agenda});
+      required this.agenda,
+      this.backup = false});
   final StoreScreenshotScreen screen;
   final StoreScreenshotContent content;
   final PremiumTestFixture fixture;
   final CustomNoteTemplateStore templates;
   final ReminderAgendaController agenda;
+  final bool backup;
   final positions = NotePositionStore.memory();
   bool get hasHomeParent =>
+      backup ||
       screen == StoreScreenshotScreen.cardStyle ||
       screen == StoreScreenshotScreen.reminderAgenda;
 
-  Widget _screen() => switch (screen) {
-        StoreScreenshotScreen.home ||
-        StoreScreenshotScreen.foldersSearch ||
-        StoreScreenshotScreen.starterTemplates =>
-          const HomeScreen(),
-        StoreScreenshotScreen.formattedNote => NoteDetailScreen(
-            noteId: content.formattedNote().id!,
-            positionStore: positions,
-            templateStore: templates),
-        StoreScreenshotScreen.checklist => NoteDetailScreen(
-            noteId: content.checklistNote.id!,
-            positionStore: positions,
-            templateStore: templates),
-        StoreScreenshotScreen.voiceMemo => NoteDetailScreen(
-            noteId: content.voiceNote.id!,
-            positionStore: positions,
-            templateStore: templates),
-        StoreScreenshotScreen.cardStyle => CardAppearanceScreen(
-            note: content.styleNote,
-            premiumAccess: fixture.access,
-            onSaveAppearance: (_, __) async {}),
-        StoreScreenshotScreen.reminderAgenda =>
-          RemindersScreen(controller: agenda),
-      };
+  Widget _screen() => backup
+      ? const BackupScreen()
+      : switch (screen) {
+          StoreScreenshotScreen.home ||
+          StoreScreenshotScreen.foldersSearch ||
+          StoreScreenshotScreen.starterTemplates =>
+            const HomeScreen(),
+          StoreScreenshotScreen.formattedNote => NoteDetailScreen(
+              noteId: content.formattedNote().id!,
+              positionStore: positions,
+              templateStore: templates),
+          StoreScreenshotScreen.checklist => NoteDetailScreen(
+              noteId: content.checklistNote.id!,
+              positionStore: positions,
+              templateStore: templates),
+          StoreScreenshotScreen.voiceMemo => NoteDetailScreen(
+              noteId: content.voiceNote.id!,
+              positionStore: positions,
+              templateStore: templates),
+          StoreScreenshotScreen.cardStyle => CardAppearanceScreen(
+              note: content.styleNote,
+              premiumAccess: fixture.access,
+              onSaveAppearance: (_, __) async {}),
+          StoreScreenshotScreen.reminderAgenda =>
+            RemindersScreen(controller: agenda),
+        };
 
   @override
   List<AutoRoute> get routes => [
@@ -518,7 +533,7 @@ class _StoreFrame extends StatelessWidget {
 
 Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
     StoreScreenshotContent content, StoreScreenshotScreen screen,
-    {bool desktopWidgets = false}) async {
+    {bool desktopWidgets = false, bool backup = false}) async {
   final fixture = PremiumTestFixture(premium: true, supported: device.apple);
   await fixture.init();
   final notes = _Notes(content.notes());
@@ -557,7 +572,8 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
       content: content,
       fixture: fixture,
       templates: templates,
-      agenda: agenda);
+      agenda: agenda,
+      backup: backup);
   getIt.pushNewScope();
   getIt.registerSingleton<NoteRepository>(notes);
   getIt.registerSingleton<FolderRepository>(folders);
@@ -618,16 +634,18 @@ Future<_CaptureHost> _mount(WidgetTester tester, _Device device,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate
             ],
-            builder: (context, child) => _StoreFrame(
-                device: device,
-                heading: desktopWidgets
-                    ? widgetCaption.heading
-                    : content.heading(screen, ios: device.apple),
-                subtitle: desktopWidgets
-                    ? widgetCaption.subtitle
-                    : _subtitle(content, screen, ios: device.apple),
-                widgetImages: widgetImages,
-                child: child!),
+            builder: (context, child) => _captureAppOnly
+                ? child!
+                : _StoreFrame(
+                    device: device,
+                    heading: desktopWidgets
+                        ? widgetCaption.heading
+                        : content.heading(screen, ios: device.apple),
+                    subtitle: desktopWidgets
+                        ? widgetCaption.subtitle
+                        : _subtitle(content, screen, ios: device.apple),
+                    widgetImages: widgetImages,
+                    child: child!),
           ))));
   await tester.pumpAndSettle();
   if (router.hasHomeParent) {
@@ -835,9 +853,13 @@ void main() {
   });
 
   for (final device in _devices) {
-    // Keep the existing six-device mobile export unchanged. Mac captures are
-    // explicitly requested with STORE_DEVICES=macos and a separate output root.
-    if (device.macos && const String.fromEnvironment('STORE_DEVICES').isEmpty) {
+    // Keep the existing six-device mobile export unchanged. New formats are
+    // explicitly requested with STORE_DEVICES and their own output root.
+    if ((device.macos ||
+            device.name.startsWith('iphone_duo_') ||
+            device.name.endsWith('_9_16') ||
+            device.name.endsWith('_16_9')) &&
+        const String.fromEnvironment('STORE_DEVICES').isEmpty) {
       continue;
     }
     if (!_selected(
@@ -873,6 +895,23 @@ void main() {
           } finally {
             if (host != null) await host.dispose(tester);
             debugPrint('store disposed: ${screen.name}');
+          }
+        }
+        if (!device.apple &&
+            const String.fromEnvironment('STORE_SCREENS').isNotEmpty &&
+            _selected(
+                const String.fromEnvironment('STORE_SCREENS'), 'backup')) {
+          // Capture the real dashboard only when explicitly requested, without
+          // changing the established eight-screen sequence or its filenames.
+          _CaptureHost? host;
+          try {
+            host = await _mount(
+                tester, device, content, StoreScreenshotScreen.home,
+                backup: true);
+            await _capture(tester, device, content, StoreScreenshotScreen.home,
+                filename: '09-backup');
+          } finally {
+            if (host != null) await host.dispose(tester);
           }
         }
         if (device.macos &&

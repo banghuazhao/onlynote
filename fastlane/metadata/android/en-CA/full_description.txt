@@ -1,0 +1,21 @@
+Onlynote is a notes and to-do list app for shopping lists, daily tasks and ideas you want to keep. No account needed.
+
+Write and plan
+Create notes, build checklists and add photos. Check off items as you go, with completed items moving to the bottom of the list. Add a voice recording when speaking is easier than typing.
+
+Keep useful details close
+Add the home screen widget to see pinned and recent notes, then open a note or start a new one.
+
+Find what you saved
+Organize notes into folders and search by title or content. Pin important notes and drag cards into the order that works for you.
+
+Make notes your own
+Choose note colours, font styles, text size and card size for a library that suits the way you read.
+
+Remember and share
+Set a reminder for a note. Share a note as an image when you want to send a list or an idea.
+
+Recover a deleted note
+Open Trash to restore a note you removed, or delete it permanently.
+
+Use Onlynote for quick memos, shopping lists, daily tasks and notes with photos.

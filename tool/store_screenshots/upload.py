@@ -18,11 +18,18 @@ APP_ID = '1616516732'
 PACKAGE = 'com.appsbay.onlynote'
 APPLE_BASE = 'https://api.appstoreconnect.apple.com/v1'
 PLAY_BASE = f'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE}/edits'
-APPLE_DEVICES = {
+LEGACY_APPLE_DEVICES = {
     'iphone6_9': ('APP_IPHONE_67', (1320, 2868)),
     'iphone6_3': ('APP_IPHONE_61', (1206, 2622)),
     'ipad13': ('APP_IPAD_PRO_3GEN_129', (2064, 2752)),
 }
+# Duo uses Asset Library placements, not the deprecated ScreenshotDisplayType.
+# Placement group identifiers are discovered from Apple's reference data.
+APPLE_LIBRARY_DEVICES = {
+    'iphone_duo_outer': ('IPHONE_DUO', (1398, 2034)),
+    'iphone_duo_inner': ('IPHONE_DUO', (2007, 2853)),
+}
+APPLE_DEVICES = {**LEGACY_APPLE_DEVICES, **APPLE_LIBRARY_DEVICES}
 PLAY_DEVICES = {
     'playphone': ('phoneScreenshots', (1080, 1920)),
     'play7inch': ('sevenInchScreenshots', (1200, 1920)),
@@ -31,6 +38,7 @@ PLAY_DEVICES = {
 APPLE_LOCALES = {'en': 'en-US', 'zh-Hans': 'zh-Hans', 'zh-Hant': 'zh-Hant'}
 PLAY_LOCALES = {'en': ['en-US'], 'zh-Hans': ['zh-CN'], 'zh-Hant': ['zh-TW', 'zh-HK']}
 LEGACY_APPLE_DISPLAYS = {'APP_IPHONE_65', 'APP_IPHONE_55', 'APP_IPAD_PRO_129'}
+DEFAULT_DEVICES = (*LEGACY_APPLE_DEVICES, *PLAY_DEVICES)
 
 
 def helper(name, file):
@@ -42,15 +50,19 @@ def helper(name, file):
 
 class StoreApi:
     def __init__(self, credentials):
-        self.apple_auth = helper('asc_credentials', credentials / 'AppStoreConnect_API_keys/asc_token.py')
-        self.play_auth = helper('play_credentials', credentials / 'GooglePlay_API/publish_play_release.py')
+        self.credentials = credentials
+        self.auth = {}
         self.tokens = {}
         self.session = requests.Session()
 
     def token(self, store):
         cached = self.tokens.get(store)
         if cached is None or time.monotonic() - cached[1] > 480:
-            value = self.apple_auth.token() if store == 'apple' else self.play_auth.token()
+            if store not in self.auth:
+                filename = ('AppStoreConnect_API_keys/asc_token.py' if store == 'apple'
+                            else 'GooglePlay_API/publish_play_release.py')
+                self.auth[store] = helper(f'{store}_credentials', self.credentials / filename)
+            value = self.auth[store].token()
             self.tokens[store] = value, time.monotonic()
         return self.tokens[store][0]
 
@@ -71,10 +83,10 @@ def save(file, value):
     file.write_text(json.dumps(value, indent=2, ensure_ascii=False))
 
 
-def files(root, device, locale, size):
+def files(root, device, locale, size, count=8):
     values = sorted((root / device / locale).glob('[0-9][0-9]-*.jpg'))
-    if len(values) != 8:
-        raise ValueError(f'{device}/{locale}: expected 8 JPEG files, found {len(values)}')
+    if len(values) != count:
+        raise ValueError(f'{device}/{locale}: expected {count} JPEG files, found {len(values)}')
     for path in values:
         with Image.open(path) as image:
             if image.size != size or image.mode != 'RGB':
@@ -84,11 +96,31 @@ def files(root, device, locale, size):
     return values
 
 
-def preflight(root):
+def select_devices(value=None, store=None):
+    available = APPLE_DEVICES if store == 'apple' else PLAY_DEVICES if store == 'play' else {**APPLE_DEVICES, **PLAY_DEVICES}
+    selected = [name.strip() for name in value.split(',')] if value else [
+        name for name in DEFAULT_DEVICES if name in available]
+    unknown = set(selected) - available.keys()
+    if unknown:
+        raise ValueError(f'Unknown {store or "store"} devices: {sorted(unknown)}')
+    return {name: available[name] for name in dict.fromkeys(selected)}
+
+
+def select_locales(value=None):
+    selected = [name.strip() for name in value.split(',')] if value else list(APPLE_LOCALES)
+    unknown = set(selected) - APPLE_LOCALES.keys()
+    if unknown:
+        raise ValueError(f'Unknown locales: {sorted(unknown)}')
+    return {name: APPLE_LOCALES[name] for name in dict.fromkeys(selected)}
+
+
+def preflight(root, devices=None, locales=None, count=8):
+    devices = select_devices() if devices is None else devices
+    locales = APPLE_LOCALES if locales is None else locales
     total = 0
-    for device, (_, size) in {**APPLE_DEVICES, **PLAY_DEVICES}.items():
-        for locale in APPLE_LOCALES:
-            total += len(files(root, device, locale, size))
+    for device, (_, size) in devices.items():
+        for locale in locales:
+            total += len(files(root, device, locale, size, count))
     print(f'Validated {total} opaque, correctly sized store images.', flush=True)
 
 
@@ -134,8 +166,11 @@ def upload_apple_file(api, root, set_id, path):
         headers = {entry['name']: entry['value'] for entry in part.get('requestHeaders', [])}
         start = part['offset']
         # Storage URLs carry their own authorization; never forward the Apple JWT.
-        response = requests.request(part['method'], part['url'], headers=headers,
-                                    data=body[start:start + part['length']], timeout=55)
+        try:
+            response = requests.request(part['method'], part['url'], headers=headers,
+                                        data=body[start:start + part['length']], timeout=55)
+        except requests.RequestException:
+            raise RuntimeError('Screenshot part upload failed (transport error)') from None
         if not response.ok:
             raise RuntimeError(f'Screenshot part upload failed ({response.status_code})')
     uploaded = api.call('apple', 'PATCH', f"{APPLE_BASE}/appScreenshots/{reserved['id']}", json={'data': {
@@ -195,7 +230,9 @@ def finish_apple_sets(api, root, report):
             time.sleep(min(10, remaining))
 
 
-def upload_apple(api, root, version_string, allow_create):
+def upload_apple(api, root, version_string, allow_create, devices=None, locales=None, count=8):
+    devices = LEGACY_APPLE_DEVICES if devices is None else devices
+    locales = APPLE_LOCALES if locales is None else locales
     version = apple_version(api, version_string, allow_create)
     vid = version['id']
     localizations = api.call('apple', 'GET', f'{APPLE_BASE}/appStoreVersions/{vid}/appStoreVersionLocalizations',
@@ -232,7 +269,7 @@ def upload_apple(api, root, version_string, allow_create):
     report = {'version': version_string, 'versionId': vid, 'sets': []}
     legacy_sets = []
     print(f'Apple destination: {version_string}, {version["attributes"]["appStoreState"]}', flush=True)
-    for source_locale, store_locale in APPLE_LOCALES.items():
+    for source_locale, store_locale in locales.items():
         locale = next((l for l in localizations if l['attributes']['locale'] == store_locale), None)
         if locale is None:
             locale = api.call('apple', 'POST', f'{APPLE_BASE}/appStoreVersionLocalizations', json={'data': {
@@ -241,7 +278,7 @@ def upload_apple(api, root, version_string, allow_create):
             }})['data']
         sets = api.call('apple', 'GET', f"{APPLE_BASE}/appStoreVersionLocalizations/{locale['id']}/appScreenshotSets",
                         params={'limit': 200})['data']
-        for device, (display_type, size) in APPLE_DEVICES.items():
+        for device, (display_type, size) in devices.items():
             shot_set = next((s for s in sets if s['attributes']['screenshotDisplayType'] == display_type), None)
             if shot_set is None:
                 shot_set = api.call('apple', 'POST', f'{APPLE_BASE}/appScreenshotSets', json={'data': {
@@ -253,7 +290,7 @@ def upload_apple(api, root, version_string, allow_create):
             existing = api.call('apple', 'GET', f'{APPLE_BASE}/appScreenshotSets/{sid}/appScreenshots',
                                 params={'limit': 200})['data']
             desired = [(path, hashlib.md5(path.read_bytes()).hexdigest())
-                       for path in files(root, device, source_locale, size)]
+                       for path in files(root, device, source_locale, size, count)]
             matches = {}
             for path, checksum in desired:
                 candidates = [s for s in existing if s['attributes']['fileName'] == path.name
@@ -286,7 +323,8 @@ def upload_apple(api, root, version_string, allow_create):
                                    'ids': selected, 'state': 'QUEUED'})
             save(root / 'apple-upload-report.json', report)
         for old_set in sets:
-            if old_set['attributes']['screenshotDisplayType'] in LEGACY_APPLE_DISPLAYS:
+            if (set(devices) == set(LEGACY_APPLE_DEVICES)
+                    and old_set['attributes']['screenshotDisplayType'] in LEGACY_APPLE_DISPLAYS):
                 legacy_sets.append(old_set['id'])
     print(f'Apple queued: {sum(len(item["ids"]) for item in report["sets"])} screenshots; '
           'waiting for processing.', flush=True)
@@ -302,7 +340,9 @@ def upload_apple(api, root, version_string, allow_create):
     print(f'Apple verified: {len(report["sets"])} screenshot sets in editable version {version_string}.', flush=True)
 
 
-def upload_play(api, root, commit):
+def upload_play(api, root, commit, devices=None, locales=None, count=8):
+    devices = PLAY_DEVICES if devices is None else devices
+    locales = PLAY_LOCALES if locales is None else {name: PLAY_LOCALES[name] for name in locales}
     existing_report = root / 'play-upload-report.json'
     if existing_report.exists():
         prior = json.loads(existing_report.read_text())
@@ -316,11 +356,11 @@ def upload_play(api, root, commit):
     listing_languages = {l['language'] for l in api.call('play', 'GET', f'{base}/listings').get('listings', [])}
     report = {'edit': edit, 'committed': False, 'tracksBefore': tracks, 'sets': []}
     save(root / 'play-upload-report.json', report)
-    for source_locale, store_locales in PLAY_LOCALES.items():
+    for source_locale, store_locales in locales.items():
         for locale in store_locales:
             if locale not in listing_languages:
                 raise ValueError(f'Google Play localization {locale} does not exist')
-            for device, (image_type, size) in PLAY_DEVICES.items():
+            for device, (image_type, size) in devices.items():
                 target = f'{base}/listings/{locale}/{image_type}'
                 old = api.call('play', 'GET', target)
                 backup_dir = root / 'backup/play' / locale / image_type
@@ -332,7 +372,7 @@ def upload_play(api, root, commit):
                     (backup_dir / f'{index + 1:02d}.png').write_bytes(response.content)
                 api.call('play', 'DELETE', target)
                 uploaded = []
-                for path in files(root, device, source_locale, size):
+                for path in files(root, device, source_locale, size, count):
                     upload_url = f'https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/{PACKAGE}/edits/{eid}/listings/{locale}/{image_type}'
                     value = api.call('play', 'POST', upload_url, params={'uploadType': 'media'},
                                      headers={'Content-Type': 'image/jpeg'}, data=path.read_bytes())['image']
@@ -388,19 +428,34 @@ def main():
     parser.add_argument('--root', type=Path, default=Path('build/store_screenshots/2026-10-08'))
     parser.add_argument('--credentials', type=Path, default=Path.home() / 'Development/secret')
     parser.add_argument('--version', default='1.6.0')
+    parser.add_argument('--devices', help='Comma-separated devices to validate/upload; defaults to the original devices for the chosen store.')
+    parser.add_argument('--locales', help='Comma-separated source locales to validate/upload.')
+    parser.add_argument('--count', type=int, default=8, help='Expected screenshots per device and locale (default: 8).')
     parser.add_argument('--create-draft', action='store_true')
     parser.add_argument('--commit-play', action='store_true', help='Commit may send the listing changes for review/publishing.')
     args = parser.parse_args()
-    preflight(args.root)
+    if not 1 <= args.count <= 10:
+        parser.error('--count must be between 1 and 10')
+    store = args.action if args.action in {'apple', 'play'} else None
+    devices = select_devices(args.devices, store)
+    locales = select_locales(args.locales)
+    if args.action != 'play-commit':
+        preflight(args.root, devices, locales, args.count)
     if args.action == 'validate':
         return
     api = StoreApi(args.credentials)
     if args.action == 'apple':
-        upload_apple(api, args.root, args.version, args.create_draft)
+        legacy = {name: definition for name, definition in devices.items() if name in LEGACY_APPLE_DEVICES}
+        library = {name: definition for name, definition in devices.items() if name in APPLE_LIBRARY_DEVICES}
+        if legacy:
+            upload_apple(api, args.root, args.version, args.create_draft, legacy, locales, args.count)
+        if library:
+            from apple_library import upload_apple_library
+            upload_apple_library(api, args.root, args.version, args.create_draft, library, locales, args.count)
     elif args.action == 'play-commit':
         commit_play(api, args.root)
     else:
-        upload_play(api, args.root, args.commit_play)
+        upload_play(api, args.root, args.commit_play, devices, locales, args.count)
 
 
 if __name__ == '__main__':

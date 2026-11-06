@@ -1,0 +1,1 @@
+- Compatibilité améliorée : l'installation d'Onlynote ne nécessite plus de mise au point automatique de l'appareil photo ni de microphone. Les fonctions photo et d'enregistrement vocal restent disponibles sur les appareils compatibles.

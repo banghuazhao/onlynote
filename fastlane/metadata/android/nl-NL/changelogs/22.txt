@@ -1,0 +1,1 @@
+- Verbeterde apparaatcompatibiliteit: voor het installeren van Onlynote zijn camera-autofocus en een microfoon niet meer vereist. Foto's en spraakopnamen blijven beschikbaar op ondersteunde apparaten.

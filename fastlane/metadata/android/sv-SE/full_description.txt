@@ -1,0 +1,21 @@
+Onlynote är en app för anteckningar och att göra-listor: för inköp, dagens uppgifter och idéer du vill spara. Inget konto behövs.
+
+Skriv och planera
+Skapa anteckningar och checklistor och lägg till foton. Bocka av punkter efter hand; klara punkter flyttas till slutet av listan. Lägg till en röstinspelning när det är enklare att prata än att skriva.
+
+Ha det viktiga nära
+Lägg till en widget på startskärmen för att se fästa och senaste anteckningar. Öppna en anteckning eller börja på en ny.
+
+Hitta det du sparat
+Ordna anteckningar i mappar och sök efter titel eller innehåll. Fäst viktiga anteckningar och dra korten till den ordning du föredrar.
+
+Gör anteckningarna till dina
+Välj färger, typsnitt, textstorlek och kortstorlek efter hur du vill läsa.
+
+Kom ihåg och dela
+Ställ in en påminnelse för en anteckning. Dela en anteckning som bild när du vill skicka en lista eller idé.
+
+Återställ en raderad anteckning
+Öppna papperskorgen för att återställa en borttagen anteckning eller radera den permanent.
+
+För snabba minnesanteckningar, inköpslistor, dagens uppgifter och anteckningar med foton.

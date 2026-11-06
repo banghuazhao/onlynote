@@ -1,0 +1,1 @@
+- Mejoramos la compatibilidad: ya no necesitas enfoque automático de cámara ni micrófono para instalar Onlynote. Las funciones de fotos y grabación de voz siguen disponibles en dispositivos compatibles.

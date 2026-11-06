@@ -1,0 +1,240 @@
+{
+  "sourceLocale": "en-US",
+  "source": {
+    "header": {
+      "title": "Your day,\nin notes.",
+      "subtitle": "Notes, checklists, and little moments."
+    },
+    "search": {
+      "title": "Notes and lists.\nBeautifully simple.",
+      "subtitle": "Capture ideas. Check off plans."
+    }
+  },
+  "uiCapturePolicy": {
+    "en": "Use English UI for every locale except zh-Hans and zh-Hant.",
+    "zh-Hans": "Use Simplified Chinese UI.",
+    "zh-Hant": "Use Traditional Chinese UI."
+  },
+  "locales": {
+    "da": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Din dag,\ni noter.",
+        "subtitle": "Noter, tjeklister\nog små øjeblikke."
+      },
+      "search": {
+        "title": "Noter og lister.\nSmukt og enkelt.",
+        "subtitle": "Skriv idéer ned.\nKryds opgaver af."
+      }
+    },
+    "de-DE": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Dein Tag.\nIn Notizen.",
+        "subtitle": "Notizen, Checklisten\nund kleine Momente."
+      },
+      "search": {
+        "title": "Notizen und Listen.\nSchön einfach.",
+        "subtitle": "Ideen festhalten.\nAufgaben abhaken."
+      }
+    },
+    "en-AU": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Your day,\nin notes.",
+        "subtitle": "Notes, checklists, and little moments."
+      },
+      "search": {
+        "title": "Notes and lists.\nBeautifully simple.",
+        "subtitle": "Capture ideas. Check off plans."
+      }
+    },
+    "en-CA": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Your day,\nin notes.",
+        "subtitle": "Notes, checklists, and little moments."
+      },
+      "search": {
+        "title": "Notes and lists.\nBeautifully simple.",
+        "subtitle": "Capture ideas. Check off plans."
+      }
+    },
+    "en-GB": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Your day,\nin notes.",
+        "subtitle": "Notes, checklists, and little moments."
+      },
+      "search": {
+        "title": "Notes and lists.\nBeautifully simple.",
+        "subtitle": "Capture ideas. Check off plans."
+      }
+    },
+    "en-US": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Your day,\nin notes.",
+        "subtitle": "Notes, checklists, and little moments."
+      },
+      "search": {
+        "title": "Notes and lists.\nBeautifully simple.",
+        "subtitle": "Capture ideas. Check off plans."
+      }
+    },
+    "es-ES": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Tu día,\nen notas.",
+        "subtitle": "Notas, listas de tareas\ny pequeños momentos."
+      },
+      "search": {
+        "title": "Notas y listas.\nSencillas y bonitas.",
+        "subtitle": "Anota ideas.\nMarca tareas completadas."
+      }
+    },
+    "es-MX": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Tu día,\nen notas.",
+        "subtitle": "Notas, listas de tareas\ny pequeños momentos."
+      },
+      "search": {
+        "title": "Notas y listas.\nSencillas y bonitas.",
+        "subtitle": "Anota ideas.\nMarca tareas completadas."
+      }
+    },
+    "fi": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Päiväsi\nmuistiin.",
+        "subtitle": "Muistiinpanot, listat\nja pienet hetket."
+      },
+      "search": {
+        "title": "Muistiinpanot ja listat.\nKauniin yksinkertaista.",
+        "subtitle": "Kirjaa ideat.\nKuittaa tehtävät."
+      }
+    },
+    "fr-CA": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Vos jours,\nen notes.",
+        "subtitle": "Notes, listes de tâches\net petits moments."
+      },
+      "search": {
+        "title": "Notes et listes.\nUne belle simplicité.",
+        "subtitle": "Notez vos idées.\nCochez vos tâches."
+      }
+    },
+    "fr-FR": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Vos jours,\nen notes.",
+        "subtitle": "Notes, listes de tâches\net petits moments."
+      },
+      "search": {
+        "title": "Notes et listes.\nUne belle simplicité.",
+        "subtitle": "Notez vos idées.\nCochez vos tâches."
+      }
+    },
+    "id": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Harimu,\ncatatanmu.",
+        "subtitle": "Catatan, daftar tugas,\ndan momen kecil."
+      },
+      "search": {
+        "title": "Catatan dan daftar.\nIndah dan sederhana.",
+        "subtitle": "Catat ide. Centang tugas."
+      }
+    },
+    "ja": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "一日を、\nメモに。",
+        "subtitle": "メモ、チェックリスト、\n日々の小さなこと。"
+      },
+      "search": {
+        "title": "メモとリスト\n美しく、\nシンプルに。",
+        "subtitle": "アイデアを残す。\n予定をチェック。"
+      }
+    },
+    "ko": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "당신의 하루를,\n메모로.",
+        "subtitle": "메모, 체크리스트,\n그리고 소소한 순간들."
+      },
+      "search": {
+        "title": "메모와 목록.\n아름답고\n간결하게.",
+        "subtitle": "아이디어를 담고,\n할 일을 체크하세요."
+      }
+    },
+    "ms": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Hari anda,\ndalam nota.",
+        "subtitle": "Nota, senarai semak\ndan detik-detik kecil."
+      },
+      "search": {
+        "title": "Nota dan senarai.\nIndah dan ringkas.",
+        "subtitle": "Catat idea.\nTandakan tugas selesai."
+      }
+    },
+    "nl-NL": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Je dag,\nin notities.",
+        "subtitle": "Notities, checklists\nen kleine momenten."
+      },
+      "search": {
+        "title": "Notities en lijstjes.\nMooi en eenvoudig.",
+        "subtitle": "Leg ideeën vast.\nVink taken af."
+      }
+    },
+    "sv": {
+      "uiCaptureLocale": "en",
+      "header": {
+        "title": "Din dag,\nmed ord.",
+        "subtitle": "Anteckningar, checklistor\noch små ögonblick."
+      },
+      "search": {
+        "title": "Anteckna.\nGör listor.\nVackert.\nEnkelt.",
+        "subtitle": "Fånga idéer.\nBocka av uppgifter."
+      }
+    },
+    "zh-Hans": {
+      "uiCaptureLocale": "zh-Hans",
+      "header": {
+        "title": "你的一天，\n写进备忘录。",
+        "subtitle": "备忘录、待办清单，\n还有生活中的小瞬间。"
+      },
+      "search": {
+        "title": "备忘与清单，\n简约而美。",
+        "subtitle": "记下灵感，勾选待办。"
+      }
+    },
+    "zh-Hant": {
+      "uiCaptureLocale": "zh-Hant",
+      "header": {
+        "title": "你的一天，\n寫進備忘錄。",
+        "subtitle": "備忘錄、待辦清單，\n還有生活中的小片刻。"
+      },
+      "search": {
+        "title": "備忘與清單，\n簡約而美。",
+        "subtitle": "記下靈感，勾選待辦。"
+      }
+    }
+  },
+  "translationNotes": [
+    "English copy is identical across en-AU, en-CA, en-GB and en-US; none of the source words needs regional spelling changes.",
+    "German Schön einfach, French Une belle simplicité, Spanish Sencillas y bonitas, and the corresponding Nordic/Asian phrases adapt Beautifully simple naturally rather than word for word.",
+    "Several search subtitles refer to tasks instead of literally translating plans, which makes checking items off natural in those languages. No additional feature claim is introduced.",
+    "All other-locale UI remains English as requested; localized marketing copy does not imply additional in-app UI languages.",
+    "Header titles were shortened for large two-line typography: Finnish Päiväsi muistiin (note your day), French Vos jours, en notes (your days in notes), Indonesian Harimu, catatanmu (your day, your notes), Japanese 一日を、メモに (a day in notes), and Swedish Din dag, med ord (your day in words).",
+    "Finnish and Swedish search titles remain the longest; preserve whole compound words while fitting actual font metrics.",
+    "Finnish header subtitle uses listat (lists) for the compact checklist reference, keeping large readable type in two lines.",
+    "CJK search copy has deliberate phrase-level breaks to prevent Japanese/Korean word fragments or a Chinese punctuation-only line. Japanese and Korean search headlines use three lines; Chinese shortens 备忘录/備忘錄 to 备忘/備忘 (notes).",
+    "Swedish search title uses four short complete phrases (take notes, make lists, beautiful, simple) to retain large type without splitting Anteckningar."
+  ]
+}

@@ -73,6 +73,12 @@
 - Localized note-reader dates and times, including the device's 12-hour or 24-hour clock preference.
 - Remembered whether completed checklist items are collapsed across notes and launches, while keeping every item visible in exports and search navigation.
 
+## 1.12.0+22
+
+- Added iPhone Duo release support with the iOS 27.1 SDK and screenshots for the outer and inner displays.
+- Kept note-reader content and Find controls clear of side safe areas while folding, unfolding, or rotating the device.
+- Made Android camera autofocus and microphone hardware optional so devices without them can install Onlynote.
+
 ## 1.9.0+19
 
 - Added Export notes to Backup & Restore, saving every note, including archived ones, as one zip of Markdown, plain text, or PDF files — one file per note.

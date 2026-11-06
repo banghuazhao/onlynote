@@ -1,0 +1,1 @@
+- Parannettu laiteyhteensopivuus: Onlynoten asentaminen ei enää edellytä kameran automaattitarkennusta tai mikrofonia. Kuva- ja äänitystoiminnot ovat yhä käytettävissä tuetuilla laitteilla.

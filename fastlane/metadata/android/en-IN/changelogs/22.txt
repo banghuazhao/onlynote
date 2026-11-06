@@ -1,0 +1,1 @@
+- Improved device compatibility: Onlynote no longer requires camera autofocus or a microphone to install. Photo and voice tools remain available on supported devices.

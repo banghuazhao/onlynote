@@ -1,0 +1,21 @@
+Onlynote est une application de notes et de listes de tâches pour les courses, les projets du quotidien et les idées à conserver. Aucun compte nécessaire.
+
+Écrivez et planifiez
+Créez des notes et des listes de tâches, puis ajoutez des photos. Cochez les éléments au fil de vos progrès : ceux qui sont terminés passent en bas de la liste. Ajoutez un enregistrement vocal quand parler est plus simple qu'écrire.
+
+Gardez l'essentiel à portée
+Ajoutez le widget à l'écran d'accueil pour voir vos notes épinglées et récentes. Ouvrez une note ou commencez-en une nouvelle.
+
+Retrouvez vos notes
+Classez-les dans des dossiers et recherchez par titre ou contenu. Épinglez les notes importantes et faites glisser les cartes dans l'ordre qui vous convient.
+
+Donnez-leur votre style
+Choisissez les couleurs, les polices, la taille du texte et celle des cartes selon votre façon de lire.
+
+Pensez-y et partagez
+Définissez un rappel pour une note. Partagez une note sous forme d'image pour envoyer une liste ou une idée.
+
+Récupérez une note supprimée
+Ouvrez la corbeille pour restaurer une note retirée ou la supprimer définitivement.
+
+Pour les mémos rapides, les listes de courses, les tâches du jour et les notes avec photos.

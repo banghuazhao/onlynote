@@ -1,0 +1,1 @@
+- Kompatibilitas perangkat ditingkatkan: Onlynote tidak lagi memerlukan fokus otomatis kamera atau mikrofon untuk dipasang. Fitur foto dan rekaman suara tetap tersedia di perangkat yang mendukungnya.

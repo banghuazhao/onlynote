@@ -1,0 +1,1 @@
+- Verbesserte Gerätekompatibilität: Für die Installation von Onlynote sind kein Kamera-Autofokus und kein Mikrofon mehr erforderlich. Foto- und Sprachaufnahmefunktionen bleiben auf unterstützten Geräten verfügbar.
