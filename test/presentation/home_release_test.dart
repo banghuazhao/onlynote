@@ -343,6 +343,9 @@ void main() {
       await _tap(tester, find.byKey(const ValueKey('home-selection-more')));
       expect(find.text(S.current.Archive_Note), findsOneWidget);
       expect(find.text('${S.current.Delete} (1)'), findsOneWidget);
+      expect(find.text(S.current.Move_To_Folder), findsOneWidget);
+      expect(find.text(S.current.Add_Tags), findsOneWidget);
+      expect(find.text(S.current.Pin), findsOneWidget);
       await _dismissMenu(tester);
       await _tap(tester, find.byTooltip(S.current.Cancel));
 
@@ -355,6 +358,11 @@ void main() {
       await _tap(tester, find.byKey(const ValueKey('home-selection-more')));
       expect(find.text('${S.current.Delete_Forever} (1)'), findsOneWidget);
       expect(find.text(S.current.Restore), findsOneWidget);
+      // Trash holds restore and permanent delete only: organizing a deleted
+      // note would move something the library does not show.
+      expect(find.text(S.current.Move_To_Folder), findsNothing);
+      expect(find.text(S.current.Add_Tags), findsNothing);
+      expect(find.text(S.current.Pin), findsNothing);
       await _tap(tester, find.text(S.current.Restore));
       expect(home.notes.values['trashed']!.isDeleted, isFalse);
       expect(home.selection.state, const MultipleDeleteState.initial());
@@ -698,6 +706,117 @@ void main() {
     expect(find.byType(CardAppearanceScreen), findsNothing);
     expect(home.notes.values['first']!.toDomain().cardStyle.isDefault, isTrue);
     expect(tester.getSize(card('first')).width, 173);
+    expect(tester.takeException(), isNull);
+  });
+  Future<void> selectBoth(WidgetTester tester, _Home home) async {
+    home.selection.add(const MultipleDeleteEvent.toggleSelect('first'));
+    home.selection.add(const MultipleDeleteEvent.toggleSelect('second'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('organize menu moves the whole selection into one folder',
+      (tester) async {
+    final home = await _openHome(tester);
+    await selectBoth(tester, home);
+
+    await _tap(tester, find.byKey(const ValueKey('home-selection-organize')));
+    expect(find.text(S.current.Move_To_Folder), findsOneWidget);
+    expect(find.text(S.current.Add_Tags), findsOneWidget);
+    expect(find.text(S.current.Pin), findsOneWidget);
+    _expectMenuIcons(tester);
+
+    await _tap(tester, find.text(S.current.Move_To_Folder));
+    // Both notes start outside a folder, so No folder is the shared choice.
+    expect(
+        tester
+            .widget<ListTile>(find.byKey(const ValueKey('move-to-folder-none')))
+            .selected,
+        isTrue);
+    await _tap(
+        tester, find.byKey(const ValueKey('move-to-folder-folder-work')));
+
+    expect(home.notes.values['first']!.folderId, 'work');
+    expect(home.notes.values['second']!.folderId, 'work');
+    expect(home.notes.values['trashed']!.folderId, isNull);
+    expect(home.selection.state, const MultipleDeleteState.initial());
+    expect(find.text(S.current.Notes_Moved_Count(2)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('organize menu adds tags to the whole selection',
+      (tester) async {
+    final home = await _openHome(tester);
+    await selectBoth(tester, home);
+
+    await _tap(tester, find.byKey(const ValueKey('home-selection-organize')));
+    await _tap(tester, find.text(S.current.Add_Tags));
+    // Bulk tagging only adds, so the sheet opens with nothing selected.
+    expect(find.byKey(const ValueKey('note-tag-release')), findsNothing);
+    await tester.enterText(
+        find.byKey(const ValueKey('note-tag-input')), 'release');
+    await tester.pumpAndSettle();
+    await _tap(tester, find.byKey(const ValueKey('note-tags-add')));
+    await _tap(tester, find.byKey(const ValueKey('note-tags-save')));
+
+    expect(home.notes.values['first']!.tags, ['release']);
+    expect(home.notes.values['second']!.tags, ['release']);
+    expect(home.notes.values['trashed']!.tags, isEmpty);
+    expect(home.selection.state, const MultipleDeleteState.initial());
+    expect(find.text(S.current.Tags_Added_Count(2)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('organize menu sets and clears the pin for a whole selection',
+      (tester) async {
+    final home = await _openHome(tester);
+    // One note starts pinned: the action must set the whole selection rather
+    // than flip it apart, and must not count a note that needed no write.
+    home.notes.values['first'] = NoteDto.fromNote(
+        home.notes.values['first']!.toDomain().copyWith(isPinned: true));
+    home.bloc.add(const HomeEvent.getAllNotes());
+    await tester.pumpAndSettle();
+    await selectBoth(tester, home);
+
+    await _tap(tester, find.byKey(const ValueKey('home-selection-organize')));
+    expect(find.text(S.current.Unpin), findsNothing);
+    await _tap(tester, find.text(S.current.Pin));
+    expect(home.notes.values['first']!.isPinned, isTrue);
+    expect(home.notes.values['second']!.isPinned, isTrue);
+    expect(home.selection.state, const MultipleDeleteState.initial());
+    expect(find.text(S.current.Notes_Pinned_Count(1)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
+    // An all-pinned selection offers the opposite action, not a flip.
+    await selectBoth(tester, home);
+    await _tap(tester, find.byKey(const ValueKey('home-selection-organize')));
+    expect(find.text(S.current.Pin), findsNothing);
+    await _tap(tester, find.text(S.current.Unpin));
+    expect(home.notes.values['first']!.isPinned, isFalse);
+    expect(home.notes.values['second']!.isPinned, isFalse);
+    expect(find.text(S.current.Notes_Unpinned_Count(2)), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Trash selection offers no organize menu at full width',
+      (tester) async {
+    final home = await _openHome(tester);
+    await _openFolders(tester, 390);
+    await _tap(tester, find.text(S.current.Trash));
+    expect(home.bloc.state.mapOrNull(loaded: (state) => state.showTrash),
+        isTrue);
+    home.selection.add(const MultipleDeleteEvent.toggleSelect('trashed'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('home-selection-organize')), findsNothing);
+    expect(find.byTooltip(S.current.Restore), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 }
