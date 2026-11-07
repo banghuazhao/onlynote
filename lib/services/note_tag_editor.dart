@@ -10,6 +10,7 @@ import 'saved_note_views.dart';
 class TagEditOutcome {
   const TagEditOutcome({
     this.notes = 0,
+    this.libraryNotes = 0,
     this.views = 0,
     this.templates = 0,
     this.notesKept = 0,
@@ -18,6 +19,12 @@ class TagEditOutcome {
 
   /// Notes whose stored tags were rewritten, archived and Trash included.
   final int notes;
+
+  /// The part of [notes] the library lists: archived kept, Trash excluded.
+  /// Manage tags counts a tag's notes the same way, so this is the figure to
+  /// report back — a total including Trash would contradict the count on the
+  /// row the user just tapped.
+  final int libraryNotes;
 
   /// Saved views whose tag criteria were rewritten.
   final int views;
@@ -87,6 +94,7 @@ class NoteTagEditor {
     }
     return TagEditOutcome(
       notes: notes.changed,
+      libraryNotes: notes.changedInLibrary,
       views: views,
       templates: templates,
       notesKept: notes.kept,
@@ -94,9 +102,10 @@ class NoteTagEditor {
     );
   }
 
-  Future<({int changed, int kept})> _rewriteNotes(
+  Future<({int changed, int changedInLibrary, int kept})> _rewriteNotes(
       List<String> Function(List<String> tags) rewrite) async {
     var changed = 0;
+    var changedInLibrary = 0;
     var kept = 0;
     for (final note in _notes.getAllNotes()) {
       if (note.id == null) continue;
@@ -108,10 +117,11 @@ class NoteTagEditor {
         // no edit-history version for metadata the editor never touched.
         await _notes.addUpdateNote(note.copyWith(tags: updated));
         changed++;
+        if (!note.isDeleted) changedInLibrary++;
       } catch (_) {
         kept++;
       }
     }
-    return (changed: changed, kept: kept);
+    return (changed: changed, changedInLibrary: changedInLibrary, kept: kept);
   }
 }

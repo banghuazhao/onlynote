@@ -112,6 +112,9 @@ void main() {
 
     expect(outcome.complete, isTrue);
     expect(outcome.notes, 3);
+    // Manage tags lists a tag's notes without Trash, so the change reports
+    // that scope separately: three rewritten, two of them listed.
+    expect(outcome.libraryNotes, 2);
     expect(notes.writes, ['active', 'archived', 'trashed']);
     expect(notes.saved['active']!.tags, ['Job', 'Research']);
     expect(notes.saved['archived']!.tags, ['Job']);
@@ -154,6 +157,7 @@ void main() {
 
     expect(outcome.complete, isTrue);
     expect(outcome.notes, 3);
+    expect(outcome.libraryNotes, 2);
     expect(notes.saved['active']!.tags, ['Research']);
     expect(notes.saved['archived']!.tags, isEmpty);
     expect(notes.saved['trashed']!.tags, isEmpty);
@@ -211,6 +215,19 @@ void main() {
     expect(outcome.referencesKept, isTrue);
     expect(outcome.complete, isFalse);
     expect(notes.saved['active']!.tags, ['Job', 'Research']);
+  });
+
+  test('a tag only Trash carries counts nothing for the library', () async {
+    notes.saved.remove('active');
+    notes.saved.remove('archived');
+
+    final outcome = await editor().remove('Work');
+
+    // Such a tag is never listed, so this count never reaches a toast. It
+    // stays honest anyway: nothing the library shows lost the tag.
+    expect(outcome.notes, 1);
+    expect(outcome.libraryNotes, 0);
+    expect(notes.saved['trashed']!.tags, isEmpty);
   });
 
   test('a tag no note carries changes nothing', () async {

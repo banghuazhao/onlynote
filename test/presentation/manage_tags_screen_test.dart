@@ -266,6 +266,37 @@ void main() {
     await _drainMessages(tester);
   });
 
+  testWidgets('the rename report counts the same notes the row does',
+      (tester) async {
+    // A tag Trash carries too: three notes are rewritten, while the row
+    // counts the two the library lists. Reporting the total would make the
+    // number look like it changed on its own a second after it was read.
+    notes.saved['trashed'] = NoteDto.fromNote(Note(
+        id: 'trashed',
+        title: 'Dropped',
+        tags: ['Work'],
+        deletedAt: DateTime.utc(2026, 10, 6)));
+    await pump(tester);
+
+    expect(
+        find.descendant(
+            of: _key('managed-tag-work'), matching: find.text('2 notes')),
+        findsOneWidget);
+
+    await _tap(tester, _key('managed-tag-work-menu'));
+    await _tap(tester, find.text('Rename tag').last);
+    await tester.enterText(find.byType(TextField).last, 'Job');
+    await _tap(tester, find.text('OK'));
+
+    // Trash is still rewritten, so restoring the note cannot bring the old
+    // name back. The hint is what says so — the count no longer has to.
+    expect(storedTags('trashed'), ['Job']);
+    expect(find.text('Tag renamed in 2 notes'), findsOneWidget);
+    expect(find.text('Tag renamed in 3 notes'), findsNothing);
+
+    await _drainMessages(tester);
+  });
+
   testWidgets('renaming onto an existing tag asks before merging',
       (tester) async {
     await pump(tester);

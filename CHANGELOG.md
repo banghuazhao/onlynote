@@ -9,6 +9,7 @@
 - Kept notes that already match a bulk change unwritten, and reported notes already holding the tag limit instead of dropping their tags.
 - Reported the notes that gained tags alongside any left at the tag limit, so a part-applied bulk tagging no longer reads as a failure.
 - Showed progress on the tag being renamed or removed, and kept typing in the tag search responsive in a large library.
+- Counted a finished tag rename or removal over the notes Manage tags lists, so the number no longer jumps when Trash also carries the tag.
 
 - Added Markdown file and ZIP import with previews, note selection, local images, supported formatting, Premium limits, and safe partial-import retries.
 - Added unfinished-task search to Today and Undo for task completion, preserving unrelated edits and providing retry feedback.

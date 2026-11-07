@@ -149,7 +149,11 @@ class _ManageTagsScreenState extends State<ManageTagsScreen> {
         context.showToast(strings.Tag_Change_Incomplete, isError: true);
         return;
       }
-      context.showToast(message(strings, outcome.notes));
+      // The row the user tapped counts the tag's notes without Trash, so
+      // report that same scope: a total including Trash reads as the number
+      // changing on its own. Manage_Tags_Hint is what says Trash was
+      // updated too.
+      context.showToast(message(strings, outcome.libraryNotes));
     } catch (_) {
       if (mounted) {
         context.showToast(S.of(context).Tag_Change_Failed, isError: true);
